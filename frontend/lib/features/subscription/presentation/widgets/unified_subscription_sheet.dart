@@ -395,14 +395,14 @@ class _UnifiedSubscriptionSheetState
                 _recommendedTemplateId = null;
               });
             },
-            selectedColor: AppColors.primary.withValues(alpha: 0.15),
+            selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
             labelStyle: AppTypography.bodySmall.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.ink,
+                  isSelected ? AppColors.paperAccent : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           );
         }),
@@ -412,7 +412,7 @@ class _UnifiedSubscriptionSheetState
               _customLessonCount != null &&
               !_lessonCountOptions.contains(_customLessonCount),
           onSelected: (_) => _showCustomLessonCountDialog(),
-          selectedColor: AppColors.primary.withValues(alpha: 0.15),
+          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
           labelStyle: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -468,14 +468,14 @@ class _UnifiedSubscriptionSheetState
                   _customValidityDays = selected ? days : null;
                 });
               },
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected ? AppColors.primary : AppColors.ink,
+                    isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
             );
           }).toList(),
@@ -519,7 +519,7 @@ class _UnifiedSubscriptionSheetState
                   ),
                   side: BorderSide(
                     color:
-                        canSubmit ? AppColors.primary : AppColors.inkQuaternary,
+                        canSubmit ? AppColors.paperAccent : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -530,7 +530,7 @@ class _UnifiedSubscriptionSheetState
                   style: AppTypography.buttonSmall.copyWith(
                     color:
                         canSubmit
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.textDisabledLight,
                   ),
                 ),
@@ -542,7 +542,7 @@ class _UnifiedSubscriptionSheetState
             child: ElevatedButton(
               onPressed: canSubmit ? _onSendProposal : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space3,
@@ -550,7 +550,7 @@ class _UnifiedSubscriptionSheetState
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
-                disabledBackgroundColor: AppColors.primary.withValues(
+                disabledBackgroundColor: AppColors.paperAccent.withValues(
                   alpha: 0.3,
                 ),
               ),
@@ -728,11 +728,11 @@ class _TemplateChip extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isSelected
-                ? AppColors.primary.withValues(alpha: 0.05)
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+          color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -764,7 +764,7 @@ class _TemplateChip extends StatelessWidget {
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
               color:
-                  isSelected ? AppColors.primary : AppColors.ink,
+                  isSelected ? AppColors.paperAccent : AppColors.ink,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -775,7 +775,7 @@ class _TemplateChip extends StatelessWidget {
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
               color:
-                  isSelected ? AppColors.primary : AppColors.inkSecondary,
+                  isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),

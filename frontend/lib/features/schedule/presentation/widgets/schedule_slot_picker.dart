@@ -190,7 +190,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border:
               isSelected
-                  ? Border.all(color: AppColors.primary, width: 1.5)
+                  ? Border.all(color: AppColors.paperAccent, width: 1.5)
                   : null,
         ),
         child: Center(
@@ -206,7 +206,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
   _CellConfig _getCellConfig(_SlotState slotState, bool isSelected) {
     if (isSelected) {
       return const _CellConfig(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         textColor: Colors.white,
         icon: Icons.check,
       );
@@ -215,8 +215,8 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
     switch (slotState) {
       case _SlotState.available:
         return _CellConfig(
-          backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-          textColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccentSoft.withValues(alpha: 0.2),
+          textColor: AppColors.paperAccent,
         );
       case _SlotState.booked:
         return const _CellConfig(

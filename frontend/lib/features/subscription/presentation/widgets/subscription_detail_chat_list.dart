@@ -209,7 +209,7 @@ class _SessionSection extends ConsumerWidget {
                 height: 0.5,
                 color:
                     isSelected
-                        ? AppColors.primary.withValues(alpha: 0.3)
+                        ? AppColors.paperAccent.withValues(alpha: 0.3)
                         : AppColors.inkQuaternary,
               ),
             ),
@@ -223,7 +223,7 @@ class _SessionSection extends ConsumerWidget {
                 style: AppTypography.caption.copyWith(
                   color:
                       isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkTertiary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -235,7 +235,7 @@ class _SessionSection extends ConsumerWidget {
                 height: 0.5,
                 color:
                     isSelected
-                        ? AppColors.primary.withValues(alpha: 0.3)
+                        ? AppColors.paperAccent.withValues(alpha: 0.3)
                         : AppColors.inkQuaternary,
               ),
             ),
@@ -344,7 +344,7 @@ class _SessionSection extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         isTeacher
-                            ? AppColors.primary.withValues(alpha: 0.08)
+                            ? AppColors.paperAccent.withValues(alpha: 0.08)
                             : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
@@ -394,7 +394,7 @@ class _SessionSection extends ConsumerWidget {
         Text(
           changeLabel,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             fontWeight: FontWeight.w600,
           ),
         ),

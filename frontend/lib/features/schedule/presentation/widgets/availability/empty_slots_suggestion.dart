@@ -56,7 +56,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
               const Icon(
                 Icons.calendar_today,
                 size: 18,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -174,7 +174,7 @@ class _SuggestionCard extends StatelessWidget {
                 TextButton(
                   onPressed: onSelect,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: AppColors.paperAccent,
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space3,
                       vertical: AppSpacing.space2,

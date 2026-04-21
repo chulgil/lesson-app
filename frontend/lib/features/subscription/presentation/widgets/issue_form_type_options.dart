@@ -77,17 +77,17 @@ class MonthlyOptionsSection extends StatelessWidget {
                   label: Text('$months개월'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(months),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                  checkmarkColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                  checkmarkColor: AppColors.paperAccent,
                   backgroundColor: AppColors.paper,
                   side: BorderSide(
                     color:
-                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                   ),
                   labelStyle: AppTypography.bodyMedium.copyWith(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -108,17 +108,17 @@ class TrialOptionsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: AppColors.primary),
+          Icon(Icons.info_outline, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
             ),
           ),
         ],

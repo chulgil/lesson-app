@@ -117,13 +117,13 @@ class _StudentProposalAcceptScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
+        color: AppColors.paperAccent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Text(
         '"$message"',
         style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           fontStyle: FontStyle.italic,
         ),
         textAlign: TextAlign.center,
@@ -249,7 +249,7 @@ class _StudentProposalAcceptScreenState
                 vertical: AppSpacing.space1,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
@@ -258,13 +258,13 @@ class _StudentProposalAcceptScreenState
                   const Icon(
                     Icons.copy,
                     size: AppSpacing.iconXS,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Text(
                     '복사',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

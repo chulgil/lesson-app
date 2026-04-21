@@ -83,18 +83,18 @@ class AppliedPolicySection extends StatelessWidget {
         children: [
           Container(
             height: 1,
-            color: AppColors.primary.withValues(alpha: 0.12),
+            color: AppColors.paperAccent.withValues(alpha: 0.12),
           ),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children: [
-              Icon(Icons.rule_rounded, size: 16, color: AppColors.primary),
+              Icon(Icons.rule_rounded, size: 16, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '적용 정책',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ],
@@ -191,9 +191,9 @@ class SubscriptionSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +201,7 @@ class SubscriptionSummaryCard extends StatelessWidget {
           Text(
             '발급 요약',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -235,7 +235,7 @@ class SubscriptionSummaryCard extends StatelessWidget {
               label: '보너스',
               value:
                   '+$bonusLessons회${effectiveBonusReason != null ? ' ($effectiveBonusReason)' : ''}',
-              valueColor: AppColors.primary,
+              valueColor: AppColors.paperAccent,
             ),
 
           // Payment status
@@ -382,9 +382,9 @@ class BatchSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,7 +392,7 @@ class BatchSummaryCard extends StatelessWidget {
           Text(
             '배치 발급 요약',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -429,7 +429,7 @@ class BatchSummaryCard extends StatelessWidget {
             label: '총 예상 금액',
             value: formatWonWithComma(finalAmount * studentCount),
             isBold: true,
-            valueColor: AppColors.primary,
+            valueColor: AppColors.paperAccent,
           ),
 
           // Bonus
@@ -438,7 +438,7 @@ class BatchSummaryCard extends StatelessWidget {
               label: '보너스',
               value:
                   '+$bonusLessons회${effectiveBonusReason != null ? ' ($effectiveBonusReason)' : ''}',
-              valueColor: AppColors.primary,
+              valueColor: AppColors.paperAccent,
             ),
 
           if (startDate != null)

@@ -152,9 +152,9 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -162,13 +162,13 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.autorenew,
               size: 24,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -248,11 +248,11 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? AppColors.primary.withValues(alpha: 0.05)
+                  ? AppColors.paperAccent.withValues(alpha: 0.05)
                   : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -265,7 +265,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                   width: 2,
                 ),
               ),
@@ -277,7 +277,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           height: 12,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       )
@@ -332,7 +332,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
             Text(
               template.formattedPrice,
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w700,
               ),
             ),

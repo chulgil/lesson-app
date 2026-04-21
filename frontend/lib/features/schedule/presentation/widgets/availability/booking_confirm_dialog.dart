@@ -76,7 +76,7 @@ class BookingConfirmDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: AppColors.paperAccent.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Column(
@@ -84,7 +84,7 @@ class BookingConfirmDialog extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.person, size: 16, color: AppColors.primary),
+                    Icon(Icons.person, size: 16, color: AppColors.paperAccent),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       teacherName,
@@ -100,7 +100,7 @@ class BookingConfirmDialog extends StatelessWidget {
                     Icon(
                       Icons.calendar_today,
                       size: 16,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
@@ -112,7 +112,7 @@ class BookingConfirmDialog extends StatelessWidget {
                 const SizedBox(height: AppSpacing.space1),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 16, color: AppColors.primary),
+                    Icon(Icons.access_time, size: 16, color: AppColors.paperAccent),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '$startTime - $endTime',
@@ -198,7 +198,7 @@ class BookingConfirmDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

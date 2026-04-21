@@ -32,7 +32,7 @@ class AvailabilityBlock extends StatelessWidget {
           color: _backgroundColor,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: isSelected ? AppColors.primary : _borderColor,
+            color: isSelected ? AppColors.paperAccent : _borderColor,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -68,7 +68,7 @@ class AvailabilityBlock extends StatelessWidget {
 
   Color get _backgroundColor {
     if (isSelected) {
-      return AppColors.primary.withValues(alpha: 0.15);
+      return AppColors.paperAccent.withValues(alpha: 0.15);
     }
     switch (status) {
       case AvailabilitySlotStatus.available:

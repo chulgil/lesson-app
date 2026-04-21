@@ -155,7 +155,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent,
                   child: Text(
                     studentName.isNotEmpty ? studentName[0] : 'S',
                     style: AppTypography.bodyMedium.copyWith(

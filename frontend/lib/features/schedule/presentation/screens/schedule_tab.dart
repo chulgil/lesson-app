@@ -241,7 +241,7 @@ class ScheduleTab extends ConsumerWidget {
             icon: const Icon(Icons.add),
             tooltip: '레슨 추가',
             style: IconButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               foregroundColor: Colors.white,
             ),
           ),
@@ -277,13 +277,13 @@ class ScheduleTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '오늘',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -320,7 +320,7 @@ class ScheduleTab extends ConsumerWidget {
                             Icon(
                               Icons.check,
                               size: 16,
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             )
                           else
                             const SizedBox(width: AppSpacing.space4),
@@ -709,7 +709,7 @@ class _LessonTimeCard extends ConsumerWidget {
     switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case LessonStatus.completed:
         return AppColors.paperOk;
       case LessonStatus.cancelled:
@@ -824,7 +824,7 @@ class _ViewModeToggle extends StatelessWidget {
                     size: 16,
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkTertiary,
                   ),
                 ),

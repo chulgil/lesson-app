@@ -167,7 +167,7 @@ class _NotePreviewCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusLarge,
                               ),
@@ -175,7 +175,7 @@ class _NotePreviewCard extends StatelessWidget {
                             child: Text(
                               kp,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
                             ),
                           ),

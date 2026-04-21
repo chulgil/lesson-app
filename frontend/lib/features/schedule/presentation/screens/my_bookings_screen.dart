@@ -127,12 +127,12 @@ class MyBookingsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: const Icon(
               Icons.music_note,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               size: 24,
             ),
           ),
@@ -233,7 +233,7 @@ class MyBookingsScreen extends ConsumerWidget {
           color:
               isPast
                   ? AppColors.inkQuaternary
-                  : AppColors.primary.withValues(alpha: 0.3),
+                  : AppColors.paperAccent.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -251,7 +251,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   color:
                       isPast
                           ? AppColors.paper
-                          : AppColors.primary.withValues(alpha: 0.1),
+                          : AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
@@ -260,7 +260,7 @@ class MyBookingsScreen extends ConsumerWidget {
                     color:
                         isPast
                             ? AppColors.inkSecondary
-                            : AppColors.primary,
+                            : AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -315,11 +315,11 @@ class MyBookingsScreen extends ConsumerWidget {
                     icon: const Icon(Icons.swap_horiz, size: 18),
                     label: const Text('변경'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
+                      foregroundColor: AppColors.paperAccent,
                       side: BorderSide(
                         color:
                             canReschedule
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                       ),
                       padding: const EdgeInsets.symmetric(

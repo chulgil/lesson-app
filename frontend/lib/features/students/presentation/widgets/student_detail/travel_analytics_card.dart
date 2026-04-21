@@ -36,7 +36,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
                     Icon(
                       Icons.directions_car_outlined,
                       size: 18,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
@@ -82,7 +82,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
       ],

@@ -95,7 +95,7 @@ class UnifiedRequestCard extends StatelessWidget {
             color:
                 request.type == LessonRequestType.trial
                     ? AppColors.paperDark
-                    : AppColors.primaryLight.withValues(alpha: 0.2),
+                    : AppColors.paperAccentSoft.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
@@ -104,7 +104,7 @@ class UnifiedRequestCard extends StatelessWidget {
               color:
                   request.type == LessonRequestType.trial
                       ? AppColors.ink
-                      : AppColors.primary,
+                      : AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -182,7 +182,7 @@ class UnifiedRequestCard extends StatelessWidget {
                     size: 14,
                     color:
                         slot.priority == 1
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space1),
@@ -191,7 +191,7 @@ class UnifiedRequestCard extends StatelessWidget {
                     style: AppTypography.caption.copyWith(
                       color:
                           slot.priority == 1
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                       fontWeight:
                           slot.priority == 1
@@ -460,7 +460,7 @@ class UnifiedRequestCard extends StatelessWidget {
         AppColors.paperDark,
       ),
       UnifiedRequestStatus.negotiating => (AppColors.ink, AppColors.paperDark),
-      _ => (AppColors.primary, AppColors.primaryLight),
+      _ => (AppColors.paperAccent, AppColors.paperAccentSoft),
     };
 
     return Container(
@@ -521,7 +521,7 @@ class _AlternativeSlotCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(Icons.access_time, size: 16, color: AppColors.primary),
+              Icon(Icons.access_time, size: 16, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${slot.dayLabel}요일 ${slot.startTime} - ${slot.endTime}',
@@ -534,7 +534,7 @@ class _AlternativeSlotCard extends StatelessWidget {
                 Text(
                   '선택',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

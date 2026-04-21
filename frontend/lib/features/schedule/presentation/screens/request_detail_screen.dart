@@ -382,7 +382,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     decoration: BoxDecoration(
                       color:
                           request.type == LessonRequestType.trial
-                              ? AppColors.primary.withValues(alpha: 0.04)
+                              ? AppColors.paperAccent.withValues(alpha: 0.04)
                               : AppColors.paperDark,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
@@ -391,7 +391,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                           request.type == LessonRequestType.trial
                               ? Border(
                                 left: BorderSide(
-                                  color: AppColors.primary,
+                                  color: AppColors.paperAccent,
                                   width: 3,
                                 ),
                               )
@@ -408,7 +408,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                             child: Text(
                               AppStrings.studentMessage,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

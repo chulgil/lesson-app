@@ -170,7 +170,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                             style: AppTypography.caption.copyWith(
                               color:
                                   isToday
-                                      ? AppColors.primary
+                                      ? AppColors.paperAccent
                                       : AppColors.inkSecondary,
                               fontWeight: isToday ? FontWeight.bold : null,
                             ),
@@ -180,7 +180,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                             style: AppTypography.caption.copyWith(
                               color:
                                   isToday
-                                      ? AppColors.primary
+                                      ? AppColors.paperAccent
                                       : AppColors.inkTertiary,
                             ),
                           ),
@@ -379,9 +379,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.2),
+          color: AppColors.paperAccent.withValues(alpha: 0.2),
           border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.5),
+            color: AppColors.paperAccent.withValues(alpha: 0.5),
             width: 0.5,
           ),
         ),
@@ -389,7 +389,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
           child: Text(
             ['❶', '❷', '❸'][suggestedIndex.clamp(0, 2)],
             style: AppTypography.captionSmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.bold,
             ),
           ),

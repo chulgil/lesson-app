@@ -43,7 +43,7 @@ class LocationSummaryCard extends ConsumerWidget {
                 Icon(
                   Icons.location_on_outlined,
                   size: 18,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
@@ -127,7 +127,7 @@ class LocationSummaryCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
@@ -136,13 +136,13 @@ class LocationSummaryCard extends ConsumerWidget {
           Icon(
             Icons.directions_car_outlined,
             size: 14,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             '이동 $travelTime분',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w500,
             ),
           ),

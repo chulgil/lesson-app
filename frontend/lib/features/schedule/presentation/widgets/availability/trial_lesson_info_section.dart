@@ -50,14 +50,14 @@ class TrialLessonInfoSection extends StatelessWidget {
               label: Text(goal.label),
               selected: isSelected,
               onSelected: (_) => onGoalChanged(goal),
-              selectedColor: AppColors.primary,
+              selectedColor: AppColors.paperAccent,
               backgroundColor: AppColors.paper,
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: isSelected ? Colors.white : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -85,14 +85,14 @@ class TrialLessonInfoSection extends StatelessWidget {
               label: Text(level.label),
               selected: isSelected,
               onSelected: (_) => onExperienceChanged(level),
-              selectedColor: AppColors.primary,
+              selectedColor: AppColors.paperAccent,
               backgroundColor: AppColors.paper,
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: isSelected ? Colors.white : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -140,7 +140,7 @@ class TrialLessonInfoSection extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.paperAccent, width: 1.5),
             ),
             contentPadding: const EdgeInsets.all(AppSpacing.space3),
             counterStyle: AppTypography.caption.copyWith(

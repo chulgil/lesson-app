@@ -71,11 +71,11 @@ class ProposalChatCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isRecommended
-              ? AppColors.primary.withValues(alpha: 0.06)
+              ? AppColors.paperAccent.withValues(alpha: 0.06)
               : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: isRecommended ? AppColors.primary : AppColors.inkQuaternary,
+            color: isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isRecommended ? 1.5 : 1,
           ),
         ),

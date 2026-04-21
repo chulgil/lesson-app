@@ -111,7 +111,7 @@ class SessionProgressBar extends StatelessWidget {
 
     final Color color;
     if (isCompleted) {
-      color = AppColors.primary;
+      color = AppColors.paperAccent;
     } else if (isEmpty) {
       color = AppColors.inkQuaternary.withValues(alpha: 0.4);
     } else {
@@ -221,7 +221,7 @@ class _SessionDot extends StatelessWidget {
           width: SessionProgressBar._dotSize,
           height: SessionProgressBar._dotSize,
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.check, size: 12, color: Colors.white),
@@ -237,14 +237,14 @@ class _SessionDot extends StatelessWidget {
               height: SessionProgressBar._ringSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primaryLight, width: 2),
+                border: Border.all(color: AppColors.paperAccentSoft, width: 2),
               ),
             ),
             Container(
               width: SessionProgressBar._dotSize,
               height: SessionProgressBar._dotSize,
               decoration: const BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 shape: BoxShape.circle,
               ),
             ),
@@ -268,9 +268,9 @@ class _SessionDot extends StatelessWidget {
     switch (state) {
       case _SessionState.completed:
       case _SessionState.scheduled:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case _SessionState.future:
-        return isSelected ? AppColors.primary : AppColors.inkTertiary;
+        return isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
     }
   }
 }

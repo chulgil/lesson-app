@@ -47,7 +47,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddTemplateDialog(context, ref),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(
           '수강권 추가',
@@ -113,7 +113,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
               onPressed: () => _showAddTemplateDialog(context, ref),
               icon: const Icon(Icons.add),
               label: const Text('첫 수강권 만들기'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
             ),
           ],
         ),
@@ -491,7 +491,7 @@ class _DetailChip extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isActive
-                ? AppColors.primary.withValues(alpha: 0.1)
+                ? AppColors.paperAccent.withValues(alpha: 0.1)
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
@@ -501,13 +501,13 @@ class _DetailChip extends StatelessWidget {
           Icon(
             icon,
             size: 14,
-            color: isActive ? AppColors.primary : AppColors.inkTertiary,
+            color: isActive ? AppColors.paperAccent : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: isActive ? AppColors.primary : AppColors.inkTertiary,
+              color: isActive ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
           ),
         ],
@@ -732,7 +732,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                 child: FilledButton(
                   onPressed: _isSaving ? null : _save,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
                     ),

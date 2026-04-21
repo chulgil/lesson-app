@@ -33,7 +33,7 @@ class SubscriptionChapterInfo extends StatelessWidget {
             _buildRow(
               AppStrings.discount,
               '-${formatNumberWithComma(subscription.discountAmount!)}${AppStrings.wonUnit} (${subscription.discountReason ?? ""})',
-              valueColor: AppColors.primary,
+              valueColor: AppColors.paperAccent,
             ),
           if (subscription.startDate != null)
             _buildRow(

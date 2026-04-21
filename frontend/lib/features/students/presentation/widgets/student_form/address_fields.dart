@@ -57,8 +57,8 @@ class AddressFields extends StatelessWidget {
                   icon: const Icon(Icons.search, size: AppSpacing.iconSM),
                   label: const Text('주소 검색'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
+                    foregroundColor: AppColors.paperAccent,
+                    side: const BorderSide(color: AppColors.paperAccent),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMedium),

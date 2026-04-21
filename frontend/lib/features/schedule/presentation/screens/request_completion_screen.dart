@@ -185,11 +185,11 @@ class RequestCompletionScreen extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary : AppColors.paper,
+                  color: isActive ? AppColors.paperAccent : AppColors.paper,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isActive
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.scheduleMutedAccent,
                     width: 2,
                   ),
@@ -211,7 +211,7 @@ class RequestCompletionScreen extends StatelessWidget {
                   width: 2,
                   height: 36,
                   color: isActive
-                      ? AppColors.primary.withValues(alpha: 0.3)
+                      ? AppColors.paperAccent.withValues(alpha: 0.3)
                       : AppColors.scheduleMutedAccent.withValues(alpha: 0.3),
                 ),
             ],
@@ -230,7 +230,7 @@ class RequestCompletionScreen extends StatelessWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: isActive
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkSecondary,
                   ),
                 ),
@@ -295,7 +295,7 @@ class RequestCompletionScreen extends StatelessWidget {
                     Text(
                       '${slot.priority}순위',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -376,7 +376,7 @@ class RequestCompletionScreen extends StatelessWidget {
           context.go(AppRoutes.home);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccent,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(

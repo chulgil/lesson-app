@@ -160,7 +160,7 @@ class _ScheduleChangeResponseBottomSheetState
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeightSmall,
                         ),
-                        side: const BorderSide(color: AppColors.primary),
+                        side: const BorderSide(color: AppColors.paperAccent),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
@@ -170,7 +170,7 @@ class _ScheduleChangeResponseBottomSheetState
                       child: Text(
                         AppStrings.scheduleChangeCounter,
                         style: AppTypography.buttonSmall.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     ),
@@ -184,7 +184,7 @@ class _ScheduleChangeResponseBottomSheetState
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeightSmall,
                         ),
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
@@ -224,10 +224,10 @@ class _ScheduleChangeResponseBottomSheetState
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? AppColors.primary.withValues(alpha: 0.08)
+                  ? AppColors.paperAccent.withValues(alpha: 0.08)
                   : AppColors.paperDark,
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
@@ -237,7 +237,7 @@ class _ScheduleChangeResponseBottomSheetState
               isSelected
                   ? Icons.radio_button_checked
                   : Icons.radio_button_unchecked,
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               size: 20,
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -246,7 +246,7 @@ class _ScheduleChangeResponseBottomSheetState
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color:
-                    isSelected ? AppColors.primary : AppColors.ink,
+                    isSelected ? AppColors.paperAccent : AppColors.ink,
               ),
             ),
           ],

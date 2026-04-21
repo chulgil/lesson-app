@@ -34,15 +34,15 @@ class RegularLessonStudentInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: AppColors.paperAccent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
             child: Text(
               studentName[0],
               style: AppTypography.headingSmall.copyWith(color: Colors.white),
@@ -120,9 +120,9 @@ class RegularLessonDurationSelector extends StatelessWidget {
             }
           },
           backgroundColor: AppColors.paper,
-          selectedColor: AppColors.primary,
+          selectedColor: AppColors.paperAccent,
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
             color: isSelected ? Colors.white : AppColors.ink,
@@ -220,14 +220,14 @@ class DayButton extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary
+              ? AppColors.paperAccent
               : isAvailable
                   ? AppColors.paper
                   : AppColors.paperDark,
           shape: BoxShape.circle,
           border: Border.all(
             color: isSelected
-                ? AppColors.primary
+                ? AppColors.paperAccent
                 : isAvailable
                     ? AppColors.inkQuaternary
                     : Colors.transparent,
@@ -325,13 +325,13 @@ class RegularLessonTimeSelector extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   '${formatTimeOfDay(daySlot.startTime)}-${formatTimeOfDay(daySlot.endTime)} 가능',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),
@@ -449,7 +449,7 @@ class OptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isSelected
-          ? AppColors.primary.withValues(alpha: 0.1)
+          ? AppColors.paperAccent.withValues(alpha: 0.1)
           : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
@@ -460,7 +460,7 @@ class OptionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -471,7 +471,7 @@ class OptionCard extends StatelessWidget {
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color:
-                      isSelected ? AppColors.primary : AppColors.ink,
+                      isSelected ? AppColors.paperAccent : AppColors.ink,
                 ),
               ),
               Text(
@@ -516,12 +516,12 @@ class RegularLessonFeeSelector extends StatelessWidget {
             if (selected) onFeeChanged(fees[index]);
           },
           backgroundColor: AppColors.paper,
-          selectedColor: AppColors.primary.withValues(alpha: 0.15),
+          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.ink,
+            color: isSelected ? AppColors.paperAccent : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         );
@@ -555,7 +555,7 @@ class RegularLessonStartDateSelector extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: AppColors.primary),
+            Icon(Icons.calendar_today, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
@@ -605,9 +605,9 @@ class RegularLessonSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: AppColors.paperAccent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -643,7 +643,7 @@ class RegularLessonSummary extends StatelessWidget {
               Text(
                 formatFee(monthlyFee),
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ],
@@ -753,7 +753,7 @@ class FirstMonthFeeSection extends StatelessWidget {
                         formatFee(prorated.proratedFee),
                         style: AppTypography.bodyLarge.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                       Text(

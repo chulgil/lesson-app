@@ -251,7 +251,7 @@ class _AllLessonRequestsScreenState
     required int count,
     required bool isSelected,
   }) {
-    final color = isSelected ? AppColors.primary : AppColors.inkTertiary;
+    final color = isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
     final displayLabel = count > 0 ? '$label $count' : label;
 
     return GestureDetector(
@@ -266,7 +266,7 @@ class _AllLessonRequestsScreenState
             height: 20,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? AppColors.primary : Colors.transparent,
+              color: isSelected ? AppColors.paperAccent : Colors.transparent,
               border: Border.all(color: color, width: isSelected ? 2 : 1.5),
             ),
             child:
@@ -280,7 +280,7 @@ class _AllLessonRequestsScreenState
             displayLabel,
             style: AppTypography.captionSmall.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.inkTertiary,
+                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -487,10 +487,10 @@ class _AllLessonRequestsScreenState
           vertical: AppSpacing.space1,
         ),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.paper,
+          color: selected ? AppColors.paperAccent : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.inkQuaternary,
+            color: selected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Row(

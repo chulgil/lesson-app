@@ -171,7 +171,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             child: _SummaryStatCard(
               label: AppStrings.summaryActive,
               count: activeCount,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),

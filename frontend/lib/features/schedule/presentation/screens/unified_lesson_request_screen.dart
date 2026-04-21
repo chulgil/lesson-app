@@ -158,11 +158,11 @@ class _UnifiedLessonRequestScreenState
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
             child: const Icon(
               Icons.person,
               size: 32,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space4),
@@ -232,22 +232,22 @@ class _UnifiedLessonRequestScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.15),
+          color: AppColors.paperAccent.withValues(alpha: 0.15),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.primary),
+          const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               message,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 height: 1.4,
               ),
             ),
@@ -281,7 +281,7 @@ class _UnifiedLessonRequestScreenState
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return AppColors.primary;
+              return AppColors.paperAccent;
             }
             return AppColors.paper;
           }),
@@ -322,15 +322,15 @@ class _UnifiedLessonRequestScreenState
                 _selectedInstrument = selected ? instrument : null;
               });
             },
-            selectedColor: AppColors.primary.withValues(alpha: 0.2),
+            selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
             backgroundColor: AppColors.paper,
             labelStyle: AppTypography.bodyMedium.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.ink,
+                  isSelected ? AppColors.paperAccent : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           );
         }).toList(),
@@ -359,7 +359,7 @@ class _UnifiedLessonRequestScreenState
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
           ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
@@ -407,7 +407,7 @@ class _UnifiedLessonRequestScreenState
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return AppColors.primary;
+              return AppColors.paperAccent;
             }
             return AppColors.paper;
           }),
@@ -533,7 +533,7 @@ class _UnifiedLessonRequestScreenState
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
           ),
         ),
       ),
@@ -605,13 +605,13 @@ class _UnifiedLessonRequestScreenState
             : const Icon(Icons.send),
         label: Text(_isSubmitting ? AppStrings.submittingRequest : AppStrings.submitRequest),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccent,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          disabledBackgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -752,7 +752,7 @@ class _SectionWrapper extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.primary),
+            Icon(icon, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(title, style: AppTypography.headingSmall),
             if (isRequired)

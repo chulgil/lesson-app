@@ -355,7 +355,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),
@@ -431,7 +431,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               const Icon(
                 Icons.chat_bubble_outline,
                 size: 16,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space2),
               TextButton(
@@ -439,7 +439,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 child: Text(
                   '선생님에게 문의하기',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -604,8 +604,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                       icon: const Icon(Icons.phone, size: 18),
                       label: const Text('전화하기'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
+                        foregroundColor: AppColors.paperAccent,
+                        side: const BorderSide(color: AppColors.paperAccent),
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space3,
                         ),

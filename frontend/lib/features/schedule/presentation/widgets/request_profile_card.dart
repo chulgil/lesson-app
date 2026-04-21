@@ -44,7 +44,7 @@ class RequestProfileCard extends StatelessWidget {
       children: [
         _buildTopInfoRow(urgent),
         const SizedBox(height: AppSpacing.space3),
-        _buildStudentInfoRow(studentName, AppColors.primary),
+        _buildStudentInfoRow(studentName, AppColors.paperAccent),
       ],
     );
   }
@@ -56,7 +56,7 @@ class RequestProfileCard extends StatelessWidget {
       children: [
         _buildTopInfoRow(urgent),
         const SizedBox(height: AppSpacing.space3),
-        _buildStudentInfoRow(studentName, AppColors.primary),
+        _buildStudentInfoRow(studentName, AppColors.paperAccent),
         if (student != null) ...[
           const SizedBox(height: AppSpacing.space3),
           Row(
@@ -212,7 +212,7 @@ class RequestProfileCard extends StatelessWidget {
     final typeColor =
         request.type == LessonRequestType.trial
             ? AppColors.ink
-            : AppColors.primary;
+            : AppColors.paperAccent;
 
     return Container(
       padding: const EdgeInsets.symmetric(

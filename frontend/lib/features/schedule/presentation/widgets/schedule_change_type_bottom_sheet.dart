@@ -103,10 +103,10 @@ class _ChangeTypeCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 24),
+                child: Icon(icon, color: AppColors.paperAccent, size: 24),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(

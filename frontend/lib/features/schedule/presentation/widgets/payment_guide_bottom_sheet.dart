@@ -178,7 +178,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
               child: FilledButton(
                 onPressed: _isValid ? _submit : null,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
@@ -210,10 +210,10 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.paper,
+          color: selected ? AppColors.paperAccent : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.inkQuaternary,
+            color: selected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Center(

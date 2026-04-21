@@ -449,7 +449,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             Text(
               _getContextLine(),
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
               maxLines: 1,

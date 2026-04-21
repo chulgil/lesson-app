@@ -132,7 +132,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Text(title, style: AppTypography.headingSmall),
       ],
@@ -292,7 +292,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: AppColors.primary,
+          activeThumbColor: AppColors.paperAccent,
         ),
       ],
     );
@@ -302,9 +302,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +312,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
           Text(
             '📋 정책 요약',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -455,7 +455,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('정책이 저장되었습니다'),
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
         context.pop();

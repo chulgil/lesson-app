@@ -146,7 +146,7 @@ class _BookingRescheduleScreenState
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              const Icon(Icons.event, size: 20, color: AppColors.primary),
+              const Icon(Icons.event, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 _formatCurrentBooking(),
@@ -288,12 +288,12 @@ class _BookingRescheduleScreenState
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -409,7 +409,7 @@ class _BookingRescheduleScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
+              color: AppColors.paperAccent.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
@@ -417,14 +417,14 @@ class _BookingRescheduleScreenState
                 const Icon(
                   Icons.arrow_forward,
                   size: 20,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '변경 후: ${_selectedSlot!.formattedDate} ${_selectedSlot!.formattedStartTime}',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -443,7 +443,7 @@ class _BookingRescheduleScreenState
                       ? () => _handleReschedule(isLastChance)
                       : null,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
                 ),

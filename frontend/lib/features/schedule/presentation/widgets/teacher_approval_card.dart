@@ -158,11 +158,11 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
           child: Text(
             booking.studentName.isNotEmpty ? booking.studentName[0] : '?',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
         ),
@@ -233,10 +233,10 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           width: 2,
         ),
       ),
@@ -309,7 +309,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             onPressed: canApprove ? widget.onApprove : null,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor:
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
@@ -404,13 +404,13 @@ class TeacherApprovalListItem extends StatelessWidget {
               // Student avatar
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 child: Text(
                   booking.studentName.isNotEmpty
                       ? booking.studentName[0]
                       : '?',
                   style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),

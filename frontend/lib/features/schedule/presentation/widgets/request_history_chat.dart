@@ -174,7 +174,7 @@ class RequestHistoryChat extends StatelessWidget {
                   decoration: BoxDecoration(
                     // Color by role (not viewer): teacher=primary, student=secondary
                     color: event.actorType == ProposerRole.teacher
-                        ? AppColors.primary.withValues(alpha: 0.08)
+                        ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),

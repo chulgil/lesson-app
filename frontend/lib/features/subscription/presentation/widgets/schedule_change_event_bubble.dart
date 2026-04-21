@@ -95,7 +95,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: isMyMessage
-                        ? AppColors.primary.withValues(alpha: 0.08)
+                        ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
@@ -370,7 +370,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: i == 0
-                        ? AppColors.primary.withValues(alpha: 0.12)
+                        ? AppColors.paperAccent.withValues(alpha: 0.12)
                         : AppColors.scheduleMutedBackground,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusSmall),
@@ -379,7 +379,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                     AppStrings.slotPriority(i + 1),
                     style: AppTypography.caption.copyWith(
                       color: i == 0
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),

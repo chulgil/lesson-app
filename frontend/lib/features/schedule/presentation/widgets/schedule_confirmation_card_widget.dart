@@ -141,11 +141,11 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
             child: Text(
               card.teacherName.isNotEmpty ? card.teacherName[0] : '?',
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -232,12 +232,12 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: isRecommended
-            ? AppColors.primary.withValues(alpha: 0.08)
+            ? AppColors.paperAccent.withValues(alpha: 0.08)
             : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isRecommended
-              ? AppColors.primary.withValues(alpha: 0.3)
+              ? AppColors.paperAccent.withValues(alpha: 0.3)
               : AppColors.inkQuaternary,
         ),
       ),
@@ -247,10 +247,10 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
+                color: AppColors.paperAccent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Icon(Icons.star, color: AppColors.primary, size: 16),
+              child: Icon(Icons.star, color: AppColors.paperAccent, size: 16),
             )
           else
             Container(
@@ -274,7 +274,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                   Text(
                     _getScheduleTypeLabel(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w500,
                         ),
                   ),

@@ -28,10 +28,10 @@ class SubscriptionIssuedCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
+        color: AppColors.paperAccent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.15),
+          color: AppColors.paperAccent.withValues(alpha: 0.15),
         ),
       ),
       child: Column(
@@ -42,7 +42,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
             '\u{1F3B5} ${AppStrings.subscriptionIssuedMessage}',
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -121,7 +121,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
               height: 1,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: AppColors.paperAccent.withValues(alpha: 0.3),
                 ),
               ),
             );

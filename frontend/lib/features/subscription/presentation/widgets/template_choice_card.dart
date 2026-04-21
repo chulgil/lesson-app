@@ -36,7 +36,7 @@ class TemplateChoiceCard extends StatelessWidget {
         color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isRecommended ? AppColors.primary : AppColors.inkQuaternary,
+          color: isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isRecommended ? 2 : 1,
         ),
       ),
@@ -53,7 +53,7 @@ class TemplateChoiceCard extends StatelessWidget {
                     vertical: AppSpacing.space1,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
@@ -103,7 +103,7 @@ class TemplateChoiceCard extends StatelessWidget {
               '회당 ${formatWonWithComma(unitPrice)}',
               style: AppTypography.bodySmall.copyWith(
                 color: isRecommended
-                    ? AppColors.primary
+                    ? AppColors.paperAccent
                     : AppColors.inkTertiary,
                 fontWeight:
                     isRecommended ? FontWeight.w600 : FontWeight.w400,
@@ -122,7 +122,7 @@ class TemplateChoiceCard extends StatelessWidget {
                 onPressed: isProcessing ? null : onAccept,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isRecommended
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.paperDark,
                   foregroundColor:
                       isRecommended ? Colors.white : AppColors.ink,

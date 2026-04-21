@@ -168,13 +168,13 @@ class TimelineLessonBlock extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         '$minutesUntilNext분 후',
         style: AppTypography.captionSmall.copyWith(
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           fontWeight: FontWeight.w600,
         ),
       ),

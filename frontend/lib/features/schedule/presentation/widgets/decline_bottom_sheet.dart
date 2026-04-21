@@ -133,7 +133,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeightSmall,
                         ),
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,

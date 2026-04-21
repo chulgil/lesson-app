@@ -105,13 +105,13 @@ class ProposalHeaderCard extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.card_giftcard,
               size: 32,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -205,9 +205,9 @@ class ProposalMessageCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,13 +217,13 @@ class ProposalMessageCard extends StatelessWidget {
               const Icon(
                 Icons.chat_bubble_outline,
                 size: 18,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '선생님 메시지',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -327,7 +327,7 @@ class ProposalDiscountCard extends StatelessWidget {
               Text(
                 _formatPrice(discountedPrice),
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -400,7 +400,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
               const Icon(
                 Icons.account_balance,
                 size: 18,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
@@ -438,7 +438,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                             Icon(
                               Icons.check,
                               size: 16,
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             )
                           else
                             const SizedBox(width: AppSpacing.space4),
@@ -452,7 +452,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
@@ -461,12 +461,12 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
             Text(
               '계좌 변경',
               style: AppTypography.caption.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(width: 2),
-            Icon(Icons.arrow_drop_down, size: 16, color: AppColors.primary),
+            Icon(Icons.arrow_drop_down, size: 16, color: AppColors.paperAccent),
           ],
         ),
       ),
@@ -523,13 +523,13 @@ class _PaymentInfoRow extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.paperAccent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '복사',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

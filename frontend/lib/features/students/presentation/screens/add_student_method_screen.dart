@@ -90,11 +90,11 @@ class _MethodCard extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isPrimary
-                ? AppColors.primary.withValues(alpha: 0.05)
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isPrimary ? AppColors.primary : AppColors.inkQuaternary,
+          color: isPrimary ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isPrimary ? 1.5 : 1,
         ),
       ),
@@ -111,7 +111,7 @@ class _MethodCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isPrimary
-                            ? AppColors.primary.withValues(alpha: 0.15)
+                            ? AppColors.paperAccent.withValues(alpha: 0.15)
                             : AppColors.paperDark,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
@@ -122,7 +122,7 @@ class _MethodCard extends StatelessWidget {
                     size: 24,
                     color:
                         isPrimary
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                   ),
                 ),
@@ -133,7 +133,7 @@ class _MethodCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color:
                         isPrimary
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.ink,
                   ),
                 ),
@@ -145,7 +145,7 @@ class _MethodCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -184,8 +184,8 @@ class _MethodCard extends StatelessWidget {
                       : OutlinedButton(
                         onPressed: onTap,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary),
+                          foregroundColor: AppColors.paperAccent,
+                          side: const BorderSide(color: AppColors.paperAccent),
                         ),
                         child: Text(buttonText),
                       ),

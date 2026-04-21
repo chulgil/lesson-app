@@ -63,7 +63,7 @@ class ChipInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipColor = selectedColor ?? AppColors.primary;
+    final chipColor = selectedColor ?? AppColors.paperAccent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

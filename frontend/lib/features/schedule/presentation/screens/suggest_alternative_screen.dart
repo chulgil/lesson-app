@@ -510,7 +510,7 @@ class _SuggestAlternativeScreenState
             onPressed: _suggestedSlots.isNotEmpty ? _submitPropose : null,
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -661,10 +661,10 @@ class _SuggestAlternativeScreenState
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.05),
+                  color: AppColors.paperAccent.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
+                    color: AppColors.paperAccent.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -672,7 +672,7 @@ class _SuggestAlternativeScreenState
                     Text(
                       ['❶', '❷', '❸'][index.clamp(0, 2)],
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -900,7 +900,7 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
                 minimumSize: const Size.fromHeight(
                   AppSpacing.buttonHeightSmall,
                 ),
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),

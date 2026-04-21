@@ -239,7 +239,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
             onPressed: _canGoPrev ? _goToPrevWeek : null,
             icon: const Icon(Icons.chevron_left),
             iconSize: 24,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             disabledColor: AppColors.scheduleMutedAccent,
           ),
           Text(
@@ -252,7 +252,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
             onPressed: _canGoNext ? _goToNextWeek : null,
             icon: const Icon(Icons.chevron_right),
             iconSize: 24,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             disabledColor: AppColors.scheduleMutedAccent,
           ),
         ],
@@ -286,7 +286,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                       fontWeight: FontWeight.w600,
                       color:
                           isToday
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                     ),
                   ),
@@ -297,7 +297,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                     decoration:
                         isToday
                             ? const BoxDecoration(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                               shape: BoxShape.circle,
                             )
                             : null,
@@ -408,10 +408,10 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
       child: Container(
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.08),
+          color: AppColors.paperAccent.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.2),
+            color: AppColors.paperAccent.withValues(alpha: 0.2),
             width: 0.5,
           ),
         ),
@@ -439,13 +439,13 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   Color _priorityColor(int priority) {
     switch (priority) {
       case 1:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case 2:
-        return AppColors.primaryLight;
+        return AppColors.paperAccentSoft;
       case 3:
-        return AppColors.primaryLight.withValues(alpha: 0.7);
+        return AppColors.paperAccentSoft.withValues(alpha: 0.7);
       default:
-        return AppColors.primary;
+        return AppColors.paperAccent;
     }
   }
 
@@ -472,7 +472,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                   '${slot.priority}순위: ',
                   style: AppTypography.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 Expanded(child: Text(label, style: AppTypography.bodySmall)),

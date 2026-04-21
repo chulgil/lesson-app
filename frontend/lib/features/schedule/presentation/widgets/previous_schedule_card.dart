@@ -102,7 +102,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.schedule,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         size: 24,
                       ),
                       const SizedBox(width: AppSpacing.space3),

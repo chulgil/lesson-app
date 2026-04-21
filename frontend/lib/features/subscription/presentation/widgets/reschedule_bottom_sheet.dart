@@ -200,7 +200,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, size: 20, color: AppColors.primary),
+            Icon(Icons.calendar_today, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space3),
             Text(
               _selectedDate != null
@@ -238,7 +238,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         ),
         child: Row(
           children: [
-            Icon(Icons.access_time, size: 20, color: AppColors.primary),
+            Icon(Icons.access_time, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space3),
             Text(
               _selectedTime != null
@@ -296,13 +296,13 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color:
               isSelected
-                  ? AppColors.primary.withValues(alpha: 0.05)
+                  ? AppColors.paperAccent.withValues(alpha: 0.05)
                   : AppColors.paper,
         ),
         child: Row(
@@ -311,7 +311,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               icon,
               size: 20,
               color:
-                  isSelected ? AppColors.primary : AppColors.inkTertiary,
+                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -324,7 +324,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                       fontWeight: FontWeight.w600,
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.ink,
                     ),
                   ),
@@ -339,7 +339,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               ),
             ),
             if (isSelected)
-              Icon(Icons.check_circle, size: 20, color: AppColors.primary),
+              Icon(Icons.check_circle, size: 20, color: AppColors.paperAccent),
           ],
         ),
       ),

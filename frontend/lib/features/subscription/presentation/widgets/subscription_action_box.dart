@@ -66,10 +66,10 @@ class SubscriptionActionBox extends StatelessWidget {
                   : AppStrings.rescheduleDisabled,
             ),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
+              foregroundColor: AppColors.paperAccent,
               side: BorderSide(
                 color: subscription.canReschedule
-                    ? AppColors.primary
+                    ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
               ),
             ),
@@ -108,8 +108,8 @@ class SubscriptionActionBox extends StatelessWidget {
             icon: const Icon(Icons.schedule, size: 18),
             label: Text(AppStrings.rescheduleAction),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
+              foregroundColor: AppColors.paperAccent,
+              side: const BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),

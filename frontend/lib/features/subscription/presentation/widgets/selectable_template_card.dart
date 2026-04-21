@@ -50,14 +50,14 @@ class SelectableTemplateCard extends StatelessWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           boxShadow:
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -102,7 +102,7 @@ class SelectableTemplateCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.ink,
                       ),
                     ),
@@ -116,7 +116,7 @@ class SelectableTemplateCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkQuaternary,
                     ),
                     child:
@@ -150,7 +150,7 @@ class SelectableTemplateCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.ink,
                     ),
                   ),

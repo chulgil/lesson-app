@@ -59,11 +59,11 @@ class SubscriptionTypeSelector extends StatelessWidget {
           decoration: BoxDecoration(
             color:
                 isSelected
-                    ? AppColors.primary.withValues(alpha: 0.1)
+                    ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -73,7 +73,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
                 icon,
                 color:
                     isSelected
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkSecondary,
               ),
               const SizedBox(height: AppSpacing.space1),
@@ -82,7 +82,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
                 style: AppTypography.bodySmall.copyWith(
                   color:
                       isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -114,13 +114,13 @@ class SubscriptionTypeSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: AppColors.primary.withValues(alpha: 0.7)),
+          Icon(icon, size: 16, color: AppColors.paperAccent.withValues(alpha: 0.7)),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -195,19 +195,19 @@ class PaymentStatusSection extends StatelessWidget {
                     label: Text(method.label),
                     selected: isSelected,
                     onSelected: (_) => onPaymentMethodChanged(method),
-                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                    checkmarkColor: AppColors.primary,
+                    selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                    checkmarkColor: AppColors.paperAccent,
                     backgroundColor: AppColors.paper,
                     side: BorderSide(
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkQuaternary,
                     ),
                     labelStyle: AppTypography.bodySmall.copyWith(
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -264,7 +264,7 @@ class _PaymentStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = accentColor ?? AppColors.primary;
+    final color = accentColor ?? AppColors.paperAccent;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -355,11 +355,11 @@ class AmountInputSection extends StatelessWidget {
                           onAmountChanged(amount);
                         }
                       },
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                       labelStyle: AppTypography.bodySmall.copyWith(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -367,7 +367,7 @@ class AmountInputSection extends StatelessWidget {
                       side: BorderSide(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                       ),
                       shape: RoundedRectangleBorder(

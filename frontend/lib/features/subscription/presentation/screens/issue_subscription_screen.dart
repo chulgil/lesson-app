@@ -559,7 +559,7 @@ class _IssueSubscriptionScreenState
             style: AppTypography.bodySmall.copyWith(
               color:
                   matchesPolicy
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.inkTertiary,
               fontWeight: FontWeight.w500,
             ),
@@ -576,7 +576,7 @@ class _IssueSubscriptionScreenState
                   selected: _rescheduleAllowance == count,
                   onSelected:
                       (_) => setState(() => _rescheduleAllowance = count),
-                  selectedColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent,
                   backgroundColor: AppColors.paper,
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
@@ -591,7 +591,7 @@ class _IssueSubscriptionScreenState
                   side: BorderSide(
                     color:
                         _rescheduleAllowance == count
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
@@ -627,7 +627,7 @@ class _IssueSubscriptionScreenState
                     selected: _rescheduleDeadlineHours == hours,
                     onSelected:
                         (_) => setState(() => _rescheduleDeadlineHours = hours),
-                    selectedColor: AppColors.primary,
+                    selectedColor: AppColors.paperAccent,
                     backgroundColor: AppColors.paper,
                     labelStyle: AppTypography.bodySmall.copyWith(
                       color:
@@ -642,7 +642,7 @@ class _IssueSubscriptionScreenState
                     side: BorderSide(
                       color:
                           _rescheduleDeadlineHours == hours
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkQuaternary,
                     ),
                     shape: RoundedRectangleBorder(
@@ -759,7 +759,7 @@ class _PolicyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDefault ? AppColors.primary : AppColors.inkTertiary;
+    final color = isDefault ? AppColors.paperAccent : AppColors.inkTertiary;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,

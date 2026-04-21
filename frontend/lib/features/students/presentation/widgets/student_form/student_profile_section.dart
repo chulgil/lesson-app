@@ -24,7 +24,7 @@ class StudentProfileSection extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   displayName.isNotEmpty ? displayName[0] : '?',
                   style: AppTypography.displayMedium.copyWith(
@@ -39,7 +39,7 @@ class StudentProfileSection extends StatelessWidget {
                   bottom: 0,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),

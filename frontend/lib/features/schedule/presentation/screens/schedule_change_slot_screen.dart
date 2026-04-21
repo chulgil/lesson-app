@@ -120,17 +120,17 @@ class _ScheduleChangeSlotScreenState
       ),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: AppColors.paperAccent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+          Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               AppStrings.bulkChangeSlotGuide,
-              style: AppTypography.caption.copyWith(color: AppColors.primary),
+              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
             ),
           ),
         ],
@@ -261,7 +261,7 @@ class _ScheduleChangeSlotScreenState
                   Text(
                     circleNumbers[i],
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space2),

@@ -52,12 +52,12 @@ class ScheduleOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPrimary = option.priority == 1;
     final borderColor = isSelected
-        ? AppColors.primary
+        ? AppColors.paperAccent
         : isDisabled
             ? AppColors.inkQuaternary
             : AppColors.inkQuaternary;
     final backgroundColor = isSelected
-        ? AppColors.primary.withValues(alpha: 0.05)
+        ? AppColors.paperAccent.withValues(alpha: 0.05)
         : isDisabled
             ? AppColors.inkSecondary.withValues(alpha: 0.05)
             : AppColors.paperDark;
@@ -154,7 +154,7 @@ class ScheduleOptionCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isPrimary
-            ? AppColors.primary.withValues(alpha: 0.1)
+            ? AppColors.paperAccent.withValues(alpha: 0.1)
             : AppColors.inkSecondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
       ),
@@ -165,14 +165,14 @@ class ScheduleOptionCard extends StatelessWidget {
             Icon(
               Icons.star,
               size: 14,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
             const SizedBox(width: AppSpacing.space1),
           ],
           Text(
             option.priorityLabel,
             style: AppTypography.caption.copyWith(
-              color: isPrimary ? AppColors.primary : AppColors.inkSecondary,
+              color: isPrimary ? AppColors.paperAccent : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -205,9 +205,9 @@ class ScheduleOptionCard extends StatelessWidget {
       height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isSelected ? AppColors.primary : Colors.transparent,
+        color: isSelected ? AppColors.paperAccent : Colors.transparent,
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+          color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: 2,
         ),
       ),
@@ -394,13 +394,13 @@ class AddScheduleOptionButton extends StatelessWidget {
             Icon(
               Icons.add_circle_outline,
               size: 20,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '$optionNumber순위 추가 (선택)',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w500,
               ),
             ),

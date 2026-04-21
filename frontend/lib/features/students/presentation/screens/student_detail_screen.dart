@@ -742,11 +742,11 @@ class _StudentDetailContent extends ConsumerWidget {
                     vertical: AppSpacing.space4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withValues(alpha: 0.2),
+                    color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    border: Border.all(color: AppColors.primary),
+                    border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -759,7 +759,7 @@ class _StudentDetailContent extends ConsumerWidget {
                             child: Text(
                               digit,
                               style: AppTypography.headingLarge.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
                               ),

@@ -190,11 +190,11 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                   onSelected: (selected) {
                     if (selected) onChanged(value);
                   },
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -235,13 +235,13 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
         children: [
           Row(
             children: [
-              Icon(Icons.preview, size: 18, color: AppColors.primary),
+              Icon(Icons.preview, size: 18, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '미리보기',
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ],

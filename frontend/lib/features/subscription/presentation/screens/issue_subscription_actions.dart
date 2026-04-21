@@ -157,7 +157,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('수강권이 발급되었습니다'),
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
 
@@ -472,7 +472,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$successCount명에게 수강권이 발급되었습니다'),
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         } else {

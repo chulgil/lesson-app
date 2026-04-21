@@ -92,7 +92,7 @@ class _StudentProposalBottomSheetState
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.05),
+                    color: AppColors.paperAccent.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -103,14 +103,14 @@ class _StudentProposalBottomSheetState
                       const Icon(
                         Icons.chat_bubble_outline,
                         size: 16,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           widget.teacherProposal.message!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),
@@ -149,7 +149,7 @@ class _StudentProposalBottomSheetState
                       decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? AppColors.primary.withValues(alpha: 0.1)
+                                ? AppColors.paperAccent.withValues(alpha: 0.1)
                                 : AppColors.paperDark,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
@@ -157,7 +157,7 @@ class _StudentProposalBottomSheetState
                         border: Border.all(
                           color:
                               isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkQuaternary,
                           width: isSelected ? 2 : 1,
                         ),
@@ -170,7 +170,7 @@ class _StudentProposalBottomSheetState
                                 : Icons.radio_button_unchecked,
                             color:
                                 isSelected
-                                    ? AppColors.primary
+                                    ? AppColors.paperAccent
                                     : AppColors.inkSecondary,
                             size: 20,
                           ),

@@ -265,7 +265,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
     // Generate random profile color
     final profileColors = [
-      AppColors.primary,
+      AppColors.paperAccent,
       AppColors.secondary,
       AppColors.paperOk,
       AppColors.profilePurple,

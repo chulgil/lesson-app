@@ -311,7 +311,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                           }
                           : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     disabledBackgroundColor: AppColors.scheduleMutedAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -358,12 +358,12 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.primary.withValues(alpha: 0.08)
+                          ? AppColors.paperAccent.withValues(alpha: 0.08)
                           : AppColors.paper,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -374,7 +374,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.ink,
                   ),
                 ),
@@ -502,7 +502,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   Widget _buildPhase2PaymentChoice() {
     return _buildActionRow(
       icon: Icons.card_membership,
-      iconColor: AppColors.primary,
+      iconColor: AppColors.paperAccent,
       message: AppStrings.phase2SelectMethod,
       primaryLabel: AppStrings.proposalTitle,
       primaryIcon: Icons.arrow_forward,
@@ -560,7 +560,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Guide message
         Row(
           children: [
-            Icon(Icons.card_giftcard, color: AppColors.primary, size: 18),
+            Icon(Icons.card_giftcard, color: AppColors.paperAccent, size: 18),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -624,11 +624,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? AppColors.primary.withValues(alpha: 0.06)
+                  ? AppColors.paperAccent.withValues(alpha: 0.06)
                   : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -638,7 +638,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 18,
               color:
-                  isSelected ? AppColors.primary : AppColors.inkTertiary,
+                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
@@ -681,7 +681,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   Widget _buildSubscriptionSummary() {
     return Row(
       children: [
-        Icon(Icons.card_membership, size: 18, color: AppColors.primary),
+        Icon(Icons.card_membership, size: 18, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
@@ -702,7 +702,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           child: Text(
             AppStrings.subscriptionDetailLink,
             style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -774,7 +774,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               style: AppTypography.buttonSmall.copyWith(color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -823,7 +823,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           style: AppTypography.buttonSmall.copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),

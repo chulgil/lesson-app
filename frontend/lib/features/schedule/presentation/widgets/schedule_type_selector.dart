@@ -63,7 +63,7 @@ class _ScheduleTypeCard extends StatelessWidget {
     return Material(
       color:
           isSelected
-              ? AppColors.primary.withValues(alpha: 0.08)
+              ? AppColors.paperAccent.withValues(alpha: 0.08)
               : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
@@ -74,7 +74,7 @@ class _ScheduleTypeCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -86,7 +86,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.primary.withValues(alpha: 0.15)
+                          ? AppColors.paperAccent.withValues(alpha: 0.15)
                           : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
@@ -96,7 +96,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                       : Icons.event_note,
                   color:
                       isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                 ),
               ),
@@ -113,7 +113,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color:
                                 isSelected
-                                    ? AppColors.primary
+                                    ? AppColors.paperAccent
                                     : AppColors.ink,
                           ),
                         ),
@@ -153,7 +153,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Radio<ScheduleType>(value: type, activeColor: AppColors.primary),
+              Radio<ScheduleType>(value: type, activeColor: AppColors.paperAccent),
             ],
           ),
         ),
@@ -188,14 +188,14 @@ class LessonGoalSelector extends StatelessWidget {
                 if (selected) onGoalSelected(goal);
               },
               backgroundColor: AppColors.paper,
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected ? AppColors.primary : AppColors.ink,
+                    isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );

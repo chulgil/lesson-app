@@ -45,7 +45,7 @@ class SubscriptionHistorySection extends ConsumerWidget {
                   Icon(
                     Icons.bar_chart_rounded,
                     size: 18,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(

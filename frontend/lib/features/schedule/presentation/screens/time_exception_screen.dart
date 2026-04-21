@@ -41,7 +41,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddExceptionDialog(),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(
           '휴무 추가',
@@ -522,11 +522,11 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                       setState(() => _selectedType = type);
                     }
                   },
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,

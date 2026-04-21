@@ -131,7 +131,7 @@ class _GroupClassAttendanceScreenState
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Center(
@@ -169,7 +169,7 @@ class _GroupClassAttendanceScreenState
                 '${_getAttendedCount()}/${_attendanceState.length}',
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
               Text(

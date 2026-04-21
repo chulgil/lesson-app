@@ -62,13 +62,13 @@ class BookingCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                     child: Text(
                       booking.studentName.isNotEmpty
                           ? booking.studentName[0]
                           : '?',
                       style: AppTypography.headingSmall.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ),
@@ -149,12 +149,12 @@ class BookingCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.05),
+                    color: AppColors.paperAccent.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.paperAccent.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -163,7 +163,7 @@ class BookingCard extends StatelessWidget {
                       Icon(
                         Icons.message_outlined,
                         size: 18,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(

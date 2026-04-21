@@ -186,14 +186,14 @@ class _LocationTravelSelectorState
           label: Text(option.label),
           selected: isSelected,
           onSelected: (_) => _onTypeSelected(option.type),
-          selectedColor: AppColors.primary,
+          selectedColor: AppColors.paperAccent,
           backgroundColor: AppColors.paper,
           labelStyle: AppTypography.bodySmall.copyWith(
             color: isSelected ? Colors.white : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -314,7 +314,7 @@ class _LocationTravelSelectorState
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: const BorderSide(color: AppColors.paperAccent),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -365,7 +365,7 @@ class _LocationTravelSelectorState
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space3,

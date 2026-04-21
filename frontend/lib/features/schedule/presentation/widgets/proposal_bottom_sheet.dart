@@ -189,7 +189,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                     child: FilledButton(
                       onPressed: _selectedIds.isNotEmpty ? _submit : null,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
@@ -270,7 +270,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : Colors.transparent,
+            color: isSelected ? AppColors.paperAccent : Colors.transparent,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium - 1),
           ),
           child: Text(

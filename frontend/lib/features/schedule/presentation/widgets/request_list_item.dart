@@ -67,12 +67,12 @@ class RequestListItem extends StatelessWidget {
     final initial = _displayName.isNotEmpty ? _displayName[0] : '?';
     final avatar = CircleAvatar(
       radius: AppSpacing.avatarSmall / 2,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+      backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
       child: Text(
         initial,
         style: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w700,
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
         ),
       ),
     );
@@ -229,7 +229,7 @@ class RequestListItem extends StatelessWidget {
         ? request.studentActionColorKey
         : request.teacherActionColorKey;
     return switch (colorKey) {
-      'action' => AppColors.primary,
+      'action' => AppColors.paperAccent,
       _ => AppColors.inkTertiary,
     };
   }

@@ -126,7 +126,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onSendMessage,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.paperAccent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,

@@ -133,7 +133,7 @@ class _GroupClassDetailScreenState
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -348,13 +348,13 @@ class _GroupClassDetailScreenState
         color:
             isWaitlist
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
-                : AppColors.primary.withValues(alpha: 0.05),
+                : AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isWaitlist
                   ? AppColors.paperAccent.withValues(alpha: 0.3)
-                  : AppColors.primary.withValues(alpha: 0.3),
+                  : AppColors.paperAccent.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -369,7 +369,7 @@ class _GroupClassDetailScreenState
                 booking.statusText,
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isWaitlist ? AppColors.paperAccent : AppColors.primary,
+                  color: isWaitlist ? AppColors.paperAccent : AppColors.paperAccent,
                 ),
               ),
             ],
@@ -450,7 +450,7 @@ class _GroupClassDetailScreenState
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              backgroundColor: isFull ? AppColors.paperAccent : AppColors.primary,
+              backgroundColor: isFull ? AppColors.paperAccent : AppColors.paperAccent,
             ),
             child:
                 _isProcessing

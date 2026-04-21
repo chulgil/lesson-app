@@ -125,7 +125,7 @@ enum PracticeStatus {
 /// Name-based profile color generation for API responses.
 Color _profileColorFromName(String name) {
   const colors = [
-    AppColors.primary,
+    AppColors.paperAccent,
     AppColors.secondary,
     AppColors.paperOk,
     AppColors.ink,

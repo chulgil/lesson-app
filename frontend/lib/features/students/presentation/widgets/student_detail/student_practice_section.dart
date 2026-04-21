@@ -32,7 +32,7 @@ class StudentPracticeSection extends ConsumerWidget {
               data: (practiced) => Text(
                 '${practiced.where((p) => p).length}/7일',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),

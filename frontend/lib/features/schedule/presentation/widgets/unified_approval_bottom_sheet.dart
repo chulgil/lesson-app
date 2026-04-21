@@ -90,13 +90,13 @@ class _UnifiedApprovalBottomSheetState
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
             child: Text(
               '${widget.request.type.label} 신청',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -119,11 +119,11 @@ class _UnifiedApprovalBottomSheetState
       children: [
         CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
           child: Text(
             name.isNotEmpty ? name[0] : '?',
             style: AppTypography.headingMedium.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
         ),
@@ -223,13 +223,13 @@ class _UnifiedApprovalBottomSheetState
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.08)
+                        ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paper,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusMedium),
                     border: Border.all(
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
@@ -241,7 +241,7 @@ class _UnifiedApprovalBottomSheetState
                         height: 28,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.scheduleMutedBackground,
                           shape: BoxShape.circle,
                         ),
@@ -266,7 +266,7 @@ class _UnifiedApprovalBottomSheetState
                                 ? FontWeight.w600
                                 : FontWeight.normal,
                             color: isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.ink,
                           ),
                         ),
@@ -274,7 +274,7 @@ class _UnifiedApprovalBottomSheetState
                       if (isSelected)
                         const Icon(
                           Icons.check_circle,
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           size: 24,
                         ),
                     ],
@@ -321,7 +321,7 @@ class _UnifiedApprovalBottomSheetState
       children: [
         Row(
           children: [
-            const Icon(Icons.swap_horiz, size: 20, color: AppColors.primary),
+            const Icon(Icons.swap_horiz, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '역제안 — 가능한 시간을 선택해주세요',
@@ -387,7 +387,7 @@ class _UnifiedApprovalBottomSheetState
             style: OutlinedButton.styleFrom(
               padding:
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: const BorderSide(color: AppColors.primary),
+              side: const BorderSide(color: AppColors.paperAccent),
               shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(AppSpacing.radiusMedium),
@@ -396,7 +396,7 @@ class _UnifiedApprovalBottomSheetState
             child: Text(
               '역제안',
               style: AppTypography.button.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
           ),
@@ -412,7 +412,7 @@ class _UnifiedApprovalBottomSheetState
             style: FilledButton.styleFrom(
               padding:
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor:
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
@@ -478,7 +478,7 @@ class _UnifiedApprovalBottomSheetState
             style: FilledButton.styleFrom(
               padding:
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor:
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(

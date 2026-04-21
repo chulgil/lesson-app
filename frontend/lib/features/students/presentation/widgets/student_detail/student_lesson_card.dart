@@ -31,7 +31,7 @@ class StudentLessonCard extends StatelessWidget {
         border: Border.all(
           color:
               isUpcoming
-                  ? AppColors.primary.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent.withValues(alpha: 0.3)
                   : AppColors.inkQuaternary,
         ),
       ),
@@ -53,7 +53,7 @@ class StudentLessonCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isUpcoming
-                          ? AppColors.primary.withValues(alpha: 0.1)
+                          ? AppColors.paperAccent.withValues(alpha: 0.1)
                           : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
@@ -64,7 +64,7 @@ class StudentLessonCard extends StatelessWidget {
                       style: AppTypography.headingSmall.copyWith(
                         color:
                             isUpcoming
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.ink,
                       ),
                     ),
@@ -73,7 +73,7 @@ class StudentLessonCard extends StatelessWidget {
                       style: AppTypography.caption.copyWith(
                         color:
                             isUpcoming
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkSecondary,
                       ),
                     ),
@@ -133,7 +133,7 @@ class StudentLessonCard extends StatelessWidget {
               Column(
                 children: [
                   if (lesson.hasRecordings)
-                    Icon(Icons.mic, size: 18, color: AppColors.primary),
+                    Icon(Icons.mic, size: 18, color: AppColors.paperAccent),
                   if (lesson.hasFeedback)
                     Icon(Icons.note, size: 18, color: AppColors.secondary),
                 ],

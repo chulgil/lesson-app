@@ -221,13 +221,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.card_giftcard,
               size: 24,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -332,7 +332,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? AppColors.primary.withValues(alpha: 0.05)
+                                ? AppColors.paperAccent.withValues(alpha: 0.05)
                                 : AppColors.paper,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
@@ -340,7 +340,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                         border: Border.all(
                           color:
                               isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkQuaternary,
                           width: isSelected ? 2 : 1,
                         ),
@@ -356,7 +356,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                               border: Border.all(
                                 color:
                                     isSelected
-                                        ? AppColors.primary
+                                        ? AppColors.paperAccent
                                         : AppColors.inkQuaternary,
                                 width: 2,
                               ),
@@ -369,7 +369,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                         height: 12,
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: AppColors.primary,
+                                          color: AppColors.paperAccent,
                                         ),
                                       ),
                                     )
@@ -441,7 +441,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           Text(
                             template.formattedPrice,
                             style: AppTypography.headingSmall.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

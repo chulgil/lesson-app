@@ -281,7 +281,7 @@ class _ProposalSettingsScreenState
                           decoration: BoxDecoration(
                             color:
                                 isSelected
-                                    ? AppColors.primary.withValues(alpha: 0.05)
+                                    ? AppColors.paperAccent.withValues(alpha: 0.05)
                                     : AppColors.paper,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusLarge,
@@ -289,7 +289,7 @@ class _ProposalSettingsScreenState
                             border: Border.all(
                               color:
                                   isSelected
-                                      ? AppColors.primary
+                                      ? AppColors.paperAccent
                                       : AppColors.inkQuaternary,
                               width: isSelected ? 2 : 1,
                             ),
@@ -307,13 +307,13 @@ class _ProposalSettingsScreenState
                                   border: Border.all(
                                     color:
                                         isSelected
-                                            ? AppColors.primary
+                                            ? AppColors.paperAccent
                                             : AppColors.inkQuaternary,
                                     width: 2,
                                   ),
                                   color:
                                       isSelected
-                                          ? AppColors.primary
+                                          ? AppColors.paperAccent
                                           : Colors.transparent,
                                 ),
                                 child:

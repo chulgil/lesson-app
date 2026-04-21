@@ -90,19 +90,19 @@ class SubscriptionPolicySheet extends ConsumerWidget {
             ? AppColors.paperAccent
             : remaining == 1
             ? AppColors.paperAccent
-            : AppColors.primary;
+            : AppColors.paperAccent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(Icons.rule_rounded, size: 20, color: AppColors.primary),
+            Icon(Icons.rule_rounded, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '적용 정책',
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
           ],

@@ -187,12 +187,12 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             color:
-                isSelected ? AppColors.primary.withValues(alpha: 0.05) : null,
+                isSelected ? AppColors.paperAccent.withValues(alpha: 0.05) : null,
           ),
           child: Row(
             children: [
@@ -203,7 +203,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                 size: 20,
                 color:
                     isSelected
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkTertiary,
               ),
               const SizedBox(width: AppSpacing.space3),

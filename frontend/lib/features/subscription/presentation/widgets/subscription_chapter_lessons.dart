@@ -376,11 +376,11 @@ class _SubscriptionChapterLessonsState
               ),
               decoration: isCurrent
                   ? BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.06),
+                      color: AppColors.paperAccent.withValues(alpha: 0.06),
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMedium),
                       border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2),
+                        color: AppColors.paperAccent.withValues(alpha: 0.2),
                       ),
                     )
                   : null,
@@ -506,7 +506,7 @@ class _SubscriptionChapterLessonsState
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: isTeacher
-                    ? AppColors.primary.withValues(alpha: 0.08)
+                    ? AppColors.paperAccent.withValues(alpha: 0.08)
                     : AppColors.paperDark,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(AppSpacing.radiusLarge),
@@ -554,7 +554,7 @@ class _SubscriptionChapterLessonsState
             Text(
               '${AppStrings.moreSessionsLabel(first, last)} (${AppStrings.showMore})',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -633,7 +633,7 @@ class _SubscriptionChapterLessonsState
         return AppColors.paperOk;
       case _SessionStatus.scheduled:
       case _SessionStatus.bookingRequired:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case _SessionStatus.upcoming:
       case _SessionStatus.pending:
         return AppColors.inkTertiary;

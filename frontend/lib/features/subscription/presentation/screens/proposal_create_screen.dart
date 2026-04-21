@@ -197,7 +197,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
@@ -260,11 +260,11 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                       child: Text(
                         student.name[0],
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     ),
@@ -468,7 +468,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   vertical: AppSpacing.space4,
                 ),
                 side: BorderSide(
-                  color: canSubmit ? AppColors.primary : AppColors.inkQuaternary,
+                  color: canSubmit ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),

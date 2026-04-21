@@ -106,7 +106,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     if (isBulkMode) {
       return const _GuideContent(
         title: AppStrings.scheduleChangeTitle,
-        color: AppColors.primary,
+        color: AppColors.paperAccent,
         message: AppStrings.guideBulkModeMessage,
       );
     }

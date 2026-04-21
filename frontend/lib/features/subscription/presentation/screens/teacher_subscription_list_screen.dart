@@ -68,9 +68,9 @@ class _TeacherSubscriptionListScreenState
             loading: () => _tabs.map((tab) => Tab(text: tab.label)).toList(),
             error: (_, __) => _tabs.map((tab) => Tab(text: tab.label)).toList(),
           ),
-          labelColor: AppColors.primary,
+          labelColor: AppColors.paperAccent,
           unselectedLabelColor: AppColors.inkSecondary,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.paperAccent,
         ),
       ),
       body: subscriptionsAsync.when(

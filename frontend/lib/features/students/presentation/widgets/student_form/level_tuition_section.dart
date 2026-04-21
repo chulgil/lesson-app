@@ -67,14 +67,14 @@ class LevelAndTuitionSection extends StatelessWidget {
                   }
                 },
                 backgroundColor: AppColors.paper,
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
+                selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
                   color:
-                      isSelected ? AppColors.primary : AppColors.ink,
+                      isSelected ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
@@ -174,7 +174,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                           int.tryParse(feeController.text) ?? 0,
                         ),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -251,7 +251,7 @@ class LevelAndTuitionSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: (isLinked ? AppColors.ink : AppColors.primary)
+              color: (isLinked ? AppColors.ink : AppColors.paperAccent)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
@@ -260,7 +260,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                 Icon(
                   Icons.info_outline,
                   size: 16,
-                  color: isLinked ? AppColors.ink : AppColors.primary,
+                  color: isLinked ? AppColors.ink : AppColors.paperAccent,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
@@ -269,7 +269,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                         ? '수강권이 발급된 학생은 수강료가 수강권에서 관리됩니다'
                         : '수강료를 직접 수정하면 레벨 기본값과 다르게 설정됩니다',
                     style: AppTypography.caption.copyWith(
-                      color: isLinked ? AppColors.ink : AppColors.primary,
+                      color: isLinked ? AppColors.ink : AppColors.paperAccent,
                     ),
                   ),
                 ),

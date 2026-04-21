@@ -91,7 +91,7 @@ class _WeeklySummaryCard extends StatelessWidget {
                   icon: Icons.timer_outlined,
                   label: '총 연습시간',
                   value: overview.formattedTotalTime,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
               Expanded(
@@ -269,7 +269,7 @@ class _DayColumn extends StatelessWidget {
             decoration:
                 isToday
                     ? BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       borderRadius: BorderRadius.circular(AppSpacing.space1),
                     )
                     : null,
@@ -397,7 +397,7 @@ class _RecordingTile extends ConsumerWidget {
                           Text(
                             '· ${AppStrings.recordingFeedbackCount(feedbackCount)}',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -448,13 +448,13 @@ class _TileLeading extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primaryLight.withValues(alpha: 0.2),
+            color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(AppSpacing.space2),
           ),
           child: const Icon(
             Icons.chat_bubble_outline,
             size: 18,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
         if (feedbackCount > 0)
@@ -464,7 +464,7 @@ class _TileLeading extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(color: AppColors.paper, width: 1.5),
               ),
@@ -504,7 +504,7 @@ class _DetailStatsButton extends StatelessWidget {
       icon: const Icon(Icons.bar_chart_outlined, size: 18),
       label: const Text('상세 통계 보기'),
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
+        foregroundColor: AppColors.paperAccent,
         side: const BorderSide(color: AppColors.inkQuaternary),
         padding: const EdgeInsets.symmetric(
           vertical: AppSpacing.space3,

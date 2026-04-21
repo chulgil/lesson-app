@@ -223,7 +223,7 @@ class _TeacherAvailabilityScreenState
           decoration: BoxDecoration(
             color:
                 hasSchedules
-                    ? AppColors.primary.withValues(alpha: 0.1)
+                    ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
                     : AppColors.paper,
@@ -236,7 +236,7 @@ class _TeacherAvailabilityScreenState
                 fontWeight: FontWeight.w600,
                 color:
                     hasSchedules
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : isWeekend
                         ? AppColors.secondary
                         : AppColors.inkSecondary,
@@ -262,7 +262,7 @@ class _TeacherAvailabilityScreenState
           icon: Icon(
             hasSchedules ? Icons.edit_outlined : Icons.add,
             size: 20,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           onPressed: () => _showScheduleDialog(preselectedDay: dayIndex),
         ),
@@ -353,11 +353,11 @@ class _TeacherAvailabilityScreenState
                 Text(
                   '탭하여 변경',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                Icon(Icons.chevron_right, size: 16, color: AppColors.primary),
+                Icon(Icons.chevron_right, size: 16, color: AppColors.paperAccent),
               ],
             ),
           ],
@@ -374,7 +374,7 @@ class _TeacherAvailabilityScreenState
   }) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: Column(
@@ -395,7 +395,7 @@ class _TeacherAvailabilityScreenState
           value,
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
       ],
@@ -435,7 +435,7 @@ class _TeacherAvailabilityScreenState
                       fontWeight: FontWeight.w600,
                       color:
                           hasSchedule
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
                   ),
@@ -483,14 +483,14 @@ class _TeacherAvailabilityScreenState
                                       horizontal: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(
+                                      color: AppColors.paperAccent.withValues(
                                         alpha: 0.15,
                                       ),
                                       borderRadius: BorderRadius.circular(
                                         AppSpacing.radiusSmall,
                                       ),
                                       border: Border.all(
-                                        color: AppColors.primary.withValues(
+                                        color: AppColors.paperAccent.withValues(
                                           alpha: 0.3,
                                         ),
                                       ),
@@ -501,7 +501,7 @@ class _TeacherAvailabilityScreenState
                                           s.startTime,
                                           style: AppTypography.captionXSmall
                                               .copyWith(
-                                                color: AppColors.primary,
+                                                color: AppColors.paperAccent,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                         ),
@@ -509,7 +509,7 @@ class _TeacherAvailabilityScreenState
                                           s.endTime,
                                           style: AppTypography.captionXSmall
                                               .copyWith(
-                                                color: AppColors.primary,
+                                                color: AppColors.paperAccent,
                                               ),
                                         ),
                                       ],
@@ -579,7 +579,7 @@ class _TeacherAvailabilityScreenState
             label: const Text('특별 일정 관리'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.3)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),

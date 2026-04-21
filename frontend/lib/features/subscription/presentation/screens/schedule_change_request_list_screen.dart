@@ -92,7 +92,7 @@ class _ScheduleChangeRequestListScreenState
           child: TabBar(
             controller: _tabController,
             indicator: BoxDecoration(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             indicatorSize: TabBarIndicatorSize.tab,

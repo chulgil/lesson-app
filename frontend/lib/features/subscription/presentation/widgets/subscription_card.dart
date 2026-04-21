@@ -160,15 +160,15 @@ class SubscriptionCard extends StatelessWidget {
     switch (subscription.type) {
       case SubscriptionType.trial:
         icon = Icons.star_outline;
-        color = AppColors.primary;
+        color = AppColors.paperAccent;
         break;
       case SubscriptionType.monthly:
         icon = Icons.calendar_month;
-        color = AppColors.primary;
+        color = AppColors.paperAccent;
         break;
       case SubscriptionType.package:
         icon = Icons.confirmation_number_outlined;
-        color = AppColors.primary;
+        color = AppColors.paperAccent;
         break;
     }
 
@@ -209,16 +209,16 @@ class SubscriptionCard extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
+          color: AppColors.paperAccent.withValues(alpha: 0.3),
         ),
       ),
       child: Text(
         subscription.bonusText ?? '',
         style: AppTypography.caption.copyWith(
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -325,7 +325,7 @@ class SubscriptionCard extends StatelessWidget {
             _buildDetailRow(
               '• 보너스',
               '+${subscription.bonusCount}회 (${subscription.bonusReason ?? "보너스"})',
-              valueColor: AppColors.primary,
+              valueColor: AppColors.paperAccent,
             ),
           ],
           // 사용 횟수
@@ -339,7 +339,7 @@ class SubscriptionCard extends StatelessWidget {
             '${subscription.remainingLessons ?? 0}회',
             valueColor: subscription.isExpiringSoon
                 ? AppColors.paperAccent
-                : AppColors.primary,
+                : AppColors.paperAccent,
             isBold: true,
           ),
           // 변경 횟수
@@ -398,13 +398,13 @@ class SubscriptionCard extends StatelessWidget {
                 Icon(
                   Icons.verified_outlined,
                   size: 14,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   '유효기간 내 자유롭게 사용',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ],

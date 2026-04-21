@@ -45,7 +45,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         isSelected
-                            ? AppColors.primary.withValues(alpha: 0.1)
+                            ? AppColors.paperAccent.withValues(alpha: 0.1)
                             : AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
@@ -53,7 +53,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                     border: Border.all(
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
@@ -135,7 +135,7 @@ class MembershipInfoCard extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Center(

@@ -113,11 +113,11 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                                   setState(() => _selectedDay = index);
                                 }
                               },
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                       labelStyle: AppTypography.bodySmall.copyWith(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : isWeekend
                                 ? AppColors.secondary
                                 : AppColors.inkSecondary,
@@ -164,7 +164,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                   ),
                   value: _isActive,
                   onChanged: (value) => setState(() => _isActive = value),
-                  activeThumbColor: AppColors.primary,
+                  activeThumbColor: AppColors.paperAccent,
                   contentPadding: EdgeInsets.zero,
                 ),
 

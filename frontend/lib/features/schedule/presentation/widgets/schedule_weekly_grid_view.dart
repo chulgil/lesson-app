@@ -607,7 +607,7 @@ class _ScheduleWeeklyGridViewState
   /// Column background color — only today highlighted, everything else default
   Color? _getColumnBackground(_DayType dayType, bool isRestDay) {
     if (dayType == _DayType.today) {
-      return AppColors.primary.withValues(alpha: 0.04);
+      return AppColors.paperAccent.withValues(alpha: 0.04);
     }
     return null;
   }

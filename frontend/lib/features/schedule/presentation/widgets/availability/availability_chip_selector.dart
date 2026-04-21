@@ -236,7 +236,7 @@ class _TimeChip extends StatelessWidget {
 
   Color get _backgroundColor {
     if (isSelected) {
-      return AppColors.primary;
+      return AppColors.paperAccent;
     }
     if (slot.isRecommended) {
       return AppColors.paperAccentSoft; // Light orange
@@ -246,7 +246,7 @@ class _TimeChip extends StatelessWidget {
 
   Color get _borderColor {
     if (isSelected) {
-      return AppColors.primary;
+      return AppColors.paperAccent;
     }
     if (slot.isRecommended) {
       return AppColors.secondary; // #F4A460

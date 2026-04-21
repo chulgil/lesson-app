@@ -168,7 +168,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   child: Text(
                     '선택',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),
@@ -288,7 +288,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   Icons.tune,
                   color:
                       hasActiveFilter
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                 ),
                 if (hasActiveFilter)
@@ -299,7 +299,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -346,7 +346,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                             : Icons.radio_button_unchecked,
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkTertiary,
                       ),
                       title: Text(
@@ -430,7 +430,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                           : Icons.radio_button_unchecked,
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
                     title: Text(option.label),
@@ -720,12 +720,12 @@ class _StudentCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color:
             isSelected
-                ? AppColors.primary.withValues(alpha: 0.05)
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border:
             isSelected
-                ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
+                ? Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3))
                 : null,
         boxShadow: [
           BoxShadow(
@@ -761,7 +761,7 @@ class _StudentCard extends ConsumerWidget {
                   child: Checkbox(
                     value: isSelected,
                     onChanged: (value) => onSelectionChanged(value ?? false),
-                    activeColor: AppColors.primary,
+                    activeColor: AppColors.paperAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
@@ -775,11 +775,11 @@ class _StudentCard extends ConsumerWidget {
               // Avatar
               CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 child: Text(
                   swm.initial,
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -814,7 +814,7 @@ class _StudentCard extends ConsumerWidget {
                               vertical: 1,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.paperAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusSmall,
                               ),
@@ -822,7 +822,7 @@ class _StudentCard extends ConsumerWidget {
                             child: Text(
                               '$subjectCount과목',
                               style: AppTypography.captionSmall.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

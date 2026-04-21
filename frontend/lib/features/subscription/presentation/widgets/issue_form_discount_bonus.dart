@@ -140,14 +140,14 @@ class BonusSection extends StatelessWidget {
       label: Text(reason),
       selected: isSelected,
       onSelected: (_) => onBonusReasonChanged(reason),
-      selectedColor: AppColors.primary.withValues(alpha: 0.15),
-      checkmarkColor: AppColors.primary,
+      selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+      checkmarkColor: AppColors.paperAccent,
       backgroundColor: AppColors.paper,
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+        color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
       ),
       labelStyle: AppTypography.bodySmall.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.inkSecondary,
+        color: isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
     );

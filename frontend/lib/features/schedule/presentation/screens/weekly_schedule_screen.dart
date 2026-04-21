@@ -40,7 +40,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddScheduleDialog(),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(
           '스케줄 추가',
@@ -109,9 +109,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.08),
+          color: AppColors.paperAccent.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,17 +119,17 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             // Header
             Row(
               children: [
-                Icon(Icons.settings, size: 20, color: AppColors.primary),
+                Icon(Icons.settings, size: 20, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '레슨 시간 설정',
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.chevron_right, size: 20, color: AppColors.primary),
+                Icon(Icons.chevron_right, size: 20, color: AppColors.paperAccent),
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -205,7 +205,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary.withValues(alpha: 0.7)),
+        Icon(icon, size: 20, color: AppColors.paperAccent.withValues(alpha: 0.7)),
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
@@ -268,7 +268,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           decoration: BoxDecoration(
             color:
                 hasSchedules
-                    ? AppColors.primary.withValues(alpha: 0.1)
+                    ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
                     : AppColors.paper,
@@ -281,7 +281,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 fontWeight: FontWeight.w600,
                 color:
                     hasSchedules
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : isWeekend
                         ? AppColors.secondary
                         : AppColors.inkSecondary,
@@ -307,7 +307,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           icon: Icon(
             hasSchedules ? Icons.edit_outlined : Icons.add,
             size: 20,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           onPressed: () => _showAddScheduleDialog(preselectedDay: dayIndex),
         ),

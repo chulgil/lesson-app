@@ -146,7 +146,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
             child: FilledButton(
               onPressed: isLoading ? null : onBook,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space3,
                 ),

@@ -32,11 +32,11 @@ class FrequencyOption extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? AppColors.paperAccent.withValues(alpha: 0.1)
               : AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -47,7 +47,7 @@ class FrequencyOption extends StatelessWidget {
               Icon(
                 Icons.check_circle,
                 size: 20,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space2),
             ],
@@ -58,7 +58,7 @@ class FrequencyOption extends StatelessWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color:
-                        isSelected ? AppColors.primary : AppColors.ink,
+                        isSelected ? AppColors.paperAccent : AppColors.ink,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -66,7 +66,7 @@ class FrequencyOption extends StatelessWidget {
                   subtitle,
                   style: AppTypography.caption.copyWith(
                     color: isSelected
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkSecondary,
                   ),
                 ),

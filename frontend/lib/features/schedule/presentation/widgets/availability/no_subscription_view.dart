@@ -231,14 +231,14 @@ class NoSubscriptionView extends ConsumerWidget {
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '$number',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -257,7 +257,7 @@ class NoSubscriptionView extends ConsumerWidget {
             Text(
               '← 현재 단계',
               style: AppTypography.caption.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w500,
               ),
             ),
