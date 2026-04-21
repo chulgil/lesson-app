@@ -70,7 +70,8 @@ class AuthNotifier extends _$AuthNotifier {
 
       debugPrint('[Auth] Stored tokens found, attempting auto-login...');
       final user = await _authRepository.getMe();
-      debugPrint('[Auth] Auto-login succeeded: ${user.email}');
+      // data-privacy: 개인정보(email)를 로그에 출력하지 않는다
+      debugPrint('[Auth] Auto-login succeeded (role=${user.role})');
       state = _stateFromUser(user);
     } on UnauthorizedException {
       // Token is invalid/expired and refresh also failed — must re-login
