@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../data/services/backup_service.dart';
 import '../../domain/entities/backup_state.dart';
@@ -53,10 +54,9 @@ class StatusCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       '백업 현황',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimaryLight,
                       ),
@@ -66,8 +66,7 @@ class StatusCard extends StatelessWidget {
                       state.lastBackupDate != null
                           ? '마지막 백업: ${formatDateTimeDash(state.lastBackupDate!)}'
                           : '백업 기록 없음',
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),
                     ),
@@ -125,17 +124,15 @@ class StatItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          style: AppTypography.headingSmall.copyWith(
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimaryLight,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
@@ -175,8 +172,7 @@ class ProgressCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w500,
                     color: AppColors.info,
                   ),
@@ -184,9 +180,8 @@ class ProgressCard extends StatelessWidget {
               ),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w700,
                   color: AppColors.info,
                 ),
               ),
@@ -230,7 +225,7 @@ class ErrorCard extends StatelessWidget {
           Expanded(
             child: Text(
               error,
-              style: const TextStyle(fontSize: 14, color: AppColors.error),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
             ),
           ),
           IconButton(
@@ -255,10 +250,9 @@ class ActionsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '수동 백업',
-          style: TextStyle(
-            fontSize: 14,
+          style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondaryLight,
           ),
@@ -281,10 +275,9 @@ class ActionsSection extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space6),
         // Orphan recordings section
-        const Text(
+        Text(
           '녹음 관리',
-          style: TextStyle(
-            fontSize: 14,
+          style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondaryLight,
           ),
@@ -464,8 +457,7 @@ class ActionButton extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         color:
                             isDisabled
@@ -476,8 +468,7 @@ class ActionButton extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
+                      style: AppTypography.bodySmall.copyWith(
                         color:
                             isDisabled
                                 ? AppColors.textDisabledLight
@@ -513,10 +504,9 @@ class BackupListSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '저장된 백업',
-          style: TextStyle(
-            fontSize: 14,
+          style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondaryLight,
           ),
@@ -827,8 +817,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       children: [
                         Text(
                           '연결되지 않은 녹음',
-                          style: TextStyle(
-                            fontSize: 15,
+                          style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimaryLight,
                           ),
@@ -838,8 +827,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                           hasOrphans
                               ? '$count개의 녹음이 섹션에 연결되지 않았습니다'
                               : '모든 녹음이 섹션에 연결되어 있습니다',
-                          style: TextStyle(
-                            fontSize: 13,
+                          style: AppTypography.bodySmall.copyWith(
                             color:
                                 hasOrphans
                                     ? AppColors.warning
@@ -863,10 +851,9 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       ),
                       child: Text(
                         '$count',
-                        style: const TextStyle(
+                        style: AppTypography.bodySmall.copyWith(
                           color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
