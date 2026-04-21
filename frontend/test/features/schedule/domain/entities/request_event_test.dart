@@ -90,8 +90,8 @@ void main() {
       expect(RequestEventType.proposalAccepted.label, '수강권 수락');
     });
 
-    test('label - 결제 완료', () {
-      expect(RequestEventType.paymentNotified.label, '결제 완료');
+    test('label - 입금 알림', () {
+      expect(RequestEventType.paymentNotified.label, '입금 알림');
     });
 
     test('label - 발급 완료', () {
@@ -101,7 +101,7 @@ void main() {
     test('isTerminal - 종료 이벤트', () {
       expect(RequestEventType.cancel.isTerminal, isTrue);
       expect(RequestEventType.expire.isTerminal, isTrue);
-      expect(RequestEventType.completed.isTerminal, isTrue);
+      expect(RequestEventType.subscriptionCompleted.isTerminal, isTrue);
       expect(RequestEventType.reject.isTerminal, isTrue);
     });
 
@@ -223,7 +223,7 @@ void main() {
         eventType: RequestEventType.reject,
         message: '현재 가능한 시간이 없어 이번에는 어렵습니다.',
       );
-      expect(event.chatDisplayMessage, '요청을 거절했습니다');
+      expect(event.chatDisplayMessage, '레슨 요청을 거절했습니다');
     });
 
     test('대안 시간 제안', () {

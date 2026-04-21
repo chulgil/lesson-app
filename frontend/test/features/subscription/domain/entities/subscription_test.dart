@@ -256,7 +256,7 @@ void main() {
       expect(sub.summaryText, contains('만료됨'));
     });
 
-    test('Package: 횟수 소진 → "소진됨" 포함', () {
+    test('Package: 횟수 소진 → "모두 사용" 포함', () {
       final now = DateTime.now();
       final sub = createSubscription(
         type: SubscriptionType.package,
@@ -265,7 +265,7 @@ void main() {
         endDate: now.add(const Duration(days: 30)),
         status: SubscriptionStatus.active,
       );
-      expect(sub.summaryText, contains('소진됨'));
+      expect(sub.summaryText, contains('모두 사용'));
     });
 
     test('Trial 체험 미사용 → "체험중"', () {
@@ -357,14 +357,15 @@ void main() {
       expect(sub.isExpired, true);
     });
 
-    test('remainingLessons가 0이면 → true', () {
+    test('remainingLessons가 0이지만 status active → false (isDepleted와 분리)', () {
       final sub = createSubscription(
         type: SubscriptionType.package,
         totalLessons: 4,
         usedLessons: 4,
         status: SubscriptionStatus.active,
       );
-      expect(sub.isExpired, true);
+      // isExpired는 status/endDate만 확인 (isDepleted와 분리된 개념)
+      expect(sub.isExpired, false);
     });
 
     test('active 상태, 횟수 남음, 기간 남음 → false', () {
@@ -394,11 +395,11 @@ void main() {
       expect(sub.isExpiringSoon, true);
     });
 
-    test('잔여 2회 이하 → true', () {
+    test('잔여 1회 → true (단일 경고 상태)', () {
       final sub = createSubscription(
         type: SubscriptionType.package,
         totalLessons: 8,
-        usedLessons: 6,
+        usedLessons: 7,
         endDate: DateTime.now().add(const Duration(days: 30)),
       );
       expect(sub.isExpiringSoon, true);
@@ -612,8 +613,8 @@ void main() {
       expect(sub.isExpired, true);
       // summaryText에는 "만료됨" 표시
       expect(sub.summaryText, contains('만료됨'));
-      // 하지만 횟수도 표시되어야 함
-      expect(sub.summaryText, contains('4/8회'));
+      // 미사용 잔여 횟수 표시: "4회 미사용 (만료됨)"
+      expect(sub.summaryText, contains('4회 미사용'));
     });
   });
 }

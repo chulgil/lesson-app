@@ -23,10 +23,7 @@ void main() {
     });
 
     test('reject sets status to rejected with reason', () async {
-      final result = await repo.reject(
-        'ulr_1',
-        reason: '현재 스케줄이 꽉 찼습니다',
-      );
+      final result = await repo.reject('ulr_1', reason: '현재 스케줄이 꽉 찼습니다');
 
       expect(result.status, UnifiedRequestStatus.rejected);
       expect(result.rejectionReason, '현재 스케줄이 꽉 찼습니다');
@@ -59,8 +56,10 @@ void main() {
 
       // Events-based: check event was created
       final events = await repo.getEventsByRequestId('ulr_1');
-      final proposeEvent = events.where((e) =>
-          e.eventType.name == 'proposeAlternative').toList();
+      final proposeEvent =
+          events
+              .where((e) => e.eventType.name == 'proposeAlternative')
+              .toList();
       expect(proposeEvent, isNotEmpty);
       expect(proposeEvent.last.suggestedSlots.length, 2);
       expect(proposeEvent.last.message, '이 시간대는 어떠세요?');
@@ -93,7 +92,8 @@ void main() {
       // Selected slot is tracked via event, not preferredDay/Time
       final events = await repo.getEventsByRequestId('ulr_1');
       final acceptEvent = events.lastWhere(
-          (e) => e.eventType == RequestEventType.acceptAlternative);
+        (e) => e.eventType == RequestEventType.acceptAlternative,
+      );
       expect(acceptEvent.selectedSlotIndex, 0);
       expect(acceptEvent.message, '좋아요!');
     });
@@ -169,8 +169,17 @@ void main() {
       final request = await repo.getById('ulr_1');
       final slot = request!.preferredSlots.first;
 
-      // dayOfWeek-based → "매주 X요일 HH:mm"
-      expect(slot.displayLabel, startsWith('매주'));
+      // PreferredTimeSlot.displayLabel 포맷 통일:
+      //   date 있음 → "M/D(요일) HH:mm ~ HH:mm"
+      //   dayOfWeek만 → "요일 HH:mm ~ HH:mm"
+      expect(
+        slot.displayLabel,
+        matches(
+          RegExp(
+            r'^(\d{1,2}/\d{1,2}\([월화수목금토일]\)|[월화수목금토일]) \d{2}:\d{2} ~ \d{2}:\d{2}$',
+          ),
+        ),
+      );
     });
 
     test('all slots have priority ordering', () async {

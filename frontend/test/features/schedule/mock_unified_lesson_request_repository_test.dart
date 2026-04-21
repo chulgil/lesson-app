@@ -15,9 +15,9 @@ void main() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   group('seed data count', () {
-    test('10개 요청 시드', () async {
+    test('17개 요청 시드', () async {
       final requests = await repo.getByTeacherId('teacher_1');
-      expect(requests.length, 10);
+      expect(requests.length, 17);
     });
   });
 
@@ -154,7 +154,12 @@ void main() {
       await repo.proposeAlternatives(
         'ulr_1',
         slots: [
-          TimeSlotOption(id: 'ts_new', dayOfWeek: 1, startTime: '15:00', endTime: '16:00'),
+          TimeSlotOption(
+            id: 'ts_new',
+            dayOfWeek: 1,
+            startTime: '15:00',
+            endTime: '16:00',
+          ),
         ],
         message: '다른 시간 제안합니다',
       );

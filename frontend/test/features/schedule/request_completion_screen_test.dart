@@ -49,7 +49,7 @@ void main() {
         endTime: '11:00',
       );
 
-      expect(slot.displayLabel, '3/25(수) 10:00');
+      expect(slot.displayLabel, '3/25(수) 10:00 ~ 11:00');
     });
 
     test('preferred slot displayLabel for regular', () {
@@ -60,7 +60,7 @@ void main() {
         endTime: '17:00',
       );
 
-      expect(slot.displayLabel, '매주 목요일 16:00');
+      expect(slot.displayLabel, '목 16:00 ~ 17:00');
     });
   });
 

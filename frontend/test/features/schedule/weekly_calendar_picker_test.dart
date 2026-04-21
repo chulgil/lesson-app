@@ -30,8 +30,7 @@ void main() {
     test('can go up to maxWeeksAhead - 1 weeks forward', () {
       const maxWeeksAhead = 4;
       final minWeek = currentWeekStart();
-      final maxWeek =
-          minWeek.add(Duration(days: 7 * (maxWeeksAhead - 1)));
+      final maxWeek = minWeek.add(Duration(days: 7 * (maxWeeksAhead - 1)));
 
       // From week 0, can go to week 3 (4 weeks total including current)
       var week = minWeek;
@@ -46,7 +45,8 @@ void main() {
     test('week label shows correct date range', () {
       final weekStart = DateTime(2026, 3, 23); // Monday
       final weekEnd = weekStart.add(const Duration(days: 6));
-      final label = '${weekStart.month}/${weekStart.day} ~ '
+      final label =
+          '${weekStart.month}/${weekStart.day} ~ '
           '${weekEnd.month}/${weekEnd.day}';
       expect(label, '3/23 ~ 3/29');
     });
@@ -90,10 +90,7 @@ void main() {
         startTime: '10:00',
         endTime: '11:00',
       );
-      expect(
-        slotDisplayLabel(slot, LessonRequestType.trial),
-        '3/25(수) 10:00',
-      );
+      expect(slotDisplayLabel(slot, LessonRequestType.trial), '3/25(수) 10:00');
     });
 
     test('regular type → shows weekday + time', () {
@@ -104,10 +101,7 @@ void main() {
         startTime: '10:00',
         endTime: '11:00',
       );
-      expect(
-        slotDisplayLabel(slot, LessonRequestType.regular),
-        '매주 수요일 10:00',
-      );
+      expect(slotDisplayLabel(slot, LessonRequestType.regular), '매주 수요일 10:00');
     });
   });
 
@@ -200,9 +194,9 @@ void main() {
       expect(preferred[0].priority, 1);
       expect(preferred[1].priority, 2);
       expect(preferred[2].priority, 3);
-      expect(preferred[0].displayLabel, '3/25(수) 10:00');
-      expect(preferred[1].displayLabel, '3/24(화) 14:00');
-      expect(preferred[2].displayLabel, '3/26(목) 16:00');
+      expect(preferred[0].displayLabel, '3/25(수) 10:00 ~ 11:00');
+      expect(preferred[1].displayLabel, '3/24(화) 14:00 ~ 15:00');
+      expect(preferred[2].displayLabel, '3/26(목) 16:00 ~ 17:00');
     });
 
     test('regular 3-slot shows weekday labels', () {
@@ -222,8 +216,8 @@ void main() {
 
       final preferred = convertSlots(logic.slots, LessonRequestType.regular);
 
-      expect(preferred[0].displayLabel, '매주 수요일 10:00');
-      expect(preferred[1].displayLabel, '매주 화요일 14:00');
+      expect(preferred[0].displayLabel, '수 10:00 ~ 11:00');
+      expect(preferred[1].displayLabel, '화 14:00 ~ 15:00');
     });
   });
 
