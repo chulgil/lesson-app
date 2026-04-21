@@ -68,11 +68,7 @@ class NextLessonCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.event_available,
-            color: AppColors.textTertiaryLight,
-            size: 32,
-          ),
+          Icon(Icons.event_available, color: AppColors.inkTertiary, size: 32),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -81,14 +77,14 @@ class NextLessonCard extends ConsumerWidget {
                 Text(
                   '예정된 레슨이 없습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '선생님을 찾아 레슨을 예약해보세요',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -129,11 +125,7 @@ class NextLessonCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.primaryDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppColors.ink,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -144,7 +136,7 @@ class NextLessonCard extends ConsumerWidget {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: AppColors.paper.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Column(

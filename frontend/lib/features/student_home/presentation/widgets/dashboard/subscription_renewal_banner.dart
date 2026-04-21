@@ -45,8 +45,10 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
 
         final bannerColor =
             hasRenewalProposal
-                ? AppColors.primary
-                : (hasExpired ? AppColors.error : AppColors.warning);
+                ? AppColors.ink
+                : (hasExpired
+                    ? AppColors.paperAccent
+                    : AppColors.paperHighlight);
 
         final title =
             hasRenewalProposal
@@ -116,7 +118,7 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                         Text(
                           subtitle,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],

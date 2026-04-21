@@ -45,7 +45,7 @@ class StudentDashboardTab extends ConsumerWidget {
                   Text(
                     formatDateMDWithDayLong(now),
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space1),

@@ -99,7 +99,7 @@ class PracticeSummarySection extends ConsumerWidget {
             Expanded(
               child: _buildCompactStatCard(
                 icon: Icons.local_fire_department,
-                iconColor: AppColors.warning,
+                iconColor: AppColors.paperAccent,
                 value: '$streakDays일',
                 label: '연속 연습',
               ),
@@ -108,7 +108,7 @@ class PracticeSummarySection extends ConsumerWidget {
             Expanded(
               child: _buildCompactStatCard(
                 icon: Icons.timer_outlined,
-                iconColor: AppColors.info,
+                iconColor: AppColors.ink,
                 value: weeklyTimeStr,
                 label: '이번 주 총',
               ),
@@ -117,7 +117,7 @@ class PracticeSummarySection extends ConsumerWidget {
             Expanded(
               child: _buildCompactStatCard(
                 icon: Icons.check_circle_outline,
-                iconColor: AppColors.success,
+                iconColor: AppColors.paperOk,
                 value: '$goalPercent%',
                 label: '목표 달성',
               ),
@@ -158,7 +158,7 @@ class PracticeSummarySection extends ConsumerWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -216,8 +216,7 @@ class PracticeSummarySection extends ConsumerWidget {
               Text(
                 days[index],
                 style: AppTypography.caption.copyWith(
-                  color:
-                      isToday ? AppColors.primary : AppColors.textTertiaryLight,
+                  color: isToday ? AppColors.ink : AppColors.inkTertiary,
                   fontWeight: isToday ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),

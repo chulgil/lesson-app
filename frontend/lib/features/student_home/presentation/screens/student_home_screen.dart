@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
@@ -50,10 +49,10 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
               parts.add('${result.cleanedUp}개 정리');
             }
             message = '녹음 파일: ${parts.join(', ')} (전체 ${result.total}개)';
-            bgColor = AppColors.success;
+            bgColor = AppColors.paperOk;
           } else {
             message = '녹음 파일 ${result.total}개 확인됨 (복구 불필요)';
-            bgColor = AppColors.info;
+            bgColor = AppColors.ink;
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -91,9 +90,9 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
 
   Widget _buildBottomNavigationWithCenterButton() {
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(top: BorderSide(color: AppColors.borderLight, width: 1)),
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
       ),
       child: SafeArea(
         top: false,
@@ -102,22 +101,12 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, Icons.home_outlined, Icons.home, '홈'),
-              _buildNavItem(
-                1,
-                Icons.calendar_today_outlined,
-                Icons.calendar_today,
-                '스케줄',
-              ),
+              _buildNavItem(0, 'I', '홈'),
+              _buildNavItem(1, 'II', '스케줄'),
               // Center practice button (same level as other items)
               const PracticeCenterButton(size: 48),
-              _buildNavItem(
-                2,
-                Icons.fitness_center_outlined,
-                Icons.fitness_center,
-                '연습',
-              ),
-              _buildNavItem(3, Icons.person_outline, Icons.person, '프로필'),
+              _buildNavItem(2, 'III', '연습'),
+              _buildNavItem(3, 'IV', '프로필'),
             ],
           ),
         ),
@@ -125,13 +114,10 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
     );
   }
 
-  Widget _buildNavItem(
-    int index,
-    IconData icon,
-    IconData activeIcon,
-    String label,
-  ) {
+  Widget _buildNavItem(int index, String roman, String label) {
     final isSelected = _currentIndex == index;
+    final accentColor =
+        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
 
     return InkWell(
       onTap: () => setState(() => _currentIndex = index),
@@ -141,20 +127,21 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color:
-                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+            Text(
+              roman,
+              style: NotebookTypography.roman.copyWith(
+                fontSize: 18,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: AppSpacing.space1),
+            const SizedBox(height: 2),
             Text(
               label,
-              style: AppTypography.bodySmall.copyWith(
-                color:
-                    isSelected
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              style: NotebookTypography.sectionLabel.copyWith(
+                fontSize: 10,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],

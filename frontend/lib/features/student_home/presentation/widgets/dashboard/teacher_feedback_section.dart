@@ -29,7 +29,8 @@ class TeacherFeedbackSection extends ConsumerWidget {
             TextButton(
               onPressed: () {
                 context.push(
-                    '${AppRoutes.repertoireHistory}?studentId=$studentId');
+                  '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                );
               },
               child: const Text('더보기'),
             ),
@@ -40,11 +41,14 @@ class TeacherFeedbackSection extends ConsumerWidget {
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
           data: (lessons) {
-            final feedbackLessons = lessons
-                .where((l) =>
-                    l.status == LessonStatus.completed && l.hasFeedback)
-                .toList()
-              ..sort((a, b) => b.date.compareTo(a.date));
+            final feedbackLessons =
+                lessons
+                    .where(
+                      (l) =>
+                          l.status == LessonStatus.completed && l.hasFeedback,
+                    )
+                    .toList()
+                  ..sort((a, b) => b.date.compareTo(a.date));
 
             if (feedbackLessons.isEmpty) {
               return _buildEmptyState();
@@ -69,7 +73,7 @@ class TeacherFeedbackSection extends ConsumerWidget {
         child: Text(
           '아직 피드백이 없습니다',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ),
@@ -96,11 +100,11 @@ class TeacherFeedbackSection extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: AppColors.paperDark,
                 child: Text(
                   teacherInitial,
                   style: AppTypography.caption.copyWith(
-                    color: Colors.white,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -116,7 +120,7 @@ class TeacherFeedbackSection extends ConsumerWidget {
               Text(
                 dateStr,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],
@@ -125,7 +129,7 @@ class TeacherFeedbackSection extends ConsumerWidget {
           Text(
             lesson.feedback ?? '',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               height: 1.5,
             ),
           ),

@@ -44,23 +44,21 @@ class PendingProposalsBanner extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              border: Border.all(
-                color: AppColors.warning.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.2),
+                  decoration: const BoxDecoration(
+                    color: AppColors.paperDark,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.card_giftcard,
-                    color: AppColors.warning,
+                    color: AppColors.paperAccent,
                     size: 20,
                   ),
                 ),
@@ -80,7 +78,7 @@ class PendingProposalsBanner extends ConsumerWidget {
                             ? (proposal.discountReason ?? '지금 확인하고 혜택 받으세요')
                             : (proposal.message ?? '선생님이 수강권을 제안했습니다'),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -88,10 +86,7 @@ class PendingProposalsBanner extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textSecondaryLight,
-                ),
+                const Icon(Icons.chevron_right, color: AppColors.inkSecondary),
               ],
             ),
           ),
