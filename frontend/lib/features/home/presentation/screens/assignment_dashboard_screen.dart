@@ -37,7 +37,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text('데이터를 불러올 수 없습니다', style: AppTypography.bodyMedium),
@@ -64,13 +64,13 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             Icon(
               Icons.assignment_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '이번 주 과제가 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -110,7 +110,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             _buildSectionHeader(
               '미완료 학생',
               '${incompleteStudents.length}명',
-              AppColors.warning,
+              AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space3),
             ...incompleteStudents.map(
@@ -124,7 +124,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             _buildSectionHeader(
               '완료한 학생',
               '${completedStudents.length}명',
-              AppColors.success,
+              AppColors.paperOk,
             ),
             const SizedBox(height: AppSpacing.space3),
             ...completedStudents.map(
@@ -144,17 +144,17 @@ class AssignmentDashboardScreen extends ConsumerWidget {
   ) {
     final color =
         rate >= 0.8
-            ? AppColors.success
+            ? AppColors.paperOk
             : rate >= 0.5
-            ? AppColors.warning
-            : AppColors.error;
+            ? AppColors.paperAccent
+            : AppColors.paperAccent;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -195,14 +195,14 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           Text(
             '이번 주 완료율',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '${summary.completedItems} / ${summary.totalItems} 과제 완료',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -221,7 +221,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             '전체 과제',
             '${summary.totalItems}',
             Icons.assignment_outlined,
-            AppColors.info,
+            AppColors.ink,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -230,7 +230,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             '완료 학생',
             '$completedCount',
             Icons.check_circle_outline,
-            AppColors.success,
+            AppColors.paperOk,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -239,7 +239,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             '미완료',
             '$incompleteCount',
             Icons.pending_outlined,
-            incompleteCount > 0 ? AppColors.warning : AppColors.success,
+            incompleteCount > 0 ? AppColors.paperAccent : AppColors.paperOk,
           ),
         ),
       ],
@@ -272,7 +272,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -296,9 +296,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         Text(
           count,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
@@ -313,15 +311,15 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         status.totalItems > 0 ? status.completedItems / status.totalItems : 0.0;
     final color =
         isCompleted
-            ? AppColors.success
+            ? AppColors.paperOk
             : rate >= 0.5
-            ? AppColors.warning
-            : AppColors.error;
+            ? AppColors.paperAccent
+            : AppColors.paperAccent;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Material(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: InkWell(
           onTap:
@@ -333,7 +331,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(
               children: [
@@ -368,7 +366,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                         Text(
                           status.mostUrgentItem!.title,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -408,7 +406,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                 Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ],
             ),
