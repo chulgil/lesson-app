@@ -270,7 +270,7 @@ Text(
 | Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
 | Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **완료** (a4b8f54f + 4094f677 + 199c491f + 6cc52ca0) |
 | Phase 5 | 학생 설정·프로필 화면 확산 + 대시보드 잔재 정리 (student_home 전역 레거시 팔레트 0건 달성) | **완료** (b365c8b5 + da93a738 + e2d97784 + 24c359dd + a00dd961 + 310d3435 + cd867abc) |
-| Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | 계획됨 |
+| Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | **진행 중** (6.A 기계적 토큰 이식 완료 / 6.B 시맨틱 토큰 per-file 검토 남음) |
 
 ### 7.1 Phase 1 실제 산출물
 
@@ -329,6 +329,38 @@ Text(
 | 대시보드 + 탭 잔재 | `dashboard/*.dart` · `student_lessons_tab.dart` · `student_practice_tab.dart` | cd867abc |
 
 **검증**: `grep -rE "surfaceLight\|backgroundLight\|primaryLight\|secondaryLight\|successLight\|warningLight\|errorLight\|infoLight\|textSecondaryLight\|textTertiaryLight\|textPrimaryLight\|borderLight\|surfaceSecondaryLight\|practiceGood\|practicePoor" features/student_home` → 0건. `flutter analyze` → 0 issues.
+
+### 7.5 Phase 6.A 산출물 (수강권/스케줄/선생님 기계적 토큰 이식)
+
+**전략**: 시맨틱 동등한 9개 "safe" 토큰을 `perl -i -pe` 로 도메인 전역 sed 치환. 공통 수정 → 일괄 반영.
+
+| 도메인 | 파일 수 | 커밋 |
+|--------|---------|------|
+| `features/subscription/` | 42개 | 50344636 |
+| `features/schedule/` | 60개 | 76b5d196 |
+| `features/students/` | 26개 | 76b5d196 |
+| **합계** | **128개** | **1,175줄 치환** |
+
+**치환 매핑** (semantically equivalent, visually neutral):
+
+| 레거시 | Notebook |
+|--------|---------|
+| `surfaceLight` | `paper` |
+| `backgroundLight` | `paperDark` |
+| `surfaceSecondaryLight` | `paperDark` |
+| `textPrimaryLight` | `ink` |
+| `textSecondaryLight` | `inkSecondary` |
+| `textTertiaryLight` | `inkTertiary` |
+| `borderLight` | `inkQuaternary` |
+| `practiceGood` | `paperOk` |
+| `practicePoor` | `paperAccent` |
+
+**검증**: 9개 토큰 Phase 6 3개 도메인 grep → 0건. `flutter analyze` → 0 issues.
+
+**보류 (Phase 6.B 대상, 918 refs)**:
+- `AppColors.primary/success/warning/error/info` 직접 사용 (시맨틱 검토 필요 — 예: primary가 purple accent로 쓰이는지 브랜드 컬러로 쓰이는지 per-file 판단)
+- `*Light` 의미 변형 토큰 (`primaryLight`/`successLight` 등 — 18개 refs)
+- `Color(0x...)` 하드코딩 — `ux-rules.md` HARD-GATE 위반 사례
 
 ---
 
