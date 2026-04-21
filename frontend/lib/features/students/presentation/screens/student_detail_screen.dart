@@ -173,6 +173,10 @@ class _StudentDetailContent extends ConsumerWidget {
       expandedHeight: 270,
       pinned: true,
       forceElevated: innerBoxIsScrolled,
+      // 접힐 때 흰색 배경 → 흰색 아이콘/탭 겹침 방지 (M3 surfaceTint 포함).
+      backgroundColor: student.profileColor,
+      foregroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
       leading: IconButton(
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
