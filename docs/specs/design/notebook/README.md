@@ -1163,6 +1163,31 @@ Text(
 
 ---
 
+### 7.37 외부 링크·AI 노트·일정 변경·검색 필터 바텀시트 제목 Playfair 통일
+
+**배경**: §7.34 가 61개 바텀시트의 **표면 톤**을 paper 로 단일화하고 §7.36(녹음 시트·시작 가이드·주간 랭킹 카드) 이 일부 커스텀 헤더를 Playfair 로 옮겼지만, 네 개의 자주 쓰이는 바텀시트 — 선생님이 교재 링크를 추가하는 `AddExternalLinkSheet`, AI 가 생성한 노트를 확인하는 `AiNotesResultSheet`, 단일/일괄 일정 변경을 선택하는 `ScheduleChangeTypeBottomSheet`, 선생님 검색 결과를 좁히는 `TeacherSearchFilterSheet` — 의 **커스텀 헤더 제목**은 여전히 `AppTypography.headingSmall` (Pretendard 18/w600) 로 남아 있었다. 종이 표면 위에 산세리프 제목만 떠 있는 상태였다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/lessons/presentation/widgets/add_external_link_sheet.dart` | 바텀시트 헤더 `'외부 링크 추가'` `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`. `notebook_typography` import 추가 | c708bef8 |
+| `features/lessons/presentation/widgets/ai_notes_result_sheet.dart` | 바텀시트 헤더 `'AI 레슨 노트'` `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`. `auto_awesome` 아이콘과 `Save` TextButton 은 §7.30 에 따라 유지 | c708bef8 |
+| `features/schedule/presentation/widgets/schedule_change_type_bottom_sheet.dart` | 바텀시트 헤더 `AppStrings.scheduleChangeTypeTitle` `AppTypography.headingSmall` → `NotebookTypography.appBarTitle` | c708bef8 |
+| `features/search/presentation/widgets/teacher_search_filter_sheet.dart` | 바텀시트 헤더 `'필터'` `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`. `NotebookTypography.appBarTitle` 은 getter 이므로 `Text` 의 `const` 제거 | c708bef8 |
+
+**설계 포인트**:
+- **§7.27 패턴 일관 적용**: 네 파일 모두 `showModalBottomSheet` 안에서 헤더 `Row` 를 직접 만들어 `Text(..., style: AppTypography.headingSmall)` 과 닫기 버튼/초기화 버튼/저장 버튼을 `spaceBetween` 으로 정렬한 전형적 커스텀 헤더다. 별도 분기 없이 §7.27 의 "커스텀 헤더 = `appBarTitle` 재사용" 패턴을 그대로 적용한다.
+- **`const Text` 제거 이유**: `NotebookTypography.appBarTitle` 은 `TextStyle` getter(런타임 평가)이므로 `Text` 를 `const` 로 선언하면 컴파일 에러. `teacher_search_filter_sheet.dart:62` 에서 `const` 만 제거하고 나머지 구조는 유지.
+- **아이콘·액션 버튼은 §7.30 제외**: `Icons.auto_awesome`(AI 노트), `Icons.close`(외부 링크), `TextButton('초기화')`(필터), `TextButton('저장')`(AI 노트)는 제목이 아닌 심볼·액션이므로 Playfair 적용 대상이 아니다. §7.30 의 아이콘·제스처 제외 규칙을 그대로 따른다.
+- **네 시트의 역할 다양성**: 생성(외부 링크 추가), 결과 확인(AI 노트), 선택(일정 변경 타입), 필터(검색 필터) — 네 가지 다른 상호작용 유형이지만 모두 "페이퍼 표면 위의 한 행짜리 제목" 이라는 공통 골격을 가진다. 한 번의 치환으로 역할별 색채는 유지하되 서체 계보만 통일된다.
+
+**검증**:
+- `flutter analyze [4 files]` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 네 개의 서로 다른 작업대 — 악보 보관함의 링크 바인더, AI 가 타이핑을 마친 노트 패드, 일정표의 분기 결정판, 선생님 명부의 필터 카드. 각자 다른 상호작용을 담고 있지만 이제 모두 같은 캘리그래퍼의 손글씨로 "제목"이 적혀 있다. 종이 위의 Playfair 는 표지의 위엄이 아니라 그 아래 모든 행위에 같은 사람이 책임지고 있다는 표시다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
