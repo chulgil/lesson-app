@@ -7,6 +7,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
@@ -140,7 +141,11 @@ class _RepertoireCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(repertoire.name, style: AppTypography.headingSmall),
+                      // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
+                      Text(
+                        repertoire.name,
+                        style: NotebookTypography.pieceTitle,
+                      ),
                       if (repertoire.description != null)
                         Text(
                           repertoire.description!,

@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_format_utils.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/repertoire_archive_provider.dart';
@@ -34,17 +35,15 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.space2),
+                // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
                 Expanded(
                   child: Text(
                     repertoire.name,
-                    style: AppTypography.headingSmall,
+                    style: NotebookTypography.pieceTitle,
                   ),
                 ),
                 PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: AppColors.inkSecondary,
-                  ),
+                  icon: Icon(Icons.more_vert, color: AppColors.inkSecondary),
                   onSelected: (value) => _handleMenuAction(context, ref, value),
                   itemBuilder:
                       (context) => [
@@ -213,7 +212,9 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 child: const Text(AppStrings.cancel),
               ),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
                 onPressed: () async {
                   Navigator.of(context).pop();
                   await ref
