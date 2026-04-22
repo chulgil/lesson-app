@@ -653,7 +653,8 @@ class RegularLessonSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('월 수강료', style: AppTypography.headingSmall),
+              // Notebook × Score: 카드 내 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+              Text('월 수강료', style: NotebookTypography.sectionTitle),
               Text(
                 formatFee(monthlyFee),
                 style: AppTypography.headingSmall.copyWith(

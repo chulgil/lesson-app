@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/challenge.dart';
 import '../providers/challenge_provider.dart';
 
@@ -47,10 +48,8 @@ class ChallengesCard extends ConsumerWidget {
                 children: [
                   const Text('🏆', style: TextStyle(fontSize: 20)),
                   const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    '도전 과제',
-                    style: AppTypography.headingSmall,
-                  ),
+                  // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+                  Text('도전 과제', style: NotebookTypography.sectionTitle),
                   const Spacer(),
                   if (challenges.length > maxVisible && onViewAll != null)
                     TextButton(
@@ -65,10 +64,12 @@ class ChallengesCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.space3),
-              ...visible.map((c) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                    child: _ChallengeItem(challenge: c),
-                  )),
+              ...visible.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                  child: _ChallengeItem(challenge: c),
+                ),
+              ),
             ],
           ),
         );
@@ -95,10 +96,7 @@ class _ChallengeItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                challenge.type.icon,
-                style: const TextStyle(fontSize: 16),
-              ),
+              Text(challenge.type.icon, style: const TextStyle(fontSize: 16)),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
@@ -114,17 +112,19 @@ class _ChallengeItem extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: challenge.period == ChallengePeriod.weekly
-                      ? AppColors.ink.withValues(alpha: 0.1)
-                      : AppColors.paperAccent.withValues(alpha: 0.1),
+                  color:
+                      challenge.period == ChallengePeriod.weekly
+                          ? AppColors.ink.withValues(alpha: 0.1)
+                          : AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   challenge.period.displayName,
                   style: AppTypography.caption.copyWith(
-                    color: challenge.period == ChallengePeriod.weekly
-                        ? AppColors.ink
-                        : AppColors.paperAccent,
+                    color:
+                        challenge.period == ChallengePeriod.weekly
+                            ? AppColors.ink
+                            : AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -174,9 +174,10 @@ class _ChallengeItem extends StatelessWidget {
               Text(
                 'D-${challenge.remainingDays}',
                 style: AppTypography.caption.copyWith(
-                  color: challenge.remainingDays <= 2
-                      ? AppColors.paperAccent
-                      : AppColors.inkTertiary,
+                  color:
+                      challenge.remainingDays <= 2
+                          ? AppColors.paperAccent
+                          : AppColors.inkTertiary,
                 ),
               ),
             ],

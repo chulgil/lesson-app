@@ -63,9 +63,10 @@ class BookingConfirmDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
       ),
+      // Notebook × Score: AlertDialog title 은 전역 dialogTheme.titleTextStyle
+      // (NotebookTypography.dialogTitle) 을 상속. 인라인 style 오버라이드 제거 (§7.41 cleanup 패턴).
       title: Text(
         isReschedule ? '레슨 시간을 변경하시겠습니까?' : '예약을 확정하시겠습니까?',
-        style: AppTypography.headingSmall.copyWith(fontWeight: FontWeight.w600),
         textAlign: TextAlign.center,
       ),
       content: Column(
@@ -112,7 +113,11 @@ class BookingConfirmDialog extends StatelessWidget {
                 const SizedBox(height: AppSpacing.space1),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 16, color: AppColors.paperAccent),
+                    Icon(
+                      Icons.access_time,
+                      size: 16,
+                      color: AppColors.paperAccent,
+                    ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '$startTime - $endTime',
