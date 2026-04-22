@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 
@@ -444,9 +445,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(AppSpacing.space4),
+                      // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
                       child: Text(
                         '개인정보 수집·이용 동의',
-                        style: AppTypography.headingSmall,
+                        style: NotebookTypography.sectionTitle,
                       ),
                     ),
                     const Divider(height: 1),
@@ -498,7 +500,8 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('계좌 추가', style: AppTypography.headingSmall),
+            // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('계좌 추가', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space4),
 
             // Consent checkbox

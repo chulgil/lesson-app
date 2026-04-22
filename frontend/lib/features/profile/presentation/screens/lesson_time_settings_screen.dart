@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../settings/presentation/providers/teacher_settings_provider.dart';
@@ -207,9 +208,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space2),
         Text(
           '최소 1개의 시간은 활성화 상태여야 합니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
@@ -225,7 +224,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('예약 설정', style: AppTypography.headingSmall),
+        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+        Text('예약 설정', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '레슨 예약 관련 설정을 지정하세요',
@@ -276,7 +276,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: AppSpacing.space4),
-                Text('레슨 간 휴식 시간', style: AppTypography.headingSmall),
+                // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+                Text('레슨 간 휴식 시간', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '레슨과 레슨 사이의 휴식 시간을 설정합니다',
@@ -324,7 +325,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: AppSpacing.space4),
-                Text('최소 예약 가능 시간', style: AppTypography.headingSmall),
+                // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+                Text('최소 예약 가능 시간', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
@@ -498,13 +500,17 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    borderSide: const BorderSide(color: AppColors.inkQuaternary),
+                    borderSide: const BorderSide(
+                      color: AppColors.inkQuaternary,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    borderSide: const BorderSide(color: AppColors.inkQuaternary),
+                    borderSide: const BorderSide(
+                      color: AppColors.inkQuaternary,
+                    ),
                   ),
                   counterText: '',
                 ),
@@ -737,7 +743,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               if (currentPrice != null)
                 TextButton(
                   onPressed: () => Navigator.pop(context, -1),
-                  child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                  child: Text(
+                    '삭제',
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
                 ),
               TextButton(
                 onPressed: () => Navigator.pop(context),

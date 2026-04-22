@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 
@@ -93,7 +94,8 @@ class _InstrumentManagementScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('현재 가르치는 악기', style: AppTypography.headingSmall),
+        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+        Text('현재 가르치는 악기', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '악기를 탭하면 삭제할 수 있습니다',
@@ -192,7 +194,8 @@ class _InstrumentManagementScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('악기 추가', style: AppTypography.headingSmall),
+        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+        Text('악기 추가', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space4),
 
         // Preset instruments grid
