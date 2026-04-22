@@ -516,7 +516,7 @@ Text(
 
 ### 7.11 Phase 3 후속 실적용 (StaffDivider + PencilCircle + PencilBox 도입)
 
-**범위**: Phase 3에서 신설한 공용 위젯을 실제 화면 6곳에 적용. "추가만 하고 쓰이지 않는 위젯" 잔여물 제거.
+**범위**: Phase 3에서 신설한 공용 위젯을 실제 화면 8곳에 적용. "추가만 하고 쓰이지 않는 위젯" 잔여물 제거 + 연습 체크박스 일관성 확보.
 
 | 위젯 | 적용 파일 | 변경 | 커밋 |
 |------|-----------|------|------|
@@ -526,9 +526,11 @@ Text(
 | `PencilCircle` | `features/practice/presentation/widgets/goal/goal_setting_chips.dart` | `ChoiceChip.avatar` 슬롯에 `PencilCircle(size: 16)`. `showCheckmark: false` 로 Material 체크마크 대체 | 795b5c18 |
 | `PencilBox` | `features/auth/presentation/screens/terms_agreement_screen.dart` | Material `Checkbox` 2곳(전체 동의 20px · 개별 약관 18px) → `PencilBox`. 외부 `InkWell` 이 탭 처리 | ae35f194 |
 | `PencilBox` | `features/lessons/presentation/widgets/practice_items_section.dart` | 연습 완료 표시 원형 컨테이너+Icon → `PencilBox(size: 20, checkColor: paperOk)`. 녹색 펜 느낌 유지, 원형 → 사각 체크로 변경 | ae35f194 |
+| `PencilBox` | `features/practice/presentation/screens/practice_repertoire_screen.dart` | 섹션 완료 `Transform.scale + Checkbox(activeColor: paperOk)` → `GestureDetector + PencilBox(size: 22, checkColor: paperOk)` | 13b366d8 |
+| `PencilBox` | `features/student_home/presentation/screens/student_practice_tab.dart` | 오늘(탭 가능) `Checkbox` + 과거/미래(읽기 전용) `Icons.check_circle/radio_button_unchecked` 혼재 → `PencilBox(size: 22, checkColor: paperOk)` 로 통일. 과거/미래는 `borderColor: inkSecondary` | 13b366d8 |
 
 **검증**:
-- `flutter analyze` → 0 issues (6곳 모두)
+- `flutter analyze` → 0 issues (8곳 모두)
 - `flutter test` → 392/392 passed
 - 기능·Provider·라우팅 변경 없음 (style-only)
 
