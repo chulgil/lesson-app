@@ -1303,6 +1303,41 @@ Text(
 
 ---
 
+### 7.41 FloatingActionButton 인라인 override cleanup — §7.40 이후 중복 제거
+
+**배경**: §7.40에서 `floatingActionButtonTheme` 를 등록해 18개 `.extended` FAB 전부에 Vermillion + paper + elevation 0 시그니처를 자동 공급했다. 그러나 6개 호출부(`backgroundColor: paperAccent` 3건 + `Colors.white` 라벨 강제 3건 + `foregroundColor: Colors.white` 1건이 4개 파일에 중첩)는 여전히 인라인 오버라이드를 유지해 테마를 가리고 있었다. Flutter 속성 우선순위에 따라 인라인이 테마를 덮어 쓰므로, 테마가 의도한 `paper` 라벨(크림 `0xFFF2ECDD`)이 아니라 pure `Colors.white (0xFFFFFFFF)` 가 라벨로 고정돼 있었다.
+
+**변경**:
+
+| 파일 | 제거 |
+|------|------|
+| `features/schedule/presentation/screens/weekly_schedule_screen.dart` | `backgroundColor: paperAccent` · `Icon(color: white)` · `Text(style: copyWith(white))` |
+| `features/schedule/presentation/screens/time_exception_screen.dart` | 동일 3건 |
+| `features/subscription/presentation/screens/subscription_template_list_screen.dart` | 동일 3건 |
+| `features/invite/presentation/screens/my_connections_screen.dart` | `backgroundColor: paperAccent` · `foregroundColor: Colors.white` |
+
+**영향 범위**: 4개 화면(주간 스케줄·휴무 예외·수강권 템플릿·내 연결)의 `.extended` FAB 이 §7.40 테마의 `paperAccent + paper + Inter w600 + elevation 0` 시그니처로 자동 복귀. 라벨 색이 pure white 에서 크림 paper 로 전환되어 Vermillion 배경과의 대비가 약간 완화되며, Notebook × Score 전 화면이 동일한 CTA 외피를 공유한다.
+
+**설계 포인트**:
+- `Colors.white`(순백) → `AppColors.paper`(크림)로 승격: §7.40 `foregroundColor: paper` 기본값이 자동 적용. Notebook 파지 톤과 라벨이 한 팔레트로 수렴.
+- `AppTypography.bodyMedium.copyWith(color: white)` 제거: 테마의 `extendedTextStyle: bodyMedium w600 paper` 가 DefaultTextStyle 로 라벨에 주입됨. 기존 `w400` 에서 `w600` 으로 강조도 승격.
+- 나머지 11개 `.extended` FAB(학생 상세·계좌 편집·결제 관리·레퍼토리·팁 템플릿 등)는 이미 오버라이드가 없어 §7.40 직후 자동 승격된 상태. 이번 cleanup 으로 18개 FAB 전부가 테마 단일 진원지 체제로 완전 수렴.
+
+**회귀 방지**: 속성 우선순위 체인(`inline > theme`)은 유지되므로 향후 개별 화면이 `backgroundColor` 를 재설정해 특수 CTA 를 만들 수 있는 확장성은 그대로. 단, 기본 Vermillion 이 맞다면 인라인은 더 이상 필요 없음을 §7.41 이 기록한다.
+
+**검증**:
+- `flutter analyze` → No issues (편집 4 파일 기준, 기존 2건 경고는 `notebook_typography` 임포트 건으로 범위 밖)
+- `flutter test` → 392/392 passed
+- 임포트 정리: 3개 파일(`weekly_schedule_screen`·`time_exception_screen`·`subscription_template_list_screen`)에서 `AppTypography` 임포트가 다른 용도(FAB 외)로 계속 사용 중이라 유지. 미사용 경고 없음.
+
+**마일스톤**: §7.40 이론적 수렴(테마 등록)과 §7.41 물리적 수렴(인라인 정리)이 한 쌍으로 완결. 이후 `.extended` FAB 신규 추가 시 `onPressed · icon · label` 세 프로퍼티만 명시하면 Notebook CTA 가 자동 적용된다.
+
+**커밋**: 코드는 `59be7339` 에 §7.39 후속 Playfair 통일 작업과 묶여 포함됨(훅이 프리-existing 변경과 함께 자동 스테이지). 7개 파일 + 80/-83 lines 중 FAB cleanup 분은 4 파일 · -36 lines 축소가 해당 분.
+
+**은유**: §7.40 이 15개 노트 귀퉁이에 같은 인주를 찍어 뒀다면, §7.41 은 그 위에 붙어 있던 네 장의 반투명 스티커(`pure white 라벨 · 순백 아이콘 · 바탕색 고정 주석`)를 떼어낸 작업이다. 스티커 밑에 이미 같은 색이 찍혀 있었기에 떼는 순간 노트 전체가 한 번에 정돈된다 — 추가로 칠할 필요 없이 이미 칠해진 것을 드러내는 것이 단일 진원지 패턴의 본질.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
