@@ -794,6 +794,28 @@ Text(
 
 **은유**: 악보 뒷면에 접혀 나오는 주석 쪽지도 같은 종이와 같은 테두리로 인쇄되는 느낌. 메뉴 팝업이 본문 페이지의 축소판처럼 보여 "어디에 있어도 같은 악보집" 감각 유지.
 
+### 7.24 DatePicker + TimePicker 테마 통일 — Material blue 제거, Vermillion 선택 + 2px ink 테두리
+
+**배경**: §7.23 까지 팝업·드롭다운 메뉴는 통일되었으나, `showDatePicker` / `showDateRangePicker` / `showTimePicker` 호출(15 파일) 이 띄우는 날짜·시간 선택기는 Material3 기본 `ColorScheme.primary` (blue) 를 선택색으로 사용하여 Notebook 팔레트에서 가장 눈에 띄는 잔여 이질 영역. 스케줄링·과제 마감·레슨 시간 등 앱 핵심 플로우에서 반복 노출되어 사용자 몰입을 깨는 가장 큰 holdout 이었음.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `datePickerTheme` + `timePickerTheme` 추가. 배경 `paper`, 2px ink 테두리, 선택일/시간 `paperAccent` + 비선택 `paperAccentSoft`, 오늘 Vermillion 테두리 강조, 시계 다이얼 핸들 Vermillion | fe473cf1 |
+| `core/theme/app_theme.dart` (dark) | 동일 구조에 `surfaceDark` 배경 + `paper` 2px 테두리 + `borderDark` 비선택 배경 | fe473cf1 |
+
+**영향 범위** (15 파일):
+- `showDatePicker` 호출: 레슨 일시 선택, 과제 마감일, 정기 레슨 기간 설정, 수강권 시작일 등
+- `showDateRangePicker` 호출: 레슨 필터 기간 지정, 결제 내역 조회 기간
+- `showTimePicker` 호출: 레슨 시작 시간, 연습 알림 시간, 수업 가능 시간대 설정
+- `WidgetStateProperty.resolveWith` 로 selected/disabled 상태별 색상 분기
+- `todayBorder` 로 오늘 날짜를 Vermillion 테두리로 항상 식별 가능하게 표시
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 악보집에 끼워진 달력·시계표도 Playfair 악보와 같은 잉크·같은 테두리로 인쇄된 느낌. Material 기본 blue 는 "공장에서 찍어낸 캘린더 스티커", Vermillion + 2px ink 는 "편집자가 손으로 표시한 달력" 의 차이. 앱의 모든 "시간 선택" 순간이 Notebook 카드 외곽선 규칙과 동일한 시각 언어로 통일.
+
 ---
 
 ## 8. 구현 원칙
