@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 const _supportEmail = 'support@lessonaza.com';
 
@@ -61,7 +62,8 @@ class HelpScreen extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
           // FAQ header
-          Text('자주 묻는 질문', style: AppTypography.headingSmall),
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+          Text('자주 묻는 질문', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space4),
 
           // FAQ items

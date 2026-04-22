@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 import 'section_recording_list_item.dart';
 
@@ -35,9 +36,10 @@ class SectionRecordingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
         Text(
           '녹음 기록 (${recordings.length})',
-          style: AppTypography.headingSmall,
+          style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space3),
 
@@ -46,8 +48,8 @@ class SectionRecordingsSection extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: recordings.length,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppSpacing.space2),
+          separatorBuilder:
+              (context, index) => const SizedBox(height: AppSpacing.space2),
           itemBuilder: (context, index) {
             final recording = recordings[index];
             return SectionRecordingListItem(
@@ -74,11 +76,7 @@ class SectionRecordingsSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.mic_none,
-            size: 48,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.mic_none, size: 48, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '아직 녹음이 없습니다',
@@ -98,4 +96,3 @@ class SectionRecordingsSection extends StatelessWidget {
     );
   }
 }
-
