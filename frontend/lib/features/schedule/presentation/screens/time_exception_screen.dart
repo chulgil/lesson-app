@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -88,7 +89,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
           // Upcoming exceptions
           if (upcoming.isNotEmpty) ...[
-            Text('예정된 휴무', style: AppTypography.headingSmall),
+            // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('예정된 휴무', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space3),
             ...upcoming.map((e) => _buildExceptionCard(e)),
           ],
@@ -96,9 +98,11 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           // Past exceptions
           if (past.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space6),
+            // Notebook × Score: 과거 섹션 제목도 Playfair sectionTitle 로 통일, 차분한 톤은
+            // inkSecondary copyWith 로 보존 (§7.17, color override 변형).
             Text(
               '지난 휴무',
-              style: AppTypography.headingSmall.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),

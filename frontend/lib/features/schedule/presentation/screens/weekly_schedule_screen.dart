@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -79,7 +80,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           const SizedBox(height: AppSpacing.space6),
 
           // Weekly overview
-          Text('주간 스케줄', style: AppTypography.headingSmall),
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+          Text('주간 스케줄', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
 
           // Days grid
