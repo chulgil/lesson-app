@@ -141,3 +141,7 @@ backend/test.db
 
 # Design reference materials (not for commit)
 design-plan/
+
+# Autopus local project scaffolding (tool artifact, not for commit)
+.autopus/
+autopus.yaml

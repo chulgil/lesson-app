@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 
 /// Student info for lesson selection
 class LessonStudentInfo {
@@ -27,6 +27,7 @@ class LessonFormSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: AppTypography.headingSmall);
+    // Notebook × Score: 레슨 폼 섹션 제목도 Playfair sectionTitle(17) 로 통일.
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 }

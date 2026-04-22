@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 
 /// Section title text.
 class FormSectionTitle extends StatelessWidget {
@@ -12,7 +13,8 @@ class FormSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: AppTypography.headingSmall);
+    // Notebook × Score: 폼 섹션 제목도 Playfair sectionTitle(17) 로 통일.
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 }
 
@@ -28,9 +30,7 @@ class FormSectionSubtitle extends StatelessWidget {
       padding: const EdgeInsets.only(top: AppSpacing.space1),
       child: Text(
         subtitle,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }
