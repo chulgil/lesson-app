@@ -55,9 +55,9 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
                   },
                   icon: Icon(
                     Icons.close,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                     size: 18,
                   ),
                   padding: EdgeInsets.zero,
@@ -163,9 +163,9 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
         }
       },
       selectedColor: AppColors.primary.withAlpha(30),
-      backgroundColor: AppColors.surfaceSecondaryLight,
+      backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+        color: isSelected ? AppColors.primary : AppColors.ink,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
@@ -194,11 +194,11 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
         });
       },
       selectedColor: AppColors.primary.withAlpha(30),
-      backgroundColor: AppColors.surfaceSecondaryLight,
+      backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
         color: _showCustomInput || isCustomSelected
             ? AppColors.primary
-            : AppColors.textPrimaryLight,
+            : AppColors.ink,
         fontWeight: _showCustomInput || isCustomSelected
             ? FontWeight.w600
             : FontWeight.normal,

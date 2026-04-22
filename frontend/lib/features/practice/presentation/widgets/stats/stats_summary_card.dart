@@ -19,9 +19,9 @@ class StatsSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(10),
@@ -146,7 +146,7 @@ class StatsSummaryCard extends StatelessWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -176,7 +176,7 @@ class StatsSummaryCard extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],

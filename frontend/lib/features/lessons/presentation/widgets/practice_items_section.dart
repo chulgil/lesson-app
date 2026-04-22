@@ -48,7 +48,7 @@ class PracticeItemsSection extends ConsumerWidget {
                   Text(
                     '데이터를 불러오는데 실패했습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
@@ -108,13 +108,13 @@ class PracticeItemsSection extends ConsumerWidget {
           Icon(
             Icons.assignment_outlined,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             isTeacher ? '이번 주 연습 과제를 추가해보세요' : '아직 연습 과제가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -139,7 +139,7 @@ class PracticeItemsSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -153,9 +153,9 @@ class PracticeItemsSection extends ConsumerWidget {
               children: [
                 CircularProgressIndicator(
                   value: rate,
-                  backgroundColor: AppColors.borderLight,
+                  backgroundColor: AppColors.inkQuaternary,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    rate >= 1.0 ? AppColors.practiceGood : AppColors.primary,
+                    rate >= 1.0 ? AppColors.paperOk : AppColors.primary,
                   ),
                   strokeWidth: 4,
                 ),
@@ -182,7 +182,7 @@ class PracticeItemsSection extends ConsumerWidget {
                 Text(
                   '$completed / $total 완료',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -200,9 +200,9 @@ class PracticeItemsSection extends ConsumerWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(
         color: Colors.transparent,
@@ -229,8 +229,8 @@ class PracticeItemsSection extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color:
                               item.isCompleted
-                                  ? AppColors.textTertiaryLight
-                                  : AppColors.textPrimaryLight,
+                                  ? AppColors.inkTertiary
+                                  : AppColors.ink,
                         ),
                       ),
                       if (item.description != null &&
@@ -241,8 +241,8 @@ class PracticeItemsSection extends ConsumerWidget {
                           style: AppTypography.bodySmall.copyWith(
                             color:
                                 item.isCompleted
-                                    ? AppColors.textTertiaryLight
-                                    : AppColors.textSecondaryLight,
+                                    ? AppColors.inkTertiary
+                                    : AppColors.inkSecondary,
                           ),
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis,
@@ -263,7 +263,7 @@ class PracticeItemsSection extends ConsumerWidget {
                       '${item.practiceCount}회',
                       style: AppTypography.caption.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -291,13 +291,13 @@ class PracticeItemsSection extends ConsumerWidget {
         width: 24,
         height: 24,
         decoration: BoxDecoration(
-          color: item.isCompleted ? AppColors.practiceGood : Colors.transparent,
+          color: item.isCompleted ? AppColors.paperOk : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(
             color:
                 item.isCompleted
-                    ? AppColors.practiceGood
-                    : AppColors.borderLight,
+                    ? AppColors.paperOk
+                    : AppColors.inkQuaternary,
             width: 2,
           ),
         ),

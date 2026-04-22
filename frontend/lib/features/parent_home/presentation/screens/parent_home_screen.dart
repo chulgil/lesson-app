@@ -52,7 +52,7 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
           onTap: (index) => setState(() => _currentIndex = index),
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textTertiaryLight,
+          unselectedItemColor: AppColors.inkTertiary,
           items: _buildNavItems(activeProfile),
         ),
       ),

@@ -70,7 +70,7 @@ class ChildProfilesScreen extends ConsumerWidget {
             Icon(
               Icons.child_care_outlined,
               size: 80,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
@@ -78,7 +78,7 @@ class ChildProfilesScreen extends ConsumerWidget {
             Text(
               '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -199,7 +199,7 @@ class _ChildProfileCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        side: BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
@@ -263,13 +263,13 @@ class _ChildProfileCard extends StatelessWidget {
                         Icon(
                           profile.instrumentIcon,
                           size: 14,
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${profile.instrumentLabel} • ${profile.levelLabel}',
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -281,13 +281,13 @@ class _ChildProfileCard extends StatelessWidget {
                           Icon(
                             Icons.person_outline,
                             size: 14,
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                           const SizedBox(width: AppSpacing.space1),
                           Text(
                             profile.teacherName!,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                           ),
                         ],
@@ -310,7 +310,7 @@ class _ChildProfileCard extends StatelessWidget {
                     onPressed: onTap,
                     icon: Icon(
                       Icons.edit_outlined,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     tooltip: '정보 수정',
                   ),

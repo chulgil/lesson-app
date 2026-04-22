@@ -66,7 +66,7 @@ class ParentProfileTab extends ConsumerWidget {
                   trailing: Text(
                     '한국어',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   onTap: () => LanguageSelectSheet.show(context),
@@ -96,7 +96,7 @@ class ParentProfileTab extends ConsumerWidget {
                   trailing: Text(
                     'v1.0.0',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   onTap: () => context.push(AppRoutes.appInfo),

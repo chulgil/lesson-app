@@ -34,7 +34,7 @@ class MonthGroupHeader extends StatelessWidget {
           Text(
             monthGroup.label,
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           if (monthGroup.hasInProgress) ...[
@@ -55,7 +55,7 @@ class MonthGroupHeader extends StatelessWidget {
             ),
           ],
           const SizedBox(width: AppSpacing.space2),
-          Expanded(child: Container(height: 1, color: AppColors.borderLight)),
+          Expanded(child: Container(height: 1, color: AppColors.inkQuaternary)),
         ],
       ),
     );

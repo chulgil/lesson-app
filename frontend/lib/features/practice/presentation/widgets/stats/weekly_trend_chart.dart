@@ -31,9 +31,9 @@ class WeeklyTrendChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +73,7 @@ class WeeklyTrendChart extends StatelessWidget {
               return Text(
                 stat.weekLabel,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               );
             }).toList(),

@@ -94,7 +94,7 @@ class _StaffPainter extends CustomPainter {
 
   void _drawStaffLines(Canvas canvas, Size size, double staffTop) {
     final linePaint = Paint()
-      ..color = AppColors.textTertiaryLight
+      ..color = AppColors.inkTertiary
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -116,7 +116,7 @@ class _StaffPainter extends CustomPainter {
         text: '𝄞',
         style: TextStyle(
           fontSize: 38,
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
           fontFamily: 'Noto Music',
         ),
       ),
@@ -136,8 +136,8 @@ class _StaffPainter extends CustomPainter {
     final noteY = _getNoteY(note.name, staffTop);
 
     // Colors
-    final noteColor = isPerfect ? AppColors.success : AppColors.textPrimaryLight;
-    final accentColor = isPerfect ? AppColors.success : AppColors.textSecondaryLight;
+    final noteColor = isPerfect ? AppColors.success : AppColors.ink;
+    final accentColor = isPerfect ? AppColors.success : AppColors.inkSecondary;
 
     // Draw ledger lines if needed
     _drawLedgerLines(canvas, centerX, staffTop, note.name, noteColor);

@@ -45,7 +45,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -65,7 +65,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               Text(
                 '원활한 서비스 이용을 위해\n아래 약관에 동의해 주세요.',
                 style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
 
@@ -164,13 +164,13 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color:
                 _allChecked
                     ? AppColors.primary.withValues(alpha: 0.5)
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -204,7 +204,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
     required VoidCallback onViewContent,
   }) {
     final tag = required ? '[필수]' : '[선택]';
-    final tagColor = required ? AppColors.error : AppColors.textTertiaryLight;
+    final tagColor = required ? AppColors.error : AppColors.inkTertiary;
 
     return InkWell(
       onTap: () => onChanged(!value),
@@ -239,7 +239,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               child: Text(
                 '보기',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -282,7 +282,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                     child: Text(
                       content,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                         height: 1.6,
                       ),
                     ),

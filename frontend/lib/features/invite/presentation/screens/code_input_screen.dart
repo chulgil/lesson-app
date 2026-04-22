@@ -59,7 +59,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
     final targetRole = userRole == InviteUserRole.teacher ? '학생' : '선생님';
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('초대 코드 입력'),
         leading: IconButton(
@@ -101,7 +101,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
               Text(
                 '6자리 숫자 코드를 입력해주세요',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -217,11 +217,11 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
           fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            borderSide: BorderSide(color: AppColors.borderLight),
+            borderSide: BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            borderSide: BorderSide(color: AppColors.borderLight),
+            borderSide: BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),

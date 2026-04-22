@@ -43,7 +43,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
         child: Text(
           '출석 데이터가 없습니다',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       );
@@ -102,9 +102,9 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: rate / 100,
               minHeight: 8,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor: AppColors.inkQuaternary,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
@@ -127,7 +127,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           Text(
             '${overview.totalCompleted}/${overview.totalCountable}회',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -156,7 +156,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
               child: LinearProgressIndicator(
                 value: rate / 100,
                 minHeight: 6,
-                backgroundColor: AppColors.borderLight,
+                backgroundColor: AppColors.inkQuaternary,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ),
@@ -167,7 +167,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
             child: Text(
               '${rate.toStringAsFixed(0)}% (${sr.completed}/${sr.total})',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.end,
             ),
@@ -194,7 +194,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           Text(
             '${ar.date.month}/${ar.date.day}',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),

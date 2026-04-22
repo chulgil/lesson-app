@@ -181,7 +181,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               child: Text(
                 '데이터를 불러오는데 실패했습니다',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -193,7 +193,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -213,7 +213,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 Text(
                   '${lesson.instrument} · ${lesson.duration}분',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -292,16 +292,16 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               avatar: Icon(
                 Icons.add,
                 size: 16,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               label: Text(
                 '추가',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
-              backgroundColor: AppColors.surfaceSecondaryLight,
-              side: BorderSide(color: AppColors.borderLight),
+              backgroundColor: AppColors.paperDark,
+              side: BorderSide(color: AppColors.inkQuaternary),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space1,
               ),
@@ -410,9 +410,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         const SizedBox(height: AppSpacing.space2),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: TextField(
             controller: _feedbackController,
@@ -421,7 +421,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             decoration: InputDecoration(
               hintText: '레슨 피드백을 작성하세요...',
               hintStyle: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(AppSpacing.space4),
@@ -480,7 +480,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 const Spacer(),
                 Icon(
                   isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ],
             ),
@@ -504,7 +504,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 vertical: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
@@ -528,7 +528,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                     icon: Icon(
                       Icons.close,
                       size: 18,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                     constraints: const BoxConstraints(),
                     padding: EdgeInsets.zero,
@@ -555,9 +555,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   Widget _buildTipsField() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
         controller: _tipController,
@@ -566,7 +566,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         decoration: InputDecoration(
           hintText: '연습할 때 주의할 점을 적어주세요...',
           hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(AppSpacing.space4),
@@ -596,7 +596,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('✅ 피드백이 저장되었습니다'),
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -654,17 +654,17 @@ class _KeyPointInputState extends State<_KeyPointInput> {
             decoration: InputDecoration(
               hintText: '포인트 추가...',
               hintStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               filled: true,
-              fillColor: AppColors.surfaceLight,
+              fillColor: AppColors.paper,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space3,

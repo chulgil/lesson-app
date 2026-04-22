@@ -76,13 +76,13 @@ class _AddRecordingResourceSheetState
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius:
                       BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(
                     color: _selectedFilePath != null
                         ? AppColors.primary
-                        : AppColors.borderLight,
+                        : AppColors.inkQuaternary,
                     width: _selectedFilePath != null ? 2 : 1,
                   ),
                 ),
@@ -95,15 +95,15 @@ class _AddRecordingResourceSheetState
                       size: 48,
                       color: _selectedFilePath != null
                           ? AppColors.primary
-                          : AppColors.textTertiaryLight,
+                          : AppColors.inkTertiary,
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       _selectedFileName ?? '탭하여 오디오 파일 선택',
                       style: AppTypography.bodyMedium.copyWith(
                         color: _selectedFilePath != null
-                            ? AppColors.textPrimaryLight
-                            : AppColors.textSecondaryLight,
+                            ? AppColors.ink
+                            : AppColors.inkSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -111,7 +111,7 @@ class _AddRecordingResourceSheetState
                       Text(
                         'm4a, mp3, wav 지원',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                       ),
                   ],

@@ -25,13 +25,13 @@ class PaymentCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isOverdue
                   ? AppColors.error.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+                  : AppColors.inkQuaternary,
         ),
         boxShadow: [
           BoxShadow(
@@ -105,7 +105,7 @@ class PaymentCard extends StatelessWidget {
               Text(
                 payment.periodDisplay,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -130,7 +130,7 @@ class PaymentCard extends StatelessWidget {
             Text(
               payment.method.label,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -183,11 +183,11 @@ class PaymentCard extends StatelessWidget {
       case PaymentStatus.confirmed:
       // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
-        return AppColors.practiceGood;
+        return AppColors.paperOk;
       case PaymentStatus.overdue:
         return AppColors.error;
       case PaymentStatus.cancelled:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case PaymentStatus.refunded:
         return AppColors.info;
     }
@@ -246,11 +246,11 @@ class PaymentStatusBadge extends StatelessWidget {
         case PaymentStatus.confirmed:
         // ignore: deprecated_member_use_from_same_package
         case PaymentStatus.completed:
-          color = AppColors.practiceGood;
+          color = AppColors.paperOk;
         case PaymentStatus.overdue:
           color = AppColors.error;
         case PaymentStatus.cancelled:
-          color = AppColors.textTertiaryLight;
+          color = AppColors.inkTertiary;
         case PaymentStatus.refunded:
           color = AppColors.info;
       }
@@ -336,7 +336,7 @@ class PaymentActionButton extends StatelessWidget {
           icon: const Icon(Icons.check, size: 16),
           label: const Text('입금확인'),
           style: FilledButton.styleFrom(
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space4,
               vertical: AppSpacing.space2,

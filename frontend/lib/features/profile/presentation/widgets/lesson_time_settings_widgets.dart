@@ -70,8 +70,8 @@ class DurationOptionItem extends StatelessWidget {
         style: AppTypography.bodyLarge.copyWith(
           color:
               isDisabled
-                  ? AppColors.textTertiaryLight
-                  : AppColors.textPrimaryLight,
+                  ? AppColors.inkTertiary
+                  : AppColors.ink,
           decoration: isDisabled ? TextDecoration.lineThrough : null,
           fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
         ),
@@ -81,7 +81,7 @@ class DurationOptionItem extends StatelessWidget {
               ? Text(
                 '커스텀',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               )
               : null,
@@ -121,25 +121,25 @@ class TimeSlotsEmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.schedule, size: 48, color: AppColors.textTertiaryLight),
+            Icon(Icons.schedule, size: 48, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '설정된 시간대가 없습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '시간대를 추가하여 레슨 가능 시간을 설정하세요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -179,7 +179,7 @@ class DaySectionCard extends StatelessWidget {
       child: ExpansionTile(
         leading: Icon(
           hasSlots ? Icons.check_circle : Icons.cancel,
-          color: hasSlots ? AppColors.success : AppColors.textTertiaryLight,
+          color: hasSlots ? AppColors.success : AppColors.inkTertiary,
         ),
         title: Text(
           dayName,
@@ -188,7 +188,7 @@ class DaySectionCard extends StatelessWidget {
         subtitle: Text(
           hasSlots ? '${slots.length}개 시간대' : '휴무',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         children: [
@@ -206,7 +206,7 @@ class DaySectionCard extends StatelessWidget {
               child: Text(
                 '등록된 시간대가 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ),
@@ -242,15 +242,15 @@ class TimeSlotTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         Icons.access_time,
-        color: slot.isActive ? AppColors.primary : AppColors.textTertiaryLight,
+        color: slot.isActive ? AppColors.primary : AppColors.inkTertiary,
       ),
       title: Text(
         slot.timeRange,
         style: AppTypography.bodyMedium.copyWith(
           color:
               slot.isActive
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+                  ? AppColors.ink
+                  : AppColors.inkTertiary,
           decoration: slot.isActive ? null : TextDecoration.lineThrough,
         ),
       ),
@@ -290,7 +290,7 @@ class TimePickerButton extends StatelessWidget {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -630,10 +630,10 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                         style: AppTypography.bodySmall.copyWith(
                           color:
                               exists
-                                  ? AppColors.textTertiaryLight
+                                  ? AppColors.inkTertiary
                                   : isSelected
                                   ? AppColors.primary
-                                  : AppColors.textPrimaryLight,
+                                  : AppColors.ink,
                           decoration:
                               exists ? TextDecoration.lineThrough : null,
                         ),

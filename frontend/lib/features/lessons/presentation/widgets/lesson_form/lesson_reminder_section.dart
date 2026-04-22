@@ -31,9 +31,9 @@ class LessonReminderSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -44,12 +44,12 @@ class LessonReminderSection extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.practiceGood.withValues(alpha: 0.1),
+                  color: AppColors.paperOk.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: const Icon(
                   Icons.notifications_active,
-                  color: AppColors.practiceGood,
+                  color: AppColors.paperOk,
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -66,7 +66,7 @@ class LessonReminderSection extends StatelessWidget {
                     Text(
                       '레슨 시작 전 알림 받기',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -88,7 +88,7 @@ class LessonReminderSection extends StatelessWidget {
                 Text(
                   '알림 시간',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const Spacer(),
@@ -118,7 +118,7 @@ class _ReminderTimeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -140,7 +140,7 @@ class _ReminderTimeSelector extends StatelessWidget {
                 option.$2,
                 style: AppTypography.caption.copyWith(
                   color:
-                      isSelected ? Colors.white : AppColors.textSecondaryLight,
+                      isSelected ? Colors.white : AppColors.inkSecondary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),

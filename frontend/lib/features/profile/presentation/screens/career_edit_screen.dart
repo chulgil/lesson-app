@@ -375,7 +375,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -392,7 +392,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(
-          color: AppColors.borderLight.withValues(alpha: 0.5),
+          color: AppColors.inkQuaternary.withValues(alpha: 0.5),
         ),
       ),
     );

@@ -30,10 +30,10 @@ class LessonDateTimeSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isPast ? AppColors.warning : AppColors.borderLight,
+              color: isPast ? AppColors.warning : AppColors.inkQuaternary,
             ),
           ),
           child: Column(
@@ -66,7 +66,7 @@ class LessonDateTimeSection extends StatelessWidget {
                           Text(
                             '날짜',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                           Text(
@@ -82,7 +82,7 @@ class LessonDateTimeSection extends StatelessWidget {
                     Icon(
                       Icons.edit,
                       size: 18,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ],
                 ),
@@ -118,7 +118,7 @@ class LessonDateTimeSection extends StatelessWidget {
                           Text(
                             '시간',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                           Text(
@@ -133,7 +133,7 @@ class LessonDateTimeSection extends StatelessWidget {
                     Icon(
                       Icons.edit,
                       size: 18,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ],
                 ),

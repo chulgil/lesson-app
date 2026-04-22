@@ -41,7 +41,7 @@ class NotificationBellIcon extends ConsumerWidget {
         children: [
           Icon(
             Icons.notifications_outlined,
-            color: iconColor ?? AppColors.textPrimaryLight,
+            color: iconColor ?? AppColors.ink,
             size: iconSize,
           ),
           // Unread badge

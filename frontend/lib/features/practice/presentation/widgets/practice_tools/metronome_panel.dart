@@ -270,7 +270,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                         Text(
                           _getTempoMarking(state.settings.bpm),
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                         Text(
@@ -364,9 +364,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     vertical: AppSpacing.space3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,7 +385,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                                     ? '복합 박자'
                                     : '단순 박자',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                               if (state.settings.timeSignature.isCompound)
@@ -402,7 +402,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                       ),
                       Icon(
                         Icons.keyboard_arrow_down,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ],
                   ),
@@ -439,9 +439,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     vertical: AppSpacing.space3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -481,7 +481,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                               Text(
                                 '패턴: ${state.settings.subdivision.visualPattern}',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                   letterSpacing: 2,
                                 ),
                               ),
@@ -491,7 +491,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                       ),
                       Icon(
                         Icons.keyboard_arrow_down,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ],
                   ),

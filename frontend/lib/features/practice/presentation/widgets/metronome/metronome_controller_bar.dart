@@ -43,7 +43,7 @@ class _MetronomeControllerBarState extends ConsumerState<MetronomeControllerBar>
       child: Container(
         height: 106,
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -156,7 +156,7 @@ class _BpmControls extends StatelessWidget {
               Text(
                 'BPM',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],

@@ -58,7 +58,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         Icon(
                           Icons.inventory_2_outlined,
                           size: 64,
-                          color: AppColors.textSecondaryLight.withValues(
+                          color: AppColors.inkSecondary.withValues(
                             alpha: 0.5,
                           ),
                         ),
@@ -66,7 +66,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         Text(
                           '아카이브된 레퍼토리가 없습니다',
                           style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],

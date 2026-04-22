@@ -106,7 +106,7 @@ class _AddYoutubeResourceSheetState
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -158,7 +158,7 @@ class _AddYoutubeResourceSheetState
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Column(
@@ -170,12 +170,12 @@ class _AddYoutubeResourceSheetState
                           fit: BoxFit.cover,
                           errorBuilder:
                               (_, __, ___) => Container(
-                                color: AppColors.surfaceSecondaryLight,
+                                color: AppColors.paperDark,
                                 child: Center(
                                   child: Icon(
                                     Icons.play_circle_outline,
                                     size: 48,
-                                    color: AppColors.textTertiaryLight,
+                                    color: AppColors.inkTertiary,
                                   ),
                                 ),
                               ),
@@ -183,19 +183,19 @@ class _AddYoutubeResourceSheetState
                       ),
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space2),
-                        color: AppColors.practiceGood.withValues(alpha: 0.1),
+                        color: AppColors.paperOk.withValues(alpha: 0.1),
                         child: Row(
                           children: [
                             Icon(
                               Icons.check_circle,
                               size: 16,
-                              color: AppColors.practiceGood,
+                              color: AppColors.paperOk,
                             ),
                             const SizedBox(width: AppSpacing.space2),
                             Text(
                               'URL 확인됨',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.practiceGood,
+                                color: AppColors.paperOk,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -334,7 +334,7 @@ class _AddYoutubeResourceSheetState
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space1),
@@ -350,7 +350,7 @@ class _AddYoutubeResourceSheetState
                   decoration: InputDecoration(
                     hintText: '분',
                     hintStyle: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space2,
@@ -382,7 +382,7 @@ class _AddYoutubeResourceSheetState
                   decoration: InputDecoration(
                     hintText: '초',
                     hintStyle: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space2,

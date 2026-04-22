@@ -32,9 +32,9 @@ class DailyBarChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,15 +79,15 @@ class DailyBarChart extends StatelessWidget {
     // Determine bar color
     Color barColor;
     if (isFuture) {
-      barColor = AppColors.surfaceSecondaryLight;
+      barColor = AppColors.paperDark;
     } else if (!stat.hasPracticed) {
-      barColor = AppColors.borderLight;
+      barColor = AppColors.inkQuaternary;
     } else if (stat.practiceMinutes >= 45) {
-      barColor = AppColors.practiceGood;
+      barColor = AppColors.paperOk;
     } else if (stat.practiceMinutes >= 20) {
       barColor = AppColors.practiceNormal;
     } else {
-      barColor = AppColors.practicePoor;
+      barColor = AppColors.paperAccent;
     }
 
     return Column(
@@ -98,7 +98,7 @@ class DailyBarChart extends StatelessWidget {
           Text(
             '${stat.practiceMinutes}분',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         const SizedBox(height: AppSpacing.space1),
@@ -125,7 +125,7 @@ class DailyBarChart extends StatelessWidget {
           child: Text(
             stat.dayLabel,
             style: AppTypography.caption.copyWith(
-              color: isToday ? Colors.white : AppColors.textSecondaryLight,
+              color: isToday ? Colors.white : AppColors.inkSecondary,
               fontWeight: isToday ? FontWeight.w600 : null,
             ),
           ),

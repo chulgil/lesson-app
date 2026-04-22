@@ -88,13 +88,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Icon(
               Icons.event_busy,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '레슨을 찾을 수 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -132,7 +132,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Text(
               '데이터를 불러오는데 실패했습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space6),
@@ -353,14 +353,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   Widget _buildTabBar() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: TabBar(
         controller: _tabController,
         tabs: const [Tab(text: '레슨 노트'), Tab(text: '과제')],
         labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.textSecondaryLight,
+        unselectedLabelColor: AppColors.inkSecondary,
         indicatorColor: AppColors.primary,
       ),
     );
@@ -571,7 +571,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       child: Icon(
                         Icons.close,
                         size: 18,
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -580,7 +580,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 Text(
                   '수강권을 발급하면 정기 레슨을 시작할 수 있습니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space3),

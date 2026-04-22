@@ -28,7 +28,7 @@ Color getVisibilityColor(ProfileVisibility visibility) {
     case ProfileVisibility.students:
       return AppColors.info;
     case ProfileVisibility.private:
-      return AppColors.textTertiaryLight;
+      return AppColors.inkTertiary;
   }
 }
 
@@ -165,7 +165,7 @@ class SearchToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -173,7 +173,7 @@ class SearchToggle extends StatelessWidget {
           Icon(
             Icons.search,
             color:
-                isSearchable ? AppColors.primary : AppColors.textTertiaryLight,
+                isSearchable ? AppColors.primary : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -189,7 +189,7 @@ class SearchToggle extends StatelessWidget {
                 Text(
                   '학생/학부모가 선생님을 검색할 수 있습니다',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -243,16 +243,16 @@ class VisibilityTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.textSecondaryLight),
+        leading: Icon(icon, color: AppColors.inkSecondary),
         title: Text(title, style: AppTypography.bodyMedium),
         subtitle: Text(
           subtitle,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         trailing: PopupMenuButton<ProfileVisibility>(
@@ -390,8 +390,8 @@ class PreviewSection extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isVisible
-                ? AppColors.surfaceSecondaryLight
-                : AppColors.surfaceSecondaryLight.withValues(alpha: 0.5),
+                ? AppColors.paperDark
+                : AppColors.paperDark.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -413,13 +413,13 @@ class PreviewSection extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.textTertiaryLight.withValues(alpha: 0.2),
+                    color: AppColors.inkTertiary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '비공개',
                     style: AppTypography.captionSmall.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ),
@@ -433,7 +433,7 @@ class PreviewSection extends StatelessWidget {
             Text(
               '이 정보는 공개되지 않습니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -566,7 +566,7 @@ class ProfilePreviewContent extends StatelessWidget {
               if (settings.photoVisibility == ProfileVisibility.public)
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: AppColors.surfaceSecondaryLight,
+                  backgroundColor: AppColors.paperDark,
                   backgroundImage:
                       profile.profileImage != null
                           ? NetworkImage(profile.profileImage!)
@@ -576,18 +576,18 @@ class ProfilePreviewContent extends StatelessWidget {
                           ? Icon(
                             Icons.person,
                             size: 50,
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           )
                           : null,
                 )
               else
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: AppColors.surfaceSecondaryLight,
+                  backgroundColor: AppColors.paperDark,
                   child: Icon(
                     Icons.visibility_off,
                     size: 30,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               const SizedBox(height: AppSpacing.space3),
@@ -597,7 +597,7 @@ class ProfilePreviewContent extends StatelessWidget {
                 Text(
                   '비공개',
                   style: AppTypography.headingLarge.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               const SizedBox(height: AppSpacing.space1),
@@ -605,7 +605,7 @@ class ProfilePreviewContent extends StatelessWidget {
                 Text(
                   profile.instruments.join(' · '),
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
             ],

@@ -30,7 +30,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
               children: [
                 Icon(
                   Icons.inventory_2_outlined,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.space2),
@@ -43,7 +43,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   onSelected: (value) => _handleMenuAction(context, ref, value),
                   itemBuilder:
@@ -82,7 +82,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
             Text(
               '아카이브: ${repertoire.archivedAt != null ? formatDateDashPadded(repertoire.archivedAt!) : '-'}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             if (repertoire.description != null) ...[
@@ -90,7 +90,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
               Text(
                 repertoire.description!,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -247,18 +247,18 @@ class _InfoChip extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.textSecondaryLight),
+          Icon(icon, size: 14, color: AppColors.inkSecondary),
           const SizedBox(width: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

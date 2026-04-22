@@ -60,7 +60,7 @@ class CompletionToggle extends StatelessWidget {
                     : Icons.check_circle_outline,
                 color: isCompleted
                     ? AppColors.success
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
                 size: 32,
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -74,7 +74,7 @@ class CompletionToggle extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: isCompleted
                             ? AppColors.success
-                            : AppColors.textPrimaryLight,
+                            : AppColors.ink,
                       ),
                     ),
                     Text(
@@ -82,7 +82,7 @@ class CompletionToggle extends StatelessWidget {
                           ? '탭하여 완료 취소'
                           : '탭하여 이 섹션을 완료로 표시하세요',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     if (!isCompleted &&
@@ -146,13 +146,13 @@ class CompletionToggle extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: isAllCompleted
                       ? AppColors.success
-                      : AppColors.textPrimaryLight,
+                      : AppColors.ink,
                 ),
               ),
               Text(
                 isAllCompleted ? '탭하여 초기화' : '하루 $totalCount회 반복',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
 

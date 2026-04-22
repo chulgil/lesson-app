@@ -420,7 +420,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                     onPressed: () => _removeSection(index),
                     icon: const Icon(Icons.close, size: 20),
                     visualDensity: VisualDensity.compact,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
               ],
             ),

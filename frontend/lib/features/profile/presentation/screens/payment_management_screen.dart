@@ -94,7 +94,7 @@ class _PaymentManagementScreenState
                     Tab(text: '완료'),
                   ],
                   labelColor: AppColors.primary,
-                  unselectedLabelColor: AppColors.textSecondaryLight,
+                  unselectedLabelColor: AppColors.inkSecondary,
                   indicatorColor: AppColors.primary,
                 ),
               ),
@@ -173,13 +173,13 @@ class _PaymentManagementScreenState
           Icon(
             Icons.receipt_long,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '결제 내역이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -304,9 +304,9 @@ class _PaymentManagementScreenState
                                           : Border.all(
                                             color:
                                                 isFuture
-                                                    ? AppColors.borderLight
+                                                    ? AppColors.inkQuaternary
                                                         .withValues(alpha: 0.3)
-                                                    : AppColors.borderLight,
+                                                    : AppColors.inkQuaternary,
                                           ),
                                 ),
                                 child: Text(
@@ -316,8 +316,8 @@ class _PaymentManagementScreenState
                                         isSelected
                                             ? Colors.white
                                             : isFuture
-                                            ? AppColors.textTertiaryLight
-                                            : AppColors.textPrimaryLight,
+                                            ? AppColors.inkTertiary
+                                            : AppColors.ink,
                                     fontWeight:
                                         isSelected
                                             ? FontWeight.w600
@@ -368,7 +368,7 @@ class _PaymentManagementScreenState
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
-                      color: AppColors.practiceGood.withValues(alpha: 0.1),
+                      color: AppColors.paperOk.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
                       ),
@@ -378,13 +378,13 @@ class _PaymentManagementScreenState
                         Icon(
                           Icons.check_circle,
                           size: 18,
-                          color: AppColors.practiceGood,
+                          color: AppColors.paperOk,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
                           '학생이 입금완료를 알렸습니다',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.practiceGood,
+                            color: AppColors.paperOk,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -415,7 +415,7 @@ class _PaymentManagementScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${payment.studentName}님 입금이 확인되었습니다'),
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -450,7 +450,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(color: AppColors.backgroundLight, child: tabBar);
+    return Container(color: AppColors.paperDark, child: tabBar);
   }
 
   @override

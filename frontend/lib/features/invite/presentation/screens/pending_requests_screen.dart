@@ -20,7 +20,7 @@ class PendingRequestsScreen extends ConsumerWidget {
     final responderState = ref.watch(connectionRequestResponderProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('연결 요청'),
         leading: IconButton(
@@ -93,7 +93,7 @@ class PendingRequestsScreen extends ConsumerWidget {
                   ? '학생이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.'
                   : '선생님이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -210,7 +210,7 @@ class _RequestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -251,13 +251,13 @@ class _RequestCard extends StatelessWidget {
                         Icon(
                           method.icon,
                           size: 14,
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${method.label}로 연결 요청',
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -276,7 +276,7 @@ class _RequestCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
@@ -344,7 +344,7 @@ class _RequestCard extends StatelessWidget {
 
     if (remaining.inDays > 0) {
       text = '${remaining.inDays}일 남음';
-      color = AppColors.textSecondaryLight;
+      color = AppColors.inkSecondary;
     } else if (remaining.inHours > 0) {
       text = '${remaining.inHours}시간 남음';
       color = AppColors.warning;

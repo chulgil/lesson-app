@@ -86,7 +86,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusLarge),
             ),
@@ -142,7 +142,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     decoration: InputDecoration(
                       hintText: '\uBA54\uC2DC\uC9C0 (\uC120\uD0DD)',
                       hintStyle: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
@@ -196,7 +196,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -213,7 +213,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                   color:
                       isSelected
                           ? AppColors.primary.withValues(alpha: 0.15)
-                          : AppColors.surfaceSecondaryLight,
+                          : AppColors.paperDark,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -221,7 +221,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                   color:
                       isSelected
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                   size: AppSpacing.iconMD,
                 ),
               ),
@@ -242,7 +242,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     Text(
                       badge.description,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -256,7 +256,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 color:
                     isSelected
                         ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+                        : AppColors.inkTertiary,
                 size: AppSpacing.iconSM,
               ),
             ],

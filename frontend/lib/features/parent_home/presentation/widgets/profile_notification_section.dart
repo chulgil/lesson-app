@@ -32,7 +32,7 @@ class ProfileNotificationSection extends ConsumerWidget {
               Text(
                 '알림 설정',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -52,7 +52,7 @@ class ProfileNotificationSection extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               boxShadow: [
                 BoxShadow(
@@ -159,7 +159,7 @@ class ProfileNotificationSection extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 24, color: AppColors.textSecondaryLight),
+          Icon(icon, size: 24, color: AppColors.inkSecondary),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -195,7 +195,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                 Text(
                   subtitle,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -215,7 +215,7 @@ class ProfileNotificationSection extends ConsumerWidget {
     return Divider(
       height: 1,
       indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-      color: AppColors.borderLight,
+      color: AppColors.inkQuaternary,
     );
   }
 

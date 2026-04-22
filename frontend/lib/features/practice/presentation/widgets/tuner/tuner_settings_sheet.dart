@@ -172,7 +172,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
         Text(
           '오케스트라나 앙상블에 맞춰 조절하세요',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -193,7 +193,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -209,7 +209,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
             Text(
               '${TunerSettings.minReferenceFrequency.toInt()}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             Expanded(
@@ -226,7 +226,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
             Text(
               '${TunerSettings.maxReferenceFrequency.toInt()}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -268,7 +268,7 @@ class _TranspositionSection extends StatelessWidget {
         Text(
           '악보 기준 음을 실음으로 변환합니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -288,7 +288,7 @@ class _TranspositionSection extends StatelessWidget {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -302,7 +302,7 @@ class _TranspositionSection extends StatelessWidget {
             child: Text(
               '${currentTransposition.description} 악기용',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -335,7 +335,7 @@ class _DifficultySection extends StatelessWidget {
         Text(
           'Perfect/Good 판정 기준을 조절합니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -358,7 +358,7 @@ class _DifficultySection extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                                : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
@@ -373,7 +373,7 @@ class _DifficultySection extends StatelessWidget {
           child: Text(
             'Perfect: ±${currentDifficulty.perfectCent}¢ / Good: ±${currentDifficulty.goodCent}¢',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -405,7 +405,7 @@ class _EnharmonicSection extends StatelessWidget {
         Text(
           '반음 표기 방식을 선택합니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -425,7 +425,7 @@ class _EnharmonicSection extends StatelessWidget {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -464,7 +464,7 @@ class _ClefSection extends StatelessWidget {
         Text(
           '오선지 표기 방식을 선택합니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -487,7 +487,7 @@ class _ClefSection extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                                : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
@@ -527,7 +527,7 @@ class _ClefSection extends StatelessWidget {
                       Text(
                         '음역대에 따라 음자리표 자동 전환 (첼로 등)',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],

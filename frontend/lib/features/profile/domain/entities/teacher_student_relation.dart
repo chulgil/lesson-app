@@ -134,9 +134,9 @@ class TeacherStudentRelation {
       case RelationStatus.none:
         return AppColors.info;
       case RelationStatus.active:
-        return AppColors.practiceGood;
+        return AppColors.paperOk;
       case RelationStatus.inactive:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 

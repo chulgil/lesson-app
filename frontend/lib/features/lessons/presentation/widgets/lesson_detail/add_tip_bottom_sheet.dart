@@ -42,7 +42,7 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),

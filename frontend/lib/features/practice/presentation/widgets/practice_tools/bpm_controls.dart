@@ -37,7 +37,7 @@ class CircleButton extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.backgroundLight,
+                color: AppColors.paperDark,
                 fontWeight: FontWeight.bold,
               ),
             ),

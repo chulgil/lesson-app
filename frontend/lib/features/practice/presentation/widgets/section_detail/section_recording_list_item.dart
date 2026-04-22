@@ -87,7 +87,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 shape: BoxShape.circle,
               ),
               child: const Center(
@@ -102,7 +102,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             Text(
               '확인 중...',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -149,7 +149,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.textSecondaryLight.withValues(
+                            color: AppColors.inkSecondary.withValues(
                               alpha: 0.2,
                             ),
                             borderRadius: BorderRadius.circular(
@@ -159,7 +159,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                           child: Text(
                             '${widget.recording.bpm} BPM',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ),
@@ -170,7 +170,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   Text(
                     '${_formatDate(widget.recording.createdAt)} · ${widget.recording.formattedDuration}',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space1),
@@ -305,7 +305,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                     Text(
                       _formatDate(widget.recording.createdAt),
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],

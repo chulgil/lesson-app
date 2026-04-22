@@ -169,7 +169,7 @@ class GamificationHeader extends ConsumerWidget {
     return Container(
       height: 100,
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: const Center(child: CircularProgressIndicator()),

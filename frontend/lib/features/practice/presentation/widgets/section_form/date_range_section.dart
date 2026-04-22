@@ -50,9 +50,9 @@ class DateRangeSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +95,7 @@ class DateRangeSection extends StatelessWidget {
                 Icon(
                   endDate == null ? Icons.repeat : Icons.event_available,
                   size: 16,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
@@ -103,7 +103,7 @@ class DateRangeSection extends StatelessWidget {
                       ? (endDateNullHint ?? '종료일 미설정 시 매일 반복됩니다')
                       : (endDateSetHint ?? '종료일까지만 연습 목록에 표시됩니다'),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],

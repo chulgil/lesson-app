@@ -89,7 +89,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondaryLight,
+          unselectedLabelColor: AppColors.inkSecondary,
           indicatorWeight: 3,
           tabs: const [
             Tab(icon: Icon(Icons.school_outlined), text: '학원'),
@@ -125,14 +125,14 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide(color: AppColors.primary, width: 2),
                 ),
                 filled: true,
-                fillColor: AppColors.surfaceSecondaryLight,
+                fillColor: AppColors.paperDark,
               ),
               onChanged: _onSearch,
               textInputAction: TextInputAction.search,
@@ -157,7 +157,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                         Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                         const SizedBox(height: AppSpacing.space2),
                         Text(
@@ -328,20 +328,20 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                   ? Icons.school_outlined
                   : Icons.person_search_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               isAcademyTab ? '검색된 학원이 없습니다' : '검색된 선생님이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
             Text(
               '다른 검색어나 필터를 시도해보세요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],

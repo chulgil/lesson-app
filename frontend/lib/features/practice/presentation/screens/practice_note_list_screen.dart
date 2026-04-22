@@ -53,7 +53,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
           // Section info header
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             width: double.infinity,
             child: sectionAsync.when(
               data:
@@ -93,7 +93,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
                 Text(
                   repertoireName,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -111,7 +111,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
                 Text(
                   _formatSectionInfo(section),
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -144,7 +144,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
           child: Text(
             sectionName,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -193,13 +193,13 @@ class PracticeNoteListScreen extends ConsumerWidget {
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     _formatDateHeader(dateNotes.first),
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

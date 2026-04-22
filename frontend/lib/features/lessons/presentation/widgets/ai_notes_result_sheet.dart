@@ -163,7 +163,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                             bottom: AppSpacing.space2,
                           ),
                           elevation: 0,
-                          color: AppColors.surfaceSecondaryLight,
+                          color: AppColors.paperDark,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -182,7 +182,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                                 Text(
                                   a.description,
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                 ),
                               ],
@@ -222,7 +222,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
   InputDecoration _inputDecoration() {
     return InputDecoration(
       filled: true,
-      fillColor: AppColors.surfaceSecondaryLight,
+      fillColor: AppColors.paperDark,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,

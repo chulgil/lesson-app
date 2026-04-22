@@ -159,7 +159,7 @@ class ParentLessonsTab extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
-                                color: AppColors.surfaceSecondaryLight,
+                                color: AppColors.paperDark,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium,
                                 ),
@@ -169,13 +169,13 @@ class ParentLessonsTab extends ConsumerWidget {
                                   Icon(
                                     Icons.calendar_today,
                                     size: 16,
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                   const SizedBox(width: AppSpacing.space2),
                                   Text(
                                     '12월 21일 (토) 14:00 - 15:00',
                                     style: AppTypography.bodySmall.copyWith(
-                                      color: AppColors.textSecondaryLight,
+                                      color: AppColors.inkSecondary,
                                     ),
                                   ),
                                 ],
@@ -265,7 +265,7 @@ class ParentLessonsTab extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
-                                color: AppColors.surfaceSecondaryLight,
+                                color: AppColors.paperDark,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium,
                                 ),
@@ -297,7 +297,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                         Text(
                                           '3:24',
                                           style: AppTypography.caption.copyWith(
-                                            color: AppColors.textSecondaryLight,
+                                            color: AppColors.inkSecondary,
                                           ),
                                         ),
                                       ],
@@ -342,9 +342,9 @@ class ParentLessonsTab extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -376,7 +376,7 @@ class ParentLessonsTab extends ConsumerWidget {
                 Text(
                   description,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -394,7 +394,7 @@ class ParentLessonsTab extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         boxShadow: [
           BoxShadow(
@@ -437,7 +437,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                     ? AppColors.error
                                     : day == '토'
                                     ? AppColors.primary
-                                    : AppColors.textSecondaryLight,
+                                    : AppColors.inkSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -453,7 +453,7 @@ class ParentLessonsTab extends ConsumerWidget {
             child: Text(
               '월간 캘린더 뷰',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
@@ -498,9 +498,9 @@ class _LessonCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
           children: [
@@ -511,7 +511,7 @@ class _LessonCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color:
                     isPast
-                        ? AppColors.surfaceSecondaryLight
+                        ? AppColors.paperDark
                         : AppColors.primaryLight.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -522,7 +522,7 @@ class _LessonCard extends StatelessWidget {
                     style: AppTypography.headingMedium.copyWith(
                       color:
                           isPast
-                              ? AppColors.textSecondaryLight
+                              ? AppColors.inkSecondary
                               : AppColors.primary,
                     ),
                   ),
@@ -531,7 +531,7 @@ class _LessonCard extends StatelessWidget {
                     style: AppTypography.caption.copyWith(
                       color:
                           isPast
-                              ? AppColors.textTertiaryLight
+                              ? AppColors.inkTertiary
                               : AppColors.primary,
                     ),
                   ),
@@ -552,8 +552,8 @@ class _LessonCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color:
                               isPast
-                                  ? AppColors.textSecondaryLight
-                                  : AppColors.textPrimaryLight,
+                                  ? AppColors.inkSecondary
+                                  : AppColors.ink,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -564,7 +564,7 @@ class _LessonCard extends StatelessWidget {
                   Text(
                     '$startTime - $endTime • $teacherName',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -595,8 +595,8 @@ class _LessonCard extends StatelessWidget {
         label = '예정';
         break;
       case LessonStatus.completed:
-        bgColor = AppColors.surfaceSecondaryLight;
-        textColor = AppColors.textSecondaryLight;
+        bgColor = AppColors.paperDark;
+        textColor = AppColors.inkSecondary;
         label = '완료';
         break;
       case LessonStatus.cancelled:

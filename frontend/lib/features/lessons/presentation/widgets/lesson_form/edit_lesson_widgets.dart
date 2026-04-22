@@ -37,9 +37,9 @@ class EditLessonStudentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -155,7 +155,7 @@ void showCancelLessonDialog({
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Column(
@@ -170,7 +170,7 @@ void showCancelLessonDialog({
                     Text(
                       '${formatDateMDWithDayParens(lessonDate)} ${formatLessonTime(lessonTime)}',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -180,7 +180,7 @@ void showCancelLessonDialog({
               Text(
                 '학생에게 레슨 취소 알림이 전송됩니다.',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],

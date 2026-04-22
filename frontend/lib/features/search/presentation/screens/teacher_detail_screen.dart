@@ -24,7 +24,7 @@ class TeacherDetailScreen extends ConsumerWidget {
     final profileAsync = ref.watch(teacherPublicProfileProvider(teacherId));
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -35,13 +35,13 @@ class TeacherDetailScreen extends ConsumerWidget {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
                     '프로필을 불러올 수 없습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -61,13 +61,13 @@ class TeacherDetailScreen extends ConsumerWidget {
                   Icon(
                     Icons.person_off_outlined,
                     size: 48,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
                     '선생님 정보를 찾을 수 없습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -211,7 +211,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                   child: Text(
                     profile.introduction,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -226,7 +226,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     child: Text(
                       '${profile.experienceYears}년 경력',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -274,10 +274,10 @@ class _TeacherDetailContent extends ConsumerWidget {
                               .map(
                                 (a) => Chip(
                                   label: Text(a),
-                                  backgroundColor: AppColors.textSecondaryLight
+                                  backgroundColor: AppColors.inkSecondary
                                       .withValues(alpha: 0.1),
                                   labelStyle: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                 ),
                               )
@@ -307,7 +307,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                               child: Text(
                                 '${edu.school} ${edu.major} (${edu.degree})',
                                 style: AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                             );
@@ -349,7 +349,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                     child: Text(
                                       '${career.organization} - ${career.position} (${career.period})',
                                       style: AppTypography.bodyMedium.copyWith(
-                                        color: AppColors.textSecondaryLight,
+                                        color: AppColors.inkSecondary,
                                       ),
                                     ),
                                   ),
@@ -521,7 +521,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       Text(
                         previousLessonPeriod,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                   ],
@@ -567,7 +567,7 @@ class _TeacherDetailContent extends ConsumerWidget {
         Text(
           '선생님에게 레슨 신청서가 전달됩니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           textAlign: TextAlign.center,
         ),

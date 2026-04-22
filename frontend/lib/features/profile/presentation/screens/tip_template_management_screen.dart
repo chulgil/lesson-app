@@ -91,20 +91,20 @@ class _TipTemplateManagementScreenState
                 Icon(
                   Icons.library_books_outlined,
                   size: 64,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
                   '등록된 템플릿이 없습니다',
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '자주 사용하는 팁을 템플릿으로 저장하세요',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -134,7 +134,7 @@ class _TipTemplateManagementScreenState
                 Text(
                   '템플릿을 불러오는데 실패했습니다',
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -252,13 +252,13 @@ class _TipTemplateManagementScreenState
                       Icon(
                         Icons.repeat,
                         size: 14,
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
                         '${template.usageCount}회',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                       ),
                     ],
@@ -277,7 +277,7 @@ class _TipTemplateManagementScreenState
                   Text(
                     '마지막 사용: ${_formatDate(template.lastUsedAt!)}',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
               ],

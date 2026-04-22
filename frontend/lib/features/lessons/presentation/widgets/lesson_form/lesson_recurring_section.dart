@@ -26,9 +26,9 @@ class LessonRecurringSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +49,7 @@ class LessonRecurringSection extends StatelessWidget {
                     Text(
                       '매주 같은 요일/시간에 레슨 예약',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -70,7 +70,7 @@ class LessonRecurringSection extends StatelessWidget {
             Text(
               '반복 요일',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -86,7 +86,7 @@ class LessonRecurringSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.surfaceSecondaryLight,
+                          : AppColors.paperDark,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -95,7 +95,7 @@ class LessonRecurringSection extends StatelessWidget {
                         style: AppTypography.bodySmall.copyWith(
                           color: isSelected
                               ? Colors.white
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),

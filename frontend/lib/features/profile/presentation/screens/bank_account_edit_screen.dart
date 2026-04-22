@@ -48,20 +48,20 @@ class BankAccountEditScreen extends ConsumerWidget {
           Icon(
             Icons.account_balance_outlined,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '등록된 계좌가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '학생의 수강료 입금을 위한 계좌를 추가하세요.',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -223,7 +223,7 @@ class _BankAccountCard extends StatelessWidget {
         side:
             account.isDefault
                 ? BorderSide(color: AppColors.primary, width: 1.5)
-                : BorderSide(color: AppColors.borderLight),
+                : BorderSide(color: AppColors.inkQuaternary),
       ),
       elevation: 0,
       child: Padding(
@@ -239,7 +239,7 @@ class _BankAccountCard extends StatelessWidget {
                   color:
                       account.isDefault
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
@@ -295,7 +295,7 @@ class _BankAccountCard extends StatelessWidget {
             Text(
               account.accountHolder,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             if (onSetDefault != null) ...[
@@ -458,7 +458,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         child: Text(
                           _consentContent,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                             height: 1.6,
                           ),
                         ),
@@ -506,13 +506,13 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color:
                       _consentChecked
                           ? AppColors.primary.withValues(alpha: 0.5)
-                          : AppColors.borderLight,
+                          : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -569,7 +569,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     child: Text(
                       '내용보기',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -594,7 +594,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     decoration: InputDecoration(
                       hintText: '은행 선택',
                       hintStyle: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
@@ -612,7 +612,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         child: Text(
                           _directInputLabel,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),

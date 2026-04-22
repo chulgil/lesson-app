@@ -34,12 +34,12 @@ class AllRecordingsScreen extends ConsumerWidget {
     final recordingsAsync = ref.watch(allRecordingsWithSectionInfoProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('전체 녹음 파일'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
-        foregroundColor: AppColors.textPrimaryLight,
+        foregroundColor: AppColors.ink,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -246,7 +246,7 @@ class _RecordingsList extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem('전체', total, AppColors.textPrimaryLight),
+            _buildStatItem('전체', total, AppColors.ink),
             _buildStatItem('연결됨', connectedCount, AppColors.success),
             _buildStatItem('미연결', orphanedCount, AppColors.warning),
           ],
@@ -268,7 +268,7 @@ class _RecordingsList extends StatelessWidget {
         Text(
           label,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -293,7 +293,7 @@ class _RecordingsList extends StatelessWidget {
             title,
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -438,7 +438,7 @@ class _RecordingCard extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isOrphaned ? AppColors.warning : AppColors.borderLight,
+          color: isOrphaned ? AppColors.warning : AppColors.inkQuaternary,
         ),
       ),
       child: Padding(
@@ -515,14 +515,14 @@ class _RecordingCard extends ConsumerWidget {
                       Text(
                         formatDateTimeDotPadded(recording.createdAt),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Text(
                         _formatDuration(recording.durationSeconds),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       if (recording.bpm != null) ...[

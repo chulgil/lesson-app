@@ -246,7 +246,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
         Text(
           '주차 범위',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -588,10 +588,10 @@ class _PaymentTypeCard extends StatelessWidget {
           color:
               isSelected
                   ? color.withValues(alpha: 0.1)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? color : AppColors.borderLight,
+            color: isSelected ? color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -599,14 +599,14 @@ class _PaymentTypeCard extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? color : AppColors.textSecondaryLight,
+              color: isSelected ? color : AppColors.inkSecondary,
               size: 28,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               type.label,
               style: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? color : AppColors.textPrimaryLight,
+                color: isSelected ? color : AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -616,7 +616,7 @@ class _PaymentTypeCard extends StatelessWidget {
                 color:
                     isSelected
                         ? color.withValues(alpha: 0.8)
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),

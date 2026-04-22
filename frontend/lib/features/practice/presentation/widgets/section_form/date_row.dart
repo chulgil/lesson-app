@@ -35,7 +35,7 @@ class DateRow extends StatelessWidget {
     if (showClearButton) {
       return Container(
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         padding: const EdgeInsets.symmetric(
@@ -54,14 +54,14 @@ class DateRow extends StatelessWidget {
                     Text(
                       label,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const Spacer(),
                     Text(
                       '${date!.year}년 ${date!.month}월 ${date!.day}일',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textPrimaryLight,
+                        color: AppColors.ink,
                       ),
                     ),
                   ],
@@ -82,13 +82,13 @@ class DateRow extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   backgroundColor:
-                      AppColors.textTertiaryLight.withValues(alpha: 0.2),
+                      AppColors.inkTertiary.withValues(alpha: 0.2),
                   shape: const CircleBorder(),
                 ),
                 child: Icon(
                   Icons.close,
                   size: 16,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -100,7 +100,7 @@ class DateRow extends StatelessWidget {
     // Normal mode - entire row is tappable
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: InkWell(
@@ -116,7 +116,7 @@ class DateRow extends StatelessWidget {
               Text(
                 label,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const Spacer(),
@@ -126,15 +126,15 @@ class DateRow extends StatelessWidget {
                     : placeholder ?? '선택',
                 style: AppTypography.bodyMedium.copyWith(
                   color: date != null
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
               Icon(
                 Icons.chevron_right,
                 size: 20,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ],
           ),

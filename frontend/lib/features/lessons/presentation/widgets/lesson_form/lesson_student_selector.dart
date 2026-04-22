@@ -20,9 +20,9 @@ class LessonStudentSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
@@ -82,7 +82,7 @@ class LessonStudentSelector extends StatelessWidget {
                           Text(
                             selectedStudent!.currentPiece,
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ],
@@ -95,12 +95,12 @@ class LessonStudentSelector extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryLight,
+                    color: AppColors.paperDark,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.person_add,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
@@ -108,12 +108,12 @@ class LessonStudentSelector extends StatelessWidget {
                   child: Text(
                     '학생을 선택하세요',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ),
               ],
-              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
             ],
           ),
         ),

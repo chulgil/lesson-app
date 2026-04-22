@@ -67,7 +67,7 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
     final tunerState = ref.watch(tunerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('튜너'),
         centerTitle: true,
@@ -124,7 +124,7 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
               right: 0,
               bottom: 0,
               child: Container(
-                color: AppColors.backgroundLight,
+                color: AppColors.paperDark,
                 padding: const EdgeInsets.only(top: AppSpacing.space4, bottom: AppSpacing.space8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -170,10 +170,10 @@ class CompactTunerWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
           border: Border.all(
-            color: isListening ? AppColors.primary : AppColors.borderLight,
+            color: isListening ? AppColors.primary : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -181,14 +181,14 @@ class CompactTunerWidget extends ConsumerWidget {
           children: [
             Icon(
               isListening ? Icons.graphic_eq : Icons.mic_none,
-              color: isListening ? AppColors.primary : AppColors.textTertiaryLight,
+              color: isListening ? AppColors.primary : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               currentNote?.fullName ?? (isListening ? '감지 중...' : '튜너'),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isListening ? AppColors.primary : AppColors.textSecondaryLight,
+                color: isListening ? AppColors.primary : AppColors.inkSecondary,
               ),
             ),
             if (currentNote != null) ...[

@@ -38,7 +38,7 @@ class _QuickFeedbackStudentListState
           child: Text(
             '데이터를 불러오는데 실패했습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -87,19 +87,19 @@ class _QuickFeedbackStudentListState
             decoration: InputDecoration(
               hintText: '학생 검색...',
               hintStyle: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               filled: true,
-              fillColor: AppColors.surfaceSecondaryLight,
+              fillColor: AppColors.paperDark,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space3,
@@ -150,7 +150,7 @@ class _QuickFeedbackStudentListState
       title,
       style: AppTypography.bodyMedium.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
       ),
     );
   }
@@ -168,16 +168,16 @@ class _QuickFeedbackStudentListState
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          side: BorderSide(color: AppColors.borderLight),
+          side: BorderSide(color: AppColors.inkQuaternary),
         ),
-        tileColor: AppColors.surfaceLight,
+        tileColor: AppColors.paper,
         leading: CircleAvatar(
           backgroundColor: isCompleted
-              ? AppColors.practiceGood.withValues(alpha: 0.2)
+              ? AppColors.paperOk.withValues(alpha: 0.2)
               : AppColors.primary.withValues(alpha: 0.1),
           child: Icon(
             isCompleted ? Icons.check_circle : Icons.schedule,
-            color: isCompleted ? AppColors.practiceGood : AppColors.primary,
+            color: isCompleted ? AppColors.paperOk : AppColors.primary,
             size: 20,
           ),
         ),
@@ -190,13 +190,13 @@ class _QuickFeedbackStudentListState
         subtitle: Text(
           '${lesson.startTime} 레슨 (${isCompleted ? "완료" : "예정"})',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         trailing: hasFeedback
-            ? Icon(Icons.check, color: AppColors.practiceGood, size: 20)
+            ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
             : Icon(Icons.edit_outlined,
-                color: AppColors.textTertiaryLight, size: 20),
+                color: AppColors.inkTertiary, size: 20),
       ),
     );
   }
@@ -213,14 +213,14 @@ class _QuickFeedbackStudentListState
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          side: BorderSide(color: AppColors.borderLight),
+          side: BorderSide(color: AppColors.inkQuaternary),
         ),
-        tileColor: AppColors.surfaceLight,
+        tileColor: AppColors.paper,
         leading: CircleAvatar(
-          backgroundColor: AppColors.surfaceSecondaryLight,
+          backgroundColor: AppColors.paperDark,
           child: Icon(
             Icons.person_outline,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
             size: 20,
           ),
         ),
@@ -233,13 +233,13 @@ class _QuickFeedbackStudentListState
         subtitle: Text(
           '${lesson.date.month}월 ${lesson.date.day}일 마지막 레슨',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         trailing: hasFeedback
-            ? Icon(Icons.check, color: AppColors.practiceGood, size: 20)
+            ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
             : Icon(Icons.edit_outlined,
-                color: AppColors.textTertiaryLight, size: 20),
+                color: AppColors.inkTertiary, size: 20),
       ),
     );
   }
@@ -252,7 +252,7 @@ class _QuickFeedbackStudentListState
           Icon(
             Icons.chat_bubble_outline,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
@@ -260,7 +260,7 @@ class _QuickFeedbackStudentListState
                 ? '피드백을 보낼 레슨이 없습니다'
                 : '검색 결과가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),

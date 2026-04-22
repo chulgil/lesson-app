@@ -20,15 +20,15 @@ class RepertoireStatsList extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Center(
           child: Text(
             '연습한 레퍼토리가 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -38,9 +38,9 @@ class RepertoireStatsList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +82,7 @@ class RepertoireStatsList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -132,7 +132,7 @@ class RepertoireStatsList extends StatelessWidget {
                     Container(
                       height: 6,
                       decoration: BoxDecoration(
-                        color: AppColors.borderLight,
+                        color: AppColors.inkQuaternary,
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -155,7 +155,7 @@ class RepertoireStatsList extends StatelessWidget {
               Text(
                 '${stat.completionPercent}%',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -167,7 +167,7 @@ class RepertoireStatsList extends StatelessWidget {
           Text(
             '${stat.completedSections}/${stat.totalSections} 섹션 완료',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],

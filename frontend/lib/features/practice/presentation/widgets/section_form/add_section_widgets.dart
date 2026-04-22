@@ -26,9 +26,9 @@ class SectionHeader extends StatelessWidget {
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -45,7 +45,7 @@ class SectionHeader extends StatelessWidget {
                 Text(
                   subtitle,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -99,7 +99,7 @@ class RangePickers extends StatelessWidget {
           child: Text(
             '~',
             style: AppTypography.headingMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -147,7 +147,7 @@ class SettingSectionHeader extends StatelessWidget {
               Text(
                 trailingLabel!,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
           ],
@@ -157,7 +157,7 @@ class SettingSectionHeader extends StatelessWidget {
           Text(
             description!,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -248,7 +248,7 @@ class _RepeatCountHint extends StatelessWidget {
             child: Text(
               '매일 $repeatCount회 연습을 완료하면 모든 발바닥이 채워집니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
           ),

@@ -38,14 +38,14 @@ class LessonDurationSelector extends StatelessWidget {
               onDurationChanged(d.$1);
             }
           },
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
           selectedColor: AppColors.primary.withValues(alpha: 0.15),
           checkmarkColor: AppColors.primary,
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+            color: isSelected ? AppColors.primary : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         );

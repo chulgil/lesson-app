@@ -115,7 +115,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -290,7 +290,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   Widget _buildRepertoireSelector(List<PracticeRepertoire> repertoires) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -315,7 +315,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                           : null,
                   border: Border(
                     bottom: BorderSide(
-                      color: AppColors.borderLight,
+                      color: AppColors.inkQuaternary,
                       width: 0.5,
                     ),
                   ),
@@ -331,7 +331,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                           color:
                               isSelected
                                   ? AppColors.primary
-                                  : AppColors.borderLight,
+                                  : AppColors.inkQuaternary,
                           width: 2,
                         ),
                         color:
@@ -364,7 +364,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                             Text(
                               '${repertoire.sections.length}개 섹션',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textSecondaryLight,
+                                color: AppColors.inkSecondary,
                               ),
                             ),
                         ],
@@ -402,7 +402,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                         color:
                             _isCreatingNewRepertoire
                                 ? AppColors.secondary
-                                : AppColors.borderLight,
+                                : AppColors.inkQuaternary,
                         width: 2,
                       ),
                       color:
@@ -426,7 +426,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     color:
                         _isCreatingNewRepertoire
                             ? AppColors.secondary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
@@ -435,7 +435,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       color:
                           _isCreatingNewRepertoire
                               ? AppColors.secondary
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                       fontWeight:
                           _isCreatingNewRepertoire
                               ? FontWeight.w600
@@ -472,12 +472,12 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             icon: Icon(
               Icons.add,
               size: 18,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             label: Text(
               '구간 추가',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             style: TextButton.styleFrom(
@@ -504,9 +504,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       ),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -514,9 +514,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<RangeType>(
@@ -552,7 +552,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 decoration: InputDecoration(
                   hintText: '시작',
                   hintStyle: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space2,
@@ -562,7 +562,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   filled: true,
-                  fillColor: AppColors.surfaceLight,
+                  fillColor: AppColors.paper,
                 ),
                 style: AppTypography.bodySmall,
               ),
@@ -584,7 +584,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 decoration: InputDecoration(
                   hintText: '끝',
                   hintStyle: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space2,
@@ -594,7 +594,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   filled: true,
-                  fillColor: AppColors.surfaceLight,
+                  fillColor: AppColors.paper,
                 ),
                 style: AppTypography.bodySmall,
               ),
@@ -617,7 +617,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 child: Icon(
                   Icons.close,
                   size: 20,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             )

@@ -45,14 +45,14 @@ class ProfileMenuSection extends StatelessWidget {
           Text(
             title,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               boxShadow: [
                 BoxShadow(
@@ -75,7 +75,7 @@ class ProfileMenuSection extends StatelessWidget {
                       Divider(
                         height: 1,
                         indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                        color: AppColors.borderLight,
+                        color: AppColors.inkQuaternary,
                       ),
                   ],
                 );
@@ -106,7 +106,7 @@ class ProfileMenuItemTile extends StatelessWidget {
             Icon(
               item.icon,
               size: 24,
-              color: item.labelColor ?? AppColors.textSecondaryLight,
+              color: item.labelColor ?? AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -116,14 +116,14 @@ class ProfileMenuItemTile extends StatelessWidget {
                   Text(
                     item.label,
                     style: AppTypography.bodyLarge.copyWith(
-                      color: item.labelColor ?? AppColors.textPrimaryLight,
+                      color: item.labelColor ?? AppColors.ink,
                     ),
                   ),
                   if (item.subtitle != null)
                     Text(
                       item.subtitle!,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                 ],
@@ -133,7 +133,7 @@ class ProfileMenuItemTile extends StatelessWidget {
             if (item.trailing == null)
               Icon(
                 Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
           ],
         ),

@@ -138,13 +138,13 @@ class ProfileInfoCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color:
                 isEmpty
                     ? AppColors.warning.withValues(alpha: 0.3)
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -165,7 +165,7 @@ class ProfileInfoCard extends StatelessWidget {
                   Text(
                     title,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -174,14 +174,14 @@ class ProfileInfoCard extends StatelessWidget {
                     style: AppTypography.bodyLarge.copyWith(
                       color:
                           isEmpty
-                              ? AppColors.textTertiaryLight
-                              : AppColors.textPrimaryLight,
+                              ? AppColors.inkTertiary
+                              : AppColors.ink,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),
@@ -205,9 +205,9 @@ class EducationCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -234,14 +234,14 @@ class EducationCard extends ConsumerWidget {
                 Text(
                   '${education.major} · ${education.degree}${education.graduationYear != null ? ' · ${education.graduationYear}년 졸업' : ''}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
+            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
             onSelected: (value) {
               if (value == 'edit') {
                 context.push('${AppRoutes.educationEdit}?index=$index');
@@ -282,9 +282,9 @@ class CareerCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -337,7 +337,7 @@ class CareerCard extends ConsumerWidget {
                 Text(
                   '${career.position} · ${career.period}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 if (career.description != null &&
@@ -346,7 +346,7 @@ class CareerCard extends ConsumerWidget {
                   Text(
                     career.description!,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -356,7 +356,7 @@ class CareerCard extends ConsumerWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
+            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
             onSelected: (value) {
               if (value == 'edit') {
                 context.push('${AppRoutes.careerEdit}?index=$index');
@@ -398,7 +398,7 @@ class CertificateCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
@@ -456,14 +456,14 @@ class CertificateCard extends ConsumerWidget {
                 Text(
                   '${getCertificateTypeLabel(certificate.type)} · ${certificate.issuingBody}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${certificate.issueDate.year}년 ${certificate.issueDate.month}월 발급',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
                 if (certificate.isRejected &&
@@ -480,7 +480,7 @@ class CertificateCard extends ConsumerWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
+            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
             onSelected: (value) {
               if (value == 'edit') {
                 context.push(
@@ -531,21 +531,21 @@ class ProfileEmptyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: AppColors.inkQuaternary,
           style: BorderStyle.solid,
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 48, color: AppColors.textTertiaryLight),
+          Icon(icon, size: 48, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
             message,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),

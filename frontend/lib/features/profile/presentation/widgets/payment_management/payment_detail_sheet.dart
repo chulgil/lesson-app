@@ -61,7 +61,7 @@ class PaymentDetailSheet extends ConsumerWidget {
               Text(
                 payment.periodDisplay,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -115,7 +115,7 @@ class PaymentDetailSheet extends ConsumerWidget {
               icon: const Icon(Icons.check),
               label: const Text('입금 확인'),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.practiceGood,
+                backgroundColor: AppColors.paperOk,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
                 ),
@@ -196,7 +196,7 @@ class _DetailRow extends StatelessWidget {
           Text(
             label,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(

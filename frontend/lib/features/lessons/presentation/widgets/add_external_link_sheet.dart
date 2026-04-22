@@ -75,7 +75,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
                 hintText: 'https://...',
                 border: const OutlineInputBorder(),
                 prefixIcon:
-                    const Icon(Icons.link, color: AppColors.textTertiaryLight),
+                    const Icon(Icons.link, color: AppColors.inkTertiary),
                 suffixIcon: _urlValid
                     ? const Icon(Icons.check_circle, color: AppColors.success)
                     : null,

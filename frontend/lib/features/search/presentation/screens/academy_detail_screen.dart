@@ -23,7 +23,7 @@ class AcademyDetailScreen extends ConsumerWidget {
     final teachersAsync = ref.watch(academyTeachersProvider(organizationId));
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: academyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildErrorState(context, '학원 정보를 불러올 수 없습니다'),
@@ -59,7 +59,7 @@ class AcademyDetailScreen extends ConsumerWidget {
                         child: Text(
                           '선생님 목록을 불러올 수 없습니다',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -84,13 +84,13 @@ class AcademyDetailScreen extends ConsumerWidget {
           Icon(
             Icons.error_outline,
             size: 48,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             message,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -236,7 +236,7 @@ class AcademyDetailScreen extends ConsumerWidget {
           child: Text(
             text,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -286,7 +286,7 @@ class AcademyDetailScreen extends ConsumerWidget {
               child: Text(
                 '소속 선생님이 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -396,14 +396,14 @@ class _AcademyTeacherCard extends StatelessWidget {
                         Text(
                           teacher.instruments.join(' · '),
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                         if (teacher.experienceYears != null) ...[
                           Text(
                             ' | ${teacher.experienceYears}년 경력',
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ],

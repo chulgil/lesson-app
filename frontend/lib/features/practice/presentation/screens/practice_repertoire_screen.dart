@@ -144,7 +144,7 @@ class _RepertoireCard extends ConsumerWidget {
                         Text(
                           repertoire.description!,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                     ],
@@ -229,13 +229,13 @@ class _RepertoireCard extends ConsumerWidget {
                     Icon(
                       Icons.queue_music,
                       size: 40,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       '섹션을 추가해주세요',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space2),
@@ -274,7 +274,7 @@ class _RepertoireCard extends ConsumerWidget {
               vertical: AppSpacing.space2,
             ),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(AppSpacing.radiusMedium),
                 bottomRight: Radius.circular(AppSpacing.radiusMedium),
@@ -286,13 +286,13 @@ class _RepertoireCard extends ConsumerWidget {
                 Text(
                   '완료: ${repertoire.completedSectionCount}/${repertoire.sections.length}',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 Text(
                   '총 연습: ${repertoire.formattedTotalTime}',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -419,7 +419,7 @@ class _SectionListItem extends ConsumerWidget {
                         Icon(
                           Icons.repeat,
                           size: 14,
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ],
                     ],
@@ -428,7 +428,7 @@ class _SectionListItem extends ConsumerWidget {
                   Text(
                     section.rangeText, // Uses rangeType to show line or measure
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -462,7 +462,7 @@ class _SectionListItem extends ConsumerWidget {
                 child: IconButton(
                   icon: const Icon(
                     Icons.mic_none,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   onPressed: () {
                     context.push(
@@ -513,7 +513,7 @@ class _SectionListItem extends ConsumerWidget {
               ),
 
             // Arrow
-            const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

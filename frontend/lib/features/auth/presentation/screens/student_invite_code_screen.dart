@@ -81,7 +81,7 @@ class _StudentInviteCodeScreenState
                       Text(
                         '선생님으로부터 받은\n초대 코드를 입력해주세요',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -100,10 +100,10 @@ class _StudentInviteCodeScreenState
                           decoration: InputDecoration(
                             hintText: '초대 코드 입력',
                             hintStyle: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                             filled: true,
-                            fillColor: AppColors.surfaceSecondaryLight,
+                            fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
@@ -228,9 +228,9 @@ class _StudentInviteCodeScreenState
                         child: OutlinedButton(
                           onPressed: _handleStartWithoutCode,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textSecondaryLight,
+                            foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(
-                              color: AppColors.borderLight,
+                              color: AppColors.inkQuaternary,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius:
@@ -240,7 +240,7 @@ class _StudentInviteCodeScreenState
                           child: Text(
                             '코드 없이 시작하기',
                             style: AppTypography.button.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ),

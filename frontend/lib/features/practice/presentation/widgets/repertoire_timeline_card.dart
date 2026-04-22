@@ -33,9 +33,9 @@ class RepertoireTimelineCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +48,7 @@ class RepertoireTimelineCard extends StatelessWidget {
                       repertoire.name,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimaryLight,
+                        color: AppColors.ink,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -64,7 +64,7 @@ class RepertoireTimelineCard extends StatelessWidget {
               Text(
                 _periodText,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
@@ -73,7 +73,7 @@ class RepertoireTimelineCard extends StatelessWidget {
               Text(
                 _countsText,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -84,7 +84,7 @@ class RepertoireTimelineCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: repertoire.completionRate.clamp(0.0, 1.0),
                   minHeight: 6,
-                  backgroundColor: AppColors.borderLight,
+                  backgroundColor: AppColors.inkQuaternary,
                   valueColor: AlwaysStoppedAnimation<Color>(_progressColor),
                 ),
               ),
@@ -103,8 +103,8 @@ class RepertoireTimelineCard extends StatelessWidget {
 
     if (repertoire.isArchived) {
       label = '아카이브';
-      backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.15);
-      textColor = AppColors.textTertiaryLight;
+      backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.15);
+      textColor = AppColors.inkTertiary;
     } else if (repertoire.endDate != null) {
       label = '완료';
       backgroundColor = AppColors.success.withValues(alpha: 0.15);
@@ -160,7 +160,7 @@ class RepertoireTimelineCard extends StatelessWidget {
 
   /// Progress bar color based on completion
   Color get _progressColor {
-    if (repertoire.isArchived) return AppColors.textTertiaryLight;
+    if (repertoire.isArchived) return AppColors.inkTertiary;
     if (repertoire.completionRate >= 1.0) return AppColors.success;
     return AppColors.primary;
   }

@@ -57,11 +57,11 @@ class _LessonNoteHistoryScreenState
               decoration: InputDecoration(
                 hintText: '노트 검색...',
                 hintStyle: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 prefixIcon: const Icon(
                   Icons.search,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 suffixIcon:
                     _query.isNotEmpty
@@ -74,7 +74,7 @@ class _LessonNoteHistoryScreenState
                         )
                         : null,
                 filled: true,
-                fillColor: AppColors.surfaceSecondaryLight,
+                fillColor: AppColors.paperDark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide.none,
@@ -103,7 +103,7 @@ class _LessonNoteHistoryScreenState
                         label: Text(period.label),
                         selected: isSelected,
                         onSelected: (_) => setState(() => _period = period),
-                        backgroundColor: AppColors.surfaceLight,
+                        backgroundColor: AppColors.paper,
                         selectedColor: AppColors.primary.withValues(
                           alpha: 0.15,
                         ),
@@ -112,13 +112,13 @@ class _LessonNoteHistoryScreenState
                           color:
                               isSelected
                                   ? AppColors.primary
-                                  : AppColors.borderLight,
+                                  : AppColors.inkQuaternary,
                         ),
                         labelStyle: AppTypography.bodySmall.copyWith(
                           color:
                               isSelected
                                   ? AppColors.primary
-                                  : AppColors.textSecondaryLight,
+                                  : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
@@ -198,7 +198,7 @@ class _LessonNoteHistoryScreenState
                 entry.key,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
             ),
@@ -234,9 +234,9 @@ class _NoteCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,14 +248,14 @@ class _NoteCard extends StatelessWidget {
                 Text(
                   '$dateStr  ${lesson.instrument}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Icon(
                   Icons.chevron_right,
                   size: 18,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ],
             ),
@@ -317,7 +317,7 @@ class _NoteCard extends StatelessWidget {
                     child: Text(
                       lesson.practiceTips!,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -343,7 +343,7 @@ class _NoteCard extends StatelessWidget {
                     child: Text(
                       lesson.studentNote!,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

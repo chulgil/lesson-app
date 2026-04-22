@@ -79,7 +79,7 @@ class _ParentInviteCodeScreenState
                       Text(
                         '자녀의 선생님으로부터 받은\n초대 코드를 입력해주세요',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -98,10 +98,10 @@ class _ParentInviteCodeScreenState
                           decoration: InputDecoration(
                             hintText: '초대 코드 입력',
                             hintStyle: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                             filled: true,
-                            fillColor: AppColors.surfaceSecondaryLight,
+                            fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
@@ -193,7 +193,7 @@ class _ParentInviteCodeScreenState
                       Row(
                         children: [
                           Expanded(
-                            child: Divider(color: AppColors.borderLight),
+                            child: Divider(color: AppColors.inkQuaternary),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -201,12 +201,12 @@ class _ParentInviteCodeScreenState
                             child: Text(
                               '또는',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Divider(color: AppColors.borderLight),
+                            child: Divider(color: AppColors.inkQuaternary),
                           ),
                         ],
                       ),
@@ -229,7 +229,7 @@ class _ParentInviteCodeScreenState
                             Text(
                               '나중에 프로필에서 자녀를 등록할 수 있습니다',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                           ],

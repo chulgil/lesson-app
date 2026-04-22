@@ -53,7 +53,7 @@ enum ChildConnectionStatus {
       case ChildConnectionStatus.pending:
         return AppColors.warning;
       case ChildConnectionStatus.unconnected:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 

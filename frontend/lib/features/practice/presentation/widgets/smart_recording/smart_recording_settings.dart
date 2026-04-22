@@ -51,7 +51,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       Text(
                         '녹음 앞뒤 무음 구간 자동 제거',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -80,7 +80,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   const Icon(
                     Icons.tune,
                     size: 18,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
@@ -118,7 +118,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   Text(
                     '낮음',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   Expanded(
@@ -149,7 +149,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   Text(
                     '높음',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -159,7 +159,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Row(
@@ -167,14 +167,14 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     Icon(
                       Icons.info_outline,
                       size: 16,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
                         '높은 민감도: 작은 소리도 녹음에 포함\n낮은 민감도: 큰 소리만 녹음에 포함',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ),
@@ -193,7 +193,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   const Icon(
                     Icons.content_cut,
                     size: 18,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
@@ -209,7 +209,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                         Text(
                           '재생 시 긴 무음 구간 자동 건너뛰기',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -235,7 +235,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     Text(
                       '무음 감지 기준',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const Spacer(),
@@ -266,7 +266,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     Text(
                       '5초',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     Expanded(
@@ -300,7 +300,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     Text(
                       '30초',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -338,13 +338,13 @@ class SmartRecordingToggle extends ConsumerWidget {
           color:
               settings.smartRecordingEnabled
                   ? AppColors.primary.withValues(alpha: 0.1)
-                  : AppColors.surfaceSecondaryLight,
+                  : AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color:
                 settings.smartRecordingEnabled
                     ? AppColors.primary.withValues(alpha: 0.3)
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -356,7 +356,7 @@ class SmartRecordingToggle extends ConsumerWidget {
               color:
                   settings.smartRecordingEnabled
                       ? AppColors.primary
-                      : AppColors.textSecondaryLight,
+                      : AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
@@ -365,7 +365,7 @@ class SmartRecordingToggle extends ConsumerWidget {
                 color:
                     settings.smartRecordingEnabled
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),

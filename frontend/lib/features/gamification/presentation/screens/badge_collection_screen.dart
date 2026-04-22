@@ -71,9 +71,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -105,7 +105,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           Text(
             '총 ${data.totalPoints}P',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -116,7 +116,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: data.levelProgress,
               minHeight: 8,
-              backgroundColor: AppColors.surfaceSecondaryLight,
+              backgroundColor: AppColors.paperDark,
               valueColor: const AlwaysStoppedAnimation<Color>(
                 AppColors.primary,
               ),
@@ -126,7 +126,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           Text(
             '다음 레벨까지 ${data.pointsToNextLevel}P',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -150,7 +150,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
             child: Text(
               '미획득',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
@@ -170,14 +170,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color:
             badge.isEarned
-                ? AppColors.surfaceLight
-                : AppColors.surfaceSecondaryLight,
+                ? AppColors.paper
+                : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               badge.isEarned
                   ? rarityColor.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Row(
@@ -190,14 +190,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
               color:
                   badge.isEarned
                       ? rarityColor.withValues(alpha: 0.15)
-                      : AppColors.surfaceSecondaryLight,
+                      : AppColors.paperDark,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: Icon(
               _getIconData(badge.icon),
               size: 20,
-              color: badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
+              color: badge.isEarned ? rarityColor : AppColors.inkTertiary,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -213,14 +213,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
                     fontWeight: FontWeight.w600,
                     color:
                         badge.isEarned
-                            ? AppColors.textPrimaryLight
-                            : AppColors.textTertiaryLight,
+                            ? AppColors.ink
+                            : AppColors.inkTertiary,
                   ),
                 ),
                 Text(
                   badge.description,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -243,7 +243,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
               _getRarityLabel(badge.rarity),
               style: AppTypography.captionSmall.copyWith(
                 color:
-                    badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
+                    badge.isEarned ? rarityColor : AppColors.inkTertiary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -258,14 +258,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Center(
           child: Text(
             '포인트 기록이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ),
@@ -274,9 +274,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children:
@@ -297,7 +297,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                         Icon(
                           _getPointTypeIcon(item.type),
                           size: 18,
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         const SizedBox(width: AppSpacing.space3),
                         Expanded(
@@ -319,7 +319,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                             Text(
                               '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                           ],
@@ -332,7 +332,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                       height: 1,
                       indent: AppSpacing.space4,
                       endIndent: AppSpacing.space4,
-                      color: AppColors.borderLight,
+                      color: AppColors.inkQuaternary,
                     ),
                 ],
               );

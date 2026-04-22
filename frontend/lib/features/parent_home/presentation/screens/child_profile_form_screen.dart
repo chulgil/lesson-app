@@ -203,7 +203,7 @@ class _ChildProfileFormScreenState
                           border:
                               isSelected
                                   ? Border.all(
-                                    color: AppColors.textPrimaryLight,
+                                    color: AppColors.ink,
                                     width: 3,
                                   )
                                   : null,
@@ -235,14 +235,14 @@ class _ChildProfileFormScreenState
               decoration: InputDecoration(
                 hintText: '자녀 이름 또는 별명 입력',
                 filled: true,
-                fillColor: AppColors.surfaceLight,
+                fillColor: AppColors.paper,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
               ),
               validator: (value) {
@@ -270,9 +270,9 @@ class _ChildProfileFormScreenState
                 horizontal: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(color: AppColors.borderLight),
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -338,9 +338,9 @@ class _ChildProfileFormScreenState
                 horizontal: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(color: AppColors.borderLight),
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
@@ -376,9 +376,9 @@ class _ChildProfileFormScreenState
                 horizontal: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(color: AppColors.borderLight),
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(

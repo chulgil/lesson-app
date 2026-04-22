@@ -41,7 +41,7 @@ class SmartRecordingIndicator extends ConsumerWidget {
       RecordingPhase.ending => (
         Icons.pause_circle_outline,
         '소리 감지 대기...',
-        AppColors.textSecondaryLight,
+        AppColors.inkSecondary,
       ),
     };
 
@@ -147,7 +147,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
                   const Icon(
                     Icons.content_cut,
                     size: 16,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text('앞 ${_formatDuration(trimmedStart)} 트림'),
@@ -159,7 +159,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
                   const Icon(
                     Icons.content_cut,
                     size: 16,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text('뒤 ${_formatDuration(trimmedEnd)} 트림'),
@@ -171,7 +171,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
                   const Icon(
                     Icons.skip_next,
                     size: 16,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(

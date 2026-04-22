@@ -111,19 +111,19 @@ class _LocationChip extends StatelessWidget {
       avatar: Icon(
         _icon,
         size: 16,
-        color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+        color: isSelected ? AppColors.primary : AppColors.inkSecondary,
       ),
       label: Text(location.name),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: AppColors.paper,
       selectedColor: AppColors.primary.withValues(alpha: 0.15),
       checkmarkColor: AppColors.primary,
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.borderLight,
+        color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
       ),
       labelStyle: AppTypography.bodySmall.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+        color: isSelected ? AppColors.primary : AppColors.ink,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
     );
@@ -135,7 +135,7 @@ class _EmptyHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '등록된 장소가 없습니다',
-      style: AppTypography.caption.copyWith(color: AppColors.textTertiaryLight),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
     );
   }
 }

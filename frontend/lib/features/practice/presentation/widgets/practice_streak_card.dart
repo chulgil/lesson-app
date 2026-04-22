@@ -199,7 +199,7 @@ class PracticeStreakCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       height: 180,
@@ -211,7 +211,7 @@ class PracticeStreakCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
@@ -221,7 +221,7 @@ class PracticeStreakCard extends ConsumerWidget {
           Text(
             '스트릭 정보를 불러올 수 없습니다',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

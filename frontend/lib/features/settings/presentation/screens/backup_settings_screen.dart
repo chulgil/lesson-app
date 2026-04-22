@@ -21,12 +21,12 @@ class BackupSettingsScreen extends ConsumerWidget {
     final backupState = ref.watch(backupStateProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('녹음 백업'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
-        foregroundColor: AppColors.textPrimaryLight,
+        foregroundColor: AppColors.ink,
       ),
       body: backupState.when(
         data: (state) => _BackupContent(state: state),

@@ -80,13 +80,13 @@ class RepertoireHistoryScreen extends ConsumerWidget {
           Icon(
             Icons.library_music_outlined,
             size: 64,
-            color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
+            color: AppColors.inkSecondary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '아직 레퍼토리가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

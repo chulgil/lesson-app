@@ -17,9 +17,9 @@ class FollowFeedItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +57,7 @@ class FollowFeedItem extends StatelessWidget {
               Text(
                 _formatTime(post.createdAt),
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],
@@ -93,7 +93,7 @@ class FollowFeedItem extends StatelessWidget {
           Text(
             post.content,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,

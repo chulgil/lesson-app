@@ -25,12 +25,12 @@ class OrphanRecordingsScreen extends ConsumerWidget {
     final diagnosticAsync = ref.watch(orphanedRecordingsWithDiagnosticProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('연결되지 않은 녹음'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
-        foregroundColor: AppColors.textPrimaryLight,
+        foregroundColor: AppColors.ink,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -168,7 +168,7 @@ class _DiagnosticCard extends StatelessWidget {
           Text(
             label,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(
@@ -207,7 +207,7 @@ class _RecordingsListWithDiagnostic extends ConsumerWidget {
             child: Text(
               '${diagnostic.orphans.length}개의 녹음이 섹션에 연결되지 않았습니다.\n각 녹음을 섹션에 연결하거나 삭제할 수 있습니다.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           );
@@ -357,7 +357,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -404,7 +404,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                           Text(
                             _formatDuration(_duration),
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                           if (widget.recording.bpm != null) ...[
@@ -462,7 +462,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                     _duration.inMilliseconds > 0
                         ? _position.inMilliseconds / _duration.inMilliseconds
                         : 0,
-                backgroundColor: AppColors.borderLight,
+                backgroundColor: AppColors.inkQuaternary,
                 valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                 minHeight: 3,
               ),

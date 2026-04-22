@@ -26,9 +26,9 @@ class ChildCard extends ConsumerWidget {
         return Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -99,7 +99,7 @@ class ChildCard extends ConsumerWidget {
                               ? '악기 미설정'
                               : student.instrument,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -142,7 +142,7 @@ class ChildCard extends ConsumerWidget {
                   ],
 
                   // Chevron
-                  Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+                  Icon(Icons.chevron_right, color: AppColors.inkTertiary),
                 ],
               ),
 
@@ -164,7 +164,7 @@ class ChildCard extends ConsumerWidget {
                     icon: Icons.fitness_center,
                     label: '오늘 연습',
                     value: '45분',
-                    color: AppColors.practiceGood,
+                    color: AppColors.paperOk,
                   ),
                   const SizedBox(width: AppSpacing.space4),
                   _buildStatItem(
@@ -183,7 +183,7 @@ class ChildCard extends ConsumerWidget {
           () => Container(
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Center(child: CircularProgressIndicator()),
@@ -224,7 +224,7 @@ class ChildCard extends ConsumerWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],

@@ -98,7 +98,7 @@ class _InstrumentManagementScreenState
         Text(
           '악기를 탭하면 삭제할 수 있습니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
@@ -106,7 +106,7 @@ class _InstrumentManagementScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Center(
@@ -115,13 +115,13 @@ class _InstrumentManagementScreenState
                   Icon(
                     Icons.music_off,
                     size: 48,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     '등록된 악기가 없습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -198,7 +198,7 @@ class _InstrumentManagementScreenState
           Text(
             '목록에서 선택',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -225,7 +225,7 @@ class _InstrumentManagementScreenState
         Text(
           '직접 입력',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),

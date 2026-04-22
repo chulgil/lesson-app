@@ -66,7 +66,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
               child: Text(
                 profile.introduction,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                   height: 1.6,
                 ),
               ),
@@ -83,7 +83,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
               child: Text(
                 profile.teachingStyle!,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                   height: 1.6,
                 ),
               ),
@@ -312,7 +312,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
                 ),
                 child: Row(
@@ -321,13 +321,13 @@ class ProfilePreviewScreen extends ConsumerWidget {
                     Icon(
                       chip.icon,
                       size: 16,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       chip.label,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -349,7 +349,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           Text(
             title,
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -386,7 +386,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

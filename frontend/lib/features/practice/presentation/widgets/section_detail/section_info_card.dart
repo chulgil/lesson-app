@@ -55,7 +55,7 @@ class SectionInfoCard extends StatelessWidget {
                     Text(
                       '$repertoireName · ${_formatPeriodShort()}',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -63,7 +63,7 @@ class SectionInfoCard extends StatelessWidget {
                     Text(
                       _formatPeriodShort(),
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -84,7 +84,7 @@ class SectionInfoCard extends StatelessWidget {
                         Text(
                           rangeText,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -96,7 +96,7 @@ class SectionInfoCard extends StatelessWidget {
                     Text(
                       section.sectionName!,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],

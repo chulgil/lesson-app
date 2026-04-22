@@ -208,7 +208,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     Text(
                       '학생들에게 보여질 기본 정보를 설정해주세요',
                       style: AppTypography.bodyLarge.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
 
@@ -279,7 +279,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppColors.borderLight,
+                    disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusLarge,
@@ -349,7 +349,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.borderLight,
+                    color: AppColors.inkQuaternary,
                     shape: BoxShape.circle,
                     image:
                         _profileImage != null
@@ -368,7 +368,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           ? Icon(
                             Icons.person,
                             size: 48,
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           )
                           : null,
                 ),
@@ -426,7 +426,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -461,19 +461,19 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child:
                 _selectedInstruments.isEmpty
                     ? Row(
                       children: [
-                        Icon(Icons.add, color: AppColors.textTertiaryLight),
+                        Icon(Icons.add, color: AppColors.inkTertiary),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
                           '악기를 선택해주세요',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -536,7 +536,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               '$charCount / 20자 이상',
               style: AppTypography.caption.copyWith(
                 color:
-                    isValid ? AppColors.success : AppColors.textTertiaryLight,
+                    isValid ? AppColors.success : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -556,7 +556,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -594,7 +594,7 @@ class _ProgressStep extends StatelessWidget {
               color:
                   isActive || isCompleted
                       ? AppColors.primary
-                      : AppColors.borderLight,
+                      : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -607,7 +607,7 @@ class _ProgressStep extends StatelessWidget {
                           color:
                               isActive
                                   ? Colors.white
-                                  : AppColors.textTertiaryLight,
+                                  : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -619,8 +619,8 @@ class _ProgressStep extends StatelessWidget {
             style: AppTypography.caption.copyWith(
               color:
                   isActive || isCompleted
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -641,7 +641,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.borderLight,
+      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
     );
   }
 }
@@ -718,7 +718,7 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                           ? Icon(Icons.check_circle, color: AppColors.primary)
                           : Icon(
                             Icons.circle_outlined,
-                            color: AppColors.borderLight,
+                            color: AppColors.inkQuaternary,
                           ),
                   onTap: () {
                     setState(() {

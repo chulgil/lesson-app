@@ -68,7 +68,7 @@ enum InviteStatus {
       case InviteStatus.active:
         return AppColors.success;
       case InviteStatus.used:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case InviteStatus.expired:
         return AppColors.warning;
       case InviteStatus.revoked:
@@ -238,9 +238,9 @@ enum ConnectionRequestStatus {
       case ConnectionRequestStatus.rejected:
         return AppColors.error;
       case ConnectionRequestStatus.cancelled:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case ConnectionRequestStatus.expired:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 

@@ -51,7 +51,7 @@ class _MetronomeFullScreenModalState
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -222,7 +222,7 @@ class _BpmDisplay extends StatelessWidget {
         Text(
           'BPM',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -381,7 +381,7 @@ class _TimeSignatureSelector extends StatelessWidget {
                   selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
                     color:
-                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                        isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -451,7 +451,7 @@ class _SubdivisionSelector extends StatelessWidget {
                       color:
                           isSelected
                               ? Colors.white
-                              : AppColors.textPrimaryLight,
+                              : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -467,7 +467,7 @@ class _SubdivisionSelector extends StatelessWidget {
             vertical: AppSpacing.space2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: FittedBox(
@@ -486,7 +486,7 @@ class _SubdivisionSelector extends StatelessWidget {
                 Text(
                   '(${selected.englishName})',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -519,10 +519,10 @@ class _SubdivisionChip extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceLight,
+          color: isSelected ? AppColors.primary : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
         ),
         child: Column(
@@ -531,7 +531,7 @@ class _SubdivisionChip extends StatelessWidget {
             Text(
               subdivision.visualPattern,
               style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                color: isSelected ? Colors.white : AppColors.ink,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -542,7 +542,7 @@ class _SubdivisionChip extends StatelessWidget {
                 color:
                     isSelected
                         ? Colors.white.withValues(alpha: 0.9)
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
             ),
           ],
@@ -581,7 +581,7 @@ class _SoundSelector extends StatelessWidget {
                   selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
                     color:
-                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                        isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -625,7 +625,7 @@ class _AccentPatternSelector extends StatelessWidget {
                   selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
                     color:
-                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                        isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -636,7 +636,7 @@ class _AccentPatternSelector extends StatelessWidget {
         Text(
           selected.description,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],

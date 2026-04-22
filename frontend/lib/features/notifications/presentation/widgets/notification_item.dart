@@ -31,7 +31,7 @@ class NotificationItem extends StatelessWidget {
                   ? AppColors.primary.withValues(alpha: 0.05)
                   : Colors.white,
           border: const Border(
-            bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
+            bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
           ),
         ),
         child: Row(
@@ -56,7 +56,7 @@ class NotificationItem extends StatelessWidget {
                           style: AppTypography.bodyMedium.copyWith(
                             fontWeight:
                                 isUnread ? FontWeight.w600 : FontWeight.normal,
-                            color: AppColors.textPrimaryLight,
+                            color: AppColors.ink,
                           ),
                         ),
                       ),
@@ -64,7 +64,7 @@ class NotificationItem extends StatelessWidget {
                       Text(
                         _formatTime(notification.createdAt),
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -76,7 +76,7 @@ class NotificationItem extends StatelessWidget {
                   Text(
                     notification.body,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -252,7 +252,7 @@ class NotificationItem extends StatelessWidget {
       case NotificationPriority.normal:
         return AppColors.primary.withValues(alpha: 0.1);
       case NotificationPriority.low:
-        return AppColors.textSecondaryLight.withValues(alpha: 0.1);
+        return AppColors.inkSecondary.withValues(alpha: 0.1);
     }
   }
 

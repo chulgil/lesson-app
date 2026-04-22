@@ -22,9 +22,9 @@ class PracticeRankingList extends StatelessWidget {
         const SizedBox(height: AppSpacing.space3),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child:
               rankings.isEmpty
@@ -34,7 +34,7 @@ class PracticeRankingList extends StatelessWidget {
                       child: Text(
                         '연습 데이터가 없습니다',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                       ),
                     ),
@@ -53,7 +53,7 @@ class PracticeRankingList extends StatelessWidget {
                                   height: 1,
                                   indent: AppSpacing.space4,
                                   endIndent: AppSpacing.space4,
-                                  color: AppColors.borderLight,
+                                  color: AppColors.inkQuaternary,
                                 ),
                             ],
                           );
@@ -69,11 +69,11 @@ class PracticeRankingList extends StatelessWidget {
     if (rank == 1) {
       rankColor = AppColors.warning;
     } else if (rank == 2) {
-      rankColor = AppColors.textSecondaryLight;
+      rankColor = AppColors.inkSecondary;
     } else if (rank == 3) {
       rankColor = AppColors.secondary;
     } else {
-      rankColor = AppColors.textTertiaryLight;
+      rankColor = AppColors.inkTertiary;
     }
 
     final percent = (student.practiceRate * 100).toInt();
@@ -119,7 +119,7 @@ class PracticeRankingList extends StatelessWidget {
                 Text(
                   student.instrument,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -134,13 +134,13 @@ class PracticeRankingList extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: student.practiceRate,
                 minHeight: 8,
-                backgroundColor: AppColors.surfaceSecondaryLight,
+                backgroundColor: AppColors.paperDark,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   student.practiceRate >= 0.8
-                      ? AppColors.practiceGood
+                      ? AppColors.paperOk
                       : student.practiceRate >= 0.5
                       ? AppColors.practiceNormal
-                      : AppColors.practicePoor,
+                      : AppColors.paperAccent,
                 ),
               ),
             ),

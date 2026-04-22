@@ -29,7 +29,7 @@ class FollowCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -103,7 +103,7 @@ class FollowCard extends StatelessWidget {
                 Text(
                   _formatDate(follow.createdAt),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -120,7 +120,7 @@ class FollowCard extends StatelessWidget {
               color:
                   follow.notificationEnabled
                       ? AppColors.primary
-                      : AppColors.textTertiaryLight,
+                      : AppColors.inkTertiary,
               size: 20,
             ),
             tooltip: follow.notificationEnabled ? '알림 끄기' : '알림 켜기',
@@ -131,7 +131,7 @@ class FollowCard extends StatelessWidget {
             onPressed: onUnfollow,
             icon: Icon(
               Icons.person_remove_outlined,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
               size: 20,
             ),
             tooltip: '팔로우 취소',

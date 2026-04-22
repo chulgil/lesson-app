@@ -30,7 +30,7 @@ class PracticeStatsCard extends StatelessWidget {
             Container(
               width: 1,
               height: 40,
-              color: AppColors.borderLight,
+              color: AppColors.inkQuaternary,
             ),
             Expanded(
               child: _StatItem(
@@ -42,7 +42,7 @@ class PracticeStatsCard extends StatelessWidget {
             Container(
               width: 1,
               height: 40,
-              color: AppColors.borderLight,
+              color: AppColors.inkQuaternary,
             ),
             Expanded(
               child: _StatItem(
@@ -85,7 +85,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],

@@ -243,7 +243,7 @@ class ProfileTab extends ConsumerWidget {
                 trailing: Text(
                   'v${EnvironmentConfig.appVersion}',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 onTap: () => context.push(AppRoutes.appInfo),
@@ -319,7 +319,7 @@ class ProfileTab extends ConsumerWidget {
                       Text(
                         email,
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -365,7 +365,7 @@ class ProfileTab extends ConsumerWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -423,9 +423,9 @@ class ProfileTab extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,7 +454,7 @@ class ProfileTab extends ConsumerWidget {
               child: LinearProgressIndicator(
                 value: percent / 100,
                 minHeight: 6,
-                backgroundColor: AppColors.borderLight,
+                backgroundColor: AppColors.inkQuaternary,
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
@@ -463,7 +463,7 @@ class ProfileTab extends ConsumerWidget {
               Text(
                 '다음: $nextStep',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -629,14 +629,14 @@ class ProfileTab extends ConsumerWidget {
           Text(
             title,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               boxShadow: [
                 BoxShadow(
@@ -660,7 +660,7 @@ class ProfileTab extends ConsumerWidget {
                           Divider(
                             height: 1,
                             indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                            color: AppColors.borderLight,
+                            color: AppColors.inkQuaternary,
                           ),
                       ],
                     );
@@ -683,7 +683,7 @@ class ProfileTab extends ConsumerWidget {
             Icon(
               item.icon,
               size: 24,
-              color: item.labelColor ?? AppColors.textSecondaryLight,
+              color: item.labelColor ?? AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -693,7 +693,7 @@ class ProfileTab extends ConsumerWidget {
                   Text(
                     item.label,
                     style: AppTypography.bodyLarge.copyWith(
-                      color: item.labelColor ?? AppColors.textPrimaryLight,
+                      color: item.labelColor ?? AppColors.ink,
                     ),
                   ),
                   if (item.subtitle != null) ...[
@@ -701,7 +701,7 @@ class ProfileTab extends ConsumerWidget {
                     Text(
                       item.subtitle!,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -710,7 +710,7 @@ class ProfileTab extends ConsumerWidget {
             ),
             if (item.trailing != null) item.trailing!,
             if (item.trailing == null)
-              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),
@@ -784,9 +784,9 @@ class _ShortcutCard extends StatelessWidget {
           horizontal: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           children: [

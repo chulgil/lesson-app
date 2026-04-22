@@ -23,8 +23,8 @@ class LessonHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +92,7 @@ class LessonHeaderCard extends StatelessWidget {
                     Text(
                       '${lesson.date.month}월 ${lesson.date.day}일 ${lesson.startTime} · ${lesson.duration}분',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -116,7 +116,7 @@ class LessonHeaderCard extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceSecondaryLight,
+                        color: AppColors.paperDark,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
                         ),
@@ -148,12 +148,12 @@ class _StatusBadge extends StatelessWidget {
       case LessonStatus.reschedulePending:
         color = AppColors.primary;
       case LessonStatus.completed:
-        color = AppColors.practiceGood;
+        color = AppColors.paperOk;
       case LessonStatus.cancelled:
       case LessonStatus.cancelledByStudentAdvance:
       case LessonStatus.cancelledByTeacher:
       case LessonStatus.cancelledMutual:
-        color = AppColors.textTertiaryLight;
+        color = AppColors.inkTertiary;
       case LessonStatus.noShow:
       case LessonStatus.cancelledByStudentLate:
       case LessonStatus.studentAbsent:

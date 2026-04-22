@@ -308,7 +308,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             Text(
               '최대 $_maxSpecialties개까지 선택할 수 있습니다',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -322,7 +322,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             Text(
               '최대 $_maxAreas개까지 추가할 수 있습니다',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -369,16 +369,16 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           labelStyle: AppTypography.bodyMedium.copyWith(
             color: isSelected
                 ? AppColors.primary
-                : AppColors.textPrimaryLight,
+                : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             ),
           ),
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
         );
       }).toList(),
     );
@@ -454,12 +454,12 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             setState(() => _lessonAreas.remove(area));
           },
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
-          backgroundColor: AppColors.surfaceSecondaryLight,
+          backgroundColor: AppColors.paperDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-            side: BorderSide(color: AppColors.borderLight),
+            side: BorderSide(color: AppColors.inkQuaternary),
           ),
         );
       }).toList(),
@@ -499,7 +499,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             isSufficient ? '$length자' : '$length자 (최소 $_minIntroductionLength자)',
             style: AppTypography.caption.copyWith(
               color: isSufficient
-                  ? AppColors.textTertiaryLight
+                  ? AppColors.inkTertiary
                   : AppColors.error,
             ),
           ),
@@ -516,7 +516,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

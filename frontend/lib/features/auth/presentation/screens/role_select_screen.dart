@@ -91,7 +91,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               Text(
                 '레슨 앱에서 어떤 역할로 사용하시나요?',
                 style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -194,7 +194,7 @@ class _RoleCard extends StatelessWidget {
                   Text(
                     description,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

@@ -114,7 +114,7 @@ class LevelUpDialog extends StatelessWidget {
               '축하합니다! 꾸준한 연습으로\n새로운 레벨에 도달했어요!',
               textAlign: TextAlign.center,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 height: 1.5,
               ),
             ),

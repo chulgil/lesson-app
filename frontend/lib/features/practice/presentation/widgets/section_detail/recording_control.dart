@@ -168,7 +168,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
           decoration: BoxDecoration(
             color: widget.isRecording
                 ? AppColors.error.withValues(alpha: 0.15)
-                : AppColors.surfaceSecondaryLight,
+                : AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: widget.isRecording
                 ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
@@ -277,7 +277,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                           }
                         },
                         style: FilledButton.styleFrom(
-                          backgroundColor: hasMicPermission ? AppColors.error : AppColors.textSecondaryLight,
+                          backgroundColor: hasMicPermission ? AppColors.error : AppColors.inkSecondary,
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.space8,
                             vertical: AppSpacing.space4,

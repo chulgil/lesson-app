@@ -93,7 +93,7 @@ class ProfileHeader extends ConsumerWidget {
                 Text(
                   userProfile.userId,
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

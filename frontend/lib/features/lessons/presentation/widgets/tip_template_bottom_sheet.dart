@@ -55,7 +55,7 @@ class _TipTemplateBottomSheetState
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXLarge),
             ),
@@ -160,15 +160,15 @@ class _TipTemplateBottomSheetState
         onSelected: (selected) {
           setState(() => _selectedCategory = selected ? category : null);
         },
-        backgroundColor: AppColors.surfaceSecondaryLight,
+        backgroundColor: AppColors.paperDark,
         selectedColor: AppColors.primaryLight,
         checkmarkColor: AppColors.primary,
         labelStyle: AppTypography.bodySmall.copyWith(
-          color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+          color: isSelected ? AppColors.primary : AppColors.inkSecondary,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
         side: BorderSide(
-          color: isSelected ? AppColors.primary : AppColors.borderLight,
+          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
         ),
       ),
     );
@@ -195,7 +195,7 @@ class _TipTemplateBottomSheetState
                   Text(
                     '자주 사용',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -240,9 +240,9 @@ class _TipTemplateBottomSheetState
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +272,7 @@ class _TipTemplateBottomSheetState
                   Text(
                     '${template.usageCount}회',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -321,13 +321,13 @@ class _TipTemplateBottomSheetState
                 Icon(
                   Icons.search_off,
                   size: 48,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   '검색 결과가 없습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -358,7 +358,7 @@ class _TipTemplateBottomSheetState
                 Text(
                   '템플릿을 불러오는데 실패했습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -376,9 +376,9 @@ class _TipTemplateBottomSheetState
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,7 +430,7 @@ class _TipTemplateBottomSheetState
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ],
               ),
@@ -441,7 +441,7 @@ class _TipTemplateBottomSheetState
                 Text(
                   '${template.usageCount}회 사용됨',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],

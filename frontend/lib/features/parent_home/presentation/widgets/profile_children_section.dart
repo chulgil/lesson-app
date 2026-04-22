@@ -35,7 +35,7 @@ class ProfileChildrenSection extends ConsumerWidget {
               Text(
                 '연결된 자녀',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -57,7 +57,7 @@ class ProfileChildrenSection extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               boxShadow: [
                 BoxShadow(
@@ -88,7 +88,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                         Divider(
                           height: 1,
                           indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                          color: AppColors.borderLight,
+                          color: AppColors.inkQuaternary,
                         ),
                       ProfileMenuItemTile(
                         item: ProfileMenuItem(
@@ -150,7 +150,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                       Text(
                         '(만 ${profile.age}세)',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                       ),
                     ],
@@ -158,7 +158,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   Text(
                     '${profile.instrumentLabel} • ${profile.teacherName ?? "선생님 미연결"}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -170,7 +170,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                 color:
                     profile.isActive
                         ? AppColors.successLight
-                        : AppColors.surfaceSecondaryLight,
+                        : AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
@@ -179,7 +179,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   color:
                       profile.isActive
                           ? AppColors.success
-                          : AppColors.textTertiaryLight,
+                          : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -209,7 +209,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   Text(
                     '자녀를 추가할 방법을 선택하세요',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space6),

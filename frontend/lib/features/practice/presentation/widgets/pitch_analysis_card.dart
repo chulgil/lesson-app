@@ -35,7 +35,7 @@ class PitchAnalysisCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +114,7 @@ class PitchAnalysisCard extends ConsumerWidget {
             Text(
               '음 분포',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -138,7 +138,7 @@ class PitchAnalysisCard extends ConsumerWidget {
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const Spacer(),
@@ -155,7 +155,7 @@ class PitchAnalysisCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(3),
           child: LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
-            backgroundColor: AppColors.borderLight,
+            backgroundColor: AppColors.inkQuaternary,
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 8,
           ),
@@ -173,12 +173,12 @@ class PitchAnalysisCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space2),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: AppColors.textTertiaryLight),
+            Icon(icon, size: 16, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space1),
             Expanded(
               child: Column(
@@ -187,7 +187,7 @@ class PitchAnalysisCard extends ConsumerWidget {
                   Text(
                     label,
                     style: AppTypography.captionSmall.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                   Text(

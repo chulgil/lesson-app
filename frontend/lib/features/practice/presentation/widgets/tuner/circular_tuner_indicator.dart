@@ -184,7 +184,7 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
     } else {
       // Normal style
       backgroundColor = baseColor.withValues(alpha: 0.3);
-      textColor = AppColors.textSecondaryLight;
+      textColor = AppColors.inkSecondary;
     }
 
     return Transform.translate(
@@ -273,7 +273,7 @@ class _CentGaugePainter extends CustomPainter {
 
     // Background track
     final trackPaint = Paint()
-      ..color = AppColors.borderLight
+      ..color = AppColors.inkQuaternary
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
@@ -346,9 +346,9 @@ class TunerInfoBar extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -372,7 +372,7 @@ class TunerInfoBar extends ConsumerWidget {
                       : (note.centDeviation < 0
                           ? AppColors.tunerCentFlat
                           : AppColors.tunerCentSharp))
-                  : AppColors.textTertiaryLight,
+                  : AppColors.inkTertiary,
             ),
           ),
         ],

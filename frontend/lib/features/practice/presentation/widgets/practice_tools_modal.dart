@@ -122,7 +122,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -153,7 +153,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                   child: TabBar(
                     controller: _tabController,
                     labelColor: AppColors.primary,
-                    unselectedLabelColor: AppColors.textSecondaryLight,
+                    unselectedLabelColor: AppColors.inkSecondary,
                     indicatorColor: AppColors.primary,
                     indicatorWeight: 3,
                     labelPadding: EdgeInsets.zero,

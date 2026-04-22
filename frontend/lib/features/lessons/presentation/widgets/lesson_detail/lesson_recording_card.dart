@@ -30,7 +30,7 @@ class LessonRecordingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         boxShadow: [
           BoxShadow(
@@ -67,7 +67,7 @@ class LessonRecordingCard extends StatelessWidget {
                     Text(
                       '$date · $duration',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -88,7 +88,7 @@ class LessonRecordingCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
@@ -96,13 +96,13 @@ class LessonRecordingCard extends StatelessWidget {
                     Icon(
                       Icons.text_snippet_outlined,
                       size: 16,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '텍스트 변환 완료',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const Spacer(),

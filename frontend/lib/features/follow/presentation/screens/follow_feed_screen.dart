@@ -28,7 +28,7 @@ class FollowFeedScreen extends ConsumerWidget {
           child: Text(
             '소식을 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -58,13 +58,13 @@ class FollowFeedScreen extends ConsumerWidget {
             Icon(
               Icons.article_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '팔로우한 선생님의 소식이 표시됩니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),

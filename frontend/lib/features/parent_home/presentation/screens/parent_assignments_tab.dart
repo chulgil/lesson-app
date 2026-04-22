@@ -246,12 +246,12 @@ class _AssignmentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               isCompleted
-                  ? AppColors.borderLight
+                  ? AppColors.inkQuaternary
                   : _getPriorityColor().withValues(alpha: 0.3),
         ),
       ),
@@ -268,12 +268,12 @@ class _AssignmentCard extends StatelessWidget {
                   color:
                       isCompleted
                           ? AppColors.success
-                          : AppColors.surfaceSecondaryLight,
+                          : AppColors.paperDark,
                   shape: BoxShape.circle,
                   border:
                       isCompleted
                           ? null
-                          : Border.all(color: AppColors.borderLight),
+                          : Border.all(color: AppColors.inkQuaternary),
                 ),
                 child:
                     isCompleted
@@ -290,8 +290,8 @@ class _AssignmentCard extends StatelessWidget {
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
                     color:
                         isCompleted
-                            ? AppColors.textTertiaryLight
-                            : AppColors.textPrimaryLight,
+                            ? AppColors.inkTertiary
+                            : AppColors.ink,
                   ),
                 ),
               ),
@@ -308,7 +308,7 @@ class _AssignmentCard extends StatelessWidget {
                 Text(
                   description,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
@@ -320,7 +320,7 @@ class _AssignmentCard extends StatelessWidget {
                       color:
                           isCompleted
                               ? AppColors.success
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
@@ -331,7 +331,7 @@ class _AssignmentCard extends StatelessWidget {
                                 ? AppColors.success
                                 : dueDate.contains('내일')
                                 ? AppColors.warning
-                                : AppColors.textTertiaryLight,
+                                : AppColors.inkTertiary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

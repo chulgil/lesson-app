@@ -38,7 +38,7 @@ class StatCard extends StatelessWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),

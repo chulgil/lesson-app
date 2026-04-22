@@ -63,7 +63,7 @@ enum ParentStatus {
       case ParentStatus.active:
         return AppColors.success;
       case ParentStatus.inactive:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 }

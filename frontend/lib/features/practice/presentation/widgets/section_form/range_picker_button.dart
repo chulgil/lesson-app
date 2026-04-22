@@ -32,7 +32,7 @@ class RangePickerButton extends StatelessWidget {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Column(
@@ -40,7 +40,7 @@ class RangePickerButton extends StatelessWidget {
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
@@ -57,7 +57,7 @@ class RangePickerButton extends StatelessWidget {
                 Text(
                   unit,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

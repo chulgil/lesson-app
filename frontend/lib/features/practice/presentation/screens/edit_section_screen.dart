@@ -307,7 +307,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                               Text(
                                 _repertoire!.description!,
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                           ],
@@ -375,7 +375,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 Text(
                   '연습할 마디 구간을 선택하세요',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -395,7 +395,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 Text(
                   '연습할 줄 구간을 선택하세요 (1~10줄)',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),

@@ -27,7 +27,7 @@ class RoleOptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
@@ -55,13 +55,13 @@ class RoleOptionCard extends StatelessWidget {
                   Text(
                     description,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

@@ -67,7 +67,7 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
               vertical: AppSpacing.space3,
             ),
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+              border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

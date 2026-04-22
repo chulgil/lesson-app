@@ -28,9 +28,9 @@ class NotePreviewCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: notesAsync.when(
           data: (notes) => _buildContent(notes),
@@ -61,7 +61,7 @@ class NotePreviewCard extends ConsumerWidget {
                   Text(
                     '최근 연습노트',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -69,7 +69,7 @@ class NotePreviewCard extends ConsumerWidget {
                   Text(
                     latestNote.timeText,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -78,7 +78,7 @@ class NotePreviewCard extends ConsumerWidget {
               Text(
                 latestNote.content,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -86,7 +86,7 @@ class NotePreviewCard extends ConsumerWidget {
             ],
           ),
         ),
-        Icon(Icons.chevron_right, color: AppColors.textTertiaryLight, size: 20),
+        Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
       ],
     );
   }
@@ -94,17 +94,17 @@ class NotePreviewCard extends ConsumerWidget {
   Widget _buildEmpty() {
     return Row(
       children: [
-        Icon(Icons.edit_note, color: AppColors.textTertiaryLight, size: 20),
+        Icon(Icons.edit_note, color: AppColors.inkTertiary, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
             '연습노트가 없습니다. 터치하여 추가하세요.',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
-        Icon(Icons.chevron_right, color: AppColors.textTertiaryLight, size: 20),
+        Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
       ],
     );
   }
@@ -112,13 +112,13 @@ class NotePreviewCard extends ConsumerWidget {
   Widget _buildLoading() {
     return Row(
       children: [
-        Icon(Icons.edit_note, color: AppColors.textTertiaryLight, size: 20),
+        Icon(Icons.edit_note, color: AppColors.inkTertiary, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Container(
             height: 16,
             decoration: BoxDecoration(
-              color: AppColors.borderLight,
+              color: AppColors.inkQuaternary,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
           ),

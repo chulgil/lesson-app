@@ -35,9 +35,9 @@ class UnconnectedChildDashboard extends ConsumerWidget {
 
     return DebugWrapper(
       child: Scaffold(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         appBar: AppBar(
-          backgroundColor: AppColors.backgroundLight,
+          backgroundColor: AppColors.paperDark,
           elevation: 0,
           title: const ProfileSwitcher(),
           centerTitle: false,
@@ -100,7 +100,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   Text(
                     child.name,
                     style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space2),
@@ -140,7 +140,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               Text(
                 '${child.instrumentLabel} · ${child.levelLabel}',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -157,7 +157,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
         Text(
           '오늘의 연습',
           style: AppTypography.headingMedium.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -219,14 +219,14 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                     Text(
                       '선생님과 연결하세요',
                       style: AppTypography.headingSmall.copyWith(
-                        color: AppColors.textPrimaryLight,
+                        color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '레퍼토리, 레슨 예약, 숙제 확인이 가능해집니다',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -283,7 +283,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
             Text(
               '이번 주 연습',
               style: AppTypography.headingMedium.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
             TextButton(
@@ -325,7 +325,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
             Text(
               weekDays[index],
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -340,7 +340,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                         : hasPractice
                         ? AppColors.success.withValues(alpha: 0.1)
                         : isPast
-                        ? AppColors.surfaceSecondaryLight
+                        ? AppColors.paperDark
                         : Colors.transparent,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border:
@@ -350,7 +350,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                           color:
                               hasPractice
                                   ? AppColors.success
-                                  : AppColors.borderLight,
+                                  : AppColors.inkQuaternary,
                           width: hasPractice ? 2 : 1,
                         ),
               ),
@@ -364,7 +364,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                             ? Colors.white
                             : hasPractice
                             ? AppColors.success
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                   ),
                 ),
               ),
@@ -443,7 +443,7 @@ class _FeatureCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           boxShadow: [
             BoxShadow(
@@ -469,14 +469,14 @@ class _FeatureCard extends StatelessWidget {
             Text(
               title,
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
             Text(
               subtitle,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],

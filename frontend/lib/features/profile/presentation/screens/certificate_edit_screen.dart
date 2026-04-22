@@ -335,7 +335,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color: AppColors.inkQuaternary),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
@@ -347,7 +347,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                     ),
                     Icon(
                       Icons.calendar_today,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       size: 20,
                     ),
                   ],
@@ -376,11 +376,11 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 height: 200,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: AppColors.borderLight,
+                    color: AppColors.inkQuaternary,
                     style: BorderStyle.solid,
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                 ),
                 clipBehavior: Clip.hardEdge,
                 child: _buildImageContent(),
@@ -567,20 +567,20 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           Icon(
             Icons.add_photo_alternate_outlined,
             size: 48,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '자격증 이미지를 등록하세요',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '카메라 촬영 또는 갤러리에서 선택',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -596,7 +596,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

@@ -54,7 +54,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
 
     // Load student info for profile color
     final student = await ref.read(studentProvider(lesson.studentId).future);
-    final profileColor = student?.profileColor ?? AppColors.textTertiaryLight;
+    final profileColor = student?.profileColor ?? AppColors.inkTertiary;
 
     // Parse startTime "HH:mm" to TimeOfDay
     final timeParts = lesson.startTime.split(':');
@@ -158,7 +158,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 color:
                     (_hasChanges && !_isSaving)
                         ? null
-                        : AppColors.textTertiaryLight,
+                        : AppColors.inkTertiary,
               ),
             ),
           ),
@@ -486,7 +486,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           SnackBar(
             content: const Text('레슨 정보가 수정되었습니다'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop();

@@ -115,7 +115,7 @@ enum PracticePriority {
       case PracticePriority.should:
         return AppColors.practiceNormal; // 🟡
       case PracticePriority.could:
-        return AppColors.practiceGood; // 🟢
+        return AppColors.paperOk; // 🟢
     }
   }
 

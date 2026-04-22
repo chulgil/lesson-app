@@ -148,7 +148,7 @@ class ParentDashboardTab extends ConsumerWidget {
             Icon(
               Icons.child_care_outlined,
               size: 80,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
@@ -156,7 +156,7 @@ class ParentDashboardTab extends ConsumerWidget {
             Text(
               '자녀를 추가하여 레슨 일정과\n연습 현황을 관리해보세요',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -233,13 +233,13 @@ class ParentDashboardTab extends ConsumerWidget {
                                 Icon(
                                   Icons.child_care_outlined,
                                   size: 48,
-                                  color: AppColors.textTertiaryLight,
+                                  color: AppColors.inkTertiary,
                                 ),
                                 const SizedBox(height: AppSpacing.space2),
                                 Text(
                                   '등록된 자녀가 없습니다',
                                   style: AppTypography.bodyMedium.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                 ),
                               ],
@@ -494,7 +494,7 @@ class ParentDashboardTab extends ConsumerWidget {
         subtitle: Text(
           '오후 2:00 - 3:00 • 김선생님',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         trailing: Container(
@@ -548,7 +548,7 @@ class ParentDashboardTab extends ConsumerWidget {
               Text(
                 dayLabel,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
@@ -563,7 +563,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           ? AppColors.primaryLight
                           : isPast
                           ? AppColors.errorLight
-                          : AppColors.surfaceSecondaryLight,
+                          : AppColors.paperDark,
                   shape: BoxShape.circle,
                   border:
                       isToday
@@ -584,7 +584,7 @@ class ParentDashboardTab extends ConsumerWidget {
                               color:
                                   isToday
                                       ? AppColors.primary
-                                      : AppColors.textSecondaryLight,
+                                      : AppColors.inkSecondary,
                             ),
                           ),
                 ),
@@ -644,7 +644,7 @@ class ParentDashboardTab extends ConsumerWidget {
                   Text(
                     '결제 기한: 12/28',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

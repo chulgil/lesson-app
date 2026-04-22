@@ -325,7 +325,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                               Text(
                                 _repertoire!.description!,
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                           ],
@@ -466,7 +466,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         Text(
           isMeasure ? '연습할 마디 구간을 선택하세요' : '연습할 줄 구간을 선택하세요 (1~10줄)',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),

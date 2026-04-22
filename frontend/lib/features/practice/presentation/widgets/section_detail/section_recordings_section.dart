@@ -69,7 +69,7 @@ class SectionRecordingsSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -77,20 +77,20 @@ class SectionRecordingsSection extends StatelessWidget {
           Icon(
             Icons.mic_none,
             size: 48,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '아직 녹음이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '위의 녹음 버튼을 눌러 연습을 기록해보세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],

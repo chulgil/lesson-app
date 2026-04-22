@@ -160,7 +160,7 @@ class _StudentProfileSetupScreenState
                       Text(
                         '기본 정보를 설정해주세요',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
 
@@ -190,7 +190,7 @@ class _StudentProfileSetupScreenState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppColors.borderLight,
+                    disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusLarge,
@@ -261,7 +261,7 @@ class _StudentProfileSetupScreenState
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -296,7 +296,7 @@ class _StudentProfileSetupScreenState
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child:
@@ -305,13 +305,13 @@ class _StudentProfileSetupScreenState
                       children: [
                         Icon(
                           Icons.music_note,
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
                           '악기를 선택해주세요',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -366,14 +366,14 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : AppColors.borderLight,
+              color: isActive ? AppColors.primary : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '$step',
                 style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? Colors.white : AppColors.textTertiaryLight,
+                  color: isActive ? Colors.white : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -385,8 +385,8 @@ class _ProgressStep extends StatelessWidget {
             style: AppTypography.caption.copyWith(
               color:
                   isActive
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -407,7 +407,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.borderLight,
+      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
     );
   }
 }
@@ -458,7 +458,7 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.textPrimaryLight,
+                              : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),
@@ -470,7 +470,7 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.borderLight,
+                                : AppColors.inkQuaternary,
                       ),
                     ),
                     showCheckmark: false,

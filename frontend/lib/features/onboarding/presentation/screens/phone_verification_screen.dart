@@ -198,7 +198,7 @@ class _PhoneVerificationScreenState
                       ? '${_phoneController.text}로 전송된\n인증번호 6자리를 입력해주세요'
                       : '레슨 관리와 학생 초대를 위해\n휴대폰 인증이 필요합니다',
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
 
@@ -307,7 +307,7 @@ class _PhoneVerificationScreenState
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -361,7 +361,7 @@ class _PhoneVerificationScreenState
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -382,7 +382,7 @@ class _PhoneVerificationScreenState
               style: AppTypography.bodyMedium.copyWith(
                 color: _remainingSeconds <= 120
                     ? AppColors.primary
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
               ),
             ),
           ),
@@ -402,7 +402,7 @@ class _PhoneVerificationScreenState
             child: Text(
               '휴대폰 번호 변경',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
                 decoration: TextDecoration.underline,
               ),
             ),
@@ -433,14 +433,14 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : AppColors.borderLight,
+              color: isActive ? AppColors.primary : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '$step',
                 style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? Colors.white : AppColors.textTertiaryLight,
+                  color: isActive ? Colors.white : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -451,8 +451,8 @@ class _ProgressStep extends StatelessWidget {
             label,
             style: AppTypography.caption.copyWith(
               color: isActive
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+                  ? AppColors.ink
+                  : AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -473,7 +473,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.borderLight,
+      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
     );
   }
 }

@@ -29,7 +29,7 @@ class AddChildOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -57,7 +57,7 @@ class AddChildOption extends StatelessWidget {
                   Text(
                     description,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -65,7 +65,7 @@ class AddChildOption extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ],
         ),

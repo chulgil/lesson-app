@@ -102,7 +102,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                     child: Text(
                       '건너뛰기',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                   ),
@@ -146,7 +146,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                       child: OutlinedButton(
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.borderLight),
+                          side: BorderSide(color: AppColors.inkQuaternary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusLarge,
@@ -157,7 +157,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         child: Text(
                           '이전',
                           style: AppTypography.button.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -253,7 +253,7 @@ class _TutorialPage extends StatelessWidget {
           Text(
             content.title,
             style: AppTypography.headingLarge.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
             textAlign: TextAlign.center,
           ),
@@ -264,7 +264,7 @@ class _TutorialPage extends StatelessWidget {
           Text(
             content.description,
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -302,7 +302,7 @@ class _PageIndicator extends StatelessWidget {
       height: 8,
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : AppColors.borderLight,
+        color: isActive ? AppColors.primary : AppColors.inkQuaternary,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
     );
@@ -334,7 +334,7 @@ class _ProgressStep extends StatelessWidget {
             color:
                 isActive || isCompleted
                     ? AppColors.primary
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -347,7 +347,7 @@ class _ProgressStep extends StatelessWidget {
                         color:
                             isActive
                                 ? Colors.white
-                                : AppColors.textTertiaryLight,
+                                : AppColors.inkTertiary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

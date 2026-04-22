@@ -22,7 +22,7 @@ Color getDifficultyColor(String? difficulty) {
     case '상급':
       return AppColors.error;
     default:
-      return AppColors.textSecondaryLight;
+      return AppColors.inkSecondary;
   }
 }
 
@@ -50,7 +50,7 @@ class RepertoireSearchAndFilter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -139,20 +139,20 @@ class RepertoireEmptyState extends StatelessWidget {
           Icon(
             Icons.library_music,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             hasFilters ? '검색 결과가 없습니다' : '등록된 곡이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '곡을 추가하여 레퍼토리를 관리하세요',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -216,7 +216,7 @@ class PieceCard extends StatelessWidget {
                       Text(
                         piece.composer!,
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     if (piece.opus != null) ...[
@@ -457,7 +457,7 @@ class _PieceDialogState extends State<PieceDialog> {
                           color:
                               isSelected
                                   ? getDifficultyColor(difficulty)
-                                  : AppColors.textPrimaryLight,
+                                  : AppColors.ink,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -652,7 +652,7 @@ void showPieceDetails({
                       Text(
                         piece.composer!,
                         style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
 
@@ -727,7 +727,7 @@ class _PieceDetailRow extends StatelessWidget {
           Text(
             '$label: ',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(value, style: AppTypography.bodyMedium),

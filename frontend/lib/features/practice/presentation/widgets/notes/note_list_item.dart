@@ -27,9 +27,9 @@ class NoteListItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +59,7 @@ class NoteListItem extends StatelessWidget {
                   Text(
                     '(수정됨)',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -69,7 +69,7 @@ class NoteListItem extends StatelessWidget {
                   icon: Icon(
                     Icons.more_vert,
                     size: 18,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -118,7 +118,7 @@ class NoteListItem extends StatelessWidget {
             Text(
               note.content,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
           ],

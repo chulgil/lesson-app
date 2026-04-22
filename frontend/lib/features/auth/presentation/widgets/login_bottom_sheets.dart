@@ -49,7 +49,7 @@ void showParentLoginSheet(BuildContext context) {
                 Text(
                   '자녀의 레슨과 연습을 확인하세요',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
 
@@ -61,8 +61,8 @@ void showParentLoginSheet(BuildContext context) {
                   label: 'Google로 계속하기',
                   description: '기존 학부모 (자녀 등록됨)',
                   backgroundColor: AppColors.googleBackground,
-                  textColor: AppColors.textPrimaryLight,
-                  borderColor: AppColors.borderLight,
+                  textColor: AppColors.ink,
+                  borderColor: AppColors.inkQuaternary,
                   onPressed: () {
                     Navigator.pop(sheetContext);
                     context.go(AppRoutes.parentHome);
@@ -75,7 +75,7 @@ void showParentLoginSheet(BuildContext context) {
                   label: '카카오로 계속하기',
                   description: '기존 학부모 (자녀 없음)',
                   backgroundColor: AppColors.kakaoBackground,
-                  textColor: AppColors.textPrimaryLight,
+                  textColor: AppColors.ink,
                   onPressed: () {
                     Navigator.pop(sheetContext);
                     context.go(AppRoutes.parentHome);
@@ -132,7 +132,7 @@ void showRoleSelectSheet(
                 Text(
                   '레슨 앱에서 어떤 역할로 사용하시나요?',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
 

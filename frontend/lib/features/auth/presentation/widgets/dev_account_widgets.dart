@@ -91,7 +91,7 @@ class DevAccountCard extends StatelessWidget {
                   Text(
                     description,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

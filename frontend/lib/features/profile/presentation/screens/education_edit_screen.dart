@@ -313,7 +313,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

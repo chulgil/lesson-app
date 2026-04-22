@@ -21,7 +21,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(userRole == InviteUserRole.teacher ? '내 학생' : '내 선생님'),
         leading: IconButton(
@@ -112,7 +112,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                   ? '초대 링크를 공유하거나\n학생의 QR 코드를 스캔하세요.'
                   : '선생님의 초대 코드를 입력하거나\nQR 코드를 스캔하세요.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -315,14 +315,14 @@ class MyConnectionsScreen extends ConsumerWidget {
                 Text(
                   userRole == InviteUserRole.teacher ? '학생' : '선생님',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '연결일: ${_formatDate(connection.connectedAt)}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space6),
@@ -418,7 +418,7 @@ class _SectionHeader extends StatelessWidget {
           '$title ($count명)',
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -449,7 +449,7 @@ class _HelpItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
           children: [
@@ -476,7 +476,7 @@ class _HelpItem extends StatelessWidget {
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -484,7 +484,7 @@ class _HelpItem extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
               size: 20,
             ),
           ],
@@ -529,9 +529,9 @@ class _ConnectionCard extends StatelessWidget {
           color:
               isActive
                   ? Colors.white
-                  : AppColors.textTertiaryLight.withValues(alpha: 0.05),
+                  : AppColors.inkTertiary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
           children: [
@@ -541,7 +541,7 @@ class _ConnectionCard extends StatelessWidget {
               backgroundColor:
                   isActive
                       ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                      : AppColors.inkTertiary.withValues(alpha: 0.1),
               backgroundImage:
                   profileImage != null ? NetworkImage(profileImage) : null,
               child:
@@ -552,7 +552,7 @@ class _ConnectionCard extends StatelessWidget {
                           color:
                               isActive
                                   ? AppColors.primary
-                                  : AppColors.textTertiaryLight,
+                                  : AppColors.inkTertiary,
                         ),
                       )
                       : null,
@@ -571,7 +571,7 @@ class _ConnectionCard extends StatelessWidget {
                           style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                             color:
-                                isActive ? null : AppColors.textSecondaryLight,
+                                isActive ? null : AppColors.inkSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -587,7 +587,7 @@ class _ConnectionCard extends StatelessWidget {
                         ? '연결됨: ${_formatRelativeDate(connection.connectedAt)}'
                         : '해제됨: ${_formatRelativeDate(connection.deactivatedAt ?? connection.connectedAt)}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -599,7 +599,7 @@ class _ConnectionCard extends StatelessWidget {
                 onPressed: onTap,
                 icon: Icon(
                   Icons.more_vert,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               )
             else if (onReconnect != null)
@@ -655,13 +655,13 @@ class _StatusBadge extends StatelessWidget {
         color:
             isActive
                 ? AppColors.success.withValues(alpha: 0.1)
-                : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                : AppColors.inkTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         isActive ? '연결됨' : '해제됨',
         style: AppTypography.caption.copyWith(
-          color: isActive ? AppColors.success : AppColors.textTertiaryLight,
+          color: isActive ? AppColors.success : AppColors.inkTertiary,
           fontWeight: FontWeight.w500,
         ),
       ),

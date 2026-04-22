@@ -33,7 +33,7 @@ class TimeSignaturePicker extends StatelessWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -95,7 +95,7 @@ class TimeSignaturePicker extends StatelessWidget {
           Text(
             description,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space3),
@@ -143,10 +143,10 @@ class _TimeSignatureCard extends StatelessWidget {
           vertical: AppSpacing.space4,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceLight,
+          color: isSelected ? AppColors.primary : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           boxShadow:
@@ -174,7 +174,7 @@ class _TimeSignatureCard extends StatelessWidget {
                   color:
                       isSelected
                           ? Colors.white70
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -196,20 +196,20 @@ class _TimeSignatureCard extends StatelessWidget {
           numerator,
           style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+            color: isSelected ? Colors.white : AppColors.ink,
             height: 1.0,
           ),
         ),
         Container(
           width: 24,
           height: 2,
-          color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+          color: isSelected ? Colors.white : AppColors.ink,
         ),
         Text(
           denominator,
           style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+            color: isSelected ? Colors.white : AppColors.ink,
             height: 1.0,
           ),
         ),

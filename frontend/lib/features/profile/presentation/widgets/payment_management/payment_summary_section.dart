@@ -37,7 +37,7 @@ class PaymentSummarySection extends StatelessWidget {
                 title: '수납 완료',
                 value: summary.formattedTotalReceived,
                 subtitle: '${summary.paidStudents}명',
-                color: AppColors.practiceGood,
+                color: AppColors.paperOk,
                 icon: Icons.check_circle,
               ),
               StatCard(

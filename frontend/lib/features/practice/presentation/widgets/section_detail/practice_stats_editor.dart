@@ -27,9 +27,9 @@ class PracticeStatsEditor extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -42,7 +42,7 @@ class PracticeStatsEditor extends StatelessWidget {
               onTap: () => _showCountEditor(context),
             ),
           ),
-          Container(width: 1, height: 32, color: AppColors.borderLight),
+          Container(width: 1, height: 32, color: AppColors.inkQuaternary),
           // Total practice time
           Expanded(
             child: _StatItem(
@@ -120,7 +120,7 @@ class _StatItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: AppColors.textSecondaryLight),
+            Icon(icon, size: 18, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Column(
@@ -129,13 +129,13 @@ class _StatItem extends StatelessWidget {
                   Text(
                     label,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   Text(
                     value,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -145,7 +145,7 @@ class _StatItem extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ],
         ),

@@ -112,7 +112,7 @@ class _RepertoireDetailScreenState
                     Text(
                       repertoire.dateRangeText,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -125,7 +125,7 @@ class _RepertoireDetailScreenState
             Text(
               repertoire.description!,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -222,7 +222,7 @@ class _RepertoireDetailScreenState
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -262,7 +262,7 @@ class _RepertoireDetailScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Center(
@@ -271,20 +271,20 @@ class _RepertoireDetailScreenState
                   Icon(
                     Icons.library_music_outlined,
                     size: 48,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     '섹션이 없습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     '연습할 구간을 추가해보세요',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -487,9 +487,9 @@ class _SectionListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: () {
@@ -518,7 +518,7 @@ class _SectionListTile extends StatelessWidget {
                     Text(
                       section.rangeText,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -546,7 +546,7 @@ class _SectionListTile extends StatelessWidget {
               const SizedBox(width: AppSpacing.space2),
               Icon(
                 Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
                 size: 20,
               ),
             ],
@@ -560,18 +560,18 @@ class _SectionListTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: AppColors.textSecondaryLight),
+          Icon(icon, size: 12, color: AppColors.inkSecondary),
           const SizedBox(width: 2),
           Text(
             value,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -600,9 +600,9 @@ class _ReorderableSectionTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -616,7 +616,7 @@ class _ReorderableSectionTile extends StatelessWidget {
               ),
               child: Icon(
                 Icons.drag_handle,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
@@ -656,7 +656,7 @@ class _ReorderableSectionTile extends StatelessWidget {
                           Text(
                             section.rangeText,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ],
@@ -682,7 +682,7 @@ class _ReorderableSectionTile extends StatelessWidget {
                     const SizedBox(width: AppSpacing.space2),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                       size: 20,
                     ),
                   ],
@@ -699,18 +699,18 @@ class _ReorderableSectionTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: AppColors.textSecondaryLight),
+          Icon(icon, size: 12, color: AppColors.inkSecondary),
           const SizedBox(width: 2),
           Text(
             value,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

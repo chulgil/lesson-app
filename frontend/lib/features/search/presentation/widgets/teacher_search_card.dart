@@ -50,7 +50,7 @@ class TeacherSearchCard extends StatelessWidget {
               // Profile image
               CircleAvatar(
                 radius: 35,
-                backgroundColor: AppColors.surfaceSecondaryLight,
+                backgroundColor: AppColors.paperDark,
                 backgroundImage:
                     publicProfile.profileImage != null
                         ? NetworkImage(publicProfile.profileImage!)
@@ -60,7 +60,7 @@ class TeacherSearchCard extends StatelessWidget {
                         ? Icon(
                           Icons.person,
                           size: 35,
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         )
                         : null,
               ),
@@ -208,13 +208,13 @@ class TeacherSearchCard extends StatelessWidget {
           Icon(
             Icons.work_outline,
             size: 14,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             '${publicProfile.experienceYears}년',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -223,13 +223,13 @@ class TeacherSearchCard extends StatelessWidget {
           Icon(
             Icons.payments_outlined,
             size: 14,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             publicProfile.feeRange!.formatted,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -246,13 +246,13 @@ class TeacherSearchCard extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 area,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             );

@@ -58,7 +58,7 @@ class _AttendanceConfirmationSheetState
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusLarge),
             ),
@@ -129,7 +129,7 @@ class _AttendanceConfirmationSheetState
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Column(
@@ -144,7 +144,7 @@ class _AttendanceConfirmationSheetState
               Text(
                 '${lesson.studentName} ${lesson.instrument}',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -242,7 +242,7 @@ class _AttendanceConfirmationSheetState
           decoration: InputDecoration(
             hintText: AppStrings.optionalNote,
             hintStyle: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -337,7 +337,7 @@ class _AttendanceConfirmationSheetState
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? reason.color : AppColors.borderLight,
+            color: isSelected ? reason.color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -347,7 +347,7 @@ class _AttendanceConfirmationSheetState
           children: [
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? reason.color : AppColors.textTertiaryLight,
+              color: isSelected ? reason.color : AppColors.inkTertiary,
               size: 20,
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -367,7 +367,7 @@ class _AttendanceConfirmationSheetState
                       color:
                           reason.isDeducted
                               ? AppColors.error
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                   ),
                 ],

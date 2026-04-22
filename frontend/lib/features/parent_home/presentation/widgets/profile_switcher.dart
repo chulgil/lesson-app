@@ -53,7 +53,7 @@ class _SingleProfileDisplay extends ConsumerWidget {
             userProfile.activeProfileDisplayName,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
         ],
@@ -83,9 +83,9 @@ class _ProfileDropdown extends ConsumerWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -100,14 +100,14 @@ class _ProfileDropdown extends ConsumerWidget {
               userProfile.activeProfileDisplayName,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
             const Icon(
               Icons.keyboard_arrow_down,
               size: 20,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ],
         ),
@@ -166,7 +166,7 @@ class _ProfileDropdown extends ConsumerWidget {
           child: Text(
             '자녀 프로필',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -240,7 +240,7 @@ class _ProfileDropdown extends ConsumerWidget {
                       style: TextStyle(
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: AppColors.textPrimaryLight,
+                        color: AppColors.ink,
                       ),
                     ),
                     if (option.badge != null) ...[
@@ -253,7 +253,7 @@ class _ProfileDropdown extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color:
                               option.badgeColor?.withValues(alpha: 0.1) ??
-                              AppColors.surfaceLight,
+                              AppColors.paper,
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -263,7 +263,7 @@ class _ProfileDropdown extends ConsumerWidget {
                           style: AppTypography.captionSmall.copyWith(
                             color:
                                 option.badgeColor ??
-                                AppColors.textSecondaryLight,
+                                AppColors.inkSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -275,7 +275,7 @@ class _ProfileDropdown extends ConsumerWidget {
                   Text(
                     option.subtitle!,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
               ],
@@ -393,7 +393,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
               '프로필 전환',
               style: AppTypography.headingSmall.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -440,7 +440,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
                 '자녀 프로필',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -535,7 +535,7 @@ class _ProfileTile extends StatelessWidget {
                         style: AppTypography.bodyLarge.copyWith(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w500,
-                          color: AppColors.textPrimaryLight,
+                          color: AppColors.ink,
                         ),
                       ),
                       if (badge != null) ...[
@@ -548,7 +548,7 @@ class _ProfileTile extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 badgeColor?.withValues(alpha: 0.1) ??
-                                AppColors.surfaceLight,
+                                AppColors.paper,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSmall,
                             ),
@@ -556,7 +556,7 @@ class _ProfileTile extends StatelessWidget {
                           child: Text(
                             badge!,
                             style: AppTypography.captionSmall.copyWith(
-                              color: badgeColor ?? AppColors.textSecondaryLight,
+                              color: badgeColor ?? AppColors.inkSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -567,7 +567,7 @@ class _ProfileTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

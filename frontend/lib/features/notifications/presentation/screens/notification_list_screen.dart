@@ -27,7 +27,7 @@ class NotificationListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('알림'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         actions: [
           TextButton(
@@ -41,7 +41,7 @@ class NotificationListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: notificationsAsync.when(
         data: (notifications) => _buildNotificationList(context, ref, notifications),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -92,7 +92,7 @@ class NotificationListScreen extends ConsumerWidget {
           child: Text(
             dateLabel,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -161,7 +161,7 @@ class NotificationListScreen extends ConsumerWidget {
           Text(
             '알림을 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

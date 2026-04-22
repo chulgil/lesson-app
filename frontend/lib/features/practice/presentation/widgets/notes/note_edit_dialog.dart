@@ -105,17 +105,17 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
               decoration: InputDecoration(
                 hintText: '연습하면서 느낀 점을 기록하세요...',
                 hintStyle: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 filled: true,
-                fillColor: AppColors.surfaceSecondaryLight,
+                fillColor: AppColors.paperDark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

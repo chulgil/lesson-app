@@ -135,7 +135,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                 category.label,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -143,9 +143,9 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             children:
@@ -183,8 +183,8 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               style: AppTypography.bodyMedium.copyWith(
                 color:
                     item.isRequired
-                        ? AppColors.textTertiaryLight
-                        : AppColors.textPrimaryLight,
+                        ? AppColors.inkTertiary
+                        : AppColors.ink,
               ),
             ),
           ),
@@ -195,7 +195,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               decoration: BoxDecoration(
                 color:
                     item.isRequired
-                        ? AppColors.textTertiaryLight.withValues(alpha: 0.2)
+                        ? AppColors.inkTertiary.withValues(alpha: 0.2)
                         : item.isRecommended
                         ? AppColors.success.withValues(alpha: 0.15)
                         : Colors.transparent,
@@ -206,10 +206,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                 style: AppTypography.captionSmall.copyWith(
                   color:
                       item.isRequired
-                          ? AppColors.textTertiaryLight
+                          ? AppColors.inkTertiary
                           : item.isRecommended
                           ? AppColors.success
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),

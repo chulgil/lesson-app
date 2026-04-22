@@ -294,7 +294,7 @@ class _PracticeGoalSettingScreenState
             Text(
               '일일 목표',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
@@ -315,7 +315,7 @@ class _PracticeGoalSettingScreenState
             Text(
               '주간 목표',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
@@ -344,7 +344,7 @@ class _PracticeGoalSettingScreenState
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(

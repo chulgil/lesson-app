@@ -107,7 +107,7 @@ class _PracticeRecordingScreenState
                       Text(
                         '녹음 파일 복구 중...',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -443,7 +443,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
               color:
                   widget.isRecording
                       ? AppColors.primary
-                      : AppColors.surfaceLight,
+                      : AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
             ),
             child: ClipRRect(
@@ -468,7 +468,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
               color:
                   widget.isRecording
                       ? AppColors.primary
-                      : AppColors.textSecondaryLight,
+                      : AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
@@ -477,7 +477,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
           Text(
             widget.isRecording ? '녹음 중...' : '최대 3분',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space4),
@@ -549,7 +549,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                       backgroundColor:
                           hasMicPermission
                               ? AppColors.primary
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                     ),
                     tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                   ),
@@ -570,19 +570,19 @@ class _EmptyRecordingsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.mic_none, size: 64, color: AppColors.textSecondaryLight),
+          Icon(Icons.mic_none, size: 64, color: AppColors.inkSecondary),
           SizedBox(height: AppSpacing.space4),
           Text(
             '녹음이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
           Text(
             '위의 마이크 버튼을 눌러 녹음을 시작하세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -665,7 +665,7 @@ class _RecordingItem extends StatelessWidget {
       color:
           recording.isRepresentative
               ? AppColors.primaryLight
-              : AppColors.surfaceLight,
+              : AppColors.paper,
       child: ListTile(
         leading: IconButton.filled(
           onPressed: onPlay,
@@ -707,7 +707,7 @@ class _RecordingItem extends StatelessWidget {
             Text(
               recording.formattedDuration,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             if (recording.isShared) ...[

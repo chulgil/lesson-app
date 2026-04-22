@@ -43,9 +43,9 @@ class _RankingContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       child: Column(
@@ -54,7 +54,7 @@ class _RankingContent extends StatelessWidget {
           Text(
             AppStrings.weeklyRanking,
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -101,7 +101,7 @@ class _RankingEntryRow extends StatelessWidget {
             child: Text(
               entry.studentName,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
                 fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
@@ -112,7 +112,7 @@ class _RankingEntryRow extends StatelessWidget {
           Text(
             AppStrings.weeklyPointsValue(entry.weeklyPoints),
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -157,7 +157,7 @@ class _ProgressBar extends StatelessWidget {
       child: LinearProgressIndicator(
         value: value.clamp(0.0, 1.0),
         minHeight: 8,
-        backgroundColor: AppColors.borderLight,
+        backgroundColor: AppColors.inkQuaternary,
         valueColor: AlwaysStoppedAnimation<Color>(_tierColor(tier)),
       ),
     );
@@ -168,7 +168,7 @@ class _ProgressBar extends StatelessWidget {
       case RankingTier.gold:
         return AppColors.amber;
       case RankingTier.silver:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case RankingTier.bronze:
         return AppColors.secondary;
     }

@@ -40,7 +40,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     final isValidConnection = currentUserRole != inviteCreatorRole;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('연결 요청'),
         leading: IconButton(
@@ -90,7 +90,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 ? '선생님은 선생님의 초대 코드를 사용할 수 없습니다.\n학생의 초대 코드를 사용해주세요.'
                 : '학생은 학생의 초대 코드를 사용할 수 없습니다.\n선생님의 초대 코드를 사용해주세요.',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -138,7 +138,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           Text(
             '연결 요청을 보내시겠습니까?',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -152,7 +152,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
               children: [
@@ -186,7 +186,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +194,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 Text(
                   '메시지 (선택)',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -206,19 +206,19 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   decoration: InputDecoration(
                     hintText: '간단한 자기소개나 인사말을 작성해주세요',
                     hintStyle: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
-                      borderSide: BorderSide(color: AppColors.borderLight),
+                      borderSide: BorderSide(color: AppColors.inkQuaternary),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
-                      borderSide: BorderSide(color: AppColors.borderLight),
+                      borderSide: BorderSide(color: AppColors.inkQuaternary),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
@@ -272,7 +272,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             child: Text(
               '취소',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -290,12 +290,12 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+        Icon(icon, size: 20, color: AppColors.inkSecondary),
         const SizedBox(width: AppSpacing.space3),
         Text(
           label,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const Spacer(),
@@ -397,7 +397,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 Text(
                   '해당 $targetRoleLabel과 이미\n연결되어 있습니다.',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -472,7 +472,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 Text(
                   '$targetRoleLabel이 요청을 수락하면\n연결이 완료됩니다.',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -521,7 +521,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           context.go(homeRoute);
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.textSecondaryLight,
+                          foregroundColor: AppColors.inkSecondary,
                         ),
                         child: const Text('홈으로'),
                       ),
@@ -568,7 +568,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           context.go(homeRoute);
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.textSecondaryLight,
+                          foregroundColor: AppColors.inkSecondary,
                         ),
                         child: const Text('홈으로'),
                       ),

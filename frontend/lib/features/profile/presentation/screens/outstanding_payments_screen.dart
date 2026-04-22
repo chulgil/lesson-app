@@ -45,14 +45,14 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           Text(
             '미수금이 없습니다',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '모든 수강료가 수금 완료되었습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -157,13 +157,13 @@ class _UnpaidCard extends ConsumerWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color:
                 daysOverdue > 0
                     ? AppColors.error.withValues(alpha: 0.3)
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
           ),
           boxShadow: [
             BoxShadow(
@@ -206,7 +206,7 @@ class _UnpaidCard extends ConsumerWidget {
                         Text(
                           _subscriptionTypeLabel(subscription),
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -238,8 +238,8 @@ class _UnpaidCard extends ConsumerWidget {
                       icon: const Icon(Icons.notifications_outlined, size: 18),
                       label: const Text('알림 보내기'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textSecondaryLight,
-                        side: BorderSide(color: AppColors.borderLight),
+                        foregroundColor: AppColors.inkSecondary,
+                        side: BorderSide(color: AppColors.inkQuaternary),
                       ),
                     ),
                   ),

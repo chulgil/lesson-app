@@ -159,7 +159,7 @@ class ResourceAttachmentEditor extends ConsumerWidget {
             Icon(
               Icons.attach_file,
               size: 16,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
@@ -231,9 +231,9 @@ class _AttachedResourceList extends ConsumerWidget {
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -255,7 +255,7 @@ class _AttachedResourceList extends ConsumerWidget {
                   Text(
                     resource.timestampText!,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
               ],
@@ -269,7 +269,7 @@ class _AttachedResourceList extends ConsumerWidget {
               child: Icon(
                 Icons.close,
                 size: 18,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
@@ -292,8 +292,8 @@ class _AddResourceButton extends ConsumerWidget {
       label: const Text('자료 첨부'),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 40),
-        foregroundColor: AppColors.textSecondaryLight,
-        side: BorderSide(color: AppColors.borderLight),
+        foregroundColor: AppColors.inkSecondary,
+        side: BorderSide(color: AppColors.inkQuaternary),
       ),
     );
   }
@@ -356,7 +356,7 @@ class _AddResourceButton extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.textSecondaryLight),
+      leading: Icon(icon, color: color ?? AppColors.inkSecondary),
       title: Text(label, style: AppTypography.bodyMedium),
       onTap: onTap,
       shape: RoundedRectangleBorder(
@@ -379,7 +379,7 @@ class _AddResourceButton extends ConsumerWidget {
 
               return Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: AppColors.paper,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(AppSpacing.radiusXLarge),
                   ),
@@ -415,7 +415,7 @@ class _AddResourceButton extends ConsumerWidget {
                               child: Text(
                                 '등록된 자료가 없습니다',
                                 style: AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                             );
@@ -443,7 +443,7 @@ class _AddResourceButton extends ConsumerWidget {
                                         ? Text(
                                           r.timestampText!,
                                           style: AppTypography.caption.copyWith(
-                                            color: AppColors.textTertiaryLight,
+                                            color: AppColors.inkTertiary,
                                           ),
                                         )
                                         : null,

@@ -86,7 +86,7 @@ class AiNotesButton extends ConsumerWidget {
                   Text(
                     '레슨 녹음을 업로드하면 노트를 자동 작성합니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -161,7 +161,7 @@ class AiNotesButton extends ConsumerWidget {
                   Text(
                     '탭하여 결과를 확인하고 수정할 수 있습니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

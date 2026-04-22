@@ -102,7 +102,7 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
       builder:
           (context, scrollController) => Container(
             decoration: const BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             padding: EdgeInsets.only(bottom: bottomInset),
@@ -112,7 +112,7 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
                   margin: EdgeInsets.symmetric(vertical: AppSpacing.space3),
                 ),
                 _Header(recording: widget.recording),
-                const Divider(height: 1, color: AppColors.borderLight),
+                const Divider(height: 1, color: AppColors.inkQuaternary),
                 Expanded(
                   child: _FeedbackList(
                     feedbacks: feedbacks,
@@ -167,14 +167,14 @@ class _Header extends StatelessWidget {
               Text(
                 recording.sectionName,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '· ${recording.formattedDuration}',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               if (recording.bpm != null) ...[
@@ -182,7 +182,7 @@ class _Header extends StatelessWidget {
                 Text(
                   '· ${recording.bpm} BPM',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -192,7 +192,7 @@ class _Header extends StatelessWidget {
           Text(
             formatDateYMD(recording.sharedAt),
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -220,14 +220,14 @@ class _FeedbackList extends StatelessWidget {
           Icon(
             Icons.chat_bubble_outline,
             size: 40,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             AppStrings.recordingFeedbackEmpty,
             textAlign: TextAlign.center,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -235,7 +235,7 @@ class _FeedbackList extends StatelessWidget {
             AppStrings.recordingFeedbackDescription,
             textAlign: TextAlign.center,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -282,7 +282,7 @@ class _FeedbackBubble extends StatelessWidget {
           Text(
             _formatTimestamp(feedback.createdAt),
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -315,8 +315,8 @@ class _InputBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: const BoxDecoration(
-          color: AppColors.surfaceLight,
-          border: Border(top: BorderSide(color: AppColors.borderLight)),
+          color: AppColors.paper,
+          border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -330,10 +330,10 @@ class _InputBar extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: AppStrings.recordingFeedbackHint,
                   hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   filled: true,
-                  fillColor: AppColors.backgroundLight,
+                  fillColor: AppColors.paperDark,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.space3),
                     borderSide: BorderSide.none,

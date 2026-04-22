@@ -23,16 +23,16 @@ class SectionSortDropdown extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space1),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<SectionSortType>(
           value: currentSort,
-          icon: Icon(Icons.arrow_drop_down, color: AppColors.textSecondaryLight),
+          icon: Icon(Icons.arrow_drop_down, color: AppColors.inkSecondary),
           isDense: true,
-          style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimaryLight),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
           items: SectionSortType.values.map((type) {
             return DropdownMenuItem<SectionSortType>(
               value: type,
@@ -44,7 +44,7 @@ class SectionSortDropdown extends ConsumerWidget {
                     size: 16,
                     color: currentSort == type
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
@@ -52,7 +52,7 @@ class SectionSortDropdown extends ConsumerWidget {
                     style: TextStyle(
                       color: currentSort == type
                           ? AppColors.primary
-                          : AppColors.textPrimaryLight,
+                          : AppColors.ink,
                       fontWeight: currentSort == type
                           ? FontWeight.w600
                           : FontWeight.normal,

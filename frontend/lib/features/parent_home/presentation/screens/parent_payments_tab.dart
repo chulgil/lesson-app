@@ -183,7 +183,7 @@ class _SubscriptionList extends StatelessWidget {
         if (expired.isNotEmpty) ...[
           _SectionHeader(
             title: AppStrings.statusExpired,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space2),
           ...expired.map((s) => _buildCard(context, s)),
@@ -298,7 +298,7 @@ class _ChildSummaryHeader extends StatelessWidget {
                 Text(
                   '${profile.instrumentLabel} · ${profile.levelLabel}',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -347,7 +347,7 @@ class _SummaryStats extends StatelessWidget {
             child: _StatCard(
               label: AppStrings.statusExpired,
               count: expiredCount,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -408,7 +408,7 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title,
         style: AppTypography.headingSmall.copyWith(
-          color: color ?? AppColors.textPrimaryLight,
+          color: color ?? AppColors.ink,
         ),
       ),
     );
@@ -430,7 +430,7 @@ class _ChildSelectorSheet extends ConsumerWidget {
       builder:
           (context, controller) => Container(
             decoration: const BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
@@ -493,13 +493,13 @@ class _EmptyChildrenState extends StatelessWidget {
             const Icon(
               Icons.child_care_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '등록된 자녀가 없습니다',
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -525,14 +525,14 @@ class _UnlinkedChildState extends StatelessWidget {
             const Icon(
               Icons.link_off,
               size: 56,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '${profile.name}은(는) 아직 선생님과 연결되지 않았습니다',
               textAlign: TextAlign.center,
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -540,7 +540,7 @@ class _UnlinkedChildState extends StatelessWidget {
               '선생님 연결 후 수강권 정보가 표시됩니다',
               textAlign: TextAlign.center,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -562,20 +562,20 @@ class _NoSubscriptionsState extends StatelessWidget {
           const Icon(
             Icons.confirmation_number_outlined,
             size: 56,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '등록된 수강권이 없습니다',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '선생님에게 수강권 발급을 요청하세요',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -605,7 +605,7 @@ class _ErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],

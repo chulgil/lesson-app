@@ -38,7 +38,7 @@ class ChallengesCard extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +87,7 @@ class _ChallengeItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -140,7 +140,7 @@ class _ChallengeItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
                     value: challenge.progress,
-                    backgroundColor: AppColors.borderLight,
+                    backgroundColor: AppColors.inkQuaternary,
                     valueColor: AlwaysStoppedAnimation(
                       challenge.progress >= 1.0
                           ? AppColors.success
@@ -154,7 +154,7 @@ class _ChallengeItem extends StatelessWidget {
               Text(
                 '${challenge.currentValue}/${challenge.targetDisplay}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -176,7 +176,7 @@ class _ChallengeItem extends StatelessWidget {
                 style: AppTypography.caption.copyWith(
                   color: challenge.remainingDays <= 2
                       ? AppColors.error
-                      : AppColors.textTertiaryLight,
+                      : AppColors.inkTertiary,
                 ),
               ),
             ],

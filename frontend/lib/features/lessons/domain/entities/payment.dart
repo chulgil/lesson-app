@@ -69,7 +69,7 @@ enum PaymentStatus {
         return AppColors.error;
       case PaymentStatus.cancelled:
       case PaymentStatus.refunded:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 

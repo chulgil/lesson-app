@@ -263,7 +263,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               Text(
                 '💡 레퍼토리 저장 후 섹션 추가 화면으로 이동합니다',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

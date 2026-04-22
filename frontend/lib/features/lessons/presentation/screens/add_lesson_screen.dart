@@ -725,7 +725,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               '${_selectedStudent!.name} 학생의 정기 레슨 $createdCount개가 생성되었습니다 (4주간)',
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       } else {
@@ -751,7 +751,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           SnackBar(
             content: Text(message),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }

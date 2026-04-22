@@ -143,7 +143,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     child: Text(
                       '오늘 레슨이 없습니다',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   )
@@ -180,9 +180,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusLarge,
                             ),
-                            side: BorderSide(color: AppColors.borderLight),
+                            side: BorderSide(color: AppColors.inkQuaternary),
                           ),
-                          tileColor: AppColors.surfaceLight,
+                          tileColor: AppColors.paper,
                           title: Text(
                             '${NameUtils.givenName(lesson.studentName)} · ${lesson.instrument}',
                             style: AppTypography.bodyMedium.copyWith(
@@ -193,15 +193,15 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                             '${lesson.startTime} (${isCompleted ? "완료" : "예정"})'
                             '${hasFeedback ? " · 피드백 있음" : ""}',
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                           secondary: Icon(
                             isCompleted ? Icons.check_circle : Icons.schedule,
                             color:
                                 isCompleted
-                                    ? AppColors.practiceGood
-                                    : AppColors.textTertiaryLight,
+                                    ? AppColors.paperOk
+                                    : AppColors.inkTertiary,
                           ),
                         ),
                       );
@@ -252,9 +252,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: TextField(
                     controller: _feedbackController,
@@ -262,7 +262,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     decoration: InputDecoration(
                       hintText: '모든 선택 학생에게 전달할 피드백을 작성하세요...',
                       hintStyle: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(AppSpacing.space4),
@@ -283,7 +283,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 Text(
                   '각 학생에게 추가할 개별 메시지',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space3),
@@ -297,11 +297,11 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     padding: const EdgeInsets.only(bottom: AppSpacing.space3),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
+                        color: AppColors.paper,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
                         ),
-                        border: Border.all(color: AppColors.borderLight),
+                        border: Border.all(color: AppColors.inkQuaternary),
                       ),
                       child: TextField(
                         controller: _perStudentControllers[lesson.id],
@@ -310,7 +310,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                           labelText: NameUtils.givenName(lesson.studentName),
                           hintText: '추가 코멘트...',
                           hintStyle: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.all(
@@ -392,9 +392,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

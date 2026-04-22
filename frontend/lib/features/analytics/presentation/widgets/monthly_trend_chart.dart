@@ -26,9 +26,9 @@ class MonthlyTrendChart extends StatelessWidget {
           height: 180,
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: CustomPaint(
             size: const Size(double.infinity, 120),
@@ -50,7 +50,7 @@ class MonthlyTrendChart extends StatelessWidget {
                   return Text(
                     '${t.month.month}월',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   );
                 }).toList(),

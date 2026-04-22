@@ -129,7 +129,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Text(
           '사용할 레슨 시간을 선택하세요. 체크된 시간이 기본값입니다.',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
@@ -137,7 +137,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         // Duration list with switches
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: RadioGroup<int>(
@@ -208,7 +208,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Text(
           '최소 1개의 시간은 활성화 상태여야 합니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],
@@ -230,14 +230,14 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Text(
           '레슨 예약 관련 설정을 지정하세요',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
 
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Column(
@@ -281,7 +281,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 Text(
                   '레슨과 레슨 사이의 휴식 시간을 설정합니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -294,7 +294,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                       color:
                           current == minutes
                               ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                     title: Text(minutes == 0 ? '없음' : '$minutes분'),
                     onTap: () {
@@ -329,7 +329,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 Text(
                   '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -342,7 +342,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                       color:
                           current == hours
                               ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                     title: Text(_formatHours(hours)),
                     onTap: () {
@@ -404,7 +404,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Text(
           '레슨 가능한 요일과 시간대를 설정하세요',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
@@ -468,7 +468,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Column(
@@ -477,7 +477,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               Text(
                 '학생에게 표시할 안내 메시지',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -490,21 +490,21 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 decoration: InputDecoration(
                   hintText: TeacherSettings.defaultGuidanceMessage,
                   hintStyle: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   filled: true,
-                  fillColor: AppColors.backgroundLight,
+                  fillColor: AppColors.paperDark,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    borderSide: const BorderSide(color: AppColors.borderLight),
+                    borderSide: const BorderSide(color: AppColors.inkQuaternary),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    borderSide: const BorderSide(color: AppColors.borderLight),
+                    borderSide: const BorderSide(color: AppColors.inkQuaternary),
                   ),
                   counterText: '',
                 ),
@@ -518,7 +518,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               Text(
                 '비우면 기본 메시지가 표시됩니다',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],
@@ -536,7 +536,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space2),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: SwitchListTile(
@@ -546,7 +546,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                   ? '시간 확정 시 바로 예약 완료'
                   : '시간 확정 후 수강권 제안 필요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             value: settings.trialLessonFree,
@@ -579,7 +579,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
           Text(
             '악기를 먼저 설정하면 가격표를 입력할 수 있습니다.',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -594,13 +594,13 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         Text(
           '악기별 레벨에 따른 1회 레슨 가격을 설정하세요.',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           padding: const EdgeInsets.all(AppSpacing.space3),
@@ -616,7 +616,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                           levelLabels[level]!,
                           style: AppTypography.caption.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -671,7 +671,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                                           ? AppColors.primary.withValues(
                                             alpha: 0.3,
                                           )
-                                          : AppColors.borderLight,
+                                          : AppColors.inkQuaternary,
                                 ),
                               ),
                               child: Center(
@@ -683,7 +683,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                                     color:
                                         price != null
                                             ? AppColors.primary
-                                            : AppColors.textTertiaryLight,
+                                            : AppColors.inkTertiary,
                                     fontWeight:
                                         price != null
                                             ? FontWeight.w600
@@ -821,13 +821,13 @@ class _BookingSettingItem extends StatelessWidget {
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

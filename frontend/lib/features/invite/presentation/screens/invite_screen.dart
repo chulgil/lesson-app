@@ -43,7 +43,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(
           userRole == InviteUserRole.teacher ? '학생 초대하기' : '선생님 연결하기',
@@ -85,7 +85,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             Text(
               '초대 링크 생성 중 오류가 발생했습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -93,7 +93,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             Text(
               '잠시 후 다시 시도해주세요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -197,14 +197,14 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
             dataModuleStyle: QrDataModuleStyle(
               dataModuleShape: QrDataModuleShape.square,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '대면 수업 시 스캔하세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -218,14 +218,14 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
           Text(
             '초대 코드',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -252,7 +252,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           Text(
             '앱에서 직접 입력할 수 있는 코드입니다',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -308,7 +308,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 icon: const Icon(Icons.chat_bubble),
                 label: const Text('카카오톡'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimaryLight,
+                  foregroundColor: AppColors.ink,
                   backgroundColor: AppColors.kakaoBackground,
                   side: BorderSide.none,
                   padding: const EdgeInsets.symmetric(
@@ -332,12 +332,12 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.access_time, size: 16, color: AppColors.textSecondaryLight),
+        Icon(Icons.access_time, size: 16, color: AppColors.inkSecondary),
         const SizedBox(width: AppSpacing.space1),
         Text(
           '유효기간: ${invite.formattedExpiry}',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],

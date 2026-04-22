@@ -23,9 +23,9 @@ class GoalProgressWidget extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(10),
@@ -107,7 +107,7 @@ class GoalProgressWidget extends ConsumerWidget {
                 onPressed: onSettingsTap,
                 icon: Icon(
                   Icons.settings,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   size: 20,
                 ),
                 padding: EdgeInsets.zero,
@@ -159,14 +159,14 @@ class GoalProgressWidget extends ConsumerWidget {
               children: [
                 Icon(
                   Icons.date_range,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   size: 16,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '이번 주',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -262,13 +262,13 @@ class GoalProgressWidget extends ConsumerWidget {
                   Text(
                     '일일/주간 목표를 설정하고 달성률을 확인하세요',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textSecondaryLight),
+            Icon(Icons.chevron_right, color: AppColors.inkSecondary),
           ],
         ),
       ),
@@ -292,12 +292,12 @@ class GoalProgressWidget extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(icon, color: AppColors.textSecondaryLight, size: 16),
+            Icon(icon, color: AppColors.inkSecondary, size: 16),
             const SizedBox(width: AppSpacing.space2),
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const Spacer(),
@@ -319,7 +319,7 @@ class GoalProgressWidget extends ConsumerWidget {
             Container(
               height: 8,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
@@ -347,7 +347,7 @@ class GoalProgressWidget extends ConsumerWidget {
             '$percent%',
             style: AppTypography.caption.copyWith(
               color:
-                  isAchieved ? AppColors.success : AppColors.textSecondaryLight,
+                  isAchieved ? AppColors.success : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -368,12 +368,12 @@ class GoalProgressWidget extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(icon, color: AppColors.textSecondaryLight, size: 14),
+            Icon(icon, color: AppColors.inkSecondary, size: 14),
             const SizedBox(width: AppSpacing.space1),
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -390,7 +390,7 @@ class GoalProgressWidget extends ConsumerWidget {
             color:
                 percent >= 100
                     ? AppColors.success
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
           ),
         ),
       ],

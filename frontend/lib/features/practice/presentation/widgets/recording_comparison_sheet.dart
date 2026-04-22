@@ -249,10 +249,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 color:
                     isSelected
                         ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.surfaceLight,
+                        : AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                  color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -264,7 +264,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textTertiaryLight,
+                            : AppColors.inkTertiary,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -277,7 +277,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                   Text(
                     rec.formattedDuration,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   if (rec.bpm != null) ...[
@@ -285,7 +285,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                     Text(
                       rec.bpmText ?? '',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -364,7 +364,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                   color:
                       _alternateMode
                           ? Colors.white
-                          : AppColors.textPrimaryLight,
+                          : AppColors.ink,
                 ),
               ),
               selected: _alternateMode,
@@ -375,7 +375,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 color:
                     _alternateMode
                         ? Colors.white
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
               onSelected: (v) => setState(() => _alternateMode = v),
             ),
@@ -435,10 +435,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           color:
               isSelected
                   ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -448,7 +448,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               icon,
               size: 18,
               color:
-                  isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                  isSelected ? AppColors.primary : AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
@@ -457,7 +457,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 color:
                     isSelected
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -547,10 +547,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isPlaying ? AppColors.primary : AppColors.borderLight,
+          color: isPlaying ? AppColors.primary : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -561,7 +561,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               Text(
                 label,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -569,7 +569,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               Text(
                 '${_formatDuration(position)} / ${_formatDuration(duration)}',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
               if (bpmText != null) ...[
@@ -577,7 +577,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 Text(
                   bpmText,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -613,7 +613,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.speed, size: 16, color: AppColors.textTertiaryLight),
+        Icon(Icons.speed, size: 16, color: AppColors.inkTertiary),
         const SizedBox(width: AppSpacing.space2),
         ...speeds.map((speed) {
           final isSelected = (_playbackRate - speed).abs() < 0.01;
@@ -638,7 +638,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.primary : AppColors.borderLight,
+                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
                   ),
                 ),
                 child: Text(
@@ -647,7 +647,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
@@ -677,10 +677,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isPlaying ? AppColors.primary : AppColors.borderLight,
+          color: isPlaying ? AppColors.primary : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -689,7 +689,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           Text(
             label,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -699,7 +699,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
             borderRadius: BorderRadius.circular(2),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              backgroundColor: AppColors.borderLight,
+              backgroundColor: AppColors.inkQuaternary,
               valueColor: AlwaysStoppedAnimation(AppColors.primary),
               minHeight: 4,
             ),
@@ -715,7 +715,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               Text(
                 '${_formatDuration(position)} / ${recording.formattedDuration}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const Spacer(),
@@ -723,7 +723,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 Text(
                   recording.bpmText ?? '',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
             ],
@@ -793,14 +793,14 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: AppColors.textSecondaryLight),
+        Icon(icon, size: 16, color: AppColors.inkSecondary),
         const SizedBox(width: AppSpacing.space2),
         SizedBox(
           width: 40,
           child: Text(
             label,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -816,7 +816,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                       ? AppColors.success
                       : isPositive == false
                       ? AppColors.error
-                      : AppColors.textSecondaryLight,
+                      : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),

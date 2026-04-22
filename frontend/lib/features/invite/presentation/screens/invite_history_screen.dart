@@ -18,7 +18,7 @@ class InviteHistoryScreen extends ConsumerWidget {
     final myInvites = ref.watch(myInvitesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('초대 내역'),
         leading: IconButton(
@@ -85,7 +85,7 @@ class InviteHistoryScreen extends ConsumerWidget {
             Text(
               '초대 링크를 생성하면\n여기에 기록이 표시됩니다.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -233,13 +233,13 @@ class _InviteCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isInactive ? AppColors.backgroundLight : Colors.white,
+        color: isInactive ? AppColors.paperDark : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               isInactive
-                  ? AppColors.borderLight.withValues(alpha: 0.5)
-                  : AppColors.borderLight,
+                  ? AppColors.inkQuaternary.withValues(alpha: 0.5)
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -270,7 +270,7 @@ class _InviteCard extends StatelessWidget {
               Text(
                 _formatDate(invite.createdAt),
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -284,8 +284,8 @@ class _InviteCard extends StatelessWidget {
                   letterSpacing: 4,
                   color:
                       isInactive
-                          ? AppColors.textSecondaryLight
-                          : AppColors.textPrimaryLight,
+                          ? AppColors.inkSecondary
+                          : AppColors.ink,
                 ),
               ),
               if (!isInactive && onCopyCode != null) ...[
@@ -303,12 +303,12 @@ class _InviteCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(Icons.people, size: 14, color: AppColors.textSecondaryLight),
+              Icon(Icons.people, size: 14, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '${invite.useCount}회 사용',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               if (!isInactive) ...[
@@ -316,13 +316,13 @@ class _InviteCard extends StatelessWidget {
                 Icon(
                   Icons.access_time,
                   size: 14,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   invite.formattedExpiry,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -333,7 +333,7 @@ class _InviteCard extends StatelessWidget {
             Text(
               invite.note!,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontStyle: FontStyle.italic,
               ),
             ),

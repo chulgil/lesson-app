@@ -32,10 +32,10 @@ class AssignmentItem extends StatelessWidget {
               color:
                   isCompleted
                       ? AppColors.success
-                      : AppColors.surfaceSecondaryLight,
+                      : AppColors.paperDark,
               shape: BoxShape.circle,
               border:
-                  isCompleted ? null : Border.all(color: AppColors.borderLight),
+                  isCompleted ? null : Border.all(color: AppColors.inkQuaternary),
             ),
             child:
                 isCompleted
@@ -53,8 +53,8 @@ class AssignmentItem extends StatelessWidget {
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
                     color:
                         isCompleted
-                            ? AppColors.textTertiaryLight
-                            : AppColors.textPrimaryLight,
+                            ? AppColors.inkTertiary
+                            : AppColors.ink,
                   ),
                 ),
                 Text(
@@ -65,7 +65,7 @@ class AssignmentItem extends StatelessWidget {
                             ? AppColors.success
                             : dueDate.contains('내일')
                             ? AppColors.warning
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                   ),
                 ),
               ],

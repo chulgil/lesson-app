@@ -245,8 +245,8 @@ class _DateNavigator extends StatelessWidget {
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -270,8 +270,8 @@ class _DateNavigator extends StatelessWidget {
               Icons.chevron_right,
               color:
                   onNext != null
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
             ),
             tooltip: '다음',
           ),

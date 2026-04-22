@@ -28,9 +28,9 @@ class StatusCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +58,7 @@ class StatusCard extends StatelessWidget {
                       '백업 현황',
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimaryLight,
+                        color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space1),
@@ -67,7 +67,7 @@ class StatusCard extends StatelessWidget {
                           ? '마지막 백업: ${formatDateTimeDash(state.lastBackupDate!)}'
                           : '백업 기록 없음',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -76,7 +76,7 @@ class StatusCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
-          const Divider(height: 1, color: AppColors.borderLight),
+          const Divider(height: 1, color: AppColors.inkQuaternary),
           const SizedBox(height: AppSpacing.space4),
           Row(
             children: [
@@ -87,7 +87,7 @@ class StatusCard extends StatelessWidget {
                   value: '${state.recordingCount}개',
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.borderLight),
+              Container(width: 1, height: 40, color: AppColors.inkQuaternary),
               Expanded(
                 child: StatItem(
                   icon: Icons.folder,
@@ -120,20 +120,20 @@ class StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.textSecondaryLight, size: 20),
+        Icon(icon, color: AppColors.inkSecondary, size: 20),
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
           style: AppTypography.headingSmall.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -254,7 +254,7 @@ class ActionsSection extends ConsumerWidget {
           '수동 백업',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -279,7 +279,7 @@ class ActionsSection extends ConsumerWidget {
           '녹음 관리',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -419,7 +419,7 @@ class ActionButton extends StatelessWidget {
     final isDisabled = onPressed == null;
 
     return Material(
-      color: AppColors.surfaceLight,
+      color: AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onPressed,
@@ -428,7 +428,7 @@ class ActionButton extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
             children: [
@@ -462,7 +462,7 @@ class ActionButton extends StatelessWidget {
                         color:
                             isDisabled
                                 ? AppColors.textDisabledLight
-                                : AppColors.textPrimaryLight,
+                                : AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -472,7 +472,7 @@ class ActionButton extends StatelessWidget {
                         color:
                             isDisabled
                                 ? AppColors.textDisabledLight
-                                : AppColors.textSecondaryLight,
+                                : AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -483,7 +483,7 @@ class ActionButton extends StatelessWidget {
                 color:
                     isDisabled
                         ? AppColors.textDisabledLight
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
             ],
           ),
@@ -508,7 +508,7 @@ class BackupListSection extends ConsumerWidget {
           '저장된 백업',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -518,7 +518,7 @@ class BackupListSection extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: const Center(
@@ -527,12 +527,12 @@ class BackupListSection extends ConsumerWidget {
                       Icon(
                         Icons.folder_open,
                         size: 48,
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       SizedBox(height: AppSpacing.space3),
                       Text(
                         '저장된 백업이 없습니다',
-                        style: TextStyle(color: AppColors.textSecondaryLight),
+                        style: TextStyle(color: AppColors.inkSecondary),
                       ),
                     ],
                   ),
@@ -581,9 +581,9 @@ class BackupItem extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -602,17 +602,17 @@ class BackupItem extends ConsumerWidget {
           formatDateTimeDash(backup.createdAt),
           style: const TextStyle(
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         subtitle: Text(
           backup.formattedSize,
-          style: const TextStyle(color: AppColors.textSecondaryLight),
+          style: const TextStyle(color: AppColors.inkSecondary),
         ),
         trailing: PopupMenuButton<String>(
           icon: const Icon(
             Icons.more_vert,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           onSelected: (value) async {
             if (value == 'restore') {
@@ -773,7 +773,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
         final hasOrphans = count > 0;
 
         return Material(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           child: InkWell(
             onTap: () {
@@ -790,7 +790,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(
-                  color: hasOrphans ? AppColors.warning : AppColors.borderLight,
+                  color: hasOrphans ? AppColors.warning : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -819,7 +819,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                           '연결되지 않은 녹음',
                           style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimaryLight,
+                            color: AppColors.ink,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -831,7 +831,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                             color:
                                 hasOrphans
                                     ? AppColors.warning
-                                    : AppColors.textSecondaryLight,
+                                    : AppColors.inkSecondary,
                           ),
                         ),
                       ],
@@ -860,7 +860,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.space2),
                   Icon(
                     Icons.chevron_right,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ],
               ),

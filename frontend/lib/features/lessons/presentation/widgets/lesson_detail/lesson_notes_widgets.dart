@@ -164,9 +164,9 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
         // Text editor
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: TextField(
             maxLines: 6,
@@ -175,7 +175,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
             decoration: InputDecoration(
               hintText: '레슨 피드백을 작성하세요...',
               hintStyle: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(AppSpacing.space4),
@@ -202,14 +202,14 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                               height: 12,
                               child: CircularProgressIndicator(
                                 strokeWidth: 1.5,
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
                               '저장 중...',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                           ],
@@ -254,17 +254,17 @@ class TeacherFeedbackCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [
-            Icon(Icons.chat_bubble_outline, color: AppColors.textTertiaryLight),
+            Icon(Icons.chat_bubble_outline, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space3),
             Text(
               '아직 피드백이 없습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -275,9 +275,9 @@ class TeacherFeedbackCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +291,7 @@ class TeacherFeedbackCard extends StatelessWidget {
             Text(
               '작성: ${formatDateYMD(lesson.updatedAt!)}',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -320,18 +320,18 @@ class KeyPointsList extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [
-            Icon(Icons.lightbulb_outline, color: AppColors.textTertiaryLight),
+            Icon(Icons.lightbulb_outline, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
                 isTeacher ? '+ 버튼을 눌러 주요 포인트를 추가하세요' : '주요 포인트가 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -366,7 +366,7 @@ class KeyPointsList extends StatelessWidget {
                       onPressed: () => onRemove!(index),
                       icon: const Icon(Icons.close),
                       iconSize: 18,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,
                       tooltip: '삭제',
@@ -401,21 +401,21 @@ class PracticeTipsCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [
             Icon(
               Icons.tips_and_updates_outlined,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
                 isTeacher ? '+ 버튼을 눌러 연습 팁을 추가하세요' : '연습 팁이 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -520,17 +520,17 @@ class RecordingsEmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
-          Icon(Icons.mic_off, color: AppColors.textTertiaryLight),
+          Icon(Icons.mic_off, color: AppColors.inkTertiary),
           const SizedBox(width: AppSpacing.space3),
           Text(
             '녹음 파일이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -699,7 +699,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                 decoration: InputDecoration(
                   hintText: '오늘 배운 것, 어려웠던 점 등을 메모하세요...',
                   hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
@@ -712,7 +712,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                 Text(
                   '저장 중...',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 )
               else if (_status == _SaveStatus.saved)

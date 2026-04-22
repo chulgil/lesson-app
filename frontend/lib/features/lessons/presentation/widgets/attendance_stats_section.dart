@@ -38,7 +38,7 @@ class AttendanceStatsSection extends ConsumerWidget {
           '출석 현황',
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -46,7 +46,7 @@ class AttendanceStatsSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
@@ -63,7 +63,7 @@ class AttendanceStatsSection extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space4),
 
-              Divider(height: 1, color: AppColors.borderLight),
+              Divider(height: 1, color: AppColors.inkQuaternary),
 
               const SizedBox(height: AppSpacing.space4),
 
@@ -72,7 +72,7 @@ class AttendanceStatsSection extends ConsumerWidget {
 
               if (stats.monthlyBreakdown.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Divider(height: 1, color: AppColors.borderLight),
+                Divider(height: 1, color: AppColors.inkQuaternary),
                 const SizedBox(height: AppSpacing.space4),
                 _buildMonthlyTable(stats),
               ],
@@ -104,7 +104,7 @@ class AttendanceStatsSection extends ConsumerWidget {
               CircularProgressIndicator(
                 value: rate / 100,
                 strokeWidth: 6,
-                backgroundColor: AppColors.borderLight,
+                backgroundColor: AppColors.inkQuaternary,
                 color: rateColor,
               ),
               Text(
@@ -135,7 +135,7 @@ class AttendanceStatsSection extends ConsumerWidget {
               Text(
                 '전체 ${stats.totalLessons}회 중 ${stats.completedLessons}회 출석',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -224,7 +224,7 @@ class AttendanceStatsSection extends ConsumerWidget {
           '월별 출석 현황',
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -238,7 +238,7 @@ class AttendanceStatsSection extends ConsumerWidget {
             _tableCell('출석률', isHeader: true),
           ],
         ),
-        Divider(height: 1, color: AppColors.borderLight),
+        Divider(height: 1, color: AppColors.inkQuaternary),
 
         // Table rows (show last 6 months)
         ...stats.monthlyBreakdown.take(6).map((m) {
@@ -274,7 +274,7 @@ class AttendanceStatsSection extends ConsumerWidget {
               ),
               Divider(
                 height: 1,
-                color: AppColors.borderLight.withValues(alpha: 0.5),
+                color: AppColors.inkQuaternary.withValues(alpha: 0.5),
               ),
             ],
           );
@@ -294,7 +294,7 @@ class AttendanceStatsSection extends ConsumerWidget {
               isHeader
                   ? AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   )
                   : AppTypography.caption,
           textAlign: TextAlign.center,

@@ -28,7 +28,7 @@ class HistorySummaryCard extends StatelessWidget {
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -80,14 +80,14 @@ class HistorySummaryCard extends StatelessWidget {
         Text(
           value,
           style: AppTypography.headingSmall.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],
@@ -95,6 +95,6 @@ class HistorySummaryCard extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Container(width: 1, height: 40, color: AppColors.borderLight);
+    return Container(width: 1, height: 40, color: AppColors.inkQuaternary);
   }
 }

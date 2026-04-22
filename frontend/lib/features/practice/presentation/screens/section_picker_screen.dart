@@ -71,12 +71,12 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
     final sectionsAsync = ref.watch(allSectionsForAssignmentProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(widget.title ?? '섹션 선택'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
-        foregroundColor: AppColors.textPrimaryLight,
+        foregroundColor: AppColors.ink,
       ),
       body: Column(
         children: [
@@ -99,11 +99,11 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.borderLight),
+                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.borderLight),
+                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -194,14 +194,14 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
             Icon(
               Icons.library_music_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '섹션이 없습니다',
               style: AppTypography.headingSmall.copyWith(
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -209,7 +209,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               '먼저 레퍼토리와 섹션을 만들어주세요.',
               textAlign: TextAlign.center,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -228,13 +228,13 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
             Icon(
               Icons.search_off,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '"$_searchQuery" 검색 결과 없음',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -273,7 +273,7 @@ class _RepertoireGroup extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(AppSpacing.space4, AppSpacing.space4, AppSpacing.space4, AppSpacing.space2),
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           child: Row(
             children: [
               Icon(
@@ -288,14 +288,14 @@ class _RepertoireGroup extends StatelessWidget {
                   searchQuery,
                   AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimaryLight,
+                    color: AppColors.ink,
                   ),
                 ),
               ),
               Text(
                 '${sections.length}개 섹션',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -381,10 +381,10 @@ class _SectionTile extends StatelessWidget {
         section.rangeText,
         searchQuery,
         AppTypography.bodySmall.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+      trailing: const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
       onTap: onTap,
     );
   }

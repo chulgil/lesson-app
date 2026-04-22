@@ -75,7 +75,7 @@ class _TeacherDashboardScreenState
                         Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                         const SizedBox(height: AppSpacing.space3),
                         Text(
@@ -112,8 +112,8 @@ class _TeacherDashboardScreenState
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -241,9 +241,9 @@ class _TeacherDashboardScreenState
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
             children: [
@@ -254,7 +254,7 @@ class _TeacherDashboardScreenState
                     Text(
                       '이번 달 수익',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space1),
@@ -312,16 +312,16 @@ class _TeacherDashboardScreenState
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
             children: [
               _buildStudentStatItem(
                 '총 학생',
                 '${stats.totalStudents}명',
-                AppColors.textPrimaryLight,
+                AppColors.ink,
               ),
               _buildDivider(),
               _buildStudentStatItem(
@@ -335,7 +335,7 @@ class _TeacherDashboardScreenState
                 stats.churnedStudents > 0 ? '-${stats.churnedStudents}명' : '0명',
                 stats.churnedStudents > 0
                     ? AppColors.error
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
               ),
             ],
           ),
@@ -359,7 +359,7 @@ class _TeacherDashboardScreenState
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -368,6 +368,6 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildDivider() {
-    return Container(width: 1, height: 40, color: AppColors.borderLight);
+    return Container(width: 1, height: 40, color: AppColors.inkQuaternary);
   }
 }

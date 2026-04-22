@@ -208,7 +208,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Column(
@@ -223,7 +223,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                 Text(
                   '${lesson.studentName} ${lesson.instrument}',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -276,7 +276,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             child: Text(
               '나중에',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -336,7 +336,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           Text(
             '메모 (선택)',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -418,7 +418,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),
@@ -437,7 +437,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? reason.color : AppColors.borderLight,
+            color: isSelected ? reason.color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -447,7 +447,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           children: [
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? reason.color : AppColors.textTertiaryLight,
+              color: isSelected ? reason.color : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(

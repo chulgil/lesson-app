@@ -170,7 +170,7 @@ class GoalAchievedDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -202,7 +202,7 @@ class GoalAchievedDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -236,12 +236,12 @@ class GoalAchievedDialog extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.textSecondaryLight, size: 18),
+        Icon(icon, color: AppColors.inkSecondary, size: 18),
         const SizedBox(width: AppSpacing.space2),
         Text(
           label,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const Spacer(),
@@ -252,7 +252,7 @@ class GoalAchievedDialog extends StatelessWidget {
         Text(
           ' (목표: $target)',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
