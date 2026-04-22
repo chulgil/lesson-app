@@ -754,6 +754,46 @@ Text(
 
 **은유**: 악보의 표기 기호(♯, ♭, 강약)들이 모두 같은 잉크로 인쇄되는 원칙. 한 페이지 안에서 서로 다른 색의 기호가 섞이지 않듯, 앱의 아이콘과 리스트 항목도 단일 팔레트로 일관 적용.
 
+### 7.22 학부모 홈 섹션 헤더도 sectionTitle 로 확장
+
+**배경**: 학부모 앱의 과제 탭 / 결제 탭은 각 화면 내부에서 파일-private `_SectionHeader` 위젯을 정의하여 `AppTypography.headingSmall` 로 섹션 제목을 렌더. 공통 위젯이 아니므로 §7.17~§7.20 의 공통 위젯 수정으로는 닿지 않는 사각지대. 학부모 플로우의 핵심 탭 2개이므로 별도 이식 필요.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/parent_home/presentation/screens/parent_assignments_tab.dart` | `_SectionHeader` 가 `NotebookTypography.sectionTitle` 사용 (count 뱃지는 그대로 유지) | 17a4c194 |
+| `features/parent_home/presentation/screens/parent_payments_tab.dart` | `_SectionHeader` 가 `NotebookTypography.sectionTitle.copyWith(color: ...)` 적용 — 미납/완료 등 상태별 색상은 유지 | 17a4c194 |
+
+**영향 범위**:
+- 학부모 과제 탭 — "미완료 과제 · 완료된 과제" 등 섹션 헤더
+- 학부모 결제 탭 — "미납 결제 · 완료된 결제" 등 상태별 섹션 헤더 (색상 오버라이드 유지)
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 학부모 앱 = 선생님·학생 앱의 "관객석 뷰". 무대(선생님·학생)와 같은 프로그램 북(Playfair 섹션 표제)을 봐야 시각 일관성이 유지됨.
+
+### 7.23 PopupMenu + DropdownMenu 테마 통일 — 메뉴 팝업에도 2px ink 테두리
+
+**배경**: §7.21 까지 기본 아이콘·리스트 색상은 통일되었으나, `PopupMenuButton` (21 파일) / `showMenu` 호출이 띄우는 팝업과 `DropdownMenu` / `DropdownButton` (15 파일) 은 Material 기본 surface(흰색 + grey) 로 표시되어 Notebook 팔레트와 이질감. 팝업 배경을 종이색(`paper`) + 2px ink 테두리로 고정해 Notebook 카드 외곽선 규칙과 통일.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `popupMenuTheme` + `dropdownMenuTheme` 추가. `paper` 배경, 2px ink 테두리, 4px radius, ink 14/w500 텍스트 | 8a3138d5 |
+| `core/theme/app_theme.dart` (dark) | 동일 구조에 `surfaceDark` 배경 + `paper` 2px 테두리 | 8a3138d5 |
+
+**영향 범위** (36 파일):
+- `PopupMenuButton` 21 파일: 레슨 상세 메뉴, 과제 편집, 설정 백업, 수강권 템플릿, 프로필 스위처, 리퍼토리 등
+- `DropdownMenu` / `DropdownButton` 15 파일: 악기 선택, 레벨 선택, 요일 선택 등 폼 셀렉터
+- 팝업 배경이 종이색으로 고정되어 앱 카드 외곽선(§3) 과 동일한 2px 규칙 적용
+- `MenuStyle` 을 `WidgetStateProperty.all` 로 감싸 Material3 규격 준수
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 악보 뒷면에 접혀 나오는 주석 쪽지도 같은 종이와 같은 테두리로 인쇄되는 느낌. 메뉴 팝업이 본문 페이지의 축소판처럼 보여 "어디에 있어도 같은 악보집" 감각 유지.
+
 ---
 
 ## 8. 구현 원칙
