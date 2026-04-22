@@ -81,11 +81,7 @@ class AcademyDetailScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 48,
-            color: AppColors.inkSecondary,
-          ),
+          Icon(Icons.error_outline, size: 48, color: AppColors.inkSecondary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             message,
@@ -131,7 +127,7 @@ class AcademyDetailScreen extends ConsumerWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppColors.paper.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusXLarge,
                       ),
@@ -204,9 +200,8 @@ class AcademyDetailScreen extends ConsumerWidget {
                             .map(
                               (i) => Chip(
                                 label: Text(i),
-                                backgroundColor: AppColors.paperAccent.withValues(
-                                  alpha: 0.1,
-                                ),
+                                backgroundColor: AppColors.paperAccent
+                                    .withValues(alpha: 0.1),
                                 labelStyle: AppTypography.bodySmall.copyWith(
                                   color: AppColors.paperAccent,
                                 ),
@@ -375,7 +370,11 @@ class _AcademyTeacherCard extends StatelessWidget {
                         : null,
                 child:
                     teacher.profileImage == null
-                        ? Icon(Icons.person, color: AppColors.paperAccent, size: 28)
+                        ? Icon(
+                          Icons.person,
+                          color: AppColors.paperAccent,
+                          size: 28,
+                        )
                         : null,
               ),
               const SizedBox(width: AppSpacing.space3),

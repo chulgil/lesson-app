@@ -79,7 +79,9 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
     _recordingStartTime = DateTime.now();
 
     final recorder = ref.read(audioRecorderServiceProvider);
-    _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
+    _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((
+      amplitude,
+    ) {
       final now = DateTime.now();
 
       if (amplitude >= _quietThreshold) {
@@ -150,9 +152,10 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
 
   @override
   Widget build(BuildContext context) {
-    final amplitudeStream = widget.isRecording
-        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
-        : null;
+    final amplitudeStream =
+        widget.isRecording
+            ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+            : null;
 
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
     final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
@@ -166,13 +169,17 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.isRecording
-                ? AppColors.paperAccent.withValues(alpha: 0.15)
-                : AppColors.paperDark,
+            color:
+                widget.isRecording
+                    ? AppColors.paperAccent.withValues(alpha: 0.15)
+                    : AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: widget.isRecording
-                ? Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3))
-                : null,
+            border:
+                widget.isRecording
+                    ? Border.all(
+                      color: AppColors.paperAccent.withValues(alpha: 0.3),
+                    )
+                    : null,
           ),
           child: Stack(
             children: [
@@ -182,7 +189,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                     style: WaveformStyle.amplitude,
                     isActive: !widget.isPaused,
                     height: 200,
-                    waveColor: Colors.white.withValues(alpha: 0.6),
+                    waveColor: AppColors.paper.withValues(alpha: 0.6),
                     amplitudeStream: amplitudeStream,
                   ),
                 ),
@@ -207,7 +214,10 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: widget.isPaused ? AppColors.paperAccent : AppColors.paperAccent,
+                                color:
+                                    widget.isPaused
+                                        ? AppColors.paperAccent
+                                        : AppColors.paperAccent,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -215,7 +225,10 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                             Text(
                               widget.isPaused ? '일시정지' : '녹음 중',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: widget.isPaused ? AppColors.paperAccent : AppColors.paperAccent,
+                                color:
+                                    widget.isPaused
+                                        ? AppColors.paperAccent
+                                        : AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -246,10 +259,14 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                           ],
                           // Pause/Resume button
                           _buildControlButton(
-                            onPressed: widget.isPaused
-                                ? widget.onResumeRecording
-                                : widget.onPauseRecording,
-                            icon: widget.isPaused ? Icons.play_arrow : Icons.pause,
+                            onPressed:
+                                widget.isPaused
+                                    ? widget.onResumeRecording
+                                    : widget.onPauseRecording,
+                            icon:
+                                widget.isPaused
+                                    ? Icons.play_arrow
+                                    : Icons.pause,
                             backgroundColor: AppColors.paperAccent,
                           ),
                           const SizedBox(width: AppSpacing.space4),
@@ -264,51 +281,68 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                     ] else ...[
                       Center(
                         child: FilledButton(
-                        onPressed: hasMicPermission ? widget.onStartRecording : () async {
-                          final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
-                          if (granted) {
-                            ref.invalidate(microphonePermissionProvider);
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
-                              );
-                            }
-                          }
-                        },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: hasMicPermission ? AppColors.paperAccent : AppColors.inkSecondary,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.space8,
-                            vertical: AppSpacing.space4,
+                          onPressed:
+                              hasMicPermission
+                                  ? widget.onStartRecording
+                                  : () async {
+                                    final granted =
+                                        await ref
+                                            .read(audioRecorderServiceProvider)
+                                            .requestPermission();
+                                    if (granted) {
+                                      ref.invalidate(
+                                        microphonePermissionProvider,
+                                      );
+                                    } else {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                          style: FilledButton.styleFrom(
+                            backgroundColor:
+                                hasMicPermission
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.space8,
+                              vertical: AppSpacing.space4,
+                            ),
+                            fixedSize: const Size.fromHeight(56),
                           ),
-                          fixedSize: const Size.fromHeight(56),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              hasMicPermission ? Icons.mic : Icons.mic_off,
-                              size: 28,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: AppSpacing.space2),
-                            Text(
-                              !hasMicPermission
-                                  ? '마이크 권한 필요'
-                                  : isSmartMode
-                                      ? '스마트 녹음'
-                                      : '녹음 시작',
-                              style: AppTypography.bodyLarge.copyWith(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                hasMicPermission ? Icons.mic : Icons.mic_off,
+                                size: 28,
                                 color: Colors.white,
-                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: AppSpacing.space2),
+                              Text(
+                                !hasMicPermission
+                                    ? '마이크 권한 필요'
+                                    : isSmartMode
+                                    ? '스마트 녹음'
+                                    : '녹음 시작',
+                                style: AppTypography.bodyLarge.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     ],
                   ],
                 ),

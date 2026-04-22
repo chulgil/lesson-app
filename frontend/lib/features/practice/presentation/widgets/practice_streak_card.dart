@@ -61,7 +61,7 @@ class PracticeStreakCard extends ConsumerWidget {
                 Text(
                   '연습 스트릭',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: AppColors.paper.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -90,7 +90,7 @@ class PracticeStreakCard extends ConsumerWidget {
                   child: Text(
                     '일 연속',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.paper.withValues(alpha: 0.9),
                     ),
                   ),
                 ),
@@ -103,7 +103,7 @@ class PracticeStreakCard extends ConsumerWidget {
             Text(
               streak.motivationMessage,
               style: AppTypography.bodySmall.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: AppColors.paper.withValues(alpha: 0.8),
               ),
             ),
 
@@ -118,7 +118,7 @@ class PracticeStreakCard extends ConsumerWidget {
               Text(
                 '최고 기록: ${streak.longestStreak}일',
                 style: AppTypography.caption.copyWith(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: AppColors.paper.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -149,10 +149,10 @@ class PracticeStreakCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color:
                     isFuture
-                        ? Colors.white.withValues(alpha: 0.2)
+                        ? AppColors.paper.withValues(alpha: 0.2)
                         : isPracticed
                         ? Colors.white
-                        : Colors.white.withValues(alpha: 0.3),
+                        : AppColors.paper.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
                 border:
                     isToday ? Border.all(color: Colors.white, width: 2) : null,
@@ -172,7 +172,7 @@ class PracticeStreakCard extends ConsumerWidget {
             Text(
               weekDays[index],
               style: AppTypography.caption.copyWith(
-                color: Colors.white.withValues(alpha: isToday ? 1.0 : 0.7),
+                color: AppColors.paper.withValues(alpha: isToday ? 1.0 : 0.7),
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),

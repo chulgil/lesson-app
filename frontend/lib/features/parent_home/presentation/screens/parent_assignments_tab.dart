@@ -119,7 +119,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
                   vertical: AppSpacing.space1,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppColors.paper.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Text(
@@ -138,7 +138,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: 0.71,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              backgroundColor: AppColors.paper.withValues(alpha: 0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               minHeight: 8,
             ),
@@ -222,7 +222,7 @@ class _ProgressStat extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: AppColors.paper.withValues(alpha: 0.7),
           ),
         ),
       ],

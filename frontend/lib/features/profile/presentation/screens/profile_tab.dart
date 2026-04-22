@@ -605,7 +605,7 @@ class ProfileTab extends ConsumerWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: AppColors.paper.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -617,7 +617,7 @@ class ProfileTab extends ConsumerWidget {
     return Container(
       width: 1,
       height: 40,
-      color: Colors.white.withValues(alpha: 0.3),
+      color: AppColors.paper.withValues(alpha: 0.3),
     );
   }
 

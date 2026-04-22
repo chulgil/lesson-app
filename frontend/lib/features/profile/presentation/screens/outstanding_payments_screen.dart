@@ -44,9 +44,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           Text(
             '미수금이 없습니다',
-            style: AppTypography.headingSmall.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
@@ -104,7 +102,10 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space5),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.paperAccent, AppColors.paperAccent.withValues(alpha: 0.8)],
+            colors: [
+              AppColors.paperAccent,
+              AppColors.paperAccent.withValues(alpha: 0.8),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -115,7 +116,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             Text(
               '총 미수금',
               style: AppTypography.bodyMedium.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: AppColors.paper.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -127,7 +128,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             Text(
               '$studentCount명의 학생',
               style: AppTypography.bodySmall.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: AppColors.paper.withValues(alpha: 0.8),
               ),
             ),
           ],

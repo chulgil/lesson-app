@@ -47,7 +47,7 @@ class ProfileCompletionCard extends StatelessWidget {
               Text(
                 '프로필 완성도',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppColors.paper.withValues(alpha: 0.9),
                 ),
               ),
               Container(
@@ -56,7 +56,7 @@ class ProfileCompletionCard extends StatelessWidget {
                   vertical: AppSpacing.space1,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppColors.paper.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Text(
@@ -86,7 +86,7 @@ class ProfileCompletionCard extends StatelessWidget {
                   children: [
                     LinearProgressIndicator(
                       value: percentage / 100,
-                      backgroundColor: Colors.white.withValues(alpha: 0.3),
+                      backgroundColor: AppColors.paper.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(
@@ -98,7 +98,7 @@ class ProfileCompletionCard extends StatelessWidget {
                       Text(
                         '다음 단계: ${profile.nextSteps.join(", ")}',
                         style: AppTypography.caption.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.paper.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -172,10 +172,7 @@ class ProfileInfoCard extends StatelessWidget {
                   Text(
                     value,
                     style: AppTypography.bodyLarge.copyWith(
-                      color:
-                          isEmpty
-                              ? AppColors.inkTertiary
-                              : AppColors.ink,
+                      color: isEmpty ? AppColors.inkTertiary : AppColors.ink,
                     ),
                   ),
                 ],
@@ -261,7 +258,10 @@ class EducationCard extends ConsumerWidget {
                     value: 'edit',
                     child: Text(AppStrings.modify),
                   ),
-                  const PopupMenuItem(value: 'delete', child: Text(AppStrings.delete)),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text(AppStrings.delete),
+                  ),
                 ],
           ),
         ],
@@ -376,7 +376,10 @@ class CareerCard extends ConsumerWidget {
                     value: 'edit',
                     child: Text(AppStrings.modify),
                   ),
-                  const PopupMenuItem(value: 'delete', child: Text(AppStrings.delete)),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text(AppStrings.delete),
+                  ),
                 ],
           ),
         ],
@@ -502,7 +505,10 @@ class CertificateCard extends ConsumerWidget {
                     value: 'edit',
                     child: Text(AppStrings.modify),
                   ),
-                  const PopupMenuItem(value: 'delete', child: Text(AppStrings.delete)),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text(AppStrings.delete),
+                  ),
                 ],
           ),
         ],

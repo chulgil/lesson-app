@@ -232,7 +232,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 48,
-                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                backgroundColor: AppColors.paper.withValues(alpha: 0.2),
                 backgroundImage:
                     profile.profileImage != null
                         ? NetworkImage(profile.profileImage!)
@@ -257,7 +257,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                 Text(
                   profile.instruments.join(' · '),
                   style: AppTypography.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: AppColors.paper.withValues(alpha: 0.85),
                   ),
                 ),
               ],
@@ -318,11 +318,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      chip.icon,
-                      size: 16,
-                      color: AppColors.inkSecondary,
-                    ),
+                    Icon(chip.icon, size: 16, color: AppColors.inkSecondary),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       chip.label,
@@ -348,9 +344,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
           Text(
             title,
-            style: AppTypography.headingSmall.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
           ),
           const SizedBox(height: AppSpacing.space3),
           child,

@@ -364,7 +364,8 @@ class _ZoomableWaveformPainter extends CustomPainter {
           ..strokeWidth = 2
           ..strokeCap = StrokeCap.round;
 
-    final loopPaint = Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3);
+    final loopPaint =
+        Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3);
 
     final markerPaint =
         Paint()
@@ -674,13 +675,13 @@ class _MiniMapPainter extends CustomPainter {
     canvas.drawRRect(
       viewportRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.3)
+        ..color = AppColors.paper.withValues(alpha: 0.3)
         ..style = PaintingStyle.fill,
     );
     canvas.drawRRect(
       viewportRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.6)
+        ..color = AppColors.paper.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );

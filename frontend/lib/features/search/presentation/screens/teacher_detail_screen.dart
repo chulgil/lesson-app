@@ -137,7 +137,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.space4),
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
+                        backgroundColor: AppColors.paper.withValues(alpha: 0.2),
                         backgroundImage:
                             profile.profileImage != null
                                 ? NetworkImage(profile.profileImage!)

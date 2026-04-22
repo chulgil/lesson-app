@@ -380,8 +380,7 @@ class _TimeSignatureSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(ts),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color:
-                        isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -448,10 +447,7 @@ class _SubdivisionSelector extends StatelessWidget {
                     onSelected: (_) => onChanged(sub),
                     selectedColor: AppColors.paperAccent,
                     labelStyle: TextStyle(
-                      color:
-                          isSelected
-                              ? Colors.white
-                              : AppColors.ink,
+                      color: isSelected ? Colors.white : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -541,7 +537,7 @@ class _SubdivisionChip extends StatelessWidget {
               style: AppTypography.caption.copyWith(
                 color:
                     isSelected
-                        ? Colors.white.withValues(alpha: 0.9)
+                        ? AppColors.paper.withValues(alpha: 0.9)
                         : AppColors.inkSecondary,
               ),
             ),
@@ -580,8 +576,7 @@ class _SoundSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(sound),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color:
-                        isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -624,8 +619,7 @@ class _AccentPatternSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(pattern),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color:
-                        isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? Colors.white : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),

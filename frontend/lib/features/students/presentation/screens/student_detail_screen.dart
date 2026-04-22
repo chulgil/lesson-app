@@ -208,7 +208,7 @@ class _StudentDetailContent extends ConsumerWidget {
       bottom: TabBar(
         indicatorColor: Colors.white,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
+        unselectedLabelColor: AppColors.paper.withValues(alpha: 0.7),
         labelStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,
         ),
@@ -292,7 +292,7 @@ class _StudentDetailContent extends ConsumerWidget {
                         AppSpacing.radiusLarge,
                       ),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: AppColors.paper.withValues(alpha: 0.5),
                         width: 1,
                       ),
                     ),
@@ -311,7 +311,7 @@ class _StudentDetailContent extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppColors.paper.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusLarge,
                       ),

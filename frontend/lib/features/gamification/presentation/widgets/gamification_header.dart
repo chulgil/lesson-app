@@ -50,7 +50,7 @@ class GamificationHeader extends ConsumerWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.25),
+                    color: AppColors.paper.withValues(alpha: 0.25),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -80,7 +80,7 @@ class GamificationHeader extends ConsumerWidget {
                       Text(
                         '${data.totalPoints}P',
                         style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: AppColors.paper.withValues(alpha: 0.85),
                         ),
                       ),
                     ],
@@ -95,7 +95,7 @@ class GamificationHeader extends ConsumerWidget {
                       vertical: AppSpacing.space1,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppColors.paper.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -132,7 +132,7 @@ class GamificationHeader extends ConsumerWidget {
                   child: LinearProgressIndicator(
                     value: data.levelProgress,
                     minHeight: 6,
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    backgroundColor: AppColors.paper.withValues(alpha: 0.2),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.white,
                     ),
@@ -145,13 +145,13 @@ class GamificationHeader extends ConsumerWidget {
                     Text(
                       '다음 레벨까지 ${data.pointsToNextLevel}P',
                       style: AppTypography.caption.copyWith(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: AppColors.paper.withValues(alpha: 0.8),
                       ),
                     ),
                     Text(
                       '${(data.levelProgress * 100).toInt()}%',
                       style: AppTypography.caption.copyWith(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: AppColors.paper.withValues(alpha: 0.8),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

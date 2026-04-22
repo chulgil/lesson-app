@@ -329,7 +329,7 @@ class ParentDashboardTab extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 32,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              backgroundColor: AppColors.paper.withValues(alpha: 0.2),
               child: Text(
                 profile.initial,
                 style: AppTypography.headingLarge.copyWith(color: Colors.white),
@@ -355,7 +355,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.paper.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
                           ),
@@ -377,7 +377,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppColors.paper.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusLarge,
                       ),
