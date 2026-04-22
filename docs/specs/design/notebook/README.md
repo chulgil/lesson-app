@@ -557,6 +557,22 @@ Text(
 
 **은유**: 선생님이 레슨 노트 여백에 손으로 적어준 코멘트·팁·메모 = Gaegu 손글씨.
 
+### 7.13 바텀 네비 통일 — 로마숫자 + Vermillion 전 역할 확대
+
+**배경**: 학생 홈(`student_home_screen.dart`) 만 4대 시그니처 중 "로마숫자 + Vermillion active" 를 바텀 네비에 적용. 선생님/학부모 홈은 Material `BottomNavigationBar` + outlined 아이콘 유지 → 역할 진입 경로에서 컨셉 이탈.
+
+| 역할 | 파일 | 변경 | 커밋 |
+|------|------|------|------|
+| 선생님 | `features/home/presentation/screens/home_screen.dart` | `BottomNavigationBar` → paper 배경 + 2px ink top border + 로마숫자 4탭 (I 홈, II 스케줄, III 수강관리, IV 프로필). active = `paperAccent`, inactive = `inkTertiary` | f9c372cb |
+| 학부모 | `features/parent_home/presentation/screens/parent_home_screen.dart` | 동일 패턴 5탭 (I 홈, II 레슨, III 과제, IV 결제, V 프로필). 사용하지 않게 된 `_buildNavItems` 제거 | f9c372cb |
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+- 기능·Provider·라우팅 변경 없음 (네비 렌더만 교체)
+
+**은유**: 각 탭 = 악장 번호 (I·II·III·IV·V). 진행 중 악장만 Vermillion 으로 강조.
+
 ---
 
 ## 8. 구현 원칙
