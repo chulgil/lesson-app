@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../features/practice/domain/entities/metronome_settings.dart';
 
-/// Pastel purple color for paw (per spec).
+/// Paw color — Notebook × Score highlight tone (catAccent = paperHighlight).
 const _pawColor = AppColors.catAccent;
 
 /// Cat beat indicator with animated paw design.
@@ -278,25 +278,15 @@ class _AnimatedPawState extends State<_AnimatedPaw>
         tween: Tween(begin: _dropDistance * 0.3, end: 0),
         weight: 70,
       ),
-    ]).animate(CurvedAnimation(
-      parent: _dropController,
-      curve: Curves.easeOut,
-    ));
+    ]).animate(CurvedAnimation(parent: _dropController, curve: Curves.easeOut));
 
     // Scale animation: instant scale up, then back
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: _scalePeak),
-        weight: 20,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: _scalePeak, end: 1.0),
-        weight: 80,
-      ),
-    ]).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.easeOut,
-    ));
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: _scalePeak), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: _scalePeak, end: 1.0), weight: 80),
+    ]).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
+    );
   }
 
   @override
@@ -338,8 +328,10 @@ class _AnimatedPawState extends State<_AnimatedPaw>
       builder: (context, child) {
         // Only apply animation offset when animation is running
         // Use 0.0 as stable position to prevent position jumping on screen open
-        final dropOffset = _dropController.isAnimating ? _dropAnimation.value : 0.0;
-        final scale = _scaleController.isAnimating ? _scaleAnimation.value : 1.0;
+        final dropOffset =
+            _dropController.isAnimating ? _dropAnimation.value : 0.0;
+        final scale =
+            _scaleController.isAnimating ? _scaleAnimation.value : 1.0;
 
         return Transform.translate(
           offset: Offset(0, dropOffset),
@@ -348,9 +340,7 @@ class _AnimatedPawState extends State<_AnimatedPaw>
             alignment: Alignment.bottomCenter,
             child: CustomPaint(
               size: widget.pawSize,
-              painter: _PawPainter(
-                opacity: _beatOpacity,
-              ),
+              painter: _PawPainter(opacity: _beatOpacity),
             ),
           ),
         );
@@ -361,27 +351,22 @@ class _AnimatedPawState extends State<_AnimatedPaw>
 
 /// Paw shape painter (fill only, no stroke per spec).
 class _PawPainter extends CustomPainter {
-  _PawPainter({
-    required this.opacity,
-  });
+  _PawPainter({required this.opacity});
 
   final double opacity;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final pawPaint = Paint()
-      ..color = _pawColor.withValues(alpha: opacity)
-      ..style = PaintingStyle.fill;
+    final pawPaint =
+        Paint()
+          ..color = _pawColor.withValues(alpha: opacity)
+          ..style = PaintingStyle.fill;
 
     // Scale factor to fit paw in given size (SVG viewBox is 24x24)
     final scale = size.width / 24.0;
 
     // Draw 3 small circles (jelly pads)
-    canvas.drawCircle(
-      Offset(7.6 * scale, 8.3 * scale),
-      1.65 * scale,
-      pawPaint,
-    );
+    canvas.drawCircle(Offset(7.6 * scale, 8.3 * scale), 1.65 * scale, pawPaint);
     canvas.drawCircle(
       Offset(12.0 * scale, 7.3 * scale),
       1.75 * scale,
@@ -428,19 +413,22 @@ class _CatFacePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height * 0.45);
     final radius = size.height * 0.4;
 
-    final facePaint = Paint()
-      ..color = faceColor
-      ..style = PaintingStyle.fill;
+    final facePaint =
+        Paint()
+          ..color = faceColor
+          ..style = PaintingStyle.fill;
 
-    final featurePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.fill;
+    final featurePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.fill;
 
-    final linePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
+    final linePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5
+          ..strokeCap = StrokeCap.round;
 
     // Face circle
     canvas.drawCircle(center, radius, facePaint);
@@ -478,22 +466,35 @@ class _CatFacePainter extends CustomPainter {
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.4);
-    mouthPath.quadraticBezierTo(center.dx - radius * 0.15,
-        center.dy + radius * 0.5, center.dx - radius * 0.22, center.dy + radius * 0.4);
+    mouthPath.quadraticBezierTo(
+      center.dx - radius * 0.15,
+      center.dy + radius * 0.5,
+      center.dx - radius * 0.22,
+      center.dy + radius * 0.4,
+    );
     canvas.drawPath(mouthPath, linePaint);
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.4);
-    mouthPath.quadraticBezierTo(center.dx + radius * 0.15,
-        center.dy + radius * 0.5, center.dx + radius * 0.22, center.dy + radius * 0.4);
+    mouthPath.quadraticBezierTo(
+      center.dx + radius * 0.15,
+      center.dy + radius * 0.5,
+      center.dx + radius * 0.22,
+      center.dy + radius * 0.4,
+    );
     canvas.drawPath(mouthPath, linePaint);
 
     // Whiskers
     _drawWhiskers(canvas, center, radius, linePaint);
   }
 
-  void _drawEars(Canvas canvas, Offset center, double radius, Paint facePaint,
-      Paint linePaint) {
+  void _drawEars(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint facePaint,
+    Paint linePaint,
+  ) {
     final earPath = Path();
     earPath.moveTo(center.dx - radius * 0.7, center.dy - radius * 0.5);
     earPath.lineTo(center.dx - radius * 0.9, center.dy - radius * 1.1);
@@ -507,20 +508,30 @@ class _CatFacePainter extends CustomPainter {
     canvas.drawPath(earPath, linePaint);
   }
 
-  void _drawSmilingEye(Canvas canvas, Offset center, double radius, Paint paint) {
+  void _drawSmilingEye(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint paint,
+  ) {
     final path = Path();
     path.moveTo(center.dx - radius, center.dy);
     path.quadraticBezierTo(
-        center.dx, center.dy - radius * 0.8, center.dx + radius, center.dy);
+      center.dx,
+      center.dy - radius * 0.8,
+      center.dx + radius,
+      center.dy,
+    );
     canvas.drawPath(path, paint);
   }
 
   void _drawWhiskers(Canvas canvas, Offset center, double radius, Paint paint) {
-    final whiskerPaint = Paint()
-      ..color = paint.color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
+    final whiskerPaint =
+        Paint()
+          ..color = paint.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(
       Offset(center.dx - radius * 0.35, center.dy + radius * 0.35),
@@ -569,19 +580,22 @@ class _CompactCatPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2.2;
 
-    final facePaint = Paint()
-      ..color = faceColor
-      ..style = PaintingStyle.fill;
+    final facePaint =
+        Paint()
+          ..color = faceColor
+          ..style = PaintingStyle.fill;
 
-    final featurePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.fill;
+    final featurePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.fill;
 
-    final linePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
+    final linePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, facePaint);
     _drawEars(canvas, center, radius, facePaint, linePaint);
@@ -603,8 +617,13 @@ class _CompactCatPainter extends CustomPainter {
     _drawMouth(canvas, center, radius, linePaint);
   }
 
-  void _drawEars(Canvas canvas, Offset center, double radius, Paint facePaint,
-      Paint linePaint) {
+  void _drawEars(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint facePaint,
+    Paint linePaint,
+  ) {
     final earPath = Path();
     earPath.moveTo(center.dx - radius * 0.7, center.dy - radius * 0.5);
     earPath.lineTo(center.dx - radius * 0.9, center.dy - radius * 1.1);
@@ -618,15 +637,29 @@ class _CompactCatPainter extends CustomPainter {
     canvas.drawPath(earPath, linePaint);
   }
 
-  void _drawSmilingEye(Canvas canvas, Offset center, double radius, Paint paint) {
+  void _drawSmilingEye(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint paint,
+  ) {
     final path = Path();
     path.moveTo(center.dx - radius, center.dy);
     path.quadraticBezierTo(
-        center.dx, center.dy - radius * 0.8, center.dx + radius, center.dy);
+      center.dx,
+      center.dy - radius * 0.8,
+      center.dx + radius,
+      center.dy,
+    );
     canvas.drawPath(path, paint);
   }
 
-  void _drawNose(Canvas canvas, Offset center, double radius, Paint featurePaint) {
+  void _drawNose(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint featurePaint,
+  ) {
     final nosePath = Path();
     nosePath.moveTo(center.dx, center.dy + radius * 0.1);
     nosePath.lineTo(center.dx - radius * 0.1, center.dy + radius * 0.25);
@@ -635,7 +668,12 @@ class _CompactCatPainter extends CustomPainter {
     canvas.drawPath(nosePath, featurePaint);
   }
 
-  void _drawMouth(Canvas canvas, Offset center, double radius, Paint linePaint) {
+  void _drawMouth(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint linePaint,
+  ) {
     final mouthPath = Path();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.25);
     mouthPath.lineTo(center.dx, center.dy + radius * 0.35);
@@ -643,14 +681,22 @@ class _CompactCatPainter extends CustomPainter {
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.35);
-    mouthPath.quadraticBezierTo(center.dx - radius * 0.15,
-        center.dy + radius * 0.45, center.dx - radius * 0.2, center.dy + radius * 0.35);
+    mouthPath.quadraticBezierTo(
+      center.dx - radius * 0.15,
+      center.dy + radius * 0.45,
+      center.dx - radius * 0.2,
+      center.dy + radius * 0.35,
+    );
     canvas.drawPath(mouthPath, linePaint);
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.35);
-    mouthPath.quadraticBezierTo(center.dx + radius * 0.15,
-        center.dy + radius * 0.45, center.dx + radius * 0.2, center.dy + radius * 0.35);
+    mouthPath.quadraticBezierTo(
+      center.dx + radius * 0.15,
+      center.dy + radius * 0.45,
+      center.dx + radius * 0.2,
+      center.dy + radius * 0.35,
+    );
     canvas.drawPath(mouthPath, linePaint);
   }
 
@@ -694,18 +740,11 @@ class _CompactCatWithPulseState extends State<_CompactCatWithPulse>
     );
 
     _pulseAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.15),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.15, end: 1.0),
-        weight: 50,
-      ),
-    ]).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeOut,
-    ));
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.15), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 50),
+    ]).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
+    );
   }
 
   @override
@@ -728,7 +767,8 @@ class _CompactCatWithPulseState extends State<_CompactCatWithPulse>
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
-        final scale = _pulseController.isAnimating ? _pulseAnimation.value : 1.0;
+        final scale =
+            _pulseController.isAnimating ? _pulseAnimation.value : 1.0;
 
         return Transform.scale(
           scale: scale,

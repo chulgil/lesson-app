@@ -29,7 +29,8 @@ class StarburstPainter extends CustomPainter {
   static const int beamsPerQuadrant = 8;
 
   final double progress; // Size growth progress
-  final double colorProgress; // Color transition progress (0-0.9, stays at yellow)
+  final double
+  colorProgress; // Color transition progress (0-0.9, stays at yellow)
   final double rotation; // Rotation angle in radians
   final double fadeOut; // Fade out progress when pitch becomes inaccurate (0-1)
 
@@ -51,9 +52,13 @@ class StarburstPainter extends CustomPainter {
       if (i < 2) {
         return Colors.transparent; // T: 0-1 (2 beams = 25%)
       } else if (i < 6) {
-        return Colors.white.withValues(alpha: opacity); // W: 2-5 (4 beams = 50%)
+        return Colors.white.withValues(
+          alpha: opacity,
+        ); // W: 2-5 (4 beams = 50%)
       } else {
-        return Colors.yellow.withValues(alpha: opacity); // Y: 6-7 (2 beams = 25%)
+        return Colors.yellow.withValues(
+          alpha: opacity,
+        ); // Y: 6-7 (2 beams = 25%)
       }
     }
 
@@ -67,7 +72,10 @@ class StarburstPainter extends CustomPainter {
 
     if (colorProgress < 0.33) {
       // Phase 1 (0-2.7s): Initial pattern T25%, W50%, Y25% per quadrant
-      colors = List.generate(beamCount, (i) => getPatternColor(i, overallOpacity));
+      colors = List.generate(
+        beamCount,
+        (i) => getPatternColor(i, overallOpacity),
+      );
     } else if (colorProgress < 0.67) {
       // Phase 2 (2.7-5.3s): Transparent disappears, filled with white/yellow
       final t = ((colorProgress - 0.33) / 0.34).clamp(0.0, 1.0);
@@ -87,7 +95,11 @@ class StarburstPainter extends CustomPainter {
       colors = List.generate(beamCount, (i) {
         if (isWhitePosition(i)) {
           // Blend from white to yellow
-          return Color.lerp(Colors.white, Colors.yellow, t)!.withValues(alpha: overallOpacity);
+          return Color.lerp(
+            Colors.white,
+            Colors.yellow,
+            t,
+          )!.withValues(alpha: overallOpacity);
         } else {
           return Colors.yellow.withValues(alpha: overallOpacity);
         }
@@ -96,9 +108,10 @@ class StarburstPainter extends CustomPainter {
 
     // When nearly all yellow (8s+), draw a solid filled circle
     if (colorProgress >= 0.98) {
-      final paint = Paint()
-        ..color = Colors.yellow.withValues(alpha: overallOpacity)
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = Colors.yellow.withValues(alpha: overallOpacity)
+            ..style = PaintingStyle.fill;
       canvas.drawCircle(center, radius, paint);
       return;
     }
@@ -115,9 +128,10 @@ class StarburstPainter extends CustomPainter {
       // Skip transparent beams
       if (color == Colors.transparent || color.a < 0.01) continue;
 
-      final paint = Paint()
-        ..color = color
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = color
+            ..style = PaintingStyle.fill;
 
       // Draw straight triangular beam (width increases over time)
       final path = Path();
@@ -156,16 +170,17 @@ class HeartParticlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Light purple color like cat face
+    // Vermillion tint matching cat face accent (Notebook × Score).
     final baseColor = AppColors.paperAccent.withValues(alpha: 0.3);
 
     for (final particle in particles) {
       final opacity = particle.opacity * 0.8; // Max 80% opacity
       if (opacity <= 0.01) continue;
 
-      final paint = Paint()
-        ..color = baseColor.withValues(alpha: opacity * 0.4)
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = baseColor.withValues(alpha: opacity * 0.4)
+            ..style = PaintingStyle.fill;
 
       final pos = particle.position;
       final particleSize = particle.size;
@@ -189,19 +204,11 @@ class HeartParticlePainter extends CustomPainter {
     path.moveTo(0, s * 0.3);
 
     // Left half
-    path.cubicTo(
-      -s * 0.8, -s * 0.5,
-      -s * 0.8, s * 0.3,
-      0, s,
-    );
+    path.cubicTo(-s * 0.8, -s * 0.5, -s * 0.8, s * 0.3, 0, s);
 
     // Right half
     path.moveTo(0, s * 0.3);
-    path.cubicTo(
-      s * 0.8, -s * 0.5,
-      s * 0.8, s * 0.3,
-      0, s,
-    );
+    path.cubicTo(s * 0.8, -s * 0.5, s * 0.8, s * 0.3, 0, s);
 
     canvas.drawPath(path, paint);
   }
@@ -229,24 +236,26 @@ class CatFacePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height * 0.45);
     final radius = size.height * 0.4;
 
-    // Use metronome style colors
-    // Light purple opaque color (same visual as 0.2 alpha on white background)
+    // Face: white × vermillion 20% blend, matching metronome cat face (Notebook × Score).
     final faceColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.2)!;
     final featureColor = AppColors.paperAccent;
 
-    final facePaint = Paint()
-      ..color = faceColor
-      ..style = PaintingStyle.fill;
+    final facePaint =
+        Paint()
+          ..color = faceColor
+          ..style = PaintingStyle.fill;
 
-    final linePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
+    final linePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5
+          ..strokeCap = StrokeCap.round;
 
-    final featurePaint = Paint()
-      ..color = featureColor
-      ..style = PaintingStyle.fill;
+    final featurePaint =
+        Paint()
+          ..color = featureColor
+          ..style = PaintingStyle.fill;
 
     // Face circle
     canvas.drawCircle(center, radius, facePaint);
@@ -292,22 +301,35 @@ class CatFacePainter extends CustomPainter {
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.4);
-    mouthPath.quadraticBezierTo(center.dx - radius * 0.15,
-        center.dy + radius * 0.5, center.dx - radius * 0.22, center.dy + radius * 0.4);
+    mouthPath.quadraticBezierTo(
+      center.dx - radius * 0.15,
+      center.dy + radius * 0.5,
+      center.dx - radius * 0.22,
+      center.dy + radius * 0.4,
+    );
     canvas.drawPath(mouthPath, linePaint);
 
     mouthPath.reset();
     mouthPath.moveTo(center.dx, center.dy + radius * 0.4);
-    mouthPath.quadraticBezierTo(center.dx + radius * 0.15,
-        center.dy + radius * 0.5, center.dx + radius * 0.22, center.dy + radius * 0.4);
+    mouthPath.quadraticBezierTo(
+      center.dx + radius * 0.15,
+      center.dy + radius * 0.5,
+      center.dx + radius * 0.22,
+      center.dy + radius * 0.4,
+    );
     canvas.drawPath(mouthPath, linePaint);
 
     // Whiskers (metronome style)
     _drawWhiskers(canvas, center, radius, linePaint);
   }
 
-  void _drawEars(Canvas canvas, Offset center, double radius, Paint facePaint,
-      Paint linePaint) {
+  void _drawEars(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint facePaint,
+    Paint linePaint,
+  ) {
     final earPath = Path();
     earPath.moveTo(center.dx - radius * 0.7, center.dy - radius * 0.5);
     earPath.lineTo(center.dx - radius * 0.9, center.dy - radius * 1.1);
@@ -321,21 +343,36 @@ class CatFacePainter extends CustomPainter {
     canvas.drawPath(earPath, linePaint);
   }
 
-  void _drawSmilingEye(Canvas canvas, Offset center, double radius, Paint paint) {
+  void _drawSmilingEye(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint paint,
+  ) {
     final path = Path();
     path.moveTo(center.dx - radius, center.dy);
     path.quadraticBezierTo(
-        center.dx, center.dy - radius * 0.8, center.dx + radius, center.dy);
+      center.dx,
+      center.dy - radius * 0.8,
+      center.dx + radius,
+      center.dy,
+    );
     canvas.drawPath(path, paint);
   }
 
-  void _drawEcstaticEye(Canvas canvas, Offset center, double radius, Paint paint) {
+  void _drawEcstaticEye(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint paint,
+  ) {
     // Ecstatic eyes: wave-like shape (~~) for dreamy/ecstatic look
-    final wavePaint = Paint()
-      ..color = paint.color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.round;
+    final wavePaint =
+        Paint()
+          ..color = paint.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.0
+          ..strokeCap = StrokeCap.round;
 
     final path = Path();
     final waveHeight = radius * 0.5;
@@ -347,20 +384,33 @@ class CatFacePainter extends CustomPainter {
     // Wave shape: up-down-up pattern
     path.moveTo(startX, center.dy);
     path.quadraticBezierTo(
-        midX1 - radius * 0.25, center.dy - waveHeight, midX1, center.dy);
+      midX1 - radius * 0.25,
+      center.dy - waveHeight,
+      midX1,
+      center.dy,
+    );
     path.quadraticBezierTo(
-        center.dx, center.dy + waveHeight * 0.6, midX2, center.dy);
+      center.dx,
+      center.dy + waveHeight * 0.6,
+      midX2,
+      center.dy,
+    );
     path.quadraticBezierTo(
-        midX2 + radius * 0.25, center.dy - waveHeight, endX, center.dy);
+      midX2 + radius * 0.25,
+      center.dy - waveHeight,
+      endX,
+      center.dy,
+    );
 
     canvas.drawPath(path, wavePaint);
   }
 
   void _drawBlush(Canvas canvas, Offset center, double radius) {
     // Pink blush circles on both cheeks
-    final blushPaint = Paint()
-      ..color = AppColors.profilePink.withValues(alpha: 0.35)
-      ..style = PaintingStyle.fill;
+    final blushPaint =
+        Paint()
+          ..color = AppColors.profilePink.withValues(alpha: 0.35)
+          ..style = PaintingStyle.fill;
 
     // Left cheek blush
     canvas.drawOval(
@@ -384,11 +434,12 @@ class CatFacePainter extends CustomPainter {
   }
 
   void _drawWhiskers(Canvas canvas, Offset center, double radius, Paint paint) {
-    final whiskerPaint = Paint()
-      ..color = paint.color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
+    final whiskerPaint =
+        Paint()
+          ..color = paint.color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(
       Offset(center.dx - radius * 0.35, center.dy + radius * 0.35),

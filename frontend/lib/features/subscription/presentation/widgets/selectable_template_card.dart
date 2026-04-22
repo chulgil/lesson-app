@@ -12,8 +12,8 @@ const kMaxTemplateSelections = 3;
 /// Selectable card for subscription templates.
 ///
 /// Features:
-/// - Selected: 2px purple border + top-right check icon
-/// - Recommended: ⭐ badge (secondary color)
+/// - Selected: 2px paperAccent (vermillion) border + top-right check icon
+/// - Recommended: ⭐ badge (paperAccent)
 /// - Max 3 selections: remaining cards at 40% opacity
 /// - AnimatedContainer 200ms transition
 class SelectableTemplateCard extends StatelessWidget {
@@ -101,9 +101,7 @@ class SelectableTemplateCard extends StatelessWidget {
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color:
-                            isSelected
-                                ? AppColors.paperAccent
-                                : AppColors.ink,
+                            isSelected ? AppColors.paperAccent : AppColors.ink,
                       ),
                     ),
                   ),
@@ -148,10 +146,7 @@ class SelectableTemplateCard extends StatelessWidget {
                     template.formattedPrice,
                     style: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.bold,
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.ink,
+                      color: isSelected ? AppColors.paperAccent : AppColors.ink,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space2),
