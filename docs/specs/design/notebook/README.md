@@ -1465,6 +1465,38 @@ Text(
 
 ---
 
+### 7.46 dark 테마 `textButtonTheme` 등록 — light/dark 대칭성 회복
+
+**배경**: 지금까지의 cleanup 스프린트(§7.34 cardTheme → §7.38 dialogTheme → §7.40 floatingActionButtonTheme → §7.41/§7.44 inline override cleanup) 는 주로 light 테마를 중심으로 진행됐다. 이번 감사에서 light·dark 두 `MaterialTheme` 블록에 등록된 속성 수를 비교한 결과 **다크만 `textButtonTheme` 이 빠져 있었다**. M3 의 TextButton 은 theme 미등록 시 `colorScheme.primary`(purple 계열) 로 폴백하는데, 이는 Notebook × Score 팔레트 외 색상이 다크 모드에서만 간헐적으로 혼입되는 씨앗이 된다. §7.40 이 FAB 에서 보여준 "light 에만 있던 속성을 dark 에도 시그니처 치환으로 이식" 패턴을 그대로 적용.
+
+**등록 전/후 속성 수**:
+
+| 모드 | before | after | gap |
+|------|--------|-------|-----|
+| light | 29개 | 29개 | 0 |
+| dark | 28개 (textButtonTheme 없음) | 29개 | 0 |
+
+**추가된 속성**: `textButtonTheme: TextButtonThemeData(style: ...)`
+
+| 속성 | light | dark | 차이의 이유 |
+|------|-------|------|-------------|
+| `foregroundColor` | `AppColors.ink` | `AppColors.paper` | 표면 대비 (light=검정 잉크, dark=종이) |
+| `textStyle` | `AppTypography.bodyMedium` + w500 | 동일 | 동일 — 타이포 일관성 |
+
+**설계 포인트**:
+- **FAB 패턴과의 상동(homology)**: §7.40 도 "light 의 `extendedTextStyle` 를 dark 에도 동일 Inter w600 으로 등록" 이었다. 이번도 같은 결: "light 의 textStyle 은 그대로 유지하고, 표면 대비에 의존하는 foregroundColor 만 paper 로 치환". 이 일관된 치환 규칙이 light/dark 전환 시 타이포 굵기·레터스페이싱 드리프트를 방지한다.
+- **왜 `paperAccent` 가 아니라 `paper` 인가**: TextButton 은 primary CTA 가 아니라 보조 액션(취소·건너뛰기·이동)이 대부분이다. Vermillion 은 primary CTA(FilledButton·FAB) 에만 위임하고, TextButton 은 "표면 위에 조용히 얹힌 링크" 성격을 유지. light=ink(검은 글자)·dark=paper(흰 글자) 대칭이 이 역할을 가장 잘 표현한다.
+- **회귀 영역 최소화**: 기존 모든 TextButton 호출부는 인라인 `style:` 없이 theme 에 의존하고 있었거나(대다수), 인라인 `foregroundColor:` 를 따로 지정한 소수 파일이었다. 전자는 이번 변경으로 darkTheme 에서 정확히 `paper` 를 받게 되고, 후자는 `inline > theme` precedence 로 기존 동작을 유지한다.
+
+**검증**:
+- `flutter analyze lib/` → No issues found (12.0s)
+- `flutter test` → 392/392 passed
+- Lore commit: `895d6b73`
+
+**은유**: 같은 책을 낮판과 밤판으로 두 번 찍었는데, 낮판 목차에는 "참고 링크" 라는 검은 작은 글자가 붙어 있지만 밤판에는 그 줄이 통째로 빠져 있었다. 빠졌다기보다 기본 인쇄기가 아무 색이나 찍게 내버려 둔 채 — 때로는 보라색, 때로는 청록색 — 독자는 낮과 밤을 오갈 때마다 이 목차만 다른 손이 손본 것처럼 읽었다. 오늘 밤판 목차에도 같은 "참고 링크" 줄을 넣는다. 단 잉크는 낮판의 검정이 아니라 종이색 흰색으로 — 어두운 지면 위에서 같은 역할을 하는 정확한 대칭.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
