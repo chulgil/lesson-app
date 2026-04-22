@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
@@ -107,9 +108,10 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               ),
 
               // Title
+              // Notebook × Score: 바텀시트 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
               Text(
                 AppStrings.sessionRescheduleTitle(widget.sessionNumber),
-                style: AppTypography.headingSmall,
+                style: NotebookTypography.appBarTitle,
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -310,8 +312,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             Icon(
               icon,
               size: 20,
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -322,10 +323,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                     label,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.ink,
+                      color: isSelected ? AppColors.paperAccent : AppColors.ink,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -356,14 +354,20 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: AppColors.paperAccent.withValues(alpha: 0.3),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.warning_amber, size: 18, color: AppColors.paperAccent),
+                Icon(
+                  Icons.warning_amber,
+                  size: 18,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
@@ -379,7 +383,9 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             const SizedBox(height: AppSpacing.space1),
             Text(
               AppStrings.rescheduleCreditsChange(remaining, remaining - 1),
-              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ],
         ),
