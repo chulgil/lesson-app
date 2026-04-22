@@ -1130,6 +1130,39 @@ Text(
 
 ---
 
+### 7.36 IconButton 테마 등록 — 175개 아이콘 버튼 기본색 ink 승격
+
+**배경**: `iconButtonTheme` 이 등록되지 않아 Material 3 이 `colorScheme.onSurfaceVariant` 기본값으로 폴백. 현재 colorScheme 은 primary/secondary/surface/error 만 명시하고 `onSurfaceVariant` 는 미지정 상태 — M3 의 회색 슬레이트 폴백(`#49454E` 계열) 이 적용되어 Notebook 잉크 팔레트(`ink = #1A1A2E`) 와 미세한 색상 이질감. `IconButton()` 실사용 164건 + `.filled`/`.outlined`/`.styleFrom` 변형 11건 = 175건 중 인라인 `icon: Icon(..., color: ...)` 오버라이드 21건을 제외한 다수가 이 폴백 색상에 의존.
+
+**변경**: `lib/core/theme/app_theme.dart` 라이트/다크 각 블록의 `iconTheme` 직후에 `iconButtonTheme` 삽입.
+
+| 테마 | 위치 | foregroundColor |
+|---|---|---|
+| light | `iconTheme` 직후 (329 라인대) | `AppColors.ink` |
+| dark | `iconTheme` 직후 (790 라인대) | `AppColors.textPrimaryDark` |
+
+커밋: `1b2b3bbf`.
+
+**영향 범위**: 175 IconButton 호출부 — 21개 인라인 `icon: Icon(..., color: paperAccent/white/...)` 오버라이드는 Flutter 의 Icon `color:` 속성이 부모 IconTheme 보다 우선하므로 불변. **나머지 154개 호출부가 M3 회색 슬레이트 폴백 → Notebook `ink`/`textPrimaryDark` 로 자동 승격**.
+
+**설계 포인트**:
+- `foregroundColor` 만 지정 — `size`/`shape` 는 기본값 유지(M3 40x40 tap target, default 24px icon size 는 `iconTheme.size` 가 담당)
+- `appBarTheme.foregroundColor == ink` (light) / `textPrimaryDark` (dark) 와 정확히 일치 → AppBar actions 내부 IconButton 이 AppBar IconTheme 과 동일 색으로 렌더링되어 라이트/다크 전환 시 이질감 제거
+- M3 버튼 패밀리 테마 5종(`ElevatedButtonThemeData` · `FilledButtonThemeData` · `OutlinedButtonThemeData` · `TextButtonThemeData` · `IconButtonThemeData`) **전체 등록 완료** — 버튼 단일 지점 테마 통일 작업 마무리
+
+**호환성**:
+- 인라인 `color:` 오버라이드(21건) 회귀 0 — 속성 우선순위상 Icon 의 color 가 IconTheme 보다 우선
+- `IconButton.filled` (9건) / `IconButton.outlined` (2건) 변형도 동일한 `IconButton.styleFrom` 을 상속하므로 foregroundColor 자동 전파
+- 이미 적용된 `iconTheme: IconThemeData(color: ink)` 과 이중으로 동일 색을 지정 — Flutter 는 IconButton 내부에서 styleFrom 값을 우선 적용하지만 둘 다 `ink` 이므로 동일 결과
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 같은 악보집 전체가 이미 같은 잉크로 필사되어 있었지만, 페이지 하단의 작은 연습번호(♯)만 유독 연필 흑연 색으로 남아 있었다. 한 줄의 테마 등록으로 그 작은 부호들까지 같은 잉크로 덮어쓰자, 종이 위 모든 글자와 기호가 비로소 같은 한 사람이 한 번에 써 내려간 것처럼 읽힌다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
