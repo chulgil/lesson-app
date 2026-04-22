@@ -192,6 +192,37 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
       ),
+
+      // Switch — Notebook × Score: 활성 thumb/track 을 Vermillion 으로 통일.
+      // 개별 activeThumbColor override 가 없는 Switch 도 자동 Vermillion 적용.
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.paper;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccentSoft;
+          }
+          return AppColors.inkQuaternary;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.inkTertiary;
+        }),
+      ),
+
+      // TextSelection — Notebook × Score: 커서·선택·핸들을 Vermillion 으로 통일.
+      // TextField 전역에 자동 적용.
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: AppColors.paperAccent,
+        selectionColor: AppColors.paperAccentSoft,
+        selectionHandleColor: AppColors.paperAccent,
+      ),
     );
   }
 
@@ -362,6 +393,35 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
+      ),
+
+      // Switch — Notebook × Score: Vermillion active 유지, unselected 는 dark palette.
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.textSecondaryDark;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccentSoft;
+          }
+          return AppColors.borderDark;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.textSecondaryDark;
+        }),
+      ),
+
+      // TextSelection — Notebook × Score: dark 에서도 Vermillion 커서/선택 유지.
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: AppColors.paperAccent,
+        selectionColor: AppColors.paperAccentSoft,
+        selectionHandleColor: AppColors.paperAccent,
       ),
     );
   }
