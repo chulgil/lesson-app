@@ -1226,6 +1226,37 @@ Text(
 
 ---
 
+### 7.39 연습 통계·뱃지·정책 시트 섹션 제목 Playfair 통일
+
+**배경**: §7.17 sectionTitle 패턴은 카드 내부 섹션 제목이 아이콘과 함께 소분류를 구분할 때 쓰는 축소판 Playfair 표기다. `AppTypography.headingSmall` 로 남아 있던 통계 카드 4종 + 뱃지 콜렉션 + 정책 시트의 섹션 제목을 §7.17 로 이관해 화면 간 섹션 리듬을 일치시킨다.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 변경 전 | 변경 후 |
+|---|---|---|---|---|
+| `practice/widgets/stats/daily_bar_chart.dart` | 46 | 일별 연습 시간 | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` |
+| `practice/widgets/stats/stats_summary_card.dart` | 38 | 요약 | 동상 | 동상 |
+| `practice/widgets/stats/weekly_trend_chart.dart` | 46 | 주간 트렌드 | 동상 | 동상 |
+| `practice/widgets/stats/repertoire_stats_list.dart` | 50 | 레퍼토리별 연습 | 동상 | 동상 |
+| `gamification/screens/badge_collection_screen.dart` | 55 | 획득한 뱃지 | 동상 | 동상 |
+| `gamification/screens/badge_collection_screen.dart` | 63 | 포인트 히스토리 | 동상 | 동상 |
+| `subscription/widgets/subscription_policy_sheet.dart` | 105 | 적용 정책 | `headingSmall.copyWith(color: paperAccent)` | `NotebookTypography.sectionTitle.copyWith(color: paperAccent)` |
+
+**설계 포인트**:
+- **§7.17 일관 적용**: 아이콘 + 섹션 제목 조합(`Row > Icon + Text`)의 Text 는 전부 `NotebookTypography.sectionTitle` 로 고정한다. 이 패턴은 연습 통계, 뱃지, 정책 세 모듈에서 서로 다른 맥락이지만 "같은 크기의 소제목" 이라는 시각적 리듬이 유지돼야 한다.
+- **§7.30 제외 항목 엄수**: `stats_summary_card` 의 수치 `value` 와 `badge_collection_screen` 의 `data.levelTitle` 은 동적 데이터 값이라 제목이 아닌 **stat value** 성격이다. §7.30 기준(수치·이니셜·동적 값은 타이틀이 아니다)에 따라 `AppTypography.headingSmall.copyWith(...)` 를 유지한다. `Icons.bar_chart`, `Icons.insights`, `Icons.trending_up`, `Icons.library_music`, `Icons.description` 같은 아이콘도 그대로 둔다.
+- **copyWith 체인 유지**: `subscription_policy_sheet` 는 `paperAccent` 강조색을 얹는 패턴이라 `NotebookTypography.sectionTitle.copyWith(color: ...)` 로 체인을 그대로 옮긴다. sectionTitle 기저에 있는 Playfair Display 17/w700 은 `fontFamily` 필드가 copyWith 로 덮이지 않는 한 유지된다.
+- **모듈 간 중첩 패턴**: 통계(daily/weekly/summary/repertoire)는 네 개의 서로 다른 카드이지만 전부 동일 구조 — 아이콘 → space2 → 제목 → space4 → 본문 — 로 짜여 있다. 한 번의 §7.17 적용이 네 카드의 헤더 질감을 한 번에 일치시킨다.
+
+**검증**:
+- `flutter analyze` (6 files) → No issues found
+- `flutter test` → 392/392 passed
+- Lore commit: `aa0fb419`
+
+**은유**: 연습 통계는 매일 열어 보는 장부다. "요약", "일별", "주간", "레퍼토리별" 이라는 네 개의 탭 헤더가 동일한 펜촉으로 쓰여 있어야 장부 전체가 한 사람의 필체로 읽힌다. §7.17 은 이 "같은 펜촉" 을 강제하는 규칙이고, 오늘 배치는 네 카드가 서로 다른 잉크병에서 뽑혀 나오던 흔적을 마지막으로 정리했다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
