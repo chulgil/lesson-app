@@ -6,6 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../lessons/presentation/providers/lesson_note_providers.dart';
 
@@ -142,11 +143,15 @@ class _NotePreviewCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space1),
 
-            // Feedback text
+            // Feedback text — Notebook × Score: 선생님 손글씨 주석으로 Gaegu 렌더.
             if (lesson.feedback != null)
               Text(
                 lesson.feedback!,
-                style: AppTypography.bodySmall,
+                style: NotebookTypography.hand.copyWith(
+                  fontSize: 13,
+                  height: 1.3,
+                  color: AppColors.paperPencil,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -167,7 +172,9 @@ class _NotePreviewCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(
+                                alpha: 0.08,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusLarge,
                               ),
