@@ -1818,6 +1818,38 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 ---
 
+### 7.56 profile/ 미수금·프로필 미리보기·확장 프로필·공개 프로필 시트 섹션 제목 Playfair 통일 — profile/ 배치 #2 + helper 전파 최적화
+
+**배경**: profile/ 배치 #1(§7.55, 화면 레이어 3파일) 에 이어 이번 배치는 **helper 전파 패턴을 의도적으로 활용**. profile/ 영역에 산재한 `_buildSection`·`_buildSectionTitle` 같은 section title helper 2개를 한 번씩만 수정하여 9 개 정적 타이틀에 일괄 반영. 공통-우선 원칙(users direction: "공통을 수정하면 일괄반영이 가능하기때문에 공통수정쪽으로 설계되어야합니다") 의 정석 구현.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 패턴 | 전파 효과 |
+|------|------|------|------|---------|
+| `frontend/lib/features/profile/presentation/screens/outstanding_payments_screen.dart` | 87 | "미수금 목록" | §7.17 direct | 1건 |
+| `frontend/lib/features/profile/presentation/screens/profile_preview_screen.dart` | 350 | `_buildSection` helper `title` 파라미터 | §7.17 helper propagation | **6건** (소개/교수 스타일/전문 분야/학력/경력/자격증) |
+| `frontend/lib/features/profile/presentation/screens/extended_profile_screen.dart` | 86 | `_buildSectionTitle` helper | §7.17 helper propagation | **3건** (학력/경력/자격증) |
+| `frontend/lib/features/profile/presentation/widgets/profile_visibility_widgets.dart` | 514 | "공개 프로필 미리보기" | §7.27 appBarTitle | 1건 (BottomSheetHandle + title 조합) |
+
+**설계 포인트**:
+- **helper 전파 = 공통-우선 원칙의 정량적 증거**: 코드 교체는 4 라인이지만 렌더링 결과는 **11 개 섹션 타이틀** 이 Playfair 로 전환됨. 비율 2.75 배. profile/ 영역처럼 section helper 가 이미 존재하는 도메인에서는 helper 1 수정이 direct 1 수정보다 항상 우위.
+- **§7.27 appBarTitle 판별 — BottomSheetHandle 의 위치**: `profile_visibility_widgets:512` 의 "공개 프로필 미리보기" 는 DraggableScrollableSheet 내부 Column 안에 `BottomSheetHandle` (line 499) + `Padding > Row > [Icon + Text + Spacer + IconButton]` 구조. **BottomSheetHandle 가 같은 Column 의 직전 자식** 이므로 §7.27 판별 적중. `lesson_time_settings_screen` 의 `showModalBottomSheet + SafeArea + Column` 구조와는 달리 handle 이 명시적으로 붙어 있어 appBarTitle 로 판정.
+- **§7.30 예외 5건 정리 (profile/ 도메인)**:
+  - Empty-state headline: `outstanding_payments_screen:48` "미수금이 없습니다"
+  - 가격: `outstanding_payments_screen:224` `formatWonWithComma(subscription.amount)` (paperAccent 강조색)
+  - 동적 연도 라벨: `payment_management_screen:244` `'$selectedYear년'` (IconButton 사이 동적 연도 스와이퍼)
+  - 동적 요금 범위: `extended_profile_dialogs:177` `FeeRange(...).formatted` (슬라이더 아래 동적 금액)
+  - 아바타 이니셜: `payment_detail_sheet:52` `payment.studentName[0]` (CircleAvatar 내부 화이트 문자)
+
+**검증**:
+- `flutter analyze` 4 files → No issues found (9.0s)
+- Import cleanup: `extended_profile_screen.dart` 의 `app_typography` 임포트가 helper 교체 후 unused 가 되어 제거. AppTypography 를 참조하지 않는 `profile_preview_screen`/`outstanding_payments_screen` 도 기존 `bodyMedium`/`bodySmall` 등에서 계속 사용하므로 유지.
+- Lore commit: `b73da2b8`
+
+**은유**: 장부에는 때로 한 줄을 고치면 여러 페이지가 한꺼번에 바뀌는 공통 양식이 있다. profile 장부의 "미리보기 챕터" 와 "확장 프로필 챕터" 에는 바로 그런 **공통 제목 서식** 이 인쇄되어 있었다. 서식의 한 칸 — `_buildSection` 의 style 한 곳 — 을 Playfair 로 바꾸자 "소개"·"교수 스타일"·"전문 분야"·"학력"·"경력"·"자격증" 여섯 제목이 한꺼번에 새 서체로 갈아탔다. 한 번 더 — `_buildSectionTitle` 을 손대자 또 다른 세 제목이 따라 바뀌었다. 장부 관리자의 규칙은 명확하다: **같은 제목을 반복해서 쓴 자리에는 공통 서식이 있어야 하고, 그 공통 서식이 있어야 나중에 한 번에 바꿀 수 있다.** 이번 배치는 그 규칙이 일에서 얼마나 빛을 발하는지 보여주는 기록이다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
