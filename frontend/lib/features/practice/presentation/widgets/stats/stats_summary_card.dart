@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// Summary card displaying key statistics
 class StatsSummaryCard extends StatelessWidget {
   final PracticeStatsReport report;
 
-  const StatsSummaryCard({
-    super.key,
-    required this.report,
-  });
+  const StatsSummaryCard({super.key, required this.report});
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +33,10 @@ class StatsSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.insights,
-                color: AppColors.paperAccent,
-                size: 20,
-              ),
+              Icon(Icons.insights, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '요약',
-                style: AppTypography.headingSmall,
-              ),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('요약', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -136,12 +128,7 @@ class StatsSummaryCard extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: AppSpacing.space2),
-          Text(
-            value,
-            style: AppTypography.headingSmall.copyWith(
-              color: color,
-            ),
-          ),
+          Text(value, style: AppTypography.headingSmall.copyWith(color: color)),
           const SizedBox(height: 2),
           Text(
             label,
@@ -168,16 +155,12 @@ class StatsSummaryCard extends StatelessWidget {
         ],
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );

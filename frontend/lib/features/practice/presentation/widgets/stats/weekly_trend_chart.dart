@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// Line chart showing weekly practice trend (for monthly reports)
@@ -40,16 +41,10 @@ class WeeklyTrendChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.trending_up,
-                color: AppColors.paperAccent,
-                size: 20,
-              ),
+              Icon(Icons.trending_up, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '주간 트렌드',
-                style: AppTypography.headingSmall,
-              ),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('주간 트렌드', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -69,14 +64,15 @@ class WeeklyTrendChart extends StatelessWidget {
           // Week labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: weeklyStats.map((stat) {
-              return Text(
-                stat.weekLabel,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              );
-            }).toList(),
+            children:
+                weeklyStats.map((stat) {
+                  return Text(
+                    stat.weekLabel,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -88,34 +84,34 @@ class _TrendLinePainter extends CustomPainter {
   final List<WeeklyStats> weeklyStats;
   final int maxMinutes;
 
-  _TrendLinePainter({
-    required this.weeklyStats,
-    required this.maxMinutes,
-  });
+  _TrendLinePainter({required this.weeklyStats, required this.maxMinutes});
 
   @override
   void paint(Canvas canvas, Size size) {
     if (weeklyStats.isEmpty) return;
 
-    final paint = Paint()
-      ..color = AppColors.paperAccent
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = AppColors.paperAccent
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round
+          ..style = PaintingStyle.stroke;
 
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          AppColors.paperAccent.withAlpha(50),
-          AppColors.paperAccent.withAlpha(0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    final fillPaint =
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.paperAccent.withAlpha(50),
+              AppColors.paperAccent.withAlpha(0),
+            ],
+          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    final dotPaint = Paint()
-      ..color = AppColors.paperAccent
-      ..style = PaintingStyle.fill;
+    final dotPaint =
+        Paint()
+          ..color = AppColors.paperAccent
+          ..style = PaintingStyle.fill;
 
     final path = Path();
     final fillPath = Path();
@@ -145,7 +141,11 @@ class _TrendLinePainter extends CustomPainter {
         path.quadraticBezierTo(controlX, p1.dy, p1.dx, p1.dy);
 
         fillPath.quadraticBezierTo(
-            controlX, p0.dy, controlX, (p0.dy + p1.dy) / 2);
+          controlX,
+          p0.dy,
+          controlX,
+          (p0.dy + p1.dy) / 2,
+        );
         fillPath.quadraticBezierTo(controlX, p1.dy, p1.dx, p1.dy);
       }
 
@@ -161,11 +161,7 @@ class _TrendLinePainter extends CustomPainter {
       // Draw dots
       for (final point in points) {
         canvas.drawCircle(point, 6, dotPaint);
-        canvas.drawCircle(
-          point,
-          4,
-          Paint()..color = Colors.white,
-        );
+        canvas.drawCircle(point, 4, Paint()..color = Colors.white);
       }
     }
   }

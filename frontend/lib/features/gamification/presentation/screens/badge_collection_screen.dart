@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/gamification.dart';
 import '../providers/gamification_provider.dart';
 import '../widgets/challenges_card.dart';
@@ -51,14 +52,16 @@ class BadgeCollectionScreen extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space5),
 
         // Badges section
-        Text('획득한 뱃지', style: AppTypography.headingSmall),
+        // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+        Text('획득한 뱃지', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         _buildBadgeGrid(data.earnedBadges),
 
         const SizedBox(height: AppSpacing.space5),
 
         // Point history
-        Text('포인트 히스토리', style: AppTypography.headingSmall),
+        // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+        Text('포인트 히스토리', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         _buildPointHistory(data.recentHistory),
 
@@ -125,9 +128,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '다음 레벨까지 ${data.pointsToNextLevel}P',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -168,10 +169,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color:
-            badge.isEarned
-                ? AppColors.paper
-                : AppColors.paperDark,
+        color: badge.isEarned ? AppColors.paper : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
@@ -212,9 +210,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color:
-                        badge.isEarned
-                            ? AppColors.ink
-                            : AppColors.inkTertiary,
+                        badge.isEarned ? AppColors.ink : AppColors.inkTertiary,
                   ),
                 ),
                 Text(
@@ -242,8 +238,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
             child: Text(
               _getRarityLabel(badge.rarity),
               style: AppTypography.captionSmall.copyWith(
-                color:
-                    badge.isEarned ? rarityColor : AppColors.inkTertiary,
+                color: badge.isEarned ? rarityColor : AppColors.inkTertiary,
                 fontWeight: FontWeight.w600,
               ),
             ),

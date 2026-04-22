@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// Bar chart showing daily practice time
@@ -43,7 +44,8 @@ class DailyBarChart extends StatelessWidget {
             children: [
               Icon(Icons.bar_chart, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text('일별 연습 시간', style: AppTypography.headingSmall),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('일별 연습 시간', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),

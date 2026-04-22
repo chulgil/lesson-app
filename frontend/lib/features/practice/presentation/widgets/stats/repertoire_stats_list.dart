@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// List widget showing repertoire-level statistics
 class RepertoireStatsList extends StatelessWidget {
   final List<RepertoireStats> repertoireStats;
 
-  const RepertoireStatsList({
-    super.key,
-    required this.repertoireStats,
-  });
+  const RepertoireStatsList({super.key, required this.repertoireStats});
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +45,10 @@ class RepertoireStatsList extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.library_music,
-                color: AppColors.paperAccent,
-                size: 20,
-              ),
+              Icon(Icons.library_music, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '레퍼토리별 연습',
-                style: AppTypography.headingSmall,
-              ),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('레퍼토리별 연습', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -142,7 +134,10 @@ class RepertoireStatsList extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.paperAccent, AppColors.paperAccent],
+                            colors: [
+                              AppColors.paperAccent,
+                              AppColors.paperAccent,
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(3),
                         ),
@@ -166,9 +161,7 @@ class RepertoireStatsList extends StatelessWidget {
           // Section count
           Text(
             '${stat.completedSections}/${stat.totalSections} 섹션 완료',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),

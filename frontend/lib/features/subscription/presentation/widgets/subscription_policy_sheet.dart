@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/lesson_policy.dart';
@@ -99,9 +100,10 @@ class SubscriptionPolicySheet extends ConsumerWidget {
           children: [
             Icon(Icons.rule_rounded, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
+            // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
             Text(
               '적용 정책',
-              style: AppTypography.headingSmall.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.paperAccent,
               ),
             ),
@@ -120,9 +122,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space3),
         Text(
           '수강권 발급 시점의 정책이 적용됩니다. 선생님이 이후 정책을 변경해도 이 수강권에는 영향을 주지 않습니다.',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
