@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';
@@ -118,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.space3),
 
         // Pencil underline
-        const _PencilUnderline(
+        const PencilUnderline(
           width: 160,
           color: AppColors.paperAccent,
           strokeWidth: 2.2,
@@ -495,58 +496,4 @@ class _NotebookAuthBtn extends StatelessWidget {
       ),
     );
   }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// PencilUnderline — 손그림 느낌 단순 곡선 (CustomPainter).
-// 레퍼런스: design-plan/hybrid/primitives.jsx PencilUnderline.
-// ─────────────────────────────────────────────────────────────────
-class _PencilUnderline extends StatelessWidget {
-  final double width;
-  final Color color;
-  final double strokeWidth;
-
-  const _PencilUnderline({
-    required this.width,
-    required this.color,
-    this.strokeWidth = 2.0,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(width, 6),
-      painter: _PencilUnderlinePainter(color: color, strokeWidth: strokeWidth),
-    );
-  }
-}
-
-class _PencilUnderlinePainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-
-  _PencilUnderlinePainter({required this.color, required this.strokeWidth});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = strokeWidth
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-    final w = size.width;
-    final path =
-        Path()
-          ..moveTo(1, 3.5)
-          ..quadraticBezierTo(w * 0.3, 1.5, w * 0.5, 3)
-          ..quadraticBezierTo(w * 0.7, 4.5, w - 1, 3.5);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _PencilUnderlinePainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
 }
