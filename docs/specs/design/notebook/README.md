@@ -549,6 +549,8 @@ Text(
 | Gaegu 프리뷰 | `features/student_home/presentation/widgets/student_lesson_card.dart` | 레슨 리스트 피드백 2줄 프리뷰를 `AppTypography.bodySmall` → `NotebookTypography.hand.copyWith(fontSize: 13, height: 1.3)` | 5573fb4b |
 | Gaegu 프리뷰 | `features/lessons/presentation/screens/lesson_note_history_screen.dart` | 노트 이력 카드 3종(피드백 3줄 / 연습 팁 1줄 / 학생 메모 2줄) → `NotebookTypography.hand`(프리뷰는 fontSize 13 / height 1.3) | 4eae2269 |
 | Gaegu 본문 | `features/lessons/presentation/widgets/lesson_detail/lesson_notes_widgets.dart` | `_PracticeTipsCard` 본문 `AppTypography.bodyMedium(color: ink)` → `NotebookTypography.hand(color: ink)`. 배경(ink α 0.1) 대비 유지 | 4eae2269 |
+| Gaegu 프리뷰 | `features/students/presentation/widgets/student_detail/student_notes_section.dart` | 학생 상세 노트 프리뷰 피드백 2줄 `AppTypography.bodySmall` → `NotebookTypography.hand.copyWith(fontSize: 13, height: 1.3, paperPencil)` | b107379c |
+| Gaegu 프리뷰 | `features/students/presentation/widgets/student_detail/student_lesson_card.dart` | 학생 상세 레슨 카드 피드백 1줄 프리뷰 `AppTypography.caption(inkTertiary)` → `NotebookTypography.hand.copyWith(fontSize: 13, height: 1.3, paperPencil)` | b107379c |
 
 **검증**:
 - `flutter analyze` → 0 issues
