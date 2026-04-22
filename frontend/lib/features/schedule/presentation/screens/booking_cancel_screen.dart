@@ -59,9 +59,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canCancel =
-        widget.isTeacherCancel || widget.remainingReschedules > 0;
-    final isLastChance = !widget.isTeacherCancel && widget.remainingReschedules == 1;
+    final canCancel = widget.isTeacherCancel || widget.remainingReschedules > 0;
+    final isLastChance =
+        !widget.isTeacherCancel && widget.remainingReschedules == 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -82,7 +82,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               const SizedBox(height: AppSpacing.space4),
 
               // Warning for student cancellation
-              if (!widget.isTeacherCancel) _buildCancelWarning(canCancel, isLastChance),
+              if (!widget.isTeacherCancel)
+                _buildCancelWarning(canCancel, isLastChance),
 
               // Teacher cancel info
               if (widget.isTeacherCancel) _buildTeacherCancelInfo(),
@@ -168,7 +169,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: AppColors.paperAccent.withValues(alpha: 0.3),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,14 +214,20 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: AppColors.paperAccent.withValues(alpha: 0.3),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.warning_amber, color: AppColors.paperAccent, size: 20),
+                const Icon(
+                  Icons.warning_amber,
+                  color: AppColors.paperAccent,
+                  size: 20,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '마지막 취소 기회',
@@ -330,9 +339,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       children: [
         Text(
           '취소 사유 (선택)',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
         TextField(
@@ -370,9 +377,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed: canCancel && !_isLoading
-                ? () => _handleCancel(isLastChance)
-                : null,
+            onPressed:
+                canCancel && !_isLoading
+                    ? () => _handleCancel(isLastChance)
+                    : null,
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
@@ -380,22 +388,23 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            child:
+                _isLoading
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                    : Text(
+                      '예약 취소하기',
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  )
-                : Text(
-                    '예약 취소하기',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
           ),
         ),
 
@@ -456,39 +465,39 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       // Show confirmation dialog for last chance
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('마지막 취소 기회입니다'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
-                style: AppTypography.bodyMedium,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('마지막 취소 기회입니다'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
+                    style: AppTypography.bodyMedium,
+                  ),
+                  Text(
+                    '취소 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.paperAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  const Text('이후 더 이상 변경/취소가 불가합니다.'),
+                ],
               ),
-              Text(
-                '취소 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('돌아가기'),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              const Text('이후 더 이상 변경/취소가 불가합니다.'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('돌아가기'),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('취소하기'),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
-              child: const Text('취소하기'),
-            ),
-          ],
-        ),
       );
 
       if (confirmed != true) return;
@@ -542,9 +551,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   void _contactTeacher() {
     final teacherId = widget.teacherId;
     if (teacherId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')));
       return;
     }
 
@@ -552,9 +561,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     final phone = profileAsync.valueOrNull?.verification.phoneNumber;
 
     if (phone == null || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('선생님 연락처가 등록되지 않았습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('선생님 연락처가 등록되지 않았습니다')));
       return;
     }
 
@@ -569,93 +578,96 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
           top: Radius.circular(AppSpacing.radiusLarge),
         ),
       ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${widget.teacherName} 연락처',
-                style: AppTypography.headingSmall,
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                phone,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              Row(
+      builder:
+          (context) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        final uri = Uri(scheme: 'tel', path: phone);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri);
-                        } else {
-                          _copyToClipboard(phone);
-                        }
-                      },
-                      icon: const Icon(Icons.phone, size: 18),
-                      label: const Text('전화하기'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.paperAccent,
-                        side: const BorderSide(color: AppColors.paperAccent),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.space3,
-                        ),
-                      ),
+                  Text(
+                    '${widget.teacherName} 연락처',
+                    style: AppTypography.headingSmall,
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    phone,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        final uri = Uri(scheme: 'sms', path: phone);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri);
-                        } else {
-                          _copyToClipboard(phone);
-                        }
-                      },
-                      icon: const Icon(Icons.message, size: 18),
-                      label: const Text('문자 보내기'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.ink,
-                        side: const BorderSide(color: AppColors.ink),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.space3,
+                  const SizedBox(height: AppSpacing.space4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            final uri = Uri(scheme: 'tel', path: phone);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            } else {
+                              _copyToClipboard(phone);
+                            }
+                          },
+                          icon: const Icon(Icons.phone, size: 18),
+                          label: const Text('전화하기'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.paperAccent,
+                            side: const BorderSide(
+                              color: AppColors.paperAccent,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.space3,
+                            ),
+                          ),
                         ),
+                      ),
+                      const SizedBox(width: AppSpacing.space3),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            final uri = Uri(scheme: 'sms', path: phone);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            } else {
+                              _copyToClipboard(phone);
+                            }
+                          },
+                          icon: const Icon(Icons.message, size: 18),
+                          label: const Text('문자 보내기'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.ink,
+                            side: const BorderSide(color: AppColors.ink),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.space3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _copyToClipboard(phone);
+                      },
+                      icon: const Icon(Icons.copy, size: 16),
+                      label: const Text('번호 복사'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.inkSecondary,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.space2),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _copyToClipboard(phone);
-                  },
-                  icon: const Icon(Icons.copy, size: 16),
-                  label: const Text('번호 복사'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.inkSecondary,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 

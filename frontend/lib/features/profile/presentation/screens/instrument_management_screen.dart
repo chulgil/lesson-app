@@ -112,11 +112,7 @@ class _InstrumentManagementScreenState
             child: Center(
               child: Column(
                 children: [
-                  Icon(
-                    Icons.music_off,
-                    size: 48,
-                    color: AppColors.inkTertiary,
-                  ),
+                  Icon(Icons.music_off, size: 48, color: AppColors.inkTertiary),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     '등록된 악기가 없습니다',
@@ -160,14 +156,20 @@ class _InstrumentManagementScreenState
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
-          child: Icon(_getInstrumentIcon(instrument), color: AppColors.paperAccent),
+          child: Icon(
+            _getInstrumentIcon(instrument),
+            color: AppColors.paperAccent,
+          ),
         ),
         title: Text(instrument, style: AppTypography.bodyLarge),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.paperAccent),
+              icon: const Icon(
+                Icons.delete_outline,
+                color: AppColors.paperAccent,
+              ),
               onPressed: () => _showDeleteConfirmation(instrument),
             ),
             ReorderableDragStartListener(
@@ -333,7 +335,6 @@ class _InstrumentManagementScreenState
                   Navigator.pop(context);
                   _removeInstrument(instrument);
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

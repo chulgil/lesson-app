@@ -96,7 +96,11 @@ class StudentDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
                     '데이터를 불러오는데 실패했습니다',
@@ -595,7 +599,10 @@ class _StudentDetailContent extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.paperAccent),
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: AppColors.paperAccent,
+                  ),
                   title: Text(
                     '학생 삭제',
                     style: TextStyle(color: AppColors.paperAccent),
@@ -647,7 +654,6 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

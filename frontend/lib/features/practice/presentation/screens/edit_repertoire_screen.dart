@@ -178,7 +178,6 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                 child: const Text(AppStrings.cancel),
               ),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text(AppStrings.delete),
               ),

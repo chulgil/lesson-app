@@ -385,7 +385,9 @@ class ProfileTab extends ConsumerWidget {
           icon: const Icon(Icons.visibility_outlined, size: 18),
           label: const Text('내 프로필 미리보기'),
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.4)),
+            side: BorderSide(
+              color: AppColors.paperAccent.withValues(alpha: 0.4),
+            ),
             foregroundColor: AppColors.paperAccent,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             shape: RoundedRectangleBorder(
@@ -455,7 +457,9 @@ class ProfileTab extends ConsumerWidget {
                 value: percent / 100,
                 minHeight: 6,
                 backgroundColor: AppColors.inkQuaternary,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.paperAccent),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.paperAccent,
+                ),
               ),
             ),
             if (nextStep != null) ...[
@@ -734,7 +738,6 @@ class ProfileTab extends ConsumerWidget {
                   Navigator.pop(dialogContext);
                   await ref.read(authNotifierProvider.notifier).logout();
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('로그아웃'),
               ),
             ],

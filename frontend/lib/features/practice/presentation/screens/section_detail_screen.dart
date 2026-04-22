@@ -96,9 +96,16 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, size: 20, color: AppColors.paperAccent),
+                        Icon(
+                          Icons.delete,
+                          size: 20,
+                          color: AppColors.paperAccent,
+                        ),
                         SizedBox(width: AppSpacing.space2),
-                        Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                        Text(
+                          '삭제',
+                          style: TextStyle(color: AppColors.paperAccent),
+                        ),
                       ],
                     ),
                   ),
@@ -379,7 +386,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                     navigator.pop();
                   }
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

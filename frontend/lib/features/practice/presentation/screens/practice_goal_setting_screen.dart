@@ -228,7 +228,10 @@ class _PracticeGoalSettingScreenState
                       Center(
                         child: TextButton.icon(
                           onPressed: _showResetConfirmation,
-                          icon: Icon(Icons.refresh, color: AppColors.paperAccent),
+                          icon: Icon(
+                            Icons.refresh,
+                            color: AppColors.paperAccent,
+                          ),
                           label: Text(
                             '목표 초기화',
                             style: TextStyle(color: AppColors.paperAccent),
@@ -386,7 +389,6 @@ class _PracticeGoalSettingScreenState
                     _hasChanges = true;
                   });
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('초기화'),
               ),
             ],

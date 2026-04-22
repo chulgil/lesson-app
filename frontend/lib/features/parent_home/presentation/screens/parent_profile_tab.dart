@@ -153,7 +153,6 @@ class ParentProfileTab extends ConsumerWidget {
                   Navigator.pop(context);
                   context.go(AppRoutes.login);
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('로그아웃'),
               ),
             ],

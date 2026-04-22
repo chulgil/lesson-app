@@ -83,7 +83,10 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                   const Spacer(),
                   TextButton(
                     onPressed: _isSubmitting ? null : _delete,
-                    child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                    child: Text(
+                      '삭제',
+                      style: TextStyle(color: AppColors.paperAccent),
+                    ),
                   ),
                 ],
               ),
@@ -246,7 +249,6 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

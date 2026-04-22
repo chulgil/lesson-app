@@ -170,9 +170,7 @@ class _TeacherAvailabilityScreenState
                 Expanded(
                   child: Text(
                     helpText,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.ink,
-                    ),
+                    style: AppTypography.caption.copyWith(color: AppColors.ink),
                   ),
                 ),
               ],
@@ -300,9 +298,7 @@ class _TeacherAvailabilityScreenState
           '${schedule.startTime} - ${schedule.endTime}',
           style: AppTypography.caption.copyWith(
             color:
-                schedule.isActive
-                    ? AppColors.paperOk
-                    : AppColors.inkTertiary,
+                schedule.isActive ? AppColors.paperOk : AppColors.inkTertiary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -357,7 +353,11 @@ class _TeacherAvailabilityScreenState
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                Icon(Icons.chevron_right, size: 16, color: AppColors.paperAccent),
+                Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: AppColors.paperAccent,
+                ),
               ],
             ),
           ],
@@ -579,7 +579,9 @@ class _TeacherAvailabilityScreenState
             label: const Text('특별 일정 관리'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+              side: BorderSide(
+                color: AppColors.paperAccent.withValues(alpha: 0.3),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
@@ -727,7 +729,6 @@ class _TeacherAvailabilityScreenState
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

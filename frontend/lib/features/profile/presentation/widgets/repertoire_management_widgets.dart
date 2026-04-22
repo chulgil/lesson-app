@@ -136,11 +136,7 @@ class RepertoireEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.library_music,
-            size: 64,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.library_music, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             hasFilters ? '검색 결과가 없습니다' : '등록된 곡이 없습니다',
@@ -759,7 +755,6 @@ void showDeletePieceConfirmation({
                 Navigator.pop(dialogContext);
                 onConfirm();
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],

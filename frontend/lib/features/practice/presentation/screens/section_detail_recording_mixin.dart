@@ -365,7 +365,6 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

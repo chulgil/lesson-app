@@ -247,7 +247,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           Text(
             '오류가 발생했습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.paperAccent,
+            ),
           ),
           const SizedBox(height: AppSpacing.space4),
           TextButton(
@@ -329,7 +331,6 @@ class PracticeNoteListScreen extends ConsumerWidget {
                     );
                   }
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
