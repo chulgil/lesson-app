@@ -223,6 +223,20 @@ class AppTheme {
         selectionColor: AppColors.paperAccentSoft,
         selectionHandleColor: AppColors.paperAccent,
       ),
+
+      // Icon — Notebook × Score: 앱 전역 아이콘 기본색을 `ink` 로 고정.
+      // Material 기본 colorScheme.onSurface 를 우회해 명시적 Notebook 팔레트 선언.
+      iconTheme: const IconThemeData(color: AppColors.ink, size: 24),
+      primaryIconTheme: const IconThemeData(color: AppColors.ink),
+
+      // ListTile — Notebook × Score: icon/text 기본색 `ink`, 선택 상태는 Vermillion.
+      // 36 파일 ListTile/RadioListTile/SwitchListTile 에 일괄 적용.
+      listTileTheme: const ListTileThemeData(
+        iconColor: AppColors.ink,
+        textColor: AppColors.ink,
+        selectedColor: AppColors.paperAccent,
+        selectedTileColor: AppColors.paperAccentSoft,
+      ),
     );
   }
 
@@ -422,6 +436,18 @@ class AppTheme {
         cursorColor: AppColors.paperAccent,
         selectionColor: AppColors.paperAccentSoft,
         selectionHandleColor: AppColors.paperAccent,
+      ),
+
+      // Icon — Notebook × Score: dark 에서는 아이콘 기본색 paper.
+      iconTheme: const IconThemeData(color: AppColors.paper, size: 24),
+      primaryIconTheme: const IconThemeData(color: AppColors.paper),
+
+      // ListTile — Notebook × Score: dark 에서는 paper 기본, Vermillion 선택.
+      listTileTheme: const ListTileThemeData(
+        iconColor: AppColors.paper,
+        textColor: AppColors.textPrimaryDark,
+        selectedColor: AppColors.paperAccent,
+        selectedTileColor: AppColors.paperAccentSoft,
       ),
     );
   }
