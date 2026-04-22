@@ -635,6 +635,32 @@ Text(
 
 **은유**: SnackBar = 악보 페이지 위에 잠깐 올려놓는 쪽지. 종이(페이퍼) 위의 쪽지(ink 박스)에 Vermillion 액션 링크.
 
+### 7.17 섹션 헤더 Playfair 통일 — 매스트헤드→AppBar→섹션→곡명 위계 확립
+
+**배경**: 레슨 상세의 `LessonDetailSectionHeader` 는 "레슨 피드백 / 선생님 피드백 / 주요 포인트 / 연습 팁 / 내 메모" 5종 + `StudentMemoCard` 타이틀까지 **6곳**에서 재사용되지만, 여전히 `AppTypography.headingSmall`(Pretendard 18/w600) 로 렌더되어 상단 AppBar(Playfair) ↔ 본문 섹션(Pretendard) 사이에 서체 단절 발생. 매스트헤드·AppBar 는 Playfair, 본문 입력·바디는 Pretendard/Gaegu 인 Notebook 위계를 섹션 헤더까지 연결해야 "악보 페이지의 표제 → 악장 → 마디"로 이어지는 리듬이 완성됨.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/notebook_typography.dart` | `sectionTitle` 추가 — Playfair 17 / w600 / letterSpacing -0.2 / height 1.3. `appBarTitle`(18) 과 `pieceTitle`(16) 사이 중간 위계. | 164d2d5b |
+| `features/lessons/presentation/widgets/lesson_detail/lesson_notes_widgets.dart` | `LessonDetailSectionHeader` 타이틀이 `NotebookTypography.sectionTitle` 사용. 1-지점 수정으로 5개 섹션 + StudentMemoCard 일괄 전환. | 164d2d5b |
+
+**영향 범위**:
+- `LessonDetailSectionHeader(title: '레슨 피드백')`, `'선생님 피드백'`, `'주요 포인트'`, `'연습 팁'`, `'내 메모'` — 5종 헤더가 Playfair 서체로 전환.
+- `StudentMemoCard` 의 동일 헤더도 자동 반영.
+- 아이콘(20px Vermillion) + Playfair 17 조합으로 "악장 표제" 질감 형성.
+
+**위계 정리**:
+- `masthead` (38pt) — 페이지 최상단 타이틀
+- `appBarTitle` (18pt) — 앱바·다이얼로그 제목
+- `sectionTitle` (17pt) — 화면 내부 영역 헤더 ← **신설**
+- `pieceTitle` (16pt) — 곡명·레슨 제목
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 섹션 헤더 = 악보의 악장 표제(Andante, Allegro…). 매스트헤드가 교향곡 전체 제목이면, 섹션은 각 악장의 제목이므로 같은 Playfair 가문으로 묶되 한 단계 작은 크기로 위계 표시.
+
 ---
 
 ## 8. 구현 원칙
