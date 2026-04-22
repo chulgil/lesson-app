@@ -838,6 +838,30 @@ Text(
 
 **은유**: 교사가 한 달을 돌아볼 때 대시보드가 "악보집 끝에 붙은 월간 리포트" 처럼 느껴지도록. Playfair 로 찍은 "수익 현황 · 학생 현황 · 레슨 추이 · 연습률 TOP 5" 는 악보집 마지막 장 "이번 달 공연 결산" 섹션 제목 감각 — 숫자 본문은 여전히 읽기 편한 Noto Sans 로 남겨 가독성 희생 없이 몰입감만 강화.
 
+### 7.26 Radio 테마 통일 — 선택 링·도트까지 Vermillion, Material blue 완전 제거
+
+**배경**: §7.18 Switch, §7.15 TabBar, §7.16 SnackBar, §7.23 Popup/Dropdown, §7.24 DatePicker/TimePicker 로 대부분의 Material 기본 파랑을 Vermillion 으로 치환했지만, **Radio 위젯은 테마에서 누락** 되어 있었다. 앱 내 Radio 호출 5곳 중 2곳(`schedule_type_selector`, `lesson_time_settings_widgets`) 만 개별 `activeColor: AppColors.paperAccent` 로 오버라이드 상태이고, 나머지 3곳(`current_request_box` 템플릿 다중선택, `issue_form_membership_widgets` 수강권 선택, 기타) 은 Material blue 로 렌더되어 Notebook 팔레트에서 가장 눈에 띄는 이질 영역으로 남아 있었다. Switch 는 토글·On/Off 뉘앙스라 Vermillion 이 자연스러웠지만, Radio 는 "하나를 고르는 결정" 의 순간이라 더더욱 악보 위 붉은 연필 표시 감각이 필요하다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `radioTheme: RadioThemeData` 추가 — `fillColor` selected=paperAccent / unselected=inkQuaternary / disabled=inkTertiary, `overlayColor` pressed·hovered·focused=paperAccentSoft | 8cd2a276 |
+| `core/theme/app_theme.dart` (dark) | 동일 스펙의 dark 버전 — unselected=borderDark / disabled=textSecondaryDark. Vermillion active 유지 | 8cd2a276 |
+
+**영향 범위** (5개 Radio 호출):
+- `schedule_type_selector.dart` — 개별 레슨 / 정기 레슨 스케줄 타입 선택 (기존 activeColor override → 이제 테마로 흡수)
+- `lesson_time_settings_widgets.dart` — 레슨 시간 duration 선택 (30/45/60분)
+- `current_request_box.dart` — 선생님 수강권 제안 중 다중 템플릿에서 하나 선택 (이제 Vermillion)
+- `issue_form_membership_widgets.dart` — 수강권 발급 폼에서 멤버십 선택 (이제 Vermillion)
+- 기타 호출부 — RadioListTile 포함 3 파일
+
+**설계 포인트**: `fillColor` 는 Radio 의 외곽 링과 내부 도트를 동시에 결정한다 → selected 시 링도 Vermillion, 도트도 Vermillion 으로 두꺼운 붉은 원이 찍힌다. `overlayColor` 는 탭/호버 시 링 주변에 연한 Vermillion splash (`paperAccentSoft`) 가 번지도록 해 촉각적 피드백을 Notebook 팔레트 내에서 해결. 개별 `activeColor` override 는 남겨둬도 테마와 같은 색이므로 제거하지 않고 유지 (호환성).
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 악보집에서 연주자가 "오늘은 이 곡" 을 고를 때 연필 대신 붉은 색연필로 동그라미를 친다. 링·도트가 모두 Vermillion 이라 "선택됨" 이 한눈에 들어오고, 호버 시 번지는 연한 Vermillion splash 는 색연필이 살짝 번진 듯한 아날로그 감각.
+
 ---
 
 ## 8. 구현 원칙
