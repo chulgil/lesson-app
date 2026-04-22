@@ -237,6 +237,43 @@ class AppTheme {
         selectedColor: AppColors.paperAccent,
         selectedTileColor: AppColors.paperAccentSoft,
       ),
+
+      // PopupMenu — Notebook × Score: 메뉴 배경을 종이색, 테두리 2px ink.
+      // 21 파일의 `PopupMenuButton` / `showMenu` 호출에 일괄 적용.
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppColors.paper,
+        surfaceTintColor: AppColors.paper,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        textStyle: const TextStyle(
+          color: AppColors.ink,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // DropdownMenu — Notebook × Score: 15 파일 DropdownMenu/DropdownButton 에 적용.
+      dropdownMenuTheme: DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStateProperty.all(AppColors.paper),
+          surfaceTintColor: WidgetStateProperty.all(AppColors.paper),
+          elevation: WidgetStateProperty.all(2),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+              side: const BorderSide(color: AppColors.ink, width: 2),
+            ),
+          ),
+        ),
+        textStyle: const TextStyle(
+          color: AppColors.ink,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 
@@ -448,6 +485,42 @@ class AppTheme {
         textColor: AppColors.textPrimaryDark,
         selectedColor: AppColors.paperAccent,
         selectedTileColor: AppColors.paperAccentSoft,
+      ),
+
+      // PopupMenu — Notebook × Score: dark 에서는 surfaceDark 배경 + paper 테두리.
+      popupMenuTheme: PopupMenuThemeData(
+        color: AppColors.surfaceDark,
+        surfaceTintColor: AppColors.surfaceDark,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: const BorderSide(color: AppColors.paper, width: 2),
+        ),
+        textStyle: const TextStyle(
+          color: AppColors.textPrimaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // DropdownMenu — Notebook × Score: dark 대응.
+      dropdownMenuTheme: DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStateProperty.all(AppColors.surfaceDark),
+          surfaceTintColor: WidgetStateProperty.all(AppColors.surfaceDark),
+          elevation: WidgetStateProperty.all(2),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+              side: const BorderSide(color: AppColors.paper, width: 2),
+            ),
+          ),
+        ),
+        textStyle: const TextStyle(
+          color: AppColors.textPrimaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
