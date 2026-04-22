@@ -982,6 +982,35 @@ Text(
 
 ---
 
+### 7.32 ExpansionTile 테마 통일 — FAQ·진단·요일설정의 접기/펼치기 flat 경계
+
+**배경**: `ExpansionTile` 은 앱에서 **5 호출부 / 3 파일** 에 분포 — 학생 FAQ(`help_screen`), 녹음 파일 진단(`recording_diagnostic_screen` × 3), 선생님 레슨 시간 요일 설정(`lesson_time_settings_widgets`). 빈도는 낮지만 **Material 기본은 `primaryColor` 기반의 `iconColor`/`textColor`** 를 사용하므로 과거 보라 UI 시절의 잔재가 expand 화살표와 제목 텍스트에 남아 있었다. `help_screen` 의 FAQ 타일만 `shape: Border()`/`collapsedShape: Border()` 로 flat 경계를 손으로 맞추고 있었을 뿐, 나머지 호출부는 확장 시 Material 기본 구분선이 그어져 Card 경계와 이중으로 보이는 문제가 있었다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `frontend/lib/core/theme/app_theme.dart` | light/dark `ThemeData` 에 `expansionTileTheme: ExpansionTileThemeData` 추가. `iconColor` · `collapsedIconColor` · `textColor` · `collapsedTextColor` · `backgroundColor` · `collapsedBackgroundColor` · `shape` · `collapsedShape` 지정 | 30056f7c |
+
+**영향 범위**: 3 파일 5 호출부의 expand 화살표와 제목 기본색이 Notebook 팔레트로 자동 치환. `help_screen` 의 수동 `Border()` 설정은 이제 테마가 기본값으로 제공하므로 **중복 설정**이 되었지만 제거하지 않고 유지 (Edit 범위 최소화 — 후속 정리 여지 기록). `recording_diagnostic` 의 타이틀 `Text` 가 직접 `color: paperAccent` 를 걸어둔 경우는 override 가 우선하므로 강조가 그대로 유지된다.
+
+**설계 포인트**:
+- `iconColor: ink` · `collapsedIconColor: inkSecondary` — 펼쳐졌을 때는 본문 잉크, 접혔을 때는 한 단계 연한 잉크로 위계를 표현 (접힌 상태는 "탐색 중" 힌트, 펼친 상태는 "현재 읽는 곳" 강조).
+- `textColor` / `collapsedTextColor` 는 모두 `ink` 로 통일 — 확장 여부와 관계없이 제목의 식별력은 동일해야 FAQ/진단 타이틀을 훑어볼 때 흐름이 끊기지 않는다.
+- `backgroundColor`/`collapsedBackgroundColor` 를 `Colors.transparent` 로 지정 — Card 가 배경을 담당하는 패턴(3 파일 모두 `Card > ExpansionTile`)을 그대로 존중해 이중 배경을 피함.
+- `shape: Border()` · `collapsedShape: Border()` — 펼친 상태의 상하 구분선을 제거해 Card border 와 겹치지 않도록 함 (§7.16 SnackBar 처럼 "경계는 한 주체만 담당" 원칙).
+
+**호환성**:
+- `help_screen` 의 `shape: const Border()` 수동 override 는 테마와 값이 같아 시각 차이 없음. 제거 시 라인 수는 줄어들지만 테마 의존성을 명시적으로 드러내는 장점은 사라지므로 유지.
+- `recording_diagnostic_screen` 의 조건부 `color: paperAccent` 타이틀 (고아 파일/파일 없음 섹션) 은 override 우선으로 여전히 Vermillion 강조 — 경고성 섹션의 시각 우선순위 유지.
+- `lesson_time_settings_widgets` 의 `leading: Icon(paperOk/inkTertiary)` 는 expand 화살표가 아닌 leading 슬롯이므로 테마와 무관 — 휴무/활성 상태 구분 그대로.
+
+**검증**:
+- `flutter analyze` → `No issues found!` (10.2s)
+- `flutter test` → 392/392 passed (5s)
+
+**은유**: 악보 귀퉁이에 붙인 접을 수 있는 부록(진단 섹션·FAQ)들. 지금까지는 펼칠 때마다 책 제본선이 두 번 그어진 것처럼 보였다 — 노트의 Card 경계 한 번, Material 기본 구분선 한 번. 이제 접힘/펼침을 다루는 지휘자가 "제본선은 너희가 아니라 Card 가 긋는다" 고 선언하니, 부록은 깔끔하게 펼쳐졌다가 제자리로 돌아간다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
