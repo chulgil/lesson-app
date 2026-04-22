@@ -45,8 +45,18 @@ class AppTheme {
         titleTextStyle: NotebookTypography.appBarTitle,
       ),
 
-      // Dialog — Notebook × Score: AlertDialog 제목을 Playfair Display 로 통일.
+      // Dialog — Notebook × Score: AlertDialog 표면을 `paper` 로 승격, M3 tint/elevation 제거.
+      // 기존에는 `titleTextStyle` 만 등록되어 backgroundColor/shape/surfaceTintColor 가 M3 기본값(
+      // `surfaceContainerHigh` 회색 tint + radius 28 + elevation 6)으로 폴백됐다.
+      // 312 Dialog/AlertDialog 호출부 전반에 Notebook 질감(paper + radiusLarge + flat)을 단일 지점으로 보급.
+      // bottomSheetTheme 와 동일한 시그니처 — modal 표면 일관성 확보.
       dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
         titleTextStyle: NotebookTypography.dialogTitle,
       ),
 
@@ -519,8 +529,16 @@ class AppTheme {
         ),
       ),
 
-      // Dialog — Notebook × Score: AlertDialog 제목 Playfair (dark 테마는 color override).
+      // Dialog — Notebook × Score: dark 테마에서도 동일 설계 — AlertDialog 표면을 surfaceDark 로 승격.
+      // bottomSheetTheme(surfaceDark) 와 시그니처 통일 — 라이트/다크 전환 시 modal 표면 일관성 확보.
+      // M3 기본 tint/radius 28/elevation 6 폴백 제거, Notebook 질감(flat + radiusLarge) 유지.
       dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
         titleTextStyle: NotebookTypography.dialogTitle.copyWith(
           color: AppColors.textPrimaryDark,
         ),
