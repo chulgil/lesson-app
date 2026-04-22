@@ -274,6 +274,95 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
+
+      // DatePicker — Notebook × Score: Material 기본 blue 을 Vermillion 으로 치환.
+      // 15 파일 showDatePicker / showDateRangePicker 에 일괄 적용.
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: AppColors.paper,
+        surfaceTintColor: AppColors.paper,
+        headerBackgroundColor: AppColors.paper,
+        headerForegroundColor: AppColors.ink,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.inkTertiary;
+          }
+          return AppColors.ink;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.paperAccent;
+        }),
+        todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        todayBorder: const BorderSide(color: AppColors.paperAccent, width: 1),
+        yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.ink;
+        }),
+        yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        dividerColor: AppColors.ink,
+      ),
+
+      // TimePicker — Notebook × Score: Vermillion 선택 + paperAccentSoft 기본.
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: AppColors.paper,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        hourMinuteColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.paperAccentSoft;
+        }),
+        hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.ink;
+        }),
+        dayPeriodColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.paperAccentSoft;
+        }),
+        dayPeriodTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.ink;
+        }),
+        dialHandColor: AppColors.paperAccent,
+        dialBackgroundColor: AppColors.paperAccentSoft,
+        dialTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.ink;
+        }),
+        entryModeIconColor: AppColors.ink,
+        hourMinuteShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
     );
   }
 
@@ -520,6 +609,94 @@ class AppTheme {
           color: AppColors.textPrimaryDark,
           fontSize: 14,
           fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // DatePicker — Notebook × Score: dark 에서는 surfaceDark + paper 텍스트.
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        surfaceTintColor: AppColors.surfaceDark,
+        headerBackgroundColor: AppColors.surfaceDark,
+        headerForegroundColor: AppColors.textPrimaryDark,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppColors.paper, width: 2),
+        ),
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.textSecondaryDark;
+          }
+          return AppColors.textPrimaryDark;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.paperAccent;
+        }),
+        todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        todayBorder: const BorderSide(color: AppColors.paperAccent, width: 1),
+        yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.textPrimaryDark;
+        }),
+        yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return null;
+        }),
+        dividerColor: AppColors.paper,
+      ),
+
+      // TimePicker — Notebook × Score: dark 대응.
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppColors.paper, width: 2),
+        ),
+        hourMinuteColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.borderDark;
+        }),
+        hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.textPrimaryDark;
+        }),
+        dayPeriodColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.borderDark;
+        }),
+        dayPeriodTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.textPrimaryDark;
+        }),
+        dialHandColor: AppColors.paperAccent,
+        dialBackgroundColor: AppColors.borderDark,
+        dialTextColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.paper;
+          return AppColors.textPrimaryDark;
+        }),
+        entryModeIconColor: AppColors.paper,
+        hourMinuteShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
         ),
       ),
     );
