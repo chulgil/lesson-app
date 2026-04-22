@@ -1011,6 +1011,29 @@ Text(
 
 ---
 
+### 7.33 초대 QR 코드 카드·코드 입력 본문 제목 Playfair 통일
+
+**배경**: 선생님이 학생을 초대하거나(`invite_screen`) 학생이 선생님 코드를 입력할 때(`code_input_screen`) 나타나는 두 화면은 연결 온보딩의 핵심 길목이다. AppBar 제목은 전역 테마로 이미 Playfair 가 닿지만, **본문 안쪽의 "QR 코드" 카드 제목과 "◯◯의 초대 코드를 입력하세요" 안내 제목**은 여전히 `AppTypography.headingSmall` (Pretendard 18/w600) 로 남아 있었다. 두 화면 모두 같은 화면 안에 Vermillion 원형 아이콘 배경이 있어 본문 헤딩이 산세리프로 남으면 아이콘 원·QR 그리드의 기하 구성과 위계가 흐트러진다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/invite/presentation/screens/invite_screen.dart` | QR 코드 카드 제목 `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`. `notebook_typography` import 추가 | 30056f7c |
+| `features/invite/presentation/screens/code_input_screen.dart` | "◯◯의 초대 코드를 입력하세요" 본문 제목 `headingSmall` → `appBarTitle`. `notebook_typography` import 추가 | 30056f7c |
+
+**설계 포인트**:
+- §7.27 의 "커스텀 헤더·카드 내부 제목 = `appBarTitle` 재사용" 패턴을 QR 카드와 본문 안내 헤딩으로 확장. 두 화면 모두 같은 invite 도메인의 연속 흐름(코드 생성 → 코드 입력)이라 한 커밋으로 묶어 타이포 일관성을 유지.
+- `code_input_screen` 의 하위 안내("6자리 숫자 코드를 입력해주세요") 는 `bodyMedium` 그대로 — 제목은 Playfair 로 세리프 존재감을 주되, 부제는 본문 위계로 낮춰 단일 제목-부제 관계를 명확히 함.
+- 커밋 번호 30056f7c 는 병렬 세션의 ExpansionTile 테마 커밋과 같은 해시 — 해당 커밋에 본 두 파일 변경이 함께 staged 되어 한 커밋으로 기록됨. 문맥상 invite 도메인 변경은 별도지만, 커밋 이력 단일성을 해치지 않기 위해 이 §7.33 엔트리로 독립 기록을 남긴다.
+- 두 화면의 `CircleAvatar`/`Icon` 기하 요소는 의도적으로 제외 — 이니셜·아이콘은 기호이지 제목이 아니므로 §7.30 과 동일 원칙 유지.
+
+**검증**:
+- `flutter analyze lib/features/invite/presentation/screens/invite_screen.dart lib/features/invite/presentation/screens/code_input_screen.dart` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 오선지 앞부분의 "Tempo di Minuetto" 표기와 그 아래 "dolce" 표기. 장르·속도 표기(appBarTitle) 는 이미 세리프로 격식을 갖추고 있었지만, 본문 첫 마디 위의 연주 지시(QR 코드·본문 헤딩) 까지 같은 서체로 맞추자 비로소 한 악장이 하나의 펜으로 필사된 인상이 남는다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
