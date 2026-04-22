@@ -217,7 +217,9 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -508,7 +510,9 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 vertical: AppSpacing.space1,
               ),
               decoration: BoxDecoration(
-                color: Colors.black54,
+                // Notebook × Score: 이미지 썸네일 위 '탭하여 변경' 배지 — Material
+                // Colors.black54 대신 ink 55% alpha 토큰 사용 (§7.47 grey 이식 패턴).
+                color: AppColors.inkTertiary,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
@@ -543,7 +547,8 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 vertical: AppSpacing.space1,
               ),
               decoration: BoxDecoration(
-                color: Colors.black54,
+                // Notebook × Score: 같은 '탭하여 변경' 배지 — ink 55% alpha 토큰.
+                color: AppColors.inkTertiary,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
@@ -579,9 +584,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           const SizedBox(height: AppSpacing.space1),
           Text(
             '카메라 촬영 또는 갤러리에서 선택',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),

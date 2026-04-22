@@ -171,9 +171,11 @@ class _TimeSignatureCard extends StatelessWidget {
               Text(
                 '큰박 ${timeSignature.mainBeats}개',
                 style: AppTypography.captionSmall.copyWith(
+                  // Notebook × Score: 선택된 칩(Vermillion 배경) 위 부가 텍스트 —
+                  // Material Colors.white70 대신 paper 70% alpha (ink 75% 비선택 라인과 대칭).
                   color:
                       isSelected
-                          ? Colors.white70
+                          ? AppColors.paper.withValues(alpha: 0.7)
                           : AppColors.inkSecondary,
                 ),
               ),

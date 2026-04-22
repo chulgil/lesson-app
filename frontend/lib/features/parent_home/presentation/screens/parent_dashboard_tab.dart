@@ -404,16 +404,18 @@ class ParentDashboardTab extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.space1),
                     Row(
                       children: [
-                        const Icon(
+                        // Notebook × Score: 다크 히어로 카드 위 선생님 이름 — Material
+                        // Colors.white70 대신 paper 70% alpha 로 Notebook 팔레트 유지.
+                        Icon(
                           Icons.person_outline,
                           size: 14,
-                          color: Colors.white70,
+                          color: AppColors.paper.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           profile.teacherName!,
                           style: AppTypography.caption.copyWith(
-                            color: Colors.white70,
+                            color: AppColors.paper.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -485,7 +487,9 @@ class ParentDashboardTab extends ConsumerWidget {
               ),
               Text(
                 '토',
-                style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.paperAccent,
+                ),
               ),
             ],
           ),

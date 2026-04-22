@@ -81,10 +81,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       body: Stack(
         children: [
           // Camera preview
-          MobileScanner(
-            controller: _scannerController,
-            onDetect: _onDetect,
-          ),
+          MobileScanner(controller: _scannerController, onDetect: _onDetect),
 
           // Overlay with scan guide
           _buildScanOverlay(targetRole),
@@ -92,9 +89,11 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
           // Processing indicator
           if (_isProcessing)
             Container(
-              color: Colors.black54,
-              child: const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+              // Notebook × Score: 카메라 위 처리중 스크림 — Material Colors.black54
+              // 대신 ink 55% alpha. 인디케이터는 paper(크림) 로 Notebook 브랜드 유지.
+              color: AppColors.inkTertiary,
+              child: Center(
+                child: CircularProgressIndicator(color: AppColors.paper),
               ),
             ),
         ],
@@ -120,11 +119,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               child: Stack(
                 children: [
                   // Corner decorations
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    child: _buildCorner(true, true),
-                  ),
+                  Positioned(top: 0, left: 0, child: _buildCorner(true, true)),
                   Positioned(
                     top: 0,
                     right: 0,
@@ -152,7 +147,9 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
             margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space6),
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: Colors.black54,
+              // Notebook × Score: 카메라 프리뷰 위 안내 패널 — Material Colors.black54
+              // 대신 ink 55% alpha. 스크림 계열은 §7.47 패턴으로 통일.
+              color: AppColors.inkTertiary,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Column(
@@ -169,7 +166,8 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
                 Text(
                   'QR 코드가 프레임 안에 들어오도록 해주세요',
                   style: AppTypography.bodySmall.copyWith(
-                    color: Colors.white70,
+                    // 안내 서브텍스트 — Material Colors.white70 → paper 70% alpha.
+                    color: AppColors.paper.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -207,18 +205,22 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       height: 30,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop
-              ? BorderSide(color: AppColors.paperAccent, width: 4)
-              : BorderSide.none,
-          bottom: !isTop
-              ? BorderSide(color: AppColors.paperAccent, width: 4)
-              : BorderSide.none,
-          left: isLeft
-              ? BorderSide(color: AppColors.paperAccent, width: 4)
-              : BorderSide.none,
-          right: !isLeft
-              ? BorderSide(color: AppColors.paperAccent, width: 4)
-              : BorderSide.none,
+          top:
+              isTop
+                  ? BorderSide(color: AppColors.paperAccent, width: 4)
+                  : BorderSide.none,
+          bottom:
+              !isTop
+                  ? BorderSide(color: AppColors.paperAccent, width: 4)
+                  : BorderSide.none,
+          left:
+              isLeft
+                  ? BorderSide(color: AppColors.paperAccent, width: 4)
+                  : BorderSide.none,
+          right:
+              !isLeft
+                  ? BorderSide(color: AppColors.paperAccent, width: 4)
+                  : BorderSide.none,
         ),
       ),
     );
@@ -255,12 +257,15 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
         if (parsed.type == _QrType.academy) {
           // Navigate to academy detail screen
           if (mounted) {
-            context.push(AppRoutes.academyDetail.replaceFirst(':id', parsed.value));
+            context.push(
+              AppRoutes.academyDetail.replaceFirst(':id', parsed.value),
+            );
           }
         } else if (parsed.type == _QrType.invite) {
           // Look up the invite
-          final invite =
-              await ref.read(inviteByCodeProvider(parsed.value).future);
+          final invite = await ref.read(
+            inviteByCodeProvider(parsed.value).future,
+          );
 
           if (invite != null && invite.isValid) {
             if (mounted) {
