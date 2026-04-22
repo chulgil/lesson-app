@@ -10,6 +10,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -184,7 +185,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       ),
       child: Column(
         children: [
-          Text('QR 코드', style: AppTypography.headingSmall),
+          // Notebook × Score: QR 코드 카드 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
+          Text('QR 코드', style: NotebookTypography.appBarTitle),
           const SizedBox(height: AppSpacing.space3),
           QrImageView(
             data: invite.qrCodeData,

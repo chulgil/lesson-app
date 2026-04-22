@@ -229,6 +229,21 @@ class AppTheme {
         brightness: Brightness.light,
       ),
 
+      // ExpansionTile — Notebook × Score: FAQ/진단/요일설정 등 접기/펼치기 타일을 flat 한 잉크 경계로 통일.
+      // Material 기본은 primaryColor(보라) 기반의 iconColor/textColor 를 사용해 구형 보라 UI 잔재가 남는 문제가 있었음.
+      // shape/collapsedShape 를 Border() 로 지정해 펼쳤을 때 상하 구분선을 제거 (Card 가 경계를 담당).
+      // backgroundColor/collapsedBackgroundColor 는 투명 — Card 배경이 그대로 노출되도록 함.
+      expansionTileTheme: const ExpansionTileThemeData(
+        iconColor: AppColors.ink,
+        collapsedIconColor: AppColors.inkSecondary,
+        textColor: AppColors.ink,
+        collapsedTextColor: AppColors.ink,
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        shape: Border(),
+        collapsedShape: Border(),
+      ),
+
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.ink,
@@ -626,6 +641,19 @@ class AppTheme {
         pressElevation: 0,
         side: const BorderSide(color: AppColors.borderDark, width: 1),
         brightness: Brightness.dark,
+      ),
+
+      // ExpansionTile — Notebook × Score: dark 테마에서 Card 위 flat ExpansionTile.
+      // 아이콘/텍스트는 textPrimaryDark 계열로, 접힌 화살표만 textSecondaryDark 로 한 단계 낮춰 위계 표현.
+      expansionTileTheme: const ExpansionTileThemeData(
+        iconColor: AppColors.textPrimaryDark,
+        collapsedIconColor: AppColors.textSecondaryDark,
+        textColor: AppColors.textPrimaryDark,
+        collapsedTextColor: AppColors.textPrimaryDark,
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        shape: Border(),
+        collapsedShape: Border(),
       ),
 
       // Progress Indicator

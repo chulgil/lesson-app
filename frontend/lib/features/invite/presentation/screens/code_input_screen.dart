@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -83,15 +84,20 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.dialpad, size: 40, color: AppColors.paperAccent),
+                child: Icon(
+                  Icons.dialpad,
+                  size: 40,
+                  color: AppColors.paperAccent,
+                ),
               ),
 
               const SizedBox(height: AppSpacing.space6),
 
               // Title
+              // Notebook × Score: 초대 코드 입력 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
               Text(
                 '$targetRole의 초대 코드를 입력하세요',
-                style: AppTypography.headingSmall,
+                style: NotebookTypography.appBarTitle,
                 textAlign: TextAlign.center,
               ),
 
@@ -120,7 +126,11 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 16, color: AppColors.paperAccent),
+                    Icon(
+                      Icons.error_outline,
+                      size: 16,
+                      color: AppColors.paperAccent,
+                    ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       _errorMessage!,
