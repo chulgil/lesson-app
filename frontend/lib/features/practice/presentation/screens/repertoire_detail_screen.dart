@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/section_sort_type.dart';
@@ -148,7 +149,8 @@ class _RepertoireDetailScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('연습 통계', style: AppTypography.headingSmall),
+        // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+        Text('연습 통계', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -242,7 +244,8 @@ class _RepertoireDetailScreenState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('섹션 목록', style: AppTypography.headingSmall),
+            // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+            Text('섹션 목록', style: NotebookTypography.sectionTitle),
             TextButton.icon(
               onPressed: () {
                 context.push(
@@ -544,11 +547,7 @@ class _SectionListTile extends StatelessWidget {
               ),
 
               const SizedBox(width: AppSpacing.space2),
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.inkTertiary,
-                size: 20,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
             ],
           ),
         ),
@@ -614,10 +613,7 @@ class _ReorderableSectionTile extends StatelessWidget {
                 horizontal: AppSpacing.space2,
                 vertical: AppSpacing.space3,
               ),
-              child: Icon(
-                Icons.drag_handle,
-                color: AppColors.inkTertiary,
-              ),
+              child: Icon(Icons.drag_handle, color: AppColors.inkTertiary),
             ),
           ),
 

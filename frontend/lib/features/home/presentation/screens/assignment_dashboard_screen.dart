@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../providers/assignment_summary_provider.dart';
 
 /// Full assignment dashboard with all students' weekly progress.
@@ -292,7 +293,8 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+        Text(title, style: NotebookTypography.sectionTitle),
         const SizedBox(width: AppSpacing.space2),
         Text(
           count,
