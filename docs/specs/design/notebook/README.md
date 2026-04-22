@@ -1568,6 +1568,44 @@ Text(
 
 ---
 
+### 7.49 수강권 목록·레슨 정책 요약 섹션 제목 Playfair 통일 — copyWith 색상 변형 배치
+
+**배경**: §7.48 에서 "copyWith 류는 별도 그룹" 으로 보류했던 색상 오버라이드 섹션 제목을 정리하는 배치. §7.17 sectionTitle 의 **color override variant** 만 모아 처리해, 상태별 강조(Vermillion·ink·inkTertiary)를 보존하면서 서체만 Playfair 로 승격했다.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 전파 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/subscription/presentation/screens/subscription_list_screen.dart` | 헬퍼 | `_buildSectionHeader(title, {color})` 본체 | `AppTypography.headingSmall.copyWith(color: ...)` | `NotebookTypography.sectionTitle.copyWith(color: color ?? ink)` | 3 호출부 |
+| 〃 (호출부 1) | ~97 | "진행 중" | — | ink (default) | 헬퍼 경유 |
+| 〃 (호출부 2) | ~116 | "만료 임박" | — | paperAccent (Vermillion) | 헬퍼 경유 |
+| 〃 (호출부 3) | ~135 | "만료됨" | — | inkTertiary | 헬퍼 경유 |
+| `frontend/lib/features/subscription/presentation/screens/lesson_policy_screen.dart` | 315 | "📋 정책 요약" | `AppTypography.headingSmall.copyWith(color: paperAccent)` | `NotebookTypography.sectionTitle.copyWith(color: paperAccent)` | 직접 |
+
+실질적으로 섹션 제목 **4건**이 Playfair 로 전환됐으며, 그 중 3건은 헬퍼 1곳 수정으로 연쇄 반영됐다.
+
+**설계 포인트**:
+- **copyWith 변형 처리 원칙**: `AppTypography.headingSmall.copyWith(color: X)` 형태는 "기본 스타일에 상태별 색을 덧씌운 섹션 제목" 으로 해석한다. `NotebookTypography.sectionTitle.copyWith(color: X)` 로 치환하면 Playfair 글리프·17px·w600 은 §7.17 표준을 따르고, 색상 `X` 만 그대로 보존된다. copyWith 의 **덮어쓰기 의미론** 덕분에 부모 스타일 교체가 non-breaking.
+- **헬퍼 전파의 재확인**: §7.45 에서 확립된 "헬퍼 1곳 → N 호출부 일괄 반영" 원칙이 가장 효과적으로 작동한 배치. `_buildSectionHeader(title, {Color? color})` 는 수강권 상태 3개(active/expiringSoon/expired)에 각각 다른 색을 전달하는 설계였고, 헬퍼 본체의 스타일 루트를 Playfair 로 바꾸는 것만으로 3개 상태의 섹션 헤더가 동시에 승격됐다.
+- **§7.30 제외 roster 확장 — 빈 상태 헤드라인**: 본 배치에서 **건드리지 않은** 같은 파일 내 `headingSmall` 사용처는 모두 빈 상태 헤드라인이다. 향후 배치 판정 기준으로 명시:
+  - `subscription_list_screen:285` "등록된 수강권이 없습니다"
+  - `subscription_list_screen:316` "등록된 레슨이 없습니다"
+  - `parent_payments_tab:503` "등록된 자녀가 없습니다"
+  - `parent_payments_tab:568` "등록된 수강권이 없습니다"
+
+  이들은 "정보 부재 안내" 로 카드·페이지 섹션 제목과는 문맥이 다르다. Playfair 의 serif 격식은 "빈 장부에 대한 친근한 안내" 와 톤이 맞지 않아 §7.30 제외 roster 에 준하는 정책 대기 항목으로 분류.
+- **§7.30 제외 roster 확장 — 가격/숫자 값**: `proposal_confirm_screen:253 _formatPrice(price)`, `proposal_detail_screen:443 template.formattedPrice`, `renewal_detail_screen:334 template.formattedPrice` 는 모두 headingSmall 로 렌더되는 **금액 숫자** 다. 동적 값 stat(§7.30 제외 원칙 적용) 과 동치이며, 금액은 Inter sans-serif(tabular-nums) 유지가 오히려 판독성에 유리. 보류.
+- **스코프 격리**: 작업 트리에 평행 세션의 `prompt_plan.md` 와 `.claude/harness-signals/`·`.claude/hooks/README.md`·`.claude/hooks/task-created-validate.sh`·`.mcp.json` 이 unstaged/untracked 로 남아 있었다. `git reset HEAD` 후 2개 파일만 명시적으로 add, `git diff --cached --stat` 로 스코프 재확인.
+- **PostToolUse 포매터 부수효과**: `subscription_list_screen.dart` 는 포매터가 파일 전체를 재정렬 (166라인 변경됨). 실제 의미 변경은 import 1줄 + 주석 1줄 + 스타일 1줄뿐이고 나머지는 dart format 의 whitespace/줄바꿈 조정. `git diff --cached | grep -E "notebook|sectionTitle|headingSmall"` 로 4줄만 필터링해 의미 변경 검증.
+
+**검증**:
+- `flutter analyze` 2 files → No issues found (4.0s)
+- Lore commit: `a6d19212`
+
+**은유**: 같은 주제(수강권 상태) 를 색만 바꿔 반복하는 장부가 있다면 — 활자를 상태마다 다시 골라 찍을 필요가 없다. 장부의 "소제목 양식" 이라는 거푸집(헬퍼) 하나를 바꾸면, 어떤 색으로 찍든 서체는 이미 Playfair 다. 오늘은 거푸집 하나를 교체해 세 가지 상태(진행·임박·만료) 의 제목이 동시에 격상됐다. copyWith 는 거푸집의 "덮어쓰기 서랍" 이다 — 서체는 새 표준으로, 색은 기존 상태표기 그대로.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
