@@ -178,6 +178,20 @@ class AppTheme {
         color: AppColors.ink,
         linearTrackColor: AppColors.inkQuaternary,
       ),
+
+      // SnackBar — Notebook × Score: ink 배경 + paper 텍스트 + Vermillion 액션.
+      // 앱 전반 알림의 4대 시그니처 통일 (Material 기본 회색 SnackBar 제거).
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.ink,
+        contentTextStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.paper,
+        ),
+        actionTextColor: AppColors.paperAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+      ),
     );
   }
 
@@ -335,6 +349,19 @@ class AppTheme {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.paper,
         linearTrackColor: AppColors.borderDark,
+      ),
+
+      // SnackBar — Notebook × Score: dark 테마는 surfaceDark 배경 + paper 텍스트. 액션은 Vermillion 유지.
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        contentTextStyle: AppTypography.bodyMedium.copyWith(
+          color: AppColors.textPrimaryDark,
+        ),
+        actionTextColor: AppColors.paperAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
       ),
     );
   }
