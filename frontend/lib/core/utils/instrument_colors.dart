@@ -6,7 +6,7 @@ class InstrumentColors {
   InstrumentColors._();
 
   static const _colorMap = <String, InstrumentColorPair>{
-    '바이올린': InstrumentColorPair(Color(0xFFEDE7F6), Color(0xFF6B5B95)),
+    '바이올린': InstrumentColorPair(Color(0xFFF2ECDD), Color(0xFF9B1B12)),
     '피아노': InstrumentColorPair(Color(0xFFE3F2FD), Color(0xFF1976D2)),
     '첼로': InstrumentColorPair(Color(0xFFFFF3E0), Color(0xFFF57C00)),
     '플루트': InstrumentColorPair(Color(0xFFE8F5E9), Color(0xFF388E3C)),
