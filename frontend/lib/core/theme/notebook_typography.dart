@@ -95,6 +95,17 @@ class NotebookTypography {
     height: 1.2,
   );
 
+  /// 다이얼로그 타이틀 — Playfair Display 19 / w700.
+  /// 전역 `dialogTheme.titleTextStyle` 에 적용되어 AlertDialog 제목 전체를 통일.
+  /// AppBar 타이틀과 시각 위계를 맞추기 위해 약간 큰 19pt + 조금 타이트한 height.
+  static TextStyle get dialogTitle => GoogleFonts.playfairDisplay(
+    fontSize: 19,
+    fontWeight: FontWeight.w700,
+    color: AppColors.ink,
+    letterSpacing: 0,
+    height: 1.25,
+  );
+
   /// "Fine." 푸터 라벨 — italic serif.
   static TextStyle get fine => GoogleFonts.playfairDisplay(
     fontSize: 15,

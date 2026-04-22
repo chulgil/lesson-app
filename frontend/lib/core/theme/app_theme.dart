@@ -45,6 +45,11 @@ class AppTheme {
         titleTextStyle: NotebookTypography.appBarTitle,
       ),
 
+      // Dialog — Notebook × Score: AlertDialog 제목을 Playfair Display 로 통일.
+      dialogTheme: DialogThemeData(
+        titleTextStyle: NotebookTypography.dialogTitle,
+      ),
+
       // Card
       cardTheme: CardThemeData(
         elevation: 0,
@@ -135,6 +140,18 @@ class AppTheme {
         unselectedLabelStyle: AppTypography.caption,
       ),
 
+      // TabBar — Notebook × Score: Vermillion 인디케이터 + ink 보조색. 특수 override(흰색, pill) 는 개별 화면에서 유지.
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.paperAccent,
+        unselectedLabelColor: AppColors.inkSecondary,
+        indicatorColor: AppColors.paperAccent,
+        labelStyle: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: AppTypography.bodyMedium,
+        dividerColor: AppColors.inkQuaternary,
+      ),
+
       // Divider
       dividerTheme: const DividerThemeData(
         color: AppColors.inkQuaternary,
@@ -197,6 +214,13 @@ class AppTheme {
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: NotebookTypography.appBarTitle.copyWith(
+          color: AppColors.textPrimaryDark,
+        ),
+      ),
+
+      // Dialog — Notebook × Score: AlertDialog 제목 Playfair (dark 테마는 color override).
+      dialogTheme: DialogThemeData(
+        titleTextStyle: NotebookTypography.dialogTitle.copyWith(
           color: AppColors.textPrimaryDark,
         ),
       ),
@@ -272,6 +296,18 @@ class AppTheme {
         elevation: 0,
         selectedLabelStyle: AppTypography.caption,
         unselectedLabelStyle: AppTypography.caption,
+      ),
+
+      // TabBar — Notebook × Score: Vermillion 인디케이터는 dark 에서도 유지. 라벨색만 dark palette 로 override.
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.paperAccent,
+        unselectedLabelColor: AppColors.textSecondaryDark,
+        indicatorColor: AppColors.paperAccent,
+        labelStyle: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: AppTypography.bodyMedium,
+        dividerColor: AppColors.borderDark,
       ),
 
       // Divider
