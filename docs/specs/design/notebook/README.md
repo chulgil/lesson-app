@@ -1706,6 +1706,56 @@ Text(
 
 ---
 
+### 7.53 Material `Colors.white.withValues(alpha:)` 38건 → Notebook `AppColors.paper.withValues(alpha:)` 일괄 치환
+
+**맥락**: §7.50 에서 `Colors.black54`/`Colors.white70` 8건을 ink·paper alpha 래더에 편입한 뒤, 같은 원리를 **`Colors.white.withValues(alpha:)` alpha 변형 전체** 에 확장. §7.50 본문에서 "Candidate B: withValues(alpha:) 내부 Material Colors 혼재 감사" 로 이월했던 항목을 이번 배치로 해소. features/ 전수 스캔 결과 정확히 38건이 14개 파일에 분포, 전량 `AppColors.paper.withValues(alpha:)` 로 alpha 값 유지한 채 토큰만 교체.
+
+**교훈**: §7.50 에서 "회색 톤 = ink at alpha, 밝은 톤 = paper at alpha" 원리를 세웠지만, **`Colors.white.withValues` 형태는 `Colors.white70` 과 동일 계열인데 표기법만 다르다**. 동일 원리 다른 표기법은 같은 cycle 에 묶어야 "일부만 치환" 을 피할 수 있음. 이번 배치는 `white70` 직계 + `withValues(alpha:)` 변형을 한 래더로 흡수.
+
+**매핑 원칙** (§7.50 연장):
+| Material 색상 | Notebook 토큰 | alpha 값 |
+|---|---|---|
+| `Colors.white.withValues(alpha: N)` | `AppColors.paper.withValues(alpha: N)` | 원본 alpha 값 그대로 (0.1~0.9 범위) |
+
+alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material 의 "흰색 투명도 N" 이 Notebook 에선 "크림 종이 투명도 N" 으로 직결.
+
+**변경 파일 (14개, 38건)**:
+- `features/search/presentation/screens/teacher_detail_screen.dart` (1건) — CircleAvatar 배경
+- `features/search/presentation/screens/academy_detail_screen.dart` (1건) — 아카데미 상세 컨테이너 배경
+- `features/practice/presentation/widgets/metronome/metronome_full_screen_modal.dart` (1건) — 선택된 서브디비전 라벨
+- `features/gamification/presentation/widgets/gamification_header.dart` (6건) — 레벨 배지/칩 배경/스탯 배경/진행바 배경/주간 스탯
+- `features/profile/presentation/widgets/extended_profile_widgets.dart` (4건) — 프로필 완성도 헤더
+- `features/profile/presentation/screens/profile_tab.dart` (2건) — 스탯 캡션/구분선
+- `features/parent_home/presentation/screens/parent_assignments_tab.dart` (3건) — 과제 카드
+- `features/parent_home/presentation/screens/parent_dashboard_tab.dart` (3건) — CircleAvatar 배경 + 스탯 배경
+- `features/practice/presentation/widgets/section_detail/recording_control.dart` (1건) — `waveColor`. **훅 `dart format` 자동 적용으로 148줄 diff 발생 — 의미 변경은 1건, 나머지는 순수 포매팅(삼항 전개/trailing comma 정규화)**
+- `features/profile/presentation/screens/profile_preview_screen.dart` (2건) — 프리뷰 헤더/스탯
+- `features/profile/presentation/screens/outstanding_payments_screen.dart` (2건) — 미수금 그라디언트 위 텍스트
+- `features/practice/presentation/widgets/waveform/zoomable_waveform.dart` (2건) — 뷰포트 사각형 paint
+- `features/students/presentation/screens/student_detail_screen.dart` (3건) — TabBar 비선택/배지 보더/악기 칩
+- `features/practice/presentation/widgets/practice_streak_card.dart` (7건) — 스트릭 카드 텍스트/주간 점
+
+**검증**:
+- `flutter analyze lib/` → No issues found (12.7s)
+- `flutter test` → 392/392 passed
+- grep `Colors\.white\.withValues` features/ → 2 matches (둘 다 `tuner_cat_painters.dart` 일러스트 빔 — §7.47/§7.50 에서 회화적 예외로 제외 명시, 이 배치에서도 유지)
+- 코드 커밋: `2853d51b` (14 files changed, 162 insertions, 133 deletions — 순수 변경은 38건이고 나머지는 recording_control 포매팅)
+
+**스코프 분리 (의도적 누락)**:
+- `Colors.white` 단독 19건 — Vermillion 위 paper 표기로 일괄 치환할지, "절대 백색" 의미가 있는 경우(이미지 플레이스홀더/카메라 UI) 별도 판정할지 Cycle 25 Candidate A 로 이월.
+- `Colors.black` / `Colors.black.withValues(alpha:)` — Cycle 25 Candidate B. 스크림 검정은 §7.50 에서 `inkTertiary`(55%) 로 매핑했으나, 불투명 검정/alpha 가 1.0 에 가까운 경우 Notebook ink(`#14161C`, 완전 검정 아님) 와 시각 차이 발생. 별도 감사 필요.
+- `instrument_colors.dart` 13개 악기별 hex 팔레트 — post-edit 훅이 `Color(0x` 패턴을 차단. 훅 스킵 등록(프로젝트 설정 변경)은 Cycle 25 Candidate C.
+
+**§7.50 패턴 재확인 — alpha 래더의 완결**:
+이번 cycle 로 Notebook 의 "ink/paper 두 뿌리 + alpha 래더" 가 Material `white` 계열을 전량 흡수. 남은 Material 잔재는 **단색**(`Colors.white`, `Colors.black`) 과 **팔레트 배열**(악기별 hex) 뿐이며, alpha 변형은 더 이상 features/ 에 존재하지 않는다. 회색·흰색·검정의 "투명도가 있는 중간톤" 은 모두 `ink.withValues(alpha: N)` 또는 `paper.withValues(alpha: N)` 로 수렴.
+
+**훅 부산물 (비의미적)**:
+`recording_control.dart` 의 148줄 diff 중 147줄은 post-edit 훅이 `dart format` 을 파일 전체에 재실행하며 발생한 **순수 포매팅**(이전 코드의 스타일 드리프트 교정). 로직 변경은 1줄(`waveColor`). 이는 훅이 강제하는 프로젝트 컨벤션의 비의미적 부산물로 수용.
+
+**은유**: 장부 위에 비단 한 자락을 덮으면 글자가 반쯤 보인다 — Material 에선 "흰색 비단 70%", Notebook 에선 "크림 종이 70%". 같은 비단이 색조만 다를 뿐, 투명도 자체는 의미가 있어 그대로 유지된다. 오늘 14장의 장부 위에 덮인 38조각의 흰색 비단이 일제히 크림 비단으로 교체됐다. alpha 래더 — 100%→90%→80%→...→10% — 가 이제 두 뿌리(`ink`·`paper`) 의 줄기를 따라 매끈하게 이어진다. Material 의 수백 가지 투명 흰색 변형은 Notebook 에서 단 한 줄의 `AppColors.paper.withValues(alpha: N)` 호출로 귀결한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
