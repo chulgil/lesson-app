@@ -594,6 +594,27 @@ Text(
 
 **은유**: AppBar 타이틀 = 악보 페이지 상단의 곡 제목(Playfair serif).
 
+### 7.15 TabBar + Dialog 테마 통일 — 전역 1-지점으로 4대 시그니처 마감
+
+**배경**: 상단(AppBar) · 하단(BottomNav) · 본문(Gaegu/Playfair) 이 통일됐지만 **중간 계층(TabBar · AlertDialog)** 이 여전히 도메인별 개별 override 또는 Material 기본값(파란색) 으로 산재. Vermillion 인디케이터를 5곳이 각자 지정하고, `tip_template_management_screen` 은 override 가 없어 Material 기본 파란색 TabBar 를 렌더. 테마 한 지점을 손대서 기본값 자체를 Notebook × Score 로 만들어 개별 override 를 최소화.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/notebook_typography.dart` | `dialogTitle` 스타일 신설 — Playfair Display 19 / w700 / letterSpacing 0 / height 1.25 (AppBar 18 보다 살짝 큼) | 51ef70f8 |
+| `core/theme/app_theme.dart` (light/dark) | `tabBarTheme` 추가 — labelColor/indicator = `paperAccent`, unselected = `inkSecondary`(light)/`textSecondaryDark`(dark), 라벨은 `bodyMedium` w600 | 51ef70f8 |
+| `core/theme/app_theme.dart` (light/dark) | `dialogTheme` 추가 — `titleTextStyle = NotebookTypography.dialogTitle` (dark 는 `textPrimaryDark` color override) | 51ef70f8 |
+
+**영향 범위**:
+- TabBar 를 사용하는 전 화면 (follow_list, teacher_subscription_list, teacher_search, payment_management, lesson_detail 등). 기존 `paperAccent` override 5곳은 그대로 작동(테마 기본값과 동일) + `tip_template_management_screen` 의 Material 기본 파란색 자동 수정.
+- AlertDialog 를 사용하는 전 화면 (확인/경고 다이얼로그 수십 곳) — 제목이 Playfair 로 일괄 변경.
+- 특수 override(학생 상세 흰색 TabBar, 스케줄 변경 pill 인디케이터) 는 개별 화면에서 그대로 유지됨.
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: TabBar 인디케이터 = 악보에서 현재 섹션을 짚는 Vermillion 연필 자국. Dialog 제목 = 페이지 상단 악장 표기.
+
 ---
 
 ## 8. 구현 원칙
