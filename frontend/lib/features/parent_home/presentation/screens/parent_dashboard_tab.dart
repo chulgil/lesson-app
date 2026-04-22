@@ -454,7 +454,7 @@ class ParentDashboardTab extends ConsumerWidget {
             icon: Icons.local_fire_department,
             label: '연습 스트릭',
             value: '12일',
-            color: AppColors.secondary,
+            color: AppColors.paperAccent,
           ),
         ),
       ],

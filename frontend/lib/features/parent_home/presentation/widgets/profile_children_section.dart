@@ -233,7 +233,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   // Option 2: Connect existing student
                   AddChildOption(
                     icon: Icons.link,
-                    iconColor: AppColors.secondary,
+                    iconColor: AppColors.paperAccent,
                     title: '기존 학생 연결',
                     description: '초대 코드로 만 14세 이상 학생 계정 연결',
                     onTap: () {

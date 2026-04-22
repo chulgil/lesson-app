@@ -220,7 +220,7 @@ class _TeacherDashboardScreenState
               child: StatCard(
                 title: '월 수입',
                 value: formatWonWithComma(stats.totalRevenue),
-                color: AppColors.secondary,
+                color: AppColors.paperAccent,
                 icon: Icons.payments_outlined,
               ),
             ),

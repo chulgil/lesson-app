@@ -142,7 +142,7 @@ class RepertoireStatsList extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.paperAccent, AppColors.secondary],
+                            colors: [AppColors.paperAccent, AppColors.paperAccent],
                           ),
                           borderRadius: BorderRadius.circular(3),
                         ),

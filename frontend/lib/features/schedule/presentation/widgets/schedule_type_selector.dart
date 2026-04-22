@@ -230,15 +230,15 @@ class ExperienceLevelSelector extends StatelessWidget {
                 if (selected) onLevelSelected(level);
               },
               backgroundColor: AppColors.paper,
-              selectedColor: AppColors.secondary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.secondary,
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isSelected ? AppColors.secondary : AppColors.inkQuaternary,
+                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
                     isSelected
-                        ? AppColors.secondary
+                        ? AppColors.paperAccent
                         : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

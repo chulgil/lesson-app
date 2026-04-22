@@ -537,7 +537,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               gradient: LinearGradient(
                 colors: [
                   AppColors.paperAccent.withValues(alpha: 0.08),
-                  AppColors.secondary.withValues(alpha: 0.08),
+                  AppColors.paperAccent.withValues(alpha: 0.08),
                 ],
               ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

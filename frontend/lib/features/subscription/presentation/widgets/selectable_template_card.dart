@@ -80,7 +80,7 @@ class SelectableTemplateCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.15),
+                        color: AppColors.paperAccent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusSmall,
                         ),
@@ -88,7 +88,7 @@ class SelectableTemplateCard extends StatelessWidget {
                       child: Text(
                         '⭐ 추천',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

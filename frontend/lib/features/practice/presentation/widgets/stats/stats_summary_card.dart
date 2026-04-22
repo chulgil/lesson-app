@@ -75,7 +75,7 @@ class StatsSummaryCard extends StatelessWidget {
                   icon: Icons.check_circle,
                   label: '완료율',
                   value: '${report.completionPercent}%',
-                  color: AppColors.secondary,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ],

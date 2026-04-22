@@ -412,7 +412,7 @@ class _TipTemplateBottomSheetState
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.1),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusSmall,
                         ),
@@ -420,7 +420,7 @@ class _TipTemplateBottomSheetState
                       child: Text(
                         template.instrument!,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

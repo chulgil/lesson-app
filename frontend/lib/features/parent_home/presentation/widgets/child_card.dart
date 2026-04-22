@@ -114,7 +114,7 @@ class ChildCard extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.1),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
                         ),
@@ -125,13 +125,13 @@ class ChildCard extends ConsumerWidget {
                           Icon(
                             Icons.payment,
                             size: 14,
-                            color: AppColors.secondary,
+                            color: AppColors.paperAccent,
                           ),
                           const SizedBox(width: AppSpacing.space1),
                           Text(
                             '청구 대상',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -171,7 +171,7 @@ class ChildCard extends ConsumerWidget {
                     icon: Icons.local_fire_department,
                     label: '연습 스트릭',
                     value: '5일',
-                    color: AppColors.secondary,
+                    color: AppColors.paperAccent,
                   ),
                 ],
               ),

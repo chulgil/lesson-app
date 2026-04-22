@@ -80,13 +80,13 @@ class AvailabilityBookingPreview extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    color: AppColors.paperAccent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '⭐ 평소 시간',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

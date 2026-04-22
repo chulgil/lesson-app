@@ -188,7 +188,7 @@ class _RepertoireDetailScreenState
                 icon: Icons.library_music,
                 label: '섹션 수',
                 value: '${stats.sectionCount}개',
-                color: AppColors.secondary,
+                color: AppColors.paperAccent,
               ),
             ),
           ],

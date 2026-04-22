@@ -272,13 +272,13 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
             const SizedBox(height: AppSpacing.space3),
             Row(
               children: [
-                Icon(Icons.info_outline, size: 14, color: AppColors.secondary),
+                Icon(Icons.info_outline, size: 14, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space1),
                 Expanded(
                   child: Text(
                     '10:00 예약 시 10:30 슬롯은 자동으로 막힘',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),

@@ -186,7 +186,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.paperAccent.withValues(alpha: 0.1),
-            AppColors.secondary.withValues(alpha: 0.1),
+            AppColors.paperAccent.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

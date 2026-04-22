@@ -270,7 +270,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 hasSchedules
                     ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : isWeekend
-                    ? AppColors.secondary.withValues(alpha: 0.1)
+                    ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
@@ -283,7 +283,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                     hasSchedules
                         ? AppColors.paperAccent
                         : isWeekend
-                        ? AppColors.secondary
+                        ? AppColors.paperAccent
                         : AppColors.inkSecondary,
               ),
             ),

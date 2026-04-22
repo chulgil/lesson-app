@@ -191,9 +191,8 @@ class _TeacherDetailContent extends ConsumerWidget {
                             .map(
                               (i) => Chip(
                                 label: Text(i),
-                                backgroundColor: AppColors.paperAccent.withValues(
-                                  alpha: 0.1,
-                                ),
+                                backgroundColor: AppColors.paperAccent
+                                    .withValues(alpha: 0.1),
                                 labelStyle: AppTypography.bodySmall.copyWith(
                                   color: AppColors.paperAccent,
                                 ),
@@ -247,10 +246,10 @@ class _TeacherDetailContent extends ConsumerWidget {
                               .map(
                                 (t) => Chip(
                                   label: Text(_getLessonTypeLabel(t)),
-                                  backgroundColor: AppColors.secondary
+                                  backgroundColor: AppColors.paperAccent
                                       .withValues(alpha: 0.1),
                                   labelStyle: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.secondary,
+                                    color: AppColors.paperAccent,
                                   ),
                                 ),
                               )
@@ -411,9 +410,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                           cert.issuingBody,
                                           style: AppTypography.bodySmall
                                               .copyWith(
-                                                color:
-                                                    AppColors
-                                                        .textSecondaryLight,
+                                                color: AppColors.inkSecondary,
                                               ),
                                         ),
                                       ],
@@ -566,9 +563,7 @@ class _TeacherDetailContent extends ConsumerWidget {
         // Info text
         Text(
           '선생님에게 레슨 신청서가 전달됩니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
           textAlign: TextAlign.center,
         ),
       ],

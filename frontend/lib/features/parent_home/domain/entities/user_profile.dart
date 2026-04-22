@@ -46,7 +46,7 @@ enum ProfileType {
       case ProfileType.student:
         return AppColors.paperOk;
       case ProfileType.child:
-        return AppColors.secondary;
+        return AppColors.paperAccent;
     }
   }
 }

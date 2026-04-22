@@ -65,7 +65,7 @@ class MockStudentRepository implements StudentRepository {
         isActive: true,
         monthlyFee: 160000,
         lessonsPerWeek: 1,
-        profileColor: AppColors.secondary,
+        profileColor: AppColors.paperAccent,
         createdAt: now.subtract(const Duration(days: 60)),
         phone: '010-2345-6789',
         email: 'seoyeon.lee@example.com',

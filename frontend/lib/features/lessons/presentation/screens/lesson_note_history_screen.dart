@@ -336,7 +336,7 @@ class _NoteCard extends StatelessWidget {
                   Icon(
                     Icons.sticky_note_2_outlined,
                     size: 14,
-                    color: AppColors.secondary,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Expanded(

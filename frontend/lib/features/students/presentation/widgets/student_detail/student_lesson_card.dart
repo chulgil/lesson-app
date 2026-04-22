@@ -135,7 +135,7 @@ class StudentLessonCard extends StatelessWidget {
                   if (lesson.hasRecordings)
                     Icon(Icons.mic, size: 18, color: AppColors.paperAccent),
                   if (lesson.hasFeedback)
-                    Icon(Icons.note, size: 18, color: AppColors.secondary),
+                    Icon(Icons.note, size: 18, color: AppColors.paperAccent),
                 ],
               ),
 

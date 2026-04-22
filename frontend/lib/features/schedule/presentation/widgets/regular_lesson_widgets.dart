@@ -108,7 +108,7 @@ class RegularLessonDurationSelector extends StatelessWidget {
                 Icon(
                   Icons.star,
                   size: 12,
-                  color: isSelected ? Colors.white : AppColors.secondary,
+                  color: isSelected ? Colors.white : AppColors.paperAccent,
                 ),
               ],
             ],

@@ -180,7 +180,7 @@ class BookingConfirmDialog extends StatelessWidget {
             _buildPolicyNotice(
               icon: Icons.school,
               text: '체험 레슨은 1회만 가능합니다.',
-              color: AppColors.secondary,
+              color: AppColors.paperAccent,
             ),
           ],
         ],

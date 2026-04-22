@@ -73,7 +73,7 @@ extension RelationLessonTypeExtension on RelationLessonType {
       case RelationLessonType.regular:
         return AppColors.paperAccent;
       case RelationLessonType.oneTime:
-        return AppColors.secondary;
+        return AppColors.paperAccent;
     }
   }
 }

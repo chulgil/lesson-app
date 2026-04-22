@@ -8,7 +8,7 @@ import 'time_slot.dart';
 
 /// Lesson type enum
 enum LessonType {
-  trial,   // 체험 레슨
+  trial, // 체험 레슨
   regular, // 정규 레슨
   oneTime; // 1회 레슨
 
@@ -37,7 +37,7 @@ enum LessonType {
 
 /// Schedule type for regular lessons
 enum ScheduleType {
-  fixed,    // 고정 시간
+  fixed, // 고정 시간
   flexible; // 유동 시간
 
   String get label {
@@ -61,13 +61,13 @@ enum ScheduleType {
 
 /// Booking status enum
 enum BookingStatus {
-  pending,          // 대기 중 (신청 완료)
-  confirmed,        // 확정 (선생님 승인)
-  changeRequested,  // 변경 요청 중
-  completed,        // 완료
-  cancelled,        // 취소
-  unavailable,      // 일정 조율 필요 (선생님이 해당 시간 불가)
-  expired;          // 응답 대기 만료 (48시간 초과)
+  pending, // 대기 중 (신청 완료)
+  confirmed, // 확정 (선생님 승인)
+  changeRequested, // 변경 요청 중
+  completed, // 완료
+  cancelled, // 취소
+  unavailable, // 일정 조율 필요 (선생님이 해당 시간 불가)
+  expired; // 응답 대기 만료 (48시간 초과)
 
   String get label {
     switch (this) {
@@ -121,7 +121,7 @@ enum BookingStatus {
       case BookingStatus.cancelled:
         return AppColors.inkTertiary;
       case BookingStatus.unavailable:
-        return AppColors.secondary;
+        return AppColors.paperAccent;
       case BookingStatus.expired:
         return AppColors.inkSecondary;
     }
@@ -174,9 +174,9 @@ const kDefaultUnavailableMessage = '현재 가능한 시간이 없어 이번에�
 
 /// Lesson goal enum (for trial lessons)
 enum LessonGoal {
-  hobby,  // 취미
-  exam,   // 입시
-  major;  // 전공
+  hobby, // 취미
+  exam, // 입시
+  major; // 전공
 
   String get label {
     switch (this) {
@@ -203,9 +203,9 @@ enum LessonGoal {
 
 /// Experience level enum (for trial lessons)
 enum ExperienceLevel {
-  none,       // 처음
-  beginner,   // 1년 미만
-  some,       // 1-3년
+  none, // 처음
+  beginner, // 1년 미만
+  some, // 1-3년
   experienced; // 3년 이상
 
   String get label {
@@ -227,12 +227,12 @@ enum ExperienceLevel {
     // Handle StudentLevel enum from student.dart
     final levelName = studentLevel.toString().split('.').last;
     switch (levelName) {
-      case 'beginner':    // 입문 → 1년 미만
-      case 'elementary':  // 초급 → 1년 미만
+      case 'beginner': // 입문 → 1년 미만
+      case 'elementary': // 초급 → 1년 미만
         return ExperienceLevel.beginner;
       case 'intermediate': // 중급 → 1-3년
         return ExperienceLevel.some;
-      case 'advanced':    // 고급 → 3년 이상
+      case 'advanced': // 고급 → 3년 이상
         return ExperienceLevel.experienced;
       default:
         return ExperienceLevel.none;
@@ -431,8 +431,8 @@ class LessonBooking {
   final int durationMinutes;
   final int fee;
   final ScheduleType? scheduleType; // For regular lessons
-  final TimeSlot? fixedTimeSlot;     // For fixed schedule
-  final int? lessonsPerWeek;         // 1 or 2 for regular lessons
+  final TimeSlot? fixedTimeSlot; // For fixed schedule
+  final int? lessonsPerWeek; // 1 or 2 for regular lessons
   final String? studentPhone;
   final String? studentEmail;
   final LessonGoal? lessonGoal;
@@ -443,18 +443,19 @@ class LessonBooking {
   final DateTime? completedAt;
   final DateTime? cancelledAt;
   // Change request fields (for changeRequested status)
-  final DateTime? requestedDate;      // Requested new date
+  final DateTime? requestedDate; // Requested new date
   final TimeOfDay? requestedStartTime; // Requested new start time
-  final TimeOfDay? requestedEndTime;   // Requested new end time
-  final DateTime? changeRequestedAt;   // When change was requested
+  final TimeOfDay? requestedEndTime; // Requested new end time
+  final DateTime? changeRequestedAt; // When change was requested
   // Unavailable fields (for unavailable status - replaces rejected)
-  final String? unavailableMessage;              // Free text reason
-  final List<TimeSlot>? suggestedTimeSlots;     // Teacher's alternative suggestions
-  final DateTime? unavailableAt;                // When marked unavailable
-  final DateTime? expiredAt;                    // When auto-expired (48h timeout)
+  final String? unavailableMessage; // Free text reason
+  final List<TimeSlot>? suggestedTimeSlots; // Teacher's alternative suggestions
+  final DateTime? unavailableAt; // When marked unavailable
+  final DateTime? expiredAt; // When auto-expired (48h timeout)
   // Multi-option schedule fields (Phase 1)
-  final List<ScheduleOption>? scheduleOptions;  // 1-3 options proposed by student
-  final String? selectedOptionId;               // ID of option selected by teacher
+  final List<ScheduleOption>?
+  scheduleOptions; // 1-3 options proposed by student
+  final String? selectedOptionId; // ID of option selected by teacher
 
   const LessonBooking({
     required this.id,
@@ -520,9 +521,9 @@ class LessonBooking {
   /// Get formatted fee
   String get formattedFee {
     final formatter = fee.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
@@ -636,7 +637,9 @@ class LessonBooking {
 
   /// Check if booking is awaiting teacher selection
   bool get isAwaitingSelection =>
-      status == BookingStatus.pending && hasScheduleOptions && !hasSelectedOption;
+      status == BookingStatus.pending &&
+      hasScheduleOptions &&
+      !hasSelectedOption;
 
   LessonBooking copyWith({
     String? id,

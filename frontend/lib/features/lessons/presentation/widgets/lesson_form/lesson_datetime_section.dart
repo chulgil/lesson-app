@@ -101,13 +101,13 @@ class LessonDateTimeSection extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.1),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius:
                             BorderRadius.circular(AppSpacing.radiusMedium),
                       ),
                       child: const Icon(
                         Icons.access_time,
-                        color: AppColors.secondary,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),

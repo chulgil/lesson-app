@@ -68,13 +68,13 @@ class EditLessonStudentCard extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryLight.withValues(alpha: 0.3),
+                    color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     student.instrument,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

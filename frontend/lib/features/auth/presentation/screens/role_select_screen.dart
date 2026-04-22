@@ -114,7 +114,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 icon: Icons.music_note_rounded,
                 title: '학생',
                 description: '레슨 확인, 연습 기록, 피드백 확인',
-                color: AppColors.secondary,
+                color: AppColors.paperAccent,
                 isLoading: _isLoading,
                 onTap: () => _selectRole(UserRole.student),
               ),

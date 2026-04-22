@@ -4,35 +4,9 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary - Notebook × Score: ink (was classic purple 0xFF6B5B95)
-  static const primary = Color(0xFF14161C);
-  static const primaryLight = Color(0xFF3F5D2F); // paperOk
-  static const primaryDark = Color(0xFF14161C);
-
-  // Secondary - Notebook × Score: paperAccent (was sandy brown 0xFFF4A460)
-  static const secondary = Color(0xFF9B1B12);
-  static const secondaryLight = Color(0xFFE8DFC7); // paperDark
-
-  // Semantic - mapped to Notebook × Score palette
-  static const success = Color(0xFF3F5D2F); // paperOk
-  static const successDark = Color(0xFF2A4020);
-  static const successLight = Color(0xFFE8DFC7); // paperDark
-  static const warning = Color(0xFF9B1B12); // paperAccent
-  static const warningLight = Color(0xFFE8DFC7); // paperDark
-  static const error = Color(0xFF9B1B12); // paperAccent
-  static const errorLight = Color(0xFFE8DFC7); // paperDark
-  static const info = Color(0xFF14161C); // ink
-  static const infoLight = Color(0xFFE8DFC7); // paperDark
-
-  // Practice status - mapped to Notebook × Score palette
-  static const practiceGood = Color(0xFF3F5D2F); // paperOk
+  // Practice status - Notebook × Score 팔레트 기반
   static const practiceNormal = Color(0x8C14161C); // inkTertiary
-  static const practicePoor = Color(0xFF9B1B12); // paperAccent
   static const practicePaused = Color(0x4014161C); // inkQuaternary
-
-  // Semantic borders
-  static const successBorder = Color(0xFFA5D6A7);
-  static const infoBorder = Color(0xFF90CAF9);
 
   // Amber/gold (goals, stars, achievements)
   static const amber = Color(0xFFFFB800);
@@ -105,14 +79,7 @@ class AppColors {
   static const availabilityBorder = Color(0xFFE0E0E0);
   static const availabilityText = Color(0xFFBDBDBD);
 
-  // Light mode - Notebook × Score palette
-  static const backgroundLight = Color(0xFFE8DFC7); // paperDark
-  static const surfaceLight = Color(0xFFF2ECDD); // paper
-  static const surfaceSecondaryLight = Color(0xFFE8DFC7); // paperDark
-  static const borderLight = Color(0x4014161C); // inkQuaternary
-  static const textPrimaryLight = Color(0xFF14161C); // ink
-  static const textSecondaryLight = Color(0xBF14161C); // inkSecondary
-  static const textTertiaryLight = Color(0x8C14161C); // inkTertiary
+  // Light mode - disabled text (legacy naming kept; Notebook 팔레트는 inkQuaternary 사용)
   static const textDisabledLight = Color(0x4014161C); // inkQuaternary
 
   // Dark mode

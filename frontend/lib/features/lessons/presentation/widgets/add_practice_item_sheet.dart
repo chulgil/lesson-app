@@ -388,7 +388,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               decoration: BoxDecoration(
                 color:
                     _isCreatingNewRepertoire
-                        ? AppColors.secondary.withValues(alpha: 0.1)
+                        ? AppColors.paperAccent.withValues(alpha: 0.1)
                         : null,
               ),
               child: Row(
@@ -401,13 +401,13 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       border: Border.all(
                         color:
                             _isCreatingNewRepertoire
-                                ? AppColors.secondary
+                                ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                         width: 2,
                       ),
                       color:
                           _isCreatingNewRepertoire
-                              ? AppColors.secondary
+                              ? AppColors.paperAccent
                               : Colors.transparent,
                     ),
                     child:
@@ -425,7 +425,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     size: 20,
                     color:
                         _isCreatingNewRepertoire
-                            ? AppColors.secondary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
@@ -434,7 +434,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     style: AppTypography.bodyMedium.copyWith(
                       color:
                           _isCreatingNewRepertoire
-                              ? AppColors.secondary
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                       fontWeight:
                           _isCreatingNewRepertoire

@@ -683,10 +683,10 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withValues(alpha: 0.05),
+            color: AppColors.paperAccent.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: AppColors.secondary.withValues(alpha: 0.2),
+              color: AppColors.paperAccent.withValues(alpha: 0.2),
             ),
           ),
           child: Column(

@@ -584,7 +584,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 ListTile(
                   leading: Icon(
                     Icons.family_restroom,
-                    color: AppColors.secondary,
+                    color: AppColors.paperAccent,
                   ),
                   title: const Text('학부모 초대'),
                   subtitle: const Text('학부모 연결을 위한 초대 코드 생성'),

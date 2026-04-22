@@ -202,9 +202,7 @@ class _ProposalSettingsScreenState
         const SizedBox(height: AppSpacing.space1),
         Text(
           '선택하지 않으면 모든 활성 수강권이 제안됩니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
         templatesAsync.when(
@@ -281,7 +279,9 @@ class _ProposalSettingsScreenState
                           decoration: BoxDecoration(
                             color:
                                 isSelected
-                                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                                    ? AppColors.paperAccent.withValues(
+                                      alpha: 0.05,
+                                    )
                                     : AppColors.paper,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusLarge,
@@ -378,9 +378,8 @@ class _ProposalSettingsScreenState
                                     decoration: BoxDecoration(
                                       color:
                                           isRecommended
-                                              ? AppColors.paperAccent.withValues(
-                                                alpha: 0.2,
-                                              )
+                                              ? AppColors.paperAccent
+                                                  .withValues(alpha: 0.2)
                                               : AppColors.paperDark,
                                       borderRadius: BorderRadius.circular(
                                         AppSpacing.radiusSmall,
@@ -393,8 +392,7 @@ class _ProposalSettingsScreenState
                                             color:
                                                 isRecommended
                                                     ? AppColors.paperAccent
-                                                    : AppColors
-                                                        .textTertiaryLight,
+                                                    : AppColors.inkTertiary,
                                           ),
                                     ),
                                   ),
@@ -444,9 +442,7 @@ class _ProposalSettingsScreenState
         const SizedBox(height: AppSpacing.space1),
         Text(
           '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
         Container(
@@ -571,9 +567,7 @@ class _ProposalSettingsScreenState
         const SizedBox(height: AppSpacing.space1),
         Text(
           '제안 후 응답이 없으면 자동으로 알림을 보냅니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
         Container(

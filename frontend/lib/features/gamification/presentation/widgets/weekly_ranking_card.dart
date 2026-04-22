@@ -170,7 +170,7 @@ class _ProgressBar extends StatelessWidget {
       case RankingTier.silver:
         return AppColors.inkTertiary;
       case RankingTier.bronze:
-        return AppColors.secondary;
+        return AppColors.paperAccent;
     }
   }
 }

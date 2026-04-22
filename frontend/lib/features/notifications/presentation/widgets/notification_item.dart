@@ -248,7 +248,7 @@ class NotificationItem extends StatelessWidget {
       case NotificationPriority.urgent:
         return AppColors.paperAccent.withValues(alpha: 0.1);
       case NotificationPriority.high:
-        return AppColors.secondary.withValues(alpha: 0.2);
+        return AppColors.paperAccent.withValues(alpha: 0.2);
       case NotificationPriority.normal:
         return AppColors.paperAccent.withValues(alpha: 0.1);
       case NotificationPriority.low:

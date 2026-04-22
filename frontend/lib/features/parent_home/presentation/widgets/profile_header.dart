@@ -22,7 +22,7 @@ class ProfileHeader extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundColor: AppColors.secondary,
+                backgroundColor: AppColors.paperAccent,
                 child: Text(
                   userProfile.userName.isNotEmpty
                       ? userProfile.userName.characters.first
@@ -74,7 +74,7 @@ class ProfileHeader extends ConsumerWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.2),
+                        color: AppColors.paperAccent.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusSmall,
                         ),
@@ -82,7 +82,7 @@ class ProfileHeader extends ConsumerWidget {
                       child: Text(
                         '학부모',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

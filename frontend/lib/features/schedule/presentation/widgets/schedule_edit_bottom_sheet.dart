@@ -119,7 +119,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                             isSelected
                                 ? AppColors.paperAccent
                                 : isWeekend
-                                ? AppColors.secondary
+                                ? AppColors.paperAccent
                                 : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,

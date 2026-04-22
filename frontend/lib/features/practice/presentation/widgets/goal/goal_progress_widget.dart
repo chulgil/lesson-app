@@ -332,7 +332,7 @@ class GoalProgressWidget extends ConsumerWidget {
                     colors:
                         isAchieved
                             ? [AppColors.paperOk, AppColors.paperOk]
-                            : [AppColors.paperAccent, AppColors.secondary],
+                            : [AppColors.paperAccent, AppColors.paperAccent],
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),

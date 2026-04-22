@@ -292,7 +292,7 @@ class _UnifiedSubscriptionSheetState
       SnackBar(
         content: Text('${template.name}을 추천으로 지정했습니다'),
         duration: const Duration(seconds: 1),
-        backgroundColor: AppColors.secondary,
+        backgroundColor: AppColors.paperAccent,
       ),
     );
   }
@@ -531,7 +531,7 @@ class _UnifiedSubscriptionSheetState
                     color:
                         canSubmit
                             ? AppColors.paperAccent
-                            : AppColors.textDisabledLight,
+                            : AppColors.inkQuaternary,
                   ),
                 ),
               ),
@@ -748,13 +748,13 @@ class _TemplateChip extends StatelessWidget {
               ),
               margin: const EdgeInsets.only(bottom: AppSpacing.space1),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.15),
+                color: AppColors.paperAccent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '추천',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.secondary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),

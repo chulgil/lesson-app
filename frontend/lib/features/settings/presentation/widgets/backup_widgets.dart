@@ -437,7 +437,7 @@ class ActionButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isDisabled
-                          ? AppColors.textDisabledLight.withValues(alpha: 0.2)
+                          ? AppColors.inkQuaternary.withValues(alpha: 0.2)
                           : AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -445,7 +445,7 @@ class ActionButton extends StatelessWidget {
                   icon,
                   color:
                       isDisabled
-                          ? AppColors.textDisabledLight
+                          ? AppColors.inkQuaternary
                           : AppColors.paperAccent,
                   size: 24,
                 ),
@@ -461,7 +461,7 @@ class ActionButton extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color:
                             isDisabled
-                                ? AppColors.textDisabledLight
+                                ? AppColors.inkQuaternary
                                 : AppColors.ink,
                       ),
                     ),
@@ -471,7 +471,7 @@ class ActionButton extends StatelessWidget {
                       style: AppTypography.bodySmall.copyWith(
                         color:
                             isDisabled
-                                ? AppColors.textDisabledLight
+                                ? AppColors.inkQuaternary
                                 : AppColors.inkSecondary,
                       ),
                     ),
@@ -482,7 +482,7 @@ class ActionButton extends StatelessWidget {
                 Icons.chevron_right,
                 color:
                     isDisabled
-                        ? AppColors.textDisabledLight
+                        ? AppColors.inkQuaternary
                         : AppColors.inkSecondary,
               ),
             ],
@@ -593,10 +593,10 @@ class BackupItem extends ConsumerWidget {
         leading: Container(
           padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withValues(alpha: 0.1),
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
-          child: const Icon(Icons.archive, color: AppColors.secondary),
+          child: const Icon(Icons.archive, color: AppColors.paperAccent),
         ),
         title: Text(
           formatDateTimeDash(backup.createdAt),

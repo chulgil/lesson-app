@@ -111,8 +111,8 @@ class RepertoireTimelineCard extends StatelessWidget {
       textColor = AppColors.paperOk;
     } else {
       label = '진행 중';
-      backgroundColor = AppColors.secondary.withValues(alpha: 0.15);
-      textColor = AppColors.secondary;
+      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.15);
+      textColor = AppColors.paperAccent;
     }
 
     return Container(

@@ -23,7 +23,7 @@ class AISummaryCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.paperAccent.withValues(alpha: 0.05),
-            AppColors.secondary.withValues(alpha: 0.05),
+            AppColors.paperAccent.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

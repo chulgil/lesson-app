@@ -360,10 +360,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           leading: Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.secondary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(Icons.qr_code_scanner, color: AppColors.secondary),
+            child: Icon(Icons.qr_code_scanner, color: AppColors.paperAccent),
           ),
           title: const Text('QR 코드 스캔'),
           subtitle: Text(

@@ -36,7 +36,7 @@ class DiscountSection extends StatelessWidget {
           controller: controller,
           suffix: '%',
           maxValue: 100,
-          selectedColor: AppColors.secondary,
+          selectedColor: AppColors.paperAccent,
           zeroLabel: '없음',
         ),
         if (discountPercent > 0 && originalAmount > 0) ...[
@@ -44,7 +44,7 @@ class DiscountSection extends StatelessWidget {
           Text(
             '${formatWonWithComma(originalAmount)} → ${formatWonWithComma(finalAmount)} (-${formatWonWithComma(originalAmount - finalAmount)})',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.secondary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w500,
             ),
           ),

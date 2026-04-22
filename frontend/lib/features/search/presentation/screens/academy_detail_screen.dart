@@ -416,7 +416,7 @@ class _AcademyTeacherCard extends StatelessWidget {
               ElevatedButton(
                 onPressed: onTrialTap,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
+                  backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space3,

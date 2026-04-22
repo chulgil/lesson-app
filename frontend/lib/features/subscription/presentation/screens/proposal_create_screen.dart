@@ -324,7 +324,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                           SnackBar(
                             content: Text('${template.name}을 추천으로 지정했습니다'),
                             duration: const Duration(seconds: 1),
-                            backgroundColor: AppColors.secondary,
+                            backgroundColor: AppColors.paperAccent,
                           ),
                         );
                       }

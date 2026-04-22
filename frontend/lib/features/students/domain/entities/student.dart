@@ -126,7 +126,7 @@ enum PracticeStatus {
 Color _profileColorFromName(String name) {
   const colors = [
     AppColors.paperAccent,
-    AppColors.secondary,
+    AppColors.paperAccent,
     AppColors.paperOk,
     AppColors.ink,
     AppColors.profileRed,

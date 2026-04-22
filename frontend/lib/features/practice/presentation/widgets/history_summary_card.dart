@@ -57,7 +57,7 @@ class HistorySummaryCard extends StatelessWidget {
           _buildDivider(),
           _buildStatItem(
             icon: Icons.edit_note,
-            iconColor: AppColors.secondary,
+            iconColor: AppColors.paperAccent,
             label: '진행 중',
             value: '$inProgressCount',
           ),

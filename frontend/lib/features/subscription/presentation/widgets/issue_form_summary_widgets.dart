@@ -218,7 +218,7 @@ class SubscriptionSummaryCard extends StatelessWidget {
               label: '할인',
               value:
                   '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
-              valueColor: AppColors.secondary,
+              valueColor: AppColors.paperAccent,
             ),
             SummaryRow(
               label: '결제금액',
@@ -410,7 +410,7 @@ class BatchSummaryCard extends StatelessWidget {
               label: '할인',
               value:
                   '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
-              valueColor: AppColors.secondary,
+              valueColor: AppColors.paperAccent,
             ),
             SummaryRow(
               label: '개인당 금액',

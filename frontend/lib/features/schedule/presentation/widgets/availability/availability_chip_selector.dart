@@ -249,7 +249,7 @@ class _TimeChip extends StatelessWidget {
       return AppColors.paperAccent;
     }
     if (slot.isRecommended) {
-      return AppColors.secondary; // #F4A460
+      return AppColors.paperAccent; // #F4A460
     }
     return AppColors.inkQuaternary;
   }

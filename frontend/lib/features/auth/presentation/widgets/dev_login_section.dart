@@ -67,13 +67,13 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Student accounts ──
-        DevSectionHeader(label: '학생', color: AppColors.secondary),
+        DevSectionHeader(label: '학생', color: AppColors.paperAccent),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '🎻',
           name: '김소연',
           description: '레슨 6개, 연습 기록, 수강권 보유',
-          color: AppColors.secondary,
+          color: AppColors.paperAccent,
           isLoading: isLoading,
           onTap:
               () => onDevLogin(
@@ -87,7 +87,7 @@ class DevLoginSection extends StatelessWidget {
           emoji: '🎻',
           name: '이준호',
           description: '레슨 2개, 초급 학생',
-          color: AppColors.secondary,
+          color: AppColors.paperAccent,
           isLoading: isLoading,
           onTap:
               () => onDevLogin(
@@ -101,7 +101,7 @@ class DevLoginSection extends StatelessWidget {
           emoji: '🎵',
           name: '최유진',
           description: '체험 레슨 1개 (플루트)',
-          color: AppColors.secondary.withValues(alpha: 0.7),
+          color: AppColors.paperAccent.withValues(alpha: 0.7),
           isLoading: isLoading,
           onTap:
               () => onDevLogin(

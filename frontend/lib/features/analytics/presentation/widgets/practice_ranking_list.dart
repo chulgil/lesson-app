@@ -71,7 +71,7 @@ class PracticeRankingList extends StatelessWidget {
     } else if (rank == 2) {
       rankColor = AppColors.inkSecondary;
     } else if (rank == 3) {
-      rankColor = AppColors.secondary;
+      rankColor = AppColors.paperAccent;
     } else {
       rankColor = AppColors.inkTertiary;
     }

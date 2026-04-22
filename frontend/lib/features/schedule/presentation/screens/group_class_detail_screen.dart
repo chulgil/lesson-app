@@ -166,7 +166,7 @@ class _GroupClassDetailScreenState
               color:
                   widget.groupClass.type == GroupClassType.regular
                       ? AppColors.ink.withValues(alpha: 0.1)
-                      : AppColors.secondary.withValues(alpha: 0.1),
+                      : AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Text(
@@ -177,7 +177,7 @@ class _GroupClassDetailScreenState
                 color:
                     widget.groupClass.type == GroupClassType.regular
                         ? AppColors.ink
-                        : AppColors.secondary,
+                        : AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),

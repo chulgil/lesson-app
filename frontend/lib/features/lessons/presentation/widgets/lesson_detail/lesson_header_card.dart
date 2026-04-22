@@ -68,7 +68,7 @@ class LessonHeaderCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryLight.withValues(
+                            color: AppColors.paperAccentSoft.withValues(
                               alpha: 0.3,
                             ),
                             borderRadius: BorderRadius.circular(
@@ -78,7 +78,7 @@ class LessonHeaderCard extends StatelessWidget {
                           child: Text(
                             lesson.instrument,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

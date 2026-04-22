@@ -63,7 +63,7 @@ class LessonStudentSelector extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.secondaryLight.withValues(
+                              color: AppColors.paperAccentSoft.withValues(
                                 alpha: 0.3,
                               ),
                               borderRadius: BorderRadius.circular(
@@ -73,7 +73,7 @@ class LessonStudentSelector extends StatelessWidget {
                             child: Text(
                               selectedStudent!.instrument,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.secondary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
