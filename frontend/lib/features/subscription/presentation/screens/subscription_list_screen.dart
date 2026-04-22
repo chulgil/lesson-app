@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
@@ -19,23 +20,22 @@ import '../widgets/subscription_ticket_card.dart';
 class SubscriptionListScreen extends ConsumerWidget {
   final String? studentId;
 
-  const SubscriptionListScreen({
-    super.key,
-    this.studentId,
-  });
+  const SubscriptionListScreen({super.key, this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Use provided studentId or get from auth (currentUserIdProvider always returns non-null)
-    final String effectiveStudentId = studentId ?? ref.watch(currentUserIdProvider);
-    final membershipsAsync = ref.watch(activeStudentMembershipsProvider(effectiveStudentId));
-    final subscriptionsAsync = ref.watch(studentSubscriptionsProvider(effectiveStudentId));
+    final String effectiveStudentId =
+        studentId ?? ref.watch(currentUserIdProvider);
+    final membershipsAsync = ref.watch(
+      activeStudentMembershipsProvider(effectiveStudentId),
+    );
+    final subscriptionsAsync = ref.watch(
+      studentSubscriptionsProvider(effectiveStudentId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('내 수강권'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('내 수강권'), centerTitle: true),
       body: membershipsAsync.when(
         data: (memberships) {
           if (memberships.isEmpty) {
@@ -43,13 +43,14 @@ class SubscriptionListScreen extends ConsumerWidget {
           }
 
           return subscriptionsAsync.when(
-            data: (subscriptions) => _buildContent(
-              context,
-              ref,
-              memberships,
-              subscriptions,
-              effectiveStudentId,
-            ),
+            data:
+                (subscriptions) => _buildContent(
+                  context,
+                  ref,
+                  memberships,
+                  subscriptions,
+                  effectiveStudentId,
+                ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _buildErrorState(error.toString()),
           );
@@ -68,15 +69,22 @@ class SubscriptionListScreen extends ConsumerWidget {
     String studentId,
   ) {
     // Group subscriptions by status
-    final activeSubscriptions = subscriptions
-        .where((s) => s.status == SubscriptionStatus.active)
-        .toList();
-    final expiringSoonSubscriptions = subscriptions
-        .where((s) => s.status == SubscriptionStatus.expiringSoon || s.isExpiringSoon)
-        .toList();
-    final expiredSubscriptions = subscriptions
-        .where((s) => s.status == SubscriptionStatus.expired)
-        .toList();
+    final activeSubscriptions =
+        subscriptions
+            .where((s) => s.status == SubscriptionStatus.active)
+            .toList();
+    final expiringSoonSubscriptions =
+        subscriptions
+            .where(
+              (s) =>
+                  s.status == SubscriptionStatus.expiringSoon ||
+                  s.isExpiringSoon,
+            )
+            .toList();
+    final expiredSubscriptions =
+        subscriptions
+            .where((s) => s.status == SubscriptionStatus.expired)
+            .toList();
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.screenPadding),
@@ -99,7 +107,8 @@ class SubscriptionListScreen extends ConsumerWidget {
           ...activeSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
               (m) => m.id == subscription.membershipId,
-              orElse: () => _createPlaceholderMembership(subscription.membershipId),
+              orElse:
+                  () => _createPlaceholderMembership(subscription.membershipId),
             );
             return _SubscriptionCardWithClass(
               membership: membership,
@@ -113,12 +122,16 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expiring soon
         if (expiringSoonSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader(AppStrings.statusExpiringSoon, color: AppColors.paperAccent),
+          _buildSectionHeader(
+            AppStrings.statusExpiringSoon,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...expiringSoonSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
               (m) => m.id == subscription.membershipId,
-              orElse: () => _createPlaceholderMembership(subscription.membershipId),
+              orElse:
+                  () => _createPlaceholderMembership(subscription.membershipId),
             );
             return _SubscriptionCardWithClass(
               membership: membership,
@@ -132,12 +145,16 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expired
         if (expiredSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader(AppStrings.statusExpired, color: AppColors.inkTertiary),
+          _buildSectionHeader(
+            AppStrings.statusExpired,
+            color: AppColors.inkTertiary,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...expiredSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
               (m) => m.id == subscription.membershipId,
-              orElse: () => _createPlaceholderMembership(subscription.membershipId),
+              orElse:
+                  () => _createPlaceholderMembership(subscription.membershipId),
             );
             return _SubscriptionCardWithClass(
               membership: membership,
@@ -220,10 +237,7 @@ class SubscriptionListScreen extends ConsumerWidget {
               ...requests.map(
                 (r) => Card(
                   child: ListTile(
-                    leading: Icon(
-                      Icons.schedule,
-                      color: AppColors.paperAccent,
-                    ),
+                    leading: Icon(Icons.schedule, color: AppColors.paperAccent),
                     title: Text(
                       r.message ?? AppStrings.pendingRequests,
                       style: AppTypography.bodyMedium,
@@ -243,9 +257,11 @@ class SubscriptionListScreen extends ConsumerWidget {
   Widget _buildSectionHeader(String title, {Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+      // color 파라미터는 상태별 강조(expiringSoon=Vermillion, expired=inkTertiary)를 보존하기 위해 그대로 유지.
       child: Text(
         title,
-        style: AppTypography.headingSmall.copyWith(
+        style: NotebookTypography.sectionTitle.copyWith(
           color: color ?? AppColors.ink,
         ),
       ),
@@ -253,7 +269,9 @@ class SubscriptionListScreen extends ConsumerWidget {
   }
 
   void _navigateToDetail(BuildContext context, String subscriptionId) {
-    context.push(AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId));
+    context.push(
+      AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
+    );
   }
 
   ClassMembership _createPlaceholderMembership(String id) {
@@ -268,7 +286,10 @@ class SubscriptionListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNoSubscriptionsState(BuildContext context, List<ClassMembership> memberships) {
+  Widget _buildNoSubscriptionsState(
+    BuildContext context,
+    List<ClassMembership> memberships,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space6),
       child: Column(
@@ -306,11 +327,7 @@ class SubscriptionListScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.school_outlined,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.school_outlined, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '등록된 레슨이 없습니다',
@@ -345,16 +362,9 @@ class SubscriptionListScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.paperAccent,
-            ),
+            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space3),
-            Text(
-              '오류가 발생했습니다',
-              style: AppTypography.headingSmall,
-            ),
+            Text('오류가 발생했습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),
             Text(
               error,
@@ -386,27 +396,32 @@ class _SubscriptionCardWithClass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
+    final lessonClassAsync = ref.watch(
+      lessonClassProvider(membership.lessonClassId),
+    );
 
     return lessonClassAsync.when(
-      data: (lessonClass) => SubscriptionTicketCard(
-        subscription: subscription,
-        className: lessonClass?.name ?? '개인레슨',
-        instrument: membership.instrument,
-        onTap: onTap,
-      ),
-      loading: () => SubscriptionTicketCard(
-        subscription: subscription,
-        className: '...',
-        instrument: membership.instrument,
-        onTap: onTap,
-      ),
-      error: (_, __) => SubscriptionTicketCard(
-        subscription: subscription,
-        className: '레슨',
-        instrument: membership.instrument,
-        onTap: onTap,
-      ),
+      data:
+          (lessonClass) => SubscriptionTicketCard(
+            subscription: subscription,
+            className: lessonClass?.name ?? '개인레슨',
+            instrument: membership.instrument,
+            onTap: onTap,
+          ),
+      loading:
+          () => SubscriptionTicketCard(
+            subscription: subscription,
+            className: '...',
+            instrument: membership.instrument,
+            onTap: onTap,
+          ),
+      error:
+          (_, __) => SubscriptionTicketCard(
+            subscription: subscription,
+            className: '레슨',
+            instrument: membership.instrument,
+            onTap: onTap,
+          ),
     );
   }
 }
@@ -436,12 +451,7 @@ class _SummaryStatCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(
-              color: color,
-            ),
-          ),
+          Text(label, style: AppTypography.caption.copyWith(color: color)),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '$count',

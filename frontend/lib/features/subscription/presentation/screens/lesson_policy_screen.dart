@@ -311,9 +311,11 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 강조된 요약 섹션 제목도 Playfair sectionTitle 로 통일,
+          // paperAccent 색상만 copyWith 로 유지 (§7.17 패턴, color override 변형).
           Text(
             '📋 정책 요약',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
