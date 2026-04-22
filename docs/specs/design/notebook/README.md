@@ -1067,6 +1067,45 @@ Text(
 
 ---
 
+### 7.35 FilledButton 테마 통일 — 74개 CTA 에 Vermillion 단일 지점 보급
+
+**배경**: M3 `FilledButton` 은 앱 전반의 1차 행동(예약 요청, 취소, 저장, 로그인, 결제 등) 74개 호출부에서 쓰이고 있었다. 그 중 21개 는 `style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent)` 를 인라인으로 반복 — 같은 의도를 각 화면이 독자적으로 표현 중. `filledButtonTheme` 이 `app_theme.dart` 에 미등록이었기 때문에, 오버라이드 없는 53개 호출부는 M3 colorScheme.secondary 폴백을 받아 미세한 색조 편차가 누적됐다.
+
+**변경**: `app_theme.dart` 에 `filledButtonTheme` 을 light/dark 각 1회씩 등록 — `elevatedButtonTheme` 시그니처를 미러링하여 두 CTA 계열의 구조 통일.
+
+| 위치 | 설정 | 의도 |
+|------|------|------|
+| light `filledButtonTheme` | `backgroundColor: paperAccent` · `foregroundColor: paper` · `elevation 0` · `minimumSize(infinity, buttonHeight)` · `shape: radiusLarge` · `textStyle: AppTypography.button` | Notebook Vermillion CTA 기본값. 21개 인라인 오버라이드와 동일 — 중복 제거 후에도 시각적 결과 동일 |
+| dark `filledButtonTheme` | 동일 (paperAccent/paper) | dark surface 위에서도 Vermillion 유지 — 테마 전환 시 CTA 색 불변 보장 |
+| 커밋 | `f69f2a70` | |
+
+**영향 범위**: 74개 FilledButton 호출부 전체가 영향을 받는다.
+
+- **21개** 인라인 `backgroundColor: paperAccent` 호출부: 테마가 동일 색을 기본값으로 제공하므로 인라인 오버라이드는 중복(추후 §7.36 cleanup 대상 후보) — 지금은 그대로 유지해 회귀 0
+- **53개** 오버라이드 없는 호출부: Material 기본 secondary 대신 Notebook paperAccent 로 **자동 승격** — 특히 `recording_diagnostic_screen`, `booking_reschedule_screen`, `payment_guide_bottom_sheet`, `approval_bottom_sheet` 등 바텀시트 계열의 주요 CTA 가 일관된 Vermillion 으로 수렴
+- 개별 호출부에서 `FilledButton.styleFrom(backgroundColor: ...)` 을 다른 색으로 덮어쓰는 경우(예: 파괴적 액션에 다른 강조) 는 인라인 우선 규칙으로 그대로 유지
+
+**설계 포인트**:
+
+- `minimumSize: Size(double.infinity, AppSpacing.buttonHeight)` — ElevatedButton 과 동일. Row/Expanded 래퍼 안에서만 호출되는 패턴에서 안전하게 폭 제약을 따르고, 단독 호출 시 full-width Notebook CTA 형태가 기본.
+- `elevation: 0` — Notebook flat 원칙. 그림자 대신 색상 강도(paperAccent) 로만 주목도 확보.
+- `shape: RoundedRectangleBorder(BorderRadius.circular(radiusLarge))` — Card/BottomSheet 와 동일 반경. 버튼이 카드 위에 올라갈 때 모서리 대칭.
+- `textStyle: AppTypography.button` — Inter(또는 기본 sans) 의 CTA 라벨. CTA 계열(Elevated/Filled/Outlined) 타이포 통일.
+- light = dark 동일 CTA 색상 — colorScheme.secondary 를 paperAccent 로 통일해둔 §5 결정을 버튼 테마에서 강제. Vermillion 은 두 배경(paper/surfaceDark) 모두에서 WCAG AA 수준의 대비 확보.
+
+**호환성 / 회귀 범위**:
+
+- 인라인 `backgroundColor: paperAccent` 오버라이드는 Flutter 속성 우선순위(inline > theme)에 따라 동일 결과 — 회귀 0
+- 인라인 다른 색 오버라이드(예: 상태별 warning/success) 역시 유지
+- `FilledButton.icon()` variant 은 동일 테마 상속 — 아이콘 포함 버튼도 자동 승격
+- 정성 검증 기대치: 오버라이드 없는 `recording_diagnostic_screen` · `schedule_change_slot_screen` 등의 FilledButton 이 M3 secondary 대신 Notebook Vermillion 으로 렌더. 기존 paperAccent 인라인 호출부는 변화 없음.
+
+**검증**: `flutter analyze` 0 issues · `flutter test` 392/392 passed.
+
+**은유**: 한 권의 악보집에서 모든 '강한 강조 마디' 가 같은 붉은 잉크로 찍혀 있는 상태. 서로 다른 페이지에서 붉은 색을 섞던 작업자가 한 자리에 모여 한 병의 Vermillion 잉크를 쓰기 시작한 전환.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
