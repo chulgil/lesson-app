@@ -615,6 +615,26 @@ Text(
 
 **은유**: TabBar 인디케이터 = 악보에서 현재 섹션을 짚는 Vermillion 연필 자국. Dialog 제목 = 페이지 상단 악장 표기.
 
+### 7.16 SnackBar 테마 통일 — 앱 전반 알림을 Notebook 팔레트로
+
+**배경**: SnackBar 는 `features/` 전반에서 **507회 호출 / 105 파일**(저장·삭제·오류·안내) 이지만 Material 기본 회색 배경을 그대로 사용. 페이퍼(paper) 스캐폴드 위에 회색 박스가 뜨면서 Notebook × Score 정체성 붕괴. 개별 `ScaffoldMessenger.of(context).showSnackBar(...)` 호출부를 전부 손댈 수 없기에 테마 한 지점으로 기본값 교체.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `snackBarTheme` 추가 — `backgroundColor = ink`, `contentTextStyle = bodyMedium + paper`, `actionTextColor = paperAccent`, `behavior = floating`, `shape = radiusMedium` | ff47d57e |
+| `core/theme/app_theme.dart` (dark) | `snackBarTheme` 추가 — `backgroundColor = surfaceDark`, `contentTextStyle = bodyMedium + textPrimaryDark`, 액션·floating·shape 동일 | ff47d57e |
+
+**영향 범위**:
+- 저장/삭제 완료 안내, 네트워크 오류, 권한 거부, 공유 완료, 연습 시작 토스트 등 — 105 파일의 `ScaffoldMessenger` 호출부가 개별 수정 없이 Notebook 팔레트로 렌더.
+- 액션 버튼(실행취소 등)은 Vermillion 으로 시선 집중.
+- `floating + radiusMedium` 으로 페이퍼 위에 떠 있는 노트 카드 질감.
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: SnackBar = 악보 페이지 위에 잠깐 올려놓는 쪽지. 종이(페이퍼) 위의 쪽지(ink 박스)에 Vermillion 액션 링크.
+
 ---
 
 ## 8. 구현 원칙
