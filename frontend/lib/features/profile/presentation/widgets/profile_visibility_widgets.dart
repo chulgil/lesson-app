@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 
@@ -172,8 +173,7 @@ class SearchToggle extends StatelessWidget {
         children: [
           Icon(
             Icons.search,
-            color:
-                isSearchable ? AppColors.paperAccent : AppColors.inkTertiary,
+            color: isSearchable ? AppColors.paperAccent : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -214,10 +214,8 @@ class VisibilitySectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: AppTypography.headingSmall.copyWith(fontWeight: FontWeight.bold),
-    );
+    // Notebook × Score: 공개 범위 설정 섹션 제목도 Playfair sectionTitle(17) 로 통일.
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 }
 
@@ -251,9 +249,7 @@ class VisibilityTile extends StatelessWidget {
         title: Text(title, style: AppTypography.bodyMedium),
         subtitle: Text(
           subtitle,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         trailing: PopupMenuButton<ProfileVisibility>(
           initialValue: value,
@@ -692,7 +688,9 @@ class ProfilePreviewContent extends StatelessWidget {
                       .where((c) => c.isApproved)
                       .map(
                         (cert) => Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+                          padding: const EdgeInsets.only(
+                            bottom: AppSpacing.space1,
+                          ),
                           child: Row(
                             children: [
                               Icon(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
@@ -16,7 +17,8 @@ class RegularLessonSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: AppTypography.headingSmall);
+    // Notebook × Score: 정기 레슨 폼 섹션 제목도 Playfair sectionTitle(17) 로 통일.
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 }
 
@@ -24,10 +26,7 @@ class RegularLessonSectionTitle extends StatelessWidget {
 class RegularLessonStudentInfo extends StatelessWidget {
   final String studentName;
 
-  const RegularLessonStudentInfo({
-    super.key,
-    required this.studentName,
-  });
+  const RegularLessonStudentInfo({super.key, required this.studentName});
 
   @override
   Widget build(BuildContext context) {
@@ -94,42 +93,46 @@ class RegularLessonDurationSelector extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: durations.map((duration) {
-        final isSelected = selectedDuration == duration;
-        final isDefault = duration == settings.defaultLessonDuration;
+      children:
+          durations.map((duration) {
+            final isSelected = selectedDuration == duration;
+            final isDefault = duration == settings.defaultLessonDuration;
 
-        return ChoiceChip(
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(LessonDurations.format(duration)),
-              if (isDefault) ...[
-                const SizedBox(width: AppSpacing.space1),
-                Icon(
-                  Icons.star,
-                  size: 12,
-                  color: isSelected ? Colors.white : AppColors.paperAccent,
-                ),
-              ],
-            ],
-          ),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) {
-              onDurationChanged(duration);
-            }
-          },
-          backgroundColor: AppColors.paper,
-          selectedColor: AppColors.paperAccent,
-          side: BorderSide(
-            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-          ),
-          labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.ink,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        );
-      }).toList(),
+            return ChoiceChip(
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(LessonDurations.format(duration)),
+                  if (isDefault) ...[
+                    const SizedBox(width: AppSpacing.space1),
+                    Icon(
+                      Icons.star,
+                      size: 12,
+                      color: isSelected ? Colors.white : AppColors.paperAccent,
+                    ),
+                  ],
+                ],
+              ),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  onDurationChanged(duration);
+                }
+              },
+              backgroundColor: AppColors.paper,
+              selectedColor: AppColors.paperAccent,
+              side: BorderSide(
+                color:
+                    isSelected
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
+              ),
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color: isSelected ? Colors.white : AppColors.ink,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -158,10 +161,11 @@ class RegularLessonDaySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Get available days from teacher's slots
-    final availableDays = availableSlots
-        .where((slot) => slot.isActive)
-        .map((slot) => slot.dayOfWeek)
-        .toSet();
+    final availableDays =
+        availableSlots
+            .where((slot) => slot.isActive)
+            .map((slot) => slot.dayOfWeek)
+            .toSet();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -174,22 +178,23 @@ class RegularLessonDaySelector extends StatelessWidget {
           label: dayNames[index],
           isAvailable: isAvailable,
           isSelected: isSelected,
-          onTap: isAvailable
-              ? () {
-                  if (isSelected) {
-                    onDayToggle(dayOfWeek);
-                    onTimeRemoved(dayOfWeek, null);
-                  } else if (selectedDays.length < lessonsPerWeek) {
-                    onDayToggle(dayOfWeek);
-                  } else {
-                    // Replace oldest selection
-                    final oldest = selectedDays.first;
-                    onDayToggle(oldest);
-                    onTimeRemoved(oldest, null);
-                    onDayToggle(dayOfWeek);
+          onTap:
+              isAvailable
+                  ? () {
+                    if (isSelected) {
+                      onDayToggle(dayOfWeek);
+                      onTimeRemoved(dayOfWeek, null);
+                    } else if (selectedDays.length < lessonsPerWeek) {
+                      onDayToggle(dayOfWeek);
+                    } else {
+                      // Replace oldest selection
+                      final oldest = selectedDays.first;
+                      onDayToggle(oldest);
+                      onTimeRemoved(oldest, null);
+                      onDayToggle(dayOfWeek);
+                    }
                   }
-                }
-              : null,
+                  : null,
         );
       }),
     );
@@ -219,16 +224,18 @@ class DayButton extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.paperAccent
-              : isAvailable
+          color:
+              isSelected
+                  ? AppColors.paperAccent
+                  : isAvailable
                   ? AppColors.paper
                   : AppColors.paperDark,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected
-                ? AppColors.paperAccent
-                : isAvailable
+            color:
+                isSelected
+                    ? AppColors.paperAccent
+                    : isAvailable
                     ? AppColors.inkQuaternary
                     : Colors.transparent,
           ),
@@ -237,9 +244,10 @@ class DayButton extends StatelessWidget {
           child: Text(
             label,
             style: AppTypography.bodyMedium.copyWith(
-              color: isSelected
-                  ? Colors.white
-                  : isAvailable
+              color:
+                  isSelected
+                      ? Colors.white
+                      : isAvailable
                       ? AppColors.ink
                       : AppColors.inkTertiary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -275,28 +283,31 @@ class RegularLessonTimeSelector extends StatelessWidget {
     '목요일',
     '금요일',
     '토요일',
-    '일요일'
+    '일요일',
   ];
 
   @override
   Widget build(BuildContext context) {
     final daySlot = availableSlots.firstWhere(
       (slot) => slot.dayOfWeek == dayOfWeek && slot.isActive,
-      orElse: () => TimeSlot(
-        id: 'default',
-        dayOfWeek: dayOfWeek,
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 18, minute: 0),
-      ),
+      orElse:
+          () => TimeSlot(
+            id: 'default',
+            dayOfWeek: dayOfWeek,
+            startTime: const TimeOfDay(hour: 14, minute: 0),
+            endTime: const TimeOfDay(hour: 18, minute: 0),
+          ),
     );
 
     // Determine display range based on available times
-    final displayStart = daySlot.startTime.hour < 9
-        ? TimeOfDay(hour: daySlot.startTime.hour, minute: 0)
-        : const TimeOfDay(hour: 9, minute: 0);
-    final displayEnd = daySlot.endTime.hour > 22
-        ? TimeOfDay(hour: daySlot.endTime.hour + 1, minute: 0)
-        : const TimeOfDay(hour: 22, minute: 0);
+    final displayStart =
+        daySlot.startTime.hour < 9
+            ? TimeOfDay(hour: daySlot.startTime.hour, minute: 0)
+            : const TimeOfDay(hour: 9, minute: 0);
+    final displayEnd =
+        daySlot.endTime.hour > 22
+            ? TimeOfDay(hour: daySlot.endTime.hour + 1, minute: 0)
+            : const TimeOfDay(hour: 22, minute: 0);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -346,7 +357,8 @@ class RegularLessonTimeSelector extends StatelessWidget {
             availableStart: daySlot.startTime,
             availableEnd: daySlot.endTime,
             lessonDurationMinutes: lessonDuration,
-            bookedSlots: const [], // TODO: Get from provider when backend is ready
+            bookedSlots:
+                const [], // TODO: Get from provider when backend is ready
             displayStart: displayStart,
             displayEnd: displayEnd,
           ),
@@ -448,9 +460,10 @@ class OptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isSelected
-          ? AppColors.paperAccent.withValues(alpha: 0.1)
-          : AppColors.paper,
+      color:
+          isSelected
+              ? AppColors.paperAccent.withValues(alpha: 0.1)
+              : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onTap,
@@ -460,7 +473,8 @@ class OptionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -470,8 +484,7 @@ class OptionCard extends StatelessWidget {
                 title,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.ink,
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
                 ),
               ),
               Text(
@@ -619,9 +632,10 @@ class RegularLessonSummary extends StatelessWidget {
             if (selectedDays.isNotEmpty)
               ...(selectedDays.toList()..sort()).map((day) {
                 final time = selectedTimesPerDay[day];
-                final timeStr = time != null
-                    ? '${formatTimeOfDay(time)}-${formatTimeOfDay(addMinutes(time, lessonDuration))}'
-                    : '미선택';
+                final timeStr =
+                    time != null
+                        ? '${formatTimeOfDay(time)}-${formatTimeOfDay(addMinutes(time, lessonDuration))}'
+                        : '미선택';
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: _buildRow(
@@ -706,9 +720,10 @@ class FirstMonthFeeSection extends StatelessWidget {
     final currentWeek = LessonDateUtils.getWeekOfMonth(startDate);
     final hasWeek5 = LessonDateUtils.hasWeek5(startDate.year, startDate.month);
     final showWeek5Notice = hasWeek5 && currentWeek == 1;
-    final weekInfo = showWeek5Notice
-        ? '${prorated.remainingWeeks}주분, 5주차 휴강'
-        : '${prorated.remainingWeeks}주분';
+    final weekInfo =
+        showWeek5Notice
+            ? '${prorated.remainingWeeks}주분, 5주차 휴강'
+            : '${prorated.remainingWeeks}주분';
 
     return Column(
       children: [
@@ -718,13 +733,19 @@ class FirstMonthFeeSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: AppColors.paperAccent.withValues(alpha: 0.3),
+            ),
           ),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
@@ -794,16 +815,17 @@ class RegularLessonSubmitButton extends StatelessWidget {
       height: AppSpacing.buttonHeight,
       child: FilledButton(
         onPressed: isValid && !isSubmitting ? onSubmit : null,
-        child: isSubmitting
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Text('정규레슨 등록하기'),
+        child:
+            isSubmitting
+                ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                : const Text('정규레슨 등록하기'),
       ),
     );
   }
@@ -814,9 +836,9 @@ class RegularLessonSubmitButton extends StatelessWidget {
 /// Format fee with commas
 String formatFee(int amount) {
   final formatted = amount.toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (match) => '${match[1]},',
-      );
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+    (match) => '${match[1]},',
+  );
   return '$formatted원';
 }
 

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 
@@ -26,7 +27,8 @@ class LessonTimeSettingsSectionTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: 레슨 시간 설정 섹션 제목도 Playfair sectionTitle(17) 로 통일.
+        Text(title, style: NotebookTypography.sectionTitle),
         if (onAddPressed != null)
           TextButton.icon(
             onPressed: onAddPressed,
@@ -68,10 +70,7 @@ class DurationOptionItem extends StatelessWidget {
       title: Text(
         LessonDurations.format(duration),
         style: AppTypography.bodyLarge.copyWith(
-          color:
-              isDisabled
-                  ? AppColors.inkTertiary
-                  : AppColors.ink,
+          color: isDisabled ? AppColors.inkTertiary : AppColors.ink,
           decoration: isDisabled ? TextDecoration.lineThrough : null,
           fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
         ),
@@ -247,10 +246,7 @@ class TimeSlotTile extends StatelessWidget {
       title: Text(
         slot.timeRange,
         style: AppTypography.bodyMedium.copyWith(
-          color:
-              slot.isActive
-                  ? AppColors.ink
-                  : AppColors.inkTertiary,
+          color: slot.isActive ? AppColors.ink : AppColors.inkTertiary,
           decoration: slot.isActive ? null : TextDecoration.lineThrough,
         ),
       ),
@@ -551,7 +547,10 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 Text(
                   LessonDurations.format(_currentDuration),
                   style: AppTypography.headingLarge.copyWith(
-                    color: _isDuplicate ? AppColors.paperAccent : AppColors.paperAccent,
+                    color:
+                        _isDuplicate
+                            ? AppColors.paperAccent
+                            : AppColors.paperAccent,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -586,7 +585,9 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 activeTrackColor: AppColors.paperAccent,
-                inactiveTrackColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                inactiveTrackColor: AppColors.paperAccent.withValues(
+                  alpha: 0.2,
+                ),
                 thumbColor: AppColors.paperAccent,
                 overlayColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 valueIndicatorColor: AppColors.paperAccent,
@@ -647,7 +648,9 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                                   _sliderValue = duration.toDouble();
                                 });
                               },
-                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(
+                        alpha: 0.2,
+                      ),
                       showCheckmark: false,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space1,
@@ -780,7 +783,9 @@ void showDeleteDurationDialog({
                 Navigator.pop(dialogContext);
                 onConfirm();
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+              ),
               child: const Text(AppStrings.delete),
             ),
           ],
