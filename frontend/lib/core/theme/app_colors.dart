@@ -30,8 +30,8 @@ class AppColors {
   static const streakPaused1 = Color(0xFF9E9E9E);
   static const streakPaused2 = Color(0xFF757575);
 
-  // Cat UI accent (metronome cat paw)
-  static const catAccent = Color(0xFFB8A9C9);
+  // Cat UI accent (metronome cat paw) - Notebook paperHighlight (yellow highlighter)
+  static const catAccent = Color(0xFFF7D755);
 
   // Tuner-specific colors
   static const tunerNaturalNote = Color(0xFFB8D4E3);
@@ -54,9 +54,9 @@ class AppColors {
   static const scheduleMutedBackground = Color(0xFFF5F5F5);
   static const scheduleMutedAccent = Color(0xFFBDBDBD);
 
-  // Schedule: travel time block colors
-  static const scheduleTravelBackground = Color(0xFFE8E0F0);
-  static const scheduleTravelAccent = Color(0xFF9E8BB8);
+  // Schedule: travel time block colors - Notebook muted (paperDark + inkTertiary)
+  static const scheduleTravelBackground = Color(0xFFE8DFC7);
+  static const scheduleTravelAccent = Color(0x8C14161C);
 
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
@@ -72,7 +72,6 @@ class AppColors {
   static const slotMyBooking = Color(0xFF2196F3);
   static const slotAlmostFull = Color(0xFFFFC107);
   static const slotUnavailable = Color(0xFF9E9E9E);
-  static const slotRecommended = Color(0xFFF4A460);
 
   // Schedule: availability block (empty/available)
   static const availabilityEmpty = Color(0xFFFAFAFA);
