@@ -173,6 +173,28 @@ class AppTheme {
         side: const BorderSide(color: AppColors.inkQuaternary, width: 2),
       ),
 
+      // Radio — Notebook × Score: 선택된 Radio 의 링·도트를 Vermillion 으로 통일.
+      // 개별 activeColor override 없는 Radio 도 자동 Vermillion 적용 → Material blue 제거.
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.inkTertiary;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.inkQuaternary;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.hovered) ||
+              states.contains(WidgetState.focused)) {
+            return AppColors.paperAccentSoft;
+          }
+          return Colors.transparent;
+        }),
+      ),
+
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.ink,
@@ -514,6 +536,27 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         side: const BorderSide(color: AppColors.borderDark, width: 2),
+      ),
+
+      // Radio — Notebook × Score: dark 에서도 선택 Radio 는 Vermillion. 미선택 은 borderDark.
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.textSecondaryDark;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.paperAccent;
+          }
+          return AppColors.borderDark;
+        }),
+        overlayColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.hovered) ||
+              states.contains(WidgetState.focused)) {
+            return AppColors.paperAccentSoft;
+          }
+          return Colors.transparent;
+        }),
       ),
 
       // Progress Indicator
