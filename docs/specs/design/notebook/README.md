@@ -733,6 +733,27 @@ Text(
 
 **은유**: 앱 전역의 섹션 타이틀이 한 오케스트라의 악장 표제처럼 통일됨. 사용자가 어느 화면에 있든 "악장 번호"가 같은 서체로 표시되어 악보를 읽는 듯한 연속성 확보.
 
+### 7.21 Icon + ListTile 테마 통일 — 기본 ink, 선택 Vermillion 단일 진원지
+
+**배경**: §7.18 까지 Switch/TextSelection 같은 미세 인터랙션을 마감했으나, 앱 전반에서 가장 흔한 `Icon` 기본 색상과 `ListTile` (36 파일 사용) 의 icon/text/선택 색상은 각 호출부가 개별 스타일을 지정하고 있었음. 기본값이 없으니 일부 화면은 ink, 다른 화면은 시스템 기본(파란색) 또는 grey 로 섞여 보여 일관성 깨짐. `app_theme.dart` 1-지점에서 `iconTheme` + `listTileTheme` 추가로 전 화면 일괄 정리.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `iconTheme` + `primaryIconTheme` 기본색 `ink`, `listTileTheme` icon/text `ink`, 선택 `paperAccent` + 배경 `paperAccentSoft` | f1055bac |
+| `core/theme/app_theme.dart` (dark) | 기본색 `paper` / `textPrimaryDark`, 선택색은 동일 Vermillion 유지 | f1055bac |
+
+**영향 범위**:
+- `ListTile` 36 파일 (profile 메뉴, 설정 화면, 드로어, 선택 시트 등)의 icon/text 기본 색상이 ink 로 통일
+- 선택 상태(`selected: true`)는 Vermillion + paperAccentSoft 배경으로 시각 강조
+- 모든 `Icon()` 위젯의 기본 색상이 ink → 개별 `color: AppColors.ink` 지정 불필요
+- 다크 테마 대응 포함 — 라이트/다크 모두 일관 규칙
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 악보의 표기 기호(♯, ♭, 강약)들이 모두 같은 잉크로 인쇄되는 원칙. 한 페이지 안에서 서로 다른 색의 기호가 섞이지 않듯, 앱의 아이콘과 리스트 항목도 단일 팔레트로 일관 적용.
+
 ---
 
 ## 8. 구현 원칙
