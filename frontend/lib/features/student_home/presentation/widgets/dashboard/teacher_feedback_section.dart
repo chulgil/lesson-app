@@ -6,6 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../lessons/domain/entities/lesson.dart';
 import '../../../../lessons/presentation/providers/lesson_crud_provider.dart';
 
@@ -126,11 +127,11 @@ class TeacherFeedbackSection extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
+          // Notebook × Score: 선생님 피드백은 손글씨 주석처럼 Gaegu로 렌더.
           Text(
             lesson.feedback ?? '',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-              height: 1.5,
+            style: NotebookTypography.hand.copyWith(
+              color: AppColors.paperPencil,
             ),
           ),
         ],

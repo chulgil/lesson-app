@@ -5,6 +5,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 
@@ -212,10 +213,13 @@ class StudentLessonCard extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
+                      // Notebook × Score: 피드백 프리뷰는 손글씨 주석처럼 Gaegu로.
                       child: Text(
                         lesson.feedback!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.inkSecondary,
+                        style: NotebookTypography.hand.copyWith(
+                          fontSize: 13,
+                          color: AppColors.paperPencil,
+                          height: 1.3,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
