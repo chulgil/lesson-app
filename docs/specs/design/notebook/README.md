@@ -1106,6 +1106,30 @@ Text(
 
 ---
 
+### 7.36 녹음 시트·시작 가이드·주간 랭킹 카드 제목 Playfair 통일
+
+**배경**: §7.34 의 BottomSheet 전역 테마가 모달 표면 톤을 paper 로 일원화했지만, 정작 그 시트 **안쪽 커스텀 헤더 제목**과 카드 내부 **섹션 제목**은 여전히 `AppTypography.headingSmall` (Pretendard 18/w600) 로 남아 있는 지점이 세 군데 있었다. 선생님이 시범 녹음을 올리는 `AddRecordingResourceSheet`, 학생 홈의 `StudentGettingStartedCard`, 클래스 리더보드의 `WeeklyRankingCard` — 모두 바깥 표면·CTA 는 Notebook 팔레트로 전환됐는데 제목만 산세리프라 페이퍼 위 서체 위계가 끊겨 있었다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/lessons/presentation/widgets/add_recording_resource_sheet.dart` | 바텀시트 커스텀 헤더 `'시범 연주 녹음 추가'` `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`. `notebook_typography` import 추가 | 34b44fc4 |
+| `features/student_home/presentation/widgets/student_getting_started_card.dart` | 시작 가이드 카드 제목 `'시작 가이드'` `AppTypography.headingSmall.copyWith(color: AppColors.ink)` → `NotebookTypography.sectionTitle.copyWith(color: AppColors.ink)`. `notebook_typography` import 추가 | 34b44fc4 |
+| `features/gamification/presentation/widgets/weekly_ranking_card.dart` | 주간 랭킹 카드 제목 `AppStrings.weeklyRanking` `AppTypography.headingSmall.copyWith(color: AppColors.ink)` → `NotebookTypography.sectionTitle.copyWith`. `notebook_typography` import 추가 | 34b44fc4 |
+
+**설계 포인트**:
+- **두 위계의 분리 적용**: 바텀시트 커스텀 헤더(`add_recording_resource_sheet`) 는 §7.27 의 "커스텀 헤더 = `appBarTitle` 재사용" 패턴을 따르고, 카드 내부 섹션 제목(`student_getting_started_card`·`weekly_ranking_card`) 은 §7.17 의 "섹션 헤더 = `sectionTitle`" 패턴을 따른다. 두 파일이 Row 안에서 아이콘(`rocket_launch_rounded`·tier emoji) 과 병치되지만, 아이콘은 §7.30 원칙대로 제목이 아니므로 제외.
+- **`.copyWith(color: AppColors.ink)` 보존**: 두 카드 모두 헤더 색을 의도적으로 `ink` 로 낮춰 본문 톤과 맞췄다. `NotebookTypography.sectionTitle` 자체는 기본 잉크 색이지만 `.copyWith` 체인을 제거하지 않고 유지 — 향후 다크 모드 대응이나 상태별 색 변조(비활성 회색 등) 가 들어올 여지를 같은 체인 안에서 관리한다.
+- **주간 랭킹 tier emoji 는 `headingMedium` 그대로**: 🥇🥈🥉 는 `headingMedium` 으로 크기만 맞춘 기호 열이라 Playfair 대상이 아니다. `_tierEmoji` 는 `RankingTier` enum → 이모지 매핑으로, 서체가 아니라 글리프 자체가 의미를 전달한다.
+- **바텀시트 배경·CTA 와의 조합**: §7.34 커밋으로 `AddRecordingResourceSheet` 배경은 `paper` 로 자동 승격됐고, §7.35 커밋으로 그 안의 FilledButton 이 Vermillion 으로 전환됐다. 이번 턴에 헤더 제목이 Playfair 로 마감되면서, 시트가 올라올 때 "갱지 + Playfair 제목 + 닫기 아이콘 + Vermillion CTA" 순으로 Notebook 4대 시그니처가 한 시트 안에 한 번에 드러난다.
+
+**검증**:
+- `flutter analyze lib/features/lessons/presentation/widgets/add_recording_resource_sheet.dart lib/features/student_home/presentation/widgets/student_getting_started_card.dart lib/features/gamification/presentation/widgets/weekly_ranking_card.dart` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 세 개의 서로 다른 연습실 — 선생님 책상 위의 녹음 부스, 학생의 첫 수업 입구, 교실 벽의 주간 기록판. 바닥과 벽은 이미 같은 갱지로 발라졌지만, 각 방 문패만 유독 고딕체 인쇄물이었다. 세 문패를 한 번에 세리프로 필사해 붙이자, 세 공간이 같은 악보 속 서로 다른 악장처럼 읽히기 시작한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
