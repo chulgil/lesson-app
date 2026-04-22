@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
 
@@ -14,10 +15,7 @@ import '../providers/teaching_resource_providers.dart';
 class AddExternalLinkSheet extends ConsumerStatefulWidget {
   final void Function(TeachingResource resource)? onResourceCreated;
 
-  const AddExternalLinkSheet({
-    super.key,
-    this.onResourceCreated,
-  });
+  const AddExternalLinkSheet({super.key, this.onResourceCreated});
 
   @override
   ConsumerState<AddExternalLinkSheet> createState() =>
@@ -55,10 +53,11 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
+            // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('외부 링크 추가', style: AppTypography.headingSmall),
+                Text('외부 링크 추가', style: NotebookTypography.appBarTitle),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -74,11 +73,17 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
                 labelText: 'URL',
                 hintText: 'https://...',
                 border: const OutlineInputBorder(),
-                prefixIcon:
-                    const Icon(Icons.link, color: AppColors.inkTertiary),
-                suffixIcon: _urlValid
-                    ? const Icon(Icons.check_circle, color: AppColors.paperOk)
-                    : null,
+                prefixIcon: const Icon(
+                  Icons.link,
+                  color: AppColors.inkTertiary,
+                ),
+                suffixIcon:
+                    _urlValid
+                        ? const Icon(
+                          Icons.check_circle,
+                          color: AppColors.paperOk,
+                        )
+                        : null,
               ),
               keyboardType: TextInputType.url,
               onChanged: _onUrlChanged,
@@ -117,14 +122,18 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline,
-                      size: 16, color: AppColors.paperAccent),
+                  const Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '악보, 강의 영상, 참고 자료 등 모든 URL을 추가할 수 있습니다',
-                      style: AppTypography.caption
-                          .copyWith(color: AppColors.paperAccent),
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.paperAccent,
+                      ),
                     ),
                   ),
                 ],
@@ -137,16 +146,17 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _canSubmit ? _submit : null,
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('추가'),
+                child:
+                    _isSubmitting
+                        ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Text('추가'),
               ),
             ),
           ],
@@ -156,9 +166,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
   }
 
   bool get _canSubmit =>
-      _urlValid &&
-      _titleController.text.trim().isNotEmpty &&
-      !_isSubmitting;
+      _urlValid && _titleController.text.trim().isNotEmpty && !_isSubmitting;
 
   void _onUrlChanged(String url) {
     final trimmed = url.trim();
@@ -177,9 +185,10 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
           .createResource(
             type: TeachingResourceType.externalLink,
             title: _titleController.text.trim(),
-            description: _memoController.text.trim().isNotEmpty
-                ? _memoController.text.trim()
-                : null,
+            description:
+                _memoController.text.trim().isNotEmpty
+                    ? _memoController.text.trim()
+                    : null,
             externalUrl: _urlController.text.trim(),
           );
 
@@ -189,9 +198,9 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('링크 추가에 실패했습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('링크 추가에 실패했습니다')));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

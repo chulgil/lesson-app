@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson_schedule_change.dart';
 
@@ -44,9 +45,10 @@ class _ScheduleChangeTypeBottomSheet extends StatelessWidget {
               ),
             ),
             // Title
+            // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
             Text(
               AppStrings.scheduleChangeTypeTitle,
-              style: AppTypography.headingSmall,
+              style: NotebookTypography.appBarTitle,
             ),
             const SizedBox(height: AppSpacing.space4),
             // Single lesson option
@@ -129,10 +131,7 @@ class _ChangeTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.inkTertiary,
-              ),
+              const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
             ],
           ),
         ),

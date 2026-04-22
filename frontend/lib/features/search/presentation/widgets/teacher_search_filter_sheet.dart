@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
@@ -59,7 +60,8 @@ class _TeacherSearchFilterSheetState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('필터', style: AppTypography.headingSmall),
+                      // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
+                      Text('필터', style: NotebookTypography.appBarTitle),
                       TextButton(
                         onPressed: () {
                           setState(() => _filter = TeacherSearchFilter.empty);

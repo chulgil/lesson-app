@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../data/services/ai_notes_service.dart';
 
@@ -75,7 +76,8 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                           size: 24,
                         ),
                         const SizedBox(width: AppSpacing.space2),
-                        Text('AI 레슨 노트', style: AppTypography.headingSmall),
+                        // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
+                        Text('AI 레슨 노트', style: NotebookTypography.appBarTitle),
                       ],
                     ),
                     TextButton(
