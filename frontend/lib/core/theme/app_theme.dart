@@ -143,6 +143,26 @@ class AppTheme {
         ),
       ),
 
+      // FloatingActionButton — Notebook × Score: .extended FAB 18개(15 파일) 기본 배경을 Vermillion 으로 승격.
+      // 기존에는 6개 호출부만 인라인 `backgroundColor: paperAccent` 를 지정했고, 9개 호출부는 M3 기본값
+      // (colorScheme.primaryContainer = inkQuaternary 회색)로 폴백돼 Notebook CTA 시그니처가 끊겼다.
+      // filledButtonTheme 와 동일한 Vermillion·paper·elevation 0 시그니처로 CTA 색상 일관성 확보.
+      // .extended 의 StadiumBorder() 기본값은 유지 — Notebook ticket/pill 형태와 조화.
+      // 인라인 `backgroundColor` / `foregroundColor` 오버라이드 6건은 Flutter 속성 우선순위로 유지 — 회귀 0.
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.paperAccent,
+        foregroundColor: AppColors.paper,
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        disabledElevation: 0,
+        extendedTextStyle: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.paper,
+        ),
+      ),
+
       // Input
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -612,6 +632,23 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           textStyle: AppTypography.button,
+        ),
+      ),
+
+      // FloatingActionButton — Notebook × Score: dark 테마에서도 Vermillion CTA 시그니처 유지.
+      // filledButtonTheme(dark) 와 동일한 paperAccent·paper·elevation 0 — light/dark 전환 시 FAB 색상 일관성 확보.
+      // dark 표면 위 paperAccent 는 충분한 대비, foregroundColor 는 paper 로 밝은 라벨 유지.
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.paperAccent,
+        foregroundColor: AppColors.paper,
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        disabledElevation: 0,
+        extendedTextStyle: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.paper,
         ),
       ),
 
