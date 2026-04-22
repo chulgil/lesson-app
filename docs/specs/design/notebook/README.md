@@ -576,6 +576,24 @@ Text(
 
 **은유**: 각 탭 = 악장 번호 (I·II·III·IV·V). 진행 중 악장만 Vermillion 으로 강조.
 
+### 7.14 AppBar 타이틀 Playfair 통일 — 전역 테마 1-지점 수정
+
+**배경**: 본문·프리뷰·네비에 Playfair·Gaegu·로마숫자·Vermillion 을 모두 적용했지만 AppBar 타이틀은 Pretendard(산세리프) 로 남아있어 **상단부 전체가 4대 시그니처 이탈**. 하위 화면 수십 곳이 개별 수정 없이 한 번에 통일되도록 전역 테마를 수정.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/notebook_typography.dart` | `appBarTitle` 스타일 신설 — Playfair Display 18 / w700 / letterSpacing 0 / height 1.2 | f81dab87 |
+| `core/theme/app_theme.dart` | light · dark 두 테마의 `appBarTheme.titleTextStyle` 을 `AppTypography.headingMedium`(Pretendard) → `NotebookTypography.appBarTitle` 로 교체 (dark 는 color override) | f81dab87 |
+
+**영향 범위**: AppBar 를 사용하는 전 화면 (학부모 5탭 + 학생 하위 + 레슨·학생·결제·프로필 상세 등 수십 곳). 개별 화면 수정 없이 테마만으로 일괄 적용.
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+- 개별 AppBar title override 없음 (grep 확인)
+
+**은유**: AppBar 타이틀 = 악보 페이지 상단의 곡 제목(Playfair serif).
+
 ---
 
 ## 8. 구현 원칙
