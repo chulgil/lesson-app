@@ -56,12 +56,12 @@ class SubscriptionBadge extends StatelessWidget {
 
   String _getLabel() {
     if (subscription.type == SubscriptionType.package) {
-      return '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}';
+      return '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회';
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
-      return days > 0 ? 'D-$days' : 'EXP';
+      return days > 0 ? 'D-$days' : '만료';
     } else {
-      return 'TRIAL';
+      return '체험';
     }
   }
 
