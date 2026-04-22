@@ -1669,6 +1669,43 @@ Text(
 
 ---
 
+### 7.52 통합 레슨 신청·완료·거절 바텀시트 섹션 제목 Playfair 통일 — schedule/ 도메인 §7.17 배치 #2
+
+**배경**: §7.51 주간 스케줄·휴무 배치에 이어 schedule/ 도메인의 두 번째 §7.17 배치. 이번 대상은 학생 시점의 **레슨 신청 파이프라인** 3개 화면(통합 신청·신청 완료·거절 바텀시트). 통합 신청 화면은 `_SectionWrapper` 라는 내부 헬퍼 위젯이 6개 호출부(체험/정기/아카데미 각 폼) 에서 반복 사용되므로 헬퍼 1곳 수정으로 일괄 반영.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 전파 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/schedule/presentation/screens/unified_lesson_request_screen.dart` | 770 | `_SectionWrapper` 헬퍼 `title` | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | 6 호출부 |
+| 〃 | 774 | `_SectionWrapper` required marker ` *` | `AppTypography.headingSmall.copyWith(color: paperAccent)` | `NotebookTypography.sectionTitle.copyWith(color: paperAccent)` | 6 호출부 |
+| `frontend/lib/features/schedule/presentation/screens/request_completion_screen.dart` | 127 | "진행 단계 가이드" | `AppTypography.headingSmall.copyWith(color: ink)` | `NotebookTypography.sectionTitle.copyWith(color: ink)` | 직접 |
+| 〃 | 262 | "신청 정보 요약" | `AppTypography.headingSmall.copyWith(color: ink)` | `NotebookTypography.sectionTitle.copyWith(color: ink)` | 직접 |
+| `frontend/lib/features/schedule/presentation/screens/suggest_alternative_screen.dart` | 857 | `AppStrings.rejectBottomSheetTitle` | `AppTypography.headingSmall` | `NotebookTypography.appBarTitle` | §7.27 |
+
+실질적으로 섹션 헤더 **9건** 이 Playfair 로 전환됐다(helper 호출부 6 + direct 2 + bottom sheet 1). 그 중 6건은 헬퍼 2줄(title + required marker) 수정으로 체험·정기·아카데미 폼에 동시에 반영됐다.
+
+**설계 포인트**:
+- **§7.17 과 §7.27 의 같은-배치 공존 재확인**: 같은 커밋에 `sectionTitle` 과 `appBarTitle` 이 공존하는 것은 §7.48·§7.49·§7.51 을 거치며 표준 패턴이 됐다. 분기점은 `BottomSheetHandle` 선행 여부. suggest_alternative 의 거절 바텀시트는 handle 선행 구조이므로 `appBarTitle` 로 분기했다.
+- **`_SectionWrapper` 의 required marker 치환**: 요구 필수(*) 마커는 제목 폰트를 공유하는 장식이다. 제목 폰트를 Playfair 로 바꿨으면 마커도 동일 폰트를 써야 시각적 연속성을 유지한다. copyWith 로 색만 paperAccent(Vermillion) 로 덮어써서 빨간 별표만 눈에 띄도록.
+- **§7.30 제외 roster 확장 — schedule/ 의 동적 값 군집**: 이번 배치 선정 과정에서 확인한 schedule/ 내 **동적 값** 카테고리를 최종 정리해 기록:
+  - 동적 날짜 라벨: `schedule_tab:271` (선택한 날짜 "4월 22일 화요일"), `booking_cancel:146` (`_formatBookingDate()`)
+  - 동적 시간 값: `schedule_tab:615` (`lesson.startTime` 14:30)
+  - 동적 상태 라벨: `group_class_detail:370` (`booking.statusText`)
+  - 동적 이름: `booking_cancel:591` (`teacherName 연락처`), `request_detail:327` (opponent + 타입), `unified_lesson_request:175` (teacherName)
+  - 동적 카운트: `group_class_attendance:170` (출석 N/M)
+
+  이들은 모두 §7.30 exclusion roster 의 "dynamic stat values" 범주. 사용자 생성 고유명사나 변동 숫자는 Inter sans-serif 로 두고 Playfair 는 정적 카피에만 적용하는 원칙.
+- **PostToolUse 포매터와 old_string 재조정**: 이번 배치에서 import 추가 직후 포매터가 주변 영역을 재정렬해 `Edit` 의 old_string 을 무효화시키는 경우가 여러 번 발생. `Read` 로 실제 라인을 재확인한 뒤 복구. 포매터 친화적 방식은 "import 한 줄 추가 → 한 번 Read → 편집" 순서. 배치 크기를 늘리면 포매터와 경합하는 구간이 비례 증가하므로 도메인 단위 배치 전략(§7.51) 이 재차 정당화된다.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (5.2s)
+- Lore commit: `ab3a5581`
+
+**은유**: 학생이 레슨을 신청하는 장부는 세 장이다 — 첫 장은 신청서 폼, 둘째 장은 접수 확인서, 셋째 장은 바꿔달라는 요청서. 세 장부의 표지 활자가 서로 달랐다면 독자는 "같은 펜이 쓴 게 맞나?" 의심할 것이다. 오늘 세 장부의 섹션 제목이 한 활자(Playfair) 로 수렴했다. 신청서 안의 체험/정기/아카데미 항목도 한 거푸집(`_SectionWrapper`) 에서 찍혔으니, 거푸집 하나만 바꿔도 세 종류의 신청서가 동시에 격상됐다. 필수 항목의 빨간 별표는 여전히 빨갛지만, 별표의 몸통마저 이제 Playfair 의 손글씨다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
