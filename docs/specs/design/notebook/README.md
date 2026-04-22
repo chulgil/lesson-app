@@ -1366,6 +1366,33 @@ Text(
 
 ---
 
+### 7.43 레퍼토리·곡 이름 3개 사이트 Playfair pieceTitle 통일
+
+**배경**: §7.42 후속으로 미뤄 둔 "레퍼토리 이름" 타이틀 처리. 학생 홈 연습 탭·연습 레퍼토리 화면·아카이브 타일 세 진입점에서 `repertoire.name` 이 여전히 `AppTypography.headingSmall`(Noto Sans) 로 렌더되고 있었다. §7.30 pieceTitle 패턴의 "작품명=고유명사=세리프" 원칙을 세 곳에 동시 반영해 다른 진입점에서 같은 작품이 다른 서체로 보이는 어긋남을 제거한다.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 패턴 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/practice/presentation/screens/practice_repertoire_screen.dart` | 144 | 레퍼토리 카드 헤더 (`repertoire.name`) | `AppTypography.headingSmall` | `NotebookTypography.pieceTitle` | §7.30 |
+| `frontend/lib/features/practice/presentation/widgets/section_management/archive_repertoire_tile.dart` | 37-43 | 아카이브 타일 제목 (`repertoire.name`) | `AppTypography.headingSmall` | `NotebookTypography.pieceTitle` | §7.30 |
+| `frontend/lib/features/student_home/presentation/screens/student_practice_tab.dart` | 453-458 | 학생 홈 연습 탭 레퍼토리 카드 (`widget.repertoire.name`) | `AppTypography.headingSmall` | `NotebookTypography.pieceTitle` | §7.30 |
+
+**설계 포인트**:
+- **§7.30 pieceTitle 의 경계**: pieceTitle 은 "작품명·레퍼토리명" 과 같이 사용자가 스스로 붙인 고유명사에만 적용한다. stat 값(§7.17 이하에서도 제외), D-day 동적 토큰, empty-state 헤드라인, avatar 이니셜, `levelTitle` 등 "상태를 드러내는 텍스트" 는 대상에서 제외한다. 이번 배치는 레퍼토리 이름 세 곳에만 국한했다.
+- **동적 텍스트여도 pieceTitle 가능한 이유**: §7.30 은 "정적 vs 동적" 기준이 아니라 "작품명 vs 상태표기" 기준으로 분기한다. `repertoire.name` 은 런타임에 결정되지만 "고유명사"이므로 Playfair 가 맞다. 반대로 같은 위젯 안의 `sections.length` 개 섹션 같은 카운트는 Playfair 를 쓰지 않는다.
+- **16pt 위계 포지션**: `pieceTitle` (16/w600, letterSpacing -0.2, height 1.3) 는 `sectionTitle` (17/w600) 보다 한 단계 낮아, 카드 안에서 섹션 제목이 아니라 "콘텐츠의 주인공" 으로 읽히도록 한다. 이 때문에 `repertoire.name` 은 항상 `sectionTitle` 이 아닌 `pieceTitle` 로 맞춘다.
+- **스코프 격리 재적용**: §7.42 때 index 에 잔존하던 4개 파일이 편승한 사고를 반복하지 않기 위해, 이번에는 `git reset HEAD 2>/dev/null; git add <3 files>; git diff --cached --stat` 삼단 확인으로 오직 세 파일만 스테이징된 상태를 사전 검증했다. 결과: `3 files changed, 16 insertions(+), 8 deletions(-)` 로 깨끗.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (8.6s)
+- `flutter test test/` → 392/392 passed
+- Lore commit: `2b319c81`
+
+**은유**: 악보 위의 곡 제목은 장부의 글씨가 아니라 작곡가의 사인이다. "Mendelssohn — Violin Concerto" 는 오늘의 연습 카운트와 같은 손글씨로 적히면 무게가 반감된다. 같은 이름이 학생 홈·연습 장부·아카이브 서랍 어느 곳에서 마주쳐도 똑같이 Playfair 16pt 세리프로 찍혀 있어야, 진지한 작품이 진지한 활자로 남는다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
