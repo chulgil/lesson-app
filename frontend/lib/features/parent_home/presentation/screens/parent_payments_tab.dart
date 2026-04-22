@@ -442,7 +442,8 @@ class _ChildSelectorSheet extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                  child: Text('자녀 선택', style: AppTypography.headingSmall),
+                  // Notebook × Score: 바텀시트 커스텀 헤더는 Playfair appBarTitle 로 통일 (§7.27 패턴).
+                  child: Text('자녀 선택', style: NotebookTypography.appBarTitle),
                 ),
                 Expanded(
                   child: ListView.builder(

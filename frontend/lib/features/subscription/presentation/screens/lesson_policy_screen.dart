@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../providers/lesson_policy_providers.dart';
 import '../widgets/chip_input_field.dart';
@@ -134,7 +135,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       children: [
         Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+        Text(title, style: NotebookTypography.sectionTitle),
       ],
     );
   }
@@ -407,11 +409,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             Icon(icon, size: 20, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space3),
             Expanded(child: Text(label, style: AppTypography.bodyMedium)),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.inkTertiary,
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
@@ -25,7 +26,8 @@ class ParentLessonsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Upcoming lessons
-          Text('예정된 레슨', style: AppTypography.headingSmall),
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+          Text('예정된 레슨', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
 
           _LessonCard(
@@ -65,7 +67,8 @@ class ParentLessonsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Past lessons
-          Text('지난 레슨', style: AppTypography.headingSmall),
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+          Text('지난 레슨', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
 
           _LessonCard(
@@ -551,9 +554,7 @@ class _LessonCard extends StatelessWidget {
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
                           color:
-                              isPast
-                                  ? AppColors.inkSecondary
-                                  : AppColors.ink,
+                              isPast ? AppColors.inkSecondary : AppColors.ink,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
