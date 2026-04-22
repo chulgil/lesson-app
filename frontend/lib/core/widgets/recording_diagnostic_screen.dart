@@ -64,17 +64,20 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
         final file = File(recording.filePath);
         final exists = await file.exists();
         dbFilePaths.add(recording.filePath);
-        _dbEntries.add(_RecordingEntry(
-          id: recording.id,
-          sectionId: recording.sectionId,
-          filePath: recording.filePath,
-          fileExists: exists,
-          createdAt: recording.createdAt,
-        ));
+        _dbEntries.add(
+          _RecordingEntry(
+            id: recording.id,
+            sectionId: recording.sectionId,
+            filePath: recording.filePath,
+            fileExists: exists,
+            createdAt: recording.createdAt,
+          ),
+        );
       }
 
       // Find orphaned files (exist on disk but not in DB)
-      _orphanedFiles = _physicalFiles.where((path) => !dbFilePaths.contains(path)).toList();
+      _orphanedFiles =
+          _physicalFiles.where((path) => !dbFilePaths.contains(path)).toList();
 
       // Calculate stats
       _matchedCount = _dbEntries.where((e) => e.fileExists).length;
@@ -90,9 +93,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   @override
   Widget build(BuildContext context) {
     if (!kDebugMode) {
-      return const Scaffold(
-        body: Center(child: Text('Debug mode only')),
-      );
+      return const Scaffold(body: Center(child: Text('Debug mode only')));
     }
 
     return Scaffold(
@@ -106,26 +107,27 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Summary Card
-                  _buildSummaryCard(),
-                  const SizedBox(height: AppSpacing.space4),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Summary Card
+                    _buildSummaryCard(),
+                    const SizedBox(height: AppSpacing.space4),
 
-                  // Orphaned Files Section (files on disk but not in DB)
-                  _buildOrphanedFilesSection(),
-                  const SizedBox(height: AppSpacing.space4),
+                    // Orphaned Files Section (files on disk but not in DB)
+                    _buildOrphanedFilesSection(),
+                    const SizedBox(height: AppSpacing.space4),
 
-                  // DB Entries Section
-                  _buildDbEntriesSection(),
-                ],
+                    // DB Entries Section
+                    _buildDbEntriesSection(),
+                  ],
+                ),
               ),
-            ),
     );
   }
 
@@ -146,17 +148,23 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
             _buildSummaryRow(
               '매칭됨 (파일 존재)',
               '$_matchedCount개',
-              color: AppColors.success,
+              color: AppColors.paperOk,
             ),
             _buildSummaryRow(
               'DB 불일치 (파일 없음)',
               '$_unmatchedCount개',
-              color: _unmatchedCount > 0 ? AppColors.error : AppColors.success,
+              color:
+                  _unmatchedCount > 0
+                      ? AppColors.paperAccent
+                      : AppColors.paperOk,
             ),
             _buildSummaryRow(
               '고아 파일 (DB에 없음)',
               '${_orphanedFiles.length}개',
-              color: _orphanedFiles.isNotEmpty ? AppColors.warning : AppColors.success,
+              color:
+                  _orphanedFiles.isNotEmpty
+                      ? AppColors.paperAccent
+                      : AppColors.paperOk,
             ),
           ],
         ),
@@ -164,38 +172,43 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value,
-      {Color? color, bool wrap = false}) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    Color? color,
+    bool wrap = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: wrap
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: AppTypography.bodyMedium),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: color ?? AppColors.textSecondaryLight,
-                    fontFamily: 'monospace',
+      child:
+          wrap
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: AppTypography.bodyMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: color ?? AppColors.inkSecondary,
+                      fontFamily: 'monospace',
+                    ),
                   ),
-                ),
-              ],
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(label, style: AppTypography.bodyMedium),
-                Text(
-                  value,
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: color,
+                ],
+              )
+              : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(label, style: AppTypography.bodyMedium),
+                  Text(
+                    value,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
     );
   }
 
@@ -228,7 +241,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('삭제 실패: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -238,23 +251,26 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   Future<void> _deleteAllOrphanedFiles() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('고아 파일 전체 삭제'),
-        content: Text('${_orphanedFiles.length}개의 고아 파일을 모두 삭제하시겠습니까?\n\n이 파일들은 DB에 기록이 없어 복구할 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('고아 파일 전체 삭제'),
+            content: Text(
+              '${_orphanedFiles.length}개의 고아 파일을 모두 삭제하시겠습니까?\n\n이 파일들은 DB에 기록이 없어 복구할 수 없습니다.',
             ),
-            child: const Text('전체 삭제'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
+                child: const Text('전체 삭제'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -290,16 +306,17 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
 
   Widget _buildOrphanedFilesSection() {
     return Card(
-      color: _orphanedFiles.isNotEmpty
-          ? AppColors.warning.withValues(alpha: 0.05)
-          : null,
+      color:
+          _orphanedFiles.isNotEmpty
+              ? AppColors.paperAccent.withValues(alpha: 0.05)
+              : null,
       child: ExpansionTile(
         initiallyExpanded: _orphanedFiles.isNotEmpty,
         title: Text(
           '고아 파일 - DB에 없음 (${_orphanedFiles.length}개)',
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
-            color: _orphanedFiles.isNotEmpty ? AppColors.warning : null,
+            color: _orphanedFiles.isNotEmpty ? AppColors.paperAccent : null,
           ),
         ),
         children: [
@@ -317,13 +334,16 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
               ),
               child: OutlinedButton.icon(
                 onPressed: _deleteAllOrphanedFiles,
-                icon: const Icon(Icons.delete_sweep, color: AppColors.error),
+                icon: const Icon(
+                  Icons.delete_sweep,
+                  color: AppColors.paperAccent,
+                ),
                 label: Text(
                   '고아 파일 전체 삭제 (${_orphanedFiles.length}개)',
-                  style: const TextStyle(color: AppColors.error),
+                  style: const TextStyle(color: AppColors.paperAccent),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.error),
+                  side: const BorderSide(color: AppColors.paperAccent),
                 ),
               ),
             ),
@@ -341,7 +361,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
                   leading: const Icon(
                     Icons.warning_amber,
                     size: 20,
-                    color: AppColors.warning,
+                    color: AppColors.paperAccent,
                   ),
                   title: Text(
                     fileName,
@@ -352,11 +372,14 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
                   subtitle: Text(
                     relativePath,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: AppColors.paperAccent,
+                    ),
                     onPressed: () => _deleteOrphanedFile(path),
                     tooltip: '삭제',
                   ),
@@ -379,14 +402,14 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
         // Unmatched entries (priority)
         if (unmatchedEntries.isNotEmpty) ...[
           Card(
-            color: AppColors.error.withValues(alpha: 0.05),
+            color: AppColors.paperAccent.withValues(alpha: 0.05),
             child: ExpansionTile(
               initiallyExpanded: true,
               title: Text(
                 '파일 없음 (${unmatchedEntries.length}개)',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                 ),
               ),
               children: [
@@ -412,7 +435,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
               '파일 존재 (${matchedEntries.length}개)',
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.success,
+                color: AppColors.paperOk,
               ),
             ),
             children: [
@@ -440,38 +463,36 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
 
   Widget _buildEntryTile(_RecordingEntry entry) {
     final fileName = entry.filePath.split('/').last;
-    final relativePath = entry.filePath.contains('/Documents/')
-        ? entry.filePath.split('/Documents/').last
-        : entry.filePath;
+    final relativePath =
+        entry.filePath.contains('/Documents/')
+            ? entry.filePath.split('/Documents/').last
+            : entry.filePath;
 
     return ListTile(
       dense: true,
       leading: Icon(
         entry.fileExists ? Icons.check_circle : Icons.error,
-        color: entry.fileExists ? AppColors.success : AppColors.error,
+        color: entry.fileExists ? AppColors.paperOk : AppColors.paperAccent,
         size: 20,
       ),
       title: Text(
         fileName,
-        style: AppTypography.bodySmall.copyWith(
-          fontFamily: 'monospace',
-        ),
+        style: AppTypography.bodySmall.copyWith(fontFamily: 'monospace'),
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Section: ${entry.sectionId}',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
           Text(
             relativePath,
             style: AppTypography.caption.copyWith(
-              color: entry.fileExists
-                  ? AppColors.textTertiaryLight
-                  : AppColors.error.withValues(alpha: 0.7),
+              color:
+                  entry.fileExists
+                      ? AppColors.inkTertiary
+                      : AppColors.paperAccent.withValues(alpha: 0.7),
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

@@ -50,47 +50,47 @@ class AppDatePicker {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.surfaceLight,
-              onSurface: AppColors.textPrimaryLight,
+              primary: AppColors.ink,
+              onPrimary: AppColors.paper,
+              surface: AppColors.paper,
+              onSurface: AppColors.ink,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: AppColors.surfaceLight,
-              headerBackgroundColor: AppColors.primary,
-              headerForegroundColor: Colors.white,
+              backgroundColor: AppColors.paper,
+              headerBackgroundColor: AppColors.ink,
+              headerForegroundColor: AppColors.paper,
               dayForegroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
+                  return AppColors.paper;
                 }
                 if (states.contains(WidgetState.disabled)) {
-                  return AppColors.textDisabledLight;
+                  return AppColors.inkQuaternary;
                 }
-                return AppColors.textPrimaryLight;
+                return AppColors.ink;
               }),
               dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return AppColors.primary;
+                  return AppColors.ink;
                 }
                 return null;
               }),
               todayForegroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
+                  return AppColors.paper;
                 }
-                return AppColors.primary;
+                return AppColors.ink;
               }),
               todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return AppColors.primary;
+                  return AppColors.ink;
                 }
                 return null;
               }),
-              todayBorder: BorderSide(color: AppColors.primary, width: 1.5),
+              todayBorder: BorderSide(color: AppColors.ink, width: 1.5),
               // Improved action button styles for visibility
               cancelButtonStyle: ButtonStyle(
                 foregroundColor: WidgetStateProperty.all(
-                  AppColors.textSecondaryLight,
+                  AppColors.inkSecondary,
                 ),
                 textStyle: WidgetStateProperty.all(
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -100,8 +100,8 @@ class AppDatePicker {
                 ),
               ),
               confirmButtonStyle: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(AppColors.primary),
-                foregroundColor: WidgetStateProperty.all(Colors.white),
+                backgroundColor: WidgetStateProperty.all(AppColors.ink),
+                foregroundColor: WidgetStateProperty.all(AppColors.paper),
                 textStyle: WidgetStateProperty.all(
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
@@ -119,7 +119,7 @@ class AppDatePicker {
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
+                foregroundColor: AppColors.ink,
                 textStyle: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -158,25 +158,25 @@ class AppDatePicker {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.surfaceLight,
-              onSurface: AppColors.textPrimaryLight,
+              primary: AppColors.ink,
+              onPrimary: AppColors.paper,
+              surface: AppColors.paper,
+              onSurface: AppColors.ink,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: AppColors.surfaceLight,
-              headerBackgroundColor: AppColors.primary,
-              headerForegroundColor: Colors.white,
-              rangePickerBackgroundColor: AppColors.surfaceLight,
-              rangePickerHeaderBackgroundColor: AppColors.primary,
-              rangePickerHeaderForegroundColor: Colors.white,
-              rangeSelectionBackgroundColor: AppColors.primaryLight.withValues(
+              backgroundColor: AppColors.paper,
+              headerBackgroundColor: AppColors.ink,
+              headerForegroundColor: AppColors.paper,
+              rangePickerBackgroundColor: AppColors.paper,
+              rangePickerHeaderBackgroundColor: AppColors.ink,
+              rangePickerHeaderForegroundColor: AppColors.paper,
+              rangeSelectionBackgroundColor: AppColors.paperAccent.withValues(
                 alpha: 0.3,
               ),
               // Action button styles
               cancelButtonStyle: ButtonStyle(
                 foregroundColor: WidgetStateProperty.all(
-                  AppColors.textSecondaryLight,
+                  AppColors.inkSecondary,
                 ),
                 textStyle: WidgetStateProperty.all(
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -186,8 +186,8 @@ class AppDatePicker {
                 ),
               ),
               confirmButtonStyle: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(AppColors.primary),
-                foregroundColor: WidgetStateProperty.all(Colors.white),
+                backgroundColor: WidgetStateProperty.all(AppColors.ink),
+                foregroundColor: WidgetStateProperty.all(AppColors.paper),
                 textStyle: WidgetStateProperty.all(
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),

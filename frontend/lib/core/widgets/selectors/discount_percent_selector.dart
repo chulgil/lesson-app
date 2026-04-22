@@ -54,7 +54,7 @@ class DiscountPercentSelector extends StatelessWidget {
     this.accentColor,
   });
 
-  Color get _accentColor => accentColor ?? AppColors.secondary;
+  Color get _accentColor => accentColor ?? AppColors.paperAccent;
 
   @override
   Widget build(BuildContext context) {

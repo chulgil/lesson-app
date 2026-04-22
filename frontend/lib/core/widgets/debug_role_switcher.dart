@@ -17,7 +17,7 @@ Color _getRoleColor(UserRole role) {
     case UserRole.teacher:
       return AppColors.paperAccent;
     case UserRole.student:
-      return AppColors.secondary;
+      return AppColors.paperOk;
     case UserRole.parent:
       return AppColors.ink;
   }
@@ -247,7 +247,10 @@ class _DebugOptionsSheet extends ConsumerWidget {
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
-                  child: const Icon(Icons.bug_report, color: AppColors.paperAccent),
+                  child: const Icon(
+                    Icons.bug_report,
+                    color: AppColors.paperAccent,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Text('개발자 옵션', style: AppTypography.headingMedium),
@@ -364,13 +367,11 @@ class _DebugOptionsSheet extends ConsumerWidget {
                                 .state = student;
                           }
                         },
-                        selectedColor: AppColors.secondary.withValues(
-                          alpha: 0.2,
-                        ),
+                        selectedColor: AppColors.paperOk.withValues(alpha: 0.2),
                         labelStyle: TextStyle(
                           color:
                               isSelected
-                                  ? AppColors.secondary
+                                  ? AppColors.paperOk
                                   : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -430,7 +431,10 @@ class _DebugOptionsSheet extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.audio_file, color: AppColors.paperAccent),
+              leading: const Icon(
+                Icons.audio_file,
+                color: AppColors.paperAccent,
+              ),
               title: const Text('녹음 파일 진단'),
               subtitle: const Text('녹음 파일과 DB 매칭 상태 확인'),
               dense: true,

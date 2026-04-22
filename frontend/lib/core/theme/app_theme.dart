@@ -18,38 +18,38 @@ class AppTheme {
 
       // Colors
       colorScheme: ColorScheme.light(
-        primary: AppColors.primary,
-        onPrimary: Colors.white,
-        primaryContainer: AppColors.primaryLight,
-        secondary: AppColors.secondary,
-        onSecondary: Colors.white,
-        secondaryContainer: AppColors.secondaryLight,
-        surface: AppColors.surfaceLight,
-        onSurface: AppColors.textPrimaryLight,
-        error: AppColors.error,
-        onError: Colors.white,
+        primary: AppColors.ink,
+        onPrimary: AppColors.paper,
+        primaryContainer: AppColors.inkQuaternary,
+        secondary: AppColors.paperAccent,
+        onSecondary: AppColors.paper,
+        secondaryContainer: AppColors.paperAccentSoft,
+        surface: AppColors.paper,
+        onSurface: AppColors.ink,
+        error: AppColors.paperAccent,
+        onError: AppColors.paper,
       ),
 
       // Scaffold
-      scaffoldBackgroundColor: AppColors.backgroundLight,
+      scaffoldBackgroundColor: AppColors.paperDark,
 
       // AppBar
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textPrimaryLight,
+        foregroundColor: AppColors.ink,
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         titleTextStyle: AppTypography.headingMedium.copyWith(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.ink,
         ),
       ),
 
       // Card
       cardTheme: CardThemeData(
         elevation: 0,
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
@@ -60,8 +60,8 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.ink,
+          foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -73,9 +73,9 @@ class AppTheme {
       // OutlinedButton
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.ink,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          side: const BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.ink),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
@@ -86,7 +86,7 @@ class AppTheme {
       // TextButton
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.ink,
           textStyle: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w500,
           ),
@@ -96,40 +96,40 @@ class AppTheme {
       // Input
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceLight,
+        fillColor: AppColors.paper,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.borderLight),
+          borderSide: const BorderSide(color: AppColors.inkQuaternary),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.borderLight),
+          borderSide: const BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(color: AppColors.ink, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: const BorderSide(color: AppColors.paperAccent),
         ),
         hintStyle: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
         labelStyle: AppTypography.bodySmall.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
 
       // Bottom Navigation
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.surfaceLight,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondaryLight,
+        backgroundColor: AppColors.paper,
+        selectedItemColor: AppColors.ink,
+        unselectedItemColor: AppColors.inkSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         selectedLabelStyle: AppTypography.caption,
@@ -138,7 +138,7 @@ class AppTheme {
 
       // Divider
       dividerTheme: const DividerThemeData(
-        color: AppColors.borderLight,
+        color: AppColors.inkQuaternary,
         thickness: 1,
         space: 0,
       ),
@@ -147,20 +147,20 @@ class AppTheme {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary;
+            return AppColors.ink;
           }
           return Colors.transparent;
         }),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
-        side: const BorderSide(color: AppColors.borderLight, width: 2),
+        side: const BorderSide(color: AppColors.inkQuaternary, width: 2),
       ),
 
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.primary,
-        linearTrackColor: AppColors.borderLight,
+        color: AppColors.ink,
+        linearTrackColor: AppColors.inkQuaternary,
       ),
     );
   }
@@ -174,16 +174,16 @@ class AppTheme {
 
       // Colors
       colorScheme: ColorScheme.dark(
-        primary: AppColors.primaryLight,
+        primary: AppColors.paper,
         onPrimary: AppColors.textPrimaryDark,
-        primaryContainer: AppColors.primary,
-        secondary: AppColors.secondary,
-        onSecondary: AppColors.textPrimaryLight,
-        secondaryContainer: AppColors.secondaryLight,
+        primaryContainer: AppColors.ink,
+        secondary: AppColors.paperAccent,
+        onSecondary: AppColors.paper,
+        secondaryContainer: AppColors.paperAccentSoft,
         surface: AppColors.surfaceDark,
         onSurface: AppColors.textPrimaryDark,
-        error: AppColors.error,
-        onError: Colors.white,
+        error: AppColors.paperAccent,
+        onError: AppColors.paper,
       ),
 
       // Scaffold
@@ -216,7 +216,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primaryLight,
+          backgroundColor: AppColors.paper,
           foregroundColor: AppColors.backgroundDark,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
@@ -229,9 +229,9 @@ class AppTheme {
       // OutlinedButton
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          side: const BorderSide(color: AppColors.primaryLight),
+          side: const BorderSide(color: AppColors.paper),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
@@ -257,7 +257,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.primaryLight, width: 2),
+          borderSide: const BorderSide(color: AppColors.paper, width: 2),
         ),
         hintStyle: AppTypography.bodyMedium.copyWith(
           color: AppColors.textTertiaryDark,
@@ -267,7 +267,7 @@ class AppTheme {
       // Bottom Navigation
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.surfaceDark,
-        selectedItemColor: AppColors.primaryLight,
+        selectedItemColor: AppColors.paper,
         unselectedItemColor: AppColors.textSecondaryDark,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
@@ -286,7 +286,7 @@ class AppTheme {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primaryLight;
+            return AppColors.paper;
           }
           return Colors.transparent;
         }),
@@ -298,7 +298,7 @@ class AppTheme {
 
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.primaryLight,
+        color: AppColors.paper,
         linearTrackColor: AppColors.borderDark,
       ),
     );
