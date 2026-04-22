@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../providers/auth_provider.dart';
 
 /// Terms agreement screen shown after OAuth login for new users.
@@ -175,13 +176,10 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
         ),
         child: Row(
           children: [
-            Checkbox(
-              value: _allChecked,
-              onChanged: _toggleAll,
-              activeColor: AppColors.paperAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              ),
+            // Notebook × Score: Material Checkbox 대신 연필 사각 체크박스.
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space1),
+              child: PencilBox(checked: _allChecked, size: 20),
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
@@ -216,13 +214,10 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
         ),
         child: Row(
           children: [
-            Checkbox(
-              value: value,
-              onChanged: onChanged,
-              activeColor: AppColors.paperAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              ),
+            // Notebook × Score: Material Checkbox 대신 연필 사각 체크박스.
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space1),
+              child: PencilBox(checked: value, size: 18),
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(

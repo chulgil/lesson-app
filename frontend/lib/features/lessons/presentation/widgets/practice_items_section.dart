@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
 import 'add_practice_item_sheet.dart';
@@ -43,7 +44,11 @@ class PracticeItemsSection extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space6),
               child: Column(
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     '데이터를 불러오는데 실패했습니다',
@@ -285,26 +290,20 @@ class PracticeItemsSection extends ConsumerWidget {
   }
 
   Widget _buildCompletionCheckbox(WidgetRef ref, PracticeItem item) {
+    // Notebook × Score: 연습 완료를 연필 사각 체크박스로 표시. 체크 색은 paperOk(녹색 펜).
     return GestureDetector(
       onTap: () => _toggleComplete(ref, item),
-      child: Container(
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
         width: 24,
         height: 24,
-        decoration: BoxDecoration(
-          color: item.isCompleted ? AppColors.paperOk : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color:
-                item.isCompleted
-                    ? AppColors.paperOk
-                    : AppColors.inkQuaternary,
-            width: 2,
+        child: Center(
+          child: PencilBox(
+            checked: item.isCompleted,
+            size: 20,
+            checkColor: AppColors.paperOk,
           ),
         ),
-        child:
-            item.isCompleted
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
-                : null,
       ),
     );
   }
