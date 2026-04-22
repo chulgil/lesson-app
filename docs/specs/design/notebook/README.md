@@ -681,6 +681,28 @@ Text(
 
 **은유**: Switch active = 체크박스에 찍는 Vermillion 도장. 텍스트 커서 = Vermillion 만년필 끝.
 
+### 7.19 폼 화면도 sectionTitle 로 통일 — 학생/레슨 추가·편집 전 범위 확장
+
+**배경**: §7.17 에서 레슨 상세의 섹션 헤더를 Playfair 로 전환했으나, "학생 추가/편집" 및 "레슨 추가/편집" 폼 화면은 여전히 Pretendard `headingSmall` 로 섹션을 구분하고 있었음. 사용자 플로우에서 상세→편집으로 이동하는 순간 서체가 Pretendard 로 바뀌면서 위계 단절 발생. 두 폼 화면 모두 공통 위젯(`FormSectionTitle`, `LessonFormSectionTitle`)을 사용하므로 2-지점 수정으로 전면 반영 가능.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/students/presentation/widgets/student_form/form_section_title.dart` | `FormSectionTitle` 이 `NotebookTypography.sectionTitle` 사용 | 0bb76420 |
+| `features/lessons/presentation/widgets/lesson_form/lesson_student_info.dart` | `LessonFormSectionTitle` 동일 적용 + unused `AppTypography` import 제거 | 0bb76420 |
+| `.gitignore` | `.autopus/` + `autopus.yaml` 추가 (로컬 툴 아티팩트 제외) | 0bb76420 |
+
+**영향 범위** (23 instances / 2-widget change):
+- `add_student_screen` 7곳: 기본 정보 / 보호자 정보 / 주소 / 악기 / 레벨 및 수강료 / 레슨 일정 / 메모
+- `edit_student_screen` 7곳: 동일 7 라벨
+- `add_lesson_screen` 5곳: 학생 선택 / 일시 / 레슨 시간 / 레슨 장소 / 레슨 내용
+- `edit_lesson_screen` 4곳: 학생 / 일시 / 레슨 시간 / 레슨 내용
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 상세(공연 팸플릿) ↔ 편집(무대 뒤 악보)도 같은 Playfair 가문으로 연결. 사용자가 상세에서 편집으로 넘어가는 순간 "악보가 바뀌는" 어색함이 사라짐.
+
 ---
 
 ## 8. 구현 원칙
