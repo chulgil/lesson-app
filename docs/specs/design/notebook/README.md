@@ -1643,6 +1643,32 @@ Text(
 
 ---
 
+### 7.51 주간 스케줄·휴무 관리 섹션 제목 Playfair 통일 — schedule/ 도메인 §7.17 배치 개시
+
+**배경**: §7.49 copyWith 변형 배치 이후, 미전환 §7.17 후보가 가장 많이 남은 도메인은 `features/schedule/` (20+ 파일, ~30+ headingSmall 사용처). 전면 배치 대신 화면 단위로 나눠 처리하는 전략을 시작. 첫 배치는 선생님 시점의 관리 화면 2개(주간 스케줄·휴무) — 두 화면 모두 "정적 카드/페이지 섹션 제목" 패턴으로 §7.17 판정이 명확하다.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 변형 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/schedule/presentation/screens/weekly_schedule_screen.dart` | 82 | "주간 스케줄" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | 직접 |
+| `frontend/lib/features/schedule/presentation/screens/time_exception_screen.dart` | 91 | "예정된 휴무" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | 직접 |
+| 〃 | 101 | "지난 휴무" | `AppTypography.headingSmall.copyWith(color: inkSecondary)` | `NotebookTypography.sectionTitle.copyWith(color: inkSecondary)` | copyWith |
+
+**설계 포인트**:
+- **도메인 단위 배치 전략**: schedule/ 는 화면·위젯이 많아 한 번에 처리하면 diff 가 크고 회귀 위험이 증가한다. 화면 2-3개씩 묶어 배치별로 진행하면 PostToolUse 포매터 변경 스코프도 통제 가능. 이 원칙은 향후 §7.52~§7.55 배치에도 재사용.
+- **§7.30 제외 roster 적용**: 같은 schedule/ 내 `pending_bookings_screen.dart:84` 의 "대기 중인 신청이 없습니다" 는 빈 상태 헤드라인(§7.49 에서 roster 편입)이므로 이번 배치에서 의도적으로 제외. 동일 파일·동일 스타일이어도 **역할이 섹션 제목이 아닌** 경우는 치환하지 않는다.
+- **동적 상태 라벨과 정적 섹션 제목의 분기**: "예정된 휴무"·"지난 휴무" 는 리스트 분류 제목(정적) → §7.17. 향후 schedule/ 다른 화면에서 만날 "대기 중"·"승인 완료" 같은 **상태 뱃지/필터 라벨** 은 sectionTitle 이 아니라 status-label 계열로 분기하므로 주의.
+- **copyWith 변형 패턴 표준화**: "현재 섹션 = primary ink, 과거/만료 섹션 = inkSecondary" 는 §7.49 수강권 목록(진행/임박/만료)·이번 배치(휴무 예정/지난) 모두 동일 구조. copyWith 색상 override 는 "상태별 strength" 를 표현하는 관용 패턴임을 재확인.
+
+**검증**:
+- `flutter analyze` 2 files → No issues found (4.9s)
+- Lore commit: `fb6d666f`
+
+**은유**: 큰 책장의 맞은편 장식장에 오늘부터 새 활자를 조금씩 옮기기 시작한다. 가장 먼저 자리를 바꾼 것은 주간 일정표와 휴무 장부 — 두 장부는 선생님이 가장 자주 펼치는 것이라 제목의 서체가 바뀌면 즉시 눈에 들어온다. "예정" 은 짙은 먹, "지난" 은 옅은 먹 — 서체는 한 뿌리(Playfair) 지만 시간의 온도가 농도로 구분된다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
