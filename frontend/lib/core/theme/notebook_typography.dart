@@ -85,6 +85,16 @@ class NotebookTypography {
     height: 1.3,
   );
 
+  /// AppBar 타이틀 — Playfair Display 18 / w700.
+  /// 전역 `appBarTheme.titleTextStyle` 에 적용되어 하위 화면 전체의 상단 타이틀을 통일.
+  static TextStyle get appBarTitle => GoogleFonts.playfairDisplay(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.ink,
+    letterSpacing: 0,
+    height: 1.2,
+  );
+
   /// "Fine." 푸터 라벨 — italic serif.
   static TextStyle get fine => GoogleFonts.playfairDisplay(
     fontSize: 15,

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
+import 'notebook_typography.dart';
 
 /// App theme configuration
 class AppTheme {
@@ -33,7 +34,7 @@ class AppTheme {
       // Scaffold
       scaffoldBackgroundColor: AppColors.paperDark,
 
-      // AppBar
+      // AppBar — Notebook × Score: Playfair Display 타이틀로 4대 시그니처(Playfair) 를 상단에 통일.
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -41,9 +42,7 @@ class AppTheme {
         foregroundColor: AppColors.ink,
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        titleTextStyle: AppTypography.headingMedium.copyWith(
-          color: AppColors.ink,
-        ),
+        titleTextStyle: NotebookTypography.appBarTitle,
       ),
 
       // Card
@@ -189,7 +188,7 @@ class AppTheme {
       // Scaffold
       scaffoldBackgroundColor: AppColors.backgroundDark,
 
-      // AppBar
+      // AppBar — Notebook × Score: Playfair Display 타이틀 (dark 테마는 color override).
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -197,7 +196,7 @@ class AppTheme {
         foregroundColor: AppColors.textPrimaryDark,
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle.light,
-        titleTextStyle: AppTypography.headingMedium.copyWith(
+        titleTextStyle: NotebookTypography.appBarTitle.copyWith(
           color: AppColors.textPrimaryDark,
         ),
       ),
