@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -82,9 +83,10 @@ class PendingRequestsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.space6),
+            // Notebook × Score: 빈 상태 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
             Text(
               '대기 중인 연결 요청이 없습니다',
-              style: AppTypography.headingSmall,
+              style: NotebookTypography.appBarTitle,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -166,7 +168,9 @@ class PendingRequestsScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text('거절'),
               ),
             ],
