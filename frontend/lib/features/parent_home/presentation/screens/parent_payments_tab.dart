@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/domain/entities/class_membership.dart';
@@ -405,9 +406,10 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      // Notebook × Score: 학부모 결제 탭 섹션 헤더도 Playfair sectionTitle 로 통일.
       child: Text(
         title,
-        style: AppTypography.headingSmall.copyWith(
+        style: NotebookTypography.sectionTitle.copyWith(
           color: color ?? AppColors.ink,
         ),
       ),
@@ -522,11 +524,7 @@ class _UnlinkedChildState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.link_off,
-              size: 56,
-              color: AppColors.inkTertiary,
-            ),
+            const Icon(Icons.link_off, size: 56, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '${profile.name}은(는) 아직 선생님과 연결되지 않았습니다',
@@ -574,9 +572,7 @@ class _NoSubscriptionsState extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '선생님에게 수강권 발급을 요청하세요',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -597,7 +593,11 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.paperAccent,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text('오류가 발생했습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),

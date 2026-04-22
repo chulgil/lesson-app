@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// Parent assignments tab for viewing child's assignments
 class ParentAssignmentsTab extends ConsumerWidget {
@@ -29,7 +30,11 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Incomplete assignments
-          _SectionHeader(title: '미완료 과제', count: 2, color: AppColors.paperAccent),
+          _SectionHeader(
+            title: '미완료 과제',
+            count: 2,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(height: AppSpacing.space3),
 
           _AssignmentCard(
@@ -176,7 +181,8 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: 학부모 과제 탭 섹션 헤더도 Playfair sectionTitle 로 통일.
+        Text(title, style: NotebookTypography.sectionTitle),
         const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -265,10 +271,7 @@ class _AssignmentCard extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color:
-                      isCompleted
-                          ? AppColors.paperOk
-                          : AppColors.paperDark,
+                  color: isCompleted ? AppColors.paperOk : AppColors.paperDark,
                   shape: BoxShape.circle,
                   border:
                       isCompleted
@@ -288,10 +291,7 @@ class _AssignmentCard extends StatelessWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color:
-                        isCompleted
-                            ? AppColors.inkTertiary
-                            : AppColors.ink,
+                    color: isCompleted ? AppColors.inkTertiary : AppColors.ink,
                   ),
                 ),
               ),
