@@ -912,6 +912,24 @@ Text(
 
 **은유**: 오선지에 메트로놈 템포를 붉은 색연필로 그어 넣는다. 정해진 템포까지는 선이 진하게 칠해지고, 그 앞은 얇은 연필 밑줄만 남는다. 연필 끝을 누르는 지점(썸)도, 지나간 자국(active track)도 같은 붉은 색 — 연주자는 "어디까지 왔나" 를 한눈에 안다.
 
+### 7.29 레슨 일정 변경 바텀시트 제목 Playfair 통일
+
+**배경**: §7.27 에서 "바텀시트 커스텀 헤더는 전역 `appBarTitle` 이 닿지 않으므로 `NotebookTypography.appBarTitle` 을 직접 지정한다" 는 패턴을 세웠다. 같은 구독 플로우의 `reschedule_bottom_sheet` — 학생/선생님이 레슨 일정을 변경할 때 가장 먼저 마주하는 모달 — 역시 `AppTypography.headingSmall` (Pretendard 18/w600) 로 남아 있어 시트 안의 Vermillion 라디오·경고 박스와 시각 위계가 어긋났다. 자주 오가는 플로우일수록 제목 서체 불일치가 "다른 모듈에 들어온 느낌" 을 강하게 준다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/subscription/presentation/widgets/reschedule_bottom_sheet.dart` | 시트 헤더 `AppTypography.headingSmall` → `NotebookTypography.appBarTitle` (Playfair 18/w700) | 82292361 |
+
+**설계 포인트**:
+- §7.27 의 패턴(커스텀 헤더 = `appBarTitle` 재사용) 을 그대로 적용. 별도 신규 타이포 토큰 추가 없이 기존 단일 진원지(`NotebookTypography`) 만으로 해결.
+- 주석에 `§7.27 패턴` 을 명시하여 이후 추가되는 바텀시트 구현자가 README 로 점프할 수 있게 함.
+
+**검증**:
+- `flutter analyze lib/features/subscription/presentation/widgets/reschedule_bottom_sheet.dart` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 같은 악보집(수강권 플로우) 안에서 페이지를 넘겨도(발급 → 일정 변경) 장 제목의 Playfair 로마자 서체는 변하지 않는다. 독자의 시선이 머무를 곳이 일관되게 예고되어 있어야 "다른 책" 으로 오해하지 않는다.
+
 ---
 
 ## 8. 구현 원칙
