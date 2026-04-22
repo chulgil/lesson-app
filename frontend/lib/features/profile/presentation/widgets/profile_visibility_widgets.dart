@@ -507,9 +507,11 @@ void showProfilePreviewSheet({
                         children: [
                           const Icon(Icons.visibility, size: 20),
                           const SizedBox(width: AppSpacing.space2),
+                          // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+                          // 패턴. Playfair appBarTitle 로 통일.
                           Text(
                             '공개 프로필 미리보기',
-                            style: AppTypography.headingSmall,
+                            style: NotebookTypography.appBarTitle,
                           ),
                           const Spacer(),
                           IconButton(

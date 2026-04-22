@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 
@@ -342,9 +343,13 @@ class ProfilePreviewScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: AppSpacing.space6),
+          // Notebook × Score: _buildSection 의 section title 은 Playfair sectionTitle
+          // 로 통일. 6개 호출부(소개/교수 스타일/전문 분야/학력/경력/자격증) 에 일괄 반영 (§7.17).
           Text(
             title,
-            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
+            style: NotebookTypography.sectionTitle.copyWith(
+              color: AppColors.ink,
+            ),
           ),
           const SizedBox(height: AppSpacing.space3),
           child,

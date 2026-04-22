@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../widgets/extended_profile_widgets.dart';
@@ -70,17 +70,19 @@ class _CredentialsContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           _buildCertificateSection(context),
 
-          SizedBox(height: AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32),
+          SizedBox(
+            height:
+                AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTypography.headingSmall,
-    );
+    // Notebook × Score: _buildSectionTitle 의 title 은 Playfair sectionTitle
+    // 로 통일. 3개 호출부(학력/경력/자격증) 에 일괄 반영 (§7.17).
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 
   Widget _buildEducationSection(BuildContext context) {

@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../notifications/domain/entities/notification.dart';
@@ -81,7 +82,9 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: Text('미수금 목록', style: AppTypography.headingSmall),
+            // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            // (line 48 의 '미수금이 없습니다' 는 empty-state headline / line 222 는 가격 — §7.30 제외.)
+            child: Text('미수금 목록', style: NotebookTypography.sectionTitle),
           ),
           const SizedBox(height: AppSpacing.space3),
 
