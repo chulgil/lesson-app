@@ -1257,6 +1257,52 @@ Text(
 
 ---
 
+### 7.40 FloatingActionButton 테마 등록 — 18개 확장 FAB 에 Vermillion·flat 단일 지점 보급
+
+**배경**: `.extended` FAB 는 목록 화면의 "추가" 동선에 집중적으로 쓰인다(레슨 예약·스케줄 추가·수강권 템플릿·결제·계좌·곡·템플릿·섹션 등). 그러나 `floatingActionButtonTheme` 가 미등록인 상태에서 15개 파일 18개 호출부 중 6개만 인라인 `backgroundColor: AppColors.paperAccent` 를 지정했고, 나머지 9개는 M3 기본값 `colorScheme.primaryContainer`(→ inkQuaternary 회색)로 폴백돼 Notebook Vermillion CTA 시그니처가 끊겼다. filledButtonTheme(§7.35)·dialogTheme(§7.38)·bottomSheetTheme(§7.34)·cardTheme 와 함께 "네 번째 표면·CTA 테마" 로 통일할 차례.
+
+**변경** (`lib/core/theme/app_theme.dart`, +37/-0 lines, light/dark 양쪽 등록):
+
+| 속성 | light | dark | 비고 |
+|---|---|---|---|
+| `backgroundColor` | `paperAccent` | `paperAccent` | Vermillion — filledButtonTheme 와 시그니처 통일 |
+| `foregroundColor` | `paper` | `paper` | 크림 라벨 — 밝은 톤 유지 |
+| `elevation` + 4개 상태 | 0 | 0 | focus/hover/highlight/disabled 모두 0 — cardTheme·bottomSheetTheme·dialogTheme flat 질감과 일치 |
+| `extendedTextStyle` | Inter w600 paper | Inter w600 paper | `.extended` 라벨은 UI 단문이라 Playfair 대신 Inter Medium |
+| `shape` | (기본 StadiumBorder) | (기본 StadiumBorder) | Notebook ticket/pill 형태와 조화 — 명시 생략 |
+
+**영향 범위**: `FloatingActionButton.extended` 18개 호출 / 15개 파일.
+
+| 상태 | 파일 수 | 동작 |
+|---|---|---|
+| 인라인 `backgroundColor: paperAccent` 보유 | 6 | 속성 우선순위로 유지 — 회귀 0 |
+| 인라인 오버라이드 없음 | 9 | M3 기본(primaryContainer) → Vermillion 자동 승격 |
+
+주요 승격 대상 호출부:
+- 프로필 관리 FAB 3개: `tip_template_management_screen.dart`, `repertoire_management_screen.dart`, `payment_management_screen.dart`, `bank_account_edit_screen.dart` (계좌)
+- 연습 섹션 FAB 3개: `add_section_screen.dart`, `edit_section_screen.dart`, `quick_add_screen.dart`
+- 학생 상세 FAB: `student_detail_screen.dart`(레슨 예약) — 이미 오버라이드 없음 → Vermillion 승격 핵심 수혜 화면
+
+**설계 포인트**:
+
+1. **4개 elevation 상태 모두 0**: `elevation`·`focusElevation`·`hoverElevation`·`highlightElevation`·`disabledElevation` 를 전부 0 으로 고정. M3 FAB 기본값은 6/8/8/8/0 이라 눌림·포커스 시 그림자가 튀어 올라 cardTheme/bottomSheetTheme/dialogTheme 의 flat 합창과 어긋났다. Notebook 은 "종이 위에 붙은 스티커" 느낌이 아니라 "종이에 직접 쓴 도장" 느낌.
+2. **extendedTextStyle 은 Inter w600**: 라벨이 짧은 UI 단문("레슨 예약", "곡 추가", "계좌 추가")이라 Playfair Display 보다 Inter Medium/Semibold 가 가독성이 높다. `bodyMedium.copyWith(fontWeight: w600, color: paper)` — bottomNavigationBar 의 selectedLabel 과 동일 로직.
+3. **shape 미지정**: `.extended` 의 기본 `StadiumBorder()` 는 이미 Notebook ticket/pill 형태와 일치 — 명시 등록해 오버라이드하면 `.small`/`.large`/기본 FAB 파생 형태가 깨진다(현재 사용되지 않지만 향후 확장 대비).
+4. **파생 변형 고려**: 현재 전체 코드베이스에서 `FloatingActionButton.small`/`.large`/기본 생성자 사용이 0건 — 오직 `.extended` 만 사용. 향후 `.small` 추가 시에도 같은 Vermillion 시그니처로 자동 승격.
+
+**호환성**: Flutter 속성 우선순위로 인라인 오버라이드 6건은 그대로 유지. 9건의 오버라이드 없는 호출부만 승격.
+
+**검증**:
+- `flutter analyze` → No issues found (14.8s)
+- `flutter test` → 392/392 passed (5s)
+- Lore commit: `8e5ad822`
+
+**마일스톤**: Notebook × Score **4대 표면·CTA 테마(Card · BottomSheet · Dialog · FAB)** 단일 지점 수렴 완료. 추가 모달·플로팅 표면은 이 네 테마 중 가장 가까운 시그니처를 기준점으로 확장.
+
+**은유**: 플로팅 액션 버튼은 노트 귀퉁이에 붙인 빨간 포스트잇이다. 15개 장부(화면) 중 6개만 빨간색, 9개는 연필로 얇게 칠한 회색으로 섞여 있던 기존 상태는 "이 노트를 쓴 사람이 다섯 명쯤 있나?" 라는 질문을 만든다. 오늘 테마는 15개 귀퉁이에 모두 같은 버밀리언 인주를 찍어 한 사람이 같은 손으로 노트를 정리하고 있음을 증명한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
