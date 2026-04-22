@@ -514,6 +514,25 @@ Text(
 - `flutter analyze` → 0 issues
 - 스펙(§6.4 Pencil 프리미티브, §6.5 StaffDivider) 갱신
 
+### 7.11 Phase 3 후속 실적용 (StaffDivider + PencilCircle 도입)
+
+**범위**: Phase 3에서 신설한 공용 위젯을 실제 화면 3곳에 적용. "추가만 하고 쓰이지 않는 위젯" 잔여물 제거.
+
+| 위젯 | 적용 파일 | 변경 | 커밋 |
+|------|-----------|------|------|
+| `StaffDivider` | `features/lessons/presentation/screens/lesson_detail_screen.dart` | 피드백/포인트/연습 팁 3개 섹션 경계에 삽입 (2곳) | 9bf29b02 |
+| `StaffDivider` | `features/practice/presentation/widgets/month_group_header.dart` | 월 그룹 헤더 상단에 배치 — "새 월 = 새 악장" 은유. 기존 Row 우측 1px Expanded 라인 제거 | 3b4b6d60 |
+| `PencilCircle` | `features/parent_home/presentation/widgets/profile_switcher.dart` | 선택된 프로필 표시를 `Icons.check_circle` 에서 `PencilCircle(size: 20)` 로 교체 | 3b4b6d60 |
+| `PencilCircle` | `features/practice/presentation/widgets/goal/goal_setting_chips.dart` | `ChoiceChip.avatar` 슬롯에 `PencilCircle(size: 16)`. `showCheckmark: false` 로 Material 체크마크 대체 | 795b5c18 |
+
+**검증**:
+- `flutter analyze` → 0 issues (4곳 모두)
+- 기능·Provider·라우팅 변경 없음 (style-only)
+
+**은유 요약**:
+- StaffDivider: 섹션 구분 = 악보의 새 악장
+- PencilCircle: 선택 상태 = 연필로 그은 동그라미
+
 ---
 
 ## 8. 구현 원칙
