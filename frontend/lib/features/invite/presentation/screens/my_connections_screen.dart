@@ -50,8 +50,6 @@ class MyConnectionsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppRoutes.invite),
-        backgroundColor: AppColors.paperAccent,
-        foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add),
         label: Text(userRole == InviteUserRole.teacher ? '학생 추가' : '선생님 추가'),
       ),
@@ -328,7 +326,10 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space6),
                 const Divider(),
                 ListTile(
-                  leading: Icon(Icons.calendar_today, color: AppColors.paperAccent),
+                  leading: Icon(
+                    Icons.calendar_today,
+                    color: AppColors.paperAccent,
+                  ),
                   title: const Text('레슨 일정 보기'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -379,7 +380,9 @@ class MyConnectionsScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text('연결 해제'),
               ),
             ],
@@ -482,11 +485,7 @@ class _HelpItem extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.inkTertiary,
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
           ],
         ),
       ),
@@ -570,8 +569,7 @@ class _ConnectionCard extends StatelessWidget {
                           name,
                           style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
-                            color:
-                                isActive ? null : AppColors.inkSecondary,
+                            color: isActive ? null : AppColors.inkSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -597,10 +595,7 @@ class _ConnectionCard extends StatelessWidget {
             if (isActive)
               IconButton(
                 onPressed: onTap,
-                icon: Icon(
-                  Icons.more_vert,
-                  color: AppColors.inkSecondary,
-                ),
+                icon: Icon(Icons.more_vert, color: AppColors.inkSecondary),
               )
             else if (onReconnect != null)
               TextButton(

@@ -40,12 +40,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddScheduleDialog(),
-        backgroundColor: AppColors.paperAccent,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(
-          '스케줄 추가',
-          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
-        ),
+        icon: const Icon(Icons.add),
+        label: const Text('스케줄 추가'),
       ),
     );
   }
@@ -111,7 +107,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: AppColors.paperAccent.withValues(alpha: 0.2),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +127,11 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.chevron_right, size: 20, color: AppColors.paperAccent),
+                Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: AppColors.paperAccent,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -205,7 +207,11 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: AppColors.paperAccent.withValues(alpha: 0.7)),
+        Icon(
+          icon,
+          size: 20,
+          color: AppColors.paperAccent.withValues(alpha: 0.7),
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
@@ -213,9 +219,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
         ),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );
@@ -345,9 +349,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           '${schedule.startTime} - ${schedule.endTime}',
           style: AppTypography.caption.copyWith(
             color:
-                schedule.isActive
-                    ? AppColors.paperOk
-                    : AppColors.inkTertiary,
+                schedule.isActive ? AppColors.paperOk : AppColors.inkTertiary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -394,7 +396,11 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+          const Icon(
+            Icons.error_outline,
+            size: 48,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
@@ -471,7 +477,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],

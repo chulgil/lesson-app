@@ -1338,6 +1338,34 @@ Text(
 
 ---
 
+### 7.42 연습 편집 바텀시트·녹음 섹션·도움말 FAQ 제목 Playfair 통일
+
+**배경**: 연습 카운트/시간을 조정하는 두 개의 바텀시트 커스텀 헤더와, 섹션 상세 안에서 녹음 개수를 함께 노출하는 리스트 제목, 그리고 도움말 화면 FAQ 입구 제목이 `AppTypography.headingSmall`(Noto Sans) 로 남아 있었다. §7.27(바텀시트 커스텀 헤더) 와 §7.17(카드·페이지 섹션 제목) 분기 기준으로 각각 Playfair `appBarTitle` / `sectionTitle` 로 수렴한다.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 패턴 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/practice/presentation/widgets/section_detail/practice_stats_editor.dart` | 202 | 연습 횟수 설정 | `AppTypography.headingSmall` | `NotebookTypography.appBarTitle` | §7.27 |
+| `frontend/lib/features/practice/presentation/widgets/section_detail/practice_stats_editor.dart` | 328 | 총 연습 시간 설정 | `AppTypography.headingSmall` | `NotebookTypography.appBarTitle` | §7.27 |
+| `frontend/lib/features/practice/presentation/widgets/section_detail/section_recordings_section.dart` | 40 | 녹음 기록 (N) | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/student_home/presentation/screens/help_screen.dart` | 65 | 자주 묻는 질문 | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+
+**설계 포인트**:
+- **§7.27 vs §7.17 분기**: 같은 파일 안에 있더라도 `BottomSheetHandle` 이 선행하는 커스텀 바텀시트 헤더는 `appBarTitle`, 본문 카드 안쪽에서 아이콘·카운트 등과 함께 노출되는 제목은 `sectionTitle` 을 쓴다.
+- **§7.30 제외 엄수**: `practice_stats_card` 의 통계 값 Text, `next_lesson_card` 의 D-day 배지 Text, `invite_history_screen` 의 빈 상태 헤드라인, `student_practice_tab` 의 레퍼토리 이름 Text 는 본 배치에서 손대지 않는다. 레퍼토리 이름은 추후 `NotebookTypography.pieceTitle` 전환 대상으로 별도 섹션에서 다룬다.
+- **보간 문자열 유지**: 녹음 개수 `${recordings.length}` 가 포함된 제목은 `const Text` 로 바꿀 수 없으므로 Playfair 전환 시에도 일반 `Text` 위젯으로 유지한다.
+- **스코프 격리**: §7.41(FAB cleanup) 작업 중이던 4개 파일(my_connections/time_exception/weekly_schedule/subscription_template_list) 이 index 에 잔존해 본 배치 커밋에 편승할 뻔했으므로 `git reset HEAD <file>` 으로 분리해 미커밋 상태로 되돌렸다. 커밋 전 `git diff --cached` 로 스코프 외 파일 유입 여부를 반드시 확인해야 한다.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (2.4s)
+- `flutter test` → 392/392 passed (6s)
+- Lore commit: `bd810204`
+
+**은유**: 연습 장부의 편집 페이지와 도움말 노트는 사용자 손가락이 가장 많이 머무는 장소다. 장부 바깥의 서랍(바텀시트) 문패와 장부 안쪽의 소제목이 서로 다른 필체로 적혀 있다면 같은 노트가 아닌 것처럼 느껴진다. 오늘은 서랍 문패에는 Playfair 18pt (`appBarTitle`), 장부 소제목에는 Playfair 17pt (`sectionTitle`) 를 각각 분기해 찍어 — 다른 굵기지만 같은 손으로 쓴 글씨라는 점을 분명히 한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

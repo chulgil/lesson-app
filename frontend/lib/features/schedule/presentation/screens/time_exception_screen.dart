@@ -41,12 +41,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddExceptionDialog(),
-        backgroundColor: AppColors.paperAccent,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(
-          '휴무 추가',
-          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
-        ),
+        icon: const Icon(Icons.add),
+        label: const Text('휴무 추가'),
       ),
     );
   }
@@ -142,9 +138,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '휴무일로 설정된 날짜는 학생들에게 예약 가능 시간으로 표시되지 않습니다.',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.ink,
-                  ),
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
                 ),
               ],
             ),
@@ -157,9 +151,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   Widget _buildExceptionCard(TimeException exception, {bool isPast = false}) {
     final icon = _getExceptionIcon(exception.type);
     final color =
-        isPast
-            ? AppColors.inkTertiary
-            : _getExceptionColor(exception.type);
+        isPast ? AppColors.inkTertiary : _getExceptionColor(exception.type);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -224,11 +216,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.event_available,
-            size: 64,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.event_available, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '설정된 휴무가 없습니다',
@@ -254,7 +242,11 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+          const Icon(
+            Icons.error_outline,
+            size: 48,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
@@ -339,7 +331,9 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -552,11 +546,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              size: 18,
-              color: AppColors.inkSecondary,
-            ),
+            Icon(Icons.calendar_today, size: 18, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space2),
             Text(formatDateMDKorean(date), style: AppTypography.bodyMedium),
           ],

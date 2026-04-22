@@ -47,12 +47,8 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddTemplateDialog(context, ref),
-        backgroundColor: AppColors.paperAccent,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(
-          '수강권 추가',
-          style: AppTypography.bodyMedium.copyWith(color: Colors.white),
-        ),
+        icon: const Icon(Icons.add),
+        label: const Text('수강권 추가'),
       ),
     );
   }
@@ -113,7 +109,9 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
               onPressed: () => _showAddTemplateDialog(context, ref),
               icon: const Icon(Icons.add),
               label: const Text('첫 수강권 만들기'),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+              ),
             ),
           ],
         ),
@@ -128,7 +126,11 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.paperAccent,
+            ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '데이터를 불러올 수 없습니다',
@@ -222,7 +224,9 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
                       .read(subscriptionTemplateNotifierProvider.notifier)
                       .deleteTemplate(template);
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -415,7 +419,9 @@ class _TemplateCard extends StatelessWidget {
                                 SizedBox(width: AppSpacing.space2),
                                 Text(
                                   '삭제',
-                                  style: TextStyle(color: AppColors.paperAccent),
+                                  style: TextStyle(
+                                    color: AppColors.paperAccent,
+                                  ),
                                 ),
                               ],
                             ),
