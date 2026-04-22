@@ -7,6 +7,7 @@ import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../domain/constants/feedback_constants.dart';
 
@@ -406,10 +407,7 @@ class PracticeTipsCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.tips_and_updates_outlined,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.tips_and_updates_outlined, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
@@ -436,9 +434,10 @@ class PracticeTipsCard extends StatelessWidget {
           Icon(Icons.info_outline, color: AppColors.ink, size: 20),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
+            // Notebook × Score: 연습 팁은 선생님이 여백에 손글씨로 적어준 메모.
             child: Text(
               lesson.practiceTips ?? '',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+              style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             ),
           ),
           if (isTeacher && onEdit != null)
@@ -576,7 +575,9 @@ Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+              ),
               child: const Text(AppStrings.delete),
             ),
           ],
@@ -613,7 +614,10 @@ Future<String?> showEditPracticeTipDialog({
             if (hasTip)
               TextButton(
                 onPressed: () => Navigator.pop(context, ''),
-                child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                child: Text(
+                  '삭제',
+                  style: TextStyle(color: AppColors.paperAccent),
+                ),
               ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text.trim()),

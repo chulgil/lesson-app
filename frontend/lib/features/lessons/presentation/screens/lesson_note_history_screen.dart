@@ -7,6 +7,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_note_providers.dart';
@@ -261,11 +262,13 @@ class _NoteCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
 
-            // Feedback
+            // Feedback — Notebook × Score: 선생님 손글씨 주석으로 Gaegu 렌더.
             if (lesson.feedback != null)
               Text(
                 lesson.feedback!,
-                style: AppTypography.bodyMedium,
+                style: NotebookTypography.hand.copyWith(
+                  color: AppColors.paperPencil,
+                ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -285,7 +288,9 @@ class _NoteCard extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(
+                                alpha: 0.08,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusLarge,
                               ),
@@ -314,10 +319,13 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Expanded(
+                    // Notebook × Score: 연습 팁도 손글씨 메모로 렌더.
                     child: Text(
                       lesson.practiceTips!,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
+                      style: NotebookTypography.hand.copyWith(
+                        fontSize: 13,
+                        height: 1.3,
+                        color: AppColors.paperPencil,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -340,10 +348,13 @@ class _NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Expanded(
+                    // Notebook × Score: 학생 메모도 여백에 끼적인 손글씨 느낌으로.
                     child: Text(
                       lesson.studentNote!,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
+                      style: NotebookTypography.hand.copyWith(
+                        fontSize: 13,
+                        height: 1.3,
+                        color: AppColors.paperPencil,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
