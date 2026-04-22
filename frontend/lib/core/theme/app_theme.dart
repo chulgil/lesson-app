@@ -195,6 +195,20 @@ class AppTheme {
         }),
       ),
 
+      // Slider — Notebook × Score: BPM/튜닝/녹음 임계값 등 7개 Slider 의 active track + thumb 를 Vermillion 으로 통일.
+      // Material blue 트랙/썸 제거. value indicator 는 ink 배경 + paper 텍스트 ("악보 위 잉크 방울").
+      sliderTheme: SliderThemeData(
+        activeTrackColor: AppColors.paperAccent,
+        inactiveTrackColor: AppColors.inkQuaternary,
+        thumbColor: AppColors.paperAccent,
+        overlayColor: AppColors.paperAccentSoft,
+        valueIndicatorColor: AppColors.ink,
+        valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.paper,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.ink,
@@ -557,6 +571,20 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
+      ),
+
+      // Slider — Notebook × Score: dark 테마에서도 active track + thumb 는 Vermillion 유지.
+      // inactive track 만 borderDark 로 교체, value indicator 는 surfaceDark 배경 + textPrimaryDark.
+      sliderTheme: SliderThemeData(
+        activeTrackColor: AppColors.paperAccent,
+        inactiveTrackColor: AppColors.borderDark,
+        thumbColor: AppColors.paperAccent,
+        overlayColor: AppColors.paperAccentSoft,
+        valueIndicatorColor: AppColors.surfaceDark,
+        valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.textPrimaryDark,
+          fontWeight: FontWeight.w600,
+        ),
       ),
 
       // Progress Indicator
