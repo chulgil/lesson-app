@@ -1188,6 +1188,44 @@ Text(
 
 ---
 
+### 7.38 Dialog 테마 등록 — 312개 AlertDialog 에 paper 표면·flat radius 단일 지점 보급
+
+**배경**: `app_theme.dart` 의 `dialogTheme` 이 light/dark 모두 `titleTextStyle` 만 등록되어 있었다(§7.29 이후 Playfair 통일). 그러나 `backgroundColor` / `shape` / `surfaceTintColor` / `elevation` 은 모두 미등록 상태로 Material 3 기본값(`colorScheme.surfaceContainerHigh` 회색 tint + radius 28 + elevation 6)으로 폴백되던 상태. 결과적으로 Notebook 팔레트가 지정되지 않은 `colorScheme` 의 파생값이 회색 틴트를 남기고, 모서리는 과도하게 둥근 M3 pillowy 형태로 `BottomSheet`(radiusLarge=20) 와 시각적으로 분리되어 있었다.
+
+**변경**:
+
+| 속성 | Light 등록값 | Dark 등록값 | 설계 근거 |
+|---|---|---|---|
+| `backgroundColor` | `AppColors.paper` | `AppColors.surfaceDark` | `bottomSheetTheme` 와 동일한 modal 표면 팔레트 — 라이트/다크 전환 시 Dialog↔BottomSheet 일관성 |
+| `surfaceTintColor` | `Colors.transparent` | `Colors.transparent` | M3 기본 primary tint 제거 — Notebook 팔레트 외 색 섞임 차단 |
+| `elevation` | `0` | `0` | Flat Notebook 평면 유지 — 종이 위에 떠 있는 카드가 아닌 한 장의 인서트 |
+| `shape` | `RoundedRectangleBorder(radiusLarge)` | `RoundedRectangleBorder(radiusLarge)` | `cardTheme` / `bottomSheetTheme` 와 radius 통일 (20px). M3 기본 radius 28 보다 타이트 |
+| `titleTextStyle` | `NotebookTypography.dialogTitle` (유지) | `dialogTitle.copyWith(color: textPrimaryDark)` (유지) | §7.29 에서 등록한 Playfair 19 / w700 유지 |
+
+커밋: `6538805b`.
+
+**영향 범위**: 전 코드베이스 `AlertDialog` / `showDialog` / `Dialog` 호출 **312건 (79 파일)**. 이 중 라이트 배경·flat·radius 를 인라인으로 명시한 호출은 거의 없었고, 대부분은 M3 기본값으로 구성되어 Notebook 질감이 끊겼다. 테마 단일 지점 등록으로 312개 모두 자동 승격. Dialog 내부 컨테이너가 자체 배경을 그리는 예외 호출부가 있다면 Flutter 의 속성 우선순위(지정된 `backgroundColor:` 인라인 오버라이드가 우선)로 회귀 없음.
+
+**설계 포인트**:
+1. **`bottomSheetTheme` 와 시그니처 통일** — 두 modal 표면(Dialog · BottomSheet)이 같은 `paper` / `surfaceDark` + `elevation 0` + `surfaceTintColor transparent` + `shape radiusLarge` 를 공유. 사용자가 어느 modal 을 열어도 같은 종이 질감.
+2. **`cardTheme` 와 radius 통일** — Notebook 의 모든 paper 표면은 `AppSpacing.radiusLarge` (20px) 로 수렴. M3 기본 Dialog radius 28 은 Notebook 프레임(3px 여백 + serif 타이포그래피)과 시각적으로 부정합.
+3. **최소 추가 속성** — `titleTextStyle` 외에 `contentTextStyle` 은 의도적으로 미등록. Dialog 본문은 화면별로 `Text` / `Column` 등 커스텀 렌더링이 많아 전역 스타일 고정은 오히려 방해. 본문은 Material 의 `textTheme.bodyMedium` 기본값에 맡기고 표면·형태만 Notebook 으로 정렬.
+4. **`titleTextStyle` 은 기존 값 그대로** — §7.29 에서 이미 Playfair 로 통일된 상태. 이번 추가는 모든 Dialog 가 이 제목 스타일 위에 **Notebook 종이 질감도 함께** 입도록 완성.
+
+**호환성**:
+- Dialog 호출부에서 `backgroundColor:` / `shape:` / `surfaceTintColor:` / `elevation:` 을 인라인으로 이미 지정한 경우는 Flutter 의 속성 우선순위로 그대로 유지됨 → 회귀 0.
+- `DialogThemeData` 는 `AlertDialog` · `Dialog` · `showDialog` 의 자식 `Dialog` 위젯 모두에 적용됨. 커스텀 Dialog subclass 도 `Theme.of(context).dialogTheme` 을 참조하면 자동 승격.
+
+**검증**:
+- `flutter analyze` → 0 new issues (기존 4건 unused_import 경고는 무관한 다른 파일)
+- `flutter test` → 392/392 passed
+
+**마일스톤**: 이로써 Notebook × Score 의 **3대 표면 테마(Card · BottomSheet · Dialog)** 가 모두 동일한 paper/surfaceDark + elevation 0 + radiusLarge + surfaceTintColor transparent 시그니처로 수렴했다. 앞으로 새로 추가되는 Dialog 호출부는 명시적 오버라이드 없이도 Notebook 질감을 갖는다.
+
+**은유**: 악보집 사이에 끼워 넣는 인서트 카드. 표지(BottomSheet)도, 본문(Card)도, 때때로 손에 들어 올리는 확인서(Dialog)도 모두 같은 크림색 종이에 같은 모서리 둥글기를 가진다. 펼쳐볼 때마다 "이것도 같은 책에서 나왔다"는 감각. M3 의 기본 회색 틴트는 다른 제조사의 인서트처럼 이 일관성을 깨뜨리던 참이었다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
