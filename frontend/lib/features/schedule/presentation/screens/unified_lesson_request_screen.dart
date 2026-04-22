@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
@@ -41,10 +42,7 @@ class UnifiedLessonRequestParams {
 class UnifiedLessonRequestScreen extends ConsumerStatefulWidget {
   final UnifiedLessonRequestParams params;
 
-  const UnifiedLessonRequestScreen({
-    super.key,
-    required this.params,
-  });
+  const UnifiedLessonRequestScreen({super.key, required this.params});
 
   @override
   ConsumerState<UnifiedLessonRequestScreen> createState() =>
@@ -66,9 +64,10 @@ class _UnifiedLessonRequestScreenState
   @override
   void initState() {
     super.initState();
-    _selectedType = widget.params.isReturningStudent
-        ? LessonRequestType.regular
-        : LessonRequestType.trial;
+    _selectedType =
+        widget.params.isReturningStudent
+            ? LessonRequestType.regular
+            : LessonRequestType.trial;
 
     // Pre-fill instrument for returning students
     if (widget.params.isReturningStudent) {
@@ -200,9 +199,7 @@ class _UnifiedLessonRequestScreenState
       decoration: BoxDecoration(
         color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(
-          color: AppColors.inkQuaternary,
-        ),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -226,8 +223,9 @@ class _UnifiedLessonRequestScreenState
 
   Widget _buildGuidanceMessage() {
     final settingsAsync = ref.watch(teacherSettingsProvider);
-    final message = settingsAsync.valueOrNull?.effectiveGuidanceMessage
-        ?? TeacherSettings.defaultGuidanceMessage;
+    final message =
+        settingsAsync.valueOrNull?.effectiveGuidanceMessage ??
+        TeacherSettings.defaultGuidanceMessage;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -241,7 +239,11 @@ class _UnifiedLessonRequestScreenState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.paperAccent),
+          const Icon(
+            Icons.chat_bubble_outline,
+            size: 18,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
@@ -264,14 +266,15 @@ class _UnifiedLessonRequestScreenState
       icon: Icons.school,
       title: '레슨 유형',
       child: SegmentedButton<LessonRequestType>(
-        segments: LessonRequestType.values
-            .map(
-              (type) => ButtonSegment<LessonRequestType>(
-                value: type,
-                label: Text(type.label),
-              ),
-            )
-            .toList(),
+        segments:
+            LessonRequestType.values
+                .map(
+                  (type) => ButtonSegment<LessonRequestType>(
+                    value: type,
+                    label: Text(type.label),
+                  ),
+                )
+                .toList(),
         selected: {_selectedType},
         onSelectionChanged: (selected) {
           setState(() {
@@ -312,28 +315,31 @@ class _UnifiedLessonRequestScreenState
       child: Wrap(
         spacing: AppSpacing.space2,
         runSpacing: AppSpacing.space2,
-        children: instruments.map((instrument) {
-          final isSelected = _selectedInstrument == instrument;
-          return ChoiceChip(
-            label: Text(instrument),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _selectedInstrument = selected ? instrument : null;
-              });
-            },
-            selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
-            backgroundColor: AppColors.paper,
-            labelStyle: AppTypography.bodyMedium.copyWith(
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.ink,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-            side: BorderSide(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-            ),
-          );
-        }).toList(),
+        children:
+            instruments.map((instrument) {
+              final isSelected = _selectedInstrument == instrument;
+              return ChoiceChip(
+                label: Text(instrument),
+                selected: isSelected,
+                onSelected: (selected) {
+                  setState(() {
+                    _selectedInstrument = selected ? instrument : null;
+                  });
+                },
+                selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                backgroundColor: AppColors.paper,
+                labelStyle: AppTypography.bodyMedium.copyWith(
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -359,19 +365,23 @@ class _UnifiedLessonRequestScreenState
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
+            borderSide: const BorderSide(
+              color: AppColors.paperAccent,
+              width: 2,
+            ),
           ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
             vertical: AppSpacing.space3,
           ),
         ),
-        items: UnifiedLessonGoal.values.map((goal) {
-          return DropdownMenuItem<UnifiedLessonGoal>(
-            value: goal,
-            child: Text(goal.label, style: AppTypography.bodyMedium),
-          );
-        }).toList(),
+        items:
+            UnifiedLessonGoal.values.map((goal) {
+              return DropdownMenuItem<UnifiedLessonGoal>(
+                value: goal,
+                child: Text(goal.label, style: AppTypography.bodyMedium),
+              );
+            }).toList(),
         onChanged: (value) {
           if (value != null) {
             setState(() {
@@ -390,14 +400,15 @@ class _UnifiedLessonRequestScreenState
       icon: Icons.trending_up,
       title: '경험 수준',
       child: SegmentedButton<UnifiedExperienceLevel>(
-        segments: UnifiedExperienceLevel.values
-            .map(
-              (level) => ButtonSegment<UnifiedExperienceLevel>(
-                value: level,
-                label: Text(level.label),
-              ),
-            )
-            .toList(),
+        segments:
+            UnifiedExperienceLevel.values
+                .map(
+                  (level) => ButtonSegment<UnifiedExperienceLevel>(
+                    value: level,
+                    label: Text(level.label),
+                  ),
+                )
+                .toList(),
         selected: {_selectedExperience},
         onSelectionChanged: (selected) {
           setState(() {
@@ -495,9 +506,7 @@ class _UnifiedLessonRequestScreenState
           Expanded(
             child: Text(
               AppStrings.cancellationPolicy,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.ink,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
             ),
           ),
         ],
@@ -533,7 +542,10 @@ class _UnifiedLessonRequestScreenState
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
+            borderSide: const BorderSide(
+              color: AppColors.paperAccent,
+              width: 2,
+            ),
           ),
         ),
       ),
@@ -593,17 +605,22 @@ class _UnifiedLessonRequestScreenState
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: _isSubmitting ? null : _handleSubmit,
-        icon: _isSubmitting
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.send),
-        label: Text(_isSubmitting ? AppStrings.submittingRequest : AppStrings.submitRequest),
+        icon:
+            _isSubmitting
+                ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                : const Icon(Icons.send),
+        label: Text(
+          _isSubmitting
+              ? AppStrings.submittingRequest
+              : AppStrings.submitRequest,
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
           foregroundColor: Colors.white,
@@ -633,10 +650,7 @@ class _UnifiedLessonRequestScreenState
 
   void _showValidationError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.paperAccent,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppColors.paperAccent),
     );
   }
 
@@ -657,15 +671,14 @@ class _UnifiedLessonRequestScreenState
         instrument: _selectedInstrument!,
         goal: _selectedGoal,
         experience: _selectedExperience,
-        message: _messageController.text.trim().isEmpty
-            ? null
-            : _messageController.text.trim(),
-        preferredDay: _preferredSlots.isNotEmpty
-            ? _preferredSlots.first.dayOfWeek
-            : null,
-        preferredTime: _preferredSlots.isNotEmpty
-            ? _preferredSlots.first.startTime
-            : null,
+        message:
+            _messageController.text.trim().isEmpty
+                ? null
+                : _messageController.text.trim(),
+        preferredDay:
+            _preferredSlots.isNotEmpty ? _preferredSlots.first.dayOfWeek : null,
+        preferredTime:
+            _preferredSlots.isNotEmpty ? _preferredSlots.first.startTime : null,
         preferredDuration: 60,
         preferredSlots: _preferredSlots,
         isReturningStudent: widget.params.isReturningStudent,
@@ -754,11 +767,13 @@ class _SectionWrapper extends StatelessWidget {
           children: [
             Icon(icon, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
-            Text(title, style: AppTypography.headingSmall),
+            // Notebook × Score: _SectionWrapper 의 section title 은 Playfair
+            // sectionTitle 로 통일. 6개 호출부(체험/정기/아카데미 각 폼) 에 일괄 반영 (§7.17).
+            Text(title, style: NotebookTypography.sectionTitle),
             if (isRequired)
               Text(
                 ' *',
-                style: AppTypography.headingSmall.copyWith(
+                style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.paperAccent,
                 ),
               ),

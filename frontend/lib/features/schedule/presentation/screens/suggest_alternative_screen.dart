@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -316,9 +317,7 @@ class _SuggestAlternativeScreenState
                                     ? FontWeight.w600
                                     : FontWeight.normal,
                             color:
-                                isSelected
-                                    ? AppColors.paperOk
-                                    : AppColors.ink,
+                                isSelected ? AppColors.paperOk : AppColors.ink,
                           ),
                         ),
                       ),
@@ -854,9 +853,11 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
           const SizedBox(height: AppSpacing.space4),
 
           // Title
+          // Notebook × Score: BottomSheetHandle 선행 커스텀 바텀시트 헤더는
+          // Playfair appBarTitle 로 통일 (§7.27, 18/w700).
           Text(
             AppStrings.rejectBottomSheetTitle,
-            style: AppTypography.headingSmall,
+            style: NotebookTypography.appBarTitle,
           ),
           const SizedBox(height: AppSpacing.space2),
 

@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 
 /// Parameters for the request completion screen.
@@ -31,10 +32,7 @@ class RequestCompletionParams {
 class RequestCompletionScreen extends StatelessWidget {
   final RequestCompletionParams params;
 
-  const RequestCompletionScreen({
-    super.key,
-    required this.params,
-  });
+  const RequestCompletionScreen({super.key, required this.params});
 
   /// Number of progress steps (for testing).
   static int get stepCount => _steps.length;
@@ -44,22 +42,10 @@ class RequestCompletionScreen extends StatelessWidget {
       title: AppStrings.requestCompleteTitle,
       description: '선생님에게 요청이 전송되었습니다',
     ),
-    _StepData(
-      title: '선생님이 시간 확인',
-      description: '희망 시간을 검토 중입니다',
-    ),
-    _StepData(
-      title: '시간 확정 후 입금',
-      description: '확정된 시간에 맞춰 입금합니다',
-    ),
-    _StepData(
-      title: '선생님이 수강권 발급',
-      description: '수강권이 발급되면 알림을 보내드립니다',
-    ),
-    _StepData(
-      title: '레슨 시작!',
-      description: '첫 레슨을 즐겨보세요',
-    ),
+    _StepData(title: '선생님이 시간 확인', description: '희망 시간을 검토 중입니다'),
+    _StepData(title: '시간 확정 후 입금', description: '확정된 시간에 맞춰 입금합니다'),
+    _StepData(title: '선생님이 수강권 발급', description: '수강권이 발급되면 알림을 보내드립니다'),
+    _StepData(title: '레슨 시작!', description: '첫 레슨을 즐겨보세요'),
   ];
 
   @override
@@ -101,18 +87,12 @@ class RequestCompletionScreen extends StatelessWidget {
             color: AppColors.paperOk,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.check,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.check, size: 40, color: Colors.white),
         ),
         const SizedBox(height: AppSpacing.space4),
         Text(
           AppStrings.requestCompleteHeader,
-          style: AppTypography.headingLarge.copyWith(
-            color: AppColors.ink,
-          ),
+          style: AppTypography.headingLarge.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
@@ -142,9 +122,10 @@ class RequestCompletionScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
           Text(
             '진행 단계 가이드',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.ink,
             ),
           ),
@@ -188,31 +169,40 @@ class RequestCompletionScreen extends StatelessWidget {
                   color: isActive ? AppColors.paperAccent : AppColors.paper,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isActive
-                        ? AppColors.paperAccent
-                        : AppColors.scheduleMutedAccent,
+                    color:
+                        isActive
+                            ? AppColors.paperAccent
+                            : AppColors.scheduleMutedAccent,
                     width: 2,
                   ),
                 ),
                 child: Center(
-                  child: isActive
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
-                      : Text(
-                          '$stepNumber',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.scheduleMutedAccent,
-                            fontWeight: FontWeight.w600,
+                  child:
+                      isActive
+                          ? const Icon(
+                            Icons.check,
+                            size: 16,
+                            color: Colors.white,
+                          )
+                          : Text(
+                            '$stepNumber',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.scheduleMutedAccent,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
                 ),
               ),
               if (!isLast)
                 Container(
                   width: 2,
                   height: 36,
-                  color: isActive
-                      ? AppColors.paperAccent.withValues(alpha: 0.3)
-                      : AppColors.scheduleMutedAccent.withValues(alpha: 0.3),
+                  color:
+                      isActive
+                          ? AppColors.paperAccent.withValues(alpha: 0.3)
+                          : AppColors.scheduleMutedAccent.withValues(
+                            alpha: 0.3,
+                          ),
                 ),
             ],
           ),
@@ -229,9 +219,10 @@ class RequestCompletionScreen extends StatelessWidget {
                   title,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: isActive
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
+                    color:
+                        isActive
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -266,9 +257,10 @@ class RequestCompletionScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
           Text(
             '신청 정보 요약',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.ink,
             ),
           ),
@@ -285,28 +277,27 @@ class RequestCompletionScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
-          ...params.preferredSlots.map((slot) => Padding(
-                padding: const EdgeInsets.only(
-                  left: AppSpacing.space4,
-                  bottom: AppSpacing.space1,
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      '${slot.priority}순위',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.paperAccent,
-                        fontWeight: FontWeight.w600,
-                      ),
+          ...params.preferredSlots.map(
+            (slot) => Padding(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.space4,
+                bottom: AppSpacing.space1,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '${slot.priority}순위',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.paperAccent,
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Text(
-                      slot.displayLabel,
-                      style: AppTypography.bodySmall,
-                    ),
-                  ],
-                ),
-              )),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(slot.displayLabel, style: AppTypography.bodySmall),
+                ],
+              ),
+            ),
+          ),
           // Show empty slots
           ...List.generate(
             3 - params.preferredSlots.length,
@@ -393,8 +384,5 @@ class _StepData {
   final String title;
   final String description;
 
-  const _StepData({
-    required this.title,
-    required this.description,
-  });
+  const _StepData({required this.title, required this.description});
 }
