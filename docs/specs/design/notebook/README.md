@@ -661,6 +661,26 @@ Text(
 
 **은유**: 섹션 헤더 = 악보의 악장 표제(Andante, Allegro…). 매스트헤드가 교향곡 전체 제목이면, 섹션은 각 악장의 제목이므로 같은 Playfair 가문으로 묶되 한 단계 작은 크기로 위계 표시.
 
+### 7.18 Switch + TextSelection 테마 통일 — 미세 인터랙션까지 Vermillion
+
+**배경**: 큰 면(AppBar·TabBar·Dialog·SnackBar·섹션 헤더) 은 Notebook × Score 로 통일됐지만 **미세 인터랙션(토글·커서·드래그 선택)** 은 여전히 Material 기본(파란 thumb / 파란 커서). 설정·정책·필터 화면의 Switch 20 파일이 각자 `activeThumbColor: paperAccent` 를 지정하거나 지정하지 않아 일관성 부족. 텍스트 필드 커서도 Material 파랑으로 폼 입력 시 시그니처 이탈.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `switchTheme` 추가 — thumb/track/outline 을 `WidgetStateProperty` 로 제어. selected = `paperAccent` + `paperAccentSoft`, unselected = `paper` + `inkQuaternary` | 2d6e8739 |
+| `core/theme/app_theme.dart` (dark) | `switchTheme` 추가 — selected 는 Vermillion 유지, unselected 는 `textSecondaryDark` + `borderDark` | 2d6e8739 |
+| `core/theme/app_theme.dart` (light/dark) | `textSelectionTheme` 추가 — `cursorColor`, `selectionColor = paperAccentSoft`, `selectionHandleColor` 전부 `paperAccent` | 2d6e8739 |
+
+**영향 범위**:
+- Switch 사용 20 파일(설정·정책·필터·예약) 이 개별 `activeThumbColor` override 없이도 Vermillion active 렌더.
+- 모든 `TextField` / `TextFormField` 커서·드래그 핸들·선택 배경이 Vermillion 으로 일괄 전환 (Material 파란 커서 제거).
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: Switch active = 체크박스에 찍는 Vermillion 도장. 텍스트 커서 = Vermillion 만년필 끝.
+
 ---
 
 ## 8. 구현 원칙
