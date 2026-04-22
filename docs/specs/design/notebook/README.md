@@ -932,6 +932,26 @@ Text(
 
 ---
 
+### 7.30 연결 요청 대기 빈 상태 제목 Playfair 통일
+
+**배경**: 선생님/학생이 초대 코드로 연결을 주고받는 `pending_requests_screen` — 빈 상태("대기 중인 연결 요청이 없습니다") 가 대부분의 사용자가 처음 들어가서 마주하는 화면이다. 빈 상태 헤딩이 `AppTypography.headingSmall` (Pretendard 18/w600) 로 남아 있어, 같은 화면의 Vermillion 원형 아이콘 배경과 시각 위계가 어긋났다. 빈 상태일수록 제목 한 줄의 타이포 완성도가 앱의 "잘 만들었다는 인상"을 결정한다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/invite/presentation/screens/pending_requests_screen.dart` | 빈 상태 헤딩 `AppTypography.headingSmall` → `NotebookTypography.appBarTitle` (Playfair 18/w700) | 886ab275 |
+
+**설계 포인트**:
+- §7.27 의 "커스텀 헤더 = `appBarTitle` 재사용" 패턴을 빈 상태 헤딩으로 확장. 바텀시트 헤더(§7.27, §7.29) 와 같은 한 줄 치환 → 단일 진원지(`NotebookTypography`) 만으로 해결.
+- 같은 파일 233행의 `CircleAvatar` 이니셜 글자(`requesterName[0]`) 는 의도적으로 제외. 이니셜 글리프는 섹션/화면 제목이 아닌 "프로필 기호"로서 별도 타이포 규칙이 필요하다. Playfair 를 강제하면 구형 세리프가 원형 아바타 안에서 잘리거나 커닝이 깨질 수 있어 추후 별도 SPEC 으로 다룬다.
+
+**검증**:
+- `flutter analyze lib/features/invite/presentation/screens/pending_requests_screen.dart` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 오선지 위 "TACET" (쉼표 마디) 표기처럼, 아무 음표가 없는 마디에도 장 제목의 서체는 유지된다. 쉼의 순간일수록 제목이 일관되게 남아 있어야 곡이 같은 악보 안에 있다는 감각을 해치지 않는다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
