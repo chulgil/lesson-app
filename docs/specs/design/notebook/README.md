@@ -884,6 +884,36 @@ Text(
 
 ---
 
+### 7.28 Slider 테마 통일 — BPM·튜닝·녹음임계값 트랙·Thumb 을 Vermillion 으로
+
+**배경**: §7.18 Switch, §7.23 Popup/Dropdown, §7.24 DatePicker/TimePicker, §7.26 Radio 로 입력·선택 위젯의 Material blue 를 모두 걷어냈지만 **Slider 만 전역 테마에서 누락** 되어 있었다. 앱 내 Slider 호출 9곳 중 `tuner_settings_sheet` 1곳만 `activeColor: AppColors.paperAccent` 로 개별 override, 나머지 8곳(메트로놈 BPM 2곳, smart recording 임계값 2곳, 레슨시간 duration, 경력연수, 레슨비 min/max 2곳) 은 Material blue 트랙·썸으로 렌더되어 Notebook 팔레트에서 이탈. 연습·녹음·프로필 등 **매일 조정하는 핵심 파라미터** 가 4대 시그니처에서 빠져 있었다.
+
+| 파일 | 변경 | 커밋 |
+| core/theme/app_theme.dart (light) | sliderTheme: SliderThemeData — activeTrackColor/thumbColor=paperAccent, inactiveTrackColor=inkQuaternary, overlayColor=paperAccentSoft, valueIndicatorColor=ink + paper 텍스트 | a3a135c2 |
+| core/theme/app_theme.dart (dark)  | 동일 스펙, inactiveTrackColor=borderDark, valueIndicatorColor=surfaceDark + textPrimaryDark | a3a135c2 |
+
+**영향 범위** (9개 Slider 호출):
+- metronome_full_screen_modal.dart — 전체화면 메트로놈 BPM 슬라이더
+- practice_tools/bpm_controls.dart — 연습 패널 로그 스케일 BPM 슬라이더
+- practice_tools/metronome_panel.dart — 연습 패널 (LogarithmicBpmSlider 재사용)
+- tuner/tuner_settings_sheet.dart — 튜너 기준 주파수 (기존 override 유지, 동일 색)
+- smart_recording/smart_recording_settings.dart — 무음 트림 임계값 + 중간 무음 임계값 2곳
+- profile/lesson_time_settings_widgets.dart — 레슨 시간 duration (분)
+- profile/extended_profile_dialogs.dart — 경력 연수 + 최소 레슨비 + 최대 레슨비 3곳
+
+**설계 포인트**:
+- `activeTrackColor` + `thumbColor` 를 동일 Vermillion 으로 묶어 "드래그 중 값 = 선택된 값" 시각 일체감 확보.
+- `inactiveTrackColor` 는 light 에서 `inkQuaternary`, dark 에서 `borderDark` — 배경과의 최소 대비로 차분한 빈 구간 유지.
+- `overlayColor` = `paperAccentSoft` — 썸 터치 시 부드러운 붉은 스프레드.
+- `valueIndicatorColor` 는 bubble tooltip 배경. ink/surfaceDark + paper/textPrimaryDark 텍스트로 **잉크 방울** 이미지 유지.
+- `tuner_settings_sheet` 의 개별 `activeColor: paperAccent` override 는 테마 값과 동일하므로 제거하지 않고 유지 (호환성, 이중 안전장치).
+
+**검증**: flutter analyze → 0 issues / flutter test → 392/392 passed
+
+**은유**: 오선지에 메트로놈 템포를 붉은 색연필로 그어 넣는다. 정해진 템포까지는 선이 진하게 칠해지고, 그 앞은 얇은 연필 밑줄만 남는다. 연필 끝을 누르는 지점(썸)도, 지나간 자국(active track)도 같은 붉은 색 — 연주자는 "어디까지 왔나" 를 한눈에 안다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
