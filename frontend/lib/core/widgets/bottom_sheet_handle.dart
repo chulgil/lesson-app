@@ -27,7 +27,7 @@ class BottomSheetHandle extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: color ?? AppColors.borderLight,
+        color: color ?? AppColors.inkQuaternary,
         borderRadius: BorderRadius.circular(height / 2),
       ),
     );

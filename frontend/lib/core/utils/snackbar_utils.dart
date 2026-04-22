@@ -7,7 +7,7 @@ void showSuccessSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: AppColors.success,
+      backgroundColor: AppColors.paperOk,
     ),
   );
 }
@@ -17,7 +17,7 @@ void showErrorSnackBar(BuildContext context, [String message = '오류가 발생
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: AppColors.error,
+      backgroundColor: AppColors.paperAccent,
     ),
   );
 }
@@ -27,7 +27,7 @@ void showInfoSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: AppColors.textSecondaryLight,
+      backgroundColor: AppColors.inkSecondary,
     ),
   );
 }

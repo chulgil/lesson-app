@@ -25,7 +25,7 @@ class ProfilePhotoHeader extends StatelessWidget {
     this.profileImagePath,
     this.backgroundImagePath,
     required this.initial,
-    this.avatarColor = AppColors.primaryLight,
+    this.avatarColor = AppColors.paperAccentSoft,
     this.onTapProfile,
     this.onTapBackground,
     this.editable = true,
@@ -144,8 +144,8 @@ class ProfilePhotoHeader extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withValues(alpha: 0.3),
-            AppColors.primaryLight.withValues(alpha: 0.2),
+            AppColors.paperAccent.withValues(alpha: 0.3),
+            AppColors.paperAccentSoft.withValues(alpha: 0.2),
           ],
         ),
       ),
@@ -171,7 +171,7 @@ class ProfilePhotoHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.paperAccent,
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
       ),

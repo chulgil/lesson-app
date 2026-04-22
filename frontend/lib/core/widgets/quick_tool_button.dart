@@ -45,7 +45,7 @@ class QuickToolButton extends StatelessWidget {
             Icon(
               icon,
               size: 28,
-              color: iconColor ?? AppColors.primary,
+              color: iconColor ?? AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(

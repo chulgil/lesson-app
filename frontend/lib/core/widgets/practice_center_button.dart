@@ -68,11 +68,11 @@ class _PracticeCenterButtonState extends State<PracticeCenterButton> {
           width: widget.size,
           height: widget.size,
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: AppColors.paperAccentSoft,
             borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.2),
+                color: AppColors.paperAccent.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

@@ -94,16 +94,16 @@ class LessonDurationSelector extends StatelessWidget {
                     onDurationChanged(minutes, false);
                   }
                 },
-                backgroundColor: AppColors.surfaceLight,
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
+                backgroundColor: AppColors.paper,
+                selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
                   color: isSelected
-                      ? AppColors.primary
-                      : AppColors.textPrimaryLight,
+                      ? AppColors.paperAccent
+                      : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
@@ -118,15 +118,15 @@ class LessonDurationSelector extends StatelessWidget {
                     onDurationChanged(selectedDuration, true);
                   }
                 },
-                backgroundColor: AppColors.surfaceLight,
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
+                backgroundColor: AppColors.paper,
+                selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isCustom ? AppColors.primary : AppColors.borderLight,
+                  color: isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
                   color:
-                      isCustom ? AppColors.primary : AppColors.textPrimaryLight,
+                      isCustom ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isCustom ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -145,22 +145,22 @@ class LessonDurationSelector extends StatelessWidget {
                 hintText: '시간 입력',
                 suffixText: '분',
                 filled: true,
-                fillColor: AppColors.surfaceLight,
+                fillColor: AppColors.paper,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space3,
                   vertical: AppSpacing.space2,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.primary),
+                  borderSide: BorderSide(color: AppColors.paperAccent),
                 ),
               ),
               onChanged: (value) {

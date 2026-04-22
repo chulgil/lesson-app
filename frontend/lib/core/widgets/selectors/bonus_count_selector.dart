@@ -54,7 +54,7 @@ class BonusCountSelector extends StatelessWidget {
     this.accentColor,
   });
 
-  Color get _accentColor => accentColor ?? AppColors.primary;
+  Color get _accentColor => accentColor ?? AppColors.paperAccent;
 
   @override
   Widget build(BuildContext context) {
@@ -85,14 +85,14 @@ class BonusCountSelector extends StatelessWidget {
                     onCountChanged(count, false);
                   }
                 },
-                backgroundColor: AppColors.surfaceLight,
+                backgroundColor: AppColors.paper,
                 selectedColor: _accentColor.withValues(alpha: 0.15),
                 checkmarkColor: _accentColor,
                 side: BorderSide(
-                  color: isSelected ? _accentColor : AppColors.borderLight,
+                  color: isSelected ? _accentColor : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? _accentColor : AppColors.textPrimaryLight,
+                  color: isSelected ? _accentColor : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
@@ -106,14 +106,14 @@ class BonusCountSelector extends StatelessWidget {
                   onCountChanged(selectedCount, true);
                 }
               },
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: AppColors.paper,
               selectedColor: _accentColor.withValues(alpha: 0.15),
               checkmarkColor: _accentColor,
               side: BorderSide(
-                color: isCustom ? _accentColor : AppColors.borderLight,
+                color: isCustom ? _accentColor : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
-                color: isCustom ? _accentColor : AppColors.textPrimaryLight,
+                color: isCustom ? _accentColor : AppColors.ink,
                 fontWeight: isCustom ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -132,18 +132,18 @@ class BonusCountSelector extends StatelessWidget {
                 hintText: '횟수',
                 suffixText: '회',
                 filled: true,
-                fillColor: AppColors.surfaceLight,
+                fillColor: AppColors.paper,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space3,
                   vertical: AppSpacing.space2,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

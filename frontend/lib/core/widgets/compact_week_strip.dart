@@ -90,7 +90,7 @@ class CompactWeekStrip extends StatelessWidget {
                     decoration:
                         isSelected
                             ? BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMedium,
                               ),
@@ -104,8 +104,8 @@ class CompactWeekStrip extends StatelessWidget {
                           style: AppTypography.caption.copyWith(
                             color:
                                 isToday
-                                    ? AppColors.primary
-                                    : AppColors.textTertiaryLight,
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkTertiary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -119,15 +119,15 @@ class CompactWeekStrip extends StatelessWidget {
                                   ? BoxDecoration(
                                     color:
                                         isSelected
-                                            ? AppColors.primary
-                                            : AppColors.primary.withValues(
+                                            ? AppColors.paperAccent
+                                            : AppColors.paperAccent.withValues(
                                               alpha: 0.15,
                                             ),
                                     shape: BoxShape.circle,
                                   )
                                   : isSelected
                                   ? BoxDecoration(
-                                    color: AppColors.primary,
+                                    color: AppColors.paperAccent,
                                     shape: BoxShape.circle,
                                   )
                                   : null,
@@ -138,8 +138,8 @@ class CompactWeekStrip extends StatelessWidget {
                                   (isSelected || isToday)
                                       ? (isSelected
                                           ? Colors.white
-                                          : AppColors.primary)
-                                      : AppColors.textPrimaryLight,
+                                          : AppColors.paperAccent)
+                                      : AppColors.ink,
                               fontWeight:
                                   (isToday || isSelected)
                                       ? FontWeight.w700
@@ -155,7 +155,7 @@ class CompactWeekStrip extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 hasMarker
-                                    ? AppColors.primary.withValues(alpha: 0.5)
+                                    ? AppColors.paperAccent.withValues(alpha: 0.5)
                                     : Colors.transparent,
                             shape: BoxShape.circle,
                           ),
@@ -208,7 +208,7 @@ class CompactWeekStrip extends StatelessWidget {
               Text(
                 weekLabel,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -216,7 +216,7 @@ class CompactWeekStrip extends StatelessWidget {
               Icon(
                 Icons.calendar_month,
                 size: 14,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ],
           ),
@@ -234,13 +234,13 @@ class CompactWeekStrip extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: Text(
                 '오늘',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -264,7 +264,7 @@ class _NavChevron extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Icon(icon, size: 18, color: AppColors.textSecondaryLight),
+        child: Icon(icon, size: 18, color: AppColors.inkSecondary),
       ),
     );
   }

@@ -75,7 +75,7 @@ Future<String?> cropProfileImage(
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: '프로필 사진 편집',
-        toolbarColor: AppColors.primary,
+        toolbarColor: AppColors.paperAccent,
         toolbarWidgetColor: Colors.white,
         cropStyle: CropStyle.circle,
         lockAspectRatio: true,
@@ -110,7 +110,7 @@ Future<String?> cropBackgroundImage(
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: '배경 사진 편집',
-        toolbarColor: AppColors.primary,
+        toolbarColor: AppColors.paperAccent,
         toolbarWidgetColor: Colors.white,
         cropStyle: CropStyle.rectangle,
         lockAspectRatio: true,

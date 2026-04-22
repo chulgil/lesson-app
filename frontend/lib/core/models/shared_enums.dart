@@ -89,15 +89,15 @@ enum ConnectionStatus {
   Color get color {
     switch (this) {
       case ConnectionStatus.offline:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case ConnectionStatus.inviteSent:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case ConnectionStatus.inviteReceived:
-        return AppColors.info;
+        return AppColors.ink;
       case ConnectionStatus.connected:
-        return AppColors.success;
+        return AppColors.paperOk;
       case ConnectionStatus.disconnected:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 
@@ -135,15 +135,15 @@ enum PracticeLevel {
   Color get color {
     switch (this) {
       case PracticeLevel.newStudent:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case PracticeLevel.excellent:
-        return AppColors.success;
+        return AppColors.paperOk;
       case PracticeLevel.average:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case PracticeLevel.poor:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case PracticeLevel.onBreak:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 

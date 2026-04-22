@@ -42,7 +42,7 @@ class LessonProgressBar extends StatelessWidget {
               child: CustomPaint(
                 size: const Size(double.infinity, 2),
                 painter: _DashedLinePainter(
-                  color: isCompleted ? AppColors.primary : AppColors.borderLight,
+                  color: isCompleted ? AppColors.paperAccent : AppColors.inkQuaternary,
                   strokeWidth: 1.5,
                   dashWidth: 4,
                   dashGap: 3,
@@ -185,7 +185,7 @@ class _PhaseDot extends StatelessWidget {
           width: _dotSize,
           height: _dotSize,
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -207,7 +207,7 @@ class _PhaseDot extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.primaryLight,
+                  color: AppColors.paperAccentSoft,
                   width: 2,
                 ),
               ),
@@ -217,7 +217,7 @@ class _PhaseDot extends StatelessWidget {
               width: _dotSize,
               height: _dotSize,
               decoration: const BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 shape: BoxShape.circle,
               ),
             ),
@@ -232,7 +232,7 @@ class _PhaseDot extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.borderLight,
+              color: AppColors.inkQuaternary,
               width: 1.5,
             ),
           ),
@@ -258,10 +258,10 @@ class _PhaseDot extends StatelessWidget {
     switch (state) {
       case _PhaseState.completed:
       case _PhaseState.active:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case _PhaseState.future:
       case _PhaseState.muted:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 }

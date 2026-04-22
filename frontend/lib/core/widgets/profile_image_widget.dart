@@ -33,13 +33,13 @@ class ProfileImageWidget extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: radius,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
             backgroundImage: _resolveImage(),
             child: _resolveImage() == null
                 ? Text(
                     name.isNotEmpty ? name[0].toUpperCase() : '?',
                     style: AppTypography.headingLarge.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontSize: radius * 0.8,
                     ),
                   )
@@ -52,7 +52,7 @@ class ProfileImageWidget extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                 ),

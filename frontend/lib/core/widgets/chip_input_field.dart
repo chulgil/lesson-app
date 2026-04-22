@@ -125,22 +125,22 @@ class _ChipInputFieldState extends State<ChipInputField> {
             hintText: widget.hint,
             suffixText: widget.suffix,
             filled: true,
-            fillColor: AppColors.surfaceLight,
+            fillColor: AppColors.paper,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space3,
               vertical: AppSpacing.space2,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),
@@ -169,16 +169,16 @@ class _ChipInputFieldState extends State<ChipInputField> {
               label: Text(suggestion.label),
               selected: selected,
               onSelected: (_) => _onChipTapped(suggestion),
-              backgroundColor: AppColors.surfaceLight,
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
+              backgroundColor: AppColors.paper,
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: selected ? AppColors.primary : AppColors.borderLight,
+                color: selected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: selected
-                    ? AppColors.primary
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.paperAccent
+                    : AppColors.ink,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             );

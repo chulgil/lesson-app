@@ -15,11 +15,11 @@ import 'recording_diagnostic_screen.dart';
 Color _getRoleColor(UserRole role) {
   switch (role) {
     case UserRole.teacher:
-      return AppColors.primary;
+      return AppColors.paperAccent;
     case UserRole.student:
       return AppColors.secondary;
     case UserRole.parent:
-      return AppColors.info;
+      return AppColors.ink;
   }
 }
 
@@ -174,7 +174,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
           SnackBar(
             content: Text('계정 전환 실패: $e'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -244,10 +244,10 @@ class _DebugOptionsSheet extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
+                    color: AppColors.paperAccent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
-                  child: const Icon(Icons.bug_report, color: AppColors.warning),
+                  child: const Icon(Icons.bug_report, color: AppColors.paperAccent),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Text('개발자 옵션', style: AppTypography.headingMedium),
@@ -299,7 +299,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                               color:
                                   isSelected
                                       ? roleColor.withValues(alpha: 0.1)
-                                      : AppColors.surfaceSecondaryLight,
+                                      : AppColors.paperDark,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMedium,
                               ),
@@ -326,7 +326,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                                     color:
                                         isSelected
                                             ? roleColor
-                                            : AppColors.textSecondaryLight,
+                                            : AppColors.inkSecondary,
                                   ),
                                 ),
                               ],
@@ -371,7 +371,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                           color:
                               isSelected
                                   ? AppColors.secondary
-                                  : AppColors.textSecondaryLight,
+                                  : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
@@ -430,7 +430,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.audio_file, color: AppColors.warning),
+              leading: const Icon(Icons.audio_file, color: AppColors.paperAccent),
               title: const Text('녹음 파일 진단'),
               subtitle: const Text('녹음 파일과 DB 매칭 상태 확인'),
               dense: true,

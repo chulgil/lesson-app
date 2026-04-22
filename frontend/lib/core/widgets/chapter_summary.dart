@@ -39,7 +39,7 @@ class ChapterSummary extends StatelessWidget {
         Container(
           width: double.infinity,
           height: 1,
-          color: AppColors.borderLight,
+          color: AppColors.inkQuaternary,
         ),
 
         // Chapter header (always visible)
@@ -58,7 +58,7 @@ class ChapterSummary extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.primary.withValues(alpha: 0.12)
+                        ? AppColors.paperAccent.withValues(alpha: 0.12)
                         : AppColors.scheduleMutedBackground,
                     shape: BoxShape.circle,
                   ),
@@ -66,8 +66,8 @@ class ChapterSummary extends StatelessWidget {
                     icon,
                     size: 14,
                     color: isActive
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
@@ -84,8 +84,8 @@ class ChapterSummary extends StatelessWidget {
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w600,
                               color: isActive
-                                  ? AppColors.textPrimaryLight
-                                  : AppColors.textSecondaryLight,
+                                  ? AppColors.ink
+                                  : AppColors.inkSecondary,
                             ),
                           ),
                           if (completedDate != null) ...[
@@ -93,7 +93,7 @@ class ChapterSummary extends StatelessWidget {
                             Text(
                               completedDate!,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                           ],
@@ -105,7 +105,7 @@ class ChapterSummary extends StatelessWidget {
                         Text(
                           summary!,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -122,7 +122,7 @@ class ChapterSummary extends StatelessWidget {
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     size: 20,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
               ],
             ),

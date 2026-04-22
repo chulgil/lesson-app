@@ -26,11 +26,11 @@ enum LessonType {
   Color get color {
     switch (this) {
       case LessonType.trial:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case LessonType.regular:
-        return AppColors.success;
+        return AppColors.paperOk;
       case LessonType.oneTime:
-        return AppColors.info;
+        return AppColors.ink;
     }
   }
 }
@@ -111,19 +111,19 @@ enum BookingStatus {
   Color get color {
     switch (this) {
       case BookingStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case BookingStatus.confirmed:
-        return AppColors.info;
+        return AppColors.ink;
       case BookingStatus.changeRequested:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case BookingStatus.completed:
-        return AppColors.success;
+        return AppColors.paperOk;
       case BookingStatus.cancelled:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case BookingStatus.unavailable:
         return AppColors.secondary;
       case BookingStatus.expired:
-        return AppColors.textSecondaryLight;
+        return AppColors.inkSecondary;
     }
   }
 

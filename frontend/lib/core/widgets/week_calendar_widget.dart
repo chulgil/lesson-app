@@ -152,14 +152,14 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+          colors: [AppColors.paperAccent, AppColors.paperAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.paperAccent.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -306,7 +306,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
         child: Text(
           '오늘',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -377,7 +377,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     // Determine visual appearance
     // UX: Available dates are bright, unavailable dates are faded
     Color getTextColor() {
-      if (isSelected) return AppColors.primary;
+      if (isSelected) return AppColors.paperAccent;
 
       if (isBookingMode) {
         // Booking mode: emphasize available dates
@@ -425,9 +425,9 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                   // UX: Green dot for available, white for others
                   color:
                       isSelected
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : isBookingMode
-                          ? AppColors.success.withValues(alpha: 0.9)
+                          ? AppColors.paperOk.withValues(alpha: 0.9)
                           : Colors.white,
                   shape: BoxShape.circle,
                 ),
