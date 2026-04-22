@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../providers/repertoire_archive_provider.dart';
@@ -359,7 +360,9 @@ class _RepertoireCard extends ConsumerWidget {
                       .deleteRepertoire(repertoire.id, studentId);
                   ref.invalidate(studentRepertoiresProvider(studentId));
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -493,22 +496,30 @@ class _SectionListItem extends ConsumerWidget {
                 },
               )
             else
-              Transform.scale(
-                scale: 1.2,
-                child: Checkbox(
-                  value: section.isCompletedForDate(today),
-                  onChanged: (value) async {
-                    await ref
-                        .read(sectionCrudProvider.notifier)
-                        .toggleComplete(
-                          section.id,
-                          repertoireId,
-                          studentId: studentId,
-                          date: today,
-                        );
-                    ref.invalidate(studentRepertoiresProvider(studentId));
-                  },
-                  activeColor: AppColors.paperOk,
+              // Notebook × Score: 섹션 완료를 연필 사각 체크박스로 표시. 체크 색은 paperOk(녹색 펜).
+              GestureDetector(
+                onTap: () async {
+                  await ref
+                      .read(sectionCrudProvider.notifier)
+                      .toggleComplete(
+                        section.id,
+                        repertoireId,
+                        studentId: studentId,
+                        date: today,
+                      );
+                  ref.invalidate(studentRepertoiresProvider(studentId));
+                },
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: Center(
+                    child: PencilBox(
+                      checked: section.isCompletedForDate(today),
+                      size: 22,
+                      checkColor: AppColors.paperOk,
+                    ),
+                  ),
                 ),
               ),
 

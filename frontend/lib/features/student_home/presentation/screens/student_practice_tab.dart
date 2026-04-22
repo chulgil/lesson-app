@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -581,11 +582,10 @@ class _SectionTile extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              // Checkbox
+              // Notebook × Score: 연습 완료를 연필 사각 체크박스로 통일. 오늘은 탭 가능, 과거/미래는 읽기 전용.
               if (isToday)
-                Checkbox(
-                  value: isCompletedForDate,
-                  onChanged: (value) async {
+                GestureDetector(
+                  onTap: () async {
                     await ref
                         .read(sectionCrudProvider.notifier)
                         .toggleDailyCompletion(
@@ -595,22 +595,31 @@ class _SectionTile extends ConsumerWidget {
                           selectedDate,
                         );
                   },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  behavior: HitTestBehavior.opaque,
+                  child: SizedBox(
+                    width: 26,
+                    height: 26,
+                    child: Center(
+                      child: PencilBox(
+                        checked: isCompletedForDate,
+                        size: 22,
+                        checkColor: AppColors.paperOk,
+                      ),
+                    ),
                   ),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
                 )
               else
-                Icon(
-                  isCompletedForDate
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
-                  color:
-                      isCompletedForDate
-                          ? AppColors.paperOk
-                          : AppColors.inkSecondary,
-                  size: 22,
+                SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: Center(
+                    child: PencilBox(
+                      checked: isCompletedForDate,
+                      size: 22,
+                      borderColor: AppColors.inkSecondary,
+                      checkColor: AppColors.paperOk,
+                    ),
+                  ),
                 ),
               const SizedBox(width: AppSpacing.space2),
 
