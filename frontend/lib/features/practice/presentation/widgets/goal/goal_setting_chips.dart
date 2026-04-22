@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/notebook/pencil_primitives.dart';
 
 /// Chip selection widget for goal settings
 class GoalSettingChips extends StatefulWidget {
@@ -65,11 +66,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
           // Header
           Row(
             children: [
-              Icon(
-                widget.icon,
-                color: AppColors.paperAccent,
-                size: 18,
-              ),
+              Icon(widget.icon, color: AppColors.paperAccent, size: 18),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 widget.label,
@@ -128,7 +125,9 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
                         vertical: AppSpacing.space2,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                     ),
                     onChanged: (value) {
@@ -162,6 +161,9 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
           });
         }
       },
+      // Notebook × Score: 선택 상태를 연필 동그라미로 표시.
+      avatar: isSelected ? const PencilCircle(size: 16) : null,
+      showCheckmark: false,
       selectedColor: AppColors.paperAccent.withAlpha(30),
       backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
@@ -178,12 +180,14 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
   }
 
   Widget _buildCustomChip() {
-    final isCustomSelected = widget.selectedValue != null &&
+    final isCustomSelected =
+        widget.selectedValue != null &&
         !widget.options.contains(widget.selectedValue);
 
+    final isActive = _showCustomInput || isCustomSelected;
     return ChoiceChip(
       label: const Text('직접 입력'),
-      selected: _showCustomInput || isCustomSelected,
+      selected: isActive,
       onSelected: (selected) {
         setState(() {
           _showCustomInput = selected;
@@ -193,22 +197,28 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
           }
         });
       },
+      // Notebook × Score: 선택 상태를 연필 동그라미로 표시.
+      avatar: isActive ? const PencilCircle(size: 16) : null,
+      showCheckmark: false,
       selectedColor: AppColors.paperAccent.withAlpha(30),
       backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
-        color: _showCustomInput || isCustomSelected
-            ? AppColors.paperAccent
-            : AppColors.ink,
-        fontWeight: _showCustomInput || isCustomSelected
-            ? FontWeight.w600
-            : FontWeight.normal,
+        color:
+            _showCustomInput || isCustomSelected
+                ? AppColors.paperAccent
+                : AppColors.ink,
+        fontWeight:
+            _showCustomInput || isCustomSelected
+                ? FontWeight.w600
+                : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
-          color: _showCustomInput || isCustomSelected
-              ? AppColors.paperAccent
-              : Colors.transparent,
+          color:
+              _showCustomInput || isCustomSelected
+                  ? AppColors.paperAccent
+                  : Colors.transparent,
         ),
       ),
     );
