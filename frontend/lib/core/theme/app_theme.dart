@@ -93,6 +93,23 @@ class AppTheme {
         ),
       ),
 
+      // FilledButton — Notebook × Score: M3 primary action 버튼의 기본 채움색을 Vermillion(paperAccent) 으로 승격.
+      // 전 코드베이스 74개 호출부 중 21개가 `style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent)` 인라인을 반복.
+      // 테마 단일지점 등록으로 동일한 Notebook CTA 를 53개 오버라이드 없는 호출부에도 자동 보급.
+      // elevation 0 · shape radiusLarge · AppTypography.button — ElevatedButton 테마와 시그니처 통일.
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          elevation: 0,
+          backgroundColor: AppColors.paperAccent,
+          foregroundColor: AppColors.paper,
+          minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          ),
+          textStyle: AppTypography.button,
+        ),
+      ),
+
       // OutlinedButton
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -534,6 +551,22 @@ class AppTheme {
           elevation: 0,
           backgroundColor: AppColors.paper,
           foregroundColor: AppColors.backgroundDark,
+          minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          ),
+          textStyle: AppTypography.button,
+        ),
+      ),
+
+      // FilledButton — Notebook × Score: dark 테마에서도 Vermillion(paperAccent) CTA 유지.
+      // dark surface 위의 paperAccent 는 충분한 대비 확보 — foregroundColor 는 paper 로 밝은 라벨 유지.
+      // light 테마와 동일 시그니처로 라이트/다크 전환 시 CTA 색상 일관성 보장.
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          elevation: 0,
+          backgroundColor: AppColors.paperAccent,
+          foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
