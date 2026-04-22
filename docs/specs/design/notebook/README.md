@@ -1788,6 +1788,36 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 ---
 
+### 7.55 profile/ 화면 예약 설정·악기 관리·계좌 편집 섹션 제목 Playfair 통일 — profile/ 도메인 §7.17 배치 #1
+
+**배경**: schedule/ 도메인 3배치 완료(§7.51·§7.52·§7.54) 후 profile/ 로 이동. 이번 배치는 profile/ **화면 레이어** 3개 파일 7건을 전수 스캔해 eligible 7건 모두 §7.17 sectionTitle 로 전환. 페이지 섹션 헤더 2건 + `showModalBottomSheet` 내부 섹션 헤더 2건 + `DraggableScrollableSheet` 제목 1건 + 폼 섹션 헤더 2건이 섞인 **혼합 컨텍스트 배치**.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 컨텍스트 | 패턴 |
+|------|------|------|---------|------|
+| `frontend/lib/features/profile/presentation/screens/lesson_time_settings_screen.dart` | 228 | "예약 설정" | 페이지 섹션 | §7.17 direct |
+| 〃 | 280 | "레슨 간 휴식 시간" | 바텀시트 섹션 (showModalBottomSheet) | §7.17 direct |
+| 〃 | 329 | "최소 예약 가능 시간" | 바텀시트 섹션 (showModalBottomSheet) | §7.17 direct |
+| `frontend/lib/features/profile/presentation/screens/instrument_management_screen.dart` | 98 | "현재 가르치는 악기" | 페이지 섹션 | §7.17 direct |
+| 〃 | 198 | "악기 추가" | 페이지 섹션 | §7.17 direct |
+| `frontend/lib/features/profile/presentation/screens/bank_account_edit_screen.dart` | 451 | "개인정보 수집·이용 동의" | DraggableScrollableSheet 제목 | §7.17 direct |
+| 〃 | 504 | "계좌 추가" | 폼 섹션 | §7.17 direct |
+
+**설계 포인트**:
+- **showModalBottomSheet + BottomSheetHandle 없음 → sectionTitle**: `lesson_time_settings_screen` 의 두 바텀시트(`_showBreakTimeDialog`, `_showMinBookingHoursDialog`) 는 SafeArea + Column 구조로 **커스텀 핸들 프리픽스가 없음**. §7.27 appBarTitle 패턴(커스텀 핸들 + 상단 제목)과 달라 sectionTitle 판정. BottomSheet 제목의 Playfair 적용은 "커스텀 핸들 포함 여부"가 appBarTitle 대 sectionTitle 판별 기준임을 재확인.
+- **DraggableScrollableSheet 역시 sectionTitle**: `bank_account_edit_screen:451` 의 "개인정보 수집·이용 동의" 는 DraggableScrollableSheet 내부 Padding + Text 구조. 다이얼로그가 아니므로 dialogTitle 아닌 sectionTitle 적용. 법적 문서 제목이지만 **섹션 헤더의 계층적 역할**은 동일.
+- **폼 섹션 헤더도 sectionTitle**: `bank_account_edit_screen:504` 의 "계좌 추가" 는 Form + Column 안의 첫 Text. 페이지 루트의 섹션 구획 역할이므로 §7.17 적용.
+- **§7.30 예외 해당 없음**: 7건 모두 **정적 라벨** 이고 동적 값·이름·날짜·시간·가격·아바타 이니셜·빈 상태·레벨 토큰 어디에도 해당되지 않음. 완전 eligible.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (4.0s)
+- Lore commit: `c1924195`
+
+**은유**: 장부의 표지를 새로 꾸미는 일이라면 이번엔 여러 서랍의 제목표를 동시에 바꿨다. 첫 서랍의 "예약 설정" 은 활짝 열린 장부의 소제목, 두 번째·세 번째 서랍의 "레슨 간 휴식 시간"·"최소 예약 가능 시간" 은 살짝 꺼내 보는 메모의 머리글, 네 번째 서랍의 "현재 가르치는 악기"·"악기 추가" 는 가로놓인 장부의 양면 제목, 다섯 번째 서랍의 "개인정보 수집·이용 동의"·"계좌 추가" 는 반쯤 접어둔 서식의 제목표. 서로 다른 형태의 제목표지만 **모두 같은 서체** 로 묶였다. 서랍이 달라도 장부 주인이 같으므로, 활자는 하나여야 한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
