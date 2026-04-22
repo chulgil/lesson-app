@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/teacher_stats.dart';
 
 /// Monthly trend chart showing 6-month lesson count trend.
@@ -20,7 +21,8 @@ class MonthlyTrendChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('레슨 추이', style: AppTypography.headingSmall),
+        // Notebook × Score: 차트 카드 섹션 헤더도 Playfair sectionTitle 로 통일.
+        Text('레슨 추이', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Container(
           height: 180,

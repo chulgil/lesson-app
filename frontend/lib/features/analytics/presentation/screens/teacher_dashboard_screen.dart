@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
@@ -236,7 +237,8 @@ class _TeacherDashboardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('수익 현황', style: AppTypography.headingSmall),
+        // Notebook × Score: 교사 대시보드 섹션 헤더도 Playfair sectionTitle 로 통일.
+        Text('수익 현황', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -273,7 +275,9 @@ class _TeacherDashboardScreenState
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: (isPositive ? AppColors.paperOk : AppColors.paperAccent)
+                  color: (isPositive
+                          ? AppColors.paperOk
+                          : AppColors.paperAccent)
                       .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
@@ -283,13 +287,19 @@ class _TeacherDashboardScreenState
                     Icon(
                       isPositive ? Icons.trending_up : Icons.trending_down,
                       size: 16,
-                      color: isPositive ? AppColors.paperOk : AppColors.paperAccent,
+                      color:
+                          isPositive
+                              ? AppColors.paperOk
+                              : AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       '${isPositive ? '+' : ''}${stats.revenueChangePercent.toStringAsFixed(1)}%',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isPositive ? AppColors.paperOk : AppColors.paperAccent,
+                        color:
+                            isPositive
+                                ? AppColors.paperOk
+                                : AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -307,7 +317,7 @@ class _TeacherDashboardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('학생 현황', style: AppTypography.headingSmall),
+        Text('학생 현황', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),

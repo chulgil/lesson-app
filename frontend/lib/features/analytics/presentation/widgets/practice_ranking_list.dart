@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/teacher_stats.dart';
 
 /// Practice ranking list widget showing top practicing students.
@@ -18,7 +19,8 @@ class PracticeRankingList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('연습률 TOP 5', style: AppTypography.headingSmall),
+        // Notebook × Score: 랭킹 카드 섹션 헤더도 Playfair sectionTitle 로 통일.
+        Text('연습률 TOP 5', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Container(
           decoration: BoxDecoration(
