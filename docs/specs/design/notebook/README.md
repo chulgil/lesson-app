@@ -1393,6 +1393,49 @@ Text(
 
 ---
 
+### 7.44 FilledButton paperAccent 인라인 override 16개 파일 cleanup
+
+**배경**: §7.35 에서 `filledButtonTheme` 를 `MaterialTheme` 레벨에 등록하며 `backgroundColor: AppColors.paperAccent`·`foregroundColor: AppColors.paper`·Inter 17/w600 `textStyle` 을 default 로 공급했다. 그러나 도입 이전에 `style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent)` 로 직접 배경을 지정하던 16개 파일이 그대로 남아, 동일한 Vermillion 값을 인라인 override 로 재공급하는 중복 구간이 유지되고 있었다. §7.41 (FloatingActionButton cleanup) 과 동일한 "theme 등록 → inline override 정리" 2단계 패턴의 두 번째 적용.
+
+**원칙 재확인**:
+- `inline > theme` precedence 에 따라 override 는 항상 theme 값을 가린다. 따라서 override 와 theme default 가 동일할 때 외형은 불변이지만 — 향후 theme 값을 조정(예: darkTheme 에서 elevation 변경, Vermillion 배경 대체)하려 할 때 override 가 동시에 변경되지 않아 화면 파편화가 일어난다. 중복 제거는 "현재 무변화, 미래 일관성" 을 위한 투자.
+- 단일 라인 `style:` 만 존재하는 경우 전체 파라미터를 제거한다. 추가 속성(예: `minimumSize`, `shape`) 이 있는 경우 `backgroundColor:` 라인만 제거하고 나머지는 보존해야 하지만, 이번 스위프에서는 대상 16개 모두 단일 라인 — 안전한 대규모 mechanical 정리.
+
+**변경 파일** (16개, 모두 `style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),` 단일 라인 삭제):
+
+| 도메인 | 파일 | 라벨 |
+|--------|------|------|
+| schedule | `teacher_availability_screen.dart` | 삭제 |
+| schedule | `booking_cancel_screen.dart` | 취소하기 |
+| students | `student_detail_screen.dart` | 삭제 |
+| profile/screens | `instrument_management_screen.dart` | 삭제 |
+| profile/screens | `bank_account_edit_screen.dart` | 삭제 |
+| profile/screens | `tip_template_management_screen.dart` | 삭제 |
+| profile/screens | `profile_tab.dart` | 로그아웃 |
+| profile/widgets | `extended_profile_dialogs.dart` | 삭제 |
+| profile/widgets | `repertoire_management_widgets.dart` | 삭제 |
+| lessons/widgets | `edit_practice_item_sheet.dart` | 삭제 |
+| parent_home | `parent_profile_tab.dart` | 로그아웃 |
+| practice/screens | `practice_note_list_screen.dart` | 삭제 |
+| practice/screens | `section_detail_screen.dart` | 삭제 |
+| practice/screens | `section_detail_recording_mixin.dart` | 삭제 |
+| practice/screens | `edit_repertoire_screen.dart` | 삭제 |
+| practice/screens | `practice_goal_setting_screen.dart` | 초기화 |
+
+**시각적 불변성 확인**:
+- theme 의 `backgroundColor` default 가 `AppColors.paperAccent` (§7.35) 로 동일 — 색상 동일.
+- theme 의 `foregroundColor` default 가 `AppColors.paper` (§7.35), 인라인에서는 foregroundColor 를 지정하지 않았으므로 이전에도 theme default 가 적용됨 — 글자색 동일.
+- Inter 17/w600 `textStyle`·`shape`·`padding` 역시 theme default 그대로 사용 중이었음 — 구조 동일.
+
+**검증**:
+- `flutter analyze` → No issues found (13.1s)
+- `flutter test` → 392/392 passed
+- Lore commit: `0255cf0d`
+
+**은유**: 장부의 빨간 도장이 문서마다 찍혀 있다. 모두 같은 인주(印朱) 에서 나왔지만, 어떤 페이지는 "도장을 이 위치에 찍으라" 는 지시까지 수기로 덧붙여 있었다. 오늘 16개 페이지에서 그 지시를 지운다 — 인주는 이미 표준 위치에 배치되어 있고, 수기 지시는 남아 있어도 같은 자리를 가리키고 있을 뿐이었다. 도장 자체는 그대로, 페이지 여백만 깨끗해진다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
