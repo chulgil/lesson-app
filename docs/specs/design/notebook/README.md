@@ -182,13 +182,14 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 | `ScheduleChangeRequestSection` | `NotebookSectionHeader` + 상·하단 `inkQuaternary` 1px · `paperDark` 아바타 · 사각 1px 보더 상태 스탬프 (fill 제거) · urgent 점은 `paperAccent` |
 | `UrgentAlertZone` | 좌측 3px 세로선 (`paperAccent` urgent · `ink` 일반) + 투명 배경 · semantic error/warning/info 3색 분리 제거 (3색 원칙) |
 
-### 5.3 Phase 3 이후 대상 (미구현)
+### 5.3 Phase 3 이후 대상
 
 | 항목 | 계획 | Phase |
 |------|------|-------|
-| `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 3 |
-| 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 |
-| 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 |
+| `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 3 — **완료** |
+| `PencilUnderline` / `PencilBox` / `PencilCircle` | 손그림 프리미티브 3종 (CustomPainter) | Phase 3 — **완료** |
+| 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 — 완료 |
+| 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 — 완료 |
 
 ---
 
@@ -248,7 +249,36 @@ String romanOf(int index) {
 - 음수 → 빈 문자열
 - 렌더: Playfair Display · italic · `FontWeight.w600` (`NotebookTypography.roman`)
 
-### 6.4 손글씨 마지널리아
+### 6.4 Pencil 프리미티브 (Phase 3)
+
+파일: `lib/core/widgets/notebook/pencil_primitives.dart`
+
+| 위젯 | 생성자 기본값 | 용도 |
+|------|---------------|------|
+| `PencilUnderline` | width=80, color=paperAccent, strokeWidth=1.8 | 강조 텍스트 밑 곡선 밑줄 (roman tab, 제목 밑줄 등) |
+| `PencilBox` | checked=false, size=16, borderColor=ink, checkColor=paperAccent | 과제/체크리스트 체크박스 |
+| `PencilCircle` | size=18, color=paperAccent | 현재 활성/선택 항목 표시 (외곽 링 + 중앙 점) |
+
+기하 기준은 `design-plan/hybrid/primitives.jsx` viewBox(18x18, 22x22)이며 Flutter에서는 size 스케일링 후 `CustomPainter`로 드로잉.
+
+### 6.5 StaffDivider (Phase 3)
+
+파일: `lib/core/widgets/notebook/staff_divider.dart`
+
+5선 오선 + 우측 더블 바 + 좌측 높은음자리표(𝄞) + 옵션 템포 마킹을 단일 `CustomPaint`로 렌더.
+
+```dart
+const StaffDivider()                        // 기본 (height 22)
+const StaffDivider(showTempo: true)         // "♩ = 92" 템포 표시
+const StaffDivider(showTempo: true, tempoText: '♩ = 120')
+```
+
+- 오선: `AppColors.ink @ alpha 0.45`, strokeWidth 0.8
+- 세로 종료 바: 1.4px + 0.8px (barline pair)
+- 높은음자리표: 유니코드 `𝄞` (U+1D11E), fontSize 34, serif
+- 템포: IBM Plex Mono 9pt · letterSpacing 1 · `AppColors.inkSecondary`
+
+### 6.6 손글씨 마지널리아
 
 ```dart
 Text(
@@ -267,7 +297,7 @@ Text(
 |-------|------|------|
 | Phase 1 | 선생님 홈화면 — 토큰 + PaperScaffold + NotebookMasthead + Programme Title + 로마숫자 레슨 리스트 + Fine. 푸터 | **완료** (2026-04-21, f425ff11) |
 | Phase 2 | 공통 위젯 (StatCard/EmptyStateWidget/ThinRule/SectionHeader) + 홈 섹션 (SubscriptionBadge/TimeContextBanner/GettingStartedCard/LessonRequestSection) + 대시보드 서브위젯 (LessonCard/AssignmentSummarySection/ScheduleChangeRequestSection/UrgentAlertZone) | **완료** (2026-04-21, 3462459b + c361592d + 89f04f94) |
-| Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
+| Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | **완료** (pencil_primitives.dart + staff_divider.dart 신설, login_screen 내 사적 복제 제거) |
 | Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **완료** (a4b8f54f + 4094f677 + 199c491f + 6cc52ca0) |
 | Phase 5 | 학생 설정·프로필 화면 확산 + 대시보드 잔재 정리 (student_home 전역 레거시 팔레트 0건 달성) | **완료** (b365c8b5 + da93a738 + e2d97784 + 24c359dd + a00dd961 + 310d3435 + cd867abc) |
 | Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | **완료** (6.A 기계적 토큰 + 6.B 시맨틱 토큰 이식. 328파일, 2,213줄) |
@@ -466,6 +496,23 @@ Text(
 - `app_colors.dart` Notebook 섹션 12개 토큰 + 제품 고유 토큰(profile/streak/tuner/bubble/schedule/level 등)만 잔존
 
 **Phase 6+7+8+9 총계**: 889파일, 5,630줄. `AppColors` 레거시 시맨틱 토큰 이름 **사용·선언 모두 0건** 달성. Notebook × Score 팔레트 이식 구조적으로 완료.
+
+### 7.10 Phase 3 산출물 (CustomPainter 프리미티브)
+
+**범위**: Phase 3 최초 계획의 `StaffDivider` + 후속 확장된 pencil 프리미티브 3종을 `core/widgets/notebook/`에 정식 위젯으로 신설. `design-plan/hybrid/primitives.jsx` JSX 레퍼런스를 Dart `CustomPainter`로 포트.
+
+| 파일 | 공개 위젯 | 기하 레퍼런스 |
+|------|-----------|---------------|
+| `pencil_primitives.dart` | `PencilUnderline`, `PencilBox`, `PencilCircle` | JSX viewBox(18×18, 22×22) → Size 스케일 |
+| `staff_divider.dart` | `StaffDivider` | JSX 5라인 y=[0,4,8,12,16] + top 3 |
+
+**정리 사항**:
+- `login_screen.dart` 내 사적 복제 `_PencilUnderline` + `_PencilUnderlinePainter` 제거 후 공용 위젯으로 교체.
+- `PencilBox` / `PencilCircle` / `StaffDivider` 는 위젯 신설만. 향후 Phase에서 체크리스트/과제/활성 표시/섹션 구분에 단계적 도입.
+
+**검증**:
+- `flutter analyze` → 0 issues
+- 스펙(§6.4 Pencil 프리미티브, §6.5 StaffDivider) 갱신
 
 ---
 
