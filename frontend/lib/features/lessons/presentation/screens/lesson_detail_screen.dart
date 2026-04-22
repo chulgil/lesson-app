@@ -10,6 +10,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
@@ -85,11 +86,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.event_busy,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.event_busy, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '레슨을 찾을 수 없습니다',
@@ -243,7 +240,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   ),
                 PopupMenuItem(
                   value: 'delete',
-                  child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                  child: Text(
+                    '삭제',
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
                 ),
               ],
         ),
@@ -438,7 +438,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             ),
           ],
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space5),
+          const StaffDivider(),
+          const SizedBox(height: AppSpacing.space5),
 
           // Key points
           LessonDetailSectionHeader(
@@ -454,7 +456,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             onRemove: (index) => _removeKeyPoint(lesson, index),
           ),
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space5),
+          const StaffDivider(),
+          const SizedBox(height: AppSpacing.space5),
 
           // Practice tips
           LessonDetailSectionHeader(
