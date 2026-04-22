@@ -1606,6 +1606,43 @@ Text(
 
 ---
 
+### 7.50 Material `Colors.black54` / `Colors.white70` 8건 → Notebook ink / paper alpha 토큰 치환
+
+**맥락**: §7.47 에서 `Colors.grey[600]`/`[300]` 3건을 ink alpha 래더(75%·55%·25%)로 흡수한 뒤, 같은 원리가 적용되어야 할 **black/white alpha** 잔재 감사. Material `Colors.black54`(54% 검정)·`Colors.white70`(70% 흰색) 은 시각적으로 "스크림/오버레이 보조 텍스트" 계열이며 Notebook 팔레트에도 직접 대응이 있다. 감사 결과 features/ 에 정확히 8건(`black54` 4 + `white70` 4) 이 남아 있어 일괄 치환.
+
+**교훈**: Cycle 22(§7.47) 직전 CEO 리뷰에서 "Material Colors 잔재 감사" 를 3-후보 브레인스토밍에 올려두었지만, grey 이후 black/white alpha 는 별도 배치로 미뤘었다. 같은 원리(회색 톤 = ink at alpha, 밝은 톤 = paper at alpha)를 black/white 에도 일관 적용해 "회색만 잡고 검정·흰색 alpha 는 방치" 라는 절반 청소를 방지.
+
+**매핑 원칙** (§7.47 연장):
+| Material 색상 | Notebook 토큰 | 근거 |
+|---|---|---|
+| `Colors.black54` (54% 검정) | `AppColors.inkTertiary` (55% ink) | 1% alpha 차이는 시각적 무차이. 스크림/배지 공통 |
+| `Colors.white70` (70% 흰색) | `AppColors.paper.withValues(alpha: 0.7)` | paper 크림톤으로 Notebook 팔레트 유지 |
+| (동반) 인디케이터 `Colors.white` | `AppColors.paper` | 스크림 위 브랜드 백색은 paper |
+
+**변경 파일 (4개)**:
+- `features/profile/presentation/screens/certificate_edit_screen.dart:511,546` — 이미지 썸네일 "탭하여 변경" 배지 배경 2건. `Colors.black54` → `inkTertiary`. (배지 위 텍스트 `Colors.white` 는 이 배치에서 유지 — 스코프 분리, Cycle 24 Candidate B 로 이월)
+- `features/practice/presentation/widgets/metronome/time_signature_picker.dart:176` — 선택된 박자 칩(Vermillion 배경) 위 "큰박 N개" 부가 텍스트. `Colors.white70` → `paper.withValues(alpha: 0.7)`. 비선택 라인 `inkSecondary` (75% ink) 와 대칭 구조 확립.
+- `features/parent_home/presentation/screens/parent_dashboard_tab.dart:410,416` — 다크 히어로 카드 위 선생님 이름 Icon+Text 2건. 둘 다 `Colors.white70` → `paper.withValues(alpha: 0.7)`. `const` Icon 이 `AppColors.paper.withValues(...)` 는 `const` 컨텍스트 밖이라 `const` 키워드 제거.
+- `features/invite/presentation/screens/scan_invite_screen.dart:95,155,172` — 카메라 스캔 오버레이 3건: 처리중 스크림 `Colors.black54` → `inkTertiary`, 안내 패널 배경 `Colors.black54` → `inkTertiary`, 안내 서브텍스트 `Colors.white70` → `paper.withValues(alpha: 0.7)`. 동반으로 처리중 인디케이터 `Colors.white` → `AppColors.paper`(brand white) 승격.
+
+**검증**:
+- `flutter analyze lib/` → No issues found (13.2s, §7.47 이후 첫 배치이므로 회귀 없음 확인)
+- `flutter test` → 392/392 passed
+- grep `Colors\.(black54|white70)` features/ → 0 matches (문서/주석 언급만 6건 — 실제 사용처 0)
+- 코드 커밋: `f147bfe6`
+
+**스코프 분리 (의도적 누락)**:
+- `Colors.white` 단독 사용(certificate 2건, parent_dashboard 11건, scan_invite 6건) — Vermillion 버튼/다크 히어로 foreground 는 **Vermillion 위 브랜드 백색** 이라는 고유 의미가 있어 일괄 치환 전에 별도 판정 필요.
+- `Colors.white.withValues(alpha: N)` (parent_dashboard 3건) — Candidate B "withValues(alpha:) 내부 Material Colors 혼재 감사" 로 이월. 다음 Cycle 에서 일괄 처리.
+- `Colors.black` / `Colors.black` 단독(scan_invite 1건) — 카메라 배경 불투명 검정은 "절대 검정" 의 의미가 강하므로 Notebook ink(`#14161C`) 와 다름. 보류.
+
+**§7.47 패턴 재확인**:
+회색 톤 = ink at alpha, 밝은 톤 = paper at alpha — Notebook 팔레트는 "색상 3개 + alpha 래더" 로 Material 의 수십 개 회색/백색 팔레트를 커버한다. 이 cycle 은 그 래더에 **black/white alpha** 변형도 편입됨을 명시.
+
+**은유**: 장부의 스크림은 검정이 아니라 "흐린 먹선" 이다 — 먹(ink)을 물에 풀어 투명도를 조절하면 회색도 검정도 그 한 줄기에서 나온다. Material 의 `black54` 는 "검정을 54% 섞은 회색" 이지만, Notebook 에서는 그냥 "먹 55% 농도" 다. 오늘 두 표기법이 1% alpha 차이 안에서 만나 한 이름(`inkTertiary`)으로 수렴했다. 흰색도 같다 — "흰색 70%" 가 아니라 "크림 종이 70% 농도". 모든 중간톤은 결국 `ink`·`paper` 두 뿌리에서 자란다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
