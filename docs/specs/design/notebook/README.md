@@ -1534,6 +1534,40 @@ Text(
 
 ---
 
+### 7.48 레슨 정책·학부모 레슨/결제 탭 섹션 제목 Playfair 통일 — §7.17·§7.27 혼합 배치
+
+**배경**: §7.45 에 이어 §7.17 잔여를 계속 정리. 이번엔 레슨 정책 화면의 헬퍼 기반 섹션 헤더와 학부모 홈의 레슨 탭 두 섹션 제목을 §7.17 로 승격하면서, 같은 배치 안에서 학부모 결제 탭의 "자녀 선택" 바텀시트 헤더가 `BottomSheetHandle` 선행 구조임을 확인하고 §7.27 로 분기해 함께 처리했다. 혼합 배치 선례는 §7.42 에서 확립된 패턴.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 패턴 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/subscription/presentation/screens/lesson_policy_screen.dart` | 138 | `_buildSectionHeader(title, icon)` title | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/parent_home/presentation/screens/parent_lessons_tab.dart` | 29 | "예정된 레슨" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/parent_home/presentation/screens/parent_lessons_tab.dart` | 69 | "지난 레슨" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/parent_home/presentation/screens/parent_payments_tab.dart` | 445 | "자녀 선택" (바텀시트 헤더) | `AppTypography.headingSmall` | `NotebookTypography.appBarTitle` | §7.27 |
+
+**설계 포인트**:
+- **혼합 배치의 분기 기준 재확인**: 한 커밋에서 §7.17 과 §7.27 이 공존하는 것은 문제되지 않는다. 분기점은 **`BottomSheetHandle` 선행 여부** — 선행하면 커스텀 바텀시트 헤더(§7.27, 18/w700), 선행하지 않으면 페이지/카드 섹션 제목(§7.17, 17/w600). 변경표에서 각 행의 "패턴" 열로 혼동을 제거한다.
+- **헬퍼 함수 전파**: `lesson_policy_screen._buildSectionHeader(title, icon)` 는 호출부가 다수. 헬퍼 내부 한 줄 전환으로 호출처 N 개 섹션 제목이 동시에 Playfair 로 승격 — §7.45 에서 굳어진 "공통 수정으로 일괄 반영" 원칙의 반복 적용.
+- **의도적 제외 목록**: 이번 배치에서 **건드리지 않은** 같은 파일 내 `headingSmall` 사용처를 아래에 명시해 향후 배치의 판정 기준을 남긴다.
+  - `lesson_policy_screen:315` "📋 정책 요약" — `.copyWith(color: paperAccent)` 색상 오버라이드. `sectionTitle` 로 단순 치환 시 색상이 유실된다. 별도 배치에서 `sectionTitle.copyWith(color: paperAccent)` 로 전환.
+  - `parent_lessons_tab:417` `monthName` — 캘린더 네비게이션의 동적 월 라벨. "정적 섹션 제목" 이 아니라 "네비게이션 상태 표시" 에 가까워 §7.17 보류. §7.30 pieceTitle 도 해당 없음(월은 고유명사 아님).
+  - `parent_payments_tab:297` `profile.name` — 자녀 이름. §7.30 은 "작품명" 한정이므로 사람 이름은 별도 정책 필요. 이번 배치는 보류.
+  - `parent_payments_tab:503, 568` — `.copyWith(...)` 변형. copyWith 류는 별도 그룹으로 묶어 색상/무게 유지 전환할 예정.
+  - `parent_payments_tab:602` "오류가 발생했습니다" — 에러 헤드라인은 §7.30 제외 roster.
+- **스코프 격리**: 커밋 시 작업 트리에 평행 세션의 5개 파일(`ai_notes_result_sheet`, `location_summary_card`, `travel_analytics_card` 및 `prompt_plan.md`) 이 unstaged 로 남아 있었다. `git reset HEAD` 후 3개 파일만 명시적으로 `git add` 하고 `git diff --cached --stat` 로 확인 — 스코프 유입 없이 깨끗.
+- **§7.47 번호 경합**: README append 직전 §7.47 이 이미 평행 세션(Material Colors.grey → Notebook ink 토큰)에 점유되어 있음을 `grep "^### 7\."` 로 확인. §7.48 로 진행. 이 `grep-before-append` 프로토콜이 평행 작업 환경에서 번호 충돌을 막는 유일한 수단임을 재확인.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (10.2s)
+- `flutter test test/` → 392/392 passed
+- Lore commit: `c329c6e6`
+
+**은유**: 학부모가 펼쳐 보는 레슨 장부와 결제 장부는 오늘도 같은 책장에서 꺼낸다. 한 장부의 소제목은 활자에 찍혀 있고, 옆 장부에서 자녀를 고르라고 띄우는 서랍(바텀시트) 문패는 손으로 쥐는 손잡이(BottomSheetHandle) 아래에 붙어 있다. 활자와 문패는 둘 다 Playfair 서체지만 굵기가 다르다 — 소제목은 17pt 읽기용, 문패는 18pt 집어 올리는 용. 같은 손이 같은 잉크로 쓴 글씨지만, 역할에 맞는 굵기로 쓰는 규율은 유지된다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
