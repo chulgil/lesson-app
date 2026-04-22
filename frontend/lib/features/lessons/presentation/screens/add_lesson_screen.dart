@@ -411,7 +411,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.infoLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
@@ -459,7 +459,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.infoLight,
+                    color: AppColors.paperDark,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),

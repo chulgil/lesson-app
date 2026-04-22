@@ -205,7 +205,7 @@ class NoteWithCent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noteColor = isPerfect ? AppColors.paperOk : AppColors.primary;
+    final noteColor = isPerfect ? AppColors.paperOk : AppColors.paperAccent;
     final centColor =
         isPerfect
             ? AppColors.paperOk

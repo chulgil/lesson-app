@@ -100,7 +100,7 @@ class _ResourceChip extends StatelessWidget {
       case TeachingResourceType.youtube:
         return AppColors.youtubeRed;
       case TeachingResourceType.teacherRecording:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case TeachingResourceType.externalLink:
         return AppColors.ink;
     }

@@ -162,6 +162,6 @@ class RepertoireTimelineCard extends StatelessWidget {
   Color get _progressColor {
     if (repertoire.isArchived) return AppColors.inkTertiary;
     if (repertoire.completionRate >= 1.0) return AppColors.paperOk;
-    return AppColors.primary;
+    return AppColors.paperAccent;
   }
 }

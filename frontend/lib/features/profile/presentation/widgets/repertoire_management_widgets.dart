@@ -227,7 +227,7 @@ class PieceCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.paperAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -235,7 +235,7 @@ class PieceCard extends StatelessWidget {
                         child: Text(
                           piece.opus!,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),
@@ -794,12 +794,12 @@ void showAssignToStudentDialog({
                     final student = students[index];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: AppColors.primary.withValues(
+                        backgroundColor: AppColors.paperAccent.withValues(
                           alpha: 0.1,
                         ),
                         child: Text(
                           student.name[0],
-                          style: TextStyle(color: AppColors.primary),
+                          style: TextStyle(color: AppColors.paperAccent),
                         ),
                       ),
                       title: Text(student.name),

@@ -101,7 +101,7 @@ class _RepertoireDetailScreenState
           // Repertoire header (same as list item)
           Row(
             children: [
-              Icon(Icons.menu_book, color: AppColors.primary, size: 28),
+              Icon(Icons.menu_book, color: AppColors.paperAccent, size: 28),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Column(
@@ -157,7 +157,7 @@ class _RepertoireDetailScreenState
                 icon: Icons.repeat,
                 label: '총 연습 횟수',
                 value: '${stats.totalPracticeCount}회',
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
             const SizedBox(width: AppSpacing.space3),

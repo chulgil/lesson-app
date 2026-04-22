@@ -449,11 +449,11 @@ class RemoteParentRepository implements ParentRepository {
   }
 
   Color _parseColor(String? value) {
-    if (value == null) return AppColors.primary;
+    if (value == null) return AppColors.paperAccent;
     try {
       return Color(int.parse(value, radix: 16));
     } catch (_) {
-      return AppColors.primary;
+      return AppColors.paperAccent;
     }
   }
 

@@ -112,7 +112,7 @@ class _TeacherDetailContent extends ConsumerWidget {
         SliverAppBar(
           expandedHeight: 200,
           pinned: true,
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccent,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => context.pop(),
@@ -124,8 +124,8 @@ class _TeacherDetailContent extends ConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primary,
-                    AppColors.primary.withValues(alpha: 0.8),
+                    AppColors.paperAccent,
+                    AppColors.paperAccent.withValues(alpha: 0.8),
                   ],
                 ),
               ),
@@ -191,11 +191,11 @@ class _TeacherDetailContent extends ConsumerWidget {
                             .map(
                               (i) => Chip(
                                 label: Text(i),
-                                backgroundColor: AppColors.primary.withValues(
+                                backgroundColor: AppColors.paperAccent.withValues(
                                   alpha: 0.1,
                                 ),
                                 labelStyle: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.primary,
+                                  color: AppColors.paperAccent,
                                 ),
                               ),
                             )
@@ -341,7 +341,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                     width: 6,
                                     height: 6,
                                     decoration: const BoxDecoration(
-                                      color: AppColors.primary,
+                                      color: AppColors.paperAccent,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -452,7 +452,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       icon: const Icon(Icons.send_outlined),
                       label: const Text('레슨 신청'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space3,
@@ -553,7 +553,7 @@ class _TeacherDetailContent extends ConsumerWidget {
             icon: const Icon(Icons.replay),
             label: const Text('다시 시작하기'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
@@ -630,7 +630,7 @@ class _TeacherDetailContent extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.primary),
+            Icon(icon, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(title, style: AppTypography.headingSmall),
           ],

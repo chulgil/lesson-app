@@ -81,18 +81,18 @@ class BankAccountEditScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.primaryLight.withValues(alpha: 0.3),
+            color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
-              Icon(Icons.info_outline, size: 20, color: AppColors.primary),
+              Icon(Icons.info_outline, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
                   '기본 계좌가 수강권 제안 시 학생에게 표시됩니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),
@@ -222,7 +222,7 @@ class _BankAccountCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side:
             account.isDefault
-                ? BorderSide(color: AppColors.primary, width: 1.5)
+                ? BorderSide(color: AppColors.paperAccent, width: 1.5)
                 : BorderSide(color: AppColors.inkQuaternary),
       ),
       elevation: 0,
@@ -238,7 +238,7 @@ class _BankAccountCard extends StatelessWidget {
                   size: 20,
                   color:
                       account.isDefault
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
@@ -256,7 +256,7 @@ class _BankAccountCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -264,7 +264,7 @@ class _BankAccountCard extends StatelessWidget {
                     child: Text(
                       '기본',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -305,8 +305,8 @@ class _BankAccountCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onSetDefault,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: BorderSide(color: AppColors.primary),
+                    foregroundColor: AppColors.paperAccent,
+                    side: BorderSide(color: AppColors.paperAccent),
                   ),
                   child: const Text('기본 계좌로 설정'),
                 ),
@@ -511,7 +511,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 border: Border.all(
                   color:
                       _consentChecked
-                          ? AppColors.primary.withValues(alpha: 0.5)
+                          ? AppColors.paperAccent.withValues(alpha: 0.5)
                           : AppColors.inkQuaternary,
                 ),
               ),
@@ -525,7 +525,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       value: _consentChecked,
                       onChanged:
                           (v) => setState(() => _consentChecked = v ?? false),
-                      activeColor: AppColors.primary,
+                      activeColor: AppColors.paperAccent,
                       visualDensity: VisualDensity.compact,
                     ),
                   ),

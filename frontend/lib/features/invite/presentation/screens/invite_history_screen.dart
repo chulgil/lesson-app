@@ -70,10 +70,10 @@ class InviteHistoryScreen extends ConsumerWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.history, size: 40, color: AppColors.primary),
+              child: Icon(Icons.history, size: 40, color: AppColors.paperAccent),
             ),
             const SizedBox(height: AppSpacing.space6),
             Text(
@@ -151,13 +151,13 @@ class InviteHistoryScreen extends ConsumerWidget {
             vertical: 2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             count.toString(),
             style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -292,7 +292,7 @@ class _InviteCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.space2),
                 IconButton(
                   onPressed: onCopyCode,
-                  icon: Icon(Icons.copy, size: 18, color: AppColors.primary),
+                  icon: Icon(Icons.copy, size: 18, color: AppColors.paperAccent),
                   tooltip: '코드 복사',
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.all(AppSpacing.space1),

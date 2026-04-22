@@ -152,9 +152,9 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                 Expanded(
                   child: TabBar(
                     controller: _tabController,
-                    labelColor: AppColors.primary,
+                    labelColor: AppColors.paperAccent,
                     unselectedLabelColor: AppColors.inkSecondary,
-                    indicatorColor: AppColors.primary,
+                    indicatorColor: AppColors.paperAccent,
                     indicatorWeight: 3,
                     labelPadding: EdgeInsets.zero,
                     labelStyle: AppTypography.headingMedium.copyWith(

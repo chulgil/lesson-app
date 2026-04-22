@@ -184,7 +184,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                     child: ElevatedButton(
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
@@ -238,10 +238,10 @@ class _StudentTutorialPage extends StatelessWidget {
             width: 200,
             height: 200,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(data.icon, size: 80, color: AppColors.primary),
+            child: Icon(data.icon, size: 80, color: AppColors.paperAccent),
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -284,7 +284,7 @@ class _PageIndicator extends StatelessWidget {
       height: 8,
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+        color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
     );

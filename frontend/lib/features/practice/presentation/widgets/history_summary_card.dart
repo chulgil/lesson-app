@@ -43,7 +43,7 @@ class HistorySummaryCard extends StatelessWidget {
         children: [
           _buildStatItem(
             icon: Icons.music_note,
-            iconColor: AppColors.primary,
+            iconColor: AppColors.paperAccent,
             label: '전체',
             value: '$totalCount곡',
           ),

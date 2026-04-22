@@ -67,7 +67,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
             children: [
               Icon(
                 widget.icon,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 18,
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -162,16 +162,16 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
           });
         }
       },
-      selectedColor: AppColors.primary.withAlpha(30),
+      selectedColor: AppColors.paperAccent.withAlpha(30),
       backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.ink,
+        color: isSelected ? AppColors.paperAccent : AppColors.ink,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          color: isSelected ? AppColors.paperAccent : Colors.transparent,
         ),
       ),
     );
@@ -193,11 +193,11 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
           }
         });
       },
-      selectedColor: AppColors.primary.withAlpha(30),
+      selectedColor: AppColors.paperAccent.withAlpha(30),
       backgroundColor: AppColors.paperDark,
       labelStyle: AppTypography.bodyMedium.copyWith(
         color: _showCustomInput || isCustomSelected
-            ? AppColors.primary
+            ? AppColors.paperAccent
             : AppColors.ink,
         fontWeight: _showCustomInput || isCustomSelected
             ? FontWeight.w600
@@ -207,7 +207,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
           color: _showCustomInput || isCustomSelected
-              ? AppColors.primary
+              ? AppColors.paperAccent
               : Colors.transparent,
         ),
       ),

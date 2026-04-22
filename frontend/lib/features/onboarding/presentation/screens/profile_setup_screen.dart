@@ -277,7 +277,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading || !_isFormValid ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
@@ -379,7 +379,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
@@ -430,7 +430,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
         ),
@@ -486,15 +486,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             return Chip(
                               label: Text(instrument),
                               labelStyle: AppTypography.bodySmall.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
-                              backgroundColor: AppColors.primary.withValues(
+                              backgroundColor: AppColors.paperAccent.withValues(
                                 alpha: 0.1,
                               ),
                               deleteIcon: Icon(
                                 Icons.close,
                                 size: 16,
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
                               onDeleted: () {
                                 setState(() {
@@ -560,7 +560,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
         ),
@@ -593,7 +593,7 @@ class _ProgressStep extends StatelessWidget {
             decoration: BoxDecoration(
               color:
                   isActive || isCompleted
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
@@ -641,7 +641,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+      color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
     );
   }
 }
@@ -693,7 +693,7 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                 child: Text(
                   '완료',
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -715,7 +715,7 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                   title: Text(instrument),
                   trailing:
                       isSelected
-                          ? Icon(Icons.check_circle, color: AppColors.primary)
+                          ? Icon(Icons.check_circle, color: AppColors.paperAccent)
                           : Icon(
                             Icons.circle_outlined,
                             color: AppColors.inkQuaternary,

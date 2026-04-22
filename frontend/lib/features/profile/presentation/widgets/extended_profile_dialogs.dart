@@ -175,7 +175,7 @@ void showFeeDialog(
                           duration: duration,
                         ).formatted,
                         style: AppTypography.headingSmall.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     ),

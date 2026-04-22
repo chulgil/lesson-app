@@ -159,8 +159,8 @@ class _InstrumentManagementScreenState
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          child: Icon(_getInstrumentIcon(instrument), color: AppColors.primary),
+          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+          child: Icon(_getInstrumentIcon(instrument), color: AppColors.paperAccent),
         ),
         title: Text(instrument, style: AppTypography.bodyLarge),
         trailing: Row(
@@ -211,7 +211,7 @@ class _InstrumentManagementScreenState
                     avatar: Icon(
                       _getInstrumentIcon(instrument),
                       size: 18,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                     label: Text(instrument),
                     onPressed: () => _addInstrument(instrument),

@@ -258,7 +258,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -317,7 +317,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.primary, width: 2),
+        borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

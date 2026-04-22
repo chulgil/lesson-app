@@ -46,7 +46,7 @@ class PaymentDetailSheet extends ConsumerWidget {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: AppColors.primaryLight,
+          backgroundColor: AppColors.paperAccentSoft,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
             style: AppTypography.headingSmall.copyWith(color: Colors.white),

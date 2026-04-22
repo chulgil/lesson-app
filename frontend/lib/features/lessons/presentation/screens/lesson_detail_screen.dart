@@ -359,9 +359,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       child: TabBar(
         controller: _tabController,
         tabs: const [Tab(text: '레슨 노트'), Tab(text: '과제')],
-        labelColor: AppColors.primary,
+        labelColor: AppColors.paperAccent,
         unselectedLabelColor: AppColors.inkSecondary,
-        indicatorColor: AppColors.primary,
+        indicatorColor: AppColors.paperAccent,
       ),
     );
   }
@@ -536,13 +536,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.08),
+                  AppColors.paperAccent.withValues(alpha: 0.08),
                   AppColors.secondary.withValues(alpha: 0.08),
                 ],
               ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: AppColors.paperAccent.withValues(alpha: 0.3),
               ),
             ),
             child: Column(
@@ -552,7 +552,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   children: [
                     Icon(
                       Icons.school_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -560,7 +560,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       child: Text(
                         '정규 레슨을 제안해보세요',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -595,7 +595,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     icon: const Icon(Icons.card_membership, size: 18),
                     label: const Text('수강권 발급하기'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.paperAccent,
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space3,
                       ),

@@ -34,7 +34,7 @@ class LessonHeaderCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   isTeacher
                       ? (lesson.studentName.isNotEmpty
@@ -146,7 +146,7 @@ class _StatusBadge extends StatelessWidget {
     switch (status) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
-        color = AppColors.primary;
+        color = AppColors.paperAccent;
       case LessonStatus.completed:
         color = AppColors.paperOk;
       case LessonStatus.cancelled:

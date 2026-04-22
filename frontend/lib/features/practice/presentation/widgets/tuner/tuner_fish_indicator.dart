@@ -242,7 +242,7 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
     final bubbles = <Widget>[];
 
     // Use cat face color for bubbles
-    final bubbleColor = Color.lerp(Colors.white, AppColors.primary, 0.3)!;
+    final bubbleColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.3)!;
 
     // Bubble 1 (larger, slower)
     final bubble1Phase = phase;
@@ -395,8 +395,8 @@ class _CuteFishPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Use cat colors (same as cat face and eye)
-    final faceColor = Color.lerp(Colors.white, AppColors.primary, 0.2)!;
-    final eyeColor = AppColors.primary;
+    final faceColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.2)!;
+    final eyeColor = AppColors.paperAccent;
 
     // Scale factors based on SVG viewBox 64x64
     final sx = size.width / 64;
@@ -466,7 +466,7 @@ class _CuteFishShadowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final shadowColor = AppColors.primary;
+    final shadowColor = AppColors.paperAccent;
 
     // Scale factors based on SVG viewBox 64x64
     final sx = size.width / 64;

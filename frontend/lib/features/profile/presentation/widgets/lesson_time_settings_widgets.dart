@@ -64,7 +64,7 @@ class DurationOptionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Radio<int>(value: duration, activeColor: AppColors.primary),
+      leading: Radio<int>(value: duration, activeColor: AppColors.paperAccent),
       title: Text(
         LessonDurations.format(duration),
         style: AppTypography.bodyLarge.copyWith(
@@ -103,7 +103,7 @@ class DurationOptionItem extends StatelessWidget {
           Switch(
             value: !isDisabled,
             onChanged: isOnlyActive ? null : (value) => onToggle(value),
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
         ],
       ),
@@ -242,7 +242,7 @@ class TimeSlotTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         Icons.access_time,
-        color: slot.isActive ? AppColors.primary : AppColors.inkTertiary,
+        color: slot.isActive ? AppColors.paperAccent : AppColors.inkTertiary,
       ),
       title: Text(
         slot.timeRange,
@@ -260,7 +260,7 @@ class TimeSlotTile extends StatelessWidget {
           Switch(
             value: slot.isActive,
             onChanged: onToggle,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),
@@ -543,7 +543,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               color:
                   _isDuplicate
                       ? AppColors.paperAccent.withValues(alpha: 0.1)
-                      : AppColors.primary.withValues(alpha: 0.1),
+                      : AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Column(
@@ -551,7 +551,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 Text(
                   LessonDurations.format(_currentDuration),
                   style: AppTypography.headingLarge.copyWith(
-                    color: _isDuplicate ? AppColors.paperAccent : AppColors.primary,
+                    color: _isDuplicate ? AppColors.paperAccent : AppColors.paperAccent,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -585,11 +585,11 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
             ),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: AppColors.primary,
-                inactiveTrackColor: AppColors.primary.withValues(alpha: 0.2),
-                thumbColor: AppColors.primary,
-                overlayColor: AppColors.primary.withValues(alpha: 0.1),
-                valueIndicatorColor: AppColors.primary,
+                activeTrackColor: AppColors.paperAccent,
+                inactiveTrackColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                thumbColor: AppColors.paperAccent,
+                overlayColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                valueIndicatorColor: AppColors.paperAccent,
                 valueIndicatorTextStyle: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -632,7 +632,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                               exists
                                   ? AppColors.inkTertiary
                                   : isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.ink,
                           decoration:
                               exists ? TextDecoration.lineThrough : null,
@@ -647,7 +647,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                                   _sliderValue = duration.toDouble();
                                 });
                               },
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                       showCheckmark: false,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space1,

@@ -143,17 +143,17 @@ class _TimeSignatureCard extends StatelessWidget {
           vertical: AppSpacing.space4,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.paper,
+          color: isSelected ? AppColors.paperAccent : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           boxShadow:
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.paperAccent.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

@@ -189,7 +189,7 @@ class PracticeStreakCard extends ConsumerWidget {
       case 2: // 7-29 days - Orange/Red
         return [AppColors.streakGood1, AppColors.streakGood2];
       case 1: // 1-6 days - Purple
-        return [AppColors.primary, AppColors.primaryLight];
+        return [AppColors.paperAccent, AppColors.paperAccentSoft];
       default: // No streak - Gray
         return [AppColors.streakPaused1, AppColors.streakPaused2];
     }
@@ -283,7 +283,7 @@ class PracticeStreakBadge extends ConsumerWidget {
       case 2:
         return AppColors.streakGood1;
       default:
-        return AppColors.primary;
+        return AppColors.paperAccent;
     }
   }
 }

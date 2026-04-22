@@ -224,16 +224,16 @@ class PitchAnalysisCard extends ConsumerWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05 + ratio * 0.2),
+                color: AppColors.paperAccent.withValues(alpha: 0.05 + ratio * 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.1 + ratio * 0.3),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1 + ratio * 0.3),
                 ),
               ),
               child: Text(
                 '${entry.key} (${entry.value})',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: ratio > 0.5 ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -244,7 +244,7 @@ class PitchAnalysisCard extends ConsumerWidget {
 
   Color _gradeColor(String colorName) => switch (colorName) {
     'success' => AppColors.paperOk,
-    'primary' => AppColors.primary,
+    'primary' => AppColors.paperAccent,
     'info' => AppColors.ink,
     'warning' => AppColors.paperAccent,
     _ => AppColors.paperAccent,

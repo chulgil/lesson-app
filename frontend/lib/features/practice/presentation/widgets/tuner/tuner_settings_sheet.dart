@@ -188,11 +188,11 @@ class _ReferenceFrequencySection extends StatelessWidget {
                   label: Text('${freq.toInt()}Hz'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(freq),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                   labelStyle: TextStyle(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
@@ -219,7 +219,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
                 max: TunerSettings.maxReferenceFrequency,
                 divisions: 200, // 0.1Hz steps
                 label: '${currentFrequency.toStringAsFixed(1)}Hz',
-                activeColor: AppColors.primary,
+                activeColor: AppColors.paperAccent,
                 onChanged: onChanged,
               ),
             ),
@@ -283,11 +283,11 @@ class _TranspositionSection extends StatelessWidget {
                   label: Text(trans.label),
                   selected: isSelected,
                   onSelected: (_) => onChanged(trans),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                   labelStyle: TextStyle(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
@@ -353,11 +353,11 @@ class _DifficultySection extends StatelessWidget {
                       label: Text(diff.label),
                       selected: isSelected,
                       onSelected: (_) => onChanged(diff),
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
@@ -420,11 +420,11 @@ class _EnharmonicSection extends StatelessWidget {
                   label: Text('${mode.label} (${mode.example})'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(mode),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                   labelStyle: TextStyle(
                     color:
                         isSelected
-                            ? AppColors.primary
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
@@ -482,11 +482,11 @@ class _ClefSection extends StatelessWidget {
                       label: Text('${clef.symbol} ${clef.label}'),
                       selected: isSelected,
                       onSelected: (_) => onChanged(clef),
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
                       labelStyle: TextStyle(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
@@ -510,7 +510,7 @@ class _ClefSection extends StatelessWidget {
                 Checkbox(
                   value: autoSwitchClef,
                   onChanged: (_) => onAutoSwitchChanged(),
-                  activeColor: AppColors.primary,
+                  activeColor: AppColors.paperAccent,
                   visualDensity: VisualDensity.compact,
                 ),
                 const SizedBox(width: AppSpacing.space2),
@@ -565,7 +565,7 @@ class _ToggleSection extends StatelessWidget {
           subtitle: const Text('Perfect 연속 달성 시 콤보 표시'),
           value: showCombo,
           onChanged: (_) => onShowComboChanged(),
-          activeThumbColor: AppColors.primary,
+          activeThumbColor: AppColors.paperAccent,
           contentPadding: EdgeInsets.zero,
         ),
         SwitchListTile(
@@ -573,7 +573,7 @@ class _ToggleSection extends StatelessWidget {
           subtitle: const Text('Perfect 튜닝 시 진동'),
           value: vibrationFeedback,
           onChanged: (_) => onVibrationChanged(),
-          activeThumbColor: AppColors.primary,
+          activeThumbColor: AppColors.paperAccent,
           contentPadding: EdgeInsets.zero,
         ),
       ],

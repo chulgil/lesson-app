@@ -157,7 +157,7 @@ class HeartParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Light purple color like cat face
-    final baseColor = AppColors.primary.withValues(alpha: 0.3);
+    final baseColor = AppColors.paperAccent.withValues(alpha: 0.3);
 
     for (final particle in particles) {
       final opacity = particle.opacity * 0.8; // Max 80% opacity
@@ -231,8 +231,8 @@ class CatFacePainter extends CustomPainter {
 
     // Use metronome style colors
     // Light purple opaque color (same visual as 0.2 alpha on white background)
-    final faceColor = Color.lerp(Colors.white, AppColors.primary, 0.2)!;
-    final featureColor = AppColors.primary;
+    final faceColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.2)!;
+    final featureColor = AppColors.paperAccent;
 
     final facePaint = Paint()
       ..color = faceColor

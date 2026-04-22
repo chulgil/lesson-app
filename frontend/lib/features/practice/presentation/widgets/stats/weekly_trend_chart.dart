@@ -42,7 +42,7 @@ class WeeklyTrendChart extends StatelessWidget {
             children: [
               Icon(
                 Icons.trending_up,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -98,7 +98,7 @@ class _TrendLinePainter extends CustomPainter {
     if (weeklyStats.isEmpty) return;
 
     final paint = Paint()
-      ..color = AppColors.primary
+      ..color = AppColors.paperAccent
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -108,13 +108,13 @@ class _TrendLinePainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          AppColors.primary.withAlpha(50),
-          AppColors.primary.withAlpha(0),
+          AppColors.paperAccent.withAlpha(50),
+          AppColors.paperAccent.withAlpha(0),
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
     final dotPaint = Paint()
-      ..color = AppColors.primary
+      ..color = AppColors.paperAccent
       ..style = PaintingStyle.fill;
 
     final path = Path();

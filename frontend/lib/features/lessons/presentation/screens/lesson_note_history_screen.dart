@@ -104,20 +104,20 @@ class _LessonNoteHistoryScreenState
                         selected: isSelected,
                         onSelected: (_) => setState(() => _period = period),
                         backgroundColor: AppColors.paper,
-                        selectedColor: AppColors.primary.withValues(
+                        selectedColor: AppColors.paperAccent.withValues(
                           alpha: 0.15,
                         ),
-                        checkmarkColor: AppColors.primary,
+                        checkmarkColor: AppColors.paperAccent,
                         side: BorderSide(
                           color:
                               isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkQuaternary,
                         ),
                         labelStyle: AppTypography.bodySmall.copyWith(
                           color:
                               isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -285,7 +285,7 @@ class _NoteCard extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusLarge,
                               ),
@@ -293,7 +293,7 @@ class _NoteCard extends StatelessWidget {
                             child: Text(
                               kp,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
                             ),
                           ),

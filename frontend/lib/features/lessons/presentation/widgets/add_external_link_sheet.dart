@@ -112,19 +112,19 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
+                color: AppColors.paperAccent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.info_outline,
-                      size: 16, color: AppColors.primary),
+                      size: 16, color: AppColors.paperAccent),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '악보, 강의 영상, 참고 자료 등 모든 URL을 추가할 수 있습니다',
                       style: AppTypography.caption
-                          .copyWith(color: AppColors.primary),
+                          .copyWith(color: AppColors.paperAccent),
                     ),
                   ),
                 ],

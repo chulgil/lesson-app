@@ -186,7 +186,7 @@ class _TeacherDashboardScreenState
                 title: '총 레슨',
                 value: '${stats.totalLessons}회',
                 subtitle: '완료 ${stats.completedLessons}회',
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 icon: Icons.school,
               ),
             ),

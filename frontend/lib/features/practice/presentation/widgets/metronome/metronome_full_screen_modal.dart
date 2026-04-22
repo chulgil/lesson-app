@@ -216,7 +216,7 @@ class _BpmDisplay extends StatelessWidget {
           '$bpm',
           style: AppTypography.displayLarge.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
         Text(
@@ -255,10 +255,10 @@ class _BpmSlider extends StatelessWidget {
         Expanded(
           child: SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppColors.primary,
-              inactiveTrackColor: AppColors.primaryLight,
-              thumbColor: AppColors.primary,
-              overlayColor: AppColors.primary.withValues(alpha: 0.2),
+              activeTrackColor: AppColors.paperAccent,
+              inactiveTrackColor: AppColors.paperAccentSoft,
+              thumbColor: AppColors.paperAccent,
+              overlayColor: AppColors.paperAccent.withValues(alpha: 0.2),
             ),
             child: Slider(
               value: bpm.toDouble(),
@@ -291,8 +291,8 @@ class _CircleButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccentSoft,
+          foregroundColor: AppColors.paperAccent,
           shape: const CircleBorder(),
           padding: EdgeInsets.zero,
         ),
@@ -324,8 +324,8 @@ class _LargePlayButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary, width: 3),
+          foregroundColor: AppColors.paperAccent,
+          side: BorderSide(color: AppColors.paperAccent, width: 3),
           shape: const CircleBorder(),
           padding: EdgeInsets.zero,
         ),
@@ -335,14 +335,14 @@ class _LargePlayButton extends StatelessWidget {
                   '$currentBeat',
                   style: AppTypography.displayLarge.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontSize: 36,
                   ),
                 )
                 : Icon(
                   isPlaying ? Icons.pause : Icons.play_arrow,
                   size: 48,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
       ),
     );
@@ -378,7 +378,7 @@ class _TimeSignatureSelector extends StatelessWidget {
                   label: Text(ts.label),
                   selected: isSelected,
                   onSelected: (_) => onChanged(ts),
-                  selectedColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
                     color:
                         isSelected ? Colors.white : AppColors.ink,
@@ -446,7 +446,7 @@ class _SubdivisionSelector extends StatelessWidget {
                     label: Text(sub.label),
                     selected: isSelected,
                     onSelected: (_) => onChanged(sub),
-                    selectedColor: AppColors.primary,
+                    selectedColor: AppColors.paperAccent,
                     labelStyle: TextStyle(
                       color:
                           isSelected
@@ -519,10 +519,10 @@ class _SubdivisionChip extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.paper,
+          color: isSelected ? AppColors.paperAccent : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Column(
@@ -578,7 +578,7 @@ class _SoundSelector extends StatelessWidget {
                   label: Text(sound.label),
                   selected: isSelected,
                   onSelected: (_) => onChanged(sound),
-                  selectedColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
                     color:
                         isSelected ? Colors.white : AppColors.ink,
@@ -622,7 +622,7 @@ class _AccentPatternSelector extends StatelessWidget {
                   label: Text(pattern.label),
                   selected: isSelected,
                   onSelected: (_) => onChanged(pattern),
-                  selectedColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
                     color:
                         isSelected ? Colors.white : AppColors.ink,
@@ -704,7 +704,7 @@ class _ToggleRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: (_) => onChanged(),
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
         ],
       ),

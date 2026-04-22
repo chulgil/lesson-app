@@ -29,7 +29,7 @@ class LessonDetailSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Text(title, style: AppTypography.headingSmall),
         const Spacer(),
@@ -38,7 +38,7 @@ class LessonDetailSectionHeader extends StatelessWidget {
             onPressed: onAdd,
             icon: const Icon(Icons.add_circle_outline),
             iconSize: 22,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
             tooltip: '추가',
             constraints: const BoxConstraints(),
             padding: EdgeInsets.zero,
@@ -143,12 +143,12 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                 label: Text(
                   feedbackPresets[index],
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
                 side: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.2),
+                  color: AppColors.paperAccent.withValues(alpha: 0.2),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space1,
@@ -355,7 +355,7 @@ class KeyPointsList extends StatelessWidget {
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       shape: BoxShape.circle,
                     ),
                   ),

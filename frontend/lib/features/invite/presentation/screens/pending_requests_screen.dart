@@ -72,13 +72,13 @@ class PendingRequestsScreen extends ConsumerWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.inbox_outlined,
                 size: 40,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
             const SizedBox(height: AppSpacing.space6),
@@ -227,11 +227,11 @@ class _RequestCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 child: Text(
                   requesterName.isNotEmpty ? requesterName[0] : '?',
                   style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),
@@ -311,7 +311,7 @@ class _RequestCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: isProcessing ? null : onAccept,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,

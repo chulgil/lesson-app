@@ -35,7 +35,7 @@ class NotificationListScreen extends ConsumerWidget {
             child: Text(
               '모두 읽음',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
           ),

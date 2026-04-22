@@ -76,7 +76,7 @@ class PaymentCard extends StatelessWidget {
           backgroundColor:
               payment.type == PaymentType.trial
                   ? AppColors.ink
-                  : AppColors.primaryLight,
+                  : AppColors.paperAccentSoft,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
             style: AppTypography.bodyLarge.copyWith(
@@ -203,7 +203,7 @@ class PaymentTypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTrial = type == PaymentType.trial;
-    final color = isTrial ? AppColors.ink : AppColors.primary;
+    final color = isTrial ? AppColors.ink : AppColors.paperAccent;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

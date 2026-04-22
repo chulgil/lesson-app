@@ -123,10 +123,10 @@ class _DiagnosticCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: AppColors.primary.withValues(alpha: 0.05),
+      color: AppColors.paperAccent.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+        side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -135,13 +135,13 @@ class _DiagnosticCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+                Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 const Text(
                   '진단 정보',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ],
@@ -378,7 +378,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                         ? Icons.pause_circle_filled
                         : Icons.play_circle_filled,
                     size: 32,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -412,7 +412,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                             Text(
                               '${widget.recording.bpm}bpm',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.primary.withValues(alpha: 0.8),
+                                color: AppColors.paperAccent.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
@@ -425,7 +425,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                 IconButton(
                   onPressed: _showAssignmentSheet,
                   icon: const Icon(Icons.link),
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   tooltip: '섹션에 연결',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -463,7 +463,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                         ? _position.inMilliseconds / _duration.inMilliseconds
                         : 0,
                 backgroundColor: AppColors.inkQuaternary,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: const AlwaysStoppedAnimation(AppColors.paperAccent),
                 minHeight: 3,
               ),
             ),

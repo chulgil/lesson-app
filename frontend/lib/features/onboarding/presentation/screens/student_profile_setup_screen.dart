@@ -188,7 +188,7 @@ class _StudentProfileSetupScreenState
                 child: ElevatedButton(
                   onPressed: _isLoading || !_isFormValid ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
@@ -265,7 +265,7 @@ class _StudentProfileSetupScreenState
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
         ),
@@ -321,15 +321,15 @@ class _StudentProfileSetupScreenState
                         Chip(
                           label: Text(_selectedInstrument!),
                           labelStyle: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
-                          backgroundColor: AppColors.primary.withValues(
+                          backgroundColor: AppColors.paperAccent.withValues(
                             alpha: 0.1,
                           ),
                           deleteIcon: Icon(
                             Icons.close,
                             size: 16,
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
                           onDeleted: () {
                             setState(() => _selectedInstrument = null);
@@ -366,7 +366,7 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+              color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -407,7 +407,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+      color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
     );
   }
 }
@@ -452,12 +452,12 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                       onSelected(instrument);
                       Navigator.pop(context);
                     },
-                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                    selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
                     backgroundColor: Colors.white,
                     labelStyle: AppTypography.bodyMedium.copyWith(
                       color:
                           isSelected
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -469,7 +469,7 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                       side: BorderSide(
                         color:
                             isSelected
-                                ? AppColors.primary
+                                ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                       ),
                     ),

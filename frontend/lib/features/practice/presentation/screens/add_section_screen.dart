@@ -296,17 +296,17 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
+                    color: AppColors.paperAccent.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.paperAccent.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.library_music,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         size: 24,
                       ),
                       const SizedBox(width: AppSpacing.space3),
@@ -317,7 +317,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                             Text(
                               _repertoire!.name,
                               style: AppTypography.headingSmall.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
                             ),
                             if (_repertoire!.description != null &&

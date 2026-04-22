@@ -104,7 +104,7 @@ class AcademyDetailScreen extends ConsumerWidget {
     return SliverAppBar(
       expandedHeight: 160,
       pinned: true,
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.paperAccent,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => context.pop(),
@@ -116,8 +116,8 @@ class AcademyDetailScreen extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                AppColors.primary,
-                AppColors.primary.withValues(alpha: 0.8),
+                AppColors.paperAccent,
+                AppColors.paperAccent.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -193,7 +193,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.music_note, size: 20, color: AppColors.primary),
+                Icon(Icons.music_note, size: 20, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Wrap(
@@ -204,11 +204,11 @@ class AcademyDetailScreen extends ConsumerWidget {
                             .map(
                               (i) => Chip(
                                 label: Text(i),
-                                backgroundColor: AppColors.primary.withValues(
+                                backgroundColor: AppColors.paperAccent.withValues(
                                   alpha: 0.1,
                                 ),
                                 labelStyle: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.primary,
+                                  color: AppColors.paperAccent,
                                 ),
                                 visualDensity: VisualDensity.compact,
                                 materialTapTargetSize:
@@ -230,7 +230,7 @@ class AcademyDetailScreen extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
@@ -247,7 +247,7 @@ class AcademyDetailScreen extends ConsumerWidget {
   Widget _buildTeacherListHeader(AcademyInfo academy) {
     return Row(
       children: [
-        Icon(Icons.people_outline, size: 20, color: AppColors.primary),
+        Icon(Icons.people_outline, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Text('소속 선생님', style: AppTypography.headingSmall),
         const SizedBox(width: AppSpacing.space2),
@@ -257,13 +257,13 @@ class AcademyDetailScreen extends ConsumerWidget {
             vertical: 2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Text(
             '${academy.teacherCount}명',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -368,14 +368,14 @@ class _AcademyTeacherCard extends StatelessWidget {
               // Profile image
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 backgroundImage:
                     teacher.profileImage != null
                         ? NetworkImage(teacher.profileImage!)
                         : null,
                 child:
                     teacher.profileImage == null
-                        ? Icon(Icons.person, color: AppColors.primary, size: 28)
+                        ? Icon(Icons.person, color: AppColors.paperAccent, size: 28)
                         : null,
               ),
               const SizedBox(width: AppSpacing.space3),

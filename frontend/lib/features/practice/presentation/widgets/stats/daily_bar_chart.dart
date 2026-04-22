@@ -41,7 +41,7 @@ class DailyBarChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.bar_chart, color: AppColors.primary, size: 20),
+              Icon(Icons.bar_chart, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               Text('일별 연습 시간', style: AppTypography.headingSmall),
             ],
@@ -119,7 +119,7 @@ class DailyBarChart extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: isToday ? AppColors.primary : Colors.transparent,
+            color: isToday ? AppColors.paperAccent : Colors.transparent,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Text(

@@ -118,7 +118,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     children: [
                       const Icon(
                         Icons.workspace_premium,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Text(
@@ -160,7 +160,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     child: ElevatedButton(
                       onPressed: _selectedBadgeId == null ? null : _onConfirm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.paperAccent,
                         disabledBackgroundColor: AppColors.scheduleMutedAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
@@ -196,12 +196,12 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             color:
-                isSelected ? AppColors.primary.withValues(alpha: 0.05) : null,
+                isSelected ? AppColors.paperAccent.withValues(alpha: 0.05) : null,
           ),
           child: Row(
             children: [
@@ -212,7 +212,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.primary.withValues(alpha: 0.15)
+                          ? AppColors.paperAccent.withValues(alpha: 0.15)
                           : AppColors.paperDark,
                   shape: BoxShape.circle,
                 ),
@@ -220,7 +220,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                   badge.icon,
                   color:
                       isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkSecondary,
                   size: AppSpacing.iconMD,
                 ),
@@ -255,7 +255,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     : Icons.radio_button_off,
                 color:
                     isSelected
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkTertiary,
                 size: AppSpacing.iconSM,
               ),

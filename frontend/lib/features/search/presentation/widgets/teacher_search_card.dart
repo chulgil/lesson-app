@@ -93,7 +93,7 @@ class TeacherSearchCard extends StatelessWidget {
                     Text(
                       publicProfile.instruments.join(' · '),
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                     ),
 
@@ -156,18 +156,18 @@ class TeacherSearchCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.school, size: 12, color: AppColors.primary),
+          Icon(Icons.school, size: 12, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space1),
           Text(
             organizationName,
             style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -193,7 +193,7 @@ class TeacherSearchCard extends StatelessWidget {
             child: Icon(
               _getBadgeIcon(badge),
               size: 18,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           );
         }),

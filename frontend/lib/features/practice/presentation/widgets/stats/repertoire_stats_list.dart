@@ -49,7 +49,7 @@ class RepertoireStatsList extends StatelessWidget {
             children: [
               Icon(
                 Icons.library_music,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -108,13 +108,13 @@ class RepertoireStatsList extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha(20),
+                  color: AppColors.paperAccent.withAlpha(20),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   stat.practiceTimeText,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -142,7 +142,7 @@ class RepertoireStatsList extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.primary, AppColors.secondary],
+                            colors: [AppColors.paperAccent, AppColors.secondary],
                           ),
                           borderRadius: BorderRadius.circular(3),
                         ),

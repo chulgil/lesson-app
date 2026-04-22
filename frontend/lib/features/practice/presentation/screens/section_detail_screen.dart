@@ -202,12 +202,12 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                   icon: Icon(
                     Icons.compare_arrows,
                     size: 18,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   label: Text(
                     '비교',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

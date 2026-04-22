@@ -39,7 +39,7 @@ class SectionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: AppColors.primary),
+              Icon(icon, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(title, style: AppTypography.headingSmall),
               const Spacer(),

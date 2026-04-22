@@ -42,7 +42,7 @@ enum ProfileType {
   Color get color {
     switch (this) {
       case ProfileType.parent:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case ProfileType.student:
         return AppColors.paperOk;
       case ProfileType.child:

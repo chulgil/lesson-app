@@ -219,7 +219,7 @@ class _RecordingsList extends StatelessWidget {
 
         // Connected recordings section
         if (connected.isNotEmpty) ...[
-          _buildSectionHeader('연결된 녹음', connected.length, AppColors.primary),
+          _buildSectionHeader('연결된 녹음', connected.length, AppColors.paperAccent),
           ...connected.map(
             (r) => _RecordingCard(
               recording: r.recording,
@@ -236,10 +236,10 @@ class _RecordingsList extends StatelessWidget {
     final total = connectedCount + orphanedCount;
     return Card(
       elevation: 0,
-      color: AppColors.primary.withValues(alpha: 0.05),
+      color: AppColors.paperAccent.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+        side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -454,7 +454,7 @@ class _RecordingCard extends ConsumerWidget {
               icon: const Icon(
                 Icons.play_circle_filled,
                 size: 32,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -473,7 +473,7 @@ class _RecordingCard extends ConsumerWidget {
                         Icon(
                           Icons.folder_outlined,
                           size: 12,
-                          color: AppColors.primary.withValues(alpha: 0.7),
+                          color: AppColors.paperAccent.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Expanded(
@@ -481,7 +481,7 @@ class _RecordingCard extends ConsumerWidget {
                             '${repertoire!.name} > ${section!.pieceName}',
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: AppColors.primary.withValues(alpha: 0.9),
+                              color: AppColors.paperAccent.withValues(alpha: 0.9),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -530,7 +530,7 @@ class _RecordingCard extends ConsumerWidget {
                         Text(
                           '${recording.bpm}bpm',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.primary.withValues(alpha: 0.8),
+                            color: AppColors.paperAccent.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -543,7 +543,7 @@ class _RecordingCard extends ConsumerWidget {
             IconButton(
               onPressed: () => _showSectionPicker(context, ref),
               icon: Icon(isOrphaned ? Icons.link_off : Icons.link),
-              color: isOrphaned ? AppColors.paperAccent : AppColors.primary,
+              color: isOrphaned ? AppColors.paperAccent : AppColors.paperAccent,
               tooltip: isOrphaned ? '섹션에 연결' : '섹션 변경',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),

@@ -93,7 +93,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+          colors: [AppColors.paperAccent, AppColors.paperAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -146,12 +146,12 @@ class ParentAssignmentsTab extends ConsumerWidget {
               _ProgressStat(
                 label: '완료',
                 value: '5',
-                color: AppColors.successLight,
+                color: AppColors.paperDark,
               ),
               _ProgressStat(
                 label: '진행중',
                 value: '2',
-                color: AppColors.warningLight,
+                color: AppColors.paperAccentSoft,
               ),
             ],
           ),

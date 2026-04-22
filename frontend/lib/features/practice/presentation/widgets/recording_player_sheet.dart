@@ -387,7 +387,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                         decoration: BoxDecoration(
                           color:
                               _abLoop.isActive
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.textTertiaryDark,
                           borderRadius: BorderRadius.circular(1),
                         ),
@@ -475,7 +475,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -543,7 +543,7 @@ class _ABButton extends StatelessWidget {
       textColor = AppColors.textTertiaryDark;
     } else if (isSet) {
       // Active/set state
-      backgroundColor = AppColors.primary;
+      backgroundColor = AppColors.paperAccent;
       textColor = Colors.white;
     } else {
       // Enabled but not set

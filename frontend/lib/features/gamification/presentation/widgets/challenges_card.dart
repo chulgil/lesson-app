@@ -58,7 +58,7 @@ class ChallengesCard extends ConsumerWidget {
                       child: Text(
                         '전체 보기',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     ),
@@ -116,7 +116,7 @@ class _ChallengeItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: challenge.period == ChallengePeriod.weekly
                       ? AppColors.ink.withValues(alpha: 0.1)
-                      : AppColors.primary.withValues(alpha: 0.1),
+                      : AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
@@ -124,7 +124,7 @@ class _ChallengeItem extends StatelessWidget {
                   style: AppTypography.caption.copyWith(
                     color: challenge.period == ChallengePeriod.weekly
                         ? AppColors.ink
-                        : AppColors.primary,
+                        : AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -144,7 +144,7 @@ class _ChallengeItem extends StatelessWidget {
                     valueColor: AlwaysStoppedAnimation(
                       challenge.progress >= 1.0
                           ? AppColors.paperOk
-                          : AppColors.primary,
+                          : AppColors.paperAccent,
                     ),
                     minHeight: 6,
                   ),

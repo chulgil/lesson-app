@@ -325,16 +325,16 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 16, color: AppColors.primary),
+          Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '${_weekEnd - _weekStart + 1}주 · $_lessonCount회 레슨',
-            style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
           ),
         ],
       ),
@@ -578,7 +578,7 @@ class _PaymentTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        type == PaymentType.trial ? AppColors.ink : AppColors.primary;
+        type == PaymentType.trial ? AppColors.ink : AppColors.paperAccent;
 
     return GestureDetector(
       onTap: onTap,

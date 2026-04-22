@@ -331,7 +331,7 @@ class _SummaryStats extends StatelessWidget {
             child: _StatCard(
               label: AppStrings.summaryActive,
               count: activeCount,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),

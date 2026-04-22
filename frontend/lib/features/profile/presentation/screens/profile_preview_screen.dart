@@ -101,14 +101,14 @@ class ProfilePreviewScreen extends ConsumerWidget {
                       return Chip(
                         label: Text(specialty),
                         labelStyle: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w500,
                         ),
-                        backgroundColor: AppColors.primary.withValues(
+                        backgroundColor: AppColors.paperAccent.withValues(
                           alpha: 0.08,
                         ),
                         side: BorderSide(
-                          color: AppColors.primary.withValues(alpha: 0.2),
+                          color: AppColors.paperAccent.withValues(alpha: 0.2),
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
@@ -190,8 +190,8 @@ class ProfilePreviewScreen extends ConsumerWidget {
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('프로필 수정하기'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
+                  foregroundColor: AppColors.paperAccent,
+                  side: const BorderSide(color: AppColors.paperAccent),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
@@ -216,7 +216,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+          colors: [AppColors.paperAccent, AppColors.paperAccent],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -369,7 +369,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.primary),
+          Icon(icon, size: 20, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(

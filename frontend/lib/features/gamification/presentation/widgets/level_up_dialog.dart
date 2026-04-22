@@ -95,13 +95,13 @@ class LevelUpDialog extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Text(
                 levelTitle,
                 style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w700,
                 ),
               ),

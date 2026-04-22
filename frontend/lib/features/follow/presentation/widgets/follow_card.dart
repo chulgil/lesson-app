@@ -46,11 +46,11 @@ class FollowCard extends StatelessWidget {
             radius: 24,
             backgroundColor:
                 isTeacher
-                    ? AppColors.primary.withValues(alpha: 0.1)
+                    ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.secondary.withValues(alpha: 0.1),
             child: Icon(
               isTeacher ? Icons.person : Icons.business,
-              color: isTeacher ? AppColors.primary : AppColors.secondary,
+              color: isTeacher ? AppColors.paperAccent : AppColors.secondary,
             ),
           ),
 
@@ -81,7 +81,7 @@ class FollowCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color:
                             isTeacher
-                                ? AppColors.primary.withValues(alpha: 0.1)
+                                ? AppColors.paperAccent.withValues(alpha: 0.1)
                                 : AppColors.secondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
@@ -92,7 +92,7 @@ class FollowCard extends StatelessWidget {
                         style: AppTypography.caption.copyWith(
                           color:
                               isTeacher
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.secondary,
                         ),
                       ),
@@ -119,7 +119,7 @@ class FollowCard extends StatelessWidget {
                   : Icons.notifications_off_outlined,
               color:
                   follow.notificationEnabled
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.inkTertiary,
               size: 20,
             ),

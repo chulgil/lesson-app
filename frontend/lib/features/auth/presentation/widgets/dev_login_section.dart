@@ -48,13 +48,13 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Teacher accounts ──
-        DevSectionHeader(label: '선생님', color: AppColors.primary),
+        DevSectionHeader(label: '선생님', color: AppColors.paperAccent),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '👩‍🏫',
           name: '박미연',
           description: '학생 3명, 레슨/구독 관리',
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           isLoading: isLoading,
           onTap:
               () => onDevLogin(

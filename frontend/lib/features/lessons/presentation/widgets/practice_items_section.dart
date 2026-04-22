@@ -155,7 +155,7 @@ class PracticeItemsSection extends ConsumerWidget {
                   value: rate,
                   backgroundColor: AppColors.inkQuaternary,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    rate >= 1.0 ? AppColors.paperOk : AppColors.primary,
+                    rate >= 1.0 ? AppColors.paperOk : AppColors.paperAccent,
                   ),
                   strokeWidth: 4,
                 ),
@@ -334,7 +334,7 @@ class PracticeItemsSection extends ConsumerWidget {
         decoration:
             item.hasLike
                 ? BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
+                  color: AppColors.paperAccent.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 )
                 : null,

@@ -107,7 +107,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.primary),
+                  borderSide: const BorderSide(color: AppColors.paperAccent),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -279,7 +279,7 @@ class _RepertoireGroup extends StatelessWidget {
               Icon(
                 Icons.folder_outlined,
                 size: 20,
-                color: AppColors.primary.withValues(alpha: 0.7),
+                color: AppColors.paperAccent.withValues(alpha: 0.7),
               ),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
@@ -332,8 +332,8 @@ class _RepertoireGroup extends StatelessWidget {
           TextSpan(
             text: text.substring(index, index + query.length),
             style: style.copyWith(
-              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              color: AppColors.primary,
+              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              color: AppColors.paperAccent,
             ),
           ),
           TextSpan(text: text.substring(index + query.length)),
@@ -361,12 +361,12 @@ class _SectionTile extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: const Icon(
           Icons.music_note,
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           size: 20,
         ),
       ),
@@ -410,8 +410,8 @@ class _SectionTile extends StatelessWidget {
           TextSpan(
             text: text.substring(index, index + query.length),
             style: style.copyWith(
-              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              color: AppColors.primary,
+              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              color: AppColors.paperAccent,
             ),
           ),
           TextSpan(text: text.substring(index + query.length)),

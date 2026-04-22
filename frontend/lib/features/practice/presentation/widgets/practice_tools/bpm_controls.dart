@@ -17,7 +17,7 @@ class CircleButton extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.paperAccent,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -106,7 +106,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
   /// Get color based on BPM intensity (darker = faster).
   Color _getSliderColor(int bpm) {
     final intensity = ((bpm - _minBpm) / (_maxBpm - _minBpm)).clamp(0.0, 1.0);
-    return Color.lerp(AppColors.primaryLight, AppColors.primary, intensity)!;
+    return Color.lerp(AppColors.paperAccentSoft, AppColors.paperAccent, intensity)!;
   }
 
   @override
@@ -124,7 +124,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   activeTrackColor: sliderColor,
-                  inactiveTrackColor: AppColors.primaryLight.withValues(
+                  inactiveTrackColor: AppColors.paperAccentSoft.withValues(
                     alpha: 0.3,
                   ),
                   thumbColor: sliderColor,
@@ -173,11 +173,11 @@ class SmallButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.paperAccent,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.3)),
           ),
         ),
         child: Text(

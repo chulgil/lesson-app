@@ -50,7 +50,7 @@ class NotePreviewCard extends ConsumerWidget {
 
     return Row(
       children: [
-        Icon(Icons.edit_note, color: AppColors.primary, size: 20),
+        Icon(Icons.edit_note, color: AppColors.paperAccent, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Column(

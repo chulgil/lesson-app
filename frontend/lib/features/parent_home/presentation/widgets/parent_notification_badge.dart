@@ -20,7 +20,7 @@ class ParentNotificationBadge extends StatelessWidget {
           onPressed: onTap ?? () {},
           icon: Icon(
             count > 0 ? Icons.notifications : Icons.notifications_outlined,
-            color: count > 0 ? AppColors.primary : AppColors.inkSecondary,
+            color: count > 0 ? AppColors.paperAccent : AppColors.inkSecondary,
           ),
         ),
         if (count > 0)

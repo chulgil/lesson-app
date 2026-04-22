@@ -347,10 +347,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           return ActionChip(
             label: Text(
               preset.text,
-              style: AppTypography.caption.copyWith(color: AppColors.primary),
+              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
             ),
-            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () {
@@ -403,13 +403,13 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                         children: [
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor: AppColors.primary.withValues(
+                            backgroundColor: AppColors.paperAccent.withValues(
                               alpha: 0.1,
                             ),
                             child: Text(
                               lesson.studentName[0],
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                               ),
                             ),
                           ),

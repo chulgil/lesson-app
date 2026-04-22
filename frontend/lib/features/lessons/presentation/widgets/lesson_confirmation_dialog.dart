@@ -196,7 +196,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           // Header
           Row(
             children: [
-              const Icon(Icons.fact_check, color: AppColors.primary),
+              const Icon(Icons.fact_check, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text('레슨 확인', style: AppTypography.headingMedium),
             ],

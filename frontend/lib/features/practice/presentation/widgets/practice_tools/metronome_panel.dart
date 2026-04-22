@@ -277,7 +277,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                           '${state.settings.bpm}',
                           style: AppTypography.displayLarge.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                             fontSize: 40,
                           ),
                         ),
@@ -311,8 +311,8 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
             child: OutlinedButton(
               onPressed: () => ref.read(metronomeProvider.notifier).toggle(),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary, width: 3),
+                foregroundColor: AppColors.paperAccent,
+                side: const BorderSide(color: AppColors.paperAccent, width: 3),
                 shape: const CircleBorder(),
                 padding: EdgeInsets.zero,
               ),
@@ -322,14 +322,14 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                         '${state.currentBeat}',
                         style: AppTypography.displayLarge.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontSize: 36,
                         ),
                       )
                       : Icon(
                         state.isPlaying ? Icons.pause : Icons.play_arrow,
                         size: 48,
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
             ),
           ),
@@ -392,7 +392,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                                 Text(
                                   '큰박 ${state.settings.timeSignature.mainBeats}개',
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.primary,
+                                    color: AppColors.paperAccent,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -453,7 +453,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.paperAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMedium,
                               ),
@@ -463,7 +463,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                                 state.settings.subdivision.noteSymbol,
                                 style: AppTypography.headingLarge.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                                  color: AppColors.paperAccent,
                                 ),
                               ),
                             ),
@@ -527,7 +527,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                                 : AccentPattern.uniform,
                           );
                     },
-                    activeThumbColor: AppColors.primary,
+                    activeThumbColor: AppColors.paperAccent,
                   ),
                 ],
               ),
@@ -549,7 +549,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -559,16 +559,16 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
             numerator,
             style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               height: 1.0,
             ),
           ),
-          Container(width: 20, height: 1.5, color: AppColors.primary),
+          Container(width: 20, height: 1.5, color: AppColors.paperAccent),
           Text(
             denominator,
             style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               height: 1.0,
             ),
           ),
@@ -606,7 +606,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
     // Audio error has highest priority
     if (audioError != null) {
       message = '통화중이냥~';
-      backgroundColor = AppColors.errorLight;
+      backgroundColor = AppColors.paperAccentSoft;
       textColor = AppColors.paperAccent;
     }
     // If tempo explanation is provided, show it (success style)

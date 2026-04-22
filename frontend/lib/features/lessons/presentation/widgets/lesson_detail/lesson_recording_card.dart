@@ -48,10 +48,10 @@ class LessonRecordingCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
-                child: Icon(Icons.audio_file, color: AppColors.primary),
+                child: Icon(Icons.audio_file, color: AppColors.paperAccent),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -77,7 +77,7 @@ class LessonRecordingCard extends StatelessWidget {
                 onPressed: onPlay,
                 icon: const Icon(Icons.play_circle_filled),
                 iconSize: 40,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ],
           ),
@@ -109,7 +109,7 @@ class LessonRecordingCard extends StatelessWidget {
                     Text(
                       '보기',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

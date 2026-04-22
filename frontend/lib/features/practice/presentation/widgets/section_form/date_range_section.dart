@@ -60,7 +60,7 @@ class DateRangeSection extends StatelessWidget {
           // Header
           Row(
             children: [
-              Icon(Icons.date_range, color: AppColors.primary),
+              Icon(Icons.date_range, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text('연습 기간', style: AppTypography.headingSmall),
             ],

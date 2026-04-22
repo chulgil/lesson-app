@@ -71,21 +71,21 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
           ),
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
               const Icon(
                 Icons.notifications_active,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${_settings.enabledCount}/${ParentNotificationSettings.totalConfigurable}개 알림 활성화',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -222,7 +222,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
             item.isRequired
                 ? null
                 : (value) => _handleToggle(category, index, value),
-        activeThumbColor: AppColors.primary,
+        activeThumbColor: AppColors.paperAccent,
       ),
     );
   }

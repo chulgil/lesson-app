@@ -126,7 +126,7 @@ class _PracticeGoalSettingScreenState
           if (_hasChanges && _hasAnyGoal)
             TextButton(
               onPressed: _saveGoal,
-              child: Text('저장', style: TextStyle(color: AppColors.primary)),
+              child: Text('저장', style: TextStyle(color: AppColors.paperAccent)),
             ),
         ],
       ),
@@ -257,7 +257,7 @@ class _PracticeGoalSettingScreenState
   Widget _buildSectionHeader({required IconData icon, required String title}) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.primary, size: 22),
+        Icon(icon, color: AppColors.paperAccent, size: 22),
         const SizedBox(width: AppSpacing.space2),
         Text(title, style: AppTypography.headingSmall),
       ],
@@ -268,22 +268,22 @@ class _PracticeGoalSettingScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withAlpha(15),
+        color: AppColors.paperAccent.withAlpha(15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.primary.withAlpha(30)),
+        border: Border.all(color: AppColors.paperAccent.withAlpha(30)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.summarize, color: AppColors.primary, size: 18),
+              Icon(Icons.summarize, color: AppColors.paperAccent, size: 18),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '목표 요약',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ],

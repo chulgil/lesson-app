@@ -67,7 +67,7 @@ class _PracticeRecordingScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(state.recoveryMessage!),
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -442,7 +442,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
             decoration: BoxDecoration(
               color:
                   widget.isRecording
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
             ),
@@ -453,7 +453,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 isActive: waveformIsActive,
                 height: 100,
                 waveColor:
-                    widget.isRecording ? Colors.white : AppColors.primary,
+                    widget.isRecording ? Colors.white : AppColors.paperAccent,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -467,7 +467,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
               fontWeight: FontWeight.bold,
               color:
                   widget.isRecording
-                      ? AppColors.primary
+                      ? AppColors.paperAccent
                       : AppColors.inkSecondary,
             ),
           ),
@@ -548,7 +548,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                     style: IconButton.styleFrom(
                       backgroundColor:
                           hasMicPermission
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                     ),
                     tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
@@ -664,14 +664,14 @@ class _RecordingItem extends StatelessWidget {
       elevation: recording.isRepresentative ? 2 : 0,
       color:
           recording.isRepresentative
-              ? AppColors.primaryLight
+              ? AppColors.paperAccentSoft
               : AppColors.paper,
       child: ListTile(
         leading: IconButton.filled(
           onPressed: onPlay,
           icon: const Icon(Icons.play_arrow),
           style: IconButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
             foregroundColor: Colors.white,
           ),
         ),
@@ -685,7 +685,7 @@ class _RecordingItem extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(

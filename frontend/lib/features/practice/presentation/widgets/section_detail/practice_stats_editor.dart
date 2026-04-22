@@ -212,8 +212,8 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
                 onPressed: _count > 0 ? () => setState(() => _count--) : null,
                 icon: const Icon(Icons.remove),
                 style: IconButton.styleFrom(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  foregroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                  foregroundColor: AppColors.paperAccent,
                 ),
               ),
               const SizedBox(width: AppSpacing.space4),
@@ -223,13 +223,13 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
                   vertical: AppSpacing.space3,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Text(
                   '$_count회',
                   style: AppTypography.displayMedium.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -239,8 +239,8 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
                 onPressed: () => setState(() => _count++),
                 icon: const Icon(Icons.add),
                 style: IconButton.styleFrom(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  foregroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                  foregroundColor: AppColors.paperAccent,
                 ),
               ),
             ],

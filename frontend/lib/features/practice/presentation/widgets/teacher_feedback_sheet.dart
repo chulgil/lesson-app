@@ -268,10 +268,10 @@ class _FeedbackBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight.withValues(alpha: 0.08),
+        color: AppColors.paperAccentSoft.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.space3),
         border: Border.all(
-          color: AppColors.primaryLight.withValues(alpha: 0.24),
+          color: AppColors.paperAccentSoft.withValues(alpha: 0.24),
         ),
       ),
       child: Column(
@@ -349,7 +349,7 @@ class _InputBar extends StatelessWidget {
             FilledButton(
               onPressed: submitting ? null : onSave,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,

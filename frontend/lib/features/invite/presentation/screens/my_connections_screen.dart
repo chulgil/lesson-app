@@ -50,7 +50,7 @@ class MyConnectionsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppRoutes.invite),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add),
         label: Text(userRole == InviteUserRole.teacher ? '학생 추가' : '선생님 추가'),
@@ -89,13 +89,13 @@ class MyConnectionsScreen extends ConsumerWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.people_outline,
                 size: 48,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
             const SizedBox(height: AppSpacing.space6),
@@ -302,11 +302,11 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space6),
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                   child: Text(
                     otherName[0],
                     style: AppTypography.headingLarge.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),
@@ -328,7 +328,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space6),
                 const Divider(),
                 ListTile(
-                  leading: Icon(Icons.calendar_today, color: AppColors.primary),
+                  leading: Icon(Icons.calendar_today, color: AppColors.paperAccent),
                   title: const Text('레슨 일정 보기'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -457,10 +457,10 @@ class _HelpItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Icon(icon, color: AppColors.primary, size: 20),
+              child: Icon(icon, color: AppColors.paperAccent, size: 20),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -540,7 +540,7 @@ class _ConnectionCard extends StatelessWidget {
               radius: 28,
               backgroundColor:
                   isActive
-                      ? AppColors.primary.withValues(alpha: 0.1)
+                      ? AppColors.paperAccent.withValues(alpha: 0.1)
                       : AppColors.inkTertiary.withValues(alpha: 0.1),
               backgroundImage:
                   profileImage != null ? NetworkImage(profileImage) : null,
@@ -551,7 +551,7 @@ class _ConnectionCard extends StatelessWidget {
                         style: AppTypography.headingSmall.copyWith(
                           color:
                               isActive
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkTertiary,
                         ),
                       )
@@ -606,7 +606,7 @@ class _ConnectionCard extends StatelessWidget {
               TextButton(
                 onPressed: onReconnect,
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
+                  foregroundColor: AppColors.paperAccent,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space3,
                   ),

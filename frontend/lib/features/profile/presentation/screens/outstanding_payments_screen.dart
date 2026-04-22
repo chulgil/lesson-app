@@ -183,7 +183,7 @@ class _UnpaidCard extends ConsumerWidget {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor: AppColors.paperAccentSoft,
                     child: Text(
                       studentName.isNotEmpty ? studentName[0] : '?',
                       style: AppTypography.bodyLarge.copyWith(
@@ -271,7 +271,7 @@ class _UnpaidCard extends ConsumerWidget {
           vertical: 2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.errorLight,
+          color: AppColors.paperAccentSoft,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Text(

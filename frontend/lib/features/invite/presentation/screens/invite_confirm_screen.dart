@@ -224,7 +224,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
-                      borderSide: BorderSide(color: AppColors.primary),
+                      borderSide: BorderSide(color: AppColors.paperAccent),
                     ),
                     contentPadding: const EdgeInsets.all(AppSpacing.space3),
                   ),
@@ -241,7 +241,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _sendRequest,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
@@ -413,7 +413,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                     context.go(homeRoute);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                   ),
                   child: const Text(AppStrings.confirm),
@@ -549,7 +549,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.paperAccent,
                           foregroundColor: Colors.white,
                         ),
                         child: const Text('레슨 예약'),
@@ -583,7 +583,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           context.push(AppRoutes.students);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.paperAccent,
                           foregroundColor: Colors.white,
                         ),
                         child: const Text('학생 목록'),
@@ -601,7 +601,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       context.go(homeRoute);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.paperAccent,
                       foregroundColor: Colors.white,
                     ),
                     child: const Text(AppStrings.confirm),

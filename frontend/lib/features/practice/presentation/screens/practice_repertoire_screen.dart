@@ -125,7 +125,7 @@ class _RepertoireCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppSpacing.radiusMedium),
                 topRight: Radius.circular(AppSpacing.radiusMedium),
@@ -133,7 +133,7 @@ class _RepertoireCard extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.library_music, color: AppColors.primary),
+                const Icon(Icons.library_music, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Column(
@@ -153,7 +153,7 @@ class _RepertoireCard extends ConsumerWidget {
                 // Add section button
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline),
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   onPressed:
                       () => context.push(
                         '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
@@ -444,7 +444,7 @@ class _SectionListItem extends ConsumerWidget {
                     section.representativeRecording != null
                         ? Icons.play_circle_filled
                         : Icons.play_circle_outline,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   onPressed: () {
                     context.push(

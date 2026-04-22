@@ -27,9 +27,9 @@ class FollowListScreen extends ConsumerWidget {
         appBar: AppBar(
           title: const Text('팔로우'),
           bottom: TabBar(
-            labelColor: AppColors.primary,
+            labelColor: AppColors.paperAccent,
             unselectedLabelColor: AppColors.inkSecondary,
-            indicatorColor: AppColors.primary,
+            indicatorColor: AppColors.paperAccent,
             tabs: const [Tab(text: '전체'), Tab(text: '선생님'), Tab(text: '학원')],
           ),
         ),

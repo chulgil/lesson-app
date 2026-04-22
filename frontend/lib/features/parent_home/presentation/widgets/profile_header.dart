@@ -38,7 +38,7 @@ class ProfileHeader extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.space1),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),

@@ -36,10 +36,10 @@ class RoleOptionCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              child: Icon(icon, color: AppColors.primary),
+              child: Icon(icon, color: AppColors.paperAccent),
             ),
             const SizedBox(width: AppSpacing.space4),
             Expanded(

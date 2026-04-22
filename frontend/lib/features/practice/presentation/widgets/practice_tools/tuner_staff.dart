@@ -315,7 +315,7 @@ class NotePainter extends CustomPainter {
 
     // Draw note head
     final notePaint = Paint()
-      ..color = AppColors.primary
+      ..color = AppColors.paperAccent
       ..style = PaintingStyle.fill;
 
     canvas.save();
@@ -333,7 +333,7 @@ class NotePainter extends CustomPainter {
 
     // Draw stem
     final stemPaint = Paint()
-      ..color = AppColors.primary
+      ..color = AppColors.paperAccent
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -390,7 +390,7 @@ class NotePainter extends CustomPainter {
     // Draw sharp symbol if accidental
     if (note.name.isAccidental) {
       final accidentalPaint = Paint()
-        ..color = AppColors.primary
+        ..color = AppColors.paperAccent
         ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke;
 

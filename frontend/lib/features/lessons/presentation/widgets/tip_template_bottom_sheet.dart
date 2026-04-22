@@ -161,14 +161,14 @@ class _TipTemplateBottomSheetState
           setState(() => _selectedCategory = selected ? category : null);
         },
         backgroundColor: AppColors.paperDark,
-        selectedColor: AppColors.primaryLight,
-        checkmarkColor: AppColors.primary,
+        selectedColor: AppColors.paperAccentSoft,
+        checkmarkColor: AppColors.paperAccent,
         labelStyle: AppTypography.bodySmall.copyWith(
-          color: isSelected ? AppColors.primary : AppColors.inkSecondary,
+          color: isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
         side: BorderSide(
-          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+          color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
       ),
     );
@@ -255,7 +255,7 @@ class _TipTemplateBottomSheetState
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -263,7 +263,7 @@ class _TipTemplateBottomSheetState
                     child: Text(
                       template.category.label,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -391,7 +391,7 @@ class _TipTemplateBottomSheetState
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -399,7 +399,7 @@ class _TipTemplateBottomSheetState
                     child: Text(
                       template.category.label,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

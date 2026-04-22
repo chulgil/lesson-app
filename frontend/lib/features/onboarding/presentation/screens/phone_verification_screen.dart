@@ -228,7 +228,7 @@ class _PhoneVerificationScreenState
                         ? null
                         : (_codeSent ? _verifyCode : _sendCode),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.paperAccent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -311,7 +311,7 @@ class _PhoneVerificationScreenState
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
         ),
@@ -338,7 +338,7 @@ class _PhoneVerificationScreenState
                 style: AppTypography.bodyMedium.copyWith(
                   color: _remainingSeconds <= 30
                       ? AppColors.paperAccent
-                      : AppColors.primary,
+                      : AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -365,7 +365,7 @@ class _PhoneVerificationScreenState
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
         ),
@@ -381,7 +381,7 @@ class _PhoneVerificationScreenState
               '인증번호 다시 받기',
               style: AppTypography.bodyMedium.copyWith(
                 color: _remainingSeconds <= 120
-                    ? AppColors.primary
+                    ? AppColors.paperAccent
                     : AppColors.inkTertiary,
               ),
             ),
@@ -433,7 +433,7 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+              color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -473,7 +473,7 @@ class _ProgressDivider extends StatelessWidget {
       width: 24,
       height: 2,
       margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.primary : AppColors.inkQuaternary,
+      color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
     );
   }
 }

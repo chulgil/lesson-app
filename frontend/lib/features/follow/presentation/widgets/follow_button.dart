@@ -59,8 +59,8 @@ class FollowButton extends ConsumerWidget {
         icon: const Icon(Icons.check, size: 16),
         label: const Text('팔로잉'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.paperAccent,
+          side: BorderSide(color: AppColors.paperAccent),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           textStyle: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
@@ -74,7 +74,7 @@ class FollowButton extends ConsumerWidget {
       icon: const Icon(Icons.add, size: 16),
       label: const Text('팔로우'),
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         textStyle: AppTypography.bodySmall.copyWith(
           fontWeight: FontWeight.w600,

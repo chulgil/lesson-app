@@ -337,7 +337,7 @@ class _TargetTimeHint extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
@@ -345,14 +345,14 @@ class _TargetTimeHint extends StatelessWidget {
           const Icon(
             Icons.info_outline,
             size: 18,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               '목표시간 달성 시 진행률이 100%로 표시됩니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
           ),
@@ -377,7 +377,7 @@ class RangePreviewBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
@@ -385,13 +385,13 @@ class RangePreviewBox extends StatelessWidget {
           const Icon(
             Icons.info_outline,
             size: 18,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '섹션 이름: $rangeText',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

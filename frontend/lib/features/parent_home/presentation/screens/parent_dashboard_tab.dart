@@ -168,7 +168,7 @@ class ParentDashboardTab extends ConsumerWidget {
               icon: const Icon(Icons.add),
               label: const Text('자녀 추가하기'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space6,
@@ -269,7 +269,7 @@ class ParentDashboardTab extends ConsumerWidget {
                                       isSelected
                                           ? Icon(
                                             Icons.check,
-                                            color: AppColors.primary,
+                                            color: AppColors.paperAccent,
                                           )
                                           : null,
                                   onTap: () {
@@ -436,7 +436,7 @@ class ParentDashboardTab extends ConsumerWidget {
             icon: Icons.calendar_today,
             label: '이번주 레슨',
             value: '1회',
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -471,7 +471,7 @@ class ParentDashboardTab extends ConsumerWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.primaryLight.withValues(alpha: 0.3),
+            color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Column(
@@ -480,12 +480,12 @@ class ParentDashboardTab extends ConsumerWidget {
               Text(
                 '28',
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
               Text(
                 '토',
-                style: AppTypography.caption.copyWith(color: AppColors.primary),
+                style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
               ),
             ],
           ),
@@ -503,7 +503,7 @@ class ParentDashboardTab extends ConsumerWidget {
             vertical: AppSpacing.space1,
           ),
           decoration: BoxDecoration(
-            color: AppColors.successLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Text(
@@ -560,14 +560,14 @@ class ParentDashboardTab extends ConsumerWidget {
                       practiced
                           ? AppColors.paperOk
                           : isToday
-                          ? AppColors.primaryLight
+                          ? AppColors.paperAccentSoft
                           : isPast
-                          ? AppColors.errorLight
+                          ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
                   shape: BoxShape.circle,
                   border:
                       isToday
-                          ? Border.all(color: AppColors.primary, width: 2)
+                          ? Border.all(color: AppColors.paperAccent, width: 2)
                           : null,
                 ),
                 child: Center(
@@ -583,7 +583,7 @@ class ParentDashboardTab extends ConsumerWidget {
                             style: AppTypography.bodySmall.copyWith(
                               color:
                                   isToday
-                                      ? AppColors.primary
+                                      ? AppColors.paperAccent
                                       : AppColors.inkSecondary,
                             ),
                           ),
@@ -655,7 +655,7 @@ class ParentDashboardTab extends ConsumerWidget {
                   Text(
                     '300,000원',
                     style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                   Container(
@@ -664,7 +664,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.warningLight,
+                      color: AppColors.paperAccentSoft,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),

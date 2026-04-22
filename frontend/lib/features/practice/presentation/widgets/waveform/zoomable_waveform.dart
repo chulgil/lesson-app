@@ -264,7 +264,7 @@ class _ZoomableWaveformProgressBarState
                       child: Text(
                         '초기화',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -354,7 +354,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final playedPaint =
         Paint()
-          ..color = AppColors.primary
+          ..color = AppColors.paperAccent
           ..strokeWidth = 2
           ..strokeCap = StrokeCap.round;
 
@@ -364,11 +364,11 @@ class _ZoomableWaveformPainter extends CustomPainter {
           ..strokeWidth = 2
           ..strokeCap = StrokeCap.round;
 
-    final loopPaint = Paint()..color = AppColors.primary.withValues(alpha: 0.3);
+    final loopPaint = Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3);
 
     final markerPaint =
         Paint()
-          ..color = AppColors.primary
+          ..color = AppColors.paperAccent
           ..strokeWidth = 3;
 
     // Calculate visible range
@@ -479,7 +479,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
       Rect.fromCenter(center: Offset(x, 12), width: 22, height: 20),
       const Radius.circular(4),
     );
-    canvas.drawRRect(labelRect, Paint()..color = AppColors.primary);
+    canvas.drawRRect(labelRect, Paint()..color = AppColors.paperAccent);
 
     // Label text
     final textPainter = TextPainter(
@@ -499,7 +499,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(x, size.height - 10),
       8,
-      Paint()..color = AppColors.primary,
+      Paint()..color = AppColors.paperAccent,
     );
     canvas.drawCircle(
       Offset(x, size.height - 10),
@@ -646,7 +646,7 @@ class _MiniMapPainter extends CustomPainter {
           size.width * bProgress,
           size.height,
         ),
-        Paint()..color = AppColors.primary.withValues(alpha: 0.3),
+        Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3),
       );
     }
 
@@ -656,7 +656,7 @@ class _MiniMapPainter extends CustomPainter {
       Offset(playheadX, 0),
       Offset(playheadX, size.height),
       Paint()
-        ..color = AppColors.primary
+        ..color = AppColors.paperAccent
         ..strokeWidth = 1,
     );
 

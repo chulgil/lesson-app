@@ -60,7 +60,7 @@ class _StudentInviteCodeScreenState
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.paperAccent.withValues(alpha: 0.1),
                           borderRadius:
                               BorderRadius.circular(AppSpacing.radiusXLarge),
                         ),
@@ -113,7 +113,7 @@ class _StudentInviteCodeScreenState
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
                               borderSide: BorderSide(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 width: 2,
                               ),
                             ),
@@ -165,7 +165,7 @@ class _StudentInviteCodeScreenState
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _handleSubmitCode,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: AppColors.paperAccent,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius:

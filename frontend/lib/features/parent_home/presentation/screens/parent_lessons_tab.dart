@@ -210,14 +210,14 @@ class ParentLessonsTab extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryLight.withValues(
+                                color: AppColors.paperAccentSoft.withValues(
                                   alpha: 0.2,
                                 ),
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium,
                                 ),
                                 border: Border.all(
-                                  color: AppColors.primaryLight,
+                                  color: AppColors.paperAccentSoft,
                                 ),
                               ),
                               child: Text(
@@ -276,7 +276,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary,
+                                      color: AppColors.paperAccent,
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
@@ -436,7 +436,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                 day == '일'
                                     ? AppColors.paperAccent
                                     : day == '토'
-                                    ? AppColors.primary
+                                    ? AppColors.paperAccent
                                     : AppColors.inkSecondary,
                           ),
                           textAlign: TextAlign.center,
@@ -512,7 +512,7 @@ class _LessonCard extends StatelessWidget {
                 color:
                     isPast
                         ? AppColors.paperDark
-                        : AppColors.primaryLight.withValues(alpha: 0.2),
+                        : AppColors.paperAccentSoft.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Column(
@@ -523,7 +523,7 @@ class _LessonCard extends StatelessWidget {
                       color:
                           isPast
                               ? AppColors.inkSecondary
-                              : AppColors.primary,
+                              : AppColors.paperAccent,
                     ),
                   ),
                   Text(
@@ -532,7 +532,7 @@ class _LessonCard extends StatelessWidget {
                       color:
                           isPast
                               ? AppColors.inkTertiary
-                              : AppColors.primary,
+                              : AppColors.paperAccent,
                     ),
                   ),
                 ],
@@ -574,7 +574,7 @@ class _LessonCard extends StatelessWidget {
             if (hasNote)
               IconButton(
                 onPressed: onViewNote,
-                icon: Icon(Icons.note_outlined, color: AppColors.primary),
+                icon: Icon(Icons.note_outlined, color: AppColors.paperAccent),
                 tooltip: '레슨 노트',
               ),
           ],
@@ -590,7 +590,7 @@ class _LessonCard extends StatelessWidget {
 
     switch (status) {
       case LessonStatus.confirmed:
-        bgColor = AppColors.successLight;
+        bgColor = AppColors.paperDark;
         textColor = AppColors.paperOk;
         label = '예정';
         break;
@@ -600,7 +600,7 @@ class _LessonCard extends StatelessWidget {
         label = '완료';
         break;
       case LessonStatus.cancelled:
-        bgColor = AppColors.errorLight;
+        bgColor = AppColors.paperAccentSoft;
         textColor = AppColors.paperAccent;
         label = '취소';
         break;

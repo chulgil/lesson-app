@@ -88,7 +88,7 @@ class ChildProfilesScreen extends ConsumerWidget {
               icon: const Icon(Icons.add),
               label: const Text('자녀 추가하기'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.paperAccent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space6,
@@ -132,8 +132,8 @@ class ChildProfilesScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('자녀 추가하기'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.paperAccent,
+          side: BorderSide(color: AppColors.paperAccent),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
         ),
       ),
@@ -240,7 +240,7 @@ class _ChildProfileCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight.withValues(
+                            color: AppColors.paperAccentSoft.withValues(
                               alpha: 0.2,
                             ),
                             borderRadius: BorderRadius.circular(
@@ -250,7 +250,7 @@ class _ChildProfileCard extends StatelessWidget {
                           child: Text(
                             '만 ${profile.age}세',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -302,7 +302,7 @@ class _ChildProfileCard extends StatelessWidget {
                   // Switch to child view button
                   IconButton(
                     onPressed: onSwitchToChild,
-                    icon: Icon(Icons.switch_account, color: AppColors.primary),
+                    icon: Icon(Icons.switch_account, color: AppColors.paperAccent),
                     tooltip: '학생 화면으로 전환',
                   ),
                   // Edit button

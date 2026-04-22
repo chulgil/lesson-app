@@ -198,7 +198,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.music_note, color: AppColors.primary, size: 20),
+          Icon(Icons.music_note, color: AppColors.paperAccent, size: 20),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -227,7 +227,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   Widget _buildSectionHeader({required IconData icon, required String title}) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
         Text(
           title,
@@ -316,10 +316,10 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             child: ActionChip(
               label: Text(
                 preset.text,
-                style: AppTypography.caption.copyWith(color: AppColors.primary),
+                style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
               ),
-              backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space1,
               ),
@@ -449,7 +449,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: AppColors.primary),
+                Icon(icon, size: 20, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   title,
@@ -465,13 +465,13 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '$count',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -678,7 +678,7 @@ class _KeyPointInputState extends State<_KeyPointInput> {
         IconButton(
           onPressed: _submit,
           icon: const Icon(Icons.add_circle),
-          color: AppColors.primary,
+          color: AppColors.paperAccent,
           constraints: const BoxConstraints(),
           padding: EdgeInsets.zero,
         ),

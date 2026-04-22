@@ -179,7 +179,7 @@ class GamificationHeader extends ConsumerWidget {
   List<Color> _getLevelGradient(int level) {
     switch (level) {
       case 1:
-        return [AppColors.primary, AppColors.primaryLight];
+        return [AppColors.paperAccent, AppColors.paperAccentSoft];
       case 2:
         return [AppColors.levelSilverStart, AppColors.levelSilverEnd];
       case 3:

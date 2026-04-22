@@ -173,7 +173,7 @@ class SearchToggle extends StatelessWidget {
           Icon(
             Icons.search,
             color:
-                isSearchable ? AppColors.primary : AppColors.inkTertiary,
+                isSearchable ? AppColors.paperAccent : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -198,7 +198,7 @@ class SearchToggle extends StatelessWidget {
           Switch(
             value: isSearchable,
             onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
         ],
       ),
@@ -312,7 +312,7 @@ class VisibilityTile extends StatelessWidget {
                             Icon(
                               Icons.check,
                               size: 20,
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             ),
                           ],
                         ],
@@ -454,18 +454,18 @@ class BadgeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(getBadgeIcon(badge), size: 16, color: AppColors.primary),
+          Icon(getBadgeIcon(badge), size: 16, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space1),
           Text(
             getBadgeLabel(badge),
             style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w500,
             ),
           ),

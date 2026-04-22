@@ -85,7 +85,7 @@ class LessonRecurringSection extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.paperDark,
                       shape: BoxShape.circle,
                     ),
@@ -109,7 +109,7 @@ class LessonRecurringSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
@@ -117,14 +117,14 @@ class LessonRecurringSection extends StatelessWidget {
                   Icon(
                     Icons.info_outline,
                     size: 18,
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '4주간의 레슨이 자동으로 예약됩니다',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ),

@@ -344,7 +344,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               // Section header
               Row(
                 children: [
-                  const Icon(Icons.queue_music, size: 20, color: AppColors.primary),
+                  const Icon(Icons.queue_music, size: 20, color: AppColors.paperAccent),
                   const SizedBox(width: AppSpacing.space2),
                   Text('섹션 목록', style: AppTypography.headingSmall),
                 ],
@@ -412,7 +412,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 Text(
                   '섹션 ${index + 1}',
                   style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 if (_sections.length > 1)

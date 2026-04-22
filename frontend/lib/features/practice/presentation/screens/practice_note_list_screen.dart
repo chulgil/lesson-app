@@ -82,7 +82,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
   Widget _buildSectionHeader(dynamic section, String? repertoireName) {
     return Row(
       children: [
-        Icon(Icons.library_music, color: AppColors.primary, size: 20),
+        Icon(Icons.library_music, color: AppColors.paperAccent, size: 20),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: Column(
@@ -138,7 +138,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
   Widget _buildFallbackHeader() {
     return Row(
       children: [
-        Icon(Icons.library_music, color: AppColors.primary, size: 20),
+        Icon(Icons.library_music, color: AppColors.paperAccent, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(

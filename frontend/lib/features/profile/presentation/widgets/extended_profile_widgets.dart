@@ -152,10 +152,10 @@ class ProfileInfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              child: Icon(icon, color: AppColors.primary, size: 24),
+              child: Icon(icon, color: AppColors.paperAccent, size: 24),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -291,10 +291,10 @@ class CareerCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(Icons.work, color: AppColors.primary, size: 24),
+            child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -554,8 +554,8 @@ class ProfileEmptyCard extends StatelessWidget {
             icon: const Icon(Icons.add),
             label: Text(buttonText),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.primary),
+              foregroundColor: AppColors.paperAccent,
+              side: BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ],
@@ -580,8 +580,8 @@ class ProfileAddButton extends StatelessWidget {
         icon: const Icon(Icons.add),
         label: Text(label),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.paperAccent,
+          side: BorderSide(color: AppColors.paperAccent),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
         ),
       ),
@@ -601,7 +601,7 @@ Color getCompletionLevelColor(ProfileCompletionLevel level) {
     case ProfileCompletionLevel.standard:
       return AppColors.paperOk;
     case ProfileCompletionLevel.complete:
-      return AppColors.primary;
+      return AppColors.paperAccent;
   }
 }
 

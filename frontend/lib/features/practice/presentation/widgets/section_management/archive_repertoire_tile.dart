@@ -52,7 +52,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                           value: 'restore',
                           child: Row(
                             children: [
-                              Icon(Icons.restore, color: AppColors.primary),
+                              Icon(Icons.restore, color: AppColors.paperAccent),
                               const SizedBox(width: AppSpacing.space2),
                               const Text('복원'),
                             ],
@@ -181,7 +181,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.errorLight,
+                    color: AppColors.paperAccentSoft,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),

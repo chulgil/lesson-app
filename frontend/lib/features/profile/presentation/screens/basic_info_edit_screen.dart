@@ -213,7 +213,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                 : Text(
                     '저장',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -235,7 +235,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               profileImagePath: profileImagePath,
               backgroundImagePath: backgroundImagePath,
               initial: initial,
-              avatarColor: AppColors.primaryLight,
+              avatarColor: AppColors.paperAccentSoft,
               onTapProfile: _onTapProfileImage,
               onTapBackground: _onTapBackgroundImage,
             ),
@@ -364,18 +364,18 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               }
             });
           },
-          selectedColor: AppColors.primary.withValues(alpha: 0.15),
-          checkmarkColor: AppColors.primary,
+          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+          checkmarkColor: AppColors.paperAccent,
           labelStyle: AppTypography.bodyMedium.copyWith(
             color: isSelected
-                ? AppColors.primary
+                ? AppColors.paperAccent
                 : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           ),
           backgroundColor: AppColors.paper,
@@ -402,7 +402,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           onPressed: _addArea,
           icon: const Icon(Icons.add, size: 20),
           style: IconButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.paperAccent,
             foregroundColor: Colors.white,
             minimumSize: const Size(44, 44),
           ),
@@ -520,7 +520,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.primary, width: 2),
+        borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

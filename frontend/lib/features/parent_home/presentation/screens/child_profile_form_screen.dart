@@ -157,7 +157,7 @@ class _ChildProfileFormScreenState
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.infoLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
@@ -300,7 +300,7 @@ class _ChildProfileFormScreenState
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space2),
                 decoration: BoxDecoration(
-                  color: AppColors.warningLight,
+                  color: AppColors.paperAccentSoft,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Row(
@@ -408,7 +408,7 @@ class _ChildProfileFormScreenState
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(

@@ -126,8 +126,8 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                 child: FilledButton(
                   onPressed: _allRequired ? _onContinue : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: AppColors.primary.withValues(
+                    backgroundColor: AppColors.paperAccent,
+                    disabledBackgroundColor: AppColors.paperAccent.withValues(
                       alpha: 0.3,
                     ),
                     shape: RoundedRectangleBorder(
@@ -169,7 +169,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
           border: Border.all(
             color:
                 _allChecked
-                    ? AppColors.primary.withValues(alpha: 0.5)
+                    ? AppColors.paperAccent.withValues(alpha: 0.5)
                     : AppColors.inkQuaternary,
           ),
         ),
@@ -178,7 +178,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
             Checkbox(
               value: _allChecked,
               onChanged: _toggleAll,
-              activeColor: AppColors.primary,
+              activeColor: AppColors.paperAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
@@ -219,7 +219,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
             Checkbox(
               value: value,
               onChanged: onChanged,
-              activeColor: AppColors.primary,
+              activeColor: AppColors.paperAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),

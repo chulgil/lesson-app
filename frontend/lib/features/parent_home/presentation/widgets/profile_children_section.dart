@@ -94,7 +94,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                         item: ProfileMenuItem(
                           icon: Icons.add_circle_outline,
                           label: '자녀 추가하기',
-                          labelColor: AppColors.primary,
+                          labelColor: AppColors.paperAccent,
                           onTap: () => _showAddChildDialog(context),
                         ),
                       ),
@@ -169,7 +169,7 @@ class ProfileChildrenSection extends ConsumerWidget {
               decoration: BoxDecoration(
                 color:
                     profile.isActive
-                        ? AppColors.successLight
+                        ? AppColors.paperDark
                         : AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
@@ -217,7 +217,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   // Option 1: Add child profile (under 14)
                   AddChildOption(
                     icon: Icons.child_care,
-                    iconColor: AppColors.primary,
+                    iconColor: AppColors.paperAccent,
                     title: '만 14세 미만 자녀 등록',
                     description: '별도 계정 없이 학부모 계정에서 관리',
                     onTap: () {

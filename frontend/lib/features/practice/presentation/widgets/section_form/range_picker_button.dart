@@ -50,7 +50,7 @@ class RangePickerButton extends StatelessWidget {
                 Text(
                   '$value',
                   style: AppTypography.headingLarge.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),

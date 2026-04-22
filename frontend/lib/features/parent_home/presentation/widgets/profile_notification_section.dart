@@ -176,7 +176,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                           vertical: 1,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.paperAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -184,7 +184,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                         child: Text(
                           '필수',
                           style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -204,7 +204,7 @@ class ProfileNotificationSection extends ConsumerWidget {
           Switch(
             value: value,
             onChanged: isRequired ? null : onChanged,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
         ],
       ),

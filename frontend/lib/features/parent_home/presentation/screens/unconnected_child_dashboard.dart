@@ -168,7 +168,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 title: '연습 기록',
                 subtitle: '시간 기반 연습',
                 icon: Icons.timer,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 onTap: () => _startPractice(context, child),
               ),
             ),
@@ -185,14 +185,14 @@ class UnconnectedChildDashboard extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withValues(alpha: 0.1),
+            AppColors.paperAccent.withValues(alpha: 0.1),
             AppColors.secondary.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,12 +202,12 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space2),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: const Icon(
                   Icons.school,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   size: 20,
                 ),
               ),
@@ -243,8 +243,8 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   icon: const Icon(Icons.search, size: 18),
                   label: const Text('선생님 찾기'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
+                    foregroundColor: AppColors.paperAccent,
+                    side: const BorderSide(color: AppColors.paperAccent),
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
                     ),
@@ -258,7 +258,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   icon: const Icon(Icons.qr_code, size: 18),
                   label: const Text('초대코드 입력'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
@@ -336,7 +336,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color:
                     isToday
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : hasPractice
                         ? AppColors.paperOk.withValues(alpha: 0.1)
                         : isPast
@@ -380,7 +380,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${child.name}의 연습을 시작합니다'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.paperAccent,
       ),
     );
   }

@@ -114,7 +114,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               width: 280,
               height: 280,
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primary, width: 3),
+                border: Border.all(color: AppColors.paperAccent, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Stack(
@@ -208,16 +208,16 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       decoration: BoxDecoration(
         border: Border(
           top: isTop
-              ? BorderSide(color: AppColors.primary, width: 4)
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
               : BorderSide.none,
           bottom: !isTop
-              ? BorderSide(color: AppColors.primary, width: 4)
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
               : BorderSide.none,
           left: isLeft
-              ? BorderSide(color: AppColors.primary, width: 4)
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
               : BorderSide.none,
           right: !isLeft
-              ? BorderSide(color: AppColors.primary, width: 4)
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
               : BorderSide.none,
         ),
       ),

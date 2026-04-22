@@ -73,12 +73,12 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.primary, size: 20),
+        Icon(icon, color: AppColors.paperAccent, size: 20),
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
           style: AppTypography.headingSmall.copyWith(
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
         const SizedBox(height: 2),

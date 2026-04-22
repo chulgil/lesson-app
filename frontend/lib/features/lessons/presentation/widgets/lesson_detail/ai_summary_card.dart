@@ -22,26 +22,26 @@ class AISummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withValues(alpha: 0.05),
+            AppColors.paperAccent.withValues(alpha: 0.05),
             AppColors.secondary.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
+              Icon(Icons.auto_awesome, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 'AI가 생성한 레슨 요약',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),

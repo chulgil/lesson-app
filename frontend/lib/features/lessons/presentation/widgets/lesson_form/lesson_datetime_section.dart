@@ -49,13 +49,13 @@ class LessonDateTimeSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isPast
                             ? AppColors.paperAccent.withValues(alpha: 0.1)
-                            : AppColors.primary.withValues(alpha: 0.1),
+                            : AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius:
                             BorderRadius.circular(AppSpacing.radiusMedium),
                       ),
                       child: Icon(
                         isPast ? Icons.history : Icons.calendar_today,
-                        color: isPast ? AppColors.paperAccent : AppColors.primary,
+                        color: isPast ? AppColors.paperAccent : AppColors.paperAccent,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
@@ -148,7 +148,7 @@ class LessonDateTimeSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.warningLight,
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(

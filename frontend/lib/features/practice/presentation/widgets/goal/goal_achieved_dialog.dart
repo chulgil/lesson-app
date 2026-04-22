@@ -65,7 +65,7 @@ class GoalAchievedDialog extends StatelessWidget {
             Text(
               isWeekly ? '이번 주 목표 달성!' : '오늘 목표 달성!',
               style: AppTypography.headingMedium.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ),
             const SizedBox(height: AppSpacing.space4),

@@ -81,7 +81,7 @@ class _AddRecordingResourceSheetState
                       BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(
                     color: _selectedFilePath != null
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkQuaternary,
                     width: _selectedFilePath != null ? 2 : 1,
                   ),
@@ -94,7 +94,7 @@ class _AddRecordingResourceSheetState
                           : Icons.mic_outlined,
                       size: 48,
                       color: _selectedFilePath != null
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.inkTertiary,
                     ),
                     const SizedBox(height: AppSpacing.space2),

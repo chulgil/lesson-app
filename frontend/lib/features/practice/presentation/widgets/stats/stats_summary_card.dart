@@ -37,7 +37,7 @@ class StatsSummaryCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.insights,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -57,7 +57,7 @@ class StatsSummaryCard extends StatelessWidget {
                   icon: Icons.timer,
                   label: '연습 시간',
                   value: report.totalTimeText,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),

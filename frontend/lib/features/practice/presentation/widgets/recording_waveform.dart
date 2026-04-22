@@ -100,7 +100,7 @@ class StaticWaveform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = barColor ?? AppColors.primary;
+    final color = barColor ?? AppColors.paperAccent;
     final random = Random(42); // Fixed seed for consistent appearance
 
     return SizedBox(

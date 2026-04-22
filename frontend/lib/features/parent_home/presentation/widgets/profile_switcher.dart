@@ -46,7 +46,7 @@ class _SingleProfileDisplay extends ConsumerWidget {
           Icon(
             userProfile.activeProfile.icon,
             size: 20,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(width: AppSpacing.space2),
           Text(
@@ -282,7 +282,7 @@ class _ProfileDropdown extends ConsumerWidget {
             ),
           ),
           if (isSelected)
-            const Icon(Icons.check, size: 18, color: AppColors.primary),
+            const Icon(Icons.check, size: 18, color: AppColors.paperAccent),
         ],
       ),
     );

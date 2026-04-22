@@ -111,19 +111,19 @@ class _LocationChip extends StatelessWidget {
       avatar: Icon(
         _icon,
         size: 16,
-        color: isSelected ? AppColors.primary : AppColors.inkSecondary,
+        color: isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
       ),
       label: Text(location.name),
       selected: isSelected,
       onSelected: (_) => onTap(),
       backgroundColor: AppColors.paper,
-      selectedColor: AppColors.primary.withValues(alpha: 0.15),
-      checkmarkColor: AppColors.primary,
+      selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+      checkmarkColor: AppColors.paperAccent,
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+        color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
       ),
       labelStyle: AppTypography.bodySmall.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.ink,
+        color: isSelected ? AppColors.paperAccent : AppColors.ink,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
     );

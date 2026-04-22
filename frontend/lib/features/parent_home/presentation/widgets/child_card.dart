@@ -45,7 +45,7 @@ class ChildCard extends ConsumerWidget {
                   // Avatar
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.paperAccent,
                     child: Text(
                       student.name.isNotEmpty ? student.name[0] : 'S',
                       style: AppTypography.headingMedium.copyWith(
@@ -76,7 +76,7 @@ class ChildCard extends ConsumerWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
+                                  color: AppColors.paperAccent.withValues(
                                     alpha: 0.1,
                                   ),
                                   borderRadius: BorderRadius.circular(
@@ -86,7 +86,7 @@ class ChildCard extends ConsumerWidget {
                                 child: Text(
                                   '주 보호자',
                                   style: AppTypography.caption.copyWith(
-                                    color: AppColors.primary,
+                                    color: AppColors.paperAccent,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -157,7 +157,7 @@ class ChildCard extends ConsumerWidget {
                     icon: Icons.school,
                     label: '다음 레슨',
                     value: '내일 14:00',
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space4),
                   _buildStatItem(

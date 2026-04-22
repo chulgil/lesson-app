@@ -119,7 +119,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                  borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
               ),

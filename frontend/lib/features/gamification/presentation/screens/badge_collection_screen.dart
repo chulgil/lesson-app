@@ -82,14 +82,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: Text(
               'Lv.${data.level}',
               style: AppTypography.headingMedium.copyWith(
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -118,7 +118,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
               minHeight: 8,
               backgroundColor: AppColors.paperDark,
               valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.primary,
+                AppColors.paperAccent,
               ),
             ),
           ),
@@ -312,7 +312,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                             Text(
                               '+${item.points}P',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -346,9 +346,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
       case BadgeRarity.common:
         return AppColors.ink;
       case BadgeRarity.rare:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case BadgeRarity.epic:
-        return AppColors.primaryDark;
+        return AppColors.paperAccent;
       case BadgeRarity.legendary:
         return AppColors.paperAccent;
     }

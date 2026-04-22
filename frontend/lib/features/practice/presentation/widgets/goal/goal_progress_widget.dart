@@ -70,7 +70,7 @@ class GoalProgressWidget extends ConsumerWidget {
           // Header
           Row(
             children: [
-              Icon(Icons.flag, color: AppColors.primary, size: 20),
+              Icon(Icons.flag, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               Text('오늘의 목표', style: AppTypography.headingSmall),
               const Spacer(),
@@ -238,12 +238,12 @@ class GoalProgressWidget extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(25),
+                color: AppColors.paperAccent.withAlpha(25),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(
                 Icons.flag_outlined,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 24,
               ),
             ),
@@ -332,7 +332,7 @@ class GoalProgressWidget extends ConsumerWidget {
                     colors:
                         isAchieved
                             ? [AppColors.paperOk, AppColors.paperOk]
-                            : [AppColors.primary, AppColors.secondary],
+                            : [AppColors.paperAccent, AppColors.secondary],
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),

@@ -47,12 +47,12 @@ class AiNotesButton extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withValues(alpha: 0.08),
-            AppColors.primary.withValues(alpha: 0.03),
+            AppColors.paperAccent.withValues(alpha: 0.08),
+            AppColors.paperAccent.withValues(alpha: 0.03),
           ],
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: () => _pickAndGenerate(context, ref),
@@ -62,12 +62,12 @@ class AiNotesButton extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
+                color: AppColors.paperAccent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: const Icon(
                 Icons.auto_awesome,
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
                 size: 22,
               ),
             ),
@@ -80,7 +80,7 @@ class AiNotesButton extends ConsumerWidget {
                     'AI 노트 생성',
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                   Text(
@@ -92,7 +92,7 @@ class AiNotesButton extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.primary),
+            const Icon(Icons.chevron_right, color: AppColors.paperAccent),
           ],
         ),
       ),
@@ -109,9 +109,9 @@ class AiNotesButton extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [

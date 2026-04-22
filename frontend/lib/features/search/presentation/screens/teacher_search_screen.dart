@@ -87,8 +87,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
+          indicatorColor: AppColors.paperAccent,
+          labelColor: AppColors.paperAccent,
           unselectedLabelColor: AppColors.inkSecondary,
           indicatorWeight: 3,
           tabs: const [
@@ -129,7 +129,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                  borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
                 ),
                 filled: true,
                 fillColor: AppColors.paperDark,
@@ -207,8 +207,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                         .read(teacherSearchSortStateProvider.notifier)
                         .updateSort(option);
                   },
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  checkmarkColor: AppColors.primary,
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  checkmarkColor: AppColors.paperAccent,
                 ),
               );
             }).toList(),
@@ -287,7 +287,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
         },
         child: Text(
           '전체 해제',
-          style: AppTypography.caption.copyWith(color: AppColors.primary),
+          style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
         ),
       ),
     );

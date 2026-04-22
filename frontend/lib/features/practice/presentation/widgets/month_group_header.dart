@@ -26,7 +26,7 @@ class MonthGroupHeader extends StatelessWidget {
             width: 3,
             height: 20,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

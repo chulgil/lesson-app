@@ -237,10 +237,10 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.play_arrow, color: AppColors.primary),
+                child: const Icon(Icons.play_arrow, color: AppColors.paperAccent),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -263,7 +263,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.paperAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusSmall,
                               ),
@@ -271,7 +271,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             child: Text(
                               '${widget.recording.bpm} BPM',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

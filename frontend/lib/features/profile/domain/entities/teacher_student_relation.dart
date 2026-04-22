@@ -71,7 +71,7 @@ extension RelationLessonTypeExtension on RelationLessonType {
       case RelationLessonType.trial:
         return AppColors.ink;
       case RelationLessonType.regular:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case RelationLessonType.oneTime:
         return AppColors.secondary;
     }

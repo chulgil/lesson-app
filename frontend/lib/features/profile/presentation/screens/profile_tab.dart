@@ -300,11 +300,11 @@ class ProfileTab extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   name.isNotEmpty ? name[0] : '?',
                   style: AppTypography.headingLarge.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),
@@ -341,10 +341,10 @@ class ProfileTab extends ConsumerWidget {
                           label: Text(
                             inst,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             ),
                           ),
-                          backgroundColor: AppColors.primary.withValues(
+                          backgroundColor: AppColors.paperAccent.withValues(
                             alpha: 0.08,
                           ),
                           side: BorderSide.none,
@@ -385,8 +385,8 @@ class ProfileTab extends ConsumerWidget {
           icon: const Icon(Icons.visibility_outlined, size: 18),
           label: const Text('내 프로필 미리보기'),
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.4)),
-            foregroundColor: AppColors.primary,
+            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.4)),
+            foregroundColor: AppColors.paperAccent,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -442,7 +442,7 @@ class ProfileTab extends ConsumerWidget {
                 Text(
                   '$percent%',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -455,7 +455,7 @@ class ProfileTab extends ConsumerWidget {
                 value: percent / 100,
                 minHeight: 6,
                 backgroundColor: AppColors.inkQuaternary,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.paperAccent),
               ),
             ),
             if (nextStep != null) ...[
@@ -570,7 +570,7 @@ class ProfileTab extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.primaryDark],
+            colors: [AppColors.paperAccent, AppColors.paperAccent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -790,7 +790,7 @@ class _ShortcutCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, size: 22, color: AppColors.primary),
+            Icon(icon, size: 22, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space2),
             Text(
               label,

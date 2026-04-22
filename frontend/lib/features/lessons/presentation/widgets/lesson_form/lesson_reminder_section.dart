@@ -133,7 +133,7 @@ class _ReminderTimeSelector extends StatelessWidget {
                 vertical: 8,
               ),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
+                color: isSelected ? AppColors.paperAccent : Colors.transparent,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Text(

@@ -34,8 +34,8 @@ class MonthlyTrendChart extends StatelessWidget {
             size: const Size(double.infinity, 120),
             painter: _TrendChartPainter(
               data: trendData,
-              lineColor: AppColors.primary,
-              fillColor: AppColors.primary.withValues(alpha: 0.1),
+              lineColor: AppColors.paperAccent,
+              fillColor: AppColors.paperAccent.withValues(alpha: 0.1),
             ),
           ),
         ),

@@ -40,12 +40,12 @@ class StatusCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   Icons.storage,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   size: 24,
                 ),
               ),
@@ -155,7 +155,7 @@ class ProgressCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.infoLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
@@ -214,7 +214,7 @@ class ErrorCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.errorLight,
+        color: AppColors.paperAccentSoft,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
@@ -438,7 +438,7 @@ class ActionButton extends StatelessWidget {
                   color:
                       isDisabled
                           ? AppColors.textDisabledLight.withValues(alpha: 0.2)
-                          : AppColors.primary.withValues(alpha: 0.1),
+                          : AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -446,7 +446,7 @@ class ActionButton extends StatelessWidget {
                   color:
                       isDisabled
                           ? AppColors.textDisabledLight
-                          : AppColors.primary,
+                          : AppColors.paperAccent,
                   size: 24,
                 ),
               ),
@@ -801,12 +801,12 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       color:
                           hasOrphans
                               ? AppColors.paperAccent.withValues(alpha: 0.1)
-                              : AppColors.primary.withValues(alpha: 0.1),
+                              : AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       hasOrphans ? Icons.link_off : Icons.link,
-                      color: hasOrphans ? AppColors.paperAccent : AppColors.primary,
+                      color: hasOrphans ? AppColors.paperAccent : AppColors.paperAccent,
                       size: 24,
                     ),
                   ),

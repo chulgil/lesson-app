@@ -93,9 +93,9 @@ class _PaymentManagementScreenState
                     Tab(text: '미납'),
                     Tab(text: '완료'),
                   ],
-                  labelColor: AppColors.primary,
+                  labelColor: AppColors.paperAccent,
                   unselectedLabelColor: AppColors.inkSecondary,
-                  indicatorColor: AppColors.primary,
+                  indicatorColor: AppColors.paperAccent,
                 ),
               ),
             ),
@@ -293,7 +293,7 @@ class _PaymentManagementScreenState
                                 decoration: BoxDecoration(
                                   color:
                                       isSelected
-                                          ? AppColors.primary
+                                          ? AppColors.paperAccent
                                           : Colors.transparent,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusMedium,

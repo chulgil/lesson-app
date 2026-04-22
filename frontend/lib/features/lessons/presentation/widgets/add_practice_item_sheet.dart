@@ -311,7 +311,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.primary.withValues(alpha: 0.1)
+                          ? AppColors.paperAccent.withValues(alpha: 0.1)
                           : null,
                   border: Border(
                     bottom: BorderSide(
@@ -330,12 +330,12 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                         border: Border.all(
                           color:
                               isSelected
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkQuaternary,
                           width: 2,
                         ),
                         color:
-                            isSelected ? AppColors.primary : Colors.transparent,
+                            isSelected ? AppColors.paperAccent : Colors.transparent,
                       ),
                       child:
                           isSelected

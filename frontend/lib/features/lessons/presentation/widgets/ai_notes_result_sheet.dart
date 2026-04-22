@@ -71,7 +71,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                       children: [
                         Icon(
                           Icons.auto_awesome,
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           size: 24,
                         ),
                         const SizedBox(width: AppSpacing.space2),
@@ -123,7 +123,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                               width: 6,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -206,13 +206,13 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primary),
+        Icon(icon, size: 18, color: AppColors.paperAccent),
         const SizedBox(width: 6),
         Text(
           title,
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.primary,
+            color: AppColors.paperAccent,
           ),
         ),
       ],

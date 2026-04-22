@@ -293,7 +293,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                           : Icons.radio_button_off,
                       color:
                           current == minutes
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
                     title: Text(minutes == 0 ? '없음' : '$minutes분'),
@@ -341,7 +341,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                           : Icons.radio_button_off,
                       color:
                           current == hours
-                              ? AppColors.primary
+                              ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
                     title: Text(_formatHours(hours)),
@@ -660,7 +660,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color:
                                     price != null
-                                        ? AppColors.primaryLight.withValues(
+                                        ? AppColors.paperAccentSoft.withValues(
                                           alpha: 0.1,
                                         )
                                         : null,
@@ -668,7 +668,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                                 border: Border.all(
                                   color:
                                       price != null
-                                          ? AppColors.primary.withValues(
+                                          ? AppColors.paperAccent.withValues(
                                             alpha: 0.3,
                                           )
                                           : AppColors.inkQuaternary,
@@ -682,7 +682,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                                   style: AppTypography.caption.copyWith(
                                     color:
                                         price != null
-                                            ? AppColors.primary
+                                            ? AppColors.paperAccent
                                             : AppColors.inkTertiary,
                                     fontWeight:
                                         price != null
@@ -807,10 +807,10 @@ class _BookingSettingItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Icon(icon, color: AppColors.primary, size: 20),
+              child: Icon(icon, color: AppColors.paperAccent, size: 20),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(

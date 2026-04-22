@@ -28,7 +28,7 @@ class NotificationItem extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               isUnread
-                  ? AppColors.primary.withValues(alpha: 0.05)
+                  ? AppColors.paperAccent.withValues(alpha: 0.05)
                   : Colors.white,
           border: const Border(
             bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
@@ -91,7 +91,7 @@ class NotificationItem extends StatelessWidget {
                         vertical: AppSpacing.space1,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusSmall,
                         ),
@@ -99,7 +99,7 @@ class NotificationItem extends StatelessWidget {
                       child: Text(
                         notification.actionLabel!,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -116,7 +116,7 @@ class NotificationItem extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -250,7 +250,7 @@ class NotificationItem extends StatelessWidget {
       case NotificationPriority.high:
         return AppColors.secondary.withValues(alpha: 0.2);
       case NotificationPriority.normal:
-        return AppColors.primary.withValues(alpha: 0.1);
+        return AppColors.paperAccent.withValues(alpha: 0.1);
       case NotificationPriority.low:
         return AppColors.inkSecondary.withValues(alpha: 0.1);
     }

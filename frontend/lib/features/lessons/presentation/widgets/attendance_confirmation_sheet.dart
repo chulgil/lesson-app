@@ -115,7 +115,7 @@ class _AttendanceConfirmationSheetState
         // Header
         Row(
           children: [
-            const Icon(Icons.fact_check, color: AppColors.primary),
+            const Icon(Icons.fact_check, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(
               AppStrings.lessonConfirmation,
@@ -272,7 +272,7 @@ class _AttendanceConfirmationSheetState
                       );
                     },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

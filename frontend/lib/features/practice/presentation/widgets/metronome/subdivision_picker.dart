@@ -94,16 +94,16 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
                 vertical: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: AppColors.paperAccent.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.music_note, size: 20, color: AppColors.primary),
+                  Icon(Icons.music_note, size: 20, color: AppColors.paperAccent),
                   SizedBox(width: AppSpacing.space2),
                   Text(
                     '패턴: ${_selected.visualPattern}',
@@ -187,17 +187,17 @@ class _SubdivisionChip extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.paper,
+          color: isSelected ? AppColors.paperAccent : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           boxShadow:
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.paperAccent.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

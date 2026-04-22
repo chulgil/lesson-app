@@ -69,7 +69,7 @@ void showLessonStudentPicker({
                               isSelected
                                   ? const Icon(
                                     Icons.check_circle,
-                                    color: AppColors.primary,
+                                    color: AppColors.paperAccent,
                                   )
                                   : null,
                           onTap: () {

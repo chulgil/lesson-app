@@ -100,8 +100,8 @@ class _MetronomeControllerBarState extends ConsumerState<MetronomeControllerBar>
                   onPressed: widget.onExpand,
                   tooltip: '전체 화면',
                   style: IconButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: BorderSide(color: AppColors.primary, width: 2),
+                    foregroundColor: AppColors.paperAccent,
+                    side: BorderSide(color: AppColors.paperAccent, width: 2),
                   ),
                 ),
               ),
@@ -150,7 +150,7 @@ class _BpmControls extends StatelessWidget {
                 '$bpm',
                 style: AppTypography.headingMedium.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                 ),
               ),
               Text(
@@ -175,7 +175,7 @@ class _BpmControls extends StatelessWidget {
             timeSignature,
             style: AppTypography.headingMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
           ),
         ],
@@ -202,8 +202,8 @@ class _SmallButton extends StatelessWidget {
         icon: Icon(icon, size: 16),
         onPressed: onPressed,
         style: IconButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccentSoft,
+          foregroundColor: AppColors.paperAccent,
           padding: EdgeInsets.zero,
         ),
       ),
@@ -232,7 +232,7 @@ class _PlayPauseButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         style: IconButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.paperAccent,
           foregroundColor: Colors.white,
         ),
       ),

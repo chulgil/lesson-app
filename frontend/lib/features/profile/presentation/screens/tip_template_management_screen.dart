@@ -212,7 +212,7 @@ class _TipTemplateManagementScreenState
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusSmall,
                         ),
@@ -220,7 +220,7 @@ class _TipTemplateManagementScreenState
                       child: Text(
                         template.category.label,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

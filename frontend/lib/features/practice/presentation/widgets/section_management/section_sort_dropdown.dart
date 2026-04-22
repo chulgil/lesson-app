@@ -43,7 +43,7 @@ class SectionSortDropdown extends ConsumerWidget {
                     _getIcon(type),
                     size: 16,
                     color: currentSort == type
-                        ? AppColors.primary
+                        ? AppColors.paperAccent
                         : AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
@@ -51,7 +51,7 @@ class SectionSortDropdown extends ConsumerWidget {
                     type.displayName,
                     style: TextStyle(
                       color: currentSort == type
-                          ? AppColors.primary
+                          ? AppColors.paperAccent
                           : AppColors.ink,
                       fontWeight: currentSort == type
                           ? FontWeight.w600

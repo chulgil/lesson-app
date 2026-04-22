@@ -149,7 +149,7 @@ class _TeacherSearchFilterSheetState
                             );
                           });
                         },
-                        activeThumbColor: AppColors.primary,
+                        activeThumbColor: AppColors.paperAccent,
                       ),
                     ],
                   ),
@@ -188,7 +188,7 @@ class _TeacherSearchFilterSheetState
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.paperAccent,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -237,8 +237,8 @@ class _TeacherSearchFilterSheetState
                 }
                 onChanged(newList);
               },
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              checkmarkColor: AppColors.primary,
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              checkmarkColor: AppColors.paperAccent,
             );
           }).toList(),
     );
@@ -275,8 +275,8 @@ class _TeacherSearchFilterSheetState
                   );
                 });
               },
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              checkmarkColor: AppColors.primary,
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              checkmarkColor: AppColors.paperAccent,
             );
           }).toList(),
     );
@@ -299,7 +299,7 @@ class _TeacherSearchFilterSheetState
               _filter = _filter.copyWith(minExperience: options[index]);
             });
           },
-          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+          selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
         );
       }),
     );

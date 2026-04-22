@@ -120,18 +120,18 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppColors.primary),
+                Icon(Icons.info_outline, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Text(
                     '$targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),
@@ -193,7 +193,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             backgroundColor: Colors.white,
             eyeStyle: QrEyeStyle(
               eyeShape: QrEyeShape.square,
-              color: AppColors.primary,
+              color: AppColors.paperAccent,
             ),
             dataModuleStyle: QrDataModuleStyle(
               dataModuleShape: QrDataModuleShape.square,
@@ -244,7 +244,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 onPressed: () => _copyCode(invite.inviteCode),
                 icon: const Icon(Icons.copy),
                 tooltip: '코드 복사',
-                color: AppColors.primary,
+                color: AppColors.paperAccent,
               ),
             ],
           ),
@@ -270,7 +270,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             icon: const Icon(Icons.share),
             label: const Text('링크 공유하기'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.paperAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
@@ -288,8 +288,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 icon: const Icon(Icons.link),
                 label: const Text('링크 복사'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: BorderSide(color: AppColors.primary),
+                  foregroundColor: AppColors.paperAccent,
+                  side: BorderSide(color: AppColors.paperAccent),
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space3,
                   ),
@@ -393,10 +393,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             leading: Container(
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              child: Icon(Icons.search, color: AppColors.primary),
+              child: Icon(Icons.search, color: AppColors.paperAccent),
             ),
             title: const Text('선생님 검색'),
             subtitle: const Text('앱에서 선생님 찾기'),

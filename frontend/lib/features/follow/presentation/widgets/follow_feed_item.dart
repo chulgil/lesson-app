@@ -30,13 +30,13 @@ class FollowFeedItem extends StatelessWidget {
               // Author avatar placeholder
               CircleAvatar(
                 radius: 18,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                 child: Text(
                   post.authorName.isNotEmpty
                       ? post.authorName[0]
                       : '?',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -72,7 +72,7 @@ class FollowFeedItem extends StatelessWidget {
               Text(
                 post.typeLabel,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
