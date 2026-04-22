@@ -1436,6 +1436,35 @@ Text(
 
 ---
 
+### 7.45 과제 대시보드·선생님 시간표·레퍼토리 상세 섹션 제목 Playfair 통일
+
+**배경**: §7.42/§7.43 이후 §7.17(카드·페이지 섹션 제목) 잔여를 정리하는 첫 배치. 과제 대시보드의 bar+title+count 섹션 헤더, 선생님 시간표의 `_buildSectionHeader` 공용 헬퍼, 레퍼토리 상세의 "연습 통계"/"섹션 목록" 두 정적 제목이 여전히 `AppTypography.headingSmall`(Noto Sans) 로 남아 있었다. 세 진입점을 동시에 `NotebookTypography.sectionTitle` (Playfair 17/w600) 로 수렴.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 패턴 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/home/presentation/screens/assignment_dashboard_screen.dart` | 295 | `_buildSectionHeader(title, count, color)` title | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/schedule/presentation/screens/teacher_availability_screen.dart` | 148 | `_buildSectionHeader({title, subtitle, helpText})` title | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/practice/presentation/screens/repertoire_detail_screen.dart` | 152 | "연습 통계" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+| `frontend/lib/features/practice/presentation/screens/repertoire_detail_screen.dart` | 246 | "섹션 목록" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 |
+
+**설계 포인트**:
+- **헬퍼 함수 일괄 반영**: `_buildSectionHeader` 는 호출부에서 여러 섹션 제목에 공유되는 전형적 헬퍼 구조다. 헬퍼 내부 한 곳을 바꾸면 호출처 N 개 제목이 동시에 Playfair 로 승격되므로 — 공통 수정으로 일괄 반영되는 전형 사례. 이 때문에 동일 파일 내 "몇 개 섹션인지" 보다 "몇 개의 헬퍼인지" 가 중요.
+- **동적 title 파라미터여도 §7.17 가능한 이유**: 호출부가 정적 문자열 리터럴을 넘긴다는 전제(grep 으로 확인) 하에, 헬퍼 내부에서 `title` 매개변수는 여전히 "정적 섹션 라벨" 의 역할을 한다. §7.30 (pieceTitle, 고유명사) 와의 구분점은 여기.
+- **bar+title+count 구성도 §7.17**: `assignment_dashboard_screen` 은 왼쪽 컬러 bar + 제목 + count 의 복합 헤더지만, 제목 자체는 정적 섹션 라벨이므로 Playfair 적용. count(동적 숫자) 는 그대로 `AppTypography.bodySmall` 유지.
+- **formatter 자동 정리**: `repertoire_detail_screen.dart` 에서 import 추가 후 PostToolUse 포매터가 인접한 `Icon(chevron_right)`·`Icon(drag_handle)` 두 위젯을 다중 라인 → 단일 라인으로 축약했다. 의미 변경 없음을 diff 로 확인.
+- **§7.44 와의 파일 공교로움**: 평행 세션의 §7.44 (FilledButton paperAccent inline override cleanup) 가 `teacher_availability_screen.dart` 를 이미 한 번 touch 했지만, 대상 영역(화면 하단 "삭제" FilledButton)과 본 배치의 대상 영역(섹션 헤더 helper)이 겹치지 않아 순차 머지가 깔끔했다. 커밋 전 `git diff --cached --stat` 으로 스코프 확인 완료.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (4.2s)
+- `flutter test test/` → 392/392 passed
+- Lore commit: `149a614d`
+
+**은유**: 공연 프로그램북의 장별 제목 — "1악장", "2악장", "3악장" — 은 한 번만 활자 선택을 바꾸면 모든 악장이 동시에 새 활자로 찍힌다. 프로그램북의 템플릿을 고친 것이지 각 장을 하나씩 고친 것이 아니다. 오늘은 `_buildSectionHeader` 라는 세 개의 템플릿을 Playfair 로 바꾸니, 그 밑에 매달린 과제 대시보드·시간표 설정·레퍼토리 통계가 모두 같은 손글씨로 일어선다. 공통의 위력.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
