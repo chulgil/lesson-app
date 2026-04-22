@@ -1497,6 +1497,43 @@ Text(
 
 ---
 
+### 7.47 Material `Colors.grey` 잔존 3건 → Notebook `ink` 토큰 치환
+
+**배경**: §7.46 에서 다크 테마 TextButton 폴백 경로를 막은 뒤, 다른 팔레트 누수 경로도 전수 탐색했다. `Theme.of(context).colorScheme.primary` 참조는 0건, `Theme.of(context).primaryColor` 역시 0건 (`colorScheme.surface` 7건은 light/dark 양쪽에서 명시적으로 매핑돼 있어 안전). 단 **Material `Colors.grey[300/600]` 직접 호출이 3개 파일에 남아있었다**. UI 토큰 경계를 벗어난 회색은 light/dark 전환 시 명도 대비가 따로 논다. 회색 농도별로 대응하는 Notebook `ink*` 토큰으로 치환.
+
+**치환 매핑**:
+
+| 원본 | 회색 농도 (대략) | Notebook 토큰 | alpha |
+|------|------------------|----------------|-------|
+| `Colors.grey[600]` | 50% | `AppColors.inkSecondary` | 75% ink (검은 잉크를 종이 위에 75% 불투명도로 찍은 색) |
+| `Colors.grey[300]` | 20% | `AppColors.inkQuaternary` | 25% ink |
+
+**변경 파일 (3건)**:
+
+| 파일 | 사용처 | 매핑 |
+|------|--------|------|
+| `frontend/lib/features/lessons/presentation/widgets/ai_notes_result_sheet.dart` | BottomSheetHandle (시트 상단 드래그 손잡이) | `grey[300]` → `inkQuaternary` |
+| `frontend/lib/features/students/presentation/widgets/student_detail/location_summary_card.dart` | 주소 보조 텍스트 | `grey[600]` → `inkSecondary` |
+| `frontend/lib/features/students/presentation/widgets/student_detail/travel_analytics_card.dart` | 월간 이동 통계 stat 라벨 | `grey[600]` → `inkSecondary` |
+
+**제외 대상**:
+- `tuner_cat_painters.dart` 의 `Colors.yellow`/`Colors.white`/`Colors.transparent` — 튜너 고양이 일러스트 아트. CustomPainter 로 그려지는 캐릭터 beam 인 만큼 Notebook UI 토큰 체계 밖. §7.30 의 "사용자 생성 고유명사" 처럼 "의도적 비-UI 원색" 으로 분류.
+- `Colors.transparent`·`Colors.white`·`Colors.black` — semantic primitive. Notebook 토큰화 대상 아님 (검은 잉크는 `ink`, 종이 흰색은 `paper`로 분기해 이미 토큰화돼 있으며, 진짜 Colors.white/black/transparent 가 필요한 구간은 별개).
+
+**설계 포인트**:
+- **"회색 농도 → alpha-over-ink" 치환 규칙**: Notebook 은 회색을 독립 색상이 아닌 "검은 잉크를 종이 위에 옅게 찍은 것" 으로 모델링한다. 회색 자체를 토큰화하지 않고 `inkSecondary`(75%)·`inkTertiary`(55%)·`inkQuaternary`(25%) 네 단계로 alpha 를 조절한다. 이 구조 덕분에 light(종이 위 잉크) ↔ dark(어둠 위 빛) 전환 시 대비 공식이 자동으로 뒤집힌다.
+- **grep pattern 의 정확성**: 단순 `grep "Colors\."` 는 `InstrumentColors`·`SubscriptionStatusColors`·`baseColors` 등 "Colors" 를 포함한 도메인 객체를 모두 잡아낸다. `grep -E "(^|[^A-Za-z])Colors\."` 로 단어 경계를 지정하면 Material `Colors.X` 만 정확히 추출된다. 이후 감사에서도 이 패턴을 재사용한다.
+- **`AppColors` import 선존재 확인**: 3개 파일 모두 이미 `app_colors.dart` 를 import 중이었다 — 수정은 "새 import 추가 없이 라인 1개씩 3건" 으로 끝난 가장 저위험 cleanup.
+
+**검증**:
+- `flutter analyze lib/` → No issues found (19.2s)
+- `flutter test` → 392/392 passed
+- Lore commit: `31c2ba86`
+
+**은유**: 서재의 모든 연필이 "2B" 라는 표준 흑심을 공유하는 서재에서, 어느 구석에서 정체 불명의 마커 두 자루가 발견됐다. 색은 비슷한 회색이지만 심은 다른 공장에서 왔고 — 같은 종이 위에 나란히 그으면 명도 위계가 미묘하게 어긋난다. 오늘 세 자루를 2B 연필의 옅은 획(25%·75% 필압)으로 바꿨다. 새로 산 것이 아니라 원래 서재가 써오던 두께를 정확히 매칭한 것 — 독자의 눈은 차이를 느끼지 못하지만, 서재의 물성은 이제 단 하나의 흑심으로 통일된다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
