@@ -1756,6 +1756,38 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 ---
 
+### 7.54 schedule/ 위젯 수강료·예약 확정 다이얼로그·도전 과제 카드 제목 Playfair 통일 — schedule/ 배치 #3 + 다이얼로그 테마 상속 패턴
+
+**배경**: §7.51·§7.52 로 schedule/ 도메인 선생님/학생 주요 화면을 정리한 뒤, 세 번째 배치는 schedule/ **위젯 레이어** + gamification/ 1건으로 확장. schedule/widgets/ 9개 파일을 전수 스캔해 eligible 2건만 추출. 나머지 7건은 §7.30 exclusion (아바타 이니셜 5 + 동적 이름 2 + 동적 시간 1 + 동적 날짜+라벨 1 + 가격 1). 동일 배치에 **AlertDialog 테마 상속 전환 패턴** 이 처음 등장 — dialogTheme.titleTextStyle 이 §7.53 이전에 이미 Playfair dialogTitle 로 등록돼 있었던 점을 활용.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 이전 스타일 | 이후 스타일 | 패턴 |
+|------|------|------|-------------|-------------|------|
+| `frontend/lib/features/schedule/presentation/widgets/regular_lesson_widgets.dart` | 656 | "월 수강료" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 direct |
+| `frontend/lib/features/schedule/presentation/widgets/availability/booking_confirm_dialog.dart` | 68 | AlertDialog title (ternary "레슨 시간을 변경하시겠습니까?" / "예약을 확정하시겠습니까?") | `AppTypography.headingSmall.copyWith(fontWeight: w600)` | (style 제거 → dialogTheme 상속) | §7.41 cleanup |
+| `frontend/lib/features/gamification/presentation/widgets/challenges_card.dart` | 51 | "도전 과제" | `AppTypography.headingSmall` | `NotebookTypography.sectionTitle` | §7.17 direct |
+
+**설계 포인트**:
+- **AlertDialog 테마 상속 전환 패턴**: `app_theme.dart:60` 의 `dialogTheme.titleTextStyle: NotebookTypography.dialogTitle` 이 이미 등록돼 있으므로, AlertDialog 의 `title: Text(..., style: X)` 형태에서 `style:` 인자를 제거하면 **자동으로 `dialogTitle`(Playfair 19/w700) 상속**. 기존 인라인 override 는 `AppTypography.headingSmall.copyWith(fontWeight: w600)` 였으므로, 제거 후 weight 가 w600→w700 로 올라감. 이는 Notebook dialogTitle 표준과 일치하는 승격. **향후 AlertDialog/Dialog 호출부는 style 인라인 override 를 모두 정리하는 것이 원칙**.
+- **§7.41 cleanup 패턴과의 구조적 유사성**: §7.41 은 FloatingActionButton 인라인 override 를 `floatingActionButtonTheme` 으로 흡수, 이번은 AlertDialog 인라인 override 를 `dialogTheme.titleTextStyle` 로 흡수. 컴포넌트가 전역 테마를 갖는 경우 인라인 override 제거가 "stylistic diff 최소화 + 테마 일관성 보장" 의 최적 경로임을 재확인.
+- **§7.30 제외 roster — schedule/ 위젯의 아바타 이니셜 군집**: 이번 스캔에서 §7.30 "avatar initials" 카테고리가 schedule/widgets/ 에 집중돼 있음이 드러남. 5 파일 5건:
+  - `request_profile_card:120` (`name[0]`)
+  - `teacher_approval_card:164,412` (`booking.studentName[0]` 2건)
+  - `booking_card:70` (`booking.studentName[0]`)
+  - `regular_lesson_widgets:47` (`studentName[0]`)
+
+  이들은 원 모양 컨테이너(CircleAvatar) 안의 단일 문자 + 색 배경 + 화이트 텍스트 조합 — "사용자 생성 고유명사의 시각적 요약" 이라 §7.30 pieceTitle 과 판정 기준이 다르다. Sans-serif 로 유지해야 CircleAvatar 의 동그라미 안에서 글자 중심이 시각적으로 맞음(serif 의 세리프 꼬리는 원형 컨테이너에서 중심이탈 유발).
+- **§7.30 제외 roster — gamification/ 의 level-title 토큰**: `badge_collection_screen:103` 은 `data.levelTitle` (예: "브론즈 견습생", "실버 연습생") 을 표시. 사용자 등급에 따라 문자열이 동적으로 바뀌는 **게이미피케이션 레벨 토큰** 이므로 §7.30 의 "level-title tokens" 범주. 동적 값이고 해당 화면의 핵심 "자랑 포인트" 라 Inter sans-serif 로 유지해 주목도를 확보.
+
+**검증**:
+- `flutter analyze` 3 files → No issues found (3.7s)
+- Lore commit: `322a5486`
+
+**은유**: 세 곳의 오래된 일기장에서 각자 다른 활자로 새긴 소제목 몇 줄을 찾아냈다. 한 장부의 "월 수강료" 는 카드 안에 숨은 정적 제목, 다른 장부의 "예약 확정" 은 다이얼로그의 외침, 세 번째 장부의 "도전 과제" 는 아이들이 매일 보는 도감의 장 제목. 셋 다 Playfair 로 옮겼지만 한 가지가 특별하다 — "예약 확정" 은 자기 활자를 고집하던 위치에서 **활자를 아예 빼버렸다**. 장부의 기본 표준(dialogTheme) 이 이미 Playfair 로 정해져 있으니, 굳이 각자 고를 필요가 없다. 빈 자리가 오히려 표준을 드러낸다. 장부 관리자는 이제 소제목 폰트를 일일이 지정하지 않는다 — 장부 전체의 약속이 이미 그 일을 한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
