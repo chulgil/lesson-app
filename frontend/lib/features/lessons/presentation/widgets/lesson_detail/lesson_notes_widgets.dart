@@ -284,8 +284,9 @@ class TeacherFeedbackCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            // Notebook × Score: 레슨 상세 피드백 본문도 선생님 손글씨 주석(Gaegu)으로 렌더.
             lesson.feedback!,
-            style: AppTypography.bodyMedium.copyWith(height: 1.6),
+            style: NotebookTypography.hand,
           ),
           if (lesson.updatedAt != null) ...[
             const SizedBox(height: AppSpacing.space3),
