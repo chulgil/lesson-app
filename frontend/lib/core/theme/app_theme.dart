@@ -209,6 +209,26 @@ class AppTheme {
         ),
       ),
 
+      // Chip — Notebook × Score: FilterChip/ChoiceChip/ActionChip 의 선택 상태를 Vermillion 으로 통일.
+      // Material blue 선택색 제거. 개별 호출부가 selectedColor/backgroundColor 를 override 하지 않은 경우의 기본값.
+      // elevation 0 으로 Notebook flat 원칙 유지, checkmark 는 Vermillion.
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.paperDark,
+        selectedColor: AppColors.paperAccentSoft,
+        disabledColor: AppColors.inkQuaternary,
+        secondarySelectedColor: AppColors.paperAccentSoft,
+        labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+        secondaryLabelStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.paperAccent,
+          fontWeight: FontWeight.w600,
+        ),
+        checkmarkColor: AppColors.paperAccent,
+        elevation: 0,
+        pressElevation: 0,
+        side: const BorderSide(color: AppColors.inkQuaternary, width: 1),
+        brightness: Brightness.light,
+      ),
+
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.ink,
@@ -585,6 +605,27 @@ class AppTheme {
           color: AppColors.textPrimaryDark,
           fontWeight: FontWeight.w600,
         ),
+      ),
+
+      // Chip — Notebook × Score: dark 테마의 FilterChip/ChoiceChip/ActionChip 기본 외형.
+      // 배경은 surfaceDark, 선택색은 paperAccentSoft 유지 (light 와 동일 Vermillion 레이어).
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        selectedColor: AppColors.paperAccentSoft,
+        disabledColor: AppColors.borderDark,
+        secondarySelectedColor: AppColors.paperAccentSoft,
+        labelStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.textPrimaryDark,
+        ),
+        secondaryLabelStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.paperAccent,
+          fontWeight: FontWeight.w600,
+        ),
+        checkmarkColor: AppColors.paperAccent,
+        elevation: 0,
+        pressElevation: 0,
+        side: const BorderSide(color: AppColors.borderDark, width: 1),
+        brightness: Brightness.dark,
       ),
 
       // Progress Indicator
