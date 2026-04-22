@@ -539,6 +539,22 @@ Text(
 - PencilCircle: 선택 상태 = 연필로 그은 동그라미
 - PencilBox: 완료 체크 = 손으로 그린 사각 체크박스 (paperOk = 녹색 펜)
 
+### 7.12 Gaegu 손글씨 확장 — 선생님 피드백 렌더 경로
+
+**배경**: 4대 시그니처 중 Gaegu 사용처가 실제 렌더 기준 4곳(TimeContextBanner, EmptyStateWidget, GettingStartedCard, login_screen) 에 머물러 가장 약했음. 학생이 매일 보는 "선생님 피드백"은 "손글씨 주석" 은유와 가장 자연스럽게 부합하는 지점.
+
+| 위젯 | 적용 파일 | 변경 | 커밋 |
+|------|-----------|------|------|
+| Gaegu 본문 | `features/student_home/presentation/widgets/dashboard/teacher_feedback_section.dart` | 대시보드 피드백 본문을 `AppTypography.bodyMedium` → `NotebookTypography.hand` + `paperPencil` | 5573fb4b |
+| Gaegu 프리뷰 | `features/student_home/presentation/widgets/student_lesson_card.dart` | 레슨 리스트 피드백 2줄 프리뷰를 `AppTypography.bodySmall` → `NotebookTypography.hand.copyWith(fontSize: 13, height: 1.3)` | 5573fb4b |
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+- 기능·Provider 변경 없음 (렌더 스타일만)
+
+**은유**: 선생님이 레슨 노트 여백에 손으로 적어준 코멘트 = Gaegu 손글씨.
+
 ---
 
 ## 8. 구현 원칙
