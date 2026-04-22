@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -49,9 +50,10 @@ class StudentGettingStartedCard extends ConsumerWidget {
             children: [
               Icon(Icons.rocket_launch_rounded, color: AppColors.ink, size: 24),
               const SizedBox(width: AppSpacing.space2),
+              // Notebook × Score: 카드 내부 섹션 제목도 Playfair sectionTitle 로 통일 (§7.17 패턴).
               Text(
                 '시작 가이드',
-                style: AppTypography.headingSmall.copyWith(
+                style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.ink,
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
 
@@ -15,10 +16,7 @@ import '../providers/teaching_resource_providers.dart';
 class AddRecordingResourceSheet extends ConsumerStatefulWidget {
   final void Function(TeachingResource resource)? onResourceCreated;
 
-  const AddRecordingResourceSheet({
-    super.key,
-    this.onResourceCreated,
-  });
+  const AddRecordingResourceSheet({super.key, this.onResourceCreated});
 
   @override
   ConsumerState<AddRecordingResourceSheet> createState() =>
@@ -56,11 +54,11 @@ class _AddRecordingResourceSheetState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
+            // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('시범 연주 녹음 추가',
-                    style: AppTypography.headingSmall),
+                Text('시범 연주 녹음 추가', style: NotebookTypography.appBarTitle),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -77,12 +75,12 @@ class _AddRecordingResourceSheetState
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
                   color: AppColors.paperDark,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusLarge),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(
-                    color: _selectedFilePath != null
-                        ? AppColors.paperAccent
-                        : AppColors.inkQuaternary,
+                    color:
+                        _selectedFilePath != null
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                     width: _selectedFilePath != null ? 2 : 1,
                   ),
                 ),
@@ -93,17 +91,19 @@ class _AddRecordingResourceSheetState
                           ? Icons.audiotrack
                           : Icons.mic_outlined,
                       size: 48,
-                      color: _selectedFilePath != null
-                          ? AppColors.paperAccent
-                          : AppColors.inkTertiary,
+                      color:
+                          _selectedFilePath != null
+                              ? AppColors.paperAccent
+                              : AppColors.inkTertiary,
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       _selectedFileName ?? '탭하여 오디오 파일 선택',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: _selectedFilePath != null
-                            ? AppColors.ink
-                            : AppColors.inkSecondary,
+                        color:
+                            _selectedFilePath != null
+                                ? AppColors.ink
+                                : AppColors.inkSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -148,16 +148,17 @@ class _AddRecordingResourceSheetState
               width: double.infinity,
               child: FilledButton(
                 onPressed: _canSubmit ? _submit : null,
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('추가'),
+                child:
+                    _isSubmitting
+                        ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Text('추가'),
               ),
             ),
           ],
@@ -182,16 +183,18 @@ class _AddRecordingResourceSheetState
           _selectedFilePath = result.path;
           _selectedFileName = result.name;
           if (_titleController.text.isEmpty) {
-            _titleController.text =
-                result.name.replaceAll(RegExp(r'\.[^.]+$'), '');
+            _titleController.text = result.name.replaceAll(
+              RegExp(r'\.[^.]+$'),
+              '',
+            );
           }
         });
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('파일을 선택할 수 없습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('파일을 선택할 수 없습니다')));
       }
     }
   }
@@ -207,9 +210,10 @@ class _AddRecordingResourceSheetState
           .createResource(
             type: TeachingResourceType.teacherRecording,
             title: _titleController.text.trim(),
-            description: _memoController.text.trim().isNotEmpty
-                ? _memoController.text.trim()
-                : null,
+            description:
+                _memoController.text.trim().isNotEmpty
+                    ? _memoController.text.trim()
+                    : null,
             audioUrl: _selectedFilePath,
           );
 
@@ -219,9 +223,9 @@ class _AddRecordingResourceSheetState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('녹음 추가에 실패했습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음 추가에 실패했습니다')));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

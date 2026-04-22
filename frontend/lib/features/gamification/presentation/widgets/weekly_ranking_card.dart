@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/weekly_ranking.dart';
 import '../providers/leaderboard_provider.dart';
 
@@ -14,10 +15,7 @@ import '../providers/leaderboard_provider.dart';
 class WeeklyRankingCard extends ConsumerWidget {
   final String classId;
 
-  const WeeklyRankingCard({
-    super.key,
-    required this.classId,
-  });
+  const WeeklyRankingCard({super.key, required this.classId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,18 +49,17 @@ class _RankingContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 주간 랭킹 카드 제목도 Playfair sectionTitle 로 통일 (§7.17 패턴).
           Text(
             AppStrings.weeklyRanking,
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
           ...ranking.entries.map(
-            (entry) => _RankingEntryRow(
-              entry: entry,
-              maxPoints: ranking.maxPoints,
-            ),
+            (entry) =>
+                _RankingEntryRow(entry: entry, maxPoints: ranking.maxPoints),
           ),
         ],
       ),
@@ -74,10 +71,7 @@ class _RankingEntryRow extends StatelessWidget {
   final WeeklyRankingEntry entry;
   final int maxPoints;
 
-  const _RankingEntryRow({
-    required this.entry,
-    required this.maxPoints,
-  });
+  const _RankingEntryRow({required this.entry, required this.maxPoints});
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +139,7 @@ class _ProgressBar extends StatelessWidget {
   final double value;
   final RankingTier tier;
 
-  const _ProgressBar({
-    required this.value,
-    required this.tier,
-  });
+  const _ProgressBar({required this.value, required this.tier});
 
   @override
   Widget build(BuildContext context) {
