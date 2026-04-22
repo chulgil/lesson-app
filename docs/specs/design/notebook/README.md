@@ -952,6 +952,36 @@ Text(
 
 ---
 
+### 7.31 Chip 테마 통일 — FilterChip/ChoiceChip 선택 상태를 Vermillion 으로 단일 진원지 수렴
+
+**배경**: `FilterChip`/`ChoiceChip`/`ActionChip`/`InputChip` 은 앱 전체 **174 발생 / 70 파일** 로 4대 시그니처 다음가는 밀도(연습 목표 설정, 튜너 설정, 선생님 검색 필터, 수강권 발급 폼, 가용 시간대 선택 등). §7.28 Slider 와 같이 Material blue 가 기본값으로 흘러나오던 컴포넌트이며, 20 여 개의 호출부는 이미 `selectedColor: paperAccent.withAlpha(30)` 또는 `paperAccent.withValues(alpha: 0.15)` 로 개별 override 중이었으나, **override 없는 칩은 여전히 Material blue 선택색을 드러냈다**. §7.18 Switch · §7.26 Radio · §7.28 Slider 로 이어진 "선택형 입력 = Vermillion" 원칙을 칩까지 확장.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `frontend/lib/core/theme/app_theme.dart` | light/dark `ThemeData` 에 `chipTheme: ChipThemeData` 추가. `backgroundColor` · `selectedColor` · `checkmarkColor` · `labelStyle` · `secondaryLabelStyle` · `side` · `elevation`/`pressElevation` 지정 | 3e99ce13 |
+
+**영향 범위**: 칩을 쓰는 70 파일 중 명시적 override 가 없는 호출부(예: `tuner_settings_sheet` 의 상세 필터, `profile_setup_screen` 악기 칩, `add_section_widgets` 난이도 칩, `regular_lesson_widgets` 요일 칩 일부) 의 **미선택 배경 + 선택 배경 + 체크마크 + 라벨 색** 이 Notebook 팔레트로 자동 치환.
+
+**설계 포인트**:
+- `backgroundColor` 는 `paperDark` (light) / `surfaceDark` (dark) — 칩이 카드·시트 위에서 살짝 들려 보이는 두 번째 paper 톤.
+- `selectedColor` 는 `paperAccentSoft` (12% Vermillion) — 기존 호출부가 손으로 맞추던 `paperAccent.withAlpha(30)` (≈12%) 와 동일 레이어. 이제 이 값을 테마에서 한 번만 정의하면 새 칩은 자동으로 같은 선택색을 얻는다.
+- `secondaryLabelStyle` 을 `paperAccent / w600` 으로 지정 → `showCheckmark: true` 와 `secondaryLabelStyle` 을 함께 쓰는 칩에서 선택된 라벨이 잉크색 대신 Vermillion 으로 떠오른다. 기본 `labelStyle` 은 `ink` 유지하여 비선택 칩은 차분한 본문 톤.
+- `elevation`/`pressElevation` 을 0 으로 지정해 Notebook flat 원칙 고수 — 기본 Material 칩의 탭 순간 그림자 팝업 제거.
+- `side` 를 `inkQuaternary / borderDark` 1px 로 명시 — 칩이 paper 배경과 구분되어 "클릭 가능한 영역" 이 명확해짐. 개별 호출부가 `BorderSide(color: paperAccent)` 로 선택 테두리를 override 하는 경우 여전히 override 가 우선.
+- `shape` 는 설정하지 않음 — 기존 `RoundedRectangleBorder(radiusMedium)` override 와 `StadiumBorder` 기본 양쪽을 방해하지 않기 위함.
+
+**호환성**:
+- 명시적 `selectedColor: paperAccent` (단색, 예: `trial_lesson_info_section`, `issue_subscription_screen`, `regular_lesson_widgets` 일부) 는 테마를 덮어 그대로 단색 Vermillion 으로 유지 — 강조형 칩은 계속 강조.
+- 명시적 `selectedColor: paperAccent.withValues(alpha: 0.15~0.2)` 는 테마의 12% 와 거의 같은 값이라 시각 차이 미미 — 점진적으로 override 를 제거해 테마로 수렴시킬 수 있음 (후속 정리 여지 기록).
+
+**검증**:
+- `flutter analyze` → `No issues found!` (14.1s)
+- `flutter test` → 392/392 passed (5s)
+
+**은유**: 악보에 붙이는 포스트잇(칩) 의 색을 팀마다 다르게 고르던 연주자들에게, 이제 한 지휘자(테마) 가 "선택한 포스트잇은 항상 주홍" 이라는 단 한 문장만 내리면 된다. 여전히 어느 악장이 파란 포스트잇을 고집하고 싶다면 그 악장 안에서만 override 할 수 있지만, 공백 상태의 포스트잇은 자동으로 올바른 색을 가진다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
