@@ -816,6 +816,28 @@ Text(
 
 **은유**: 악보집에 끼워진 달력·시계표도 Playfair 악보와 같은 잉크·같은 테두리로 인쇄된 느낌. Material 기본 blue 는 "공장에서 찍어낸 캘린더 스티커", Vermillion + 2px ink 는 "편집자가 손으로 표시한 달력" 의 차이. 앱의 모든 "시간 선택" 순간이 Notebook 카드 외곽선 규칙과 동일한 시각 언어로 통일.
 
+### 7.25 분석 대시보드 섹션 헤더도 sectionTitle 로 확장
+
+**배경**: §7.22 까지 레슨·학생·폼·프로필·정기레슨·학부모 홈 섹션 헤더를 Playfair sectionTitle 로 통일했으나, 교사 분석 대시보드(`teacher_dashboard_screen` + 2개 차트·랭킹 위젯) 의 섹션 헤더 4곳은 여전히 `AppTypography.headingSmall` (Noto Sans) 상태. 대시보드는 교사가 월 1회+ 진입하는 회고 플로우라 섹션 제목의 톤이 "리포트·회고 감각" 을 크게 좌우.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/analytics/presentation/screens/teacher_dashboard_screen.dart` | "수익 현황", "학생 현황" 2곳 | b96874bc |
+| `features/analytics/presentation/widgets/monthly_trend_chart.dart` | "레슨 추이" 1곳 | b96874bc |
+| `features/analytics/presentation/widgets/practice_ranking_list.dart` | "연습률 TOP 5" 1곳 | b96874bc |
+
+**적용 범위** (총 4곳):
+- 교사 대시보드 상단 섹션 2개 (수익/학생)
+- 중간 차트 카드 섹션 제목 1개
+- 하단 랭킹 리스트 섹션 제목 1개
+- 카드 내부 본문·숫자(`headingLarge`, `bodyMedium`) 는 그대로 유지하여 "섹션 제목만 악보, 본문은 Noto" 구분 유지
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 교사가 한 달을 돌아볼 때 대시보드가 "악보집 끝에 붙은 월간 리포트" 처럼 느껴지도록. Playfair 로 찍은 "수익 현황 · 학생 현황 · 레슨 추이 · 연습률 TOP 5" 는 악보집 마지막 장 "이번 달 공연 결산" 섹션 제목 감각 — 숫자 본문은 여전히 읽기 편한 Noto Sans 로 남겨 가독성 희생 없이 몰입감만 강화.
+
 ---
 
 ## 8. 구현 원칙
