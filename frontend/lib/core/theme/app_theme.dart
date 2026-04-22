@@ -50,6 +50,25 @@ class AppTheme {
         titleTextStyle: NotebookTypography.dialogTitle,
       ),
 
+      // BottomSheet — Notebook × Score: 앱 전반 showModalBottomSheet 호출부에 paper 표면과 flat elevation 을 단일 지점으로 보급.
+      // 기존 호출부 다수는 backgroundColor: Colors.transparent 로 sheet 내부 컨테이너가 배경을 그리는 패턴(오버라이드 유지).
+      // 오버라이드 없는 호출부는 Material 기본 흰 배경이 노출돼 Notebook 질감이 끊겼는데, 테마 기본값을 paper 로 올려 승격.
+      // surfaceTintColor: transparent 로 M3 tint 제거, elevation 0 으로 flat Notebook 유지.
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: AppColors.paper,
+        modalBackgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
+        modalBarrierColor: Colors.black54,
+        elevation: 0,
+        modalElevation: 0,
+        dragHandleColor: AppColors.inkQuaternary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.radiusLarge),
+          ),
+        ),
+      ),
+
       // Card
       cardTheme: CardThemeData(
         elevation: 0,
@@ -478,6 +497,24 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         titleTextStyle: NotebookTypography.dialogTitle.copyWith(
           color: AppColors.textPrimaryDark,
+        ),
+      ),
+
+      // BottomSheet — Notebook × Score: dark 테마의 modal 시트는 surfaceDark 를 paper 대체로 사용.
+      // drag handle 은 borderDark — dark 표면 위에서 inkQuaternary 보다 가독성 확보.
+      // modalBarrierColor 는 black87 로 dark 환경 강조 (light 는 black54).
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        modalBackgroundColor: AppColors.surfaceDark,
+        surfaceTintColor: Colors.transparent,
+        modalBarrierColor: Colors.black87,
+        elevation: 0,
+        modalElevation: 0,
+        dragHandleColor: AppColors.borderDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.radiusLarge),
+          ),
         ),
       ),
 
