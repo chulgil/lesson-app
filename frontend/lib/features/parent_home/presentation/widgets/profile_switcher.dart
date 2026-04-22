@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
@@ -261,9 +262,7 @@ class _ProfileDropdown extends ConsumerWidget {
                         child: Text(
                           option.badge!,
                           style: AppTypography.captionSmall.copyWith(
-                            color:
-                                option.badgeColor ??
-                                AppColors.inkSecondary,
+                            color: option.badgeColor ?? AppColors.inkSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -573,7 +572,12 @@ class _ProfileTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (isSelected) Icon(Icons.check_circle, color: color, size: 24),
+            // Notebook × Score: 선택된 프로필에 연필로 동그라미.
+            if (isSelected)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: PencilCircle(size: 20, color: color),
+              ),
           ],
         ),
       ),
