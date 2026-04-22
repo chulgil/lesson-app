@@ -336,6 +336,15 @@ class AppTheme {
       iconTheme: const IconThemeData(color: AppColors.ink, size: 24),
       primaryIconTheme: const IconThemeData(color: AppColors.ink),
 
+      // IconButton — Notebook × Score: 전역 IconButton 기본 foreground 를 `ink` 로 승격.
+      // colorScheme 에 `onSurfaceVariant` 를 지정하지 않아 M3 기본값(회색 슬레이트) 이 적용되던 문제를 해소.
+      // 175 IconButton(+ .filled/.outlined/.styleFrom 변형) 중 21개 인라인 `icon: Icon(..., color: ...)`
+      // 오버라이드는 Flutter 속성 우선순위로 유지 — 나머지 호출부가 ink 기본값으로 자동 승격.
+      // appBarTheme.foregroundColor == ink 와 일치시켜 AppBar actions 내부 IconButton 의 색상 일관성 확보.
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(foregroundColor: AppColors.ink),
+      ),
+
       // ListTile — Notebook × Score: icon/text 기본색 `ink`, 선택 상태는 Vermillion.
       // 36 파일 ListTile/RadioListTile/SwitchListTile 에 일괄 적용.
       listTileTheme: const ListTileThemeData(
@@ -777,6 +786,13 @@ class AppTheme {
       // Icon — Notebook × Score: dark 에서는 아이콘 기본색 paper.
       iconTheme: const IconThemeData(color: AppColors.paper, size: 24),
       primaryIconTheme: const IconThemeData(color: AppColors.paper),
+
+      // IconButton — Notebook × Score: dark 에서도 동일 설계 — IconButton foreground 를 textPrimaryDark 로 승격.
+      // appBarTheme.foregroundColor == textPrimaryDark 와 일치시켜 라이트/다크 전환 시 AppBar 내부 IconButton 색상 이질감 제거.
+      // 인라인 `icon: Icon(..., color: ...)` 오버라이드는 우선순위로 유지.
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(foregroundColor: AppColors.textPrimaryDark),
+      ),
 
       // ListTile — Notebook × Score: dark 에서는 paper 기본, Vermillion 선택.
       listTileTheme: const ListTileThemeData(
