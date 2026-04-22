@@ -703,6 +703,36 @@ Text(
 
 **은유**: 상세(공연 팸플릿) ↔ 편집(무대 뒤 악보)도 같은 Playfair 가문으로 연결. 사용자가 상세에서 편집으로 넘어가는 순간 "악보가 바뀌는" 어색함이 사라짐.
 
+### 7.20 정기 레슨 + 프로필 공개 설정 + 레슨 시간 설정도 sectionTitle 로 확장
+
+**배경**: §7.19 에서 학생/레슨 폼 섹션 제목까지 Playfair 로 전환했으나, 다음 3개 위젯이 여전히 `AppTypography.headingSmall` 를 사용 중이었음:
+- `RegularLessonSectionTitle` — 정기 레슨 등록 폼 (schedule)
+- `VisibilitySectionTitle` — 프로필 공개 범위 설정 시트 (profile)
+- `LessonTimeSettingsSectionTitle` — 레슨 시간 설정 화면 (profile)
+
+설정·등록 플로우가 상세·편집 화면과 서체가 달라 시각 위계 단절. 3-지점 추가 수정으로 일관성 마감.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/schedule/presentation/widgets/regular_lesson_widgets.dart` | `RegularLessonSectionTitle` 이 `NotebookTypography.sectionTitle` 사용 | 2ea52c03 |
+| `features/profile/presentation/widgets/profile_visibility_widgets.dart` | `VisibilitySectionTitle` 동일 적용 + `.copyWith(fontWeight: bold)` 오버라이드 제거 (sectionTitle 의 w600 자체로 충분) | 2ea52c03 |
+| `features/profile/presentation/widgets/lesson_time_settings_widgets.dart` | `LessonTimeSettingsSectionTitle` 동일 적용 | 2ea52c03 |
+
+**영향 범위**:
+- 정기 레슨 등록 폼 7 섹션 (학생 / 요일 / 시작시간 / 레슨 시간 / 반복 주기 / 기간 / 메모 등)
+- 공개 범위 설정 시트 1 섹션
+- 레슨 시간 설정 화면 6 섹션 (기본 시간 / 추가 시간 슬롯 / 수업 가능 시간대 등)
+
+**누적 sectionTitle 사용처** (§7.17 + §7.19 + §7.20):
+- 레슨 상세 6곳 + 학생/레슨 폼 23곳 + 정기 레슨/프로필 14곳 = **43 instances**
+- 단 5개 공통 위젯 수정으로 달성 — "공통 수정 = 일괄 반영" 원칙 재확인
+
+**검증**:
+- `flutter analyze` → 0 issues
+- `flutter test` → 392/392 passed
+
+**은유**: 앱 전역의 섹션 타이틀이 한 오케스트라의 악장 표제처럼 통일됨. 사용자가 어느 화면에 있든 "악장 번호"가 같은 서체로 표시되어 악보를 읽는 듯한 연속성 확보.
+
 ---
 
 ## 8. 구현 원칙
