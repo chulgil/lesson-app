@@ -69,7 +69,7 @@ extension RelationLessonTypeExtension on RelationLessonType {
   Color get color {
     switch (this) {
       case RelationLessonType.trial:
-        return AppColors.info;
+        return AppColors.ink;
       case RelationLessonType.regular:
         return AppColors.primary;
       case RelationLessonType.oneTime:
@@ -132,7 +132,7 @@ class TeacherStudentRelation {
   Color get statusColor {
     switch (status) {
       case RelationStatus.none:
-        return AppColors.info;
+        return AppColors.ink;
       case RelationStatus.active:
         return AppColors.paperOk;
       case RelationStatus.inactive:

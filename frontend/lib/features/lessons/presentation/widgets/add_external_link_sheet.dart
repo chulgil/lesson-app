@@ -77,7 +77,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
                 prefixIcon:
                     const Icon(Icons.link, color: AppColors.inkTertiary),
                 suffixIcon: _urlValid
-                    ? const Icon(Icons.check_circle, color: AppColors.success)
+                    ? const Icon(Icons.check_circle, color: AppColors.paperOk)
                     : null,
               ),
               keyboardType: TextInputType.url,

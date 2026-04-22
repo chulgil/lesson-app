@@ -136,16 +136,16 @@ class AiNotesButton extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.05),
+        color: AppColors.paperOk.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperOk.withValues(alpha: 0.3)),
       ),
       child: InkWell(
         onTap: () => _showResults(context, result),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Row(
           children: [
-            const Icon(Icons.check_circle, color: AppColors.success, size: 24),
+            const Icon(Icons.check_circle, color: AppColors.paperOk, size: 24),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Column(
@@ -155,7 +155,7 @@ class AiNotesButton extends ConsumerWidget {
                     'AI 노트 생성 완료',
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.success,
+                      color: AppColors.paperOk,
                     ),
                   ),
                   Text(
@@ -167,7 +167,7 @@ class AiNotesButton extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.success),
+            const Icon(Icons.chevron_right, color: AppColors.paperOk),
           ],
         ),
       ),
@@ -179,18 +179,18 @@ class AiNotesButton extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.05),
+        color: AppColors.paperAccent.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 24),
+          const Icon(Icons.error_outline, color: AppColors.paperAccent, size: 24),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               error ?? 'AI 노트 생성에 실패했습니다',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
             ),
           ),
           TextButton(

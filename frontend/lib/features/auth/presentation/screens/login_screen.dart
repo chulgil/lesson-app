@@ -288,7 +288,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(
             content: const Text('로그인 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -360,7 +360,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(
             content: const Text('Google 로그인 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

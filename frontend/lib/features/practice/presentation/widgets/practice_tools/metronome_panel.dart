@@ -607,7 +607,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
     if (audioError != null) {
       message = '통화중이냥~';
       backgroundColor = AppColors.errorLight;
-      textColor = AppColors.error;
+      textColor = AppColors.paperAccent;
     }
     // If tempo explanation is provided, show it (success style)
     else if (tempoExplanation != null) {

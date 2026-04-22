@@ -39,12 +39,12 @@ class BackupSettingsScreen extends ConsumerWidget {
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   const Text(
                     '오류가 발생했습니다.',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   ElevatedButton(

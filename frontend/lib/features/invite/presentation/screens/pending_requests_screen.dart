@@ -48,7 +48,7 @@ class PendingRequestsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '요청 목록을 불러오는 중 오류가 발생했습니다',
@@ -140,7 +140,7 @@ class PendingRequestsScreen extends ConsumerWidget {
           content: Text(
             '${request.requesterName ?? request.requesterRole.label}님과 연결되었습니다!',
           ),
-          backgroundColor: AppColors.success,
+          backgroundColor: AppColors.paperOk,
         ),
       );
     }
@@ -166,7 +166,7 @@ class PendingRequestsScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text('거절'),
               ),
             ],
@@ -297,8 +297,8 @@ class _RequestCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: isProcessing ? null : onReject,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: BorderSide(color: AppColors.error),
+                    foregroundColor: AppColors.paperAccent,
+                    side: BorderSide(color: AppColors.paperAccent),
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
                     ),
@@ -347,10 +347,10 @@ class _RequestCard extends StatelessWidget {
       color = AppColors.inkSecondary;
     } else if (remaining.inHours > 0) {
       text = '${remaining.inHours}시간 남음';
-      color = AppColors.warning;
+      color = AppColors.paperAccent;
     } else {
       text = '곧 만료';
-      color = AppColors.error;
+      color = AppColors.paperAccent;
     }
 
     return Container(

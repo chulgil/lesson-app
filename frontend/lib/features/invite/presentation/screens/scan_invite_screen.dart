@@ -310,7 +310,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.error,
+        backgroundColor: AppColors.paperAccent,
         duration: const Duration(seconds: 3),
       ),
     );

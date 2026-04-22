@@ -33,13 +33,13 @@ class DevLoginSection extends StatelessWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               'DEV MODE — 테스트 계정 선택',
               style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -114,13 +114,13 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Parent accounts ──
-        DevSectionHeader(label: '학부모', color: AppColors.info),
+        DevSectionHeader(label: '학부모', color: AppColors.ink),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '👨‍👩‍👧',
           name: '김정수',
           description: '자녀: 김소연 (레슨/연습 확인)',
-          color: AppColors.info,
+          color: AppColors.ink,
           isLoading: isLoading,
           onTap:
               () => onDevLogin(

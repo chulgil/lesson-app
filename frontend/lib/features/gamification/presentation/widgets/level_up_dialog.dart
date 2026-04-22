@@ -53,14 +53,14 @@ class LevelUpDialog extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.warning,
-                    AppColors.warning.withValues(alpha: 0.7),
+                    AppColors.paperAccent,
+                    AppColors.paperAccent.withValues(alpha: 0.7),
                   ],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.warning.withValues(alpha: 0.4),
+                    color: AppColors.paperAccent.withValues(alpha: 0.4),
                     blurRadius: 20,
                     spreadRadius: 4,
                   ),

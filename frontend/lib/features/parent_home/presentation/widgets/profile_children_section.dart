@@ -178,7 +178,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                 style: AppTypography.caption.copyWith(
                   color:
                       profile.isActive
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),

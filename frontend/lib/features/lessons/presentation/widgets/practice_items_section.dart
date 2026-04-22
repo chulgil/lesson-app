@@ -43,7 +43,7 @@ class PracticeItemsSection extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space6),
               child: Column(
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     '데이터를 불러오는데 실패했습니다',

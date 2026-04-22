@@ -31,12 +31,12 @@ class SmartRecordingIndicator extends ConsumerWidget {
       RecordingPhase.waiting => (
         Icons.hourglass_empty,
         '대기 중... 연주를 시작하세요',
-        AppColors.warning,
+        AppColors.paperAccent,
       ),
       RecordingPhase.recording => (
         Icons.fiber_manual_record,
         '녹음 중',
-        AppColors.error,
+        AppColors.paperAccent,
       ),
       RecordingPhase.ending => (
         Icons.pause_circle_outline,
@@ -117,7 +117,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
     return AlertDialog(
       title: const Row(
         children: [
-          Icon(Icons.check_circle, color: AppColors.success),
+          Icon(Icons.check_circle, color: AppColors.paperOk),
           SizedBox(width: AppSpacing.space2),
           Text('녹음 저장됨'),
         ],

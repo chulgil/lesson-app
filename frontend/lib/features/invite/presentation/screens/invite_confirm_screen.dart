@@ -69,13 +69,13 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.warning_amber_rounded,
               size: 40,
-              color: AppColors.warning,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space6),
@@ -118,10 +118,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
+              color: AppColors.paperOk.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.link, size: 48, color: AppColors.success),
+            child: Icon(Icons.link, size: 48, color: AppColors.paperOk),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -335,7 +335,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('연결 요청에 실패했습니다'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -350,7 +350,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -382,10 +382,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.1),
+                    color: AppColors.ink.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.link, size: 48, color: AppColors.info),
+                  child: Icon(Icons.link, size: 48, color: AppColors.ink),
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
@@ -453,13 +453,13 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
+                    color: AppColors.paperOk.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.check_circle,
                     size: 48,
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -481,7 +481,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
-                      color: AppColors.info.withValues(alpha: 0.1),
+                      color: AppColors.ink.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -491,14 +491,14 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         Icon(
                           Icons.lightbulb_outline,
                           size: 20,
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Expanded(
                           child: Text(
                             '지금 바로 체험레슨을 예약할 수 있어요!',
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.info,
+                              color: AppColors.ink,
                             ),
                           ),
                         ),

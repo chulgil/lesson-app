@@ -224,13 +224,13 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Text(
                   '레퍼토리를 불러올 수 없습니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),

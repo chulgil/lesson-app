@@ -129,7 +129,7 @@ class _TipTemplateManagementScreenState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
                   '템플릿을 불러오는데 실패했습니다',
@@ -163,7 +163,7 @@ class _TipTemplateManagementScreenState
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.error,
+          color: AppColors.paperAccent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: const Icon(Icons.delete, color: Colors.white),
@@ -319,7 +319,7 @@ class _TipTemplateManagementScreenState
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

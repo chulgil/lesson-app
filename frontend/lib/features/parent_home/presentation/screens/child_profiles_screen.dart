@@ -38,7 +38,7 @@ class ChildProfilesScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
                   const SizedBox(height: AppSpacing.space3),
                   Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
                   const SizedBox(height: AppSpacing.space2),

@@ -196,7 +196,7 @@ class _TeacherDashboardScreenState
                 title: '출석률',
                 value: '${stats.attendanceRate.toStringAsFixed(1)}%',
                 subtitle: '취소 ${stats.cancelledLessons}회',
-                color: AppColors.success,
+                color: AppColors.paperOk,
                 icon: Icons.check_circle_outline,
                 onTap: () => context.push(AppRoutes.teacherAttendance),
               ),
@@ -211,7 +211,7 @@ class _TeacherDashboardScreenState
                 title: '학생 수',
                 value: '${stats.totalStudents}명',
                 subtitle: '신규 +${stats.newStudents}명',
-                color: AppColors.info,
+                color: AppColors.ink,
                 icon: Icons.people_outline,
               ),
             ),
@@ -273,7 +273,7 @@ class _TeacherDashboardScreenState
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: (isPositive ? AppColors.success : AppColors.error)
+                  color: (isPositive ? AppColors.paperOk : AppColors.paperAccent)
                       .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
@@ -283,13 +283,13 @@ class _TeacherDashboardScreenState
                     Icon(
                       isPositive ? Icons.trending_up : Icons.trending_down,
                       size: 16,
-                      color: isPositive ? AppColors.success : AppColors.error,
+                      color: isPositive ? AppColors.paperOk : AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       '${isPositive ? '+' : ''}${stats.revenueChangePercent.toStringAsFixed(1)}%',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isPositive ? AppColors.success : AppColors.error,
+                        color: isPositive ? AppColors.paperOk : AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -327,14 +327,14 @@ class _TeacherDashboardScreenState
               _buildStudentStatItem(
                 '신규',
                 '+${stats.newStudents}명',
-                AppColors.success,
+                AppColors.paperOk,
               ),
               _buildDivider(),
               _buildStudentStatItem(
                 '이탈',
                 stats.churnedStudents > 0 ? '-${stats.churnedStudents}명' : '0명',
                 stats.churnedStudents > 0
-                    ? AppColors.error
+                    ? AppColors.paperAccent
                     : AppColors.inkTertiary,
               ),
             ],

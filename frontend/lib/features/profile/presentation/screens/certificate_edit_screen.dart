@@ -217,7 +217,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -254,7 +254,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             IconButton(
               onPressed: _isLoading ? null : _delete,
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: AppColors.paperAccent,
             ),
         ],
       ),
@@ -399,12 +399,12 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                   icon: Icon(
                     Icons.delete_outline,
                     size: 18,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   label: Text(
                     '이미지 삭제',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),
@@ -416,19 +416,19 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
+                color: AppColors.ink.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, size: 20, color: AppColors.info),
+                  Icon(Icons.info_outline, size: 20, color: AppColors.ink),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '제출된 자격증은 관리자의 검토 후 승인됩니다. 승인 후 프로필에 인증 뱃지가 표시됩니다.',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.info,
+                        color: AppColors.ink,
                       ),
                     ),
                   ),
@@ -484,7 +484,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           Text(
             ' *',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -604,11 +604,11 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error),
+        borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error, width: 2),
+        borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
     );
   }

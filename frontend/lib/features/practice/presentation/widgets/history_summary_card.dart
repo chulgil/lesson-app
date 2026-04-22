@@ -50,7 +50,7 @@ class HistorySummaryCard extends StatelessWidget {
           _buildDivider(),
           _buildStatItem(
             icon: Icons.check_circle,
-            iconColor: AppColors.success,
+            iconColor: AppColors.paperOk,
             label: '완료',
             value: '$completedCount',
           ),

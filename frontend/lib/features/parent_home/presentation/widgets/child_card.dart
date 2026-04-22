@@ -192,12 +192,12 @@ class ChildCard extends ConsumerWidget {
           (_, __) => Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.error.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Text(
               '정보를 불러올 수 없습니다',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.paperAccent),
             ),
           ),
     );

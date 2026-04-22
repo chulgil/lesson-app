@@ -123,7 +123,7 @@ class ParentProfileTab extends ConsumerWidget {
                 ProfileMenuItem(
                   icon: Icons.logout,
                   label: '로그아웃',
-                  labelColor: AppColors.error,
+                  labelColor: AppColors.paperAccent,
                   onTap: () => _showLogoutDialog(context),
                 ),
               ],
@@ -153,7 +153,7 @@ class ParentProfileTab extends ConsumerWidget {
                   Navigator.pop(context);
                   context.go(AppRoutes.login);
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('로그아웃'),
               ),
             ],

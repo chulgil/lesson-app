@@ -207,7 +207,7 @@ class _PracticeRecordingScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -411,7 +411,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.9),
+                color: AppColors.paperAccent.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
@@ -492,8 +492,8 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   onPressed: widget.onCancel,
                   icon: const Icon(Icons.close),
                   style: IconButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: AppColors.paperAccent,
+                    side: const BorderSide(color: AppColors.paperAccent),
                   ),
                   tooltip: '취소',
                 ),
@@ -507,7 +507,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                     onPressed: widget.onStop,
                     icon: const Icon(Icons.stop, size: 36),
                     style: IconButton.styleFrom(
-                      backgroundColor: AppColors.error,
+                      backgroundColor: AppColors.paperAccent,
                     ),
                     tooltip: '녹음 완료',
                   ),
@@ -712,11 +712,11 @@ class _RecordingItem extends StatelessWidget {
             ),
             if (recording.isShared) ...[
               SizedBox(width: AppSpacing.space2),
-              Icon(Icons.check_circle, size: 14, color: AppColors.success),
+              Icon(Icons.check_circle, size: 14, color: AppColors.paperOk),
               SizedBox(width: AppSpacing.space1),
               Text(
                 '공유됨',
-                style: AppTypography.caption.copyWith(color: AppColors.success),
+                style: AppTypography.caption.copyWith(color: AppColors.paperOk),
               ),
             ],
           ],
@@ -762,9 +762,9 @@ class _RecordingItem extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline, color: AppColors.error),
+                      Icon(Icons.delete_outline, color: AppColors.paperAccent),
                       SizedBox(width: AppSpacing.space2),
-                      Text('삭제', style: TextStyle(color: AppColors.error)),
+                      Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
                     ],
                   ),
                 ),

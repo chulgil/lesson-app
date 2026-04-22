@@ -196,7 +196,7 @@ class CompactTunerWidget extends ConsumerWidget {
               Text(
                 currentNote.centDisplayString,
                 style: AppTypography.bodySmall.copyWith(
-                  color: tunerState.isPerfect ? AppColors.success : AppColors.warning,
+                  color: tunerState.isPerfect ? AppColors.paperOk : AppColors.paperAccent,
                 ),
               ),
             ],

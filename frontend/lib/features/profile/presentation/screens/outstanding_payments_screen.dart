@@ -40,7 +40,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline, size: 64, color: AppColors.success),
+          Icon(Icons.check_circle_outline, size: 64, color: AppColors.paperOk),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '미수금이 없습니다',
@@ -104,7 +104,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space5),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.error, AppColors.error.withValues(alpha: 0.8)],
+            colors: [AppColors.paperAccent, AppColors.paperAccent.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -162,7 +162,7 @@ class _UnpaidCard extends ConsumerWidget {
           border: Border.all(
             color:
                 daysOverdue > 0
-                    ? AppColors.error.withValues(alpha: 0.3)
+                    ? AppColors.paperAccent.withValues(alpha: 0.3)
                     : AppColors.inkQuaternary,
           ),
           boxShadow: [
@@ -218,7 +218,7 @@ class _UnpaidCard extends ConsumerWidget {
                       Text(
                         formatWonWithComma(subscription.amount),
                         style: AppTypography.headingSmall.copyWith(
-                          color: AppColors.error,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                       _buildDaysBadge(daysOverdue),
@@ -250,7 +250,7 @@ class _UnpaidCard extends ConsumerWidget {
                       icon: const Icon(Icons.check, size: 18),
                       label: const Text('입금 확인'),
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.success,
+                        backgroundColor: AppColors.paperOk,
                       ),
                     ),
                   ),
@@ -277,7 +277,7 @@ class _UnpaidCard extends ConsumerWidget {
         child: Text(
           'D+$daysOverdue',
           style: AppTypography.caption.copyWith(
-            color: AppColors.error,
+            color: AppColors.paperAccent,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -380,7 +380,7 @@ class _UnpaidCard extends ConsumerWidget {
                   }
                 },
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.success,
+                  backgroundColor: AppColors.paperOk,
                 ),
                 child: const Text(AppStrings.confirm),
               ),

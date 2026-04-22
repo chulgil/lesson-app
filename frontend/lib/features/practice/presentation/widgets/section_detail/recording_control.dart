@@ -167,11 +167,11 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
         child: Container(
           decoration: BoxDecoration(
             color: widget.isRecording
-                ? AppColors.error.withValues(alpha: 0.15)
+                ? AppColors.paperAccent.withValues(alpha: 0.15)
                 : AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: widget.isRecording
-                ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
+                ? Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3))
                 : null,
           ),
           child: Stack(
@@ -207,7 +207,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: widget.isPaused ? AppColors.warning : AppColors.error,
+                                color: widget.isPaused ? AppColors.paperAccent : AppColors.paperAccent,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -215,7 +215,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                             Text(
                               widget.isPaused ? '일시정지' : '녹음 중',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: widget.isPaused ? AppColors.warning : AppColors.error,
+                                color: widget.isPaused ? AppColors.paperAccent : AppColors.paperAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -250,14 +250,14 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                 ? widget.onResumeRecording
                                 : widget.onPauseRecording,
                             icon: widget.isPaused ? Icons.play_arrow : Icons.pause,
-                            backgroundColor: AppColors.warning,
+                            backgroundColor: AppColors.paperAccent,
                           ),
                           const SizedBox(width: AppSpacing.space4),
                           // Stop button
                           _buildControlButton(
                             onPressed: widget.onStopRecording,
                             icon: Icons.stop,
-                            backgroundColor: AppColors.error,
+                            backgroundColor: AppColors.paperAccent,
                           ),
                         ],
                       ),
@@ -277,7 +277,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                           }
                         },
                         style: FilledButton.styleFrom(
-                          backgroundColor: hasMicPermission ? AppColors.error : AppColors.inkSecondary,
+                          backgroundColor: hasMicPermission ? AppColors.paperAccent : AppColors.inkSecondary,
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.space8,
                             vertical: AppSpacing.space4,

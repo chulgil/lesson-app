@@ -113,7 +113,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
 
   Widget _buildFileMissingState(BuildContext context) {
     return Card(
-      color: AppColors.error.withValues(alpha: 0.05),
+      color: AppColors.paperAccent.withValues(alpha: 0.05),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space3),
         child: Row(
@@ -122,10 +122,10 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.error_outline, color: AppColors.error),
+              child: const Icon(Icons.error_outline, color: AppColors.paperAccent),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -138,7 +138,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                         '파일 없음',
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.error,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                       if (widget.recording.bpm != null) ...[
@@ -177,7 +177,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   Text(
                     '녹음 파일이 삭제되었거나 찾을 수 없습니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.error.withValues(alpha: 0.8),
+                      color: AppColors.paperAccent.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -187,7 +187,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             IconButton(
               onPressed: () => _showDeleteConfirmation(context),
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               tooltip: '기록 삭제',
             ),
           ],
@@ -216,7 +216,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   Navigator.of(dialogContext).pop();
                   widget.onDelete();
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -285,7 +285,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.success,
+                              color: AppColors.paperOk,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusSmall,
                               ),
@@ -351,12 +351,12 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             Icon(
                               Icons.delete,
                               size: 20,
-                              color: AppColors.error,
+                              color: AppColors.paperAccent,
                             ),
                             SizedBox(width: AppSpacing.space2),
                             Text(
                               '삭제',
-                              style: TextStyle(color: AppColors.error),
+                              style: TextStyle(color: AppColors.paperAccent),
                             ),
                           ],
                         ),

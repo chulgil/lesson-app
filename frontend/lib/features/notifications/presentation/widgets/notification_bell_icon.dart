@@ -60,7 +60,7 @@ class NotificationBellIcon extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       constraints: const BoxConstraints(minWidth: 16),
       decoration: BoxDecoration(
-        color: AppColors.error,
+        color: AppColors.paperAccent,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white, width: 1.5),
       ),

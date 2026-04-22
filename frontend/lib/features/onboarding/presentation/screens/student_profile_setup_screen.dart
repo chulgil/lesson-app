@@ -99,7 +99,7 @@ class _StudentProfileSetupScreenState
         SnackBar(
           content: const Text('프로필 저장 실패. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {
@@ -240,7 +240,7 @@ class _StudentProfileSetupScreenState
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.error)),
+            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -286,7 +286,7 @@ class _StudentProfileSetupScreenState
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.error)),
+            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),

@@ -31,7 +31,7 @@ class TeacherSearchCard extends StatelessWidget {
         side:
             isPreviousTeacher
                 ? BorderSide(
-                  color: AppColors.info.withValues(alpha: 0.5),
+                  color: AppColors.ink.withValues(alpha: 0.5),
                   width: 1.5,
                 )
                 : BorderSide.none,
@@ -132,18 +132,18 @@ class TeacherSearchCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.history, size: 12, color: AppColors.info),
+          Icon(Icons.history, size: 12, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space1),
           Text(
             '이전에 레슨했어요',
             style: AppTypography.caption.copyWith(
-              color: AppColors.info,
+              color: AppColors.ink,
               fontWeight: FontWeight.w600,
             ),
           ),

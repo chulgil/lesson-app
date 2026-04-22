@@ -243,11 +243,11 @@ class PracticeNoteListScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.error),
+          Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '오류가 발생했습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.error),
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
           ),
           const SizedBox(height: AppSpacing.space4),
           TextButton(
@@ -329,7 +329,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
                     );
                   }
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

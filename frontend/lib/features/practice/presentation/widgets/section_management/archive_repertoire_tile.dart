@@ -64,12 +64,12 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                             children: [
                               Icon(
                                 Icons.delete_forever,
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
                                 '영구 삭제',
-                                style: TextStyle(color: AppColors.error),
+                                style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],
                           ),
@@ -167,7 +167,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
           (context) => AlertDialog(
             title: Row(
               children: [
-                Icon(Icons.warning, color: AppColors.error),
+                Icon(Icons.warning, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 const Text('레퍼토리 영구 삭제'),
               ],
@@ -190,7 +190,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.warning_amber,
-                        color: AppColors.error,
+                        color: AppColors.paperAccent,
                         size: 20,
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -198,7 +198,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                         child: Text(
                           '이 작업은 되돌릴 수 없습니다.\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),
@@ -213,7 +213,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 child: const Text(AppStrings.cancel),
               ),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 onPressed: () async {
                   Navigator.of(context).pop();
                   await ref

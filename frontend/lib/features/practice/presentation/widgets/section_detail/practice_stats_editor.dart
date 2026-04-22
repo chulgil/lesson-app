@@ -252,7 +252,7 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
             Text(
               '+$addedCount회 → +$addedMinutes분 추가',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.success,
+                color: AppColors.paperOk,
               ),
             ),
           ],

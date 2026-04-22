@@ -173,7 +173,7 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
     } else if (isPerfectMatch) {
       // Perfect pitch match: instant bright highlight with subtle glow
       backgroundColor = AppColors.tunerCentPerfect.withValues(alpha: 0.7);
-      textColor = AppColors.success;
+      textColor = AppColors.paperOk;
       boxShadow = [
         BoxShadow(
           color: AppColors.tunerCentPerfect.withValues(alpha: 0.5),
@@ -368,7 +368,7 @@ class TunerInfoBar extends ConsumerWidget {
               fontWeight: FontWeight.bold,
               color: note != null
                   ? (tunerState.isPerfect
-                      ? AppColors.success
+                      ? AppColors.paperOk
                       : (note.centDeviation < 0
                           ? AppColors.tunerCentFlat
                           : AppColors.tunerCentSharp))

@@ -127,7 +127,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.error),
+            Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '데이터를 불러오는데 실패했습니다',
@@ -243,7 +243,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   ),
                 PopupMenuItem(
                   value: 'delete',
-                  child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                  child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
                 ),
               ],
         ),
@@ -271,7 +271,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.paperAccent,
               ),
             );
           }
@@ -317,7 +317,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('레슨 완료 처리에 실패했습니다. 다시 시도해주세요.'),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.paperAccent,
               ),
             );
           }
@@ -341,7 +341,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.paperAccent,
               ),
             );
           }
@@ -382,21 +382,21 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.3),
+                  color: AppColors.paperAccent.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.edit_note, color: AppColors.warning, size: 20),
+                  Icon(Icons.edit_note, color: AppColors.paperAccent, size: 20),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '레슨이 완료되었습니다. 피드백을 작성해주세요!',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -692,7 +692,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('주요 포인트 추가에 실패했습니다.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -717,7 +717,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('주요 포인트 삭제에 실패했습니다.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -742,7 +742,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('피드백 저장에 실패했습니다.'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -763,7 +763,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('메모 저장에 실패했습니다.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

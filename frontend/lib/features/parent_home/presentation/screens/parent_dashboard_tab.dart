@@ -445,7 +445,7 @@ class ParentDashboardTab extends ConsumerWidget {
             icon: Icons.assignment_turned_in,
             label: '과제 완료',
             value: '4/5',
-            color: AppColors.success,
+            color: AppColors.paperOk,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -509,7 +509,7 @@ class ParentDashboardTab extends ConsumerWidget {
           child: Text(
             'D-1',
             style: AppTypography.caption.copyWith(
-              color: AppColors.success,
+              color: AppColors.paperOk,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -530,7 +530,7 @@ class ParentDashboardTab extends ConsumerWidget {
       trailing: Text(
         '5일 연습',
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.success,
+          color: AppColors.paperOk,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -558,7 +558,7 @@ class ParentDashboardTab extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color:
                       practiced
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : isToday
                           ? AppColors.primaryLight
                           : isPast
@@ -672,7 +672,7 @@ class ParentDashboardTab extends ConsumerWidget {
                     child: Text(
                       '미결제',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

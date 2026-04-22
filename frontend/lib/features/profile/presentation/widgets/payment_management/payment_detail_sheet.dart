@@ -134,13 +134,13 @@ class PaymentDetailSheet extends ConsumerWidget {
                       .read(paymentsNotifierProvider.notifier)
                       .markStudentConfirmed(payment.id);
                 },
-                icon: Icon(Icons.notifications, color: AppColors.info),
+                icon: Icon(Icons.notifications, color: AppColors.ink),
                 label: Text(
                   '학생 입금완료 알림',
-                  style: TextStyle(color: AppColors.info),
+                  style: TextStyle(color: AppColors.ink),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.info),
+                  side: BorderSide(color: AppColors.ink),
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space4,
                   ),
@@ -218,13 +218,13 @@ class _StudentConfirmedBanner extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.notifications_active, size: 20, color: AppColors.info),
+          Icon(Icons.notifications_active, size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -233,14 +233,14 @@ class _StudentConfirmedBanner extends StatelessWidget {
                 Text(
                   '학생이 입금완료를 알렸습니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '계좌 확인 후 입금확인을 눌러주세요',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.info.withValues(alpha: 0.8),
+                    color: AppColors.ink.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -277,7 +277,7 @@ class _DeleteButton extends StatelessWidget {
                   FilledButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.error,
+                      backgroundColor: AppColors.paperAccent,
                     ),
                     child: const Text(AppStrings.delete),
                   ),
@@ -288,9 +288,9 @@ class _DeleteButton extends StatelessWidget {
           await onDelete();
         }
       },
-      icon: Icon(Icons.delete, color: AppColors.error),
-      label: Text('삭제', style: TextStyle(color: AppColors.error)),
-      style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.error)),
+      icon: Icon(Icons.delete, color: AppColors.paperAccent),
+      label: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+      style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.paperAccent)),
     );
   }
 }

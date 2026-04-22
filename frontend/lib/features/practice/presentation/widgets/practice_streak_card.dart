@@ -216,7 +216,7 @@ class PracticeStreakCard extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error),
+          const Icon(Icons.error_outline, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '스트릭 정보를 불러올 수 없습니다',
@@ -312,10 +312,10 @@ class RecordPracticeButton extends ConsumerWidget {
               vertical: AppSpacing.space3,
             ),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
+              color: AppColors.paperOk.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(
-                color: AppColors.success.withValues(alpha: 0.3),
+                color: AppColors.paperOk.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -323,14 +323,14 @@ class RecordPracticeButton extends ConsumerWidget {
               children: [
                 const Icon(
                   Icons.check_circle,
-                  color: AppColors.success,
+                  color: AppColors.paperOk,
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '오늘 연습 완료!',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

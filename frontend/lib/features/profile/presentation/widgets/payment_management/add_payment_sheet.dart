@@ -578,7 +578,7 @@ class _PaymentTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        type == PaymentType.trial ? AppColors.info : AppColors.primary;
+        type == PaymentType.trial ? AppColors.ink : AppColors.primary;
 
     return GestureDetector(
       onTap: onTap,

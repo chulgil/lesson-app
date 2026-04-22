@@ -58,15 +58,15 @@ enum PaymentStatus {
   Color get color {
     switch (this) {
       case PaymentStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case PaymentStatus.paid:
-        return AppColors.info;
+        return AppColors.ink;
       case PaymentStatus.confirmed:
       // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
-        return AppColors.success;
+        return AppColors.paperOk;
       case PaymentStatus.overdue:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case PaymentStatus.cancelled:
       case PaymentStatus.refunded:
         return AppColors.inkTertiary;

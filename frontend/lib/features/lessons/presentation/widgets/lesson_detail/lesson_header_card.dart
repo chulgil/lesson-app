@@ -157,7 +157,7 @@ class _StatusBadge extends StatelessWidget {
       case LessonStatus.noShow:
       case LessonStatus.cancelledByStudentLate:
       case LessonStatus.studentAbsent:
-        color = AppColors.error;
+        color = AppColors.paperAccent;
     }
 
     return Container(

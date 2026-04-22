@@ -45,7 +45,7 @@ class CompletionToggle extends StatelessWidget {
 
     return Card(
       color: isCompleted
-          ? AppColors.success.withValues(alpha: 0.1)
+          ? AppColors.paperOk.withValues(alpha: 0.1)
           : null,
       child: InkWell(
         onTap: onToggle,
@@ -59,7 +59,7 @@ class CompletionToggle extends StatelessWidget {
                     ? Icons.check_circle
                     : Icons.check_circle_outline,
                 color: isCompleted
-                    ? AppColors.success
+                    ? AppColors.paperOk
                     : AppColors.inkTertiary,
                 size: 32,
               ),
@@ -73,7 +73,7 @@ class CompletionToggle extends StatelessWidget {
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isCompleted
-                            ? AppColors.success
+                            ? AppColors.paperOk
                             : AppColors.ink,
                       ),
                     ),
@@ -108,7 +108,7 @@ class CompletionToggle extends StatelessWidget {
     final isAllCompleted = completedCount >= totalCount;
 
     return Card(
-      color: isAllCompleted ? AppColors.success.withValues(alpha: 0.1) : null,
+      color: isAllCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
       child: InkWell(
         onTap: onToggle,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -145,7 +145,7 @@ class CompletionToggle extends StatelessWidget {
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isAllCompleted
-                      ? AppColors.success
+                      ? AppColors.paperOk
                       : AppColors.ink,
                 ),
               ),
@@ -175,13 +175,13 @@ class CompletionToggle extends StatelessWidget {
         Icon(
           Icons.share,
           size: 12,
-          color: AppColors.info,
+          color: AppColors.ink,
         ),
         const SizedBox(width: AppSpacing.space1),
         Text(
           '완료 시 대표녹음이 선생님께 공유됩니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.info,
+            color: AppColors.ink,
           ),
         ),
       ],

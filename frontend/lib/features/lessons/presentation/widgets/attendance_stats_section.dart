@@ -87,10 +87,10 @@ class AttendanceStatsSection extends ConsumerWidget {
     final rate = stats.attendanceRate;
     final rateColor =
         rate >= 90
-            ? AppColors.success
+            ? AppColors.paperOk
             : rate >= 70
-            ? AppColors.warning
-            : AppColors.error;
+            ? AppColors.paperAccent
+            : AppColors.paperAccent;
 
     return Row(
       children: [
@@ -148,36 +148,36 @@ class AttendanceStatsSection extends ConsumerWidget {
   Widget _buildStatusBreakdown(AttendanceStats stats) {
     return Column(
       children: [
-        _buildStatusRow('출석 완료', stats.completedLessons, AppColors.success),
+        _buildStatusRow('출석 완료', stats.completedLessons, AppColors.paperOk),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow(
           '학생 불참',
           stats.absentCount,
-          AppColors.warning,
+          AppColors.paperAccent,
           deducted: true,
         ),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow(
           '무단 결석',
           stats.noShowCount,
-          AppColors.error,
+          AppColors.paperAccent,
           deducted: true,
         ),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow(
           '당일 취소',
           stats.cancelledByStudentLateCount,
-          AppColors.warning,
+          AppColors.paperAccent,
           deducted: true,
         ),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow(
           '선생님 취소',
           stats.cancelledByTeacherCount,
-          AppColors.info,
+          AppColors.ink,
         ),
         const SizedBox(height: AppSpacing.space2),
-        _buildStatusRow('상호 합의 취소', stats.mutualCancelledCount, AppColors.info),
+        _buildStatusRow('상호 합의 취소', stats.mutualCancelledCount, AppColors.ink),
       ],
     );
   }
@@ -203,7 +203,7 @@ class AttendanceStatsSection extends ConsumerWidget {
               if (deducted)
                 Text(
                   ' (수강권 차감)',
-                  style: AppTypography.caption.copyWith(color: AppColors.error),
+                  style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
                 ),
             ],
           ),
@@ -245,10 +245,10 @@ class AttendanceStatsSection extends ConsumerWidget {
           final rate = m.attendanceRate;
           final rateColor =
               rate >= 90
-                  ? AppColors.success
+                  ? AppColors.paperOk
                   : rate >= 70
-                  ? AppColors.warning
-                  : AppColors.error;
+                  ? AppColors.paperAccent
+                  : AppColors.paperAccent;
 
           return Column(
             children: [

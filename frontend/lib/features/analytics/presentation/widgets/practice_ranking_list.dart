@@ -67,7 +67,7 @@ class PracticeRankingList extends StatelessWidget {
   Widget _buildRankingTile(int rank, StudentPracticeRank student) {
     final Color rankColor;
     if (rank == 1) {
-      rankColor = AppColors.warning;
+      rankColor = AppColors.paperAccent;
     } else if (rank == 2) {
       rankColor = AppColors.inkSecondary;
     } else if (rank == 3) {

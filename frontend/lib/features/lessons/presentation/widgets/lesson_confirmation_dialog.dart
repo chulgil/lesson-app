@@ -62,15 +62,15 @@ enum LessonNonCompletionReason {
   Color get color {
     switch (this) {
       case LessonNonCompletionReason.noShow:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case LessonNonCompletionReason.studentAbsent:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case LessonNonCompletionReason.cancelledByStudentLate:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case LessonNonCompletionReason.teacherCancelled:
-        return AppColors.info;
+        return AppColors.ink;
       case LessonNonCompletionReason.mutualCancelled:
-        return AppColors.info;
+        return AppColors.ink;
     }
   }
 
@@ -245,7 +245,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             icon: Icons.check_circle,
             label: '레슨 완료',
             description: '횟수 1회 차감',
-            color: AppColors.success,
+            color: AppColors.paperOk,
             onTap: () {
               Navigator.of(
                 context,
@@ -260,7 +260,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             icon: Icons.cancel,
             label: '레슨 미진행',
             description: '사유 선택 필요',
-            color: AppColors.error,
+            color: AppColors.paperAccent,
             onTap: () {
               setState(() {
                 _showReasonSelection = true;

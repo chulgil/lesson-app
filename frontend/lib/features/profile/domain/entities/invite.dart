@@ -66,13 +66,13 @@ enum InviteStatus {
   Color get color {
     switch (this) {
       case InviteStatus.active:
-        return AppColors.success;
+        return AppColors.paperOk;
       case InviteStatus.used:
         return AppColors.inkTertiary;
       case InviteStatus.expired:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case InviteStatus.revoked:
-        return AppColors.error;
+        return AppColors.paperAccent;
     }
   }
 
@@ -232,11 +232,11 @@ enum ConnectionRequestStatus {
   Color get color {
     switch (this) {
       case ConnectionRequestStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case ConnectionRequestStatus.accepted:
-        return AppColors.success;
+        return AppColors.paperOk;
       case ConnectionRequestStatus.rejected:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case ConnectionRequestStatus.cancelled:
         return AppColors.inkTertiary;
       case ConnectionRequestStatus.expired:

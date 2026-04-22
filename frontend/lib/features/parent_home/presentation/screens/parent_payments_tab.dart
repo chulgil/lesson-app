@@ -174,7 +174,7 @@ class _SubscriptionList extends StatelessWidget {
         if (expiring.isNotEmpty) ...[
           _SectionHeader(
             title: AppStrings.statusExpiringSoon,
-            color: AppColors.warning,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(height: AppSpacing.space2),
           ...expiring.map((s) => _buildCard(context, s)),
@@ -339,7 +339,7 @@ class _SummaryStats extends StatelessWidget {
             child: _StatCard(
               label: AppStrings.statusExpiringSoon,
               count: expiringCount,
-              color: AppColors.warning,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -597,7 +597,7 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space2),
             Text('오류가 발생했습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),

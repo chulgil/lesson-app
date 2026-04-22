@@ -338,7 +338,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                     isToday
                         ? AppColors.primary
                         : hasPractice
-                        ? AppColors.success.withValues(alpha: 0.1)
+                        ? AppColors.paperOk.withValues(alpha: 0.1)
                         : isPast
                         ? AppColors.paperDark
                         : Colors.transparent,
@@ -349,7 +349,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                         : Border.all(
                           color:
                               hasPractice
-                                  ? AppColors.success
+                                  ? AppColors.paperOk
                                   : AppColors.inkQuaternary,
                           width: hasPractice ? 2 : 1,
                         ),
@@ -363,7 +363,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                         isToday
                             ? Colors.white
                             : hasPractice
-                            ? AppColors.success
+                            ? AppColors.paperOk
                             : AppColors.inkSecondary,
                   ),
                 ),

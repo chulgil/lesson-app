@@ -161,7 +161,7 @@ class _AttendanceConfirmationSheetState
                 icon: Icons.check_circle,
                 label: AppStrings.lessonCompleted,
                 sublabel: AppStrings.deductOne,
-                color: AppColors.success,
+                color: AppColors.paperOk,
                 onTap: () {
                   Navigator.of(
                     context,
@@ -176,7 +176,7 @@ class _AttendanceConfirmationSheetState
                 icon: Icons.cancel,
                 label: AppStrings.lessonNotCompleted,
                 sublabel: AppStrings.selectReason,
-                color: AppColors.error,
+                color: AppColors.paperAccent,
                 onTap: () => setState(() => _showReasonSelection = true),
               ),
             ),
@@ -366,7 +366,7 @@ class _AttendanceConfirmationSheetState
                     style: AppTypography.caption.copyWith(
                       color:
                           reason.isDeducted
-                              ? AppColors.error
+                              ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
                   ),

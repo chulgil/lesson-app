@@ -33,7 +33,7 @@ class LessonDateTimeSection extends StatelessWidget {
             color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isPast ? AppColors.warning : AppColors.inkQuaternary,
+              color: isPast ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           ),
           child: Column(
@@ -48,14 +48,14 @@ class LessonDateTimeSection extends StatelessWidget {
                       height: 44,
                       decoration: BoxDecoration(
                         color: isPast
-                            ? AppColors.warning.withValues(alpha: 0.1)
+                            ? AppColors.paperAccent.withValues(alpha: 0.1)
                             : AppColors.primary.withValues(alpha: 0.1),
                         borderRadius:
                             BorderRadius.circular(AppSpacing.radiusMedium),
                       ),
                       child: Icon(
                         isPast ? Icons.history : Icons.calendar_today,
-                        color: isPast ? AppColors.warning : AppColors.primary,
+                        color: isPast ? AppColors.paperAccent : AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
@@ -73,7 +73,7 @@ class LessonDateTimeSection extends StatelessWidget {
                             formatDateYMDWithDay(selectedDate),
                             style: AppTypography.bodyLarge.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: isPast ? AppColors.warning : null,
+                              color: isPast ? AppColors.paperAccent : null,
                             ),
                           ),
                         ],
@@ -154,13 +154,13 @@ class LessonDateTimeSection extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.warning_amber_rounded,
-                    color: AppColors.warning, size: 18),
+                    color: AppColors.paperAccent, size: 18),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '과거 시간입니다. 이미 진행한 레슨을 기록하는 경우에만 사용해주세요.',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),

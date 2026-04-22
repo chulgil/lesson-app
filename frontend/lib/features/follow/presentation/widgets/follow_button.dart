@@ -92,7 +92,7 @@ class FollowButton extends ConsumerWidget {
       onPressed: () => _toggleFollow(context, ref, isFollowing),
       icon: Icon(
         isFollowing ? Icons.favorite : Icons.favorite_border,
-        color: isFollowing ? AppColors.error : AppColors.inkTertiary,
+        color: isFollowing ? AppColors.paperAccent : AppColors.inkTertiary,
       ),
       tooltip: isFollowing ? '팔로우 취소' : '팔로우',
     );

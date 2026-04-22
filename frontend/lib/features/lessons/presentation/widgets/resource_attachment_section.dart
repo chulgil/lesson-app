@@ -102,7 +102,7 @@ class _ResourceChip extends StatelessWidget {
       case TeachingResourceType.teacherRecording:
         return AppColors.primary;
       case TeachingResourceType.externalLink:
-        return AppColors.info;
+        return AppColors.ink;
     }
   }
 
@@ -469,7 +469,7 @@ class _AddResourceButton extends ConsumerWidget {
                               child: Text(
                                 '자료를 불러올 수 없습니다',
                                 style: AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.error,
+                                  color: AppColors.paperAccent,
                                 ),
                               ),
                             ),

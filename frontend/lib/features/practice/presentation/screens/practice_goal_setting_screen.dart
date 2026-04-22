@@ -142,17 +142,17 @@ class _PracticeGoalSettingScreenState
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.space3),
                       decoration: BoxDecoration(
-                        color: AppColors.info.withAlpha(25),
+                        color: AppColors.ink.withAlpha(25),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
                         ),
-                        border: Border.all(color: AppColors.info.withAlpha(50)),
+                        border: Border.all(color: AppColors.ink.withAlpha(50)),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.info_outline,
-                            color: AppColors.info,
+                            color: AppColors.ink,
                             size: 20,
                           ),
                           const SizedBox(width: AppSpacing.space2),
@@ -160,7 +160,7 @@ class _PracticeGoalSettingScreenState
                             child: Text(
                               '목표를 설정하면 목표 달성 시에만 스트릭이 유지됩니다',
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.info,
+                                color: AppColors.ink,
                               ),
                             ),
                           ),
@@ -228,10 +228,10 @@ class _PracticeGoalSettingScreenState
                       Center(
                         child: TextButton.icon(
                           onPressed: _showResetConfirmation,
-                          icon: Icon(Icons.refresh, color: AppColors.error),
+                          icon: Icon(Icons.refresh, color: AppColors.paperAccent),
                           label: Text(
                             '목표 초기화',
-                            style: TextStyle(color: AppColors.error),
+                            style: TextStyle(color: AppColors.paperAccent),
                           ),
                         ),
                       ),
@@ -386,7 +386,7 @@ class _PracticeGoalSettingScreenState
                     _hasChanges = true;
                   });
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('초기화'),
               ),
             ],

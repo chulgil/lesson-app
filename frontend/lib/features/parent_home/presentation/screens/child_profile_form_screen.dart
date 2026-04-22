@@ -116,7 +116,7 @@ class _ChildProfileFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isEditing ? '자녀 정보가 수정되었습니다' : '자녀 프로필이 추가되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop(true);
@@ -126,7 +126,7 @@ class _ChildProfileFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -162,13 +162,13 @@ class _ChildProfileFormScreenState
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                  Icon(Icons.info_outline, color: AppColors.ink, size: 20),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.info,
+                        color: AppColors.ink,
                       ),
                     ),
                   ),
@@ -307,7 +307,7 @@ class _ChildProfileFormScreenState
                   children: [
                     Icon(
                       Icons.warning_amber_rounded,
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                       size: 16,
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -315,7 +315,7 @@ class _ChildProfileFormScreenState
                       child: Text(
                         '만 14세 이상은 별도 계정 등록이 가능합니다.',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.warning,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     ),
@@ -443,7 +443,7 @@ class _ChildProfileFormScreenState
                 child: Text(
                   '자녀 프로필 삭제',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                 ),
               ),
@@ -473,7 +473,7 @@ class _ChildProfileFormScreenState
                   Navigator.pop(context);
                   await _deleteProfile();
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -495,7 +495,7 @@ class _ChildProfileFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('자녀 프로필이 삭제되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop(true);
@@ -505,7 +505,7 @@ class _ChildProfileFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('삭제 중 오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

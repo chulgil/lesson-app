@@ -326,15 +326,15 @@ class ParentLessonsTab extends ConsumerWidget {
 
     switch (priority) {
       case 'must':
-        priorityColor = AppColors.error;
+        priorityColor = AppColors.paperAccent;
         priorityLabel = '필수';
         break;
       case 'should':
-        priorityColor = AppColors.warning;
+        priorityColor = AppColors.paperAccent;
         priorityLabel = '권장';
         break;
       default:
-        priorityColor = AppColors.success;
+        priorityColor = AppColors.paperOk;
         priorityLabel = '선택';
     }
 
@@ -434,7 +434,7 @@ class ParentLessonsTab extends ConsumerWidget {
                           style: AppTypography.caption.copyWith(
                             color:
                                 day == '일'
-                                    ? AppColors.error
+                                    ? AppColors.paperAccent
                                     : day == '토'
                                     ? AppColors.primary
                                     : AppColors.inkSecondary,
@@ -591,7 +591,7 @@ class _LessonCard extends StatelessWidget {
     switch (status) {
       case LessonStatus.confirmed:
         bgColor = AppColors.successLight;
-        textColor = AppColors.success;
+        textColor = AppColors.paperOk;
         label = '예정';
         break;
       case LessonStatus.completed:
@@ -601,7 +601,7 @@ class _LessonCard extends StatelessWidget {
         break;
       case LessonStatus.cancelled:
         bgColor = AppColors.errorLight;
-        textColor = AppColors.error;
+        textColor = AppColors.paperAccent;
         label = '취소';
         break;
     }

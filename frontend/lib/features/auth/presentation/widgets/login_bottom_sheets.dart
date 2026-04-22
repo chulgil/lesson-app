@@ -35,7 +35,7 @@ void showParentLoginSheet(BuildContext context) {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.1),
+                    color: AppColors.ink.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                   child: const Center(

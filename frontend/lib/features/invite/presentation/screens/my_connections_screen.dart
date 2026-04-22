@@ -65,7 +65,7 @@ class MyConnectionsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '연결 목록을 불러오는 중 오류가 발생했습니다',
@@ -337,7 +337,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.message, color: AppColors.info),
+                  leading: Icon(Icons.message, color: AppColors.ink),
                   title: const Text('메시지 보내기'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -346,7 +346,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.link_off, color: AppColors.warning),
+                  leading: Icon(Icons.link_off, color: AppColors.paperAccent),
                   title: const Text('연결 해제'),
                   onTap: () {
                     Navigator.pop(context);
@@ -379,7 +379,7 @@ class MyConnectionsScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text('연결 해제'),
               ),
             ],
@@ -654,14 +654,14 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isActive
-                ? AppColors.success.withValues(alpha: 0.1)
+                ? AppColors.paperOk.withValues(alpha: 0.1)
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         isActive ? '연결됨' : '해제됨',
         style: AppTypography.caption.copyWith(
-          color: isActive ? AppColors.success : AppColors.inkTertiary,
+          color: isActive ? AppColors.paperOk : AppColors.inkTertiary,
           fontWeight: FontWeight.w500,
         ),
       ),

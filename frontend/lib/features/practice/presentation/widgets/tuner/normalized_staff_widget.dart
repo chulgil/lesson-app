@@ -136,8 +136,8 @@ class _StaffPainter extends CustomPainter {
     final noteY = _getNoteY(note.name, staffTop);
 
     // Colors
-    final noteColor = isPerfect ? AppColors.success : AppColors.ink;
-    final accentColor = isPerfect ? AppColors.success : AppColors.inkSecondary;
+    final noteColor = isPerfect ? AppColors.paperOk : AppColors.ink;
+    final accentColor = isPerfect ? AppColors.paperOk : AppColors.inkSecondary;
 
     // Draw ledger lines if needed
     _drawLedgerLines(canvas, centerX, staffTop, note.name, noteColor);

@@ -158,7 +158,7 @@ class BankAccountEditScreen extends ConsumerWidget {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -277,7 +277,7 @@ class _BankAccountCard extends StatelessWidget {
                     icon: Icon(
                       Icons.delete_outline,
                       size: 20,
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                     visualDensity: VisualDensity.compact,
                   ),
@@ -550,7 +550,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.1),
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -558,7 +558,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     child: Text(
                       '필수',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.error,
+                        color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

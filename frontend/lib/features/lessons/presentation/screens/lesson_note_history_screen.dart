@@ -310,7 +310,7 @@ class _NoteCard extends StatelessWidget {
                   Icon(
                     Icons.lightbulb_outline,
                     size: 14,
-                    color: AppColors.warning,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Expanded(

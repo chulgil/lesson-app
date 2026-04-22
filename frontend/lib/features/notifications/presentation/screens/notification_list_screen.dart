@@ -155,7 +155,7 @@ class NotificationListScreen extends ConsumerWidget {
           const Icon(
             Icons.error_outline,
             size: 48,
-            color: AppColors.error,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(

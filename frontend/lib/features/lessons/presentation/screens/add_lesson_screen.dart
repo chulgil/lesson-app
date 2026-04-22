@@ -416,13 +416,13 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppColors.info, size: 18),
+                Icon(Icons.info_outline, color: AppColors.ink, size: 18),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.info,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -445,7 +445,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           (context) => AlertDialog(
             title: Row(
               children: [
-                Icon(Icons.history, color: AppColors.warning, size: 24),
+                Icon(Icons.history, color: AppColors.paperAccent, size: 24),
                 const SizedBox(width: AppSpacing.space2),
                 const Text('과거 레슨 기록'),
               ],
@@ -471,14 +471,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                         '레슨 기록 시:',
                         style: AppTypography.caption.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space1),
                       Text(
                         '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                       ),
                     ],
@@ -764,7 +764,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         SnackBar(
           content: const Text('레슨 추가에 실패했습니다. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     }

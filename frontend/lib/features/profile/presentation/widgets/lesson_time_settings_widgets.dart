@@ -93,7 +93,7 @@ class DurationOptionItem extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.delete_outline,
-                color: AppColors.error.withValues(alpha: 0.7),
+                color: AppColors.paperAccent.withValues(alpha: 0.7),
                 size: 20,
               ),
               onPressed: onDelete,
@@ -179,7 +179,7 @@ class DaySectionCard extends StatelessWidget {
       child: ExpansionTile(
         leading: Icon(
           hasSlots ? Icons.check_circle : Icons.cancel,
-          color: hasSlots ? AppColors.success : AppColors.inkTertiary,
+          color: hasSlots ? AppColors.paperOk : AppColors.inkTertiary,
         ),
         title: Text(
           dayName,
@@ -542,7 +542,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
             decoration: BoxDecoration(
               color:
                   _isDuplicate
-                      ? AppColors.error.withValues(alpha: 0.1)
+                      ? AppColors.paperAccent.withValues(alpha: 0.1)
                       : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
@@ -551,7 +551,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 Text(
                   LessonDurations.format(_currentDuration),
                   style: AppTypography.headingLarge.copyWith(
-                    color: _isDuplicate ? AppColors.error : AppColors.primary,
+                    color: _isDuplicate ? AppColors.paperAccent : AppColors.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -559,7 +559,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                   Text(
                     '이미 존재하는 시간입니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                   ),
               ],
@@ -780,7 +780,7 @@ void showDeleteDurationDialog({
                 Navigator.pop(dialogContext);
                 onConfirm();
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],

@@ -84,7 +84,7 @@ class PitchAnalysisCard extends ConsumerWidget {
             label: '안정성',
             value: '${(metrics.stabilityScore * 100).round()}%',
             progress: metrics.stabilityScore,
-            color: AppColors.info,
+            color: AppColors.ink,
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -243,10 +243,10 @@ class PitchAnalysisCard extends ConsumerWidget {
   }
 
   Color _gradeColor(String colorName) => switch (colorName) {
-    'success' => AppColors.success,
+    'success' => AppColors.paperOk,
     'primary' => AppColors.primary,
-    'info' => AppColors.info,
-    'warning' => AppColors.warning,
-    _ => AppColors.error,
+    'info' => AppColors.ink,
+    'warning' => AppColors.paperAccent,
+    _ => AppColors.paperAccent,
   };
 }

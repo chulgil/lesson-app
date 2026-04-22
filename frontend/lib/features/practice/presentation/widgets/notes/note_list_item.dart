@@ -99,12 +99,12 @@ class NoteListItem extends StatelessWidget {
                               Icon(
                                 Icons.delete,
                                 size: 18,
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
                                 '삭제',
-                                style: TextStyle(color: AppColors.error),
+                                style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],
                           ),

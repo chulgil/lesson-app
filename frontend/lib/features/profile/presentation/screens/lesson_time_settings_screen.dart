@@ -38,7 +38,7 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   const Text('오류가 발생했습니다.'),
@@ -737,7 +737,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               if (currentPrice != null)
                 TextButton(
                   onPressed: () => Navigator.pop(context, -1),
-                  child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                  child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
                 ),
               TextButton(
                 onPressed: () => Navigator.pop(context),

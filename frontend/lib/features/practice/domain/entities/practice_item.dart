@@ -111,7 +111,7 @@ enum PracticePriority {
   Color get color {
     switch (this) {
       case PracticePriority.must:
-        return AppColors.error; // 🔴
+        return AppColors.paperAccent; // 🔴
       case PracticePriority.should:
         return AppColors.practiceNormal; // 🟡
       case PracticePriority.could:

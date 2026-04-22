@@ -270,7 +270,7 @@ class ProfileTab extends ConsumerWidget {
               _MenuItem(
                 icon: Icons.logout,
                 label: '로그아웃',
-                labelColor: AppColors.error,
+                labelColor: AppColors.paperAccent,
                 onTap: () => _showLogoutDialog(context, ref),
               ),
             ],
@@ -734,7 +734,7 @@ class ProfileTab extends ConsumerWidget {
                   Navigator.pop(dialogContext);
                   await ref.read(authNotifierProvider.notifier).logout();
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text('로그아웃'),
               ),
             ],

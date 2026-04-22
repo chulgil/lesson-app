@@ -157,7 +157,7 @@ class ProgressCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.infoLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -174,7 +174,7 @@ class ProgressCard extends StatelessWidget {
                   label,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                 ),
               ),
@@ -182,7 +182,7 @@ class ProgressCard extends StatelessWidget {
                 '${(progress * 100).toInt()}%',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
               ),
             ],
@@ -192,8 +192,8 @@ class ProgressCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.info.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation(AppColors.info),
+              backgroundColor: AppColors.ink.withValues(alpha: 0.2),
+              valueColor: const AlwaysStoppedAnimation(AppColors.ink),
             ),
           ),
         ],
@@ -216,21 +216,21 @@ class ErrorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.errorLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error),
+          const Icon(Icons.error_outline, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               error,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.paperAccent),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.close, size: 20),
-            color: AppColors.error,
+            color: AppColors.paperAccent,
             onPressed: onDismiss,
           ),
         ],
@@ -320,7 +320,7 @@ class ActionsSection extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('백업 생성에 실패했습니다. 다시 시도해주세요.'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -365,7 +365,7 @@ class ActionsSection extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('백업 복원에 실패했습니다. 다시 시도해주세요.'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -560,7 +560,7 @@ class BackupListSection extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space6),
                   child: Text(
                     '백업 목록을 불러올 수 없습니다',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                 ),
               ),
@@ -649,9 +649,9 @@ class BackupItem extends ConsumerWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, size: 20, color: AppColors.error),
+                      Icon(Icons.delete, size: 20, color: AppColors.paperAccent),
                       SizedBox(width: AppSpacing.space2),
-                      Text('삭제', style: TextStyle(color: AppColors.error)),
+                      Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
                     ],
                   ),
                 ),
@@ -744,7 +744,7 @@ class BackupItem extends ConsumerWidget {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
+                  backgroundColor: AppColors.paperAccent,
                 ),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text(AppStrings.delete),
@@ -790,7 +790,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(
-                  color: hasOrphans ? AppColors.warning : AppColors.inkQuaternary,
+                  color: hasOrphans ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -800,13 +800,13 @@ class OrphanRecordingsButton extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color:
                           hasOrphans
-                              ? AppColors.warning.withValues(alpha: 0.1)
+                              ? AppColors.paperAccent.withValues(alpha: 0.1)
                               : AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       hasOrphans ? Icons.link_off : Icons.link,
-                      color: hasOrphans ? AppColors.warning : AppColors.primary,
+                      color: hasOrphans ? AppColors.paperAccent : AppColors.primary,
                       size: 24,
                     ),
                   ),
@@ -830,7 +830,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                           style: AppTypography.bodySmall.copyWith(
                             color:
                                 hasOrphans
-                                    ? AppColors.warning
+                                    ? AppColors.paperAccent
                                     : AppColors.inkSecondary,
                           ),
                         ),
@@ -844,7 +844,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
                         ),

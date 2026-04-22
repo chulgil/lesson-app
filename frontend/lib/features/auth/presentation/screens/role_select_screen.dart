@@ -44,7 +44,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
           SnackBar(
             content: const Text('역할 설정 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -125,7 +125,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 icon: Icons.family_restroom_rounded,
                 title: '학부모',
                 description: '자녀의 레슨과 연습을 확인',
-                color: AppColors.info,
+                color: AppColors.ink,
                 isLoading: _isLoading,
                 onTap: () => _selectRole(UserRole.parent),
               ),

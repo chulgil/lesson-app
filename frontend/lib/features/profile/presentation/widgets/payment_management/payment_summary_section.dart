@@ -45,8 +45,8 @@ class PaymentSummarySection extends StatelessWidget {
                 value: summary.formattedTotalPending,
                 subtitle: '${summary.unpaidStudents}명',
                 color: summary.overdueStudents > 0
-                    ? AppColors.error
-                    : AppColors.warning,
+                    ? AppColors.paperAccent
+                    : AppColors.paperAccent,
                 icon: Icons.pending,
               ),
             ],
@@ -81,18 +81,18 @@ class _OverdueWarningBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber, color: AppColors.error, size: 20),
+          Icon(Icons.warning_amber, color: AppColors.paperAccent, size: 20),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '연체 $overdueCount명',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

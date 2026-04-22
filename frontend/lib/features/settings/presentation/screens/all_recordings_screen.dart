@@ -74,12 +74,12 @@ class AllRecordingsScreen extends ConsumerWidget {
                     const Icon(
                       Icons.error_outline,
                       size: 48,
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     const Text(
                       '오류가 발생했습니다.',
-                      style: TextStyle(color: AppColors.error),
+                      style: TextStyle(color: AppColors.paperAccent),
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     ElevatedButton(
@@ -113,7 +113,7 @@ class AllRecordingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('파일을 읽을 수 없습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -154,7 +154,7 @@ class AllRecordingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('파일 가져오기 중 오류가 발생했습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -164,7 +164,7 @@ class AllRecordingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -206,7 +206,7 @@ class _RecordingsList extends StatelessWidget {
 
         // Orphaned recordings section (show first if any)
         if (orphaned.isNotEmpty) ...[
-          _buildSectionHeader('연결되지 않은 녹음', orphaned.length, AppColors.warning),
+          _buildSectionHeader('연결되지 않은 녹음', orphaned.length, AppColors.paperAccent),
           ...orphaned.map(
             (r) => _RecordingCard(
               recording: r.recording,
@@ -247,8 +247,8 @@ class _RecordingsList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem('전체', total, AppColors.ink),
-            _buildStatItem('연결됨', connectedCount, AppColors.success),
-            _buildStatItem('미연결', orphanedCount, AppColors.warning),
+            _buildStatItem('연결됨', connectedCount, AppColors.paperOk),
+            _buildStatItem('미연결', orphanedCount, AppColors.paperAccent),
           ],
         ),
       ),
@@ -387,7 +387,7 @@ class _RecordingCard extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('연결 중 오류가 발생했습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -408,7 +408,7 @@ class _RecordingCard extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -438,7 +438,7 @@ class _RecordingCard extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isOrphaned ? AppColors.warning : AppColors.inkQuaternary,
+          color: isOrphaned ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
       ),
       child: Padding(
@@ -495,14 +495,14 @@ class _RecordingCard extends ConsumerWidget {
                         Icon(
                           Icons.link_off,
                           size: 12,
-                          color: AppColors.warning,
+                          color: AppColors.paperAccent,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '연결되지 않음',
                           style: AppTypography.bodySmall.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: AppColors.warning,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ],
@@ -543,7 +543,7 @@ class _RecordingCard extends ConsumerWidget {
             IconButton(
               onPressed: () => _showSectionPicker(context, ref),
               icon: Icon(isOrphaned ? Icons.link_off : Icons.link),
-              color: isOrphaned ? AppColors.warning : AppColors.primary,
+              color: isOrphaned ? AppColors.paperAccent : AppColors.primary,
               tooltip: isOrphaned ? '섹션에 연결' : '섹션 변경',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -552,7 +552,7 @@ class _RecordingCard extends ConsumerWidget {
             IconButton(
               onPressed: () => _confirmDelete(context, ref),
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               tooltip: '삭제',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),

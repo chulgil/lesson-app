@@ -377,12 +377,12 @@ class _TeacherDetailContent extends ConsumerWidget {
                               ),
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
-                                color: AppColors.success.withValues(alpha: 0.1),
+                                color: AppColors.paperOk.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium,
                                 ),
                                 border: Border.all(
-                                  color: AppColors.success.withValues(
+                                  color: AppColors.paperOk.withValues(
                                     alpha: 0.3,
                                   ),
                                 ),
@@ -391,7 +391,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                 children: [
                                   const Icon(
                                     Icons.verified,
-                                    color: AppColors.success,
+                                    color: AppColors.paperOk,
                                     size: 20,
                                   ),
                                   const SizedBox(width: AppSpacing.space2),
@@ -498,13 +498,13 @@ class _TeacherDetailContent extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.1),
+            color: AppColors.ink.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
-              Icon(Icons.history, color: AppColors.info, size: 24),
+              Icon(Icons.history, color: AppColors.ink, size: 24),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Column(
@@ -514,7 +514,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       '이전에 레슨을 받았던 선생님입니다',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.info,
+                        color: AppColors.ink,
                       ),
                     ),
                     if (previousLessonPeriod != null)
@@ -644,9 +644,9 @@ class _TeacherDetailContent extends ConsumerWidget {
   Color _getBadgeColor(VerificationBadge badge) {
     switch (badge) {
       case VerificationBadge.phoneVerified:
-        return AppColors.info;
+        return AppColors.ink;
       case VerificationBadge.certified:
-        return AppColors.success;
+        return AppColors.paperOk;
       case VerificationBadge.premium:
         return AppColors.amber;
     }

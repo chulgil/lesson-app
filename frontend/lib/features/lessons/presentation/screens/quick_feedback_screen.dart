@@ -512,7 +512,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 18,
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                   ),
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
@@ -608,7 +608,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('피드백 저장 실패'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
             behavior: SnackBarBehavior.floating,
           ),
         );

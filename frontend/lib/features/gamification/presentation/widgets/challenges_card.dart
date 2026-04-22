@@ -115,7 +115,7 @@ class _ChallengeItem extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: challenge.period == ChallengePeriod.weekly
-                      ? AppColors.info.withValues(alpha: 0.1)
+                      ? AppColors.ink.withValues(alpha: 0.1)
                       : AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
@@ -123,7 +123,7 @@ class _ChallengeItem extends StatelessWidget {
                   challenge.period.displayName,
                   style: AppTypography.caption.copyWith(
                     color: challenge.period == ChallengePeriod.weekly
-                        ? AppColors.info
+                        ? AppColors.ink
                         : AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -143,7 +143,7 @@ class _ChallengeItem extends StatelessWidget {
                     backgroundColor: AppColors.inkQuaternary,
                     valueColor: AlwaysStoppedAnimation(
                       challenge.progress >= 1.0
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : AppColors.primary,
                     ),
                     minHeight: 6,
@@ -166,7 +166,7 @@ class _ChallengeItem extends StatelessWidget {
               Text(
                 '${challenge.rewardPoints}P 보상',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.warning,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -175,7 +175,7 @@ class _ChallengeItem extends StatelessWidget {
                 'D-${challenge.remainingDays}',
                 style: AppTypography.caption.copyWith(
                   color: challenge.remainingDays <= 2
-                      ? AppColors.error
+                      ? AppColors.paperAccent
                       : AppColors.inkTertiary,
                 ),
               ),

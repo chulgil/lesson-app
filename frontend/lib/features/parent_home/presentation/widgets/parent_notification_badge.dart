@@ -30,7 +30,7 @@ class ParentNotificationBadge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space1),
               decoration: BoxDecoration(
-                color: AppColors.error,
+                color: AppColors.paperAccent,
                 shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(minWidth: 18, minHeight: 18),

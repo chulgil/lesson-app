@@ -205,7 +205,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+      SnackBar(content: Text(message), backgroundColor: AppColors.paperAccent),
     );
   }
 

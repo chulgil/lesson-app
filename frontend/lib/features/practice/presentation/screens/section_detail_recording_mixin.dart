@@ -44,7 +44,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('마이크 권한이 필요합니다'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
@@ -74,7 +74,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('녹음을 시작할 수 없습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -164,7 +164,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
       setState(() {
@@ -190,7 +190,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('녹음 저장에 실패했습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -291,7 +291,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('원본 파일이 복구되었습니다'),
-                          backgroundColor: AppColors.success,
+                          backgroundColor: AppColors.paperOk,
                         ),
                       );
                     }
@@ -302,7 +302,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('녹음이 저장되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -311,7 +311,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('녹음 저장에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -335,7 +335,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('대표 녹음으로 설정되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -344,7 +344,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('설정에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -365,7 +365,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -390,7 +390,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

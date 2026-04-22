@@ -29,7 +29,7 @@ void showLessonExitConfirmation({
             onExit();
           },
           style: TextButton.styleFrom(
-            foregroundColor: AppColors.error,
+            foregroundColor: AppColors.paperAccent,
           ),
           child: const Text('나가기'),
         ),

@@ -58,7 +58,7 @@ class _ParentInviteCodeScreenState
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: AppColors.info.withValues(alpha: 0.1),
+                          color: AppColors.ink.withValues(alpha: 0.1),
                           borderRadius:
                               BorderRadius.circular(AppSpacing.radiusXLarge),
                         ),
@@ -111,7 +111,7 @@ class _ParentInviteCodeScreenState
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
                               borderSide: BorderSide(
-                                color: AppColors.info,
+                                color: AppColors.ink,
                                 width: 2,
                               ),
                             ),
@@ -119,7 +119,7 @@ class _ParentInviteCodeScreenState
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
                               borderSide: BorderSide(
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                                 width: 2,
                               ),
                             ),
@@ -149,7 +149,7 @@ class _ParentInviteCodeScreenState
                         Text(
                           _errorMessage!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ],
@@ -163,7 +163,7 @@ class _ParentInviteCodeScreenState
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _handleSubmitCode,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.info,
+                            backgroundColor: AppColors.ink,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius:
@@ -221,7 +221,7 @@ class _ParentInviteCodeScreenState
                             Text(
                               '코드가 없어도 괜찮아요',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.info,
+                                color: AppColors.ink,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -271,7 +271,7 @@ class _ParentInviteCodeScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('자녀가 성공적으로 연결되었습니다!'),
-              backgroundColor: AppColors.success,
+              backgroundColor: AppColors.paperOk,
               behavior: SnackBarBehavior.floating,
             ),
           );

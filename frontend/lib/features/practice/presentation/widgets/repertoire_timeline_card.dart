@@ -107,8 +107,8 @@ class RepertoireTimelineCard extends StatelessWidget {
       textColor = AppColors.inkTertiary;
     } else if (repertoire.endDate != null) {
       label = '완료';
-      backgroundColor = AppColors.success.withValues(alpha: 0.15);
-      textColor = AppColors.success;
+      backgroundColor = AppColors.paperOk.withValues(alpha: 0.15);
+      textColor = AppColors.paperOk;
     } else {
       label = '진행 중';
       backgroundColor = AppColors.secondary.withValues(alpha: 0.15);
@@ -161,7 +161,7 @@ class RepertoireTimelineCard extends StatelessWidget {
   /// Progress bar color based on completion
   Color get _progressColor {
     if (repertoire.isArchived) return AppColors.inkTertiary;
-    if (repertoire.completionRate >= 1.0) return AppColors.success;
+    if (repertoire.completionRate >= 1.0) return AppColors.paperOk;
     return AppColors.primary;
   }
 }

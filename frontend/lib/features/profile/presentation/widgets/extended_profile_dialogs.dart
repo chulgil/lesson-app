@@ -368,7 +368,7 @@ void showDeleteConfirmDialog(
                 onConfirm();
                 Navigator.pop(context);
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],

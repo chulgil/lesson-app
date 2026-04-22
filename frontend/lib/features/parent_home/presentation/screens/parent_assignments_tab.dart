@@ -29,7 +29,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Incomplete assignments
-          _SectionHeader(title: '미완료 과제', count: 2, color: AppColors.warning),
+          _SectionHeader(title: '미완료 과제', count: 2, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
 
           _AssignmentCard(
@@ -53,7 +53,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Completed assignments
-          _SectionHeader(title: '완료된 과제', count: 5, color: AppColors.success),
+          _SectionHeader(title: '완료된 과제', count: 5, color: AppColors.paperOk),
           const SizedBox(height: AppSpacing.space3),
 
           _AssignmentCard(
@@ -267,7 +267,7 @@ class _AssignmentCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isCompleted
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : AppColors.paperDark,
                   shape: BoxShape.circle,
                   border:
@@ -319,7 +319,7 @@ class _AssignmentCard extends StatelessWidget {
                       size: 14,
                       color:
                           isCompleted
-                              ? AppColors.success
+                              ? AppColors.paperOk
                               : AppColors.inkTertiary,
                     ),
                     const SizedBox(width: AppSpacing.space1),
@@ -328,9 +328,9 @@ class _AssignmentCard extends StatelessWidget {
                       style: AppTypography.caption.copyWith(
                         color:
                             isCompleted
-                                ? AppColors.success
+                                ? AppColors.paperOk
                                 : dueDate.contains('내일')
-                                ? AppColors.warning
+                                ? AppColors.paperAccent
                                 : AppColors.inkTertiary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -348,11 +348,11 @@ class _AssignmentCard extends StatelessWidget {
   Color _getPriorityColor() {
     switch (priority) {
       case AssignmentPriority.must:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case AssignmentPriority.should:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case AssignmentPriority.could:
-        return AppColors.info;
+        return AppColors.ink;
     }
   }
 

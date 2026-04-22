@@ -204,7 +204,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
     required VoidCallback onViewContent,
   }) {
     final tag = required ? '[필수]' : '[선택]';
-    final tagColor = required ? AppColors.error : AppColors.inkTertiary;
+    final tagColor = required ? AppColors.paperAccent : AppColors.inkTertiary;
 
     return InkWell(
       onTap: () => onChanged(!value),

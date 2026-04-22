@@ -197,7 +197,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                     item.isRequired
                         ? AppColors.inkTertiary.withValues(alpha: 0.2)
                         : item.isRecommended
-                        ? AppColors.success.withValues(alpha: 0.15)
+                        ? AppColors.paperOk.withValues(alpha: 0.15)
                         : Colors.transparent,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
@@ -208,7 +208,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                       item.isRequired
                           ? AppColors.inkTertiary
                           : item.isRecommended
-                          ? AppColors.success
+                          ? AppColors.paperOk
                           : AppColors.inkSecondary,
                   fontWeight: FontWeight.w600,
                 ),

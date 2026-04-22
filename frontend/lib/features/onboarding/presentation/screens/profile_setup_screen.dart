@@ -86,7 +86,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -126,11 +126,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ListTile(
                       leading: Icon(
                         Icons.delete_outline,
-                        color: AppColors.error,
+                        color: AppColors.paperAccent,
                       ),
                       title: Text(
                         '사진 삭제',
-                        style: TextStyle(color: AppColors.error),
+                        style: TextStyle(color: AppColors.paperAccent),
                       ),
                       onTap: () {
                         Navigator.pop(context);
@@ -239,7 +239,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space3),
                         decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.1),
+                          color: AppColors.paperAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
                           ),
@@ -248,7 +248,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: AppColors.warning,
+                              color: AppColors.paperAccent,
                               size: 20,
                             ),
                             const SizedBox(width: AppSpacing.space2),
@@ -256,7 +256,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               child: Text(
                                 '필수 항목: ${_missingFields.join(', ')}',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.warning,
+                                  color: AppColors.paperAccent,
                                 ),
                               ),
                             ),
@@ -336,7 +336,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.error)),
+            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -411,7 +411,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.error)),
+            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -451,7 +451,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.error)),
+            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -529,14 +529,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                Text('*', style: TextStyle(color: AppColors.error)),
+                Text('*', style: TextStyle(color: AppColors.paperAccent)),
               ],
             ),
             Text(
               '$charCount / 20자 이상',
               style: AppTypography.caption.copyWith(
                 color:
-                    isValid ? AppColors.success : AppColors.inkTertiary,
+                    isValid ? AppColors.paperOk : AppColors.inkTertiary,
               ),
             ),
           ],

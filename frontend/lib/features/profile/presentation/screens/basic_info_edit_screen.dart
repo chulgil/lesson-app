@@ -479,7 +479,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           Text(
             ' *',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -500,7 +500,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             style: AppTypography.caption.copyWith(
               color: isSufficient
                   ? AppColors.inkTertiary
-                  : AppColors.error,
+                  : AppColors.paperAccent,
             ),
           ),
         );
@@ -524,11 +524,11 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error),
+        borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error, width: 2),
+        borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
     );
   }

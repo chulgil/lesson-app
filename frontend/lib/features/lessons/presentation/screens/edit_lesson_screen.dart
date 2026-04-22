@@ -132,7 +132,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                     value: 'cancel',
                     child: Row(
                       children: [
-                        Icon(Icons.event_busy, color: AppColors.warning),
+                        Icon(Icons.event_busy, color: AppColors.paperAccent),
                         const SizedBox(width: AppSpacing.space2),
                         const Text('레슨 취소'),
                       ],
@@ -142,9 +142,9 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: AppColors.error),
+                        Icon(Icons.delete_outline, color: AppColors.paperAccent),
                         const SizedBox(width: AppSpacing.space2),
-                        Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
+                        Text('레슨 삭제', style: TextStyle(color: AppColors.paperAccent)),
                       ],
                     ),
                   ),
@@ -329,7 +329,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           SnackBar(
             content: Text('${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.warning,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
         context.pop();
@@ -340,7 +340,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           SnackBar(
             content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -368,7 +368,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           SnackBar(
             content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -497,7 +497,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           SnackBar(
             content: const Text('레슨 수정에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

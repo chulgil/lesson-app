@@ -66,12 +66,12 @@ class OrphanRecordingsScreen extends ConsumerWidget {
                     const Icon(
                       Icons.error_outline,
                       size: 48,
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     const Text(
                       '오류가 발생했습니다.',
-                      style: TextStyle(color: AppColors.error),
+                      style: TextStyle(color: AppColors.paperAccent),
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     ElevatedButton(
@@ -309,7 +309,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('연결 중 오류가 발생했습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -330,7 +330,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -437,7 +437,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                 IconButton(
                   onPressed: _confirmDelete,
                   icon: const Icon(Icons.delete_outline),
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                   tooltip: '삭제',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(

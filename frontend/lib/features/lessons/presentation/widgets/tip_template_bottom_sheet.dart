@@ -190,7 +190,7 @@ class _TipTemplateBottomSheetState
               ),
               child: Row(
                 children: [
-                  Icon(Icons.star, size: 18, color: AppColors.warning),
+                  Icon(Icons.star, size: 18, color: AppColors.paperAccent),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '자주 사용',
@@ -353,7 +353,7 @@ class _TipTemplateBottomSheetState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   '템플릿을 불러오는데 실패했습니다',
@@ -463,7 +463,7 @@ class _TipTemplateBottomSheetState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('템플릿 사용 기록에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

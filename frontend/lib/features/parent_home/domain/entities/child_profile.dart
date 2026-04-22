@@ -49,9 +49,9 @@ enum ChildConnectionStatus {
   Color get color {
     switch (this) {
       case ChildConnectionStatus.connected:
-        return AppColors.success;
+        return AppColors.paperOk;
       case ChildConnectionStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case ChildConnectionStatus.unconnected:
         return AppColors.inkTertiary;
     }

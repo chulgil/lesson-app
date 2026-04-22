@@ -44,7 +44,7 @@ enum ProfileType {
       case ProfileType.parent:
         return AppColors.primary;
       case ProfileType.student:
-        return AppColors.success;
+        return AppColors.paperOk;
       case ProfileType.child:
         return AppColors.secondary;
     }

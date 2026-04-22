@@ -121,7 +121,7 @@ class _StudentInviteCodeScreenState
                               borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium),
                               borderSide: BorderSide(
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                                 width: 2,
                               ),
                             ),
@@ -151,7 +151,7 @@ class _StudentInviteCodeScreenState
                         Text(
                           _errorMessage!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ],
@@ -195,7 +195,7 @@ class _StudentInviteCodeScreenState
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space4),
                         decoration: BoxDecoration(
-                          color: AppColors.info.withValues(alpha: 0.1),
+                          color: AppColors.ink.withValues(alpha: 0.1),
                           borderRadius:
                               BorderRadius.circular(AppSpacing.radiusMedium),
                         ),
@@ -203,7 +203,7 @@ class _StudentInviteCodeScreenState
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: AppColors.info,
+                              color: AppColors.ink,
                               size: 20,
                             ),
                             const SizedBox(width: AppSpacing.space3),
@@ -211,7 +211,7 @@ class _StudentInviteCodeScreenState
                               child: Text(
                                 '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.info,
+                                  color: AppColors.ink,
                                 ),
                               ),
                             ),
@@ -304,7 +304,7 @@ class _StudentInviteCodeScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('선생님과 성공적으로 연결되었습니다!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
             behavior: SnackBarBehavior.floating,
           ),
         );

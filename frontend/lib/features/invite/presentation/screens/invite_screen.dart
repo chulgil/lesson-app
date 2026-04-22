@@ -80,7 +80,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '초대 링크 생성 중 오류가 발생했습니다',
@@ -378,10 +378,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           leading: Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.1),
+              color: AppColors.ink.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(Icons.dialpad, color: AppColors.info),
+            child: Icon(Icons.dialpad, color: AppColors.ink),
           ),
           title: const Text('초대 코드 입력'),
           subtitle: const Text('6자리 코드로 연결하기'),

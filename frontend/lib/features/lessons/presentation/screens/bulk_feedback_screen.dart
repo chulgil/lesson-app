@@ -118,17 +118,17 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           margin: const EdgeInsets.all(AppSpacing.screenPadding),
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.1),
+            color: AppColors.ink.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, size: 16, color: AppColors.info),
+              const Icon(Icons.info_outline, size: 16, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
                   '완료된 레슨 학생이 자동 선택됩니다. 변경하려면 탭하세요.',
-                  style: AppTypography.caption.copyWith(color: AppColors.info),
+                  style: AppTypography.caption.copyWith(color: AppColors.ink),
                 ),
               ),
             ],
@@ -486,7 +486,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${selectedLessons.length}명에게 피드백을 전송했습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop();
@@ -496,7 +496,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('전송 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

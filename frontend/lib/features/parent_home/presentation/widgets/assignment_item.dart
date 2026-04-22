@@ -31,7 +31,7 @@ class AssignmentItem extends StatelessWidget {
             decoration: BoxDecoration(
               color:
                   isCompleted
-                      ? AppColors.success
+                      ? AppColors.paperOk
                       : AppColors.paperDark,
               shape: BoxShape.circle,
               border:
@@ -62,9 +62,9 @@ class AssignmentItem extends StatelessWidget {
                   style: AppTypography.caption.copyWith(
                     color:
                         isCompleted
-                            ? AppColors.success
+                            ? AppColors.paperOk
                             : dueDate.contains('내일')
-                            ? AppColors.warning
+                            ? AppColors.paperAccent
                             : AppColors.inkSecondary,
                   ),
                 ),
@@ -81,7 +81,7 @@ class AssignmentItem extends StatelessWidget {
               child: Text(
                 '필수',
                 style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.bold,
                 ),
               ),

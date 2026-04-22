@@ -109,7 +109,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('시작 마디가 끝 마디보다 클 수 없습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
         return;
@@ -119,7 +119,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('시작 줄이 끝 줄보다 클 수 없습니다'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
         return;
@@ -180,7 +180,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('섹션 수정에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

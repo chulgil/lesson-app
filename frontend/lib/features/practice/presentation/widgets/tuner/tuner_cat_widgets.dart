@@ -30,8 +30,8 @@ class StatusBubble extends StatelessWidget {
 
     if (errorMessage != null) {
       message = errorMessage!;
-      backgroundColor = AppColors.error.withValues(alpha: 0.1);
-      textColor = AppColors.error;
+      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+      textColor = AppColors.paperAccent;
     } else if (!isListening) {
       message = '마이크를 켜주세요';
       backgroundColor = AppColors.inkQuaternary;
@@ -106,8 +106,8 @@ class CatSpeechBubble extends StatelessWidget {
 
     if (errorMessage != null) {
       message = errorMessage!;
-      backgroundColor = AppColors.error.withValues(alpha: 0.1);
-      textColor = AppColors.error;
+      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+      textColor = AppColors.paperAccent;
     } else if (!isListening) {
       message = '마이크를 켜주세요';
       backgroundColor = AppColors.inkQuaternary;
@@ -205,11 +205,11 @@ class NoteWithCent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noteColor = isPerfect ? AppColors.success : AppColors.primary;
+    final noteColor = isPerfect ? AppColors.paperOk : AppColors.primary;
     final centColor =
         isPerfect
-            ? AppColors.success
-            : (note.centDeviation < 0 ? AppColors.error : AppColors.warning);
+            ? AppColors.paperOk
+            : (note.centDeviation < 0 ? AppColors.paperAccent : AppColors.paperAccent);
 
     final centText =
         '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';

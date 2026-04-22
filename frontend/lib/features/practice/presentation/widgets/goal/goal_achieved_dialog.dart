@@ -85,8 +85,8 @@ class GoalAchievedDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.warning.withValues(alpha: 0.2),
-                      AppColors.error.withValues(alpha: 0.2),
+                      AppColors.paperAccent.withValues(alpha: 0.2),
+                      AppColors.paperAccent.withValues(alpha: 0.2),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -100,7 +100,7 @@ class GoalAchievedDialog extends StatelessWidget {
                       '$streakDays일 연속 스트릭!',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ],
@@ -256,7 +256,7 @@ class GoalAchievedDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
-        Icon(Icons.check_circle, color: AppColors.success, size: 18),
+        Icon(Icons.check_circle, color: AppColors.paperOk, size: 18),
       ],
     );
   }

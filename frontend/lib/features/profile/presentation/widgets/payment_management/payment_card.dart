@@ -30,7 +30,7 @@ class PaymentCard extends StatelessWidget {
         border: Border.all(
           color:
               isOverdue
-                  ? AppColors.error.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent.withValues(alpha: 0.3)
                   : AppColors.inkQuaternary,
         ),
         boxShadow: [
@@ -75,7 +75,7 @@ class PaymentCard extends StatelessWidget {
           radius: 20,
           backgroundColor:
               payment.type == PaymentType.trial
-                  ? AppColors.info
+                  ? AppColors.ink
                   : AppColors.primaryLight,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
@@ -152,18 +152,18 @@ class PaymentCard extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning_amber, size: 14, color: AppColors.error),
+            Icon(Icons.warning_amber, size: 14, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space1),
             Text(
               '연체 ${DateTime.now().difference(payment.dueDate!).inDays}일',
               style: AppTypography.caption.copyWith(
-                color: AppColors.error,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -174,22 +174,22 @@ class PaymentCard extends StatelessWidget {
   }
 
   Color _getStatusColor(PaymentStatus status, bool isOverdue) {
-    if (isOverdue) return AppColors.error;
+    if (isOverdue) return AppColors.paperAccent;
     switch (status) {
       case PaymentStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case PaymentStatus.paid:
-        return AppColors.info;
+        return AppColors.ink;
       case PaymentStatus.confirmed:
       // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
         return AppColors.paperOk;
       case PaymentStatus.overdue:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case PaymentStatus.cancelled:
         return AppColors.inkTertiary;
       case PaymentStatus.refunded:
-        return AppColors.info;
+        return AppColors.ink;
     }
   }
 }
@@ -203,7 +203,7 @@ class PaymentTypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTrial = type == PaymentType.trial;
-    final color = isTrial ? AppColors.info : AppColors.primary;
+    final color = isTrial ? AppColors.ink : AppColors.primary;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -234,25 +234,25 @@ class PaymentStatusBadge extends StatelessWidget {
     final label = payment.displayStatus;
 
     if (payment.isOverdue) {
-      color = AppColors.error;
+      color = AppColors.paperAccent;
     } else if (payment.isAwaitingTeacherConfirmation) {
-      color = AppColors.info;
+      color = AppColors.ink;
     } else {
       switch (payment.status) {
         case PaymentStatus.pending:
-          color = AppColors.warning;
+          color = AppColors.paperAccent;
         case PaymentStatus.paid:
-          color = AppColors.info;
+          color = AppColors.ink;
         case PaymentStatus.confirmed:
         // ignore: deprecated_member_use_from_same_package
         case PaymentStatus.completed:
           color = AppColors.paperOk;
         case PaymentStatus.overdue:
-          color = AppColors.error;
+          color = AppColors.paperAccent;
         case PaymentStatus.cancelled:
           color = AppColors.inkTertiary;
         case PaymentStatus.refunded:
-          color = AppColors.info;
+          color = AppColors.ink;
       }
     }
 
@@ -306,7 +306,7 @@ class PaymentActionButton extends StatelessWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.1),
+              color: AppColors.ink.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Row(
@@ -315,13 +315,13 @@ class PaymentActionButton extends StatelessWidget {
                 Icon(
                   Icons.notifications_active,
                   size: 14,
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   '입금알림',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

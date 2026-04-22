@@ -143,7 +143,7 @@ class ProfileInfoCard extends StatelessWidget {
           border: Border.all(
             color:
                 isEmpty
-                    ? AppColors.warning.withValues(alpha: 0.3)
+                    ? AppColors.paperAccent.withValues(alpha: 0.3)
                     : AppColors.inkQuaternary,
           ),
         ),
@@ -214,10 +214,10 @@ class EducationCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
+              color: AppColors.paperOk.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(Icons.school, color: AppColors.success, size: 24),
+            child: Icon(Icons.school, color: AppColors.paperOk, size: 24),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -318,7 +318,7 @@ class CareerCard extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.1),
+                          color: AppColors.paperOk.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -326,7 +326,7 @@ class CareerCard extends ConsumerWidget {
                         child: Text(
                           '재직중',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.success,
+                            color: AppColors.paperOk,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -472,7 +472,7 @@ class CertificateCard extends ConsumerWidget {
                   Text(
                     '반려 사유: ${certificate.rejectionReason}',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ],
@@ -595,11 +595,11 @@ class ProfileAddButton extends StatelessWidget {
 Color getCompletionLevelColor(ProfileCompletionLevel level) {
   switch (level) {
     case ProfileCompletionLevel.minimum:
-      return AppColors.warning;
+      return AppColors.paperAccent;
     case ProfileCompletionLevel.basic:
-      return AppColors.info;
+      return AppColors.ink;
     case ProfileCompletionLevel.standard:
-      return AppColors.success;
+      return AppColors.paperOk;
     case ProfileCompletionLevel.complete:
       return AppColors.primary;
   }
@@ -625,11 +625,11 @@ String getCompletionLevelLabel(ProfileCompletionLevel level) {
 Color getCertificateStatusColor(CertificateStatus status) {
   switch (status) {
     case CertificateStatus.pending:
-      return AppColors.warning;
+      return AppColors.paperAccent;
     case CertificateStatus.approved:
-      return AppColors.success;
+      return AppColors.paperOk;
     case CertificateStatus.rejected:
-      return AppColors.error;
+      return AppColors.paperAccent;
   }
 }
 

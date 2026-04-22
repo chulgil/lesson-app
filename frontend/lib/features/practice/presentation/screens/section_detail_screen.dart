@@ -96,9 +96,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, size: 20, color: AppColors.error),
+                        Icon(Icons.delete, size: 20, color: AppColors.paperAccent),
                         SizedBox(width: AppSpacing.space2),
-                        Text('삭제', style: TextStyle(color: AppColors.error)),
+                        Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
                       ],
                     ),
                   ),
@@ -125,7 +125,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
@@ -282,7 +282,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -313,7 +313,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('연습 기록이 수정되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -322,7 +322,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('수정에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -379,7 +379,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                     navigator.pop();
                   }
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

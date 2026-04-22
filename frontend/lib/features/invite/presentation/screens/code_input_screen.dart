@@ -120,12 +120,12 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 16, color: AppColors.error),
+                    Icon(Icons.error_outline, size: 16, color: AppColors.paperAccent),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       _errorMessage!,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.error,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ],
@@ -229,7 +229,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            borderSide: BorderSide(color: AppColors.error),
+            borderSide: BorderSide(color: AppColors.paperAccent),
           ),
         ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],

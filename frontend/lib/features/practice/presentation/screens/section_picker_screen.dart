@@ -171,9 +171,9 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                    const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
                     const SizedBox(height: AppSpacing.space4),
-                    const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
+                    const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.paperAccent)),
                   ],
                 ),
               ),

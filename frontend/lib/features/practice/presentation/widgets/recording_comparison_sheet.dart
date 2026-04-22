@@ -813,9 +813,9 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
             style: AppTypography.bodySmall.copyWith(
               color:
                   isPositive == true
-                      ? AppColors.success
+                      ? AppColors.paperOk
                       : isPositive == false
-                      ? AppColors.error
+                      ? AppColors.paperAccent
                       : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),

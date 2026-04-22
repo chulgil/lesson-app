@@ -246,7 +246,7 @@ class NotificationItem extends StatelessWidget {
   Color _getIconBackgroundColor() {
     switch (notification.priority) {
       case NotificationPriority.urgent:
-        return AppColors.error.withValues(alpha: 0.1);
+        return AppColors.paperAccent.withValues(alpha: 0.1);
       case NotificationPriority.high:
         return AppColors.secondary.withValues(alpha: 0.2);
       case NotificationPriority.normal:

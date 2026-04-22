@@ -24,9 +24,9 @@ const Map<ProfileVisibility, IconData> visibilityIcons = {
 Color getVisibilityColor(ProfileVisibility visibility) {
   switch (visibility) {
     case ProfileVisibility.public:
-      return AppColors.success;
+      return AppColors.paperOk;
     case ProfileVisibility.students:
-      return AppColors.info;
+      return AppColors.ink;
     case ProfileVisibility.private:
       return AppColors.inkTertiary;
   }
@@ -73,19 +73,19 @@ class ProfileCompletionCard extends StatelessWidget {
 
     switch (level) {
       case ProfileCompletionLevel.minimum:
-        levelColor = AppColors.error;
+        levelColor = AppColors.paperAccent;
         levelLabel = '최소';
         levelDescription = '검색 노출이 제한됩니다';
       case ProfileCompletionLevel.basic:
-        levelColor = AppColors.warning;
+        levelColor = AppColors.paperAccent;
         levelLabel = '기본';
         levelDescription = '제한적으로 검색에 노출됩니다';
       case ProfileCompletionLevel.standard:
-        levelColor = AppColors.info;
+        levelColor = AppColors.ink;
         levelLabel = '표준';
         levelDescription = '검색에 정상 노출됩니다';
       case ProfileCompletionLevel.complete:
-        levelColor = AppColors.success;
+        levelColor = AppColors.paperOk;
         levelLabel = '완성';
         levelDescription = '프리미엄 노출 혜택을 받습니다';
     }
@@ -334,13 +334,13 @@ class VisibilityInfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, size: 20, color: AppColors.info),
+          Icon(Icons.info_outline, size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -349,7 +349,7 @@ class VisibilityInfoCard extends StatelessWidget {
                 Text(
                   '공개 범위 안내',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -358,7 +358,7 @@ class VisibilityInfoCard extends StatelessWidget {
                   '• 전체 공개: 누구나 볼 수 있습니다\n'
                   '• 연결된 학생만: 연결된 학생/학부모만 볼 수 있습니다\n'
                   '• 비공개: 아무에게도 표시되지 않습니다',
-                  style: AppTypography.caption.copyWith(color: AppColors.info),
+                  style: AppTypography.caption.copyWith(color: AppColors.ink),
                 ),
               ],
             ),
@@ -698,7 +698,7 @@ class ProfilePreviewContent extends StatelessWidget {
                               Icon(
                                 Icons.verified,
                                 size: 16,
-                                color: AppColors.success,
+                                color: AppColors.paperOk,
                               ),
                               const SizedBox(width: AppSpacing.space1),
                               Expanded(

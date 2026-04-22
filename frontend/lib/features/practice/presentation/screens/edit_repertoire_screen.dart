@@ -90,7 +90,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('레퍼토리 수정에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -152,7 +152,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('아카이브에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -178,7 +178,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                 child: const Text(AppStrings.cancel),
               ),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text(AppStrings.delete),
               ),
@@ -208,7 +208,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -375,8 +375,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                       icon: const Icon(Icons.archive_outlined),
                       label: const Text('아카이브'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.warning,
-                        side: const BorderSide(color: AppColors.warning),
+                        foregroundColor: AppColors.paperAccent,
+                        side: const BorderSide(color: AppColors.paperAccent),
                       ),
                     ),
                   ),
@@ -391,8 +391,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                       icon: const Icon(Icons.delete_forever),
                       label: const Text('레퍼토리 삭제'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.error,
-                        side: const BorderSide(color: AppColors.error),
+                        foregroundColor: AppColors.paperAccent,
+                        side: const BorderSide(color: AppColors.paperAccent),
                       ),
                     ),
                   ),

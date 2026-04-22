@@ -28,18 +28,18 @@ class RepertoireArchiveScreen extends ConsumerWidget {
             margin: const EdgeInsets.all(AppSpacing.space4),
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.1),
+              color: AppColors.ink.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                Icon(Icons.info_outline, color: AppColors.ink, size: 20),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '아카이브된 레퍼토리를 복원하거나 영구 삭제할 수 있습니다.',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.info,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -91,13 +91,13 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         Icon(
                           Icons.error_outline,
                           size: 64,
-                          color: AppColors.error,
+                          color: AppColors.paperAccent,
                         ),
                         const SizedBox(height: AppSpacing.space4),
                         Text(
                           '오류가 발생했습니다',
                           style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.space2),

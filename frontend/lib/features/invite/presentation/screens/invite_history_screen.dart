@@ -46,7 +46,7 @@ class InviteHistoryScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '초대 내역을 불러오는 중 오류가 발생했습니다',
@@ -184,7 +184,7 @@ class InviteHistoryScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text('취소하기'),
               ),
             ],
@@ -345,9 +345,9 @@ class _InviteCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onRevoke,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
+                  foregroundColor: AppColors.paperAccent,
                   side: BorderSide(
-                    color: AppColors.error.withValues(alpha: 0.5),
+                    color: AppColors.paperAccent.withValues(alpha: 0.5),
                   ),
                 ),
                 child: const Text('초대 취소'),

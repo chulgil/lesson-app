@@ -344,13 +344,13 @@ class BadgeCollectionScreen extends ConsumerWidget {
   Color _getRarityColor(BadgeRarity rarity) {
     switch (rarity) {
       case BadgeRarity.common:
-        return AppColors.info;
+        return AppColors.ink;
       case BadgeRarity.rare:
         return AppColors.primary;
       case BadgeRarity.epic:
         return AppColors.primaryDark;
       case BadgeRarity.legendary:
-        return AppColors.warning;
+        return AppColors.paperAccent;
     }
   }
 

@@ -221,13 +221,13 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                             Icon(
                               Icons.check_circle_outline,
                               size: 14,
-                              color: AppColors.success,
+                              color: AppColors.paperOk,
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
                               '저장됨',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.success,
+                                color: AppColors.paperOk,
                               ),
                             ),
                           ],
@@ -427,18 +427,18 @@ class PracticeTipsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, color: AppColors.info, size: 20),
+          Icon(Icons.info_outline, color: AppColors.ink, size: 20),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               lesson.practiceTips ?? '',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.info),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
             ),
           ),
           if (isTeacher && onEdit != null)
@@ -446,7 +446,7 @@ class PracticeTipsCard extends StatelessWidget {
               onPressed: onEdit,
               icon: const Icon(Icons.edit_outlined),
               iconSize: 18,
-              color: AppColors.info,
+              color: AppColors.ink,
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
               tooltip: '수정',
@@ -475,9 +475,9 @@ class RecordingStatusIndicator extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -485,7 +485,7 @@ class RecordingStatusIndicator extends StatelessWidget {
             width: 12,
             height: 12,
             decoration: BoxDecoration(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               shape: BoxShape.circle,
             ),
           ),
@@ -493,7 +493,7 @@ class RecordingStatusIndicator extends StatelessWidget {
           Text(
             '녹음 중',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -501,7 +501,7 @@ class RecordingStatusIndicator extends StatelessWidget {
           Text(
             _formatDuration(recordingSeconds),
             style: AppTypography.headingMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
@@ -576,7 +576,7 @@ Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],
@@ -613,7 +613,7 @@ Future<String?> showEditPracticeTipDialog({
             if (hasTip)
               TextButton(
                 onPressed: () => Navigator.pop(context, ''),
-                child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                child: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
               ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text.trim()),
@@ -719,12 +719,12 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check, size: 12, color: AppColors.success),
+                    Icon(Icons.check, size: 12, color: AppColors.paperOk),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
                       '저장됨',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.success,
+                        color: AppColors.paperOk,
                       ),
                     ),
                   ],

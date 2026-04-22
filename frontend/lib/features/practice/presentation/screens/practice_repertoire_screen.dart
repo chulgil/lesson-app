@@ -61,7 +61,7 @@ class PracticeRepertoireScreen extends ConsumerWidget {
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
@@ -203,12 +203,12 @@ class _RepertoireCard extends ConsumerWidget {
                               Icon(
                                 Icons.delete,
                                 size: 20,
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                               ),
                               SizedBox(width: AppSpacing.space2),
                               Text(
                                 '삭제',
-                                style: TextStyle(color: AppColors.error),
+                                style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],
                           ),
@@ -359,7 +359,7 @@ class _RepertoireCard extends ConsumerWidget {
                       .deleteRepertoire(repertoire.id, studentId);
                   ref.invalidate(studentRepertoiresProvider(studentId));
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -508,7 +508,7 @@ class _SectionListItem extends ConsumerWidget {
                         );
                     ref.invalidate(studentRepertoiresProvider(studentId));
                   },
-                  activeColor: AppColors.success,
+                  activeColor: AppColors.paperOk,
                 ),
               ),
 

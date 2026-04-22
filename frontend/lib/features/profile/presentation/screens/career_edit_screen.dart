@@ -133,7 +133,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -170,7 +170,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
             IconButton(
               onPressed: _isLoading ? null : _delete,
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: AppColors.paperAccent,
             ),
         ],
       ),
@@ -359,7 +359,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
           Text(
             ' *',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -383,11 +383,11 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error),
+        borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.error, width: 2),
+        borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

@@ -12,15 +12,15 @@ import '../../../../features/practice/domain/entities/piece.dart';
 Color getDifficultyColor(String? difficulty) {
   switch (difficulty) {
     case '초급':
-      return AppColors.success;
+      return AppColors.paperOk;
     case '초중급':
       return AppColors.profileGreen;
     case '중급':
       return AppColors.amber;
     case '중상급':
-      return AppColors.warning;
+      return AppColors.paperAccent;
     case '상급':
-      return AppColors.error;
+      return AppColors.paperAccent;
     default:
       return AppColors.inkSecondary;
   }
@@ -309,11 +309,11 @@ class PieceCard extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, color: AppColors.error),
+                            Icon(Icons.delete, color: AppColors.paperAccent),
                             SizedBox(width: AppSpacing.space2),
                             Text(
                               '삭제',
-                              style: TextStyle(color: AppColors.error),
+                              style: TextStyle(color: AppColors.paperAccent),
                             ),
                           ],
                         ),
@@ -759,7 +759,7 @@ void showDeletePieceConfirmation({
                 Navigator.pop(dialogContext);
                 onConfirm();
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],

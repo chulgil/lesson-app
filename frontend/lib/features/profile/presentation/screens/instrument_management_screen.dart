@@ -51,7 +51,7 @@ class _InstrumentManagementScreenState
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   const Text('오류가 발생했습니다.'),
@@ -167,7 +167,7 @@ class _InstrumentManagementScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.error),
+              icon: const Icon(Icons.delete_outline, color: AppColors.paperAccent),
               onPressed: () => _showDeleteConfirmation(instrument),
             ),
             ReorderableDragStartListener(
@@ -333,7 +333,7 @@ class _InstrumentManagementScreenState
                   Navigator.pop(context);
                   _removeInstrument(instrument);
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

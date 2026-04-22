@@ -94,10 +94,10 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     final rate = overview.overallRate;
     final color =
         rate >= 90
-            ? AppColors.success
+            ? AppColors.paperOk
             : rate >= 70
-            ? AppColors.warning
-            : AppColors.error;
+            ? AppColors.paperAccent
+            : AppColors.paperAccent;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -139,10 +139,10 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     final rate = sr.rate;
     final color =
         rate >= 90
-            ? AppColors.success
+            ? AppColors.paperOk
             : rate >= 70
-            ? AppColors.warning
-            : AppColors.error;
+            ? AppColors.paperAccent
+            : AppColors.paperAccent;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -207,7 +207,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           if (isDeducted)
             Text(
               AppStrings.subscriptionDeducted,
-              style: AppTypography.caption.copyWith(color: AppColors.error),
+              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
             ),
         ],
       ),

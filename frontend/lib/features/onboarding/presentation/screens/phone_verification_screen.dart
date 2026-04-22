@@ -212,7 +212,7 @@ class _PhoneVerificationScreenState
                   Text(
                     _errorMessage!,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ],
@@ -337,7 +337,7 @@ class _PhoneVerificationScreenState
                 _formatTime(_remainingSeconds),
                 style: AppTypography.bodyMedium.copyWith(
                   color: _remainingSeconds <= 30
-                      ? AppColors.error
+                      ? AppColors.paperAccent
                       : AppColors.primary,
                   fontWeight: FontWeight.w600,
                 ),

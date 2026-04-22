@@ -113,7 +113,7 @@ class _FollowTab extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text('팔로우 취소', style: TextStyle(color: AppColors.error)),
+                child: Text('팔로우 취소', style: TextStyle(color: AppColors.paperAccent)),
               ),
             ],
           ),

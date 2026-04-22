@@ -59,9 +59,9 @@ enum ParentStatus {
   Color get color {
     switch (this) {
       case ParentStatus.pending:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case ParentStatus.active:
-        return AppColors.success;
+        return AppColors.paperOk;
       case ParentStatus.inactive:
         return AppColors.inkTertiary;
     }

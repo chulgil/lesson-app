@@ -126,11 +126,11 @@ class _WeeklyReportTab extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.error),
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
           ),
           const SizedBox(height: AppSpacing.space3),
           TextButton(
@@ -208,11 +208,11 @@ class _MonthlyReportTab extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.error),
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
           ),
           const SizedBox(height: AppSpacing.space3),
           TextButton(
