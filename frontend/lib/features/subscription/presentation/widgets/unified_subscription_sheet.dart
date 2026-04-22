@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_proposal_providers.dart';
@@ -148,7 +149,8 @@ class _UnifiedSubscriptionSheetState
                 child: const Icon(Icons.close, size: AppSpacing.iconMD),
               ),
               const Spacer(),
-              Text('수강권 발급', style: AppTypography.headingSmall),
+              // Notebook × Score: 바텀시트 제목도 Playfair appBarTitle 로 통일.
+              Text('수강권 발급', style: NotebookTypography.appBarTitle),
               const Spacer(),
               const SizedBox(width: AppSpacing.iconMD),
             ],
@@ -228,9 +230,7 @@ class _UnifiedSubscriptionSheetState
         alignment: Alignment.center,
         child: Text(
           '등록된 템플릿이 없습니다',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
       );
     }
@@ -397,12 +397,12 @@ class _UnifiedSubscriptionSheetState
             },
             selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
             labelStyle: AppTypography.bodySmall.copyWith(
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.ink,
+              color: isSelected ? AppColors.paperAccent : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
             side: BorderSide(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           );
         }),
@@ -470,12 +470,14 @@ class _UnifiedSubscriptionSheetState
               },
               selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
               labelStyle: AppTypography.bodySmall.copyWith(
-                color:
-                    isSelected ? AppColors.paperAccent : AppColors.ink,
+                color: isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                color:
+                    isSelected
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
               ),
             );
           }).toList(),
@@ -519,7 +521,9 @@ class _UnifiedSubscriptionSheetState
                   ),
                   side: BorderSide(
                     color:
-                        canSubmit ? AppColors.paperAccent : AppColors.inkQuaternary,
+                        canSubmit
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -665,7 +669,8 @@ class _UnifiedSubscriptionSheetState
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('회차 입력', style: AppTypography.headingSmall),
+            // Notebook × Score: 전역 dialogTheme(titleTextStyle=dialogTitle) 적용을 위해 style 오버라이드 제거.
+            title: const Text('회차 입력'),
             content: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
@@ -763,8 +768,7 @@ class _TemplateChip extends StatelessWidget {
             template.name,
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.ink,
+              color: isSelected ? AppColors.paperAccent : AppColors.ink,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -781,9 +785,7 @@ class _TemplateChip extends StatelessWidget {
           const SizedBox(height: AppSpacing.space1),
           Text(
             template.formattedValidity,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
