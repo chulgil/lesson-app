@@ -75,7 +75,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
           label,
           style: Theme.of(
             context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+          ).textTheme.bodySmall?.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: 2),
         Text(

@@ -107,7 +107,7 @@ class LocationSummaryCard extends ConsumerWidget {
             location.displayAddress,
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+            ).textTheme.bodySmall?.copyWith(color: AppColors.inkSecondary),
           ),
         ],
         if (travelTime > 0) ...[

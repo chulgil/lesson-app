@@ -59,7 +59,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
               // Handle bar
               BottomSheetHandle(
                 margin: const EdgeInsets.only(top: AppSpacing.space3),
-                color: Colors.grey[300],
+                color: AppColors.inkQuaternary,
               ),
 
               // Header
