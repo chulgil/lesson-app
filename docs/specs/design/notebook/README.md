@@ -864,6 +864,26 @@ Text(
 
 ---
 
+### 7.27 수강권 발급 시트·회차 입력 다이얼로그 제목 Playfair 통일
+
+**배경**: §7.5 AppBar 제목, §7.9 AlertDialog 제목 전역 테마로 대부분의 페이지/다이얼로그 상단이 Playfair Display 로 통일됐지만, `unified_subscription_sheet` 는 두 가지 이유로 예외로 남아 있었다. ① 바텀시트 헤더는 AppBar 가 아니라 커스텀 Row 구조라 전역 `appBarTitle` 이 닿지 않았고 `AppTypography.headingSmall` (Pretendard 18) 로 남아 있었다. ② 시트 내부에서 띄우는 회차 입력 AlertDialog 는 `dialogTheme` 이 자동 적용되지만 `title: Text('회차 입력', style: AppTypography.headingSmall)` 로 스타일을 직접 오버라이드해 테마를 무력화하고 있었다. 수강권 발급은 선생님이 가장 자주 진입하는 모달 플로우라 제목 타이포가 다르면 Notebook 팔레트의 경계가 가장 먼저 드러난다.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `features/subscription/presentation/widgets/unified_subscription_sheet.dart` | 바텀시트 헤더 `AppTypography.headingSmall` → `NotebookTypography.appBarTitle`, AlertDialog 제목의 `style:` 오버라이드 제거(전역 `dialogTheme` 위임) | 885c6c23 |
+
+**설계 포인트**:
+- 바텀시트 커스텀 헤더는 AppBar 와 시각 위계를 맞추기 위해 `appBarTitle` (Playfair 18/w700) 재사용. 별도 `bottomSheetTitle` 변형을 만들지 않고 AppBar 와 같은 스타일 채택 — 사용자가 "페이지 전환" 과 "모달 전환" 을 같은 무게로 경험하게 됨.
+- AlertDialog 는 전역 `dialogTheme.titleTextStyle = NotebookTypography.dialogTitle` (Playfair 19/w700) 이 이미 붙어 있으므로 `style:` 을 제거하는 "공통 수정" 만으로 19pt 로 정렬. 앞으로 추가되는 다이얼로그는 기본값으로 같은 규칙을 따른다 → 단일 진원지 재확인.
+
+**검증**:
+- `flutter analyze lib/features/subscription/presentation/widgets/unified_subscription_sheet.dart` → 0 issues
+- `flutter test test/` → 392/392 passed
+
+**은유**: 악보집 중간의 펼침 면(바텀시트)도, 그 위에 살짝 붙는 메모지(다이얼로그)도 표지와 같은 Playfair 로마자 제목을 쓴다. 제본 깊이가 달라도 "같은 책 안" 임을 제목 서체가 보증한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
