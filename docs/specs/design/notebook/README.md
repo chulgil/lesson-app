@@ -1034,6 +1034,39 @@ Text(
 
 ---
 
+### 7.34 BottomSheet 테마 통일 — 61개 모달 시트에 paper 표면·flat elevation 단일 지점 보급
+
+**배경**: 앱 전반에서 `showModalBottomSheet` 는 61개 호출부에 퍼져 있지만, `app_theme.dart` 에는 `bottomSheetTheme` 자체가 비어 있어 Material 기본값(흰 배경·elevation 1·M3 surfaceTint) 이 노출됐다. 많은 호출부가 `backgroundColor: Colors.transparent` 를 인라인으로 지정해 시트 내부 Card/Container 가 배경을 그리는 패턴으로 우회했지만, 그 인라인 지정이 없는 호출부(debug 롤 스위처·booking_cancel·auth 바텀시트·practice·parent_home 등 다수) 는 여전히 흰 사각 모달로 남아 Notebook 페이퍼 질감이 끊겼다. §7.29 AppBar·§7.31 Chip·§7.32 ExpansionTile 에 이어 **"Material 기본값이 보라/흰 잔재를 드러내는 마지막 큰 모달 창"** 을 전역 테마로 수렴할 시점.
+
+| 파일 | 변경 | 커밋 |
+|------|------|------|
+| `core/theme/app_theme.dart` (light) | `bottomSheetTheme: BottomSheetThemeData(backgroundColor: paper, modalBackgroundColor: paper, surfaceTintColor: transparent, modalBarrierColor: black54, elevation: 0, modalElevation: 0, dragHandleColor: inkQuaternary, shape: RoundedRectangleBorder(BorderRadius.vertical(top: radiusLarge)))` 추가 | 30f354ac |
+| `core/theme/app_theme.dart` (dark) | 같은 구조로 `backgroundColor/modalBackgroundColor: surfaceDark`, `dragHandleColor: borderDark`, `modalBarrierColor: black87` | 30f354ac |
+
+**영향 범위**: 61개 `showModalBottomSheet` 호출부. 그중 인라인 `backgroundColor: Colors.transparent` 를 지정한 호출부(subscription·auth·lessons·schedule·invite 등 다수) 는 기존 거동 그대로 — 시트 내부 컨테이너가 Notebook 배경을 직접 그리는 계약이 깨지지 않는다. 인라인 지정이 없는 호출부(debug_role_switcher·booking_cancel_screen·schedule_timeline_view·terms_agreement·login_bottom_sheets·students_tab·student_detail·lesson_time_settings·bank_account_edit·repertoire_management·quick_feedback·lesson_student_picker·parent_home 시리즈·practice 편집 화면들·onboarding 프로필 셋업 등 20+ 호출부) 는 흰 배경이 `paper` 로 자동 승격된다.
+
+**설계 포인트**:
+- `backgroundColor` 와 `modalBackgroundColor` 를 같은 값으로 쌍으로 지정. Flutter 의 BottomSheetThemeData 는 일반 persistent sheet(`backgroundColor`) 와 modal sheet(`modalBackgroundColor`) 를 분리 제어하는데, 앱에서는 둘 다 Notebook paper 표면이 맞으므로 동시에 묶는다.
+- `surfaceTintColor: Colors.transparent` — Material 3 의 overlay tint(primary 색 기반) 제거. Notebook 은 elevation 이 0 이어야 하므로 tint 자체가 무의미하며, 남겨두면 미세한 보라 잔재가 시트 상단에 번진다.
+- `elevation: 0` / `modalElevation: 0` — Notebook 은 종이 한 장이 책상 위로 올라오는 flat 인상. 그림자는 `modalBarrierColor` 가 대신 맡는다.
+- `shape: RoundedRectangleBorder(BorderRadius.vertical(top: radiusLarge))` — 하단이 화면에 붙은 시트 특성상 상단만 12px 라운드. §7 의 Card 전역 `radiusLarge` 와 동일 값으로 모달 모서리 위계를 시트까지 연장.
+- `dragHandleColor` 는 light 에서 `inkQuaternary` (25% 알파 잉크) 로 중립, dark 에서는 같은 알파가 표면과 구분이 약해서 `borderDark` 로 한 단계 올림.
+- `modalBarrierColor` 는 Material 기본 `black54` 를 light 에 유지하되, dark 에서는 `black87` 로 심화 — 어두운 표면 위 시트가 뜰 때 배경과의 거리감을 확보.
+
+**호환성**:
+- 인라인 `backgroundColor: Colors.transparent` 는 테마 기본값을 덮어쓰므로 기존 "내부 컨테이너가 배경 담당" 패턴은 변형 없음. 회귀 0.
+- 일부 호출부(`my_connections_screen` 등) 가 인라인 `shape: RoundedRectangleBorder(...)` 을 직접 지정한 곳은 호출부 오버라이드가 우선 — 향후 Cycle 에서 인라인 shape 를 제거해 테마로 일원화하는 정리가 가능하나, 이번 턴은 편집 범위 최소화 원칙에 따라 인라인 지정을 보존.
+- `surfaceTintColor` 와 `elevation` 은 기존 인라인 지정이 없던 속성이라 테마 설정이 그대로 적용 — 이 지점이 이번 턴의 실질 효과가 가장 큰 속성.
+
+**검증**:
+- `flutter analyze` → No issues found
+- `flutter test` → 392/392 passed (regression 0)
+- 정성 검증 기대치: `backgroundColor: Colors.transparent` 없이 호출되는 20+ 모달(debug 롤 스위처·예약 취소·약관 동의·요일 설정 편집 시트 등) 의 배경이 Notebook paper 로 전환됨. 인라인 transparent 호출은 시트 내부 컨테이너가 배경 담당 — 기존 거동 유지.
+
+**은유**: 책상 위에 올려놓은 낱장 악보. 어떤 장(chapter) 에서 꺼내든 같은 갱지 톤이 깔리고, 모서리는 같은 반경으로 둥글며, 그 아래 책상 면은 같은 어조로 어두워진다. 장(章) 마다 다른 흰 포스트잇을 쓰던 상태에서, 한 권의 필사본으로 모이는 전환.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
