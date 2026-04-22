@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
@@ -47,13 +48,67 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
           index: _currentIndex,
           children: _buildTabs(activeProfile),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.paperAccent,
-          unselectedItemColor: AppColors.inkTertiary,
-          items: _buildNavItems(activeProfile),
+        bottomNavigationBar: _buildBottomNavigation(),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, 'I', '홈'),
+              _buildNavItem(1, 'II', '레슨'),
+              _buildNavItem(2, 'III', '과제'),
+              _buildNavItem(3, 'IV', '결제'),
+              _buildNavItem(4, 'V', '프로필'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, String roman, String label) {
+    final isSelected = _currentIndex == index;
+    final accentColor =
+        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
+
+    return InkWell(
+      onTap: () => setState(() => _currentIndex = index),
+      child: SizedBox(
+        width: 60,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              roman,
+              style: NotebookTypography.roman.copyWith(
+                fontSize: 18,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: NotebookTypography.sectionLabel.copyWith(
+                fontSize: 10,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -78,36 +133,6 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
       const ParentAssignmentsTab(),
       const ParentPaymentsTab(),
       const ParentProfileTab(),
-    ];
-  }
-
-  List<BottomNavigationBarItem> _buildNavItems(ProfileType activeProfile) {
-    return const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home_outlined),
-        activeIcon: Icon(Icons.home),
-        label: '홈',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.calendar_today_outlined),
-        activeIcon: Icon(Icons.calendar_today),
-        label: '레슨',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.assignment_outlined),
-        activeIcon: Icon(Icons.assignment),
-        label: '과제',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.credit_card_outlined),
-        activeIcon: Icon(Icons.credit_card),
-        label: '결제',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.person_outline),
-        activeIcon: Icon(Icons.person),
-        label: '프로필',
-      ),
     ];
   }
 }

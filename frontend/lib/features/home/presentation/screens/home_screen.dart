@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../schedule/presentation/screens/schedule_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
@@ -42,37 +43,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomNavigation() {
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.inkQuaternary, width: 1),
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, 'I', '홈'),
+              _buildNavItem(1, 'II', '스케줄'),
+              _buildNavItem(2, 'III', '수강관리'),
+              _buildNavItem(3, 'IV', '프로필'),
+            ],
+          ),
         ),
       ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: '홈',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined, size: 22),
-            activeIcon: Icon(Icons.calendar_today, size: 22),
-            label: '스케줄',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.confirmation_number_outlined),
-            activeIcon: Icon(Icons.confirmation_number),
-            label: '수강관리',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: '프로필',
-          ),
-        ],
+    );
+  }
+
+  Widget _buildNavItem(int index, String roman, String label) {
+    final isSelected = _currentIndex == index;
+    final accentColor =
+        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
+
+    return InkWell(
+      onTap: () => setState(() => _currentIndex = index),
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              roman,
+              style: NotebookTypography.roman.copyWith(
+                fontSize: 18,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: NotebookTypography.sectionLabel.copyWith(
+                fontSize: 10,
+                color: accentColor,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
