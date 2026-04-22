@@ -514,9 +514,9 @@ Text(
 - `flutter analyze` → 0 issues
 - 스펙(§6.4 Pencil 프리미티브, §6.5 StaffDivider) 갱신
 
-### 7.11 Phase 3 후속 실적용 (StaffDivider + PencilCircle 도입)
+### 7.11 Phase 3 후속 실적용 (StaffDivider + PencilCircle + PencilBox 도입)
 
-**범위**: Phase 3에서 신설한 공용 위젯을 실제 화면 3곳에 적용. "추가만 하고 쓰이지 않는 위젯" 잔여물 제거.
+**범위**: Phase 3에서 신설한 공용 위젯을 실제 화면 6곳에 적용. "추가만 하고 쓰이지 않는 위젯" 잔여물 제거.
 
 | 위젯 | 적용 파일 | 변경 | 커밋 |
 |------|-----------|------|------|
@@ -524,14 +524,18 @@ Text(
 | `StaffDivider` | `features/practice/presentation/widgets/month_group_header.dart` | 월 그룹 헤더 상단에 배치 — "새 월 = 새 악장" 은유. 기존 Row 우측 1px Expanded 라인 제거 | 3b4b6d60 |
 | `PencilCircle` | `features/parent_home/presentation/widgets/profile_switcher.dart` | 선택된 프로필 표시를 `Icons.check_circle` 에서 `PencilCircle(size: 20)` 로 교체 | 3b4b6d60 |
 | `PencilCircle` | `features/practice/presentation/widgets/goal/goal_setting_chips.dart` | `ChoiceChip.avatar` 슬롯에 `PencilCircle(size: 16)`. `showCheckmark: false` 로 Material 체크마크 대체 | 795b5c18 |
+| `PencilBox` | `features/auth/presentation/screens/terms_agreement_screen.dart` | Material `Checkbox` 2곳(전체 동의 20px · 개별 약관 18px) → `PencilBox`. 외부 `InkWell` 이 탭 처리 | ae35f194 |
+| `PencilBox` | `features/lessons/presentation/widgets/practice_items_section.dart` | 연습 완료 표시 원형 컨테이너+Icon → `PencilBox(size: 20, checkColor: paperOk)`. 녹색 펜 느낌 유지, 원형 → 사각 체크로 변경 | ae35f194 |
 
 **검증**:
-- `flutter analyze` → 0 issues (4곳 모두)
+- `flutter analyze` → 0 issues (6곳 모두)
+- `flutter test` → 392/392 passed
 - 기능·Provider·라우팅 변경 없음 (style-only)
 
 **은유 요약**:
 - StaffDivider: 섹션 구분 = 악보의 새 악장
 - PencilCircle: 선택 상태 = 연필로 그은 동그라미
+- PencilBox: 완료 체크 = 손으로 그린 사각 체크박스 (paperOk = 녹색 펜)
 
 ---
 
