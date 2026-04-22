@@ -635,6 +635,19 @@ class AppTheme {
         ),
       ),
 
+      // TextButton — Notebook × Score: dark 테마에서도 TextButton foreground 를 paper 로 고정.
+      // light 테마에서는 ink(검정) 로 등록했으나 dark 테마에서는 미등록 상태였다 — 다크 표면 위
+      // 기본 colorScheme.primary(purple) 로 폴백돼 Notebook 팔레트 외 색상이 혼입될 수 있었다.
+      // light 테마와 동일 시그니처(bodyMedium w500) 로 밝기 전환 시 텍스트 버튼 타이포 일관성 확보.
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paper,
+          textStyle: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+
       // FloatingActionButton — Notebook × Score: dark 테마에서도 Vermillion CTA 시그니처 유지.
       // filledButtonTheme(dark) 와 동일한 paperAccent·paper·elevation 0 — light/dark 전환 시 FAB 색상 일관성 확보.
       // dark 표면 위 paperAccent 는 충분한 대비, foregroundColor 는 paper 로 밝은 라벨 유지.
