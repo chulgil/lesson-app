@@ -85,6 +85,16 @@ class NotebookTypography {
     height: 1.3,
   );
 
+  /// 섹션 제목 — 화면 내부 영역 헤더 (레슨 상세의 "선생님 피드백" / "주요 포인트" 등).
+  /// Playfair 17 / w600. `appBarTitle`(18)과 `pieceTitle`(16) 사이의 중간 위계.
+  static TextStyle get sectionTitle => GoogleFonts.playfairDisplay(
+    fontSize: 17,
+    fontWeight: FontWeight.w600,
+    color: AppColors.ink,
+    letterSpacing: -0.2,
+    height: 1.3,
+  );
+
   /// AppBar 타이틀 — Playfair Display 18 / w700.
   /// 전역 `appBarTheme.titleTextStyle` 에 적용되어 하위 화면 전체의 상단 타이틀을 통일.
   static TextStyle get appBarTitle => GoogleFonts.playfairDisplay(

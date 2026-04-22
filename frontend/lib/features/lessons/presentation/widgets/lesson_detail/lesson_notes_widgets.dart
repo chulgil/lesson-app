@@ -32,7 +32,8 @@ class LessonDetailSectionHeader extends StatelessWidget {
       children: [
         Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: 섹션 제목을 Playfair 17 로 통일 (매스트헤드·AppBar 위계와 맞춤).
+        Text(title, style: NotebookTypography.sectionTitle),
         const Spacer(),
         if (showAddButton && onAdd != null)
           IconButton(
