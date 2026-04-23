@@ -2881,6 +2881,76 @@ flutter analyze <17 files>
 
 ---
 
+### 7.82 auth/ 진입 경험 전수 감사 — 화면 타이틀 §7.17 + 바텀시트 §7.27 + Vermillion CTA §7.50 통합 배치
+
+**배경**: §7.80 예고 후보 3("타 도메인 §7.50 잔재") + §7.81 예고 후보 2("auth/ 로그인·가입 화면, 전수 미감사") 실행. `home/` 0건, `parent/` 폴더 부재. `auth/` 에서 `Colors.white` 6건 + `AppTypography.heading` 9건 발견. **진입 경험(로그인/초대코드/약관/역할선택)** 은 사용자가 앱을 처음 만나는 의례적 문턱이므로, Playfair + Vermillion 시그니처를 가장 집중적으로 적용해야 하는 도메인. 10건 동시 배치로 의례적 진입 경험 재구성.
+
+| 파일 | 라인 | 요소 | 패턴 |
+|---|---:|---|:---:|
+| student_invite_code_screen | 76 | `'학생 등록'` | §7.17 |
+| student_invite_code_screen | 169 | FilledButton `foregroundColor` | §7.50 |
+| student_invite_code_screen | 186 | Spinner `AlwaysStoppedAnimation` | §7.50 spinner |
+| parent_invite_code_screen | 77 | `'학부모 등록'` | §7.17 |
+| terms_agreement_screen | 61 | `'서비스 이용 동의'` | §7.17 |
+| terms_agreement_screen | 143 | `'계속'` FilledButton text | §7.50 |
+| terms_agreement_screen | 269 | `title` (dynamic 바텀시트 헤더) | §7.27 |
+| role_select_screen | 87 | `'$userName님, 환영합니다!'` | §7.17 |
+| login_bottom_sheets | 47 | `'학부모 로그인'` | §7.27 |
+| login_bottom_sheets | 130 | `'역할을 선택하세요'` | §7.27 |
+
+**수량**: 10 code-line edits (+ 5 imports). 7 Playfair 승격 (§7.17 4건 + §7.27 3건) + 3 §7.50 Vermillion foreground.
+
+**§7.50 범위 밖 유지 3건** — 의도적 `Colors.white` 보존:
+
+| 파일:라인 | 배경 | 유지 이유 |
+|---|---|---|
+| parent_invite_code_screen:167 | `AppColors.ink` (검정) | §7.50 은 **paperAccent(Vermillion) 배경에만** 적용. ink 배경 위 흰 글씨는 가독성 때문에 Colors.white 유지 |
+| parent_invite_code_screen:180 | `AppColors.ink` | 동일 (spinner) |
+| login_bottom_sheets:91 | `AppColors.appleBackground` | Apple 브랜드색(검정) — 브랜드 가이드 준수 |
+
+**§7.30 제외 2건** — 의도적 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| student_invite_code_screen:97 | `letterSpacing: 4` 코드 입력 필드 | input field style (헤딩 스타일을 monospace-like 입력에 재사용) |
+| parent_invite_code_screen:95 | 동일 | 동일 |
+
+**동적 타이틀 승격 판단** — `terms_agreement_screen:269 title` (dynamic 인자), `role_select_screen:87 '$userName님, 환영합니다!'` (dynamic name) 둘 다 **구조적으로 화면/바텀시트 헤더 포지션** 이므로 §7.17/§7.27 적용 (§7.78 `add_tip_bottom_sheet.dart:70 widget.title` 선례와 동일한 판정).
+
+**검증**: `flutter analyze lib/features/auth/` → No issues found! (ran in 8.1s). 5 imports 추가, 10 edits 모두 성공.
+
+**커밋**: (Cycle 38 진행 중)
+
+**도메인 관찰**: auth/ 는 **"진입 의례"** 도메인. 로그인 바텀시트 → 역할 선택 → 환영 메시지 → 초대 코드 입력 → 약관 동의 — 사용자가 앱에 처음 발 들이는 5단계 여정. 이 도메인에서 §7.17(화면 타이틀) 과 §7.27(바텀시트 제목) 이 **같은 밀도** 로 섞여 있음이 특징 — 진입 흐름에서 풀스크린과 바텀시트가 번갈아 등장하기 때문. 전환율은 **78%** (9건 heading 중 7건 Playfair 승격, 2건은 입력 필드 스타일 재사용) — **auth/ 도메인 진입 경험 전체가 정적 명사 타이틀 중심** 임을 확인.
+
+**전환율 비교** (업데이트):
+
+| 도메인 | heading 발견 | 변환 | §7.30/Input 제외 | 전환율 | 본질 |
+|---|---:|---:|---:|---:|---|
+| **auth/ (§7.82)** | **9건** | **7건** | **2건 (input field style)** | **78%** | **진입 의례** |
+| lessons/widgets (§7.78) | 15건 | 10건 | 5건 | 66.7% | 상태 전이 모달 이름 |
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% | 정적 명사 (수강권) |
+| profile/ (§7.77) | 7건 | 2건 | 5건 | 28.6% | 금액 중심 |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% | 동적 이벤트 |
+| student_home+gamification+settings (§7.79) | 10건 | 2건 | 8건 | 20% | 동적 값 집중 |
+| invite/ (§7.76) | 8건 | 1건 | 7건 | 12.5% | 상태 전이 피드백 |
+| schedule/widgets (§7.73) | 10건 | 1건 | 9건 | 10% | 동적 시간대 |
+| parent_home (§7.81) | 11건 | 0건 | 11건 | 0% | 값 표시 전용 |
+
+**신규 관찰**: **"입력 필드 스타일 재사용"** 이라는 §7.30 서브 카테고리 발견 — auth/ 의 초대 코드 입력 필드가 `AppTypography.headingMedium` 을 `letterSpacing: 4` 와 함께 **monospace-like input style** 로 재사용. 이 경우 heading 은 "제목" 이 아니라 "큰 글자 입력 영역" 역할이므로 Gothic 유지가 맞음. 향후 auth/ 아닌 다른 도메인에서도 동일 패턴 있을 수 있음 (PIN 입력, OTP 입력 등).
+
+**§7.50 적용 조건 재확인**: "Vermillion 배경에 한정" 이라는 원칙을 auth/ 에서 재검증. parent_invite_code_screen 의 ink 배경 / login_bottom_sheets 의 appleBackground 는 각각 "검정 배경" 과 "Apple 브랜드 가이드" 맥락이므로 Colors.white 유지. §7.50 은 **Notebook × Score 팔레트 내부** 에만 적용되며, **외부 브랜드 컬러(Google/Kakao/Apple) 와 순수 검정(ink) 배경은 범위 밖**.
+
+**다음 후보**:
+1. `students/` 도메인 잔재 (student_detail 제외 — §7.74 완료)
+2. `core/widgets/` 공통 위젯 §7.50 잔재 스윕
+3. `practice/screens` (§7.62·§7.64·§7.66 이후 남은 화면 — §7.81 에서도 언급)
+4. `search/` (teacher_detail/academy_detail — §7.81 parallel-contested 경고)
+
+**은유**: §7.82 는 **입구의 문장을 전부 고쳐 쓰는 일**이었다. 건물에 들어가는 사람은 **입구의 서체** 로 그 건물의 격을 가늠한다. `Gothic` 은 **"디지털 로비"** — 효율적이지만 차갑다. `Playfair` 는 **"손으로 쓴 웰컴 카드"** — 한 박자 느리지만 환영받는 느낌. auth/ 의 7건 타이틀이 Playfair 로 바뀌면서 **"등록하세요"** 에서 **"등록해 주세요"** 로 **어조가 변한다** (실제 텍스트는 같지만). Vermillion 버튼(`계속`, `코드 확인하기`)의 글자가 `Colors.white` 에서 `AppColors.paper` 로 바뀌면서 **"디지털 확인 버튼"** 이 **"잉크로 찍는 도장"** 이 된다. 진입 의례 전체가 **종이 한 장짜리 편지** 의 질감으로 재구성된 것이 §7.82 의 의도. parent_home/ 의 0% 전환율(§7.81)과 대조적으로 auth/ 의 78% 전환율은 — **"값이 흐르는 공간" 과 "의례가 일어나는 공간"** 이 Notebook × Score 적용 밀도의 극과 극임을 보여준다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../providers/auth_provider.dart';
@@ -55,13 +56,8 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
             children: [
               const SizedBox(height: AppSpacing.space8),
 
-              // Title
-              Text(
-                '서비스 이용 동의',
-                style: AppTypography.headingLarge.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
+              Text('서비스 이용 동의', style: NotebookTypography.sectionTitle),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 '원활한 서비스 이용을 위해\n아래 약관에 동의해 주세요.',
@@ -139,8 +135,9 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                   ),
                   child: Text(
                     '계속',
+                    // Notebook × Score §7.50: Vermillion CTA foreground = paper.
                     style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -266,7 +263,8 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                 // Title
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.space4),
-                  child: Text(title, style: AppTypography.headingMedium),
+                  // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                  child: Text(title, style: NotebookTypography.sectionTitle),
                 ),
                 const Divider(height: 1),
                 // Content

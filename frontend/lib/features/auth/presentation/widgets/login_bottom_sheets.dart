@@ -5,6 +5,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import 'parent_login_option.dart';
 import 'role_option_card.dart';
@@ -44,7 +45,8 @@ void showParentLoginSheet(BuildContext context) {
                 ),
                 const SizedBox(height: AppSpacing.space2),
 
-                Text('학부모 로그인', style: AppTypography.headingMedium),
+                // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                Text('학부모 로그인', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '자녀의 레슨과 연습을 확인하세요',
@@ -127,7 +129,8 @@ void showRoleSelectSheet(
                 const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space4),
 
-                Text('역할을 선택하세요', style: AppTypography.headingMedium),
+                // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                Text('역할을 선택하세요', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '레슨 앱에서 어떤 역할로 사용하시나요?',

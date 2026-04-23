@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/user_role.dart';
 import '../providers/auth_provider.dart';
 
@@ -82,9 +83,10 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               ),
               const SizedBox(height: AppSpacing.space4),
 
+              // Notebook × Score §7.17: 환영 타이틀 Playfair (의례적 진입 모먼트).
               Text(
                 '$userName님, 환영합니다!',
-                style: AppTypography.headingLarge,
+                style: NotebookTypography.sectionTitle,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.space2),

@@ -6,6 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 
 /// Parent invite code input screen
@@ -59,20 +60,21 @@ class _ParentInviteCodeScreenState
                         height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.ink.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusXLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusXLarge,
+                          ),
                         ),
                         child: const Center(
-                          child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 40)),
+                          child: Text(
+                            '👨‍👩‍👧',
+                            style: TextStyle(fontSize: 40),
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space4),
 
-                      // Title
-                      Text(
-                        '학부모 등록',
-                        style: AppTypography.headingLarge,
-                      ),
+                      // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
+                      Text('학부모 등록', style: NotebookTypography.sectionTitle),
                       const SizedBox(height: AppSpacing.space2),
 
                       // Description
@@ -104,12 +106,14 @@ class _ParentInviteCodeScreenState
                             fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium),
+                                AppSpacing.radiusMedium,
+                              ),
                               borderSide: BorderSide.none,
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium),
+                                AppSpacing.radiusMedium,
+                              ),
                               borderSide: BorderSide(
                                 color: AppColors.ink,
                                 width: 2,
@@ -117,7 +121,8 @@ class _ParentInviteCodeScreenState
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium),
+                                AppSpacing.radiusMedium,
+                              ),
                               borderSide: BorderSide(
                                 color: AppColors.paperAccent,
                                 width: 2,
@@ -166,24 +171,27 @@ class _ParentInviteCodeScreenState
                             backgroundColor: AppColors.ink,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppSpacing.radiusLarge),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusLarge,
+                              ),
                             ),
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                  : Text(
+                                    '코드 확인하기',
+                                    style: AppTypography.button,
                                   ),
-                                )
-                              : Text(
-                                  '코드 확인하기',
-                                  style: AppTypography.button,
-                                ),
                         ),
                       ),
 
@@ -197,7 +205,8 @@ class _ParentInviteCodeScreenState
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.space3),
+                              horizontal: AppSpacing.space3,
+                            ),
                             child: Text(
                               '또는',
                               style: AppTypography.caption.copyWith(
