@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/availability_slot.dart';
 import 'availability_block.dart';
 import 'availability_legend.dart';
@@ -80,11 +81,12 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
     final dateStr =
         '${widget.date.month}/${widget.date.day}($weekday) 가용 시간 관리';
 
+    // Notebook × Score: 카드 헤더는 Playfair sectionTitle 로 통일
+    // (§7.17). dateStr 은 날짜 접두어 + '가용 시간 관리' 고정 접미어로
+    // 구조적 역할은 카드 섹션 제목.
     return Text(
       dateStr,
-      style: AppTypography.headingSmall.copyWith(
-        color: AppColors.ink,
-      ),
+      style: NotebookTypography.sectionTitle.copyWith(color: AppColors.ink),
     );
   }
 
