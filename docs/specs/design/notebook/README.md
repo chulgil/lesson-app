@@ -2077,6 +2077,41 @@ flutter analyze lib/features/parent_home/presentation/screens/parent_dashboard_t
 
 **은유**: 한 명의 활자공이 다섯 개 틀(frame) 을 동시에 갖고 있는데, 두 개 틀은 여러 책자에서 공용으로 쓰인다. 이 날 활자공은 다섯 틀의 활자만 바꾸면 여덟 페이지의 표제가 한꺼번에 같은 서체로 찍혀 나온다. 다섯 번의 손길로 여덟 번의 인쇄가 정돈된다 — **공용 틀(helper) 의 경제학**. 학생이 레퍼토리를 편집할 때 보이는 제목, 반복 설정을 조절할 때 보이는 제목, 목표시간을 고를 때 보이는 제목 — 세 곳의 인상이 같은 활자공의 결정 하나로 동시에 변한다.
 
+### 7.63 Roman numerals 학생/학부모 홈 섹션 인덱스 통일 — home_screens_audit §7.3 Phase 4c 해소
+
+**배경**: Cycle 28 에서 학부모 홈 Notebook 4/6, 학생 홈 Notebook 4/6 달성 후 audit §7.3 의 선택 작업(Roman numerals)만 남았다. 선생님 홈(`dashboard_tab.dart:307,387`) 은 `romanOf(index)` 을 섹션 카운트·리스트 인덱스에 이미 사용 중. 학생·학부모 홈은 Roman numerals 0/1 로 시각 리듬이 한 박자 허전했다.
+
+**수정 파일 (3)**:
+
+| 파일 | 변경 |
+|------|------|
+| `parent_home/widgets/section_card.dart` | `int? romanIndex` optional prop 추가. romanIndex 전달 시 icon 앞에 `NotebookTypography.roman` 로마숫자 렌더 |
+| `parent_home/screens/parent_dashboard_tab.dart` | 4개 `SectionCard` 호출부(다음 레슨·이번 주 연습·과제 현황·결제 현황) 에 `romanIndex: 0~3` 부여 |
+| `student_home/widgets/dashboard/next_lesson_card.dart` | "다음 레슨" 레이블 Row 에 `${romanOf(0)}.` prefix (paper 0.9 alpha, fontSize 12) |
+
+**설계 결정**:
+
+1. **SectionCard API 확장 vs title 문자열 hack**: `title: 'I · 다음 레슨'` 로 문자열에 박는 방식은 단순하지만 sectionTitle Playfair italic 스타일로만 렌더 — `NotebookTypography.roman` 시그니처 효과 소멸. optional prop 방식으로 시그니처 보존 + 향후 확장 여지.
+2. **다크 배경 위 Roman**: 학생 NextLesson 카드의 `AppColors.ink` 다크 배경 위에서는 `NotebookTypography.roman` 의 기본 ink 색이 가려짐. `paper.withValues(alpha: 0.9)` 로 paper 색 유지 + 반투명으로 무게 조절.
+3. **인덱스 시작값**: 선생님 홈은 "Today's Programme" 카운트 = 1 (로마숫자 `I`). 학부모는 섹션이므로 `I, II, III, IV`. 0-based `romanIndex` 가 `romanOf(0)='I'` 를 반환하므로 호출부는 `0,1,2,3` 전달 = 화면에는 `I,II,III,IV` 표시.
+4. **QuickStats는 Roman 제외**: StatCard 3개 수평 배치 — SectionCard 래퍼가 없어 Roman 부여 불가. 디자인 상 "섹션 1개" 로 취급하는 것이 자연스러움.
+
+**검증**:
+
+```bash
+flutter analyze lib/features/parent_home/presentation/widgets/section_card.dart \
+  lib/features/parent_home/presentation/screens/parent_dashboard_tab.dart \
+  lib/features/student_home/presentation/widgets/dashboard/next_lesson_card.dart
+# No issues found! (ran in 7.2s)
+```
+
+**점수 변화** (audit §2.2.1, §2.3.1):
+- 학생 홈: 8.59 → **9.17 PASS** (Notebook 시그니처 4/6 → 5/6)
+- 학부모 홈: 8.58 → **9.17 PASS** (Notebook 시그니처 4/6 → 5/6)
+- 세 홈 모두 9점대 진입 (선생님 9.5 / 학생 9.17 / 학부모 9.17)
+
+**은유**: 세 장부의 장(章) 번호가 드디어 일치한다. 전에는 선생님 장부만 로마숫자 쪽 번호로 단장됐고, 학생·학부모 장부는 번호 없는 민무늬 제목만 달려 있었다. 독자가 페이지를 넘길 때 **번호가 진행감을 만든다** — "I. 다음 레슨 → II. 이번 주 연습 → III. 과제" 의 리듬이 생기면 스크롤은 **읽기** 가 되고, 없으면 스크롤은 **찾기** 로 떨어진다. 로마숫자는 장식이 아니라 **시간의 방향** 이다.
+
 ---
 
 ## 8. 구현 원칙

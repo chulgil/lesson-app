@@ -53,7 +53,17 @@
 
 ### 2.2 학생 홈 (`student_dashboard_tab.dart`)
 
-#### 2.2.1 Phase 4b 수정 후 (2026-04-23, Cycle 27)
+#### 2.2.1 Phase 4c 수정 후 (2026-04-23, Cycle 29)
+
+| 기준 | 측정 | 점수 | 근거 |
+|------|------|------|------|
+| 섹션 수 | N=8 | 9 | Masthead / ProgrammeTitle / TimeBanner / Gamification / NextLesson(+Roman) / Subscription / EventsGroup / LearningRecordGroup (+ Fine.) |
+| Notebook 적용 | 5/6 | 8.33 | + Roman numerals "I." NextLesson 카드에 추가 |
+| 정보 계층 | 전 섹션 | 10 | 기존 주석 유지 |
+| 색상 일관성 | 0건 | 10 | 기존 유지 |
+| **가중 평균** | | **9.17** | **PASS** — Roman numerals 추가로 +0.58 |
+
+#### 2.2.2 Phase 4b 수정 후 (2026-04-23, Cycle 27)
 
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
@@ -63,7 +73,7 @@
 | 색상 일관성 | Colors.* 0건 | 10 | AppColors 토큰만 사용 |
 | **가중 평균** | | **8.59** | **PASS** — Phase 4b 적용으로 FLAG 해소 |
 
-#### 2.2.2 Phase 4b 수정 전 (2026-04-22, Cycle 26)
+#### 2.2.3 Phase 4b 수정 전 (2026-04-22, Cycle 26)
 
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
@@ -75,7 +85,17 @@
 
 ### 2.3 학부모 홈 (`parent_dashboard_tab.dart`)
 
-#### 2.3.1 Phase 4a 수정 후 (2026-04-23, Cycle 28)
+#### 2.3.1 Phase 4c 수정 후 (2026-04-23, Cycle 29)
+
+| 기준 | 측정 | 점수 | 근거 |
+|------|------|------|------|
+| 섹션 수 | N=8 | 9 | Masthead / ProgrammeTitle / ChildHeader / QuickStats / UpcomingLesson(+Roman I) / PracticeStreak(+II) / RecentAssignments(+III) / PaymentStatus(+IV) (+ Fine.) |
+| Notebook 적용 | 5/6 | 8.33 | + Roman numerals SectionCard 4곳 적용 (`romanIndex` prop) |
+| 정보 계층 | 전 섹션 | 10 | 기존 "0순위~5순위" 주석 유지 |
+| 색상 일관성 | 0건 | 10 | 기존 유지 |
+| **가중 평균** | | **9.17** | **PASS** — Roman numerals 추가로 +0.59 |
+
+#### 2.3.2 Phase 4a 수정 후 (2026-04-23, Cycle 28)
 
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
@@ -85,7 +105,7 @@
 | 색상 일관성 | Colors.white 0건 | 10 | 8건 전부 `AppColors.paper` 치환 완료 (Vermillion 위 브랜드 백색 원칙) |
 | **가중 평균** | | **8.58** | **PASS** — Notebook 4/6 + 색상 0건 + 우선순위 주석 완비 |
 
-#### 2.3.2 Phase 4a 수정 전 (2026-04-22, Cycle 26)
+#### 2.3.3 Phase 4a 수정 전 (2026-04-22, Cycle 26)
 
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
@@ -97,15 +117,15 @@
 
 ## 3. 판정 요약
 
-**현재 상태 (2026-04-23, Cycle 28 완료 기준)**: 세 홈 모두 PASS.
+**현재 상태 (2026-04-23, Cycle 29 완료 기준)**: 세 홈 모두 PASS, 세 홈 모두 9점대.
 
 ```
          ┌────────────────────────────────────────────────────┐
     10   │                                                     │
          │       선생님 9.5                                    │
-     9   │       ●─────────────●  학부모 8.58                 │
-         │                     ╲                               │
-     8   │                      ●  학생 8.59                  │
+     9   │       ●─────────●────●  학생·학부모 9.17            │
+         │                                                     │
+     8   │                                                     │
          │                                                     │
      7   │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ PASS ─ ─ ─│
          │                                                     │
@@ -113,7 +133,7 @@
          │                                                     │
      5   │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ BLOCK ─ ─ │
          │                                                     │
-     4   │     (과거) 학부모 4.3 → 8.58 해소                   │
+     4   │     (과거) 학부모 4.3 → 8.58 → 9.17 해소             │
          │                                                     │
      3   │                                                     │
          └────────────────────────────────────────────────────┘
@@ -121,8 +141,8 @@
 
 **변화 궤적**:
 - 선생님: 9.5 PASS (변화 없음, 레퍼런스)
-- 학생: 5.75 FLAG → 8.59 PASS (Cycle 27)
-- 학부모: 4.30 BLOCK → 8.58 PASS (Cycle 28)
+- 학생: 5.75 FLAG → 8.59 PASS → 9.17 PASS (Cycle 27 → 29)
+- 학부모: 4.30 BLOCK → 8.58 PASS → 9.17 PASS (Cycle 28 → 29)
 
 ## 4. BLOCK 상세 — 학부모 홈 (4.3점)
 
@@ -211,11 +231,14 @@
 
 **결과**: FLAG 5.75 → PASS 8.59 (+2.84)
 
-### 7.3 Phase 4c — 일관성 강화 (선택)
+### 7.3 Phase 4c — 일관성 강화 ✅ DONE (2026-04-23, Cycle 29 · 80944a44)
 
-| 우선 | 항목 | 예상 파일 | 영향 |
+| 우선 | 항목 | 예상 파일 | 상태 |
 |------|------|-----------|------|
-| 1 | Roman numerals 인덱스 학생 홈 "다음 레슨" 카드에도 적용 | 해당 위젯 | 섹션 시각 리듬 통일 |
+| 1 | Roman numerals 인덱스 학생 "다음 레슨" 카드 적용 | next_lesson_card.dart | DONE — "I." paper 0.9 alpha |
+| 2 | Roman numerals 학부모 SectionCard 4개 (다음 레슨·이번 주 연습·과제·결제) 적용 | section_card.dart + parent_dashboard_tab.dart | DONE — `int? romanIndex` optional prop 0~3 |
+
+**결과**: Notebook 시그니처 4/6 → 5/6 (학생·학부모 홈). 선생님 홈 6/6 레퍼런스 유지.
 
 ## 8. 범위 챌린지 결과
 
