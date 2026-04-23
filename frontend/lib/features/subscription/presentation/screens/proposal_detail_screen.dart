@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -564,9 +565,12 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Notebook × Score: 모달 시트 상단 제목 블록은
+                      // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
+                      // 동적이지만 구조적 역할은 동일.
                       Text(
                         '${profile.name} 선생님께 연락하기',
-                        style: AppTypography.headingSmall,
+                        style: NotebookTypography.appBarTitle,
                       ),
                       const SizedBox(height: AppSpacing.space4),
                       ListTile(

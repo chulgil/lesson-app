@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
@@ -536,7 +537,9 @@ class _IssueSubscriptionScreenState
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('변경/취소 가능 횟수', style: AppTypography.headingSmall),
+            // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+            // 로 통일 (§7.17).
+            Text('변경/취소 가능 횟수', style: NotebookTypography.sectionTitle),
             if (policy != null) ...[
               const SizedBox(width: AppSpacing.space2),
               _PolicyBadge(isDefault: matchesPolicy),
@@ -558,9 +561,7 @@ class _IssueSubscriptionScreenState
                 : '선생님 기본 정책 ${policy.changePolicySummary} → 이 수강권만 $_rescheduleAllowance회로 재설정',
             style: AppTypography.bodySmall.copyWith(
               color:
-                  matchesPolicy
-                      ? AppColors.paperAccent
-                      : AppColors.inkTertiary,
+                  matchesPolicy ? AppColors.paperAccent : AppColors.inkTertiary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -605,9 +606,11 @@ class _IssueSubscriptionScreenState
         ),
         if (_rescheduleAllowance > 0) ...[
           const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+          // 로 통일 (§7.17).
           Text(
             AppStrings.rescheduleDeadlineLabel,
-            style: AppTypography.headingSmall,
+            style: NotebookTypography.sectionTitle,
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(

@@ -229,9 +229,11 @@ class SubscriptionListScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle
+              // 로 통일 (§7.17).
               Text(
                 AppStrings.pendingRequests,
-                style: AppTypography.headingSmall,
+                style: NotebookTypography.sectionTitle,
               ),
               const SizedBox(height: AppSpacing.space2),
               ...requests.map(

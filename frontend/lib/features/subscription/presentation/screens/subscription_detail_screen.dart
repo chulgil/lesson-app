@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
@@ -75,11 +76,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.search_off, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
               AppStrings.subscriptionNotFound,
@@ -261,7 +258,10 @@ class _SubscriptionDetailBodyState
         return Scaffold(
           appBar: AppBar(
             titleSpacing: 0,
-            title: Text(appBarTitle, style: AppTypography.headingSmall),
+            // Notebook × Score: Scaffold.appBar 제목은 Playfair appBarTitle
+            // 로 통일 (§7.27). appBarTitle 은 학생 이름 + 타입 조합으로
+            // 동적이지만 구조적 역할은 동일.
+            title: Text(appBarTitle, style: NotebookTypography.appBarTitle),
             actions: [
               IconButton(
                 icon: const Icon(Icons.rule_rounded),
