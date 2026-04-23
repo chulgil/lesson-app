@@ -1239,17 +1239,17 @@ frontend/lib/features/schedule/
 | **레슨 노트** | 구현 완료 | 95% | Phase 1 완료 (피드백/포인트/팁/녹음) |
 | **출석 관리** | 구현 완료 | - | `TeacherAttendanceScreen` — 전체 출석률 + 학생별 현황 |
 | **일괄 피드백** | 구현 완료 | - | `BulkFeedbackScreen` — 여러 학생에게 3단계 위저드로 피드백 전송 |
-| **레슨 노트 히스토리** | 구현 완료 | - | `LessonNoteHistoryScreen` — 과거 노트 타임라인 |
+| **레슨 노트 히스토리** | 부분 구현 | 70% | `LessonNoteHistoryScreen` 파일 존재, **BROKEN: `app_routes.dart`에 `lessonNoteHistory` 경로 미등록** — student_routes의 `/students/:id/notes`로만 접근 가능 |
 | **빠른 피드백** | 구현 완료 | - | `QuickFeedbackScreen` + `QuickFeedbackStudentList` |
-| **레슨 장소** | 설계 완료 | 10% | 엔티티/Provider 존재, UI 미구현 |
-| **빠른 레슨 등록** | 스펙 완료 | 0% | 구현 대기 |
+| **레슨 장소** | 부분 구현 | 60% | Phase 1 UI 완료 (LessonLocationSection, teacherLocationsProvider 연동, ChoiceChip + 기본 프리필). Phase 2 이후(§6.3 1~2단계·§6.4·§6.6·§6.7) 미구현 |
+| **빠른 레슨 등록** | 스펙 완료 | 0% | 구현 대기 (스펙 §7만 정의) |
 | **그룹 레슨** | 설계 완료 | 30% | 엔티티 + 기본 화면 존재 |
 | **3자 관계 (학원)** | 설계 완료 | 10% | LessonClass 엔티티 설계만 |
 | **앱 전환 플로우** | 부분 구현 | 70% | "결제 완료로 발급" 옵션 보완 필요 |
 | **이전 선생님 재연결** | 부분 구현 | 40% | 기본 플로우 구현, 알림/스케줄 복원 작업 중 |
 | **정기 시간 일괄 변경** | 설계 완료 | 20% | LessonScheduleChange 엔티티 존재 |
-| **스케줄 확인 카드** | 설계 완료 | 10% | ScheduleConfirmationCard 엔티티 존재 |
-| **FCM 푸시 알림** | 미구현 | 0% | 전체 알림 시스템 미연동 |
+| **스케줄 확인 카드** | 설계 완료 | 50% | ScheduleConfirmationCard 엔티티 172줄 완전 구현 (3-옵션 제안, 재등록/신규 분기, `formattedOptions`/`getOption(index)` 포함). UI 노출·라우팅 검증 필요 |
+| **FCM 푸시 알림** | 부분 구현 | 40% | 인프라 완성 (`firebase_messaging:15.2.4` 의존성, `main.dart` 백그라운드 핸들러 초기화, `FcmService.initialize()` 완성, foregroundMessage 스트림). 화면 통합·알림 UI 미구현 |
 | **백엔드 API** | 개발 중 | 20% | FastAPI 기본 구조 |
 
 ### 13.3 테스트 환경
@@ -1306,6 +1306,7 @@ frontend/lib/features/schedule/
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-04-23 | §13.2 DRIFT 검증 반영: 레슨 장소 10→60%, 스케줄 확인 카드 10→50%, FCM 0→40% (인프라 완성 반영), 레슨 노트 히스토리 완료→부분 70% (BROKEN 라우트 미등록 표기) |
 | 2026-03-07 | Enum 정의 완전성 보강 (LessonStatus 10값 등), 구현 파일 매핑 추가, 경쟁사 차별점 추가, schedule_master 상호 참조, attendance/gamification 스펙 참조 추가, 깨진 링크 수정 |
 | 2026-03-06 | Master Spec 초안 작성 - 15개 개별 스펙 통합 |
 
