@@ -109,9 +109,13 @@ class ParentAssignmentsTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Notebook × Score: accent 배너 섹션 제목은 Playfair sectionTitle
+              // 로 통일. white copyWith 유지 (§7.17).
               Text(
                 '이번 주 과제',
-                style: AppTypography.headingSmall.copyWith(color: Colors.white),
+                style: NotebookTypography.sectionTitle.copyWith(
+                  color: Colors.white,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(

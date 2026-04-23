@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
@@ -156,11 +157,7 @@ class ResourceAttachmentEditor extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.attach_file,
-              size: 16,
-              color: AppColors.inkSecondary,
-            ),
+            Icon(Icons.attach_file, size: 16, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space1),
             Text(
               '학습 자료 (${resourceIds.length})',
@@ -266,11 +263,7 @@ class _AttachedResourceList extends ConsumerWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.space1),
-              child: Icon(
-                Icons.close,
-                size: 18,
-                color: AppColors.inkTertiary,
-              ),
+              child: Icon(Icons.close, size: 18, color: AppColors.inkTertiary),
             ),
           ),
         ],
@@ -314,7 +307,9 @@ class _AddResourceButton extends ConsumerWidget {
                       margin: EdgeInsets.only(bottom: AppSpacing.space4),
                     ),
                   ),
-                  Text('학습 자료 추가', style: AppTypography.headingSmall),
+                  // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+                  // 패턴. Playfair appBarTitle 로 통일.
+                  Text('학습 자료 추가', style: NotebookTypography.appBarTitle),
                   const SizedBox(height: AppSpacing.space4),
 
                   // From library
@@ -402,7 +397,12 @@ class _AddResourceButton extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          Text('내 학습 자료', style: AppTypography.headingSmall),
+                          // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+                          // 패턴. Playfair appBarTitle 로 통일.
+                          Text(
+                            '내 학습 자료',
+                            style: NotebookTypography.appBarTitle,
+                          ),
                         ],
                       ),
                     ),

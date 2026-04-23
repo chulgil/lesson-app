@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
@@ -156,9 +157,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
       children: [
         Text(
           '오늘의 연습',
-          style: AppTypography.headingMedium.copyWith(
-            color: AppColors.ink,
-          ),
+          style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.space3),
         Row(
@@ -216,9 +215,11 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Notebook × Score: 연결 유도 카드 제목은 Playfair sectionTitle
+                    // 로 통일 (§7.17).
                     Text(
                       '선생님과 연결하세요',
-                      style: AppTypography.headingSmall.copyWith(
+                      style: NotebookTypography.sectionTitle.copyWith(
                         color: AppColors.ink,
                       ),
                     ),
@@ -282,9 +283,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           children: [
             Text(
               '이번 주 연습',
-              style: AppTypography.headingMedium.copyWith(
-                color: AppColors.ink,
-              ),
+              style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
             ),
             TextButton(
               onPressed: () {
@@ -466,9 +465,11 @@ class _FeatureCard extends StatelessWidget {
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(height: AppSpacing.space3),
+            // Notebook × Score: _FeatureCard(icon+title+subtitle) helper 의
+            // title 은 Playfair sectionTitle 로 통일 (§7.17).
             Text(
               title,
-              style: AppTypography.headingSmall.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.ink,
               ),
             ),
