@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import 'range_picker_button.dart';
 
 /// Section header widget with emoji icon, title and subtitle
@@ -38,10 +39,10 @@ class SectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: AppTypography.headingSmall,
-                ),
+                // Notebook × Score: SectionHeader helper 의 title 은 Playfair
+                // sectionTitle 로 통일. 외부 호출부 1곳(edit_repertoire_screen)
+                // 에 일괄 반영 (§7.17).
+                Text(title, style: NotebookTypography.sectionTitle),
                 Text(
                   subtitle,
                   style: AppTypography.caption.copyWith(
@@ -141,7 +142,10 @@ class SettingSectionHeader extends StatelessWidget {
           children: [
             Text(icon, style: const TextStyle(fontSize: 20)),
             const SizedBox(width: AppSpacing.space2),
-            Text(title, style: AppTypography.headingSmall),
+            // Notebook × Score: SettingSectionHeader helper 의 title 은 Playfair
+            // sectionTitle 로 통일. 호출부 3곳(edit_repertoire_screen +
+            // RepeatCountSection + TargetTimeSection) 에 일괄 반영 (§7.17).
+            Text(title, style: NotebookTypography.sectionTitle),
             const Spacer(),
             if (trailingLabel != null)
               Text(
@@ -201,10 +205,7 @@ class RepeatCountSection extends StatelessWidget {
             ),
           ),
           items: [
-            const DropdownMenuItem(
-              value: null,
-              child: Text('없음'),
-            ),
+            const DropdownMenuItem(value: null, child: Text('없음')),
             ...List.generate(
               9,
               (index) => DropdownMenuItem(
@@ -247,9 +248,7 @@ class _RepeatCountHint extends StatelessWidget {
           Expanded(
             child: Text(
               '매일 $repeatCount회 연습을 완료하면 모든 발바닥이 채워집니다',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.ink,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
             ),
           ),
         ],
@@ -304,10 +303,7 @@ class TargetTimeSection extends StatelessWidget {
             ),
           ),
           items: [
-            const DropdownMenuItem(
-              value: null,
-              child: Text('설정 안함'),
-            ),
+            const DropdownMenuItem(value: null, child: Text('설정 안함')),
             ..._presetMinutes.map(
               (minutes) => DropdownMenuItem(
                 value: minutes,
@@ -366,10 +362,7 @@ class _TargetTimeHint extends StatelessWidget {
 class RangePreviewBox extends StatelessWidget {
   final String rangeText;
 
-  const RangePreviewBox({
-    super.key,
-    required this.rangeText,
-  });
+  const RangePreviewBox({super.key, required this.rangeText});
 
   @override
   Widget build(BuildContext context) {
@@ -419,13 +412,14 @@ class PieceSuggestionChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space1,
-      children: suggestions.take(maxItems).map((name) {
-        return ActionChip(
-          label: Text(name, style: AppTypography.bodySmall),
-          onPressed: () => onSelected(name),
-          visualDensity: VisualDensity.compact,
-        );
-      }).toList(),
+      children:
+          suggestions.take(maxItems).map((name) {
+            return ActionChip(
+              label: Text(name, style: AppTypography.bodySmall),
+              onPressed: () => onSelected(name),
+              visualDensity: VisualDensity.compact,
+            );
+          }).toList(),
     );
   }
 }

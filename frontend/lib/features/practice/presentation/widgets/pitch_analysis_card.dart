@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/pitch_analysis.dart';
 import '../providers/pitch_analysis_provider.dart';
 
@@ -44,7 +45,9 @@ class PitchAnalysisCard extends ConsumerWidget {
             children: [
               const Text('🎯', style: TextStyle(fontSize: 20)),
               const SizedBox(width: AppSpacing.space2),
-              Text('피치 분석', style: AppTypography.headingSmall),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
+              // 로 통일 (§7.17).
+              Text('피치 분석', style: NotebookTypography.sectionTitle),
               const Spacer(),
               // Grade badge
               Container(
@@ -224,10 +227,14 @@ class PitchAnalysisCard extends ConsumerWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.05 + ratio * 0.2),
+                color: AppColors.paperAccent.withValues(
+                  alpha: 0.05 + ratio * 0.2,
+                ),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 border: Border.all(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1 + ratio * 0.3),
+                  color: AppColors.paperAccent.withValues(
+                    alpha: 0.1 + ratio * 0.3,
+                  ),
                 ),
               ),
               child: Text(

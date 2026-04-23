@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../providers/practice_goal_provider.dart';
 
 /// Widget displaying daily and weekly goal progress
@@ -72,7 +73,9 @@ class GoalProgressWidget extends ConsumerWidget {
             children: [
               Icon(Icons.flag, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text('오늘의 목표', style: AppTypography.headingSmall),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
+              // 로 통일 (§7.17).
+              Text('오늘의 목표', style: NotebookTypography.sectionTitle),
               const Spacer(),
               if (status.isDailyGoalAchieved)
                 Container(
@@ -157,11 +160,7 @@ class GoalProgressWidget extends ConsumerWidget {
             // Weekly summary
             Row(
               children: [
-                Icon(
-                  Icons.date_range,
-                  color: AppColors.inkSecondary,
-                  size: 16,
-                ),
+                Icon(Icons.date_range, color: AppColors.inkSecondary, size: 16),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '이번 주',
@@ -346,8 +345,7 @@ class GoalProgressWidget extends ConsumerWidget {
           child: Text(
             '$percent%',
             style: AppTypography.caption.copyWith(
-              color:
-                  isAchieved ? AppColors.paperOk : AppColors.inkSecondary,
+              color: isAchieved ? AppColors.paperOk : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -387,10 +385,7 @@ class GoalProgressWidget extends ConsumerWidget {
         Text(
           '($percent%)',
           style: AppTypography.caption.copyWith(
-            color:
-                percent >= 100
-                    ? AppColors.paperOk
-                    : AppColors.inkTertiary,
+            color: percent >= 100 ? AppColors.paperOk : AppColors.inkTertiary,
           ),
         ),
       ],

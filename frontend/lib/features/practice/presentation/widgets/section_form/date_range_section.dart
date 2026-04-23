@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import 'date_row.dart';
 
 /// Reusable date range section matching repertoire detail screen style
@@ -62,7 +63,9 @@ class DateRangeSection extends StatelessWidget {
             children: [
               Icon(Icons.date_range, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
-              Text('연습 기간', style: AppTypography.headingSmall),
+              // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
+              // 로 통일 (§7.17).
+              Text('연습 기간', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
