@@ -1850,6 +1850,38 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 ---
 
+### 7.57 students/ 학생 상세 탭 연습·노트·레슨 섹션 제목 Playfair 통일 — students/ 위젯 레이어 §7.17 배치 #1
+
+**배경**: profile/ 도메인 2배치(§7.55·§7.56) 완료 후 students/ 도메인으로 이동. screens 레이어(`student_detail_screen`, `students_tab`) 는 parallel session 이 점유 중이므로, 이번 배치는 **screens 우회 후 위젯 레이어 직진입** 전략. `students/widgets/student_detail/` 4개 파일 7건 모두 §7.17 sectionTitle 로 전환, 2건 §7.30 예외(동적 일자 + 동적 stat value) 를 명확히 분리.
+
+**변경표**:
+
+| 파일 | 라인 | 제목 | 컨텍스트 | 패턴 |
+|------|------|------|---------|------|
+| `frontend/lib/features/students/presentation/widgets/student_detail/student_practice_section.dart` | 32 | "이번 주 연습" | 카드 섹션 | §7.17 direct |
+| `frontend/lib/features/students/presentation/widgets/student_detail/student_notes_section.dart` | 30 | "레슨 노트" | 카드 섹션 | §7.17 direct |
+| `frontend/lib/features/students/presentation/widgets/student_detail/student_practice_tab.dart` | 79 | "이번 주 연습 요약" | 탭 섹션 | §7.17 direct |
+| 〃 | 177 | "주간 연습 현황" | 탭 섹션 | §7.17 direct |
+| 〃 | 316 | "공유된 녹음" | 탭 섹션 | §7.17 direct |
+| `frontend/lib/features/students/presentation/widgets/student_detail/student_lessons_sections.dart` | 33 | "다가오는 레슨" | 카드 섹션 | §7.17 direct |
+| 〃 | 120 | "최근 레슨" | 카드 섹션 | §7.17 direct |
+
+**설계 포인트**:
+- **screens 우회 전략**: parallel session 이 점유한 파일(`student_detail_screen.dart`, `students_tab.dart`) 과의 conflict 를 피하기 위해, 동일 도메인 안에서 **위젯 레이어로 진입점을 우회**. 학생 상세 화면의 섹션 제목은 대부분 **위젯 레이어의 하위 컴포넌트** 가 소유하므로, 이 전략이 실질 커버리지를 크게 떨어뜨리지 않음. 학생 상세 탭의 세 섹션(이번 주 연습 요약 / 주간 연습 현황 / 공유된 녹음) + 카드 섹션 4종이 모두 위젯 레이어에 분산돼 있어 7건 일괄 처리 가능.
+- **§7.30 예외 2건 — 학생 상세 특유 패턴**:
+  - `student_lesson_card:65` `'${lesson.date.day}'` — 레슨 카드의 상단 "날짜 숫자 + 요일" 조합에서 일자는 2자리 굵은 숫자(12/5/31 등). 동적 값이고 **달력 요소 성격** 이므로 Inter 유지.
+  - `student_practice_tab:139` `Text(value, ...)` — `_StatCard` 의 아이콘 + value + label 3단 구조에서 value 는 동적 stat(예: "5.2h", "12회"). §7.30 "동적 stat 값" 카테고리 표준 대응.
+- **카드 섹션 vs 탭 섹션 둘 다 sectionTitle**: `student_practice_section`/`student_notes_section` 은 카드 형태의 컴포넌트 헤더, `student_practice_tab` 은 SingleChildScrollView 의 큰 섹션 헤더, `student_lessons_sections` 은 둘 사이. 컨텍스트가 달라도 "섹션의 의미 기반 제목" 이면 sectionTitle 판정 — 이는 §7.17 의 범용성 재확인.
+
+**검증**:
+- `flutter analyze` 4 files → No issues found (3.6s)
+- dart formatter 가 import 재정렬로 큰 diff 유발(153 insertions/128 deletions)이지만, semantic 변경은 7 라인 + 3 import. 포매터는 프로젝트 convention 이므로 수용.
+- Lore commit: `e7d89513`
+
+**은유**: 학생 장부는 한 학생마다 여러 탭 — 연습 기록, 레슨 노트, 받아온 녹음, 다가오는 일정 — 으로 나뉜다. 각 탭의 제목만 Playfair 로 바꿨는데, 특히 레슨 카드 위에 박힌 **"31"** 같은 굵은 일자와, 연습 요약의 "5.2h" 같은 **숫자가 말하는 제목** 은 손대지 않았다. 활자는 의미의 그릇이지, 숫자의 그릇은 아니다. 숫자는 Inter 의 가지런함이 더 어울린다 — 장부의 통계 페이지가 늘 그렇듯.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
