@@ -13,7 +13,7 @@
 | 3. APPLY | ✅ 커맨드 완료 (드라이런 기본) | `~/.claude/commands/harness-absorb.md` |
 | 4. AUDIT | ✅ 기존 | `~/.claude/commands/harness-audit.md`, `harness-audit-reminder.sh` |
 | 5. autopus 흡수 | ✅ 완료 (4/7 반영, 2 보류, 1 기존) | `~/.claude/rules/{lore-commit, hash-anchored-edit, adaptive-quality, frontend-verify}.md` |
-| 6. 롤백 | ⏳ 대기 | Phase 5 후 |
+| 6. 롤백 | ✅ 완료 (제거 대상 0건) | 실조사 결과 autopus 생성물 전무 |
 
 **Phase 5 결과**:
 - 반영(4): Lore Commit · Hash-Anchored Edit · Adaptive Quality · Frontend Verify
@@ -27,7 +27,11 @@
 - `observations.jsonl` 노이즈 50건 → `observations.archive/legacy-noise-2026-04-23.jsonl` 분리
 - 백업: `*.bak.2026-04-23`
 
-**다음 액션**: Phase 6 롤백 — lesson-app 및 운영 프로젝트의 autopus 생성물(`.autopus/`, `autopus.yaml`, `.codex/`, `.gemini/`, `AGENTS.md`, `GEMINI.md` 등) 제거.
+**Phase 6 롤백 결과 (2026-04-23)**:
+- lesson-app: autopus 생성물 전무 (`autopus.yaml`, `.autopus/`, `AGENTS.md`, `GEMINI.md`, `opencode.json` 부재). `.claude/commands/auto.md` 는 사용자 자작 커맨드로 보존.
+- 운영 3개 프로젝트(docs-app, stock-alert, chulgil-me): 동일하게 전무.
+- `~/.codex/`, `~/.gemini/` 는 OpenAI Codex CLI / Google Gemini CLI 의 **독립 도구 설정**으로 autopus 와 무관 → 보존.
+- 결론: 제거 대상 0건. 자가 개선 하네스 전체 Phase(1-6) 완료.
 
 ## 범위
 
