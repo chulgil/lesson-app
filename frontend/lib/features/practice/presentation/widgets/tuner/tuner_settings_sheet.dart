@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
@@ -46,12 +47,9 @@ class TunerSettingsSheet extends ConsumerWidget {
             // Title
             Padding(
               padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Text(
-                '튜너 설정',
-                style: AppTypography.headingSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+              // 패턴. Playfair appBarTitle 로 통일 (이미 w700).
+              child: Text('튜너 설정', style: NotebookTypography.appBarTitle),
             ),
 
             const Divider(height: 1),
@@ -353,7 +351,9 @@ class _DifficultySection extends StatelessWidget {
                       label: Text(diff.label),
                       selected: isSelected,
                       onSelected: (_) => onChanged(diff),
-                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(
+                        alpha: 0.2,
+                      ),
                       labelStyle: TextStyle(
                         color:
                             isSelected
@@ -482,7 +482,9 @@ class _ClefSection extends StatelessWidget {
                       label: Text('${clef.symbol} ${clef.label}'),
                       selected: isSelected,
                       onSelected: (_) => onChanged(clef),
-                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(
+                        alpha: 0.2,
+                      ),
                       labelStyle: TextStyle(
                         color:
                             isSelected

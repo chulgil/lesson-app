@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// Dialog for adding or editing a practice note
@@ -80,9 +81,11 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
             // Header
             Row(
               children: [
+                // Notebook × Score: Dialog 헤더 제목은 Playfair dialogTitle
+                // 로 통일. isEditing 분기는 레이블만 교체.
                 Text(
                   isEditing ? '연습노트 수정' : '연습노트 추가',
-                  style: AppTypography.headingSmall,
+                  style: NotebookTypography.dialogTitle,
                 ),
                 const Spacer(),
                 IconButton(
@@ -119,7 +122,10 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
+                  borderSide: BorderSide(
+                    color: AppColors.paperAccent,
+                    width: 2,
+                  ),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
               ),

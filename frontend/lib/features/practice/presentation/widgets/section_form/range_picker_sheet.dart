@@ -7,6 +7,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 
 /// Bottom sheet with iOS-style wheel picker for range selection
 class RangePickerSheet extends StatefulWidget {
@@ -67,7 +68,9 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
               vertical: AppSpacing.space3,
             ),
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
+              border: Border(
+                bottom: BorderSide(color: AppColors.inkQuaternary),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,7 +79,10 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text(AppStrings.cancel),
                 ),
-                Text(widget.title, style: AppTypography.headingSmall),
+                // Notebook × Score: modal bottom sheet 상단 헤더(Cancel/
+                // Title/Confirm) 의 Title 은 §7.27 패턴. Playfair appBarTitle
+                // 로 통일.
+                Text(widget.title, style: NotebookTypography.appBarTitle),
                 TextButton(
                   onPressed: () {
                     widget.onSelected(_selectedValue);

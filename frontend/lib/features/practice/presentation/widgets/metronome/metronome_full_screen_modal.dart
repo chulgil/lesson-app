@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/practice/domain/entities/metronome_settings.dart';
 import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
@@ -190,9 +191,11 @@ class _Header extends StatelessWidget {
         children: [
           const SizedBox(width: AppSpacing.space12), // Balance for close button
           Expanded(
+            // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+            // 패턴. Playfair appBarTitle 로 통일.
             child: Text(
               '메트로놈',
-              style: AppTypography.headingSmall,
+              style: NotebookTypography.appBarTitle,
               textAlign: TextAlign.center,
             ),
           ),

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/recording_feedback.dart';
@@ -148,9 +149,11 @@ class _Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+          // 패턴. Playfair appBarTitle 로 통일.
           Text(
             AppStrings.recordingFeedbackTitle,
-            style: AppTypography.headingSmall,
+            style: NotebookTypography.appBarTitle,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
@@ -191,9 +194,7 @@ class _Header extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             formatDateYMD(recording.sharedAt),
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -234,9 +235,7 @@ class _FeedbackList extends StatelessWidget {
           Text(
             AppStrings.recordingFeedbackDescription,
             textAlign: TextAlign.center,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       );
@@ -281,9 +280,7 @@ class _FeedbackBubble extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             _formatTimestamp(feedback.createdAt),
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
