@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 
 /// Tutorial screen for student onboarding
@@ -246,12 +247,10 @@ class _StudentTutorialPage extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.space8),
 
-          // Title
+          // Notebook × Score: 튜토리얼 슬라이드 헤드라인 Playfair sectionTitle (§7.87-h).
           Text(
             data.title,
-            style: AppTypography.headingLarge.copyWith(
-              color: AppColors.ink,
-            ),
+            style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
 

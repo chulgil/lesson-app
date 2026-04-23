@@ -9,6 +9,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
 
 /// Phone verification screen for teacher onboarding
@@ -88,7 +89,9 @@ class _PhoneVerificationScreenState
     // Simulate API call
     await Future.delayed(const Duration(seconds: 1));
 
-    ref.read(teacherOnboardingNotifierProvider.notifier).startPhoneVerification(phone);
+    ref
+        .read(teacherOnboardingNotifierProvider.notifier)
+        .startPhoneVerification(phone);
 
     setState(() {
       _isLoading = false;
@@ -106,7 +109,9 @@ class _PhoneVerificationScreenState
     await Future.delayed(const Duration(seconds: 1));
 
     final success =
-        ref.read(teacherOnboardingNotifierProvider.notifier).resendVerificationCode();
+        ref
+            .read(teacherOnboardingNotifierProvider.notifier)
+            .resendVerificationCode();
 
     setState(() {
       _isLoading = false;
@@ -133,8 +138,9 @@ class _PhoneVerificationScreenState
 
     await Future.delayed(const Duration(seconds: 1));
 
-    final success =
-        ref.read(teacherOnboardingNotifierProvider.notifier).verifyCode(code);
+    final success = ref
+        .read(teacherOnboardingNotifierProvider.notifier)
+        .verifyCode(code);
 
     setState(() => _isLoading = false);
 
@@ -187,10 +193,10 @@ class _PhoneVerificationScreenState
 
                 const SizedBox(height: AppSpacing.space6),
 
-                // Title
+                // Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-h).
                 Text(
                   _codeSent ? '인증번호 입력' : '휴대폰 인증',
-                  style: AppTypography.headingLarge,
+                  style: NotebookTypography.sectionTitle,
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
@@ -224,29 +230,33 @@ class _PhoneVerificationScreenState
                   width: double.infinity,
                   height: AppSpacing.buttonHeight,
                   child: ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : (_codeSent ? _verifyCode : _sendCode),
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : (_codeSent ? _verifyCode : _sendCode),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLarge,
+                        ),
                       ),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                    child:
+                        _isLoading
+                            ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : Text(
+                              _codeSent ? '인증 완료' : '인증번호 받기',
+                              style: AppTypography.button,
                             ),
-                          )
-                        : Text(
-                            _codeSent ? '인증 완료' : '인증번호 받기',
-                            style: AppTypography.button,
-                          ),
                   ),
                 ),
 
@@ -277,9 +287,7 @@ class _PhoneVerificationScreenState
       children: [
         Text(
           '휴대폰 번호',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
         TextField(
@@ -336,9 +344,10 @@ class _PhoneVerificationScreenState
               Text(
                 _formatTime(_remainingSeconds),
                 style: AppTypography.bodyMedium.copyWith(
-                  color: _remainingSeconds <= 30
-                      ? AppColors.paperAccent
-                      : AppColors.paperAccent,
+                  color:
+                      _remainingSeconds <= 30
+                          ? AppColors.paperAccent
+                          : AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -374,15 +383,15 @@ class _PhoneVerificationScreenState
         // Resend button
         Center(
           child: TextButton(
-            onPressed: _remainingSeconds <= 120 && !_isLoading
-                ? _resendCode
-                : null,
+            onPressed:
+                _remainingSeconds <= 120 && !_isLoading ? _resendCode : null,
             child: Text(
               '인증번호 다시 받기',
               style: AppTypography.bodyMedium.copyWith(
-                color: _remainingSeconds <= 120
-                    ? AppColors.paperAccent
-                    : AppColors.inkTertiary,
+                color:
+                    _remainingSeconds <= 120
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
               ),
             ),
           ),
@@ -450,9 +459,7 @@ class _ProgressStep extends StatelessWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: isActive
-                  ? AppColors.ink
-                  : AppColors.inkTertiary,
+              color: isActive ? AppColors.ink : AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
 
@@ -249,12 +250,10 @@ class _TutorialPage extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.space8),
 
-          // Title
+          // Notebook × Score: 튜토리얼 슬라이드 헤드라인 Playfair sectionTitle (§7.87-h).
           Text(
             content.title,
-            style: AppTypography.headingLarge.copyWith(
-              color: AppColors.ink,
-            ),
+            style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
 
@@ -344,10 +343,7 @@ class _ProgressStep extends StatelessWidget {
                     : Text(
                       '$step',
                       style: AppTypography.caption.copyWith(
-                        color:
-                            isActive
-                                ? Colors.white
-                                : AppColors.inkTertiary,
+                        color: isActive ? Colors.white : AppColors.inkTertiary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
