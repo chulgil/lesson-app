@@ -41,7 +41,8 @@ class BottomSheetContainer extends StatelessWidget {
   const BottomSheetContainer({
     super.key,
     required this.child,
-    this.backgroundColor = Colors.white,
+    // Notebook × Score §7.50: 바텀시트 기본 배경 = Notebook paper (팔레트 일관성).
+    this.backgroundColor = AppColors.paper,
     this.borderRadius = 20,
   });
 
@@ -54,9 +55,7 @@ class BottomSheetContainer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(borderRadius),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(borderRadius)),
       ),
       child: child,
     );

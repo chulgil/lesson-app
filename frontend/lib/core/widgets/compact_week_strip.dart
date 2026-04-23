@@ -90,7 +90,9 @@ class CompactWeekStrip extends StatelessWidget {
                     decoration:
                         isSelected
                             ? BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.08),
+                              color: AppColors.paperAccent.withValues(
+                                alpha: 0.08,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMedium,
                               ),
@@ -134,10 +136,11 @@ class CompactWeekStrip extends StatelessWidget {
                           child: Text(
                             '${date.day}',
                             style: AppTypography.bodySmall.copyWith(
+                              // Notebook × Score §7.50: Vermillion chip selection foreground = paper.
                               color:
                                   (isSelected || isToday)
                                       ? (isSelected
-                                          ? Colors.white
+                                          ? AppColors.paper
                                           : AppColors.paperAccent)
                                       : AppColors.ink,
                               fontWeight:
@@ -155,7 +158,9 @@ class CompactWeekStrip extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 hasMarker
-                                    ? AppColors.paperAccent.withValues(alpha: 0.5)
+                                    ? AppColors.paperAccent.withValues(
+                                      alpha: 0.5,
+                                    )
                                     : Colors.transparent,
                             shape: BoxShape.circle,
                           ),

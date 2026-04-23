@@ -35,15 +35,16 @@ class ProfileImageWidget extends StatelessWidget {
             radius: radius,
             backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
             backgroundImage: _resolveImage(),
-            child: _resolveImage() == null
-                ? Text(
-                    name.isNotEmpty ? name[0].toUpperCase() : '?',
-                    style: AppTypography.headingLarge.copyWith(
-                      color: AppColors.paperAccent,
-                      fontSize: radius * 0.8,
-                    ),
-                  )
-                : null,
+            child:
+                _resolveImage() == null
+                    ? Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : '?',
+                      style: AppTypography.headingLarge.copyWith(
+                        color: AppColors.paperAccent,
+                        fontSize: radius * 0.8,
+                      ),
+                    )
+                    : null,
           ),
           if (showEditIcon)
             Positioned(
@@ -54,12 +55,13 @@ class ProfileImageWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+                  // Notebook × Score §7.50: Vermillion edit badge border/icon = paper.
+                  border: Border.all(color: AppColors.paper, width: 2),
                 ),
                 child: Icon(
                   Icons.camera_alt,
                   size: radius * 0.35,
-                  color: Colors.white,
+                  color: AppColors.paper,
                 ),
               ),
             ),

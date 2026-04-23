@@ -18,10 +18,7 @@ import '../theme/app_typography.dart';
 class LessonProgressBar extends StatelessWidget {
   final RequestPhase currentPhase;
 
-  const LessonProgressBar({
-    super.key,
-    required this.currentPhase,
-  });
+  const LessonProgressBar({super.key, required this.currentPhase});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +39,10 @@ class LessonProgressBar extends StatelessWidget {
               child: CustomPaint(
                 size: const Size(double.infinity, 2),
                 painter: _DashedLinePainter(
-                  color: isCompleted ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isCompleted
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                   strokeWidth: 1.5,
                   dashWidth: 4,
                   dashGap: 3,
@@ -56,10 +56,7 @@ class LessonProgressBar extends StatelessWidget {
           final phase = phases[phaseIndex];
           final state = _phaseState(phaseIndex);
 
-          return _PhaseDot(
-            label: phase.label,
-            state: state,
-          );
+          return _PhaseDot(label: phase.label, state: state);
         }),
       ),
     );
@@ -84,12 +81,12 @@ class LessonProgressBar extends StatelessWidget {
   }
 
   List<_PhaseInfo> get _phases => const [
-        _PhaseInfo(AppStrings.phaseRequest),
-        _PhaseInfo(AppStrings.phaseConfirmed),
-        _PhaseInfo(AppStrings.phasePayment),
-        _PhaseInfo(AppStrings.phaseLessons),
-        _PhaseInfo(AppStrings.phaseCompleted),
-      ];
+    _PhaseInfo(AppStrings.phaseRequest),
+    _PhaseInfo(AppStrings.phaseConfirmed),
+    _PhaseInfo(AppStrings.phasePayment),
+    _PhaseInfo(AppStrings.phaseLessons),
+    _PhaseInfo(AppStrings.phaseCompleted),
+  ];
 }
 
 enum _PhaseState { completed, active, future, muted }
@@ -115,10 +112,11 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke;
 
     final y = size.height / 2;
     var x = 0.0;
@@ -134,8 +132,7 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
-      color != oldDelegate.color ||
-      strokeWidth != oldDelegate.strokeWidth;
+      color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
 }
 
 class _PhaseDot extends StatelessWidget {
@@ -145,10 +142,7 @@ class _PhaseDot extends StatelessWidget {
   static const _dotSize = 20.0;
   static const _ringSize = 28.0;
 
-  const _PhaseDot({
-    required this.label,
-    required this.state,
-  });
+  const _PhaseDot({required this.label, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -167,9 +161,10 @@ class _PhaseDot extends StatelessWidget {
             label,
             style: AppTypography.caption.copyWith(
               color: _textColor,
-              fontWeight: state == _PhaseState.active
-                  ? FontWeight.w600
-                  : FontWeight.normal,
+              fontWeight:
+                  state == _PhaseState.active
+                      ? FontWeight.w600
+                      : FontWeight.normal,
               fontSize: 10,
             ),
           ),
@@ -188,11 +183,8 @@ class _PhaseDot extends StatelessWidget {
             color: AppColors.paperAccent,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.check,
-            size: 12,
-            color: Colors.white,
-          ),
+          // Notebook × Score §7.50: Vermillion check glyph = paper.
+          child: const Icon(Icons.check, size: 12, color: AppColors.paper),
         );
 
       case _PhaseState.active:
@@ -206,10 +198,7 @@ class _PhaseDot extends StatelessWidget {
               height: _ringSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.paperAccentSoft,
-                  width: 2,
-                ),
+                border: Border.all(color: AppColors.paperAccentSoft, width: 2),
               ),
             ),
             // Inner filled dot
@@ -231,10 +220,7 @@ class _PhaseDot extends StatelessWidget {
           height: _dotSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.inkQuaternary,
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.inkQuaternary, width: 1.5),
           ),
         );
 

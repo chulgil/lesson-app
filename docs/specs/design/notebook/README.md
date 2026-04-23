@@ -2951,6 +2951,63 @@ flutter analyze <17 files>
 
 ---
 
+### 7.83 core/widgets/ 공통 위젯 §7.50 스윕 — 전 앱 Avatar·EditBadge·Check·Chip 일괄 정리
+
+**배경**: §7.82 예고 후보 2("core/widgets/ 공통 위젯 §7.50 잔재 스윕") 실행. 공통 위젯은 **수십 개 화면에서 재사용** 되므로, 1건 수정이 전 앱 팔레트에 영향. `core/widgets/` 전수 감사 → `Colors.white` 9건이 §7.50 범위 (avatar ring/initial, edit badge border/icon, check glyph, chip selection, bottomsheet default bg) 에 해당. 단일 사이클로 **전 앱 Vermillion/profile-color foreground 를 한꺼번에 paper 로 전환**.
+
+| 파일 | 라인 | 요소 | 패턴 |
+|---|---:|---|:---:|
+| bottom_sheet_handle.dart | 44 | `BottomSheetContainer` default `backgroundColor` | §7.50 팔레트 일관성 |
+| profile_photo_header.dart | 86 | CircleAvatar ring border | §7.50 avatar ring |
+| profile_photo_header.dart | 98 | avatar initial text color | §7.50 avatar initial (컬러) |
+| profile_photo_header.dart | 176 | edit badge border (paperAccent bg) | §7.50 Vermillion edit badge |
+| profile_photo_header.dart | 178 | edit badge Icon.camera_alt | §7.50 Vermillion edit badge |
+| profile_image_widget.dart | 57 | edit badge border (paperAccent bg) | §7.50 Vermillion edit badge |
+| profile_image_widget.dart | 62 | edit badge Icon.camera_alt | §7.50 Vermillion edit badge |
+| lesson_progress_bar.dart | 194 | Icons.check (paperAccent dot) | §7.50 check glyph |
+| compact_week_strip.dart | 140 | selected day text (paperAccent bg) | §7.50 chip selection |
+
+**수량**: 9 code-line edits (0 imports — 전 파일 `AppColors` 기 임포트). 전 앱 공통 위젯 기본값/foreground 를 Notebook paper 기준으로 통일.
+
+**§7.50 잔재 패턴 6개로 확장** — §7.80 에서 5개 (avatar initial, badge count, loading spinner, check glyph, chip selection) 에 §7.83 에서 **1개 추가**:
+
+| # | 패턴 | 최초 발견 | §7.83 사례 |
+|:-:|---|---|---|
+| 1 | avatar initial (타이포 §7.30 유지, 컬러만 paper) | §7.72 | profile_photo_header:98 |
+| 2 | badge count | §7.75 | (없음) |
+| 3 | loading spinner | §7.75 | (없음) |
+| 4 | check glyph | §7.80 | lesson_progress_bar:194 |
+| 5 | chip/pill selection | §7.80 | compact_week_strip:140 |
+| **6** | **avatar ring + edit badge (border + icon)** | **§7.83** | profile_photo_header x3, profile_image_widget x2 |
+
+**특별 항목**: `bottom_sheet_handle.dart:44 BottomSheetContainer.backgroundColor` 는 **기본값 변경** — 이 위젯을 사용하는 `payment_detail_sheet`, `add_payment_sheet` 두 곳이 자동으로 Notebook paper 배경으로 전환됨 (behavioural side-effect, 의도적). §7.80 에서 `ai_notes_result_sheet:54` 를 직접 교체한 것을 이번에는 **공통 위젯 기본값으로 끌어올려** 향후 신규 바텀시트도 자동으로 paper 기반이 되도록 보장.
+
+**§7.50 범위 밖 유지 (이번 사이클)**:
+
+| 파일 | 건수 | 이유 |
+|---|---:|---|
+| week_calendar_widget.dart | 17건 | 진한 ink 배경 기반 주간 캘린더 — 별도 사이클 필요 (전체 레이아웃 컨텍스트 필요) |
+| debug_role_switcher.dart | 2건 | 디버그 전용 화면 — 프로덕션 비노출 |
+| recording_diagnostic_screen.dart | 0건 (Colors.white) / 1건 (heading) | 디버그 전용 화면 |
+
+week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므로 §7.50 "Vermillion 배경" 조건 밖. 별도 컨텍스트 분석이 필요하므로 차기 사이클 후보로 유지.
+
+**검증**: `flutter analyze lib/core/widgets/` → No issues found! (ran in 4.5s). 9 edits 모두 성공.
+
+**커밋**: (Cycle 39 진행 중)
+
+**도메인 관찰**: `core/widgets/` 는 **"앱 전체의 근육 조직"** — 여기서 1건 수정이 수십 화면에 파급. 이번 9건 배치의 실질적 임팩트는 **약 40+ 화면** 의 avatar/edit badge/check glyph/chip selection 이 동시에 Notebook paper 로 전환. **공통 위젯 스윕은 Per-screen 배치 대비 ROI 수십 배**. 향후 Notebook × Score 적용 전략 원칙 확정: **"도메인 스윕 → 공통 위젯 스윕 → 나머지 개별 화면"** 순서.
+
+**다음 후보**:
+1. `week_calendar_widget.dart` 단독 컨텍스트 분석 (ink 배경 17건 재해석)
+2. `students/` 도메인 잔재 (student_detail 제외)
+3. `practice/screens` (§7.62·§7.64·§7.66 이후 남은 화면)
+4. `core/widgets/` heading 5건 (profile_image_widget avatar initial은 이미 paperAccent — 변경 불필요, 나머지는 디버그 전용)
+
+**은유**: §7.83 은 **"도시의 수도관을 한 번에 교체하는 일"** 이었다. 각 건물(화면)을 돌며 수도꼭지(색상)를 하나씩 갈아 끼우는 대신, **중앙 배관(공통 위젯)** 을 손봐서 전 도시의 수질을 한꺼번에 바꾼다. 사용자는 어느 화면에서 avatar 테두리를 보든, edit 배지를 누르든, 체크 표시를 확인하든, 모두 같은 **"종이에 찍힌 잉크"** 질감을 경험한다 — Material 기본값의 **"LED 광택"** 이 앱 전역에서 사라졌다. §7.80 의 **"디지털 버튼 → 잉크 도장"** 은유를 공통 위젯 층위로 끌어올린 것이 §7.83.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

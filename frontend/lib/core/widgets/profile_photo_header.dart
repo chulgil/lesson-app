@@ -83,7 +83,11 @@ class ProfilePhotoHeader extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
+                            // Notebook × Score §7.50: avatar ring border = paper.
+                            border: Border.all(
+                              color: AppColors.paper,
+                              width: 3,
+                            ),
                           ),
                           child: CircleAvatar(
                             radius: avatarRadius,
@@ -93,9 +97,10 @@ class ProfilePhotoHeader extends StatelessWidget {
                                 _resolveProfileImage() == null
                                     ? Text(
                                       initial,
+                                      // Notebook × Score §7.50: avatar initial color = paper (profile color 배경).
                                       style: AppTypography.displayMedium
                                           .copyWith(
-                                            color: Colors.white,
+                                            color: AppColors.paper,
                                             fontWeight: FontWeight.bold,
                                           ),
                                     )
@@ -173,9 +178,10 @@ class ProfilePhotoHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paperAccent,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        // Notebook × Score §7.50: Vermillion edit badge border/icon = paper.
+        border: Border.all(color: AppColors.paper, width: 2),
       ),
-      child: Icon(icon, size: 16, color: Colors.white),
+      child: Icon(icon, size: 16, color: AppColors.paper),
     );
   }
 }
