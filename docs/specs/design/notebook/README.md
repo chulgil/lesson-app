@@ -2180,6 +2180,53 @@ flutter analyze <17 files>
 
 ---
 
+### 7.66 practice/screens 폼·상세 섹션 제목 Playfair 통일 — practice/ 도메인 §7.17 배치 #2
+
+**트리거**: §7.62(practice/widgets/ §7.17 배치 #1) + §7.64(practice/widgets/ §7.27 배치 #1) 에 이어, practice/screens/ 레이어의 잔존 `AppTypography.headingSmall` 섹션 제목을 §7.17 로 맞추기 위한 배치 #2.
+
+**변경 파일 (5 files / 9 edits → 10 rendered titles)**:
+
+| 파일 | 라인 | 제목 | 렌더 |
+|---|---|---|---|
+| `practice/screens/quick_add_screen.dart` | 349 | '섹션 목록' | 1 |
+| `practice/screens/section_detail_screen.dart` | 178 | '연습기록' | 1 |
+| `practice/screens/section_detail_screen.dart` | 200 | '녹음' | 1 |
+| `practice/screens/edit_section_screen.dart` | 342 | '범위 유형' | 1 |
+| `practice/screens/edit_section_screen.dart` | 373 | '마디 범위 *' | 1 |
+| `practice/screens/edit_section_screen.dart` | 393 | '줄 범위 *' | 1 |
+| `practice/screens/add_section_screen.dart` | 421 | '범위 유형' | 1 |
+| `practice/screens/add_section_screen.dart` | 463 | ternary '마디/줄 범위 *' | 1 |
+| `practice/screens/practice_goal_setting_screen.dart` | 265 (`_buildSectionHeader`) | `title` prop | 2 (일일 목표 / 주간 목표) |
+
+**양적 헬퍼 전파**: 9 code-line edits → **10 rendered titles** (8 direct + 1 ternary + 1 helper×2). 헬퍼 우선 패턴 다섯 번째 사례 (§7.56·§7.59·§7.60·§7.62 이어서).
+
+**§7.30 제외 (practice/screens/ 동일 배치 내)**:
+
+| 파일 | 라인 | 내용 | 사유 |
+|---|---|---|---|
+| `quick_add_screen.dart` | 414 | '섹션 ${index + 1}' (paperAccent) | 동적 인덱스 라벨 |
+| `edit_section_screen.dart` | 301 | `_repertoire!.name` (paperAccent) | dynamic name |
+| `add_section_screen.dart` | 319 | `_repertoire!.name` (paperAccent) | dynamic name |
+| `section_picker_screen.dart` | 202 | '섹션이 없습니다' (inkSecondary) | empty state headline |
+
+§7.30 exclusion roster 지속 적용 — 동적 값·이름·빈 상태는 Gothic 계열 유지로 정보 위계 구분.
+
+**커밋**: `c38db867 feat(notebook): practice/screens §7.17 폼/상세 섹션 제목 Playfair 통일`
+
+**검증**: `flutter analyze <5 files>` → `No issues found`.
+
+**부수 포맷터 reflow**: `quick_add_screen.dart` 는 비정규 포맷 상태였던 탓에 PostToolUse dart formatter 가 대량 reflow (156+/105- 라인 중 대부분 whitespace/wrap). 로직 변경 없음.
+
+**practice/ 도메인 §7.17/§7.27 완료 현황**:
+- §7.17 widgets: §7.62 (5 transfers → 8 renders)
+- §7.27 widgets: §7.64 (5 transfers → 5 renders)
+- §7.17 screens: §7.66 (이번, 9 transfers → 10 renders)
+- 누적 **19 transfers → 23 renders** in practice/ 도메인 전체
+
+**은유**: 악보 가게의 서재(screens)와 진열장(widgets) 이 드디어 같은 활자공의 서체로 정돈된다. 서재에는 대형 악보(폼 화면), 진열장에는 소형 카드(위젯). 전에는 서재의 라벨과 진열장 라벨이 미묘하게 달라 방문자는 "여기가 같은 가게 맞나" 순간 의심했다. 오늘 '섹션 목록' · '연습기록' · '녹음' · '범위 유형' · '마디 범위 *' · '줄 범위 *' · '일일 목표' · '주간 목표' — 여덟 개의 서재 라벨이 모두 같은 서체로 교체되었다. 고객의 시선은 라벨 서체에 걸리지 않고 **내용** 으로 흐른다 — **통일은 주의를 해방시킨다**(§7.61 은유 재인용).
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
