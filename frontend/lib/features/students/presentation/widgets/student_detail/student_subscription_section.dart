@@ -6,6 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
 import '../../../../subscription/presentation/widgets/subscription_ticket_card.dart';
 import '../../../domain/entities/class_membership.dart';
@@ -40,7 +41,9 @@ class StudentSubscriptionSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('수강권 현황', style: AppTypography.headingMedium),
+            // Notebook × Score: 수강권 현황은 Info 탭의 핵심 섹션 —
+            // Playfair sectionTitle 로 승격 (§7.17 헤더 일관성).
+            Text('수강권 현황', style: NotebookTypography.sectionTitle),
             TextButton.icon(
               onPressed: () {
                 final query =
@@ -170,11 +173,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.school_outlined,
-            size: 40,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '레슨 등록이 필요합니다',
@@ -185,9 +184,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space1),
           Text(
             '학생을 레슨에 등록한 후 수강권을 발급할 수 있습니다',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
             textAlign: TextAlign.center,
           ),
         ],
@@ -296,9 +293,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
       ),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }

@@ -2503,6 +2503,49 @@ flutter analyze <17 files>
 
 ---
 
+### 7.74 student_detail 탭 내부 섹션 제목 Playfair + §7.50 paper 통일 — 상세 화면 Info 탭 층위
+
+**배경**: §7.72 lesson_header_card 로 상세 화면 층위 진입 후, 다음 후보였던 `student_detail_screen` 의 탭 내부(StudentInfoTab / StudentLessonsTab / StudentPracticeTab)를 감사. SliverAppBar 자체는 프로필 컬러 히어로라 Notebook 승격 불가(§7.72 결정) — 탭 내부 sectionTitle 만 대상.
+
+**감사 결과**: 3 탭 → 12 하위 위젯 전수 조회. **섹션 제목 sectionTitle 승격률 92%** 이미 도달. 남은 2건만 Cycle 34 대상:
+
+| 파일 | 라인 | 패턴 | 변경 |
+|---|---:|:---:|---|
+| student_subscription_section.dart | 44 | §7.17 | "수강권 현황" `AppTypography.headingMedium` → `NotebookTypography.sectionTitle` |
+| student_practice_tab.dart | 471 | §7.50 | feedback count badge (paperAccent 배경) foreground `Colors.white` → `AppColors.paper` |
+
+**수량**: 2 code-line edits (+ 1 import) → 1 Playfair 승격 + 1 §7.50 준수.
+
+**§7.30 제외 1건** — 의도적으로 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| student_stats_cards:72 | `value` (headingMedium) | dynamic stat value |
+
+**이미 §7.17 통과한 섹션 제목 9건** (Cycle 34 전 상태, 확인만):
+- student_lessons_sections: "다가오는 레슨"(L33), "최근 레슨"(L120)
+- student_practice_section: "이번 주 연습"(L32)
+- student_practice_tab: "이번 주 연습 요약"(L79), "주간 연습 현황"(L177), "공유된 녹음"(L316)
+- student_notes_section: "레슨 노트"(L30), "hand 필기체 메타데이터"(L151)
+- student_lesson_card: "hand 필기체"(L118)
+
+**도메인 관찰**: student_detail 의 Info 탭은 §7.17 가 **이미 주도권**을 잡고 있었다 (9/11 ≈ 82%). 남은 1건은 `subscription_facade` 경계를 타고 들어온 위젯이라 Notebook 인식 외곽에 놓여 있던 것. **탭 내부 감사는 개별 파일이 아니라 전수 grep 으로 봐야 정확** — 헤더 1건만 보면 "이미 끝난 줄" 착각할 위험.
+
+**상세 화면 layer 누적 (§7.72 lesson_header_card + §7.74 student_detail 탭)**:
+- lesson_detail: hero card Playfair 승격 ✓
+- student_detail: Info 탭 섹션 제목 100% 승격 ✓, Lessons/Practice 탭 이전 승격 확인
+
+**§7.50 관찰**: Vermillion 배경 foreground 는 이번 사이클에도 1건 발견 — `Colors.white` 가 badge/chip 에서 **조용히 살아남는다**. 큰 CTA 가 아니라 작은 카운터라 grep 에서 놓치기 쉬움. `Colors\.white` 전수 grep 이 상세 화면 층위까지 도달해야 Notebook 팔레트 외곽 방어가 완결.
+
+**커밋**: (진행 중 — Cycle 34 트레일러)
+**검증**: `flutter analyze lib/features/students/presentation/widgets/student_detail/` → No issues found! (ran in 2.9s)
+
+**다음 후보**: `lesson_detail_screen` 본체(791줄) 의 sectionTitle 스캔, 또는 `add_lesson_screen`(874줄) hero 영역 승격 — 상세 화면 layer 확장 계속.
+
+**은유**: 상세 화면은 **서랍장**이다. §7.72 에서 손잡이(lesson_header_card)를 공방의 놋쇠로 바꿨고, §7.74 는 **첫째 서랍**(Info 탭)을 열어 안감까지 Notebook 무명천으로 갈았다. 놀랍게도 안감의 92% 는 이미 무명천이었다 — 다른 사이클(§7.17 배치들)이 서랍 내부에서 먼저 작업했기 때문. **상세 화면 층위는 "새로 만드는 것"이 아니라 "합류점을 찾는 것"** 에 가깝다. 아직 놋쇠가 아닌 손잡이, 아직 무명천이 아닌 안감 — 이 둘의 접점을 메우는 게 상세 화면 사이클의 본질.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
