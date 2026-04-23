@@ -2225,6 +2225,47 @@ flutter analyze <17 files>
 
 **은유**: 악보 가게의 서재(screens)와 진열장(widgets) 이 드디어 같은 활자공의 서체로 정돈된다. 서재에는 대형 악보(폼 화면), 진열장에는 소형 카드(위젯). 전에는 서재의 라벨과 진열장 라벨이 미묘하게 달라 방문자는 "여기가 같은 가게 맞나" 순간 의심했다. 오늘 '섹션 목록' · '연습기록' · '녹음' · '범위 유형' · '마디 범위 *' · '줄 범위 *' · '일일 목표' · '주간 목표' — 여덟 개의 서재 라벨이 모두 같은 서체로 교체되었다. 고객의 시선은 라벨 서체에 걸리지 않고 **내용** 으로 흐른다 — **통일은 주의를 해방시킨다**(§7.61 은유 재인용).
 
+### 7.67 students_tab 헤더 Notebook masthead 승격 — 탭 레벨 홈 일관성
+
+**트리거**: 선생님 주요 탭 3종 중 홈(`dashboard_tab`), 학부모/학생 홈은 이미 `NotebookMasthead` + `Programme Title` 2단 구조로 PASS 9점대 (home_screens_audit §2.1·§2.2·§2.3). 반면 선생님이 가장 자주 들르는 "학생 관리" 탭(`students_tab.dart`) 은 `AppTypography.headingLarge` 로만 표시되어 탭 간 시각 언어 단절. "선생님 학생화면의 Notebook 전환" 디렉티브의 1순위 대상.
+
+**변경 파일 (1 file, 69+/19-)**:
+
+| 파일 | 영역 | 변경 |
+|---|---|---|
+| `students/presentation/screens/students_tab.dart` | `_buildHeader()` 재작성 | 단일 Row → Column (Masthead + ProgrammeTitle + ThinRule + 액션 Row) |
+
+**적용 시그니처 (4/6)**:
+
+| 시그니처 | 적용 위치 |
+|---|---|
+| `NotebookMasthead` | eyebrow "STUDENTS" + trailing `check_box_outlined` (선택 모드 진입) |
+| `NotebookTypography.mastheadLabel` | "Programme of Students" (Playfair italic 소제목) |
+| `NotebookTypography.masthead` | "학생 관리" (Playfair large) |
+| `ThinRule` | ProgrammeTitle 하단 1px 분리선 |
+| `romanOf` | `_volumeIssueString` meta 생성 (VOL. · NO.) |
+
+**보존 결정**:
+1. **선택 모드는 masthead 승격 제외**: `_isSelectionMode == true` 일 때는 기존 "N명 선택됨 / 취소" 단순 Row 유지. 선택 모드는 **일시적 작업 맥락**(홈이 아닌 툴바)이므로 Playfair masthead 로 승격하면 "홈인가? 작업인가?" 혼란을 유발. 분리는 의도적.
+2. **선택 진입 버튼은 TextButton → IconButton 로 승격**: `check_box_outlined` 아이콘으로 Masthead trailing 자리에 통합. "선택" 텍스트 TextButton 이 Masthead eyebrow 와 경쟁하는 문제 해소.
+3. **학생 추가 FilledButton 은 Masthead 바깥 별도 Row 에 배치**: Masthead 는 감정 낮은 선언적 헤더, FilledButton 은 강한 CTA → 분리하여 시각 위계 명확화.
+
+**검증**: `flutter analyze students_tab.dart` → `No issues found! (3.2s)`.
+
+**탭 레벨 일관성 현황**:
+
+| 탭 | 파일 | Masthead | Notebook 시그니처 |
+|---|---|---|---|
+| 선생님 홈 | `home/dashboard_tab.dart` | ✅ "LESSONAZA" | 6/6 (감사 PASS 9.5) |
+| 학생 홈 | `student_home/student_dashboard_tab.dart` | ✅ | 5/6 (감사 PASS 9.17) |
+| 학부모 홈 | `parent_home/parent_dashboard_tab.dart` | ✅ | 5/6 (감사 PASS 9.17) |
+| 학생 관리 | `students/screens/students_tab.dart` | ✅ "STUDENTS" (이번) | 4/6 |
+| 일정 | `schedule/screens/schedule_tab.dart` | ❌ | 0/6 (다음 후보) |
+
+**다음 후보**: `schedule_tab.dart` (선생님 일정 탭, 845줄). students_tab 과 동일 패턴으로 승격 가능.
+
+**은유**: 네 개의 탭 바로 이루어진 선생님의 책상 위, 세 개 탭(홈·학생 홈·학부모 홈)은 같은 활자공이 찍은 Playfair 머리글자로 시작했는데 네 번째 탭(학생 관리)만 혼자 고딕 볼드로 소리쳤다 — 같은 책상인데 한 서랍만 다른 공방에서 만든 손잡이가 달려 있는 셈. 오늘 그 서랍의 손잡이가 교체되었다. 책상은 이제 **하나의 공방 작품**으로 보인다 — 일정 탭이라는 다섯 번째 서랍만 교체되면 책상 전체가 완전해진다.
+
 ---
 
 ## 8. 구현 원칙

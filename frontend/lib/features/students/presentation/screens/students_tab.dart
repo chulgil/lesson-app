@@ -7,7 +7,10 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/presentation/providers/practice_crud_provider.dart';
@@ -140,12 +143,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (_isSelectionMode) ...[
+    // 선택 모드: 홈 masthead 대신 단순 카운트 + 취소 Row (홈 전환 느낌 보존)
+    if (_isSelectionMode) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
             Text(
               '${_selectedStudentIds.length}명 선택됨',
               style: AppTypography.headingLarge,
@@ -159,20 +163,60 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 ),
               ),
             ),
-          ] else ...[
-            Text('학생 관리', style: AppTypography.headingLarge),
-            Row(
+          ],
+        ),
+      );
+    }
+
+    // 일반 모드: Notebook × Score masthead 승격 (선생님 홈/학부모 홈과 일관)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: AppSpacing.space2),
+          // ── Masthead: "STUDENTS" eyebrow + 학생 추가 아이콘 ──
+          NotebookMasthead(
+            eyebrow: 'STUDENTS',
+            meta: _volumeIssueString(DateTime.now()),
+            trailing: IconButton(
+              onPressed: () => setState(() => _isSelectionMode = true),
+              icon: const Icon(
+                Icons.check_box_outlined,
+                color: AppColors.ink,
+                size: 22,
+              ),
+              tooltip: '선택',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            ),
+          ),
+          // ── Programme Title — "학생 관리" Playfair ──
+          Padding(
+            padding: const EdgeInsets.only(top: 18, bottom: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () => setState(() => _isSelectionMode = true),
-                  child: Text(
-                    '선택',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.paperAccent,
-                    ),
-                  ),
+                Text(
+                  'Programme of Students',
+                  style: NotebookTypography.mastheadLabel,
                 ),
-                const SizedBox(width: AppSpacing.space2),
+                const SizedBox(height: 4),
+                Text('학생 관리', style: NotebookTypography.masthead),
+                const SizedBox(height: AppSpacing.space3),
+                const ThinRule(),
+              ],
+            ),
+          ),
+          // ── 액션 Row — 학생 추가 ──
+          Padding(
+            padding: const EdgeInsets.only(
+              top: AppSpacing.space2,
+              bottom: AppSpacing.space2,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
                 FilledButton.icon(
                   onPressed: () {
                     context.push(AppRoutes.addStudentMethod);
@@ -188,10 +232,16 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 ),
               ],
             ),
-          ],
+          ),
         ],
       ),
     );
+  }
+
+  /// Notebook meta: "VOL. IV · NO. 23" 형식.
+  /// 알림/액션이 trailing 을 대신하므로 실 렌더에는 사용되지 않지만 API 요구.
+  String _volumeIssueString(DateTime now) {
+    return 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}';
   }
 
   Widget _buildSearchBar() {
