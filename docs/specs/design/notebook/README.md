@@ -2628,6 +2628,50 @@ flutter analyze <17 files>
 
 ---
 
+### 7.77 profile/ 레퍼토리 모달 제목 Playfair 통일 — 명사 호명 도메인 §7.27 배치 #1
+
+**배경**: §7.76 invite/ 전환율 12.5% 관찰 후 **명사 호명 비중 높은 도메인** 가설 검증을 위해 profile/ 진입. `features/profile/` 전수 탐색 결과 `AppTypography.headingSmall` 7건 발견. **2/7 만 §7.27 구조적 모달 타이틀**이었고 나머지 5건은 §7.30 exclusion(동적 값 3건, avatar 1건, empty 1건). 전환율 **28.6%** — invite/ 보다는 높지만 예측한 40%+ 에 미달.
+
+| 파일 | 라인 | 텍스트/패턴 | 변경 |
+|---|---:|---|---|
+| repertoire_management_widgets.dart | 539 | `'난이도 선택'` (ListTile title, bottom sheet) | §7.27 → appBarTitle |
+| repertoire_management_widgets.dart | 585 | `'작곡가 선택'` (ListTile title, bottom sheet) | §7.27 → appBarTitle |
+
+**수량**: 2 code-line edits (+ 1 import) → 2 Playfair 승격.
+
+**§7.30 제외 5건** — 의도적 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| extended_profile_dialogs:177 | `FeeRange(...).formatted` (`paperAccent` color) | dynamic stat value |
+| outstanding_payments_screen:48 | `'미수금이 없습니다'` (check_circle icon) | empty-state headline with icon |
+| outstanding_payments_screen:224 | `formatWonWithComma(amount)` (`paperAccent` color) | dynamic price value |
+| payment_management_screen:244 | `'$selectedYear년'` (navigation arrows 사이) | dynamic calendar label |
+| payment_detail_sheet:52 | `studentName[0]` (`Colors.white` on paperAccentSoft) | avatar initial |
+
+**§7.50 관찰 (차기 배치 후보)**: `payment_detail_sheet:52` 의 avatar Colors.white 는 paperAccentSoft 배경 위 foreground → §7.50 paper 통일 대상. 이번 배치는 타이포 스코프라 §7.50 은 별도 사이클로 이월.
+
+**가설 검증 결과**: "profile/ = 명사 호명 도메인" 은 **부분 참**. 레퍼토리 메타데이터(난이도·작곡가)는 명사형 모달로 Playfair 승격 가능하나, **profile 의 지배 구조는 "결제 내역·미수금·수수료"라는 금액 중심**이라 **§7.30 dynamic stat value 가 대다수**를 차지. 다음 가설: "숫자 지배 도메인"은 전환율이 낮다 — settings/ 와 gamification/ 가 대안 후보.
+
+**전환율 비교** (업데이트):
+
+| 도메인 | heading 발견 | 변환 | §7.30 제외 | 전환율 | 본질 |
+|---|---:|---:|---:|---:|---|
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% | 정적 명사 (수강권·제안·내역) |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% | 동적 이벤트 (일정 변경·완료) |
+| schedule/widgets (§7.73) | 19건 | 1건 | 9건 | ~10% | 동적 시간대 |
+| invite/ (§7.76) | 8건 | 1건 | 7건 | 12.5% | 상태 전이 피드백 |
+| **profile/ (§7.77)** | **7건** | **2건** | **5건** | **28.6%** | **금액 중심** |
+
+**커밋**: `27bef113` style(profile): Notebook × Score §7.27 배치 #1
+**검증**: `flutter analyze` profile/repertoire → No issues found! (ran in 3.0s)
+
+**다음 후보**: settings/ (backup_widgets 등 섹션 제목 중심, 전환율 예측 50%+), gamification/ (badge_collection, 전환율 미지수), 또는 student_home/ (8 occurrences, 예상 "대시보드 섹션 제목" 지배).
+
+**은유**: §7.77 은 **서가의 장르 라벨**을 바꾸는 일이었다. 'Bach' 나 '3만원' 같은 **책 제목·가격표** 는 원래부터 손글씨(Gothic)로 두어도 의미가 통한다 — 그게 사용자가 찾는 내용이기 때문. 하지만 **"난이도 선택"·"작곡가 선택"** 같은 **서가 탭** 은 책들을 가로지르는 **상위 분류** 다. 상위 분류는 Playfair 로 쓰여야 **"여긴 다른 층위"** 라는 신호가 된다. 즉 **동적 값은 Gothic, 구조적 정적 레이블은 Playfair** — 이 원칙이 §7.27 의 심장이다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
