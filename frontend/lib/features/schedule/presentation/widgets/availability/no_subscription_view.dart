@@ -6,6 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
 
 /// View shown when a student tries to book a regular lesson without an active subscription.
@@ -57,10 +58,10 @@ class NoSubscriptionView extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space6),
 
-            // Title
+            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
               '수강권이 필요합니다',
-              style: AppTypography.headingMedium,
+              style: NotebookTypography.sectionTitle,
               textAlign: TextAlign.center,
             ),
 
@@ -81,9 +82,8 @@ class NoSubscriptionView extends ConsumerWidget {
             pendingProposalsAsync.when(
               data: (proposals) {
                 // Filter proposals from this teacher
-                final teacherProposals = proposals
-                    .where((p) => p.teacherId == teacherId)
-                    .toList();
+                final teacherProposals =
+                    proposals.where((p) => p.teacherId == teacherId).toList();
 
                 if (teacherProposals.isEmpty) {
                   return _buildNoProposalContent(context);
@@ -138,24 +138,16 @@ class NoSubscriptionView extends ConsumerWidget {
           decoration: BoxDecoration(
             color: AppColors.ink.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color: AppColors.ink.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: AppColors.ink,
-                size: 20,
-              ),
+              Icon(Icons.info_outline, color: AppColors.ink, size: 20),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Text(
                   '선생님에게 수강권 제안을 요청해 주세요.\n체험 레슨 후 선생님이 수강권을 제안합니다.',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.ink,
-                  ),
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
                 ),
               ),
             ],
@@ -182,17 +174,11 @@ class NoSubscriptionView extends ConsumerWidget {
           decoration: BoxDecoration(
             color: AppColors.paperOk.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color: AppColors.paperOk.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.paperOk.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.mail_outline,
-                color: AppColors.paperOk,
-                size: 20,
-              ),
+              Icon(Icons.mail_outline, color: AppColors.paperOk, size: 20),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Text(
@@ -211,7 +197,9 @@ class NoSubscriptionView extends ConsumerWidget {
           width: double.infinity,
           child: FilledButton.icon(
             onPressed: () {
-              context.push(AppRoutes.proposalDetail.replaceAll(':id', proposalId));
+              context.push(
+                AppRoutes.proposalDetail.replaceAll(':id', proposalId),
+              );
             },
             icon: const Icon(Icons.card_membership),
             label: const Text('수강권 제안 확인하기'),

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../../profile/presentation/providers/teacher_extended_profile_provider.dart';
@@ -105,9 +106,10 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
             ),
             child: Row(
               children: [
+                // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
                 Text(
                   AppStrings.proposalTitle,
-                  style: AppTypography.headingMedium,
+                  style: NotebookTypography.sectionTitle,
                 ),
                 const Spacer(),
                 IconButton(
@@ -362,9 +364,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         ),
         child: Text(
           AppStrings.proposalNoBankAccount,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
       );
     }
@@ -402,9 +402,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         value: _selectedBankAccountId,
         isExpanded: true,
         underline: const SizedBox.shrink(),
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.ink,
-        ),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
         selectedItemBuilder: (context) {
           return allAccounts.map((account) {
             return Align(
@@ -412,9 +410,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
               child: Text(
                 '${account.bankName} ${account.accountNumber}'
                 '${account.isDefault ? ' (기본)' : ''}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.ink,
-                ),
+                style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
               ),
             );
           }).toList();

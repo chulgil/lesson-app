@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Result from the payment guide bottom sheet.
@@ -85,10 +86,10 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
             const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
             const SizedBox(height: AppSpacing.space4),
 
-            // Title
+            // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
             Text(
               AppStrings.paymentGuideTitle,
-              style: AppTypography.headingMedium,
+              style: NotebookTypography.sectionTitle,
             ),
             const SizedBox(height: AppSpacing.space4),
 

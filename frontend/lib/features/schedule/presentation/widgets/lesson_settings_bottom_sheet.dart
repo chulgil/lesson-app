@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Bottom sheet for lesson time settings
@@ -62,8 +63,8 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
 
                 const SizedBox(height: AppSpacing.space5),
 
-                // Title
-                Text('레슨 시간 설정', style: AppTypography.headingMedium),
+                // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+                Text('레슨 시간 설정', style: NotebookTypography.sectionTitle),
 
                 const SizedBox(height: AppSpacing.space2),
 
@@ -174,9 +175,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
         const SizedBox(height: AppSpacing.space1),
         Text(
           description,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space2),
         Wrap(
@@ -272,7 +271,11 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
             const SizedBox(height: AppSpacing.space3),
             Row(
               children: [
-                Icon(Icons.info_outline, size: 14, color: AppColors.paperAccent),
+                Icon(
+                  Icons.info_outline,
+                  size: 14,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(width: AppSpacing.space1),
                 Expanded(
                   child: Text(

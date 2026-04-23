@@ -3597,6 +3597,51 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.96 Batch 선생님.D — schedule/ 2차 §7.17 11 지점 + §7.30 예외 19 지점 확정
+
+**기간**: 2026-04-23
+**성격**: **11 지점 §7.17 Playfair 승격 + 19 지점 §7.30 예외 문서화**.
+**배경**: §7.91-b 로드맵 Batch 선생님.D. schedule/ 2차 감사 — §7.87-a~e 이후 잔재 재검증. 전수 감사 결과 총 **30 지점** = 전환 **11**(36.67%) + 예외 **19**(63.33%). **예상(10~20%) 상회** — 바텀시트 9건이 전환율을 견인.
+
+#### 7.96-a §7.17 승격 11 지점
+
+| 분류 | 건수 | 파일:라인 |
+|------|------|-----------|
+| §7.27 바텀시트 헤더 | 9 | decline_bottom_sheet.dart:85, payment_guide_bottom_sheet.dart:92, proposal_bottom_sheet.dart:110, schedule_change_response_bottom_sheet.dart:108, student_proposal_bottom_sheet.dart:87, schedule_edit_bottom_sheet.dart:86 (`isEditing ? '스케줄 수정' : '스케줄 추가'` — 2원 유한집합 §7.87-h), lesson_settings_bottom_sheet.dart:66, availability/guest_student_input_dialog.dart:98, screens/time_exception_screen.dart:399 |
+| §7.89 빈 상태 3축 통과 | 1 | availability/no_subscription_view.dart:62 (`'수강권이 필요합니다'` — Center + MainAxisAlignment.center + textAlign: center) |
+| §7.89 성공 상태 3축 통과 | 1 | screens/request_completion_screen.dart:91 (`AppStrings.requestCompleteHeader` — 5단계 가이드 상단 성공 헤드라인) |
+
+#### 7.96-b §7.30 예외 19 지점 — 유형별 집계
+
+| 유형 | 건수 | 파일:라인 | 내용 |
+|------|------|-----------|------|
+| #6 이니셜 (학생/선생님 아바타) | 7 | widgets/teacher_approval_card.dart:164, :412, widgets/booking_card.dart:70, widgets/regular_lesson_widgets.dart:59, widgets/request_profile_card.dart:120, widgets/approval_bottom_sheet.dart:167, widgets/unified_approval_bottom_sheet.dart:125 | `name[0]` / `studentName[0]` — CircleAvatar 이니셜 문자 |
+| #2 개체명 (학생명·선생님명·그룹레슨명·상태 라벨) | 5 | widgets/approval_bottom_sheet.dart:177, widgets/unified_approval_bottom_sheet.dart:135, screens/unified_lesson_request_screen.dart:170, screens/group_class_detail_screen.dart:153, :372 | `booking.studentName`, `widget.params.teacherName`, `widget.groupClass.name`, `booking.statusText` |
+| #4 날짜·시간 포매터 | 4 | screens/schedule_tab.dart:300, :644, widgets/availability/availability_booking_preview.dart:68, screens/booking_cancel_screen.dart:143 | `formatDateMDWithDayLong(selectedDate)`, `lesson.startTime`, `selectedSlot.formattedTimeRange`, `_formatBookingDate()` |
+| #3 stat (수강료·출석수·정원) | 3 | widgets/regular_lesson_widgets.dart:672, screens/group_class_attendance_screen.dart:171, screens/group_class_detail_screen.dart:324 | `formatFee(monthlyFee)`, `${_getAttendedCount()}/${_attendanceState.length}`, `$confirmedCount / ${widget.schedule.maxCapacity}명` |
+
+#### 7.96 검증
+
+- `flutter analyze lib/features/schedule/` → **No issues found** (ran in 7.4s)
+- 잔재 grep 재실행: `AppTypography.heading*` 19건 = §7.30 예외 19건 일치. §7.17 후보 0건 잔존 확인.
+- 11 파일에 `NotebookTypography` import 추가, 헤더 텍스트 스타일 교체. 기능 동작 불변.
+
+#### 7.96 관찰
+
+**"2차 감사 법칙" 하한 돌파 첫 사례**: §7.93~§7.95 가 0~15.8% 범위에 수렴했으나 schedule/ 는 **36.67%** 로 상한을 돌파. 원인 분석: schedule/ 는 **"선생님↔학생 협상 UX"** 특성상 **바텀시트가 9개 집중** — decline·payment_guide·proposal·schedule_change_response·student_proposal·schedule_edit·lesson_settings·guest_student_input·time_exception. 이전 배치(profile 1건·lessons 0건·students 0건)와 달리 §7.27 후보 밀도가 구조적으로 높음. **"도메인 내 바텀시트 밀도가 2차 감사 전환율의 결정 인자"** 가설 확립.
+
+**§7.91-b 예측 정확도 편차**: 로드맵이 schedule/ 를 "10~20%" 로 예상한 것은 잔재 총량(~24건) 추정만으로 평균 전환율을 적용한 결과. 실측 30건 중 바텀시트 특수성을 반영하지 못한 예측. 향후 E(subscription) · F(practice) 배치에서도 바텀시트 밀도를 사전 카운트하여 전환율 추정에 반영 필요.
+
+**7개 이니셜의 재확인**: #6 이니셜 축이 7건으로 §7.30 예외 중 최다. `CircleAvatar > Text(name[0])` 패턴이 schedule/ 전반의 접근 승인·예약·카드에 반복 — §7.84 10-패턴 자동 판정의 **"이니셜은 명조체 유지"** 법칙이 재확증.
+
+**3축 구성의 동형성**: §7.30 예외 19건의 분포가 #6 이니셜(7) + #2 개체명(5) + #4 날짜·시간(4) + #3 stat(3) 으로 **4축 분포**. parent_home §7.92 (개체명·이니셜·stat) · profile §7.93 (개체명·stat·날짜·이니셜) · schedule §7.96 (이니셜·개체명·시간·stat) — 선생님 도메인 공통적으로 **"사람(#2/#6) + 숫자(#3) + 시점(#4)"** 3축 구조가 관찰되며, 도메인별 비중만 상이.
+
+**§7.89 3축 판정의 경계 사례**: request_completion_screen.dart:91 은 Scaffold > SingleChildScrollView > Column(기본 center crossAxis) > _buildSuccessHeader(Column(기본 center)) 의 중첩 구조. 명시적 `CrossAxisAlignment.center` 선언이 없지만 Column 기본값 center 가 적용되어 3축 중 "center align" 을 통과. Column 기본값 활용한 센터 정렬 시에도 §7.89 승격 기준에 해당한다는 판정 기록.
+
+**은유**: §7.96 은 **"교사실의 상담 부스 9 개 + 복도 벽 1 개 + 완료 도장 1 개"** — 바텀시트 9 개의 헤더(§7.27)는 상담 부스의 명패로, "수강권이 필요합니다" 안내판(§7.89)은 복도 벽 헤드라인으로, 신청 완료 헤더(§7.89)는 축하 도장으로 모두 필기체(Playfair) 승격. 반면 부스 안에서 오고 가는 이름·시간·금액·인원(§7.30)은 명조체(Gothic) 유지. 선생님 감사 8 배치 중 **"바텀시트 밀집형 도메인의 첫 표본"** — 이후 subscription/ practice/ 배치에서 바텀시트 밀도에 따른 전환율 편차 검증 대상.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

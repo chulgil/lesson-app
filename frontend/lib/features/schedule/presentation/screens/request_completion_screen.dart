@@ -88,9 +88,10 @@ class RequestCompletionScreen extends StatelessWidget {
           child: const Icon(Icons.check, size: 40, color: Colors.white),
         ),
         const SizedBox(height: AppSpacing.space4),
+        // Notebook × Score: 성공 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
         Text(
           AppStrings.requestCompleteHeader,
-          style: AppTypography.headingLarge.copyWith(color: AppColors.ink),
+          style: NotebookTypography.sectionTitle.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(

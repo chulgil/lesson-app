@@ -395,8 +395,8 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
 
                 const SizedBox(height: AppSpacing.space5),
 
-                // Title
-                Text('휴무 추가', style: AppTypography.headingMedium),
+                // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+                Text('휴무 추가', style: NotebookTypography.sectionTitle),
 
                 const SizedBox(height: AppSpacing.space6),
 

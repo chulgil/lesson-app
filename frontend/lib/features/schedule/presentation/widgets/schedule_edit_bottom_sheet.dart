@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/teacher_availability.dart';
 
@@ -81,10 +82,10 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
 
                 const SizedBox(height: AppSpacing.space5),
 
-                // Title
+                // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
                 Text(
                   isEditing ? '스케줄 수정' : '스케줄 추가',
-                  style: AppTypography.headingMedium,
+                  style: NotebookTypography.sectionTitle,
                 ),
 
                 const SizedBox(height: AppSpacing.space6),
@@ -113,7 +114,9 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                                   setState(() => _selectedDay = index);
                                 }
                               },
-                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(
+                        alpha: 0.2,
+                      ),
                       labelStyle: AppTypography.bodySmall.copyWith(
                         color:
                             isSelected
@@ -225,11 +228,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.access_time,
-              size: 18,
-              color: AppColors.inkSecondary,
-            ),
+            Icon(Icons.access_time, size: 18, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space2),
             Text(
               _formatTime(time),

@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Guest student information collected before booking
@@ -94,8 +95,8 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
 
                   const SizedBox(height: AppSpacing.space5),
 
-                  // Title
-                  Text('예약자 정보 입력', style: AppTypography.headingMedium),
+                  // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+                  Text('예약자 정보 입력', style: NotebookTypography.sectionTitle),
 
                   const SizedBox(height: AppSpacing.space2),
 
@@ -252,9 +253,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
         if (!isRequired)
           Text(
             ' (선택)',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
       ],
     );
@@ -266,11 +265,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
   }) {
     return InputDecoration(
       hintText: hintText,
-      prefixIcon: Icon(
-        prefixIcon,
-        size: 20,
-        color: AppColors.inkSecondary,
-      ),
+      prefixIcon: Icon(prefixIcon, size: 20, color: AppColors.inkSecondary),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: const BorderSide(color: AppColors.inkQuaternary),

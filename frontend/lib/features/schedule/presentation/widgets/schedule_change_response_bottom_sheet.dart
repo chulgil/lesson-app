@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/unified_lesson_request.dart';
@@ -102,10 +103,10 @@ class _ScheduleChangeResponseBottomSheetState
                 ),
               ),
 
-              // Title
+              // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
               Text(
                 AppStrings.scheduleChangeRequestArrived,
-                style: AppTypography.headingMedium,
+                style: NotebookTypography.sectionTitle,
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -237,7 +238,8 @@ class _ScheduleChangeResponseBottomSheetState
               isSelected
                   ? Icons.radio_button_checked
                   : Icons.radio_button_unchecked,
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               size: 20,
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -245,8 +247,7 @@ class _ScheduleChangeResponseBottomSheetState
               '${index + 1}순위 ${slot.displayLabel}',
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color:
-                    isSelected ? AppColors.paperAccent : AppColors.ink,
+                color: isSelected ? AppColors.paperAccent : AppColors.ink,
               ),
             ),
           ],
