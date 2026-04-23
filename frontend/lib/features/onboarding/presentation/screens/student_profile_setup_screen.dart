@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
@@ -154,8 +155,8 @@ class _StudentProfileSetupScreenState
 
                       const SizedBox(height: AppSpacing.space6),
 
-                      // Title
-                      Text('프로필 설정', style: AppTypography.headingLarge),
+                      // Title — Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-f).
+                      Text('프로필 설정', style: NotebookTypography.sectionTitle),
                       const SizedBox(height: AppSpacing.space2),
                       Text(
                         '기본 정보를 설정해주세요',
@@ -303,10 +304,7 @@ class _StudentProfileSetupScreenState
                 _selectedInstrument == null
                     ? Row(
                       children: [
-                        Icon(
-                          Icons.music_note,
-                          color: AppColors.inkTertiary,
-                        ),
+                        Icon(Icons.music_note, color: AppColors.inkTertiary),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
                           '악기를 선택해주세요',
@@ -383,10 +381,7 @@ class _ProgressStep extends StatelessWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color:
-                  isActive
-                      ? AppColors.ink
-                      : AppColors.inkTertiary,
+              color: isActive ? AppColors.ink : AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -434,8 +429,8 @@ class _InstrumentSelectorSheet extends StatelessWidget {
           const BottomSheetHandle(margin: EdgeInsets.zero),
           const SizedBox(height: AppSpacing.space4),
 
-          // Header
-          Text('악기 선택', style: AppTypography.headingMedium),
+          // Header — Notebook × Score: 시트 헤더 Playfair sectionTitle (§7.87-f / §7.27).
+          Text('악기 선택', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space4),
 
           // Choice chips grid
@@ -452,13 +447,12 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                       onSelected(instrument);
                       Navigator.pop(context);
                     },
-                    selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                    selectedColor: AppColors.paperAccent.withValues(
+                      alpha: 0.15,
+                    ),
                     backgroundColor: Colors.white,
                     labelStyle: AppTypography.bodyMedium.copyWith(
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.ink,
+                      color: isSelected ? AppColors.paperAccent : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),

@@ -9,6 +9,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/image_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
@@ -202,8 +203,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                     const SizedBox(height: AppSpacing.space6),
 
-                    // Title
-                    Text('프로필 설정', style: AppTypography.headingLarge),
+                    // Title — Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-f).
+                    Text('프로필 설정', style: NotebookTypography.sectionTitle),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       '학생들에게 보여질 기본 정보를 설정해주세요',
@@ -535,8 +536,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             Text(
               '$charCount / 20자 이상',
               style: AppTypography.caption.copyWith(
-                color:
-                    isValid ? AppColors.paperOk : AppColors.inkTertiary,
+                color: isValid ? AppColors.paperOk : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -605,9 +605,7 @@ class _ProgressStep extends StatelessWidget {
                         '$step',
                         style: AppTypography.bodySmall.copyWith(
                           color:
-                              isActive
-                                  ? Colors.white
-                                  : AppColors.inkTertiary,
+                              isActive ? Colors.white : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -684,7 +682,8 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('악기 선택', style: AppTypography.headingMedium),
+              // Notebook × Score: 시트 헤더 Playfair sectionTitle (§7.87-f / §7.27).
+              Text('악기 선택', style: NotebookTypography.sectionTitle),
               TextButton(
                 onPressed: () {
                   widget.onSelectionChanged(_selected);
@@ -715,7 +714,10 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                   title: Text(instrument),
                   trailing:
                       isSelected
-                          ? Icon(Icons.check_circle, color: AppColors.paperAccent)
+                          ? Icon(
+                            Icons.check_circle,
+                            color: AppColors.paperAccent,
+                          )
                           : Icon(
                             Icons.circle_outlined,
                             color: AppColors.inkQuaternary,
