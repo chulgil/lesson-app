@@ -2268,6 +2268,54 @@ flutter analyze <17 files>
 
 ---
 
+### 7.68 subscription/widgets 폼·요약·모달 제목 Playfair 통일 — subscription/ 도메인 §7.17/§7.27 배치 #1
+
+**트리거**: 수강권 발급 폼은 "유형 → 기간 → 정가 → 결제 방식 → 시작일 → 레슨 장소 → 이동시간 → 요약" 의 8단계 서식으로 구성되는데, 섹션 제목이 모두 Gothic `AppTypography.headingSmall` 로 선언되어 있어 Notebook × Score 의 Playfair 섹션 규칙과 불일치했다. 모달 시트(sessionCancelTitle) 까지 포함하여 subscription/widgets/ 전체를 일괄 정돈한다.
+
+**변경 파일 (7 files / 12 code edits → 20 rendered titles)**:
+
+| 파일 | 라인 | 제목 | 패턴 | 렌더 |
+|---|---|---|---|---|
+| `chip_input_field.dart` | 75 (헬퍼 `title` prop) | - | §7.17 | **9** (lesson_policy ×5 + issue_form_type_options ×2 + issue_form_discount_bonus ×2) |
+| `issue_form_sections.dart` | 28 | '수강권 유형' | §7.17 | 1 |
+| `issue_form_sections.dart` | 164 | '결제 방식' | §7.17 | 1 |
+| `issue_form_sections.dart` | 344 | '정가' | §7.17 | 1 |
+| `issue_form_sections.dart` | 455 | '시작일' | §7.17 | 1 |
+| `issue_form_summary_widgets.dart` | 203 | '발급 요약' (paperAccent 틴트) | §7.17 | 1 |
+| `issue_form_summary_widgets.dart` | 394 | '배치 발급 요약' (paperAccent 틴트) | §7.17 | 1 |
+| `issue_form_type_options.dart` | 69 | '기간 선택' | §7.17 | 1 |
+| `issue_form_membership_widgets.dart` | 32 | '레슨 선택' | §7.17 | 1 |
+| `location_travel_selector.dart` | 147 | '레슨 장소' | §7.17 | 1 |
+| `location_travel_selector.dart` | 323 | '이동시간' | §7.17 | 1 |
+| `cancel_lesson_bottom_sheet.dart` | 127 | `sessionCancelTitle(N)` | §7.27 | 1 |
+
+**양적 헬퍼 전파**: 12 code-line edits → **20 rendered titles** (11 direct + 1 헬퍼×9). §7.17 헬퍼 전파 여섯 번째 사례 (§7.56·§7.59·§7.60·§7.62·§7.66 이어서). 헬퍼 한 줄이 9 call sites 로 퍼지는 극적 레버리지.
+
+**copyWith 패턴**: `NotebookTypography.sectionTitle.copyWith(color: AppColors.paperAccent)` — 요약 카드는 accent 틴트를 유지하면서 서체만 Playfair 로 교체. 기존 색상 디자인 의도 보존.
+
+**§7.27 (cancel_lesson_bottom_sheet)**: `BottomSheetHandle` + 동적 세션 번호가 포함된 제목 블록. 텍스트는 동적이지만 모달 상단 제목 블록의 **구조적 역할** 이 §7.27 에 해당하므로 `appBarTitle` 로 승격.
+
+**§7.30 exclusion (subscription/widgets/ 동일 배치 내)**:
+
+| 파일 | 라인 | 내용 | 사유 |
+|---|---|---|---|
+| `issue_form_membership_widgets.dart` | 224 | '등록된 레슨이 없습니다' | empty state headline |
+| `issue_form_membership_widgets.dart` | 259 | '오류가 발생했습니다' | error headline |
+| `proposal_card_widgets.dart` | 329 | `_formatPrice(discountedPrice)` | dynamic price |
+| `proposal_card_widgets.dart` | 567 | '입금 확인 대기중' | status headline with icon |
+| `template_choice_card.dart` | 72 | `template.name` | dynamic template name |
+| `selectable_template_card.dart` | 147 | `template.formattedPrice` | dynamic price |
+
+**커밋**: `91faa52e feat(notebook): subscription/widgets §7.17+§7.27 폼·요약·모달 제목 Playfair 통일`
+
+**검증**: `flutter analyze <7 files>` → `No issues found! (ran in 3.9s)`.
+
+**다음 후보**: subscription/screens/ (issue_subscription, proposal_detail, renewal_detail, subscription_detail, subscription_list, subscription_template_list, proposal_confirm) — 7 화면 §7.17 배치 #2.
+
+**은유**: 수강권 발급소의 긴 카운터에는 **유형·기간·정가·결제·시작일·장소·이동·요약** 여덟 개의 창구가 줄지어 있었다. 카운터 위의 라벨 판은 공방마다 조금씩 달랐다 — 어느 판은 Gothic w600, 어느 판은 Gothic w700 — 고객은 창구를 건너가면서 미묘한 서체 차이에 시선이 걸렸다. 오늘 **모든 라벨 판이 하나의 활자공 손에서 재주조**되었다. Playfair sectionTitle 17/w600 이라는 동일한 주형(mould)에서 스무 장의 판이 찍혀 나왔다 — 그 중 아홉 장은 `ChipInputField` 라는 **공통 주형의 복제**. 카운터 위 라벨들이 드디어 같은 손글씨로 말한다 — "수강권을 발급하는 순서는 여기서 시작합니다."
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
