@@ -7,6 +7,7 @@ import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../../features/lessons/presentation/providers/booking_providers.dart';
 
@@ -163,7 +164,18 @@ class NextLessonCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
+                      // 로마숫자 인덱스 — Notebook × Score 시그니처 (Phase 4c)
+                      Text(
+                        '${romanOf(0)}.',
+                        style: NotebookTypography.roman.copyWith(
+                          fontSize: 12,
+                          color: AppColors.paper.withValues(alpha: 0.9),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '다음 레슨',
                         style: AppTypography.caption.copyWith(

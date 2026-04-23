@@ -10,6 +10,7 @@ class SectionCard extends StatelessWidget {
   final IconData icon;
   final Widget? trailing;
   final Widget child;
+  final int? romanIndex;
 
   const SectionCard({
     super.key,
@@ -17,6 +18,7 @@ class SectionCard extends StatelessWidget {
     required this.icon,
     this.trailing,
     required this.child,
+    this.romanIndex,
   });
 
   @override
@@ -38,7 +40,16 @@ class SectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // 로마숫자 인덱스 — Notebook × Score 시그니처 (Phase 4c)
+              if (romanIndex != null) ...[
+                Text(
+                  '${romanOf(romanIndex!)}.',
+                  style: NotebookTypography.roman.copyWith(fontSize: 14),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+              ],
               Icon(icon, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: SectionCard 의 title 은 Playfair sectionTitle

@@ -567,6 +567,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
   Widget _buildUpcomingLesson() {
     return SectionCard(
+      romanIndex: 0,
       title: '다음 레슨',
       icon: Icons.event,
       child: ListTile(
@@ -631,6 +632,7 @@ class ParentDashboardTab extends ConsumerWidget {
     final practiceStatus = [true, true, true, true, true, false, false]; // Demo
 
     return SectionCard(
+      romanIndex: 1,
       title: '이번 주 연습',
       icon: Icons.local_fire_department,
       trailing: Text(
@@ -704,6 +706,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
   Widget _buildRecentAssignments() {
     return SectionCard(
+      romanIndex: 2,
       title: '과제 현황',
       icon: Icons.assignment,
       trailing: TextButton(onPressed: () {}, child: const Text('전체보기')),
@@ -736,6 +739,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
   Widget _buildPaymentStatus() {
     return SectionCard(
+      romanIndex: 3,
       title: '결제 현황',
       icon: Icons.payment,
       child: Column(
