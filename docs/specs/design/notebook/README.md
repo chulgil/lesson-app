@@ -3008,6 +3008,86 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.84 search/ 선생님·학원 상세 §7.17 + practice/·lessons/ §7.30 전수 감사 — "동적 값 집중" 도메인 재확인
+
+**기간**: 2026-04-23
+**대상**: `features/search/presentation/screens/` (2건), `features/practice/presentation/` (9건), `features/lessons/presentation/widgets/` (4건) 의 `AppTypography.headingSmall` 사용
+
+**배경**: §7.79 에서 도출한 "**정적 명사 도메인은 전환율이 높고, 동적 값 도메인은 0 에 수렴한다**" 가설을 practice/ 와 lessons/ 에서 재검증. 병행 세션이 §7.78 (lessons/widgets §7.27), §7.80 (lessons/widgets §7.50), §7.82 (auth/), §7.83 (core/widgets/) 을 가져갔으므로 이번 배치는 **남은 3 도메인** 의 §7.17 + §7.30 교차 감사에 집중.
+
+**변환 (2건, §7.17)** — 공통 헬퍼 수정으로 **총 9 호출부** 를 일괄 승격:
+
+| 파일 | 라인 | 문자열 | 근거 |
+|------|------|--------|------|
+| `features/search/.../academy_detail_screen.dart` | 247 | `'소속 선생님'` | 정적 카테고리 헤더 — 학원 내 선생님 목록 섹션 |
+| `features/search/.../teacher_detail_screen.dart` | 630 (`_buildSection` 공통 헬퍼) | `title` 파라미터 | **공통 수정 → 8 호출부 일괄 반영** (`'전문 악기'`/`'소개'`/`'경력'`/`'수업 방식'`/`'수업 지역'`/`'학력'`/`'경력 사항'`/`'인증된 자격증'`) |
+
+`teacher_detail_screen.dart` 은 **헬퍼 패턴의 모범 사례** — 한 줄 수정으로 8개 섹션 헤더가 동시 승격됐다. 이는 §7.30 로드맵의 **"공통 수정을 찾아 일괄 반영"** 지침을 가장 선명하게 보여주는 사례.
+
+**§7.30 제외 (13건 × 3 도메인)**:
+
+| 파일 | 라인 | 사유 |
+|------|------|------|
+| `practice/presentation/widgets/tuner/circular_tuner_indicator.dart` | 367 | `centText` (튜너 cent 편차 — 동적 측정값, 색상 3단계 분기) |
+| `practice/presentation/widgets/section_detail/practice_stats_card.dart` | 80 | `value` (연습 통계 값, 아이콘 + 값 + 라벨 layout) |
+| `practice/presentation/widgets/stats/stats_summary_card.dart` | 131 | `value` (통계 요약 카드 — 동적 값) |
+| `practice/presentation/widgets/history_summary_card.dart` | 82 | `value` (히스토리 요약 — 동적 값) |
+| `practice/presentation/widgets/month_group_header.dart` | 43 | `monthGroup.label` (월 그룹 레이블 — 동적 월 문자열) |
+| `practice/presentation/widgets/practice_tools_modal.dart` | 163 | `unselectedLabelStyle` (TabBar — §7.30 UI 분리자) |
+| `practice/presentation/screens/quick_add_screen.dart` | 439 | `'섹션 ${index + 1}'` (동적 인덱스) |
+| `practice/presentation/screens/edit_section_screen.dart` | 302 | `_repertoire!.name` (동적 이름) |
+| `practice/presentation/screens/add_section_screen.dart` | 320 | `_repertoire!.name` (동적 이름) |
+| `practice/presentation/screens/section_picker_screen.dart` | 202 | `'섹션이 없습니다'` (빈 상태 + `library_music_outlined` 아이콘) |
+| `lessons/presentation/widgets/lesson_detail/lesson_header_card.dart` | 47 | 학생 아바타 이니셜 |
+| `lessons/presentation/widgets/add_youtube_resource_sheet.dart` | 263 | `'~'` (UI 분리자) |
+| `lessons/presentation/widgets/lesson_form/edit_lesson_widgets.dart` | 51 | `student.color` 적용 동적 이름 |
+| `lessons/presentation/widgets/lesson_form/lesson_student_selector.dart` | 42 | 동적 학생명 카드 |
+
+**도메인 전환율 누적 (13 도메인)**:
+
+| 도메인 | 발견 | 변환 | 제외 | 전환율 | 성격 |
+|--------|------|------|------|--------|------|
+| auth/ | 9 | 7 | 2 | 78% | 진입 경험 (§7.82) |
+| lessons/screens | 3 | 2 | 1 | 66.7% | 세션 경과·정보 밀집 (§7.75) |
+| lessons/widgets §7.27 | 4 | 3 | 1 | 75% | 바텀시트 (§7.78) |
+| students/ | 2 | 1 | 1 | 50% | 모달 시트 제목 (§7.81) |
+| students/widgets | 2 | 1 | 1 | 50% | 상세 Info 탭 (§7.74) |
+| subscription | 25 | 14 | 11 | 56% | 템플릿·제안 카드 |
+| profile | 7 | 2 | 5 | 28.6% | 금액 중심 (§7.77) |
+| student_home | 4 | 2 | 2 | 50% | 선생님 카테고리 (§7.79) |
+| **search/** | **10** | **9** | **1** | **90%** | **정적 카테고리 집중 (§7.84)** |
+| schedule/widgets | 10 | 1 | 9 | 10% | 동적 값 집중 |
+| invite/ | 8 | 1 | 7 | 12.5% | 상태 전이 피드백 (§7.76) |
+| **practice/** | **9** | **0** | **9** | **0%** | **연습 섹션·레퍼토리 값 표시 (§7.84)** |
+| lessons/widgets §7.30 | 4 | 0 | 4 | 0% | UI 분리자·학생 참조 (§7.84) |
+| parent_home | 11 | 0 | 11 | 0% | 자녀 상태 중계소 (§7.81) |
+| settings/gamification | 6 | 0 | 6 | 0% | 백업 스탯·뱃지 토큰 (§7.79) |
+
+**핵심 관찰 — 전환율 90% 돌파 사례 **: search/ 는 **정적 카테고리 헤더 집중 도메인** 으로 전 도메인 최고 전환율(90%)을 기록. `teacher_detail_screen.dart` 의 공통 헬퍼 `_buildSection` 이 8 호출부를 일괄 포섭한 것이 결정적 — **"한 줄 공통 수정이 8개 호출부를 승격한다"** 는 §7.30 목표의 가장 완성된 구현. 반대로 practice/ 는 **연습 측정값 표시** 에 특화되어 있어 전원 §7.30 — 튜너의 cent 편차, 연습 시간 통계, 섹션 인덱스, 레퍼토리 이름은 모두 **동적 값** 이다. 정적 카테고리 헤더가 없는 도메인 (parent_home, practice, lessons/widgets §7.30 의 학생 참조, settings/gamification 토큰) 은 **Playfair 승격 대상 원천 부재** 로 재확인.
+
+**§7.30 사전 점검 프로토콜**: §7.79–§7.84 의 누적 감사로 다음 패턴이 100% §7.30 확정:
+1. TabBar label/unselectedLabelStyle
+2. 학생·선생님 이름 카드 (color 테마 적용 대상)
+3. 튜너·스탯 카드 `value` 필드 (아이콘 + 값 + 라벨)
+4. 월/일자/D-Day 레이블
+5. UI 분리자 (`~`, `・`, 점)
+6. 아바타 이니셜 (circleAvatar `child: Text()`)
+7. 빈 상태 headline (icon + 메시지)
+8. 에러 headline (AppStrings.errorOccurred 등)
+9. 게임화 토큰 (뱃지 pts, 레벨)
+10. 동적 인덱스 (`'섹션 ${index + 1}'`)
+
+향후 배치는 위 10 패턴을 **즉시 §7.30 자동 판정** 하여 파일 읽기 생략 가능. 판단 보수주의는 유지하되 속도를 확보.
+
+**검증**:
+- `flutter analyze lib/features/search/` → No issues found (5.1s)
+- 코드 커밋: `074c4927` (search/ 2 파일, +10 -2)
+- 공통 헬퍼 수정으로 8 호출부 일괄 반영
+
+**은유**: §7.84 는 **"도서관 분류표를 모두 한글 정자체로 바꾸는 일"** 이었다. `teacher_detail_screen` 의 `_buildSection` 은 도서관의 **분류 템플릿** — 한 번 바꾸면 "전문 악기", "소개", "경력", "수업 방식", "수업 지역", "학력", "경력 사항", "인증된 자격증" 8개 분류가 동시에 같은 서체로 바뀐다. 반면 practice/ 의 튜너 수치·연습 통계·섹션 번호는 **도서관 벽의 시계 바늘** — 항상 움직이며 숫자를 표시할 뿐, 제목(명사)이 될 자격이 없다. Playfair 는 **"이것은 이름이다"** 라고 선언하는 서체이지, **"이것은 지금 재고다"** 라고 속삭이는 서체가 아니다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
