@@ -2314,6 +2314,48 @@ flutter analyze <17 files>
 
 **은유**: 수강권 발급소의 긴 카운터에는 **유형·기간·정가·결제·시작일·장소·이동·요약** 여덟 개의 창구가 줄지어 있었다. 카운터 위의 라벨 판은 공방마다 조금씩 달랐다 — 어느 판은 Gothic w600, 어느 판은 Gothic w700 — 고객은 창구를 건너가면서 미묘한 서체 차이에 시선이 걸렸다. 오늘 **모든 라벨 판이 하나의 활자공 손에서 재주조**되었다. Playfair sectionTitle 17/w600 이라는 동일한 주형(mould)에서 스무 장의 판이 찍혀 나왔다 — 그 중 아홉 장은 `ChipInputField` 라는 **공통 주형의 복제**. 카운터 위 라벨들이 드디어 같은 손글씨로 말한다 — "수강권을 발급하는 순서는 여기서 시작합니다."
 
+### 7.69 schedule_tab 헤더 Notebook masthead 승격 — 탭 레벨 홈 일관성 완결
+
+**트리거**: Cycle 31 §7.67 에서 students_tab 을 masthead 로 승격하며 "다음 후보: schedule_tab" 명시. 선생님 주요 탭 5종 (홈·학생 홈·학부모 홈·학생 관리·일정) 중 유일하게 남은 비-masthead 탭. "선생님 학생화면의 Notebook 전환" 디렉티브의 탭 레벨 최종 조각.
+
+**변경 파일 (1 file, 55+/17-)**:
+
+| 파일 | 영역 | 변경 |
+|---|---|---|
+| `schedule/presentation/screens/schedule_tab.dart` | `_buildHeader()` 재작성 | 단일 Row (제목+토글+추가) → Column (Masthead + ProgrammeTitle + ThinRule + ViewModeToggle Row) |
+
+**적용 시그니처 (4/6)**:
+
+| 시그니처 | 적용 위치 |
+|---|---|
+| `NotebookMasthead` | eyebrow "SCHEDULE" + trailing 레슨 추가 IconButton (paperAccent 강조 유지) |
+| `NotebookTypography.mastheadLabel` | "Programme of Schedule" (Playfair italic 소제목) |
+| `NotebookTypography.masthead` | "스케줄" (Playfair large) |
+| `ThinRule` | ProgrammeTitle 하단 1px 분리선 |
+| `romanOf` | `_volumeIssueString` meta 생성 |
+
+**보존 결정 및 UX 개선**:
+
+1. **레슨 추가 IconButton → Masthead trailing 으로 이동**: 기존 `backgroundColor: paperAccent + foregroundColor: Colors.white` 스타일 유지. `Colors.white` 는 `AppColors.paper` 로 교체 (§7.50 Vermillion 위 foreground paper 원칙 준수).
+2. **ViewModeToggle 은 독립 Row 로 분리**: 기존에는 "스케줄" 제목 옆 Spacer 너머에 있어 토글 위치가 우측 상단 구석. 이제 Programme Title 하단에 **중앙 정렬** — 탭 어피던스(3세그먼트 토글이 탭의 주요 제어임) 명확화.
+3. **동적 `_ViewModeToggle` 사용자 데이터는 그대로**: ref.watch + ref.read(notifier).setMode 로직 변경 없음. 기능 100% 보존.
+
+**검증**: `flutter analyze schedule_tab.dart` → `No issues found! (4.2s)`.
+
+**탭 레벨 일관성 완결 (선생님 시점)**:
+
+| 탭 | 파일 | Masthead | Notebook 시그니처 | Cycle |
+|---|---|---|---|---|
+| 홈 | `home/dashboard_tab.dart` | ✅ "LESSONAZA" | 6/6 | — (이전) |
+| 학생 홈 | `student_home/student_dashboard_tab.dart` | ✅ | 5/6 | 27·29 |
+| 학부모 홈 | `parent_home/parent_dashboard_tab.dart` | ✅ | 5/6 | 28·29 |
+| 학생 관리 | `students/screens/students_tab.dart` | ✅ "STUDENTS" | 4/6 | 31 |
+| 일정 | `schedule/screens/schedule_tab.dart` | ✅ "SCHEDULE" | 4/6 | **32 (이번)** |
+
+**탭 레벨 시그니처 균일화 달성**. 다음 감사 층위는 **상세 화면** (student_detail, lesson_detail, add_lesson 등 — Notebook 0/6).
+
+**은유**: 선생님의 책상 위 다섯 개 서랍은 각기 다른 용도(오늘·학생·학부모·관리·일정)를 담고 있었지만, 네 개는 같은 공방의 손잡이를 달고 마지막 하나만 혼자 다른 양철 손잡이로 달려 있었다 — 같은 공방이라는 약속이 5번째 서랍에서 깨지면 **책상 전체가 조립물처럼 보인다**. 오늘 마지막 서랍의 손잡이도 공방의 것으로 교체되었다. 이제 서랍을 여닫을 때마다 "이 책상은 **한 장인의 작품**" 이라는 감각이 손끝에 전달된다. 다섯 서랍 공방 균일화 완결 — 다음 단계는 **서랍 안의 폴더들**(상세 화면들) 차례.
+
 ---
 
 ## 8. 구현 원칙

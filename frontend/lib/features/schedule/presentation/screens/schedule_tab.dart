@@ -5,9 +5,12 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../student_home/presentation/screens/student_lessons_tab.dart';
@@ -213,41 +216,67 @@ class ScheduleTab extends ConsumerWidget {
     final viewMode = ref.watch(scheduleViewModeProvider);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.screenPadding,
-        AppSpacing.screenPadding,
-        0,
-      ),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '스케줄',
-            style: AppTypography.headingMedium.copyWith(
-              fontWeight: FontWeight.bold,
+          const SizedBox(height: AppSpacing.space2),
+          // ── Masthead: "SCHEDULE" eyebrow + 레슨 추가 IconButton ──
+          NotebookMasthead(
+            eyebrow: 'SCHEDULE',
+            meta: _volumeIssueString(DateTime.now()),
+            trailing: IconButton(
+              onPressed: () => _navigateToAddLesson(context, ref),
+              icon: const Icon(Icons.add),
+              tooltip: '레슨 추가',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+                foregroundColor: AppColors.paper,
+              ),
             ),
           ),
-          const Spacer(),
-          // 3-segment view mode toggle
-          _ViewModeToggle(
-            currentMode: viewMode,
-            onChanged: (mode) {
-              ref.read(scheduleViewModeProvider.notifier).setMode(mode);
-            },
+          // ── Programme Title — "스케줄" Playfair ──
+          Padding(
+            padding: const EdgeInsets.only(top: 18, bottom: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Programme of Schedule',
+                  style: NotebookTypography.mastheadLabel,
+                ),
+                const SizedBox(height: 4),
+                Text('스케줄', style: NotebookTypography.masthead),
+                const SizedBox(height: AppSpacing.space3),
+                const ThinRule(),
+              ],
+            ),
           ),
-          const SizedBox(width: AppSpacing.space2),
-          IconButton(
-            onPressed: () => _navigateToAddLesson(context, ref),
-            icon: const Icon(Icons.add),
-            tooltip: '레슨 추가',
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.paperAccent,
-              foregroundColor: Colors.white,
+          // ── View Mode Toggle Row — 독립 배치 ──
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _ViewModeToggle(
+                  currentMode: viewMode,
+                  onChanged: (mode) {
+                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                  },
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// Notebook meta: "VOL. IV · NO. 23" 형식.
+  String _volumeIssueString(DateTime now) {
+    return 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}';
   }
 
   Widget _buildDateHeader(
