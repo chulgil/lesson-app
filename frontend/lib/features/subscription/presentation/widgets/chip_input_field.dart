@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// A compact widget with quick selection chips and an input field in a single row.
 ///
@@ -71,7 +72,11 @@ class ChipInputField extends StatelessWidget {
         // Title row
         Row(
           children: [
-            Text(title, style: AppTypography.headingSmall),
+            // Notebook × Score: ChipInputField 헬퍼의 title 은 Playfair
+            // sectionTitle 로 통일. 호출부 9곳(lesson_policy_screen ×5
+            // + issue_form_type_options ×2 + issue_form_discount_bonus ×2)
+            // 에 일괄 반영 (§7.17).
+            Text(title, style: NotebookTypography.sectionTitle),
             if (isOptional) ...[
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -109,7 +114,8 @@ class ChipInputField extends StatelessWidget {
                   ),
                   labelStyle: AppTypography.bodyMedium.copyWith(
                     color: isSelected ? chipColor : AppColors.inkSecondary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                   visualDensity: VisualDensity.compact,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -135,11 +141,15 @@ class ChipInputField extends StatelessWidget {
                     vertical: AppSpacing.space2,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                 ),

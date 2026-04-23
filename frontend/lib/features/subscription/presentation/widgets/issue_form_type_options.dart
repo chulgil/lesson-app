@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import 'chip_input_field.dart';
 
 class PackageOptionsSection extends StatelessWidget {
@@ -65,7 +66,9 @@ class MonthlyOptionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('기간 선택', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('기간 선택', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Wrap(
           spacing: AppSpacing.space2,
@@ -82,7 +85,9 @@ class MonthlyOptionsSection extends StatelessWidget {
                   backgroundColor: AppColors.paper,
                   side: BorderSide(
                     color:
-                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                   ),
                   labelStyle: AppTypography.bodyMedium.copyWith(
                     color:
@@ -118,7 +123,9 @@ class TrialOptionsSection extends StatelessWidget {
           Expanded(
             child: Text(
               '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
         ],

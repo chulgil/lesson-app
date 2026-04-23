@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 
@@ -28,7 +29,9 @@ class MembershipSelectorWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('레슨 선택', style: AppTypography.headingSmall),
+          // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+          // 로 통일 (§7.17).
+          Text('레슨 선택', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
           ...memberships.map((membership) {
             final isSelected = selectedMembershipId == membership.id;
@@ -213,11 +216,7 @@ class NoMembershipState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.school_outlined,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.school_outlined, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '등록된 레슨이 없습니다',

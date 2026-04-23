@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/domain/entities/lesson_location.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 
@@ -143,7 +144,9 @@ class _LocationTravelSelectorState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('레슨 장소', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('레슨 장소', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '이 학생의 기본 레슨 장소를 선택하세요',
@@ -175,31 +178,35 @@ class _LocationTravelSelectorState
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: _locationOptions.map((option) {
-        final isSelected = _selectedType == option.type;
-        return ChoiceChip(
-          avatar: Icon(
-            option.icon,
-            size: 18,
-            color: isSelected ? Colors.white : AppColors.inkSecondary,
-          ),
-          label: Text(option.label),
-          selected: isSelected,
-          onSelected: (_) => _onTypeSelected(option.type),
-          selectedColor: AppColors.paperAccent,
-          backgroundColor: AppColors.paper,
-          labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.ink,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-          side: BorderSide(
-            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-        );
-      }).toList(),
+      children:
+          _locationOptions.map((option) {
+            final isSelected = _selectedType == option.type;
+            return ChoiceChip(
+              avatar: Icon(
+                option.icon,
+                size: 18,
+                color: isSelected ? Colors.white : AppColors.inkSecondary,
+              ),
+              label: Text(option.label),
+              selected: isSelected,
+              onSelected: (_) => _onTypeSelected(option.type),
+              selectedColor: AppColors.paperAccent,
+              backgroundColor: AppColors.paper,
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color: isSelected ? Colors.white : AppColors.ink,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+              side: BorderSide(
+                color:
+                    isSelected
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -208,22 +215,13 @@ class _LocationTravelSelectorState
       case LocationType.studentHome:
         return _buildStudentHomeAddress();
       case LocationType.academyRoom:
-        return _buildReadOnlyAddress(
-          icon: Icons.school,
-          text: '학원 주소 (자동)',
-        );
+        return _buildReadOnlyAddress(icon: Icons.school, text: '학원 주소 (자동)');
       case LocationType.externalPlace:
         return _buildExternalAddressField();
       case LocationType.teacherStudio:
-        return _buildReadOnlyAddress(
-          icon: Icons.person,
-          text: '선생님 스튜디오 (자동)',
-        );
+        return _buildReadOnlyAddress(icon: Icons.person, text: '선생님 스튜디오 (자동)');
       case LocationType.online:
-        return _buildReadOnlyAddress(
-          icon: Icons.videocam,
-          text: '이동시간 없음',
-        );
+        return _buildReadOnlyAddress(icon: Icons.videocam, text: '이동시간 없음');
     }
   }
 
@@ -240,20 +238,16 @@ class _LocationTravelSelectorState
             isWarning: true,
           );
         }
-        return _buildReadOnlyAddress(
-          icon: Icons.home,
-          text: address,
-        );
+        return _buildReadOnlyAddress(icon: Icons.home, text: address);
       },
-      loading: () => _buildReadOnlyAddress(
-        icon: Icons.home,
-        text: '주소 불러오는 중...',
-      ),
-      error: (_, __) => _buildReadOnlyAddress(
-        icon: Icons.home,
-        text: '주소 조회 실패',
-        isWarning: true,
-      ),
+      loading:
+          () => _buildReadOnlyAddress(icon: Icons.home, text: '주소 불러오는 중...'),
+      error:
+          (_, __) => _buildReadOnlyAddress(
+            icon: Icons.home,
+            text: '주소 조회 실패',
+            isWarning: true,
+          ),
     );
   }
 
@@ -265,9 +259,7 @@ class _LocationTravelSelectorState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: isWarning
-            ? AppColors.paperAccentSoft
-            : AppColors.paperDark,
+        color: isWarning ? AppColors.paperAccentSoft : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isWarning ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -278,18 +270,15 @@ class _LocationTravelSelectorState
           Icon(
             icon,
             size: AppSpacing.iconSM,
-            color: isWarning
-                ? AppColors.paperAccent
-                : AppColors.inkSecondary,
+            color: isWarning ? AppColors.paperAccent : AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               text,
               style: AppTypography.bodySmall.copyWith(
-                color: isWarning
-                    ? AppColors.paperAccent
-                    : AppColors.inkSecondary,
+                color:
+                    isWarning ? AppColors.paperAccent : AppColors.inkSecondary,
               ),
             ),
           ),
@@ -333,28 +322,31 @@ class _LocationTravelSelectorState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('이동시간', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('이동시간', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space2),
         DropdownButtonFormField<int>(
-          initialValue: _travelTimeValues.contains(effectiveValue)
-              ? effectiveValue
-              : 0,
-          items: _travelTimeValues.map((minutes) {
-            return DropdownMenuItem<int>(
-              value: minutes,
-              child: Text(
-                minutes == 0 ? '없음' : '$minutes분',
-                style: AppTypography.bodyMedium,
-              ),
-            );
-          }).toList(),
-          onChanged: isLocked
-              ? null
-              : (value) {
-                  if (value != null) {
-                    widget.onTravelTimeChanged(value);
-                  }
-                },
+          initialValue:
+              _travelTimeValues.contains(effectiveValue) ? effectiveValue : 0,
+          items:
+              _travelTimeValues.map((minutes) {
+                return DropdownMenuItem<int>(
+                  value: minutes,
+                  child: Text(
+                    minutes == 0 ? '없음' : '$minutes분',
+                    style: AppTypography.bodyMedium,
+                  ),
+                );
+              }).toList(),
+          onChanged:
+              isLocked
+                  ? null
+                  : (value) {
+                    if (value != null) {
+                      widget.onTravelTimeChanged(value);
+                    }
+                  },
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -376,9 +368,7 @@ class _LocationTravelSelectorState
         const SizedBox(height: AppSpacing.space1),
         Text(
           '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );

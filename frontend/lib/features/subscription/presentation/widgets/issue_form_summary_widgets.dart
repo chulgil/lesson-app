@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/lesson_policy.dart';
@@ -43,8 +44,7 @@ class SummaryRow extends StatelessWidget {
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
               color:
-                  valueColor ??
-                  (strikethrough ? AppColors.inkTertiary : null),
+                  valueColor ?? (strikethrough ? AppColors.inkTertiary : null),
               decoration: strikethrough ? TextDecoration.lineThrough : null,
             ),
           ),
@@ -198,9 +198,11 @@ class SubscriptionSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 요약 카드 섹션 제목은 Playfair sectionTitle
+          // 로 통일 (§7.17). paperAccent 틴트 유지.
           Text(
             '발급 요약',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
@@ -389,9 +391,11 @@ class BatchSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 요약 카드 섹션 제목은 Playfair sectionTitle
+          // 로 통일 (§7.17). paperAccent 틴트 유지.
           Text(
             '배치 발급 요약',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),

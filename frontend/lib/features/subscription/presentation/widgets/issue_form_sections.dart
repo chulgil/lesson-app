@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
@@ -24,7 +25,9 @@ class SubscriptionTypeSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('수강권 유형', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('수강권 유형', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -63,7 +66,8 @@ class SubscriptionTypeSelector extends StatelessWidget {
                     : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -72,9 +76,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
               Icon(
                 icon,
                 color:
-                    isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
+                    isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
@@ -120,7 +122,11 @@ class SubscriptionTypeSelector extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: AppColors.paperAccent.withValues(alpha: 0.7)),
+          Icon(
+            icon,
+            size: 16,
+            color: AppColors.paperAccent.withValues(alpha: 0.7),
+          ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -157,7 +163,9 @@ class PaymentStatusSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('결제 방식', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('결제 방식', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -195,7 +203,9 @@ class PaymentStatusSection extends StatelessWidget {
                     label: Text(method.label),
                     selected: isSelected,
                     onSelected: (_) => onPaymentMethodChanged(method),
-                    selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                    selectedColor: AppColors.paperAccent.withValues(
+                      alpha: 0.15,
+                    ),
                     checkmarkColor: AppColors.paperAccent,
                     backgroundColor: AppColors.paper,
                     side: BorderSide(
@@ -228,7 +238,11 @@ class PaymentStatusSection extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
@@ -273,10 +287,7 @@ class _PaymentStatusChip extends StatelessWidget {
           horizontal: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? color.withValues(alpha: 0.1)
-                  : AppColors.paper,
+          color: isSelected ? color.withValues(alpha: 0.1) : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.inkQuaternary,
@@ -334,7 +345,9 @@ class AmountInputSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('정가', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('정가', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
 
         // Amount preset chips
@@ -355,12 +368,12 @@ class AmountInputSection extends StatelessWidget {
                           onAmountChanged(amount);
                         }
                       },
-                      selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                      selectedColor: AppColors.paperAccent.withValues(
+                        alpha: 0.2,
+                      ),
                       labelStyle: AppTypography.bodySmall.copyWith(
                         color:
-                            isSelected
-                                ? AppColors.paperAccent
-                                : AppColors.ink,
+                            isSelected ? AppColors.paperAccent : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -445,7 +458,9 @@ class StartDatePickerField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('시작일', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('시작일', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         GestureDetector(
           onTap: () async {

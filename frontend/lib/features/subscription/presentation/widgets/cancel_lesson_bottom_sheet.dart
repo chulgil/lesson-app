@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/subscription.dart';
@@ -122,9 +123,12 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
               ),
 
               // Title
+              // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
+              // 패턴. Playfair appBarTitle 로 통일. sessionNumber 는 동적
+              // 삽입되지만 모달 상단 제목 블록의 구조적 역할은 동일.
               Text(
                 AppStrings.sessionCancelTitle(widget.sessionNumber),
-                style: AppTypography.headingSmall,
+                style: NotebookTypography.appBarTitle,
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
@@ -187,12 +191,15 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             color:
-                isSelected ? AppColors.paperAccent.withValues(alpha: 0.05) : null,
+                isSelected
+                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                    : null,
           ),
           child: Row(
             children: [
@@ -202,9 +209,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                     : Icons.radio_button_unchecked,
                 size: 20,
                 color:
-                    isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkTertiary,
+                    isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -284,7 +289,9 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
           Expanded(
             child: Text(
               AppStrings.rescheduleDeadlineWarning(deadlineHours),
-              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
         ],
