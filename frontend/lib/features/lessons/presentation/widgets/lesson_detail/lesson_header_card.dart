@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 
 /// Lesson header with student/teacher info and status
@@ -44,7 +45,7 @@ class LessonHeaderCard extends StatelessWidget {
                           ? lesson.teacherName![0]
                           : '?'),
                   style: AppTypography.headingSmall.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
               ),
@@ -55,11 +56,13 @@ class LessonHeaderCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
+                        // Notebook × Score: 학생/선생님 이름은 상세 카드의 주인공 —
+                        // Playfair sectionTitle 로 승격 (§7.17 헤더 일관성).
                         Text(
                           isTeacher
                               ? lesson.studentName
                               : (lesson.teacherName ?? '선생님'),
-                          style: AppTypography.headingMedium,
+                          style: NotebookTypography.sectionTitle,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Container(

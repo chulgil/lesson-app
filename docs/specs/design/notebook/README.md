@@ -2429,6 +2429,44 @@ flutter analyze <17 files>
 
 **은유**: 진열대가 많은 방에 들어갔는데 대부분이 **시계·현황판·메모지**(동적 표시)라 라벨을 붙일 수 있는 **명패 자리**는 두 곳뿐이었다 — 입구(AppBar)와 전화번호부(모달). 나머지는 달력처럼 늘 바뀌는 것들이라 오히려 라벨이 붙지 **않아야** 자기 역할을 한다. 이 방은 창고가 아니라 **관제실**에 가깝다.
 
+### 7.72 lesson_header_card 히어로 카드 Notebook 승격 — 상세 화면 진입 첫 눈길
+
+**트리거**: 탭 레벨 masthead 균일화(§7.67 students_tab · §7.69 schedule_tab) 완결 후 다음 층위로 **상세 화면군** 진입. 선생님이 하루 가장 자주 열어보는 상세 화면은 `lesson_detail_screen` — 레슨 완료/피드백 플로우의 기점. 그 화면 최상단 히어로인 `lesson_header_card` 의 학생/선생님 이름이 `AppTypography.headingMedium` (Pretendard Gothic) 으로 남아 있어 AppBar title(이미 §7.5 전역 테마로 Playfair) 과 본문 sectionTitle(§7.17 Playfair 일괄 승격) 사이에 **홀로 Gothic 한 섬**을 이루고 있었다.
+
+**변경 파일 (1 file, 7+/3-)**:
+
+| 파일 | 변경 라인 | 내용 |
+|---|---|---|
+| `lessons/presentation/widgets/lesson_detail/lesson_header_card.dart` | import + L47 + L62 | notebook_typography 임포트 추가 · CircleAvatar foreground Colors.white → AppColors.paper · 학생/선생님 이름 headingMedium → NotebookTypography.sectionTitle |
+
+**적용 시그니처 (1/6 추가 + 기존 Staff/SectionHeader 포함 3/6 유효)**:
+
+| 시그니처 | 적용 |
+|---|---|
+| `NotebookTypography.sectionTitle` | 학생/선생님 이름(상세 카드 주인공 — 레슨 정보의 기준점) |
+| `AppColors.paper` (§7.50 원칙) | CircleAvatar 이니셜 foreground (기존 `Colors.white` — paperAccentSoft 배경 위) |
+
+**보존 결정**:
+1. **날짜·악기·상태 배지는 Gothic 유지**: 동적 값(§7.30 exclusion roster) — 시간·악기명·상태 라벨은 데이터 그 자체이며 서체 위계를 위해 Gothic 계열로 정보량 구분.
+2. **Pieces Wrap(L108~130) 미변경**: `piece.displayName` 은 레슨 곡명이라 반드시 원작 서체(이탤릭 Playfair가 아님)로 표시되어야 하며, `AppTypography.bodySmall` 이 적절.
+3. **StatusBadge 배지 캡션은 Gothic 유지**: 상태 레이블은 기계적 인식(스캔) 대상이지 음미 대상이 아님.
+
+**검증**: `flutter analyze lesson_header_card.dart` → `No issues found! (2.8s)`.
+
+**상세 화면 Notebook 층위 현황 (lesson_detail_screen)**:
+
+| 영역 | 이전 | 현재 |
+|---|---|---|
+| AppBar title ('레슨 상세') | Playfair | Playfair (§7.5 전역 테마) |
+| LessonDetailSectionHeader ('레슨 피드백'·'주요 포인트'·'연습 팁') | Playfair | Playfair (기존 §7.17) |
+| LessonHeaderCard 학생/선생님 이름 | Gothic | **Playfair (이번 §7.72)** |
+| 날짜·악기·상태 배지 | Gothic | Gothic (§7.30 exclusion) |
+| StaffDivider | ✅ | ✅ |
+
+**다음 상세 화면 후보**: `student_detail_screen` 의 탭 내부 (StudentInfoTab / StudentLessonsTab / StudentPracticeTab) — SliverAppBar 자체는 프로필 컬러 히어로라 Notebook 승격 불가, 탭 내부 sectionTitle 만 대상.
+
+**은유**: 도서관 열람실에 들어서면 **입구 간판**(AppBar title)과 **서가 팻말**(section header)은 같은 서체로 쓰여 있었다. 하지만 입구에서 첫 책장을 열면 나타나는 **책의 속표지**(히어로 카드)만이 인쇄소를 잘못 지정한 듯 Gothic 볼드로 찍혀 있었다 — 똑같이 중요한 정보인데 서체 톤이 달랐다. 오늘 속표지의 학생 이름이 Playfair 로 다시 조판되었다. 이제 간판·팻말·속표지 세 군데가 같은 활자공의 손길로 이어진다. 독자는 "입구에서 책을 펴도 같은 출판사"라는 **연속 감각**을 잃지 않는다. 상세 화면의 진입 첫 눈길이 서체 톤으로 깨지지 않는다는 것 — 그게 이 소규모 승격의 큰 이유다.
+
 ---
 
 ## 8. 구현 원칙
