@@ -67,18 +67,21 @@ class ScheduleSection extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.paperDark,
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.paperDark,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
                       dayNames[index],
                       style: AppTypography.bodySmall.copyWith(
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.inkSecondary,
+                        // Notebook × Score §7.50: Vermillion selected day foreground = paper.
+                        color:
+                            isSelected
+                                ? AppColors.paper
+                                : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),

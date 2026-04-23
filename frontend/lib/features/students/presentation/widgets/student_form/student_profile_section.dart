@@ -27,8 +27,9 @@ class StudentProfileSection extends StatelessWidget {
                 backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   displayName.isNotEmpty ? displayName[0] : '?',
+                  // Notebook × Score §7.30 Gothic 유지 + §7.50 soft vermillion 배경 → 전경 paper.
                   style: AppTypography.displayMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -41,11 +42,15 @@ class StudentProfileSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      // Notebook × Score §7.50: Vermillion edit badge border/icon = paper.
+                      border: Border.all(color: AppColors.paper, width: 2),
                     ),
                     child: IconButton(
                       onPressed: onTapPhoto,
-                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        color: AppColors.paper,
+                      ),
                       iconSize: 20,
                       constraints: const BoxConstraints(
                         minWidth: 36,

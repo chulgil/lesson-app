@@ -5,6 +5,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// Screen for selecting student registration method
 class AddStudentMethodScreen extends StatelessWidget {
@@ -27,7 +28,11 @@ class AddStudentMethodScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.space4),
-              Text('어떤 방법으로 학생을 등록할까요?', style: AppTypography.headingMedium),
+              Text(
+                '어떤 방법으로 학생을 등록할까요?',
+                // Notebook × Score §7.17: 화면 레벨 질문 타이틀 = Playfair sectionTitle.
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space6),
 
               // Invite card (recommended)
@@ -131,10 +136,7 @@ class _MethodCard extends StatelessWidget {
                   title,
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
-                    color:
-                        isPrimary
-                            ? AppColors.paperAccent
-                            : AppColors.ink,
+                    color: isPrimary ? AppColors.paperAccent : AppColors.ink,
                   ),
                 ),
                 if (badge != null) ...[
@@ -153,7 +155,8 @@ class _MethodCard extends StatelessWidget {
                     child: Text(
                       badge!,
                       style: AppTypography.captionSmall.copyWith(
-                        color: Colors.white,
+                        // Notebook × Score §7.50: Vermillion badge foreground = paper.
+                        color: AppColors.paper,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

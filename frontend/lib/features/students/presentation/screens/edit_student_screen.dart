@@ -133,7 +133,11 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     '학생 정보를 불러올 수 없습니다',
@@ -193,10 +197,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                           : Text(
                             '저장',
                             style: TextStyle(
-                              color:
-                                  _hasChanges
-                                      ? null
-                                      : AppColors.inkTertiary,
+                              color: _hasChanges ? null : AppColors.inkTertiary,
                             ),
                           ),
                 ),
@@ -372,9 +373,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                                 ? const SizedBox(
                                   width: 20,
                                   height: 20,
+                                  // Notebook × Score §7.50: Vermillion filled-button spinner = paper.
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: AppColors.paper,
                                   ),
                                 )
                                 : const Text('변경사항 저장'),

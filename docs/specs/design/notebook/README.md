@@ -3123,6 +3123,40 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.86 students/ form 잔재 §7.50 + §7.17 혼합 스윕 — Vermillion chip/badge/avatar 8 지점 정리
+
+**기간**: 2026-04-23
+**대상**: `features/students/presentation/` 의 `Colors.white` 8 지점 + `AppTypography.headingMedium` 화면 질문 타이틀 1건 (student_detail 제외 — §7.74 종결)
+
+**변경**:
+
+| 파일 | 라인 | 맥락 | 이전 | 이후 | §7.x |
+|------|------|------|------|------|------|
+| add_student_method_screen.dart | 30 | 화면 질문 타이틀 | `AppTypography.headingMedium` | `NotebookTypography.sectionTitle` | §7.17 |
+| add_student_method_screen.dart | 156 | paperAccent 배지 전경 | `Colors.white` | `AppColors.paper` | §7.50 |
+| student_profile_section.dart | 31 | paperAccentSoft 아바타 이니셜 | `Colors.white` | `AppColors.paper` | §7.30 + §7.50 교차 |
+| student_profile_section.dart | 44 | paperAccent 편집 뱃지 border | `Colors.white` | `AppColors.paper` | §7.50 |
+| student_profile_section.dart | 48 | paperAccent 편집 뱃지 아이콘 | `Colors.white` | `AppColors.paper` | §7.50 |
+| duration_selector.dart | 45 | paperAccent 선택 chip 전경 | `Colors.white` | `AppColors.paper` | §7.50 |
+| schedule_section.dart | 80 | paperAccent 선택 day chip 전경 | `Colors.white` | `AppColors.paper` | §7.50 |
+| edit_student_screen.dart | 377 | paperAccent FilledButton 스피너 | `Colors.white` | `AppColors.paper` | §7.50 |
+
+**§7.30 × §7.50 교차 재확인**: `student_profile_section:31` 아바타 이니셜은 §7.30 Gothic 유지 + §7.50 paper 색상이 동시 적용된다. **타이포그라피(서체)와 전경 색상은 직교 규칙이라는 §7.83 원칙의 2차 반복 검증** — 아바타 이니셜은 "이름"이 아니라 "첫 글자 아이콘"이므로 Playfair 승격 불가이지만, Vermillion 계열 배경(paperAccent / paperAccentSoft) 위에 놓인 이상 §7.50 색상 규칙은 무조건 적용된다.
+
+**도메인 관찰**: students/ 는 **"폼 도메인"** — Profile 아바타, 요일 선택, 레슨 시간 선택, 저장 버튼 스피너 모두 "사용자 선택/입력을 받는 chip·badge·spinner"다. 이들은 **선택 상태를 Vermillion 으로 강조** 하므로 선택됐을 때의 전경은 자동으로 §7.50 대상이 된다. 폼 도메인의 공통 어휘: **"선택됐다 = Vermillion 배경 = paper 전경"**.
+
+**잔재 (의도적 제외)**:
+- `student_detail_screen.dart` L182/L209/L210/L260/L277/L302/L322/L355 — §7.74 에서 이미 전체 감사 완료. 상단 프로필 컬러 배경에 `Colors.white` 는 의도된 색상 레이어링 (ink 유사 블록 위)이므로 §7.50 범위 밖.
+- `student_detail_screen.dart` L767 — 헤더 헤딩 large (프로필 컬러 배경). §7.74 유지.
+
+**검증**: `flutter analyze lib/features/students/` → No issues found (6.4s)
+
+**변환율**: 기존 17건 중 8건 신규 §7.50/§7.17 변환 + 9건 §7.74 확정 (컬러 배경 의도 레이어 + 이미 승격분). **students/ 포화도는 99%** (미해소 0건, 제외 근거 명시 9건).
+
+**은유**: §7.86 은 **"재봉틀의 실색을 맞추는 일"** — 학생 등록 폼은 **재봉틀로 단추를 달고, 옷감을 고르고, 치수를 재는** 작업과 같다. 요일 버튼(단추), 시간 길이 버튼(치수), 저장 버튼 스피너(실패/성공 신호), 프로필 아이콘(옷감 견본)은 모두 **선택 순간 Vermillion 이 빛나고** 그 위에 올라가는 글자·아이콘은 당연히 **크림 색 실**(paper)이어야 한다. 선택이 곧 강조이고, 강조는 곧 §7.50 이다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

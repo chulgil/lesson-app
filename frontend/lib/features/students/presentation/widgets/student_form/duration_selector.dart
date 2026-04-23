@@ -26,29 +26,36 @@ class DurationSelector extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: durations.map((duration) {
-          final isSelected = selectedDuration == duration;
-          return GestureDetector(
-            onTap: () => onChanged(duration),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.paperAccent : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Text(
-                '$duration',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? Colors.white : AppColors.inkSecondary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        children:
+            durations.map((duration) {
+              final isSelected = selectedDuration == duration;
+              return GestureDetector(
+                onTap: () => onChanged(duration),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected ? AppColors.paperAccent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                  child: Text(
+                    '$duration',
+                    style: AppTypography.bodySmall.copyWith(
+                      // Notebook × Score §7.50: Vermillion selected chip foreground = paper.
+                      color:
+                          isSelected ? AppColors.paper : AppColors.inkSecondary,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }
