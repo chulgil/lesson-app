@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/tip_template_providers.dart';
@@ -71,7 +72,8 @@ class _TipTemplateBottomSheetState
                 padding: const EdgeInsets.all(AppSpacing.screenPadding),
                 child: Row(
                   children: [
-                    Text('템플릿 선택', style: AppTypography.headingMedium),
+                    // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                    Text('템플릿 선택', style: NotebookTypography.sectionTitle),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: () => _showAddTemplateDialog(context),
@@ -318,11 +320,7 @@ class _TipTemplateBottomSheetState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.search_off,
-                  size: 48,
-                  color: AppColors.inkTertiary,
-                ),
+                Icon(Icons.search_off, size: 48, color: AppColors.inkTertiary),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   '검색 결과가 없습니다',
@@ -353,7 +351,11 @@ class _TipTemplateBottomSheetState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   '템플릿을 불러오는데 실패했습니다',

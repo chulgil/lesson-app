@@ -2672,6 +2672,61 @@ flutter analyze <17 files>
 
 ---
 
+### 7.78 lessons/widgets 바텀시트·다이얼로그 제목 Playfair 통일 — lessons/ 도메인 §7.27 배치 #1
+
+**배경**: §7.75 lessons/screens 층위 완결 후 `features/lessons/presentation/widgets/` 전수 감사. `AppTypography.headingMedium/headingSmall` 15건 발견 — 분석 결과 **바텀시트·다이얼로그 제목 10건** + §7.30 제외 5건(avatar initial 2건, student.color 1건, dynamic name 1건, tilde 1건). 전환율 **66.7%** — subscription/screens 이어 두 번째로 높은 수치.
+
+| 파일 | 라인 | 텍스트 | 패턴 |
+|---|---:|---|:---:|
+| edit_practice_item_sheet | 82 | `'연습 수정'` | §7.27 |
+| lesson_confirmation_dialog | 201 | `'레슨 확인'` | §7.27 |
+| lesson_confirmation_dialog | 310 | `'레슨 미진행 사유'` | §7.27 |
+| add_youtube_resource_sheet | 134 | `'유튜브 영상 추가'` | §7.27 |
+| add_practice_item_sheet | 143 | `'연습 추가'` | §7.27 |
+| tip_template_bottom_sheet | 74 | `'템플릿 선택'` | §7.27 |
+| attendance_confirmation_sheet | 120 | `AppStrings.lessonConfirmation` | §7.27 |
+| attendance_confirmation_sheet | 214 | `AppStrings.nonCompletionReason` | §7.27 |
+| lesson_form/lesson_student_picker_sheet | 37 | `'학생 선택'` | §7.27 |
+| lesson_detail/add_tip_bottom_sheet | 70 | `widget.title` (dynamic, 헤더 포지션) | §7.27 |
+
+**수량**: 10 code-line edits (+ 8 imports, -1 cleanup) → 10 Playfair 승격.
+
+**§7.30 제외 5건** — 의도적 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| lesson_detail/lesson_header_card:47 | avatar initial | avatar initial (§7.72 이미 paper) |
+| lesson_form/lesson_student_selector:42 | student.color | student-profile color |
+| lesson_form/edit_lesson_widgets:51 | `student.color` | student-profile color |
+| add_youtube_resource_sheet:261 | `'~'` (tilde separator) | UI separator glyph |
+| lesson_detail/lesson_notes_widgets:504 | dynamic value | dynamic stat |
+
+**도메인 관찰**: lessons/widgets 는 **"레슨 전후에 열리는 바텀시트 더미"** 도메인. 레슨 시작(확인) → 진행(연습 추가/수정, 팁 추가, 유튜브 리소스) → 종료(비진행 사유, 출석 확인) 까지 모든 **상태 전이**가 바텀시트로 표현된다. **정적 명사형 모달 타이틀 밀도가 매우 높음** (10/15 = 66.7%) — "상태 전이 이름"은 본질적으로 정적이기 때문. 반대로 body 는 동적 값(학생 이름/프로필 컬러)이 지배.
+
+**전환율 비교** (업데이트):
+
+| 도메인 | heading 발견 | 변환 | §7.30 제외 | 전환율 | 본질 |
+|---|---:|---:|---:|---:|---|
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% | 정적 명사 (수강권·제안·내역) |
+| **lessons/widgets (§7.78)** | **15건** | **10건** | **5건** | **66.7%** | **상태 전이 모달 이름** |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% | 동적 이벤트 |
+| profile/ (§7.77) | 7건 | 2건 | 5건 | 28.6% | 금액 중심 |
+| invite/ (§7.76) | 8건 | 1건 | 7건 | 12.5% | 상태 전이 피드백 |
+| schedule/widgets (§7.73) | 10건 | 1건 | 9건 | 10% | 동적 시간대 |
+
+**가설 확장**: "**상태 전이 이름**" 도메인은 전환율이 높다 — lessons/widgets(66.7%), subscription(56%). 반대로 "동적 이벤트·시간대" 가 지배하는 도메인은 낮다(schedule 10-22%). 바텀시트는 **상태 전이 UI 패턴**이므로 헤더가 정적 명사로 고정되는 경향.
+
+**커밋**: (Cycle 36 진행 중)
+**검증**: `flutter analyze lib/features/lessons/presentation/widgets/` → No issues found! (ran in 4.2s). 1 unused_import 자동 cleanup(add_tip_bottom_sheet.dart AppTypography).
+
+**§7.50 범위 밖 관찰**: lessons/widgets 전수에서 `Colors.white` 8건 발견 — 차기 사이클 §7.50 전용 배치 후보. avatar / chip selected / sheet submit button 내 spinner 등이 혼재.
+
+**다음 후보**: lessons/widgets §7.50 전용 배치(Colors.white 8건), 또는 lessons/widgets/lesson_detail/ 서브 탐색(lesson_notes_widgets 500+줄).
+
+**은유**: §7.78 은 **바텀시트 더미의 이름표**를 한꺼번에 바꾸는 일이었다. 바텀시트는 화면의 **"다른 층"** — 올라오는 순간 사용자의 주의가 완전히 이동한다. 그 층의 제목이 Gothic 이면 **"여긴 아까의 연장선"** 느낌을, Playfair 면 **"여긴 별개의 순간"** 느낌을 준다. lessons/widgets 의 10개 바텀시트는 모두 **"레슨 순간 의 미세한 분기점"** — 연습을 수정하는 순간, 레슨을 확인하는 순간, 팁 템플릿을 고르는 순간. 이 분기점들에 Playfair 이름표를 달아주면, 각 순간이 **"의례적 문턱"** 으로 승격된다 — 그게 Notebook × Score 미감의 본질.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

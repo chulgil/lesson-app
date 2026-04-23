@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/lesson.dart';
 
 /// Reason for lesson not being conducted
@@ -198,7 +199,8 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             children: [
               const Icon(Icons.fact_check, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
-              Text('레슨 확인', style: AppTypography.headingMedium),
+              // Notebook × Score §7.27: 다이얼로그 제목 Playfair.
+              Text('레슨 확인', style: NotebookTypography.sectionTitle),
             ],
           ),
 
@@ -307,7 +309,8 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text('레슨 미진행 사유', style: AppTypography.headingMedium),
+              // Notebook × Score §7.27: 다이얼로그 서브 헤더 Playfair.
+              Text('레슨 미진행 사유', style: NotebookTypography.sectionTitle),
             ],
           ),
 

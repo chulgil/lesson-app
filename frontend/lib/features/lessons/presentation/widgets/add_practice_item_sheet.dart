@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
@@ -140,7 +141,8 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 ),
               ),
 
-              Text('연습 추가', style: AppTypography.headingMedium),
+              // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+              Text('연습 추가', style: NotebookTypography.sectionTitle),
               const SizedBox(height: AppSpacing.space4),
 
               // Repertoire-based form (all practice items are repertoire-based)
@@ -335,7 +337,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                           width: 2,
                         ),
                         color:
-                            isSelected ? AppColors.paperAccent : Colors.transparent,
+                            isSelected
+                                ? AppColors.paperAccent
+                                : Colors.transparent,
                       ),
                       child:
                           isSelected
@@ -469,11 +473,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 _practiceRanges.add(PracticeRangeEntry());
               });
             },
-            icon: Icon(
-              Icons.add,
-              size: 18,
-              color: AppColors.inkSecondary,
-            ),
+            icon: Icon(Icons.add, size: 18, color: AppColors.inkSecondary),
             label: Text(
               '구간 추가',
               style: AppTypography.bodySmall.copyWith(

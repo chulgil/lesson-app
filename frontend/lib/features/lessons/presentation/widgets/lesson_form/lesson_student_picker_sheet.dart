@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import 'lesson_student_info.dart';
 
@@ -34,7 +35,11 @@ void showLessonStudentPicker({
                   const BottomSheetHandle(margin: EdgeInsets.zero),
                   Padding(
                     padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                    child: Text('학생 선택', style: AppTypography.headingMedium),
+                    // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                    child: Text(
+                      '학생 선택',
+                      style: NotebookTypography.sectionTitle,
+                    ),
                   ),
                   Expanded(
                     child: ListView.separated(

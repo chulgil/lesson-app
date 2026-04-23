@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson.dart';
 import 'lesson_confirmation_dialog.dart';
@@ -117,9 +118,10 @@ class _AttendanceConfirmationSheetState
           children: [
             const Icon(Icons.fact_check, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
+            // Notebook × Score §7.27: 바텀시트 제목 Playfair.
             Text(
               AppStrings.lessonConfirmation,
-              style: AppTypography.headingMedium,
+              style: NotebookTypography.sectionTitle,
             ),
           ],
         ),
@@ -211,9 +213,10 @@ class _AttendanceConfirmationSheetState
               constraints: const BoxConstraints(),
             ),
             const SizedBox(width: AppSpacing.space2),
+            // Notebook × Score §7.27: 바텀시트 서브 헤더 Playfair.
             Text(
               AppStrings.nonCompletionReason,
-              style: AppTypography.headingMedium,
+              style: NotebookTypography.sectionTitle,
             ),
           ],
         ),

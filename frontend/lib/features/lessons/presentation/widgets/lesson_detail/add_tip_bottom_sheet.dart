@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/tip_template.dart';
 import '../tip_template_bottom_sheet.dart';
@@ -67,7 +67,8 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
               // Header
               Row(
                 children: [
-                  Text(widget.title, style: AppTypography.headingMedium),
+                  // Notebook × Score §7.27: 바텀시트 제목 Playfair (동적 title 이지만 헤더 포지션).
+                  Text(widget.title, style: NotebookTypography.sectionTitle),
                   const Spacer(),
                   TextButton.icon(
                     onPressed: () {

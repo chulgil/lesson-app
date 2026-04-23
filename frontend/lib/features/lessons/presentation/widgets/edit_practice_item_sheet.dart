@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
@@ -79,7 +80,8 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
               Row(
                 children: [
-                  Text('연습 수정', style: AppTypography.headingMedium),
+                  // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+                  Text('연습 수정', style: NotebookTypography.sectionTitle),
                   const Spacer(),
                   TextButton(
                     onPressed: _isSubmitting ? null : _delete,
