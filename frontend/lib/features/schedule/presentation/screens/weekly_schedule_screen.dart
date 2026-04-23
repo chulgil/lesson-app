@@ -28,12 +28,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('주간 스케줄 설정'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('주간 스케줄 설정')),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -372,18 +368,18 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
+            // Notebook × Score: 빈 상태 타이틀은 Playfair sectionTitle (§7.87).
             Text(
               '설정된 스케줄이 없습니다',
-              style: AppTypography.bodyLarge.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
+            // 부연 설명은 Gaegu handwriting.
             Text(
               '아래 버튼을 눌러 레슨 가능 시간을 추가하세요',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkTertiary,
-              ),
+              style: NotebookTypography.hand.copyWith(fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ],

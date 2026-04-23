@@ -24,10 +24,8 @@ class LessonRequestsScreen extends ConsumerWidget {
     final requestsAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
 
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
       appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
         title: requestsAsync.when(
           loading: () => const Text(AppStrings.lessonRequestTitle),
           error: (_, __) => const Text(AppStrings.lessonRequestTitle),

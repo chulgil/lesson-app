@@ -42,12 +42,8 @@ class _TeacherAvailabilityScreenState
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('레슨 운영 시간 설정'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('레슨 운영 시간 설정')),
       body: availabilityAsync.when(
         data: (availability) => _buildBody(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -99,6 +95,7 @@ class _TeacherAvailabilityScreenState
         children: [
           // Section 1: Weekly lesson times
           _buildSectionHeader(
+            romanIndex: 0,
             title: '주간 레슨 시간',
             subtitle: '레슨하는 요일과 시간을 설정하세요',
             helpText: '설정한 시간이 스케줄과 학생 예약 화면에 반영됩니다',
@@ -109,14 +106,18 @@ class _TeacherAvailabilityScreenState
           const SizedBox(height: AppSpacing.space8),
 
           // Section 2: Lesson settings
-          _buildSectionHeader(title: '레슨 기본 설정', subtitle: null),
+          _buildSectionHeader(romanIndex: 1, title: '레슨 기본 설정', subtitle: null),
           const SizedBox(height: AppSpacing.space3),
           _buildLessonSettings(avail),
 
           const SizedBox(height: AppSpacing.space8),
 
           // Section 3: Preview
-          _buildSectionHeader(title: '이번 주 예상 스케줄', subtitle: '설정한 시간 기반 미리보기'),
+          _buildSectionHeader(
+            romanIndex: 2,
+            title: '이번 주 예상 스케줄',
+            subtitle: '설정한 시간 기반 미리보기',
+          ),
           const SizedBox(height: AppSpacing.space3),
           _buildWeeklyPreview(avail),
 
@@ -124,6 +125,7 @@ class _TeacherAvailabilityScreenState
 
           // Section 4: Special schedules
           _buildSectionHeader(
+            romanIndex: 3,
             title: '특별 일정',
             subtitle: '휴가, 공휴일, 추가 오픈 등을 관리합니다',
           ),
@@ -142,12 +144,24 @@ class _TeacherAvailabilityScreenState
     required String title,
     String? subtitle,
     String? helpText,
+    int? romanIndex,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-        Text(title, style: NotebookTypography.sectionTitle),
+        // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle + 선택적 로마숫자 (§7.87).
+        if (romanIndex != null)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(romanOf(romanIndex), style: NotebookTypography.roman),
+              const SizedBox(width: AppSpacing.space2),
+              Text(title, style: NotebookTypography.sectionTitle),
+            ],
+          )
+        else
+          Text(title, style: NotebookTypography.sectionTitle),
         if (subtitle != null) ...[
           const SizedBox(height: AppSpacing.space1),
           Text(

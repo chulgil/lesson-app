@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import '../widgets/approval_bottom_sheet.dart';
@@ -22,6 +23,7 @@ class PendingBookingsScreen extends ConsumerWidget {
     final pendingBookings = ref.watch(pendingBookingsProvider(teacherId));
 
     return Scaffold(
+      backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text('승인 대기')),
       body: pendingBookings.when(
         data: (bookings) {
@@ -55,7 +57,11 @@ class PendingBookingsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text('오류가 발생했습니다', style: AppTypography.bodyMedium),
                   const SizedBox(height: AppSpacing.space2),
@@ -79,18 +85,18 @@ class PendingBookingsScreen extends ConsumerWidget {
         children: [
           Icon(Icons.inbox, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 빈 상태 타이틀은 Playfair sectionTitle (§7.87).
           Text(
             '대기 중인 신청이 없습니다',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
+          // 부연 설명은 Gaegu handwriting.
           Text(
-            '새로운 레슨 신청이 들어오면\n여기에 표시됩니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            '새로운 레슨 신청이 들어오면 여기에 표시돼요',
+            style: NotebookTypography.hand.copyWith(fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
