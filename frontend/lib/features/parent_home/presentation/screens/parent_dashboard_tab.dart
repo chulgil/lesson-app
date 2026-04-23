@@ -251,7 +251,8 @@ class ParentDashboardTab extends ConsumerWidget {
               color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
-            Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
+            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '자녀를 추가하여 레슨 일정과\n연습 현황을 관리해보세요',
@@ -310,7 +311,8 @@ class ParentDashboardTab extends ConsumerWidget {
                     const BottomSheetHandle(
                       margin: EdgeInsets.only(bottom: AppSpacing.space4),
                     ),
-                    Text('자녀 선택', style: AppTypography.headingMedium),
+                    // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+                    Text('자녀 선택', style: NotebookTypography.sectionTitle),
                     const SizedBox(height: AppSpacing.space4),
                     // Child list from provider
                     profilesAsync.when(

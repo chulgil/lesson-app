@@ -155,10 +155,8 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '오늘의 연습',
-          style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
-        ),
+        // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
+        Text('오늘의 연습', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -281,10 +279,8 @@ class UnconnectedChildDashboard extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '이번 주 연습',
-              style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
-            ),
+            // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
+            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
             TextButton(
               onPressed: () {
                 // TODO: Navigate to practice history

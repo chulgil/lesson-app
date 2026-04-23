@@ -3426,6 +3426,57 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.92 Batch 선생님.B — parent_home/ §7.17 8 지점 + §7.30 예외 17 지점 확정
+
+**기간**: 2026-04-23
+**성격**: **8 지점 BLOCK 반영 + 17 지점 §7.30 예외 문서화**.
+**배경**: §7.91-b 로드맵의 Batch 선생님.B 집행. parent_home/ 은 **학부모용 탭 구성** 도메인 — 대시보드 헤더·빈 상태 헤드라인이 §7.17/§7.89 후보이고, 지표·프로필 이름·날짜·초기 문자가 §7.30 예외. 전수 감사 결과 총 **25 지점** = 전환 **8**(32%) + 예외 **17**(68%).
+
+#### 7.92-a §7.17 승격 — 전통 섹션/바텀시트 헤더 4 지점
+
+| 파일 | 라인 | 전환 대상 | 근거 |
+|------|------|-----------|------|
+| screens/parent_lessons_tab.dart | 139 | `'레슨 노트'` | 바텀시트 헤더 (§7.27) — Playfair sectionTitle 고정 구조 |
+| screens/unconnected_child_dashboard.dart | 160 | `'오늘의 연습'` | 정적 섹션 헤더 (§7.17) — 대시보드 상단 구분선 |
+| screens/unconnected_child_dashboard.dart | 286 | `'이번 주 연습'` | 정적 섹션 헤더 (§7.17) — 대시보드 중단 구분선 |
+| screens/parent_dashboard_tab.dart | 313 | `'자녀 선택'` | 바텀시트 헤더 (§7.27) — 모달 상단 제목 |
+
+#### 7.92-b §7.17 승격 — §7.89 3축 빈 상태/에러 헤드라인 4 지점
+
+| 파일 | 라인 | 전환 대상 | 3축 검증 |
+|------|------|-----------|----------|
+| screens/child_profiles_screen.dart | 81 | `'등록된 자녀가 없습니다'` | Center + mainAxisAlignment.center + Icon + 단일 헤드라인 ✓ |
+| screens/parent_dashboard_tab.dart | 254 | `'등록된 자녀가 없습니다'` | Center + mainAxisAlignment.center + Icon + 단일 헤드라인 ✓ |
+| screens/parent_payments_tab.dart | 504 | `'등록된 자녀가 없습니다'` | Center + mainAxisAlignment.center + Icon + 단일 헤드라인 ✓ |
+| screens/parent_payments_tab.dart | 603 | `'오류가 발생했습니다'` | Center + mainAxisAlignment.center + Icon + 헤드라인 + 메시지 ✓ |
+
+#### 7.92-c §7.30 예외 17 지점 — 유형별 집계
+
+| 유형 | 건수 | 파일:라인 |
+|------|------|-----------|
+| #2 개체명 (사용자/자녀 이름, 이니셜) | 6 | profile_header.dart:30(이니셜)/68, child_profiles_screen.dart:223(이니셜), child_card.dart:51, parent_payments_tab.dart:297, parent_dashboard_tab.dart:769(자녀이름) |
+| #3 stat 값 (카운트/금액/%) | 8 | stat_card.dart:36, parent_assignments_tab.dart:225, parent_payments_tab.dart:388(`'$count'`), unconnected_child_dashboard.dart:87/103, parent_dashboard_tab.dart:437/451/589 |
+| #4 날짜 값 (월/일) | 2 | parent_lessons_tab.dart:420(monthName), 526(`'${date.day}'`) |
+| 축 2(center) 실패 — 인라인 빈 상태 | 1 | parent_payments_tab.dart:569 `'등록된 수강권이 없습니다'` — Padding+Column(start 정렬)로 §7.89 3축 불성립 |
+
+#### 7.92 검증
+
+- `flutter analyze lib/features/parent_home/` → **No issues found** (11.8s)
+- 잔재 grep 재실행: `AppTypography.heading*` 17건 = §7.30 예외 17건 일치. §7.17 후보 0건 확인.
+- NotebookTypography import: 5 파일 중 4 파일 이미 존재, child_profiles_screen.dart 1 파일 신규 추가.
+
+#### 7.92 관찰
+
+**예상 대비 전환율 일치**: §7.91-b 로드맵에서 parent_home 예상 전환율 **30~50%**. 실측 **32%** 로 하한 근접 — parent_home 은 "학부모 대시보드" 특성상 지표·개체명·날짜 같은 §7.30 유형이 2/3 을 차지함. Playfair 는 "탭의 뼈대 헤더 + 빈 상태/에러 헤드라인" 8 지점에만 한정.
+
+**§7.89 3축 검증의 세밀도**: parent_payments_tab.dart:569 (`'등록된 수강권이 없습니다'`) 는 헤드라인 어휘만 보면 §7.89 후보처럼 보이나, **Padding+Column(start 정렬) 인라인 블록**이라 축 2(center) 실패. 같은 파일 504 는 Center 래퍼로 축 2 통과 → Playfair. **동일 어휘라도 배치 맥락에 따라 판정이 갈린다**는 §7.89 3축 법칙이 parent_home 안에서 재확인.
+
+**개체명·이니셜·stat 의 3대 §7.30 축**: parent_home 의 §7.30 17건을 유형 분해하면 #2 개체명(6) + #3 stat(8) + #4 날짜(2) + 축2실패(1). **학부모 뷰는 "누구(개체명) + 얼마(stat) + 언제(날짜)"** 3축으로 구성된다는 도메인 특성 확인. 이는 §7.91-b 에서 예상한 "대시보드 헤더 §7.17 + 지표 §7.30" 분리 원칙과 정확히 일치.
+
+**은유**: §7.92 는 **"학부모 상담실의 차트 벽"** — 벽 위 표제 4개("레슨 노트" · "오늘의 연습" · "이번 주 연습" · "자녀 선택")와 텅 빈 상태일 때의 큰 문구 4개만 필기체(Playfair). 벽에 걸린 차트 속 숫자·이름·날짜는 전부 명조체(Gothic). 학부모가 들어오면 **"표제는 천천히, 숫자는 한눈에"** 읽히는 구조. Notebook × Score 의 **"뼈대는 필기체, 살은 명조체"** 원칙이 학부모용 뷰에서도 유지된다. 선생님 감사 8 배치 중 첫 §7.17 밀집 배치 완료.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

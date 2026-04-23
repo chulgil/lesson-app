@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/child_profile.dart';
 import '../providers/child_profile_provider.dart';
 import 'child_profile_form_screen.dart';
@@ -38,7 +39,11 @@ class ChildProfilesScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
                   const SizedBox(height: AppSpacing.space2),
@@ -73,7 +78,8 @@ class ChildProfilesScreen extends ConsumerWidget {
               color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
-            Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
+            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
@@ -302,7 +308,10 @@ class _ChildProfileCard extends StatelessWidget {
                   // Switch to child view button
                   IconButton(
                     onPressed: onSwitchToChild,
-                    icon: Icon(Icons.switch_account, color: AppColors.paperAccent),
+                    icon: Icon(
+                      Icons.switch_account,
+                      color: AppColors.paperAccent,
+                    ),
                     tooltip: '학생 화면으로 전환',
                   ),
                   // Edit button

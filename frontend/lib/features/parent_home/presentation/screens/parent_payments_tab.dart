@@ -499,12 +499,8 @@ class _EmptyChildrenState extends StatelessWidget {
               color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
-            Text(
-              '등록된 자녀가 없습니다',
-              style: AppTypography.headingSmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
+            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
           ],
         ),
       ),
@@ -600,7 +596,8 @@ class _ErrorState extends StatelessWidget {
               color: AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space2),
-            Text('오류가 발생했습니다', style: AppTypography.headingSmall),
+            // Notebook × Score: 에러 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+            Text('오류가 발생했습니다', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space2),
             Text(
               message,

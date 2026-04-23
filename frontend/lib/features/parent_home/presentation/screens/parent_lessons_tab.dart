@@ -136,7 +136,8 @@ class ParentLessonsTab extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('레슨 노트', style: AppTypography.headingMedium),
+                          // Notebook × Score: 바텀시트 섹션 헤더 (§7.17/§7.27) — Playfair sectionTitle.
+                          Text('레슨 노트', style: NotebookTypography.sectionTitle),
                           TextButton.icon(
                             onPressed: () {
                               Navigator.pop(context);
