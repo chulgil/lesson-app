@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
@@ -627,7 +628,11 @@ class _TeacherDetailContent extends ConsumerWidget {
           children: [
             Icon(icon, size: 20, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
-            Text(title, style: AppTypography.headingSmall),
+            // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
+            // (§7.17). 8개 호출부 모두 정적 명사 헤더('전문 악기'/'소개'/
+            // '경력'/'수업 방식'/'수업 지역'/'학력'/'경력 사항'/'인증된 자격증')
+            // 이므로 공통 헬퍼에서 일괄 승격.
+            Text(title, style: NotebookTypography.sectionTitle),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),

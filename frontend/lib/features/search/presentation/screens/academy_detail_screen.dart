@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../parent_home/presentation/providers/user_profile_provider.dart';
@@ -244,7 +245,9 @@ class AcademyDetailScreen extends ConsumerWidget {
       children: [
         Icon(Icons.people_outline, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
-        Text('소속 선생님', style: AppTypography.headingSmall),
+        // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
+        // (§7.17). '소속 선생님' 은 정적 그룹 헤더.
+        Text('소속 선생님', style: NotebookTypography.sectionTitle),
         const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(
