@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Bottom sheet for language selection (MVP: Korean only).
@@ -38,12 +39,8 @@ class LanguageSelectSheet extends StatelessWidget {
 
               const SizedBox(height: AppSpacing.space5),
 
-              Text(
-                '언어 설정',
-                style: AppTypography.headingMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Notebook × Score: 시트 헤더는 Playfair sectionTitle (§7.87-f / §7.27).
+              Text('언어 설정', style: NotebookTypography.sectionTitle),
 
               const SizedBox(height: AppSpacing.space6),
 

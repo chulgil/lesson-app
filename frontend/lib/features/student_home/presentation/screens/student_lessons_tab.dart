@@ -5,6 +5,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
@@ -185,12 +186,8 @@ class StudentLessonsTab extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(
-            '스케줄',
-            style: AppTypography.headingMedium.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+          Text('스케줄', style: NotebookTypography.sectionTitle),
           const Spacer(),
           FilledButton.icon(
             onPressed: () {

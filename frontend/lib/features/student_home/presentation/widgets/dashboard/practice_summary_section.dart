@@ -6,6 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../practice/presentation/providers/practice_crud_provider.dart';
 
 /// Practice summary section showing streak, weekly stats, and chart.
@@ -83,7 +84,8 @@ class PracticeSummarySection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('이번 주 연습', style: AppTypography.headingMedium),
+            // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
             TextButton(
               onPressed: () {
                 context.push('${AppRoutes.practiceStats}?studentId=$studentId');

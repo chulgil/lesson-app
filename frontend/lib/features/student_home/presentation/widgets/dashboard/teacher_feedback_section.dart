@@ -26,7 +26,8 @@ class TeacherFeedbackSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('최근 피드백', style: AppTypography.headingMedium),
+            // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+            Text('최근 피드백', style: NotebookTypography.sectionTitle),
             TextButton(
               onPressed: () {
                 context.push(

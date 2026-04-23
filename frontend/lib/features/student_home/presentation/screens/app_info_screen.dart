@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// App information screen.
 class AppInfoScreen extends StatelessWidget {
@@ -39,12 +40,8 @@ class AppInfoScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
-                Text(
-                  'Lessonaza',
-                  style: AppTypography.headingLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                // Notebook × Score: 브랜드 타이틀은 Playfair masthead (§7.87-f).
+                Text('Lessonaza', style: NotebookTypography.masthead),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '버전 1.0.0 (1)',

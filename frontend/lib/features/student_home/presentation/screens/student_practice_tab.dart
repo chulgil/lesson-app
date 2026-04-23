@@ -58,7 +58,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('내 연습', style: AppTypography.headingLarge),
+                  // Notebook × Score: 탭 타이틀 Playfair sectionTitle (§7.87-f).
+                  Text('내 연습', style: NotebookTypography.sectionTitle),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

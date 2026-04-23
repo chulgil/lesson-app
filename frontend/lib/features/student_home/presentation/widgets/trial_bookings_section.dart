@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import 'compact_trial_booking_card.dart';
@@ -41,7 +42,8 @@ class TrialBookingsSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('내 체험레슨', style: AppTypography.headingMedium),
+                // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+                Text('내 체험레슨', style: NotebookTypography.sectionTitle),
                 TextButton.icon(
                   onPressed: () => context.push(AppRoutes.teacherSearch),
                   icon: const Icon(Icons.add, size: 18),

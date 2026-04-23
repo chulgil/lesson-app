@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
@@ -64,7 +65,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('내 수강권', style: AppTypography.headingMedium),
+            Text('내 수강권', style: NotebookTypography.sectionTitle),
             if (onViewAll != null)
               TextButton(onPressed: onViewAll, child: const Text('전체 보기')),
           ],

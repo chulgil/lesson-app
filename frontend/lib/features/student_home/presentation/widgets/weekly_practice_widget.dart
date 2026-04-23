@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
 import '../../../lessons/presentation/widgets/resource_attachment_section.dart';
@@ -93,7 +94,8 @@ class WeeklyPracticeWidget extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('이번 주 연습', style: AppTypography.headingMedium),
+              // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+              Text('이번 주 연습', style: NotebookTypography.sectionTitle),
               if (onViewAll != null)
                 TextButton(onPressed: onViewAll, child: const Text('전체보기')),
             ],
@@ -192,7 +194,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showHeader) ...[
-          Text('이번 주 연습', style: AppTypography.headingMedium),
+          Text('이번 주 연습', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
         ],
         Container(
