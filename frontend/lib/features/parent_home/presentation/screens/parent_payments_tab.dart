@@ -560,9 +560,10 @@ class _NoSubscriptionsState extends StatelessWidget {
             color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
+          // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
           Text(
             '등록된 수강권이 없습니다',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
