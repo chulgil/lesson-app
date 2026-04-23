@@ -1918,6 +1918,53 @@ grep -c "NotebookMasthead|NotebookTypography|ThinRule|'Fine\\.'" \
 
 **은유**: 감사 보고서에 따르면 학생 장부는 표지 없이 첫 장부터 본문이 시작되는 초고였다. 오늘의 조판은 선생님 장부에서 쓰던 **동일한 활자판** 을 그대로 옮겨왔다 — Playfair 의 eyebrow, Programme Title 의 중심 정렬, 얇은 선 한 줄, 페이지 끝의 "Fine." 까지. 그리고 3개의 산발적 피드백 섹션은 **"학습 기록"** 이라는 한 장으로 묶었다. 세 기록의 구분은 여전히 있지만(내부 Thin Rule), 독자의 눈에는 "한 페이지의 세 단락" 으로 읽힌다. Miller 가 말한 7±2 의 부담은, 이름을 붙이는 순간 반으로 준다.
 
+### 7.59 parent_home/ 위젯 섹션·바텀시트 제목 Playfair 통일 — parent_home/ 도메인 §7.17/§7.27 배치 #1
+
+**배경**: students/ 배치 #1 (§7.57) 완료 후 parent_home/ 진입. parent_home/screens/ 중 `parent_dashboard_tab`·`parent_assignments_tab`·`parent_payments_tab`·`parent_lessons_tab` 은 병행 세션 영향에서 벗어난 것으로 확인되었으나, 이번 배치는 먼저 **위젯 레이어 4 파일만** 선별하여 helper 전파 효과를 우선 확인한다. `SectionCard` 는 이 도메인에서 가장 많이 재사용되는 공통 카드 헬퍼이므로, 1회 수정으로 다수 호출부에 일괄 반영되는 "공통 먼저" 원칙의 모범 사례.
+
+| 파일 | 라인 | 제목 | 치환 | 근거 |
+|------|------|------|------|------|
+| `section_card.dart` | 44 | `title` (parameter) | `sectionTitle` | §7.17 카드 헬퍼. 호출부 4곳(`parent_dashboard_tab`) 일괄 반영 |
+| `profile_children_section.dart` | 208 | "자녀 추가 방법" | `sectionTitle` | §7.17 카드 섹션 |
+| `profile_switcher.dart` | 393 | "프로필 전환" | `sectionTitle` | §7.17. `BottomSheetHandle` 없이 `showModalBottomSheet` 사용 → appBarTitle 아닌 sectionTitle 적용 |
+| `notification_settings_sheet.dart` | 59 | "알림 상세 설정" | `appBarTitle` | §7.27. 파일 초입 `BottomSheetHandle` 존재 확인 |
+
+**설계 포인트**:
+1. **Helper 전파 최적화**: `SectionCard.title` 한 줄 수정 → 4 호출부(parent_dashboard_tab) 일괄 반영. 코드 1 → 렌더 5 (section_card 자체 + 4 호출부). §7.56 profile 배치의 helper 전파 패턴 재확인.
+2. **section_card.dart import 교체**: `app_typography.dart` 가 유일 사용처였으므로 그대로 `notebook_typography.dart` 로 **교체**. §7.56 `extended_profile_screen` 와 동일 전략. 다른 3 파일은 `app_typography` 가 파일 내부에서 다른 용도(예: bodyMedium, caption 등)로 사용 중이므로 **추가** import.
+3. **Sheet title 분류 재확인**: `BottomSheetHandle` 존재 여부가 판별 기준.
+   - `notification_settings_sheet.dart` (handle 존재) → §7.27 `appBarTitle`
+   - `profile_switcher.dart` (handle 부재, 단순 `showModalBottomSheet`) → §7.17 `sectionTitle`
+4. **§7.30 제외 로스터 재확인**: `stat_card.dart:36` `Text(value, ...)` — dynamic stat value. Inter 의 균등함이 숫자 정렬에 적합하므로 Playfair 변환 불필요. 제외 로스터에 명시.
+5. **병행 세션 회피 전략 지속**: `git status --short` 로 parallel-contested 파일 사전 확인 → schedule/screens, students/screens, profile screens, search, subscription screens 모두 회피. parent_home/widgets/ 가 uncontested 로 확보된 네 파일 모두 전환.
+
+**§7.30 제외 누적 로스터 (11 → 12 항목)**:
+1. 아바타 initial 글자 (CircleAvatar 내부)
+2. Dynamic stat value (가격·카운트·날짜·시간)
+3. Empty state headline
+4. Error headline
+5. Gamification level-title token
+6. Dynamic name (teacher/student/opponent)
+7. Calendar month label
+8. Dynamic year/date label
+9. Dynamic fee range
+10. (§7.57) Student lesson card dynamic date
+11. (§7.57) Student practice tab dynamic stat value
+12. **(§7.59 신규)** Parent stat card dynamic stat value (`stat_card.dart:36`)
+
+**검증** (commit `4ec26c28`):
+
+```bash
+flutter analyze \
+  lib/features/parent_home/presentation/widgets/section_card.dart \
+  lib/features/parent_home/presentation/widgets/profile_children_section.dart \
+  lib/features/parent_home/presentation/widgets/notification_settings_sheet.dart \
+  lib/features/parent_home/presentation/widgets/profile_switcher.dart
+# Analyzing 4 items... No issues found! (ran in 8.9s)
+```
+
+**은유**: 학부모 장부의 공통 카드는 마치 편집자의 조판 틀과 같다. 네 편의 단락이 한 카드에 실릴 때, 카드 틀만 활자를 바꾸면 네 편 모두 같은 판형으로 다시 인쇄된다. 한 번의 조판 교체가 네 번의 재조판을 덜어낸다 — **공통은 손을 적게 쓰고 일을 많이 시키는 친구**다. 그리고 바텀시트의 두 가지 제목 스타일(§7.17 과 §7.27)은 독자에게 **표지의 유무** 를 알려주는 단서다: 핸들이 있는 시트는 "이건 임시로 열린 탭이니 언제든 닫아도 됩니다" 라고 말하고, 핸들이 없는 시트는 "이건 한 문단을 차분히 읽고 넘어가세요" 라고 말한다. 활자는 기능을 장식하지 않고 기능을 **번역** 한다.
+
 ---
 
 ## 8. 구현 원칙
