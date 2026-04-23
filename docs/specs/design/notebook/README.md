@@ -2823,6 +2823,64 @@ flutter analyze <17 files>
 
 ---
 
+### 7.81 students_tab 모달 시트 제목 Playfair + parent_home/ 전수 감사 "값 표시 전용" 도메인 확인 — §7.27 배치 + 0건 변환
+
+**배경**: §7.79 에서 3-도메인 "동적 값 집중" 클러스터 관찰 후, parent_home/ 와 students/ 도메인을 병행 감사. students/ 는 2건 변환(students_tab sheet 2건), parent_home/ 는 **11건 전원 §7.30 exclusion** — 변환 0건. 학부모 대시보드는 **"자녀 이름·결제 금액·자녀 상태·월 선택·잔여 일수"** 등 전부 동적 값이 지배, **Playfair 승격 대상이 0**인 첫 사례.
+
+**변환 2건** (students_tab):
+
+| 파일 | 라인 | 텍스트/패턴 | 변경 |
+|---|---:|---|---|
+| students_tab.dart | 384 | `'연습상태로 필터'` (bottom sheet title) | §7.27 → appBarTitle |
+| students_tab.dart | 471 | `'정렬 기준'` (bottom sheet title) | §7.27 → appBarTitle |
+
+> §7.67 masthead 승격은 `_buildHeader()` 에 한정되어, 이 두 모달 시트 타이틀은 orthogonal scope 로 별도 변환.
+
+**§7.30 제외 13건** (parent_home 11 + student_detail 2):
+
+| 도메인 | 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|---|
+| parent_home/ | unconnected_child_dashboard:103 | `child.name` | dynamic name |
+| parent_home/ | parent_lessons_tab:419 | `monthName` (이전/다음 arrow 사이) | dynamic month label |
+| parent_home/ | parent_payments_tab:297 | `profile.name` | dynamic name |
+| parent_home/ | parent_payments_tab:504 | `'등록된 자녀가 없습니다'` (child_care icon) | empty-state |
+| parent_home/ | parent_payments_tab:569 | `'등록된 수강권이 없습니다'` (ticket icon) | empty-state |
+| parent_home/ | parent_payments_tab:603 | `'오류가 발생했습니다'` | error headline |
+| parent_home/ | parent_dashboard_tab:254 | `'등록된 자녀가 없습니다'` | empty-state |
+| parent_home/ | parent_dashboard_tab:587 | `'28'` (calendar day + weekday stack) | dynamic date |
+| parent_home/ | parent_dashboard_tab:767 | `'300,000원'` (금액 + 배지 stack) | dynamic price |
+| parent_home/ | child_profiles_screen:76 | `'등록된 자녀가 없습니다'` | empty-state |
+| parent_home/ | widgets/stat_card:36 | `value` (icon + value + label stack) | dynamic stat |
+| students/ detail | student_lesson_card:65 | `'${lesson.date.day}'` (date block) | dynamic date |
+| students/ detail | student_practice_tab:142 | `value` (icon + value + label stack) | dynamic stat |
+
+**도메인 관찰**: parent_home/ 는 **"학부모 대시보드 = 자녀 상태 중계소"** 성격이 극단적이다. 학부모는 자신이 아닌 **자녀의 상태를 조회**하는 것이 주 목적이라 모든 제목이 자녀 이름·금액·일정 같은 **동적 값**으로 채워진다. §7.61 에서 이미 masthead 레벨 통일은 완료됐고, 이번 감사로 **sub-widget 층위는 추가 Playfair 승격 여지가 없음**을 확인.
+
+**"변환 0건" 도메인의 의미**: parent_home/ 는 Playfair 승격 대상이 **원천적으로 없는** 도메인. 이는 Notebook × Score 롤아웃이 **포화점**에 도달했다는 신호다. 향후 신기능 추가 시에만 Playfair 대상이 발생할 가능성. 반대로 **"§7.30 전수 확인 완료"** 라벨을 붙여 재탐색 스코프에서 제외하는 효율화 가능.
+
+**전환율 비교** (10 도메인 집계):
+
+| 도메인 | heading 발견 | 변환 | §7.30 제외 | 전환율 | 본질 |
+|---|---:|---:|---:|---:|---|
+| lessons/widgets (§7.78) | 15건 | 10건 | 5건 | 66.7% | 상태 전이 모달 이름 |
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% | 정적 명사 |
+| **students/ (§7.81)** | **4건** | **2건** | **2건** | **50%** | **모달 시트 제목** |
+| profile/ (§7.77) | 7건 | 2건 | 5건 | 28.6% | 금액 중심 |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% | 동적 이벤트 |
+| 3-도메인 클러스터 (§7.79) | 10건 | 2건 | 8건 | 20% | 동적 값 집중 |
+| invite/ (§7.76) | 8건 | 1건 | 7건 | 12.5% | 상태 전이 피드백 |
+| schedule/widgets (§7.73) | 10건 | 1건 | 9건 | 10% | 동적 시간대 |
+| **parent_home/ (§7.81)** | **11건** | **0건** | **11건** | **0%** | **자녀 상태 중계소** |
+
+**커밋**: `e48d0f5c` style(students): Notebook × Score §7.27 배치 #1
+**검증**: `flutter analyze` students_tab → No issues found! (ran in 3.4s)
+
+**다음 후보**: search/ (teacher_detail/academy_detail — parallel-contested 경고 있음, 사전 §7 섹션 검색 필수), auth/ (로그인·가입 화면, 전수 미감사), practice/screens (§7.62·§7.64·§7.66 이후 남은 화면), lessons/screens 잔여(§7.75 후 추가 파일 탐색).
+
+**은유**: §7.81 은 **"도서관의 비어있는 서가"** 를 확인하는 일이었다. parent_home/ 의 11개 headingSmall 은 모두 **책이 없는 서가 라벨** (= 자녀가 아직 연결되지 않음, 수강권이 없음)이거나 **책의 가격표** (= 결제 금액, 자녀 이름). Playfair 는 **"이 서가에 어떤 책이 꽂히는가"** 를 말할 때 빛나지, **"지금 몇 권 있는가"** 를 말할 때는 Gothic 이 더 정직하다. 이 도메인의 0% 전환율은 실패가 아니라 **"정직한 0%"** — Notebook × Score 가 개입할 필요가 없는 공간이 어디인지 명확히 그어준다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
