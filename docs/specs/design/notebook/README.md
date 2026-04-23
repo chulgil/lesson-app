@@ -2727,6 +2727,57 @@ flutter analyze <17 files>
 
 ---
 
+### 7.79 student_home/my_teachers 카테고리 섹션 제목 Playfair + 3-도메인 §7.30 전수 감사 — "동적 값 집중" 도메인 클러스터
+
+**배경**: §7.77 profile/ 이후 settings/ + gamification/ + student_home/ 3개 도메인을 **한 번에 전수 감사**. 총 10건 발견, **2건만 §7.17 구조적 섹션 제목** (my_teachers_screen 의 카테고리 헤더), 나머지 8건 전부 §7.30 exclusion. 전환율 **20%** — 3 도메인 모두 "동적 값" 이 지배하는 클러스터.
+
+| 파일 | 라인 | 텍스트/패턴 | 변경 |
+|---|---:|---|---|
+| my_teachers_screen.dart | 61 | `'앱 선생님'` (verified icon + 카테고리 그룹 헤더) | §7.17 → sectionTitle |
+| my_teachers_screen.dart | 171 | `'직접 등록한 선생님'` (person_add icon + 카테고리 그룹 헤더) | §7.17 → sectionTitle |
+
+**수량**: 2 code-line edits (+ 1 import) → 2 Playfair 승격 (모두 `my_teachers_screen.dart`).
+
+**§7.30 제외 8건** — 3 도메인 전수 관찰:
+
+| 도메인 | 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|---|
+| settings/ | backup_widgets:127 | `value` (icon + value + label 스택) | dynamic stat value |
+| gamification/ | badge_collection_screen:103 | `data.levelTitle` (Lv.{n} 위, 총 P 아래) | gamification token |
+| student_home/ | student_lessons_tab:231 | `formatDateMDWithDayLong(selectedDate)` | dynamic date label |
+| student_home/ | student_practice_tab:132 | `_formatDate(_selectedDate)` (data branch) | dynamic date label |
+| student_home/ | student_practice_tab:177 | `_formatDate(_selectedDate)` (loading branch) | dynamic date label |
+| student_home/ | student_practice_tab:190 | `_formatDate(_selectedDate)` (error branch) | dynamic date label |
+| student_home/ | student_subscription_summary:268 | `'${usedLessons}/$_totalSessions'` | dynamic fraction |
+| student_home/ | dashboard/next_lesson_card:147 | `dDayText` (D-1 / D-Day) | dynamic countdown |
+
+**AsyncValue.when 반복 패턴 관찰**: `student_practice_tab` 의 동일 `_formatDate` 렌더가 data / loading / error 3 branch 에 복제되어 있다. **DRY 리팩토링 후보** — `_DateHeader` 위젯으로 추출하면 3 → 1. 다만 스코프 밖(타이포 변환 없음)이므로 별도 사이클로 이월.
+
+**전환율 업데이트** (9 도메인 집계):
+
+| 도메인 | heading 발견 | 변환 | §7.30 제외 | 전환율 | 본질 |
+|---|---:|---:|---:|---:|---|
+| lessons/widgets (§7.78) | 15건 | 10건 | 5건 | 66.7% | 상태 전이 모달 이름 |
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% | 정적 명사 (수강권·제안·내역) |
+| profile/ (§7.77) | 7건 | 2건 | 5건 | 28.6% | 금액 중심 |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% | 동적 이벤트 |
+| **3-도메인 클러스터 (§7.79)** | **10건** | **2건** | **8건** | **20%** | **동적 값 집중** |
+| invite/ (§7.76) | 8건 | 1건 | 7건 | 12.5% | 상태 전이 피드백 |
+| schedule/widgets (§7.73) | 10건 | 1건 | 9건 | 10% | 동적 시간대 |
+
+**가설 검증**: "숫자·날짜·카운트다운 같은 **동적 값**이 화면 주인공인 도메인"은 전환율 10-30% 구간. §7.77 (금액 중심) 과 이번 §7.79 (날짜·프로그레스·레벨) 가 거의 같은 범위. 반대로 §7.78 (상태 전이 이름) 과 subscription (정적 명사) 은 50%+. **Playfair 승격은 "대상을 호명하는 명사"에만 적합하고, 값 표시는 건드리지 않는다 — 이 경계가 §7.27/§7.17 ↔ §7.30 의 본질**.
+
+**쌍 관찰** (student_home/ 내부): `my_teachers_screen` 은 2/2 변환 (100%), 나머지 4 파일은 0/6 변환 (0%). 즉 한 도메인 안에서도 **"사람/카테고리 호명 화면"** 과 **"값 표시 화면"** 이 이분된다. 전환율 20% 는 평균이 아니라 **이분 분포의 평균**이다.
+
+**커밋**: `e2a126b8` style(student_home): Notebook × Score §7.17 배치 #1
+**검증**: `flutter analyze` my_teachers → No issues found! (ran in 8.3s)
+
+**다음 후보**: students/ 도메인 (student_detail 제외 — §7.74 완료), parent_home/ (10+ occurrences 예상, 학부모 대시보드는 §7.61 이후 후속), 또는 search/ teacher_detail/academy_detail (parallel-contested 주의).
+
+**은유**: §7.79 는 **도서관에서 "저자·장르 라벨"만 바꾸고 "검색 결과 숫자" 는 그대로 두는 일**이었다. '앱 선생님' · '직접 등록한 선생님' 은 **책장의 장르 라벨** — 손으로 쓰인 듯한 Playfair 가 잘 맞는다. 반면 "3/5", "D-Day", "2026년 4월 25일" 은 **검색 결과 숫자** — 이건 Gothic 기계 숫자가 더 읽기 쉽다. 3 도메인을 한꺼번에 감사한 결과는 명확하다: Notebook × Score 는 **"숫자·날짜·카운트다운 같은 기계적 지표는 건드리지 말고 그대로 두라"** 는 규율을 요구한다. Playfair 는 **기계 지표의 대립항**으로 존재해야 하기 때문.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
