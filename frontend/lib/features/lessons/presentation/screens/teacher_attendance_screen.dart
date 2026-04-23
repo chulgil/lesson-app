@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../domain/entities/lesson.dart';
 import '../providers/attendance_providers.dart';
@@ -60,9 +61,10 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Per-student rates
+          // Notebook × Score: 출석 리스트 섹션 제목 — Playfair sectionTitle (§7.17).
           Text(
             AppStrings.studentAttendanceRates,
-            style: AppTypography.headingMedium,
+            style: NotebookTypography.sectionTitle,
           ),
           const SizedBox(height: AppSpacing.space3),
           ...overview.studentRates.map(
@@ -76,7 +78,11 @@ class TeacherAttendanceScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
 
             // Recent absences
-            Text(AppStrings.recentAbsences, style: AppTypography.headingMedium),
+            // Notebook × Score: 최근 결석 섹션 제목 — Playfair sectionTitle (§7.17).
+            Text(
+              AppStrings.recentAbsences,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space3),
             ...overview.recentAbsences.map(
               (ar) => _buildAbsenceRow(
@@ -207,7 +213,9 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           if (isDeducted)
             Text(
               AppStrings.subscriptionDeducted,
-              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
         ],
       ),

@@ -142,9 +142,15 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: AppColors.paperAccent),
+                        Icon(
+                          Icons.delete_outline,
+                          color: AppColors.paperAccent,
+                        ),
                         const SizedBox(width: AppSpacing.space2),
-                        Text('레슨 삭제', style: TextStyle(color: AppColors.paperAccent)),
+                        Text(
+                          '레슨 삭제',
+                          style: TextStyle(color: AppColors.paperAccent),
+                        ),
                       ],
                     ),
                   ),
@@ -156,9 +162,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               '저장',
               style: TextStyle(
                 color:
-                    (_hasChanges && !_isSaving)
-                        ? null
-                        : AppColors.inkTertiary,
+                    (_hasChanges && !_isSaving) ? null : AppColors.inkTertiary,
               ),
             ),
           ),
@@ -260,7 +264,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              // Notebook × Score §7.50: Vermillion CTA foreground = paper.
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text('변경사항 저장'),

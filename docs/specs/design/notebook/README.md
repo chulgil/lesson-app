@@ -2546,6 +2546,44 @@ flutter analyze <17 files>
 
 ---
 
+### 7.75 lessons/screens 출석·CTA 로딩 통일 — 섹션 제목 §7.17 + Vermillion 로딩 §7.50
+
+**배경**: §7.72/§7.74 상세 화면 층위를 이어, `lessons/presentation/screens/` 14 파일 전수 감사. 직접 타이포 호출은 **teacher_attendance_screen 3건**만, `Colors.white` 는 **3건** 존재. 분류 후 §7.17 2건 + §7.50 2건 변환, 1건은 §7.30 제외, 1건은 프로필 컬러 맥락이라 §7.50 범위 밖.
+
+| 파일 | 라인 | 텍스트/패턴 | 변경 |
+|---|---:|---|---|
+| teacher_attendance_screen.dart | 65 | `AppStrings.studentAttendanceRates` (headingMedium) | §7.17 → sectionTitle |
+| teacher_attendance_screen.dart | 80 | `AppStrings.recentAbsences` (headingMedium) | §7.17 → sectionTitle |
+| quick_feedback_screen.dart | 160 | `CircularProgressIndicator color: Colors.white` (FilledButton 내부) | §7.50 → AppColors.paper |
+| edit_lesson_screen.dart | 263 | `CircularProgressIndicator color: Colors.white` (FilledButton 내부) | §7.50 → AppColors.paper |
+
+**수량**: 4 code-line edits (+ 1 import) → 2 Playfair 승격 + 2 §7.50 준수.
+
+**§7.30 제외 1건** — 의도적 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| teacher_attendance_screen:114 | `'${AppStrings.overallAttendanceRate}  ${rate.toStringAsFixed(1)}%'` | dynamic stat value (label+rate 혼합, rate 가 시각 주인공) |
+
+**§7.50 범위 밖 1건** — Vermillion 이 아니라서 건드리지 않음:
+
+| 파일:라인 | 맥락 | 왜 제외 |
+|---|---|---|
+| add_lesson_screen:324 | `ActionChip label.color: isSelected ? Colors.white : null` (bg: `student.profileColor`) | 배경이 **프로필 컬러** (동적 색상), Vermillion 이 아님. §7.50 은 paperAccent 배경 한정 |
+
+**도메인 관찰**: lessons/screens 는 **세 부류**로 나뉜다 — (a) 출석·통계 화면(`teacher_attendance`): 섹션 제목이 드러나는 "문서형" 화면 → Playfair 승격 명확. (b) 폼 화면(`edit_lesson`, `quick_feedback`, `add_lesson`): 제목 없이 Field 중심, Playfair 대상 거의 없음. (c) 로딩/버튼 내부: Vermillion CTA 의 progress indicator — 작지만 매번 튀어나오는 Colors.white. **§7.50 은 "큰 버튼"보다 "작은 스피너" 에서 더 자주 새어나온다**.
+
+**§7.50 누적 발견** (§7.72 lesson_header_card avatar → §7.74 feedback badge → §7.75 CTA spinner): Vermillion foreground 잔재는 **avatar initial / badge count / loading spinner** 3대 패턴. 모두 "작고 시선 덜 끄는" 영역이라 grep 없이는 놓친다. §7.50 은 **전수 `Colors\.white` grep 을 주기적으로 반복**해야 완결.
+
+**커밋**: (Cycle 35 진행 중)
+**검증**: `flutter analyze` 3 files → No issues found! (ran in 3.0s)
+
+**다음 후보**: lessons/widgets (lesson_form_widgets, lesson_action_buttons 등) 전수 감사, 또는 profile/ 도메인 섹션 제목 통일.
+
+**은유**: §7.74 가 **서랍 안감**을 만지는 일이었다면, §7.75 는 **서랍 속 자물쇠 주변**을 닦는 일. 로딩 스피너는 자물쇠를 돌릴 때 잠시 반짝이는 금속 — 이 반짝임이 은백색(Colors.white)이면 Notebook 의 **종이색 온도**가 깨진다. `AppColors.paper` 는 같은 "밝음"이지만 **따뜻한 크림빛** — 기존 Vermillion 과 한 공간에 놓여도 어색하지 않다. Notebook × Score 의 미감은 "색의 일치"가 아니라 **"온도의 일치"** 에서 온다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

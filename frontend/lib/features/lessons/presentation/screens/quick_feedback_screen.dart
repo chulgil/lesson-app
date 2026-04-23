@@ -157,7 +157,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  // Notebook × Score §7.50: Vermillion CTA foreground = paper.
+                                  color: AppColors.paper,
                                 ),
                               )
                               : const Text('저장하기'),
@@ -289,11 +290,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
           // Last item: add button
           if (index == presets.length) {
             return ActionChip(
-              avatar: Icon(
-                Icons.add,
-                size: 16,
-                color: AppColors.inkSecondary,
-              ),
+              avatar: Icon(Icons.add, size: 16, color: AppColors.inkSecondary),
               label: Text(
                 '추가',
                 style: AppTypography.caption.copyWith(
@@ -316,10 +313,14 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             child: ActionChip(
               label: Text(
                 preset.text,
-                style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.paperAccent,
+                ),
               ),
               backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
-              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+              side: BorderSide(
+                color: AppColors.paperAccent.withValues(alpha: 0.2),
+              ),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space1,
               ),
