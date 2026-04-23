@@ -8,6 +8,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import 'student_lesson_card.dart';
@@ -28,7 +29,8 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('다가오는 레슨', style: AppTypography.headingSmall),
+            // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('다가오는 레슨', style: NotebookTypography.sectionTitle),
             TextButton(
               onPressed: () {
                 context.push(
@@ -43,10 +45,8 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
 
         lessonsAsync.when(
           data: (lessons) {
-            final upcomingLessons = lessons
-                .where((l) => l.isUpcoming)
-                .take(3)
-                .toList();
+            final upcomingLessons =
+                lessons.where((l) => l.isUpcoming).take(3).toList();
 
             if (upcomingLessons.isEmpty) {
               return Container(
@@ -71,23 +71,29 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
             }
 
             return Column(
-              children: upcomingLessons
-                  .map((lesson) => StudentLessonCard(lesson: lesson, isUpcoming: true))
-                  .toList(),
+              children:
+                  upcomingLessons
+                      .map(
+                        (lesson) =>
+                            StudentLessonCard(lesson: lesson, isUpcoming: true),
+                      )
+                      .toList(),
             );
           },
-          loading: () => const SizedBox(
-            height: 80,
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (_, __) => Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: const Text('레슨 정보를 불러올 수 없습니다'),
-          ),
+          loading:
+              () => const SizedBox(
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          error:
+              (_, __) => Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: const Text('레슨 정보를 불러올 수 없습니다'),
+              ),
         ),
       ],
     );
@@ -110,7 +116,8 @@ class StudentRecentLessonsSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('최근 레슨', style: AppTypography.headingSmall),
+            // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('최근 레슨', style: NotebookTypography.sectionTitle),
             TextButton(
               onPressed: () {
                 context.push(
@@ -125,10 +132,11 @@ class StudentRecentLessonsSection extends ConsumerWidget {
 
         lessonsAsync.when(
           data: (lessons) {
-            final recentLessons = lessons
-                .where((l) => l.status == LessonStatus.completed)
-                .take(3)
-                .toList();
+            final recentLessons =
+                lessons
+                    .where((l) => l.status == LessonStatus.completed)
+                    .take(3)
+                    .toList();
 
             if (recentLessons.isEmpty) {
               return Container(
@@ -153,23 +161,31 @@ class StudentRecentLessonsSection extends ConsumerWidget {
             }
 
             return Column(
-              children: recentLessons
-                  .map((lesson) => StudentLessonCard(lesson: lesson, isUpcoming: false))
-                  .toList(),
+              children:
+                  recentLessons
+                      .map(
+                        (lesson) => StudentLessonCard(
+                          lesson: lesson,
+                          isUpcoming: false,
+                        ),
+                      )
+                      .toList(),
             );
           },
-          loading: () => const SizedBox(
-            height: 80,
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (_, __) => Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: const Text('레슨 기록을 불러올 수 없습니다'),
-          ),
+          loading:
+              () => const SizedBox(
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          error:
+              (_, __) => Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: const Text('레슨 기록을 불러올 수 없습니다'),
+              ),
         ),
       ],
     );

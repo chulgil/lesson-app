@@ -26,7 +26,8 @@ class StudentNotesSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('레슨 노트', style: AppTypography.headingSmall),
+            // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('레슨 노트', style: NotebookTypography.sectionTitle),
             notesAsync.whenOrNull(
                   data:
                       (notes) =>

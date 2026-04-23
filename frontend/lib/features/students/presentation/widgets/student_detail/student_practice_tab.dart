@@ -5,6 +5,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
 import '../../../../practice/domain/entities/student_practice_overview.dart';
 import '../../../../practice/presentation/providers/practice_overview_provider.dart';
@@ -73,7 +74,9 @@ class _WeeklySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('이번 주 연습 요약', style: AppTypography.headingSmall),
+          // Notebook × Score: 탭 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+          // (line 140 의 value 는 stat value — §7.30 제외.)
+          Text('이번 주 연습 요약', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children: [
@@ -140,9 +143,7 @@ class _SummaryItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );
@@ -172,7 +173,8 @@ class _WeeklyPracticeGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('주간 연습 현황', style: AppTypography.headingSmall),
+          // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+          Text('주간 연습 현황', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children:
@@ -236,10 +238,7 @@ class _DayColumn extends StatelessWidget {
           Text(
             entry.hasPracticed ? '${entry.practiceMinutes}' : '-',
             style: AppTypography.caption.copyWith(
-              color:
-                  entry.hasPracticed
-                      ? AppColors.ink
-                      : AppColors.inkTertiary,
+              color: entry.hasPracticed ? AppColors.ink : AppColors.inkTertiary,
               fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -276,10 +275,7 @@ class _DayColumn extends StatelessWidget {
             child: Text(
               dayLabel,
               style: AppTypography.caption.copyWith(
-                color:
-                    isToday
-                        ? AppColors.paper
-                        : AppColors.inkSecondary,
+                color: isToday ? AppColors.paper : AppColors.inkSecondary,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -316,7 +312,8 @@ class _SharedRecordingsSection extends StatelessWidget {
             children: [
               const Icon(Icons.mic_outlined, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
-              Text('공유된 녹음', style: AppTypography.headingSmall),
+              // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+              Text('공유된 녹음', style: NotebookTypography.sectionTitle),
               const Spacer(),
               Text(
                 '${recordings.length}개',

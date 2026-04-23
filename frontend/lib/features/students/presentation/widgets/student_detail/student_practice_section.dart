@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/practice/domain/entities/practice_log.dart';
 import '../../../../practice/presentation/providers/practice_crud_provider.dart';
 
@@ -27,15 +28,17 @@ class StudentPracticeSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('이번 주 연습', style: AppTypography.headingSmall),
+            // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
             weeklyPracticeAsync.when(
-              data: (practiced) => Text(
-                '${practiced.where((p) => p).length}/7일',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              data:
+                  (practiced) => Text(
+                    '${practiced.where((p) => p).length}/7일',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.paperAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
               loading: () => const SizedBox.shrink(),
               error: (_, __) => const SizedBox.shrink(),
             ),
@@ -45,63 +48,73 @@ class StudentPracticeSection extends ConsumerWidget {
 
         // Practice calendar
         weeklyPracticeAsync.when(
-          data: (practiced) => Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              border: Border.all(color: AppColors.inkQuaternary),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(7, (index) {
-                final isPracticed = index < practiced.length && practiced[index];
-                return Column(
-                  children: [
-                    Text(
-                      days[index],
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: isPracticed
-                            ? AppColors.paperOk.withValues(alpha: 0.15)
-                            : AppColors.paperDark,
-                        shape: BoxShape.circle,
-                        border: isPracticed
-                            ? Border.all(color: AppColors.paperOk, width: 2)
-                            : null,
-                      ),
-                      child: Icon(
-                        isPracticed ? Icons.check : Icons.remove,
-                        size: 18,
-                        color: isPracticed
-                            ? AppColors.paperOk
-                            : AppColors.inkTertiary,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ),
-          loading: () => const SizedBox(
-            height: 80,
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (_, __) => Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            ),
-            child: const Text('연습 정보를 불러올 수 없습니다'),
-          ),
+          data:
+              (practiced) => Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.paper,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                  border: Border.all(color: AppColors.inkQuaternary),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(7, (index) {
+                    final isPracticed =
+                        index < practiced.length && practiced[index];
+                    return Column(
+                      children: [
+                        Text(
+                          days[index],
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.space2),
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color:
+                                isPracticed
+                                    ? AppColors.paperOk.withValues(alpha: 0.15)
+                                    : AppColors.paperDark,
+                            shape: BoxShape.circle,
+                            border:
+                                isPracticed
+                                    ? Border.all(
+                                      color: AppColors.paperOk,
+                                      width: 2,
+                                    )
+                                    : null,
+                          ),
+                          child: Icon(
+                            isPracticed ? Icons.check : Icons.remove,
+                            size: 18,
+                            color:
+                                isPracticed
+                                    ? AppColors.paperOk
+                                    : AppColors.inkTertiary,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+          loading:
+              () => const SizedBox(
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          error:
+              (_, __) => Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                ),
+                child: const Text('연습 정보를 불러올 수 없습니다'),
+              ),
         ),
 
         const SizedBox(height: AppSpacing.space3),
@@ -113,7 +126,8 @@ class StudentPracticeSection extends ConsumerWidget {
               return const SizedBox.shrink();
             }
             return Column(
-              children: practiceLog.tasks.map((task) => _buildTaskRow(task)).toList(),
+              children:
+                  practiceLog.tasks.map((task) => _buildTaskRow(task)).toList(),
             );
           },
           loading: () => const SizedBox.shrink(),
@@ -133,19 +147,16 @@ class StudentPracticeSection extends ConsumerWidget {
                 ? Icons.check_circle
                 : Icons.radio_button_unchecked,
             size: 20,
-            color: task.isCompleted
-                ? AppColors.paperOk
-                : AppColors.inkTertiary,
+            color: task.isCompleted ? AppColors.paperOk : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               task.title,
               style: AppTypography.bodyMedium.copyWith(
-                decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                color: task.isCompleted
-                    ? AppColors.inkTertiary
-                    : AppColors.ink,
+                decoration:
+                    task.isCompleted ? TextDecoration.lineThrough : null,
+                color: task.isCompleted ? AppColors.inkTertiary : AppColors.ink,
               ),
             ),
           ),
