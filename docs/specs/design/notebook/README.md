@@ -1965,6 +1965,44 @@ flutter analyze \
 
 **은유**: 학부모 장부의 공통 카드는 마치 편집자의 조판 틀과 같다. 네 편의 단락이 한 카드에 실릴 때, 카드 틀만 활자를 바꾸면 네 편 모두 같은 판형으로 다시 인쇄된다. 한 번의 조판 교체가 네 번의 재조판을 덜어낸다 — **공통은 손을 적게 쓰고 일을 많이 시키는 친구**다. 그리고 바텀시트의 두 가지 제목 스타일(§7.17 과 §7.27)은 독자에게 **표지의 유무** 를 알려주는 단서다: 핸들이 있는 시트는 "이건 임시로 열린 탭이니 언제든 닫아도 됩니다" 라고 말하고, 핸들이 없는 시트는 "이건 한 문단을 차분히 읽고 넘어가세요" 라고 말한다. 활자는 기능을 장식하지 않고 기능을 **번역** 한다.
 
+### 7.60 parent_home/ 유도 카드·lessons/ 학습 자료 시트 제목 Playfair 통일 — §7.17/§7.27 교차 도메인 배치
+
+**배경**: §7.59 parent_home/widgets/ 배치 완료 직후, 동일 도메인 screens 레이어와 uncontested lessons/widgets/ 중 §7.17/§7.27 전환 타겟이 남은 파일을 교차 탐색. parent_home/ 에서는 Phase 4a (commit `3e711f72`) 가 대시보드 masthead/Programme Title 구조를 먼저 바꿔놓은 상태라, `parent_dashboard_tab.dart` 잔존 headingSmall 8건은 모두 §7.30 제외 대상(가격·카운트·empty state·error headline)만 남음. 따라서 이번 배치는 남은 **의미 있는 3 파일**만 전환.
+
+**배치 대상**:
+
+| 파일 | 라인 | 제목 | 치환 | 근거 |
+|------|------|------|------|------|
+| `parent_assignments_tab.dart` | 114 | "이번 주 과제" | `sectionTitle` | §7.17. Accent 배너 내부 섹션 헤더. `color: Colors.white` copyWith 유지 |
+| `unconnected_child_dashboard.dart` | 220 | "선생님과 연결하세요" | `sectionTitle` | §7.17. 연결 유도(CTA) 카드 제목. Empty state 아닌 action-prompt |
+| `unconnected_child_dashboard.dart` | 468 | `title` (helper) | `sectionTitle` | §7.17. `_FeatureCard(icon+title+subtitle)` helper. 호출부 1곳(`_buildFeatureCards` line 166 "연습 기록") |
+| `resource_attachment_section.dart` | 311 | "학습 자료 추가" | `appBarTitle` | §7.27. `BottomSheetHandle` at line 313 |
+| `resource_attachment_section.dart` | 400 | "내 학습 자료" | `appBarTitle` | §7.27. `BottomSheetHandle` at line 399 |
+
+**설계 포인트**:
+1. **교차 도메인 배치 근거**: parent_home/ 은 §7.59 직후 남은 연속성, lessons/ 은 동일 세션 병렬 탐색에서 uncontested 로 확보. 두 도메인 모두 `BottomSheetHandle` 판별 원칙이 그대로 적용되므로 같은 배치로 묶어도 논리 혼선 없음.
+2. **Phase 4a 와의 스코프 분리**: `3e711f72` 는 `parent_dashboard_tab.dart` 와 `unconnected_child_dashboard.dart` 일부 영역에 `Colors.white → AppColors.paper` 치환을 반영했으나, 타이포 변환(`headingSmall → sectionTitle`)은 수행하지 않았다. 이번 배치는 타이포 축만 전환 — 색상 축과 **서로 겹치지 않는 diff** 로 혼합 없이 반영.
+3. **§7.17 sectionTitle 의 광범위 적용성 재확인**: 배너(accent 배경) / 연결 유도 카드 / 기능 설명 helper / 시트 내 섹션 — 네 가지 다른 컨텍스트가 모두 `sectionTitle` 로 수렴. §7.30 만 제외하면 §7.17 이 가장 일반적인 선택지임을 실전에서 반복 검증.
+4. **parent_dashboard_tab.dart 잔존분 §7.30 근거 기록**: 라인 154 "등록된 자녀가 없습니다" (empty state headline), 라인 484 "28" (dynamic count), 라인 661 "300,000원" (가격). 모두 기존 §7.30 로스터 항목. 다음 배치에서는 건드리지 않음을 명시.
+
+**Parallel-session race condition 기록** (교훈):
+- 중간 `git commit` 이 "no changes added to commit" 으로 실패.
+- 원인: Parallel session (`3e711f72`, "Autopus Cycle 28 / Phase 4a") 이 동일 3 파일에 대한 staging 을 가로채면서 내 stage 가 잠시 비워짐.
+- 해결: 동일 파일 재확인 후 `git add && git commit` 을 **단일 Bash 호출** 로 chain → race window 최소화.
+- 재발 방지: 병행 세션 감지 시 code batch 는 항상 `git add && git commit` 을 **&&** 로 묶어 단일 명령으로 실행. README commit 은 별도 세션으로 분리 가능 (충돌 가능성 낮음).
+
+**검증** (commit `20147b55`):
+
+```bash
+flutter analyze \
+  lib/features/parent_home/presentation/screens/parent_assignments_tab.dart \
+  lib/features/parent_home/presentation/screens/unconnected_child_dashboard.dart \
+  lib/features/lessons/presentation/widgets/resource_attachment_section.dart
+# Analyzing 3 items... No issues found! (ran in 3.2s)
+```
+
+**은유**: 서로 다른 장부가 나란히 책상에 놓여 있었다 — 한 장부는 학부모의 주간 점검표, 다른 장부는 선생님의 학습 자료 서랍. 두 장부의 표지는 다르지만 **인쇄 기계는 같다**. 오늘의 작업은 새로 찍어낸 활자(Playfair)를 두 장부에 동시에 얹는 일이었다. 그 사이 옆 책상에서 다른 편집자(병행 세션)가 내 활자판에 손을 대려던 찰나가 있었지만, 빠르게 인쇄기로 밀어넣으면서(`add && commit` chain) 활자를 지켜냈다. 편집실에서는 속도가 때로 논리보다 중요한 순간이 있다.
+
 ---
 
 ## 8. 구현 원칙
