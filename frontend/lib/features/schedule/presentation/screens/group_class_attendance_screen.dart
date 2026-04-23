@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -49,9 +50,9 @@ class _GroupClassAttendanceScreenState
     );
 
     return Scaffold(
+      backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: const Text('출석 체크'),
-        centerTitle: true,
         actions: [
           if (_hasChanges)
             TextButton(
@@ -196,12 +197,10 @@ class _GroupClassAttendanceScreenState
         children: [
           const Icon(Icons.lightbulb_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
+          // Notebook × Score: 안내 힌트는 Gaegu handwriting marginalia (§7.87).
           Text(
             '미참석자만 탭하세요',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.ink,
-              fontWeight: FontWeight.w500,
-            ),
+            style: NotebookTypography.hand.copyWith(fontSize: 14),
           ),
         ],
       ),

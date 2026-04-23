@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -50,7 +51,8 @@ class _GroupClassDetailScreenState
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('그룹 레슨'), centerTitle: true),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('그룹 레슨')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -369,7 +371,10 @@ class _GroupClassDetailScreenState
                 booking.statusText,
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isWaitlist ? AppColors.paperAccent : AppColors.paperAccent,
+                  color:
+                      isWaitlist
+                          ? AppColors.paperAccent
+                          : AppColors.paperAccent,
                 ),
               ),
             ],
@@ -424,11 +429,7 @@ class _GroupClassDetailScreenState
         ),
         child: Column(
           children: [
-            const Icon(
-              Icons.block,
-              size: 48,
-              color: AppColors.inkTertiary,
-            ),
+            const Icon(Icons.block, size: 48, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '예약이 마감되었습니다',
@@ -450,7 +451,8 @@ class _GroupClassDetailScreenState
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              backgroundColor: isFull ? AppColors.paperAccent : AppColors.paperAccent,
+              backgroundColor:
+                  isFull ? AppColors.paperAccent : AppColors.paperAccent,
             ),
             child:
                 _isProcessing
@@ -490,12 +492,8 @@ class _GroupClassDetailScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '클래스 소개',
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          // Notebook × Score: 섹션 제목은 Playfair sectionTitle 통일 (§7.87).
+          Text('클래스 소개', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space2),
           Text(
             widget.groupClass.description!,
@@ -522,13 +520,8 @@ class _GroupClassDetailScreenState
             children: [
               const Icon(Icons.info_outline, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space1),
-              Text(
-                '예약 안내',
-                style: AppTypography.bodySmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink,
-                ),
-              ),
+              // Notebook × Score: 섹션 제목은 Playfair sectionTitle 통일 (§7.87).
+              Text('예약 안내', style: NotebookTypography.sectionTitle),
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -587,7 +580,8 @@ class _GroupClassDetailScreenState
                   ? '대기 ${booking.waitlistPosition}번으로 등록되었습니다'
                   : '예약이 완료되었습니다',
             ),
-            backgroundColor: isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
+            backgroundColor:
+                isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
           ),
         );
       }
@@ -625,7 +619,9 @@ class _GroupClassDetailScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text('취소하기'),
               ),
             ],
