@@ -2397,6 +2397,40 @@ flutter analyze <17 files>
 
 ---
 
+### 7.71 schedule/screens 앱바·모달 제목 Playfair 통일 — schedule/ 도메인 §7.27 배치 #1
+
+**범위**: `frontend/lib/features/schedule/presentation/screens/` 의 `AppTypography.headingSmall` 9건 전수 분류(단, schedule_tab.dart 2건은 §7.69 masthead 작업과 충돌 위험으로 제외). 2건만 변환, 7건 §7.30 제외 — 매우 높은 제외율.
+
+| 파일 | 라인 | 텍스트 | 패턴 |
+|---|---:|---|:---:|
+| request_detail_screen.dart | 327 | AppBar title — `'$academyName $opponentName (${typeDisplayLabel})'` | §7.27 |
+| booking_cancel_screen.dart | 591 | 모달 시트 '${teacherName} 연락처' | §7.27 |
+
+**수량**: 2 code-line edits → 2 rendered titles.
+
+**§7.30 제외 7건** — schedule/ 도메인이 왜 창고보다 상품 선반이 많은지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| pending_bookings_screen.dart:84 | '대기 중인 신청이 없습니다' | empty-state headline (inbox 아이콘) |
+| group_class_attendance_screen.dart:170 | `'${_getAttendedCount()}/${_attendanceState.length}'` | dynamic stat value |
+| group_class_detail_screen.dart:370 | `booking.statusText` (상태 아이콘 옆) | status headline with icon |
+| booking_cancel_screen.dart:146 | `_formatBookingDate()` | dynamic date |
+| unified_lesson_request_screen.dart:174 | `widget.params.teacherName` (CircleAvatar profile card) | dynamic name |
+| schedule_tab.dart:300 | — | **parallel-contested** (§7.69 masthead) |
+| schedule_tab.dart:644 | — | **parallel-contested** (§7.69 masthead) |
+
+**도메인 특성 관찰**: schedule/ 는 **이벤트·행동 중심 도메인**이라 "정적 섹션 헤더"가 드물고 대신 **동적 상태·카운트·날짜**가 제목 자리를 차지한다. 따라서 §7.17 적용 없이 §7.27(제목 블록) 만 적용. 이는 subscription/screens 와 정반대 패턴 — subscription 은 정적 폼 섹션이 많고, schedule 은 동적 이벤트 표시가 많다.
+
+**병렬 세션 회피**: schedule_tab.dart 2건은 동시 진행 중인 §7.69 masthead 승격 작업과 겹칠 수 있어 이번 배치에서 배제. 해당 파일의 비-masthead headingSmall 은 §7.69 완결 후 별도 배치로 처리.
+
+**커밋**: `0d0413d3 style(schedule/screens): Notebook × Score §7.27 배치 #1`
+**검증**: `flutter analyze` 2 files → No issues found! (ran in 2.9s)
+
+**은유**: 진열대가 많은 방에 들어갔는데 대부분이 **시계·현황판·메모지**(동적 표시)라 라벨을 붙일 수 있는 **명패 자리**는 두 곳뿐이었다 — 입구(AppBar)와 전화번호부(모달). 나머지는 달력처럼 늘 바뀌는 것들이라 오히려 라벨이 붙지 **않아야** 자기 역할을 한다. 이 방은 창고가 아니라 **관제실**에 가깝다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
