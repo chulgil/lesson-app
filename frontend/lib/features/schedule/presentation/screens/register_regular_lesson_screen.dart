@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
@@ -46,21 +47,23 @@ class _RegisterRegularLessonScreenState
 
   @override
   Widget build(BuildContext context) {
-    final availabilityAsync =
-        ref.watch(teacherAvailabilityProvider(widget.teacherId));
-    final settingsAsync =
-        ref.watch(teacherSettingsByIdProvider(widget.teacherId));
+    final availabilityAsync = ref.watch(
+      teacherAvailabilityProvider(widget.teacherId),
+    );
+    final settingsAsync = ref.watch(
+      teacherSettingsByIdProvider(widget.teacherId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('정규레슨 등록'),
-      ),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('정규레슨 등록')),
       body: settingsAsync.when(
-        data: (settings) => availabilityAsync.when(
-          data: (slots) => _buildContent(settings, slots),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const Center(child: Text('시간 정보를 불러올 수 없습니다')),
-        ),
+        data:
+            (settings) => availabilityAsync.when(
+              data: (slots) => _buildContent(settings, slots),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const Center(child: Text('시간 정보를 불러올 수 없습니다')),
+            ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text('설정 정보를 불러올 수 없습니다')),
       ),
@@ -89,7 +92,7 @@ class _RegisterRegularLessonScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Schedule type
-          const RegularLessonSectionTitle('레슨 유형'),
+          const RegularLessonSectionTitle('레슨 유형', romanIndex: 0),
           const SizedBox(height: AppSpacing.space3),
           ScheduleTypeSelector(
             selectedType: _scheduleType,
@@ -109,7 +112,7 @@ class _RegisterRegularLessonScreenState
           // Fixed time slot selection
           if (_scheduleType == ScheduleType.fixed) ...[
             // Lesson duration selection
-            const RegularLessonSectionTitle('레슨 시간'),
+            const RegularLessonSectionTitle('레슨 시간', romanIndex: 1),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '선생님 기본 설정: ${LessonDurations.format(settings.defaultLessonDuration)}',
@@ -133,7 +136,7 @@ class _RegisterRegularLessonScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Day selection
-            const RegularLessonSectionTitle('요일 선택'),
+            const RegularLessonSectionTitle('요일 선택', romanIndex: 2),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '주 $_lessonsPerWeek회 레슨 - $_lessonsPerWeek개 요일을 선택하세요',
@@ -167,26 +170,28 @@ class _RegisterRegularLessonScreenState
 
             // Time selection for each selected day
             if (_selectedDays.isNotEmpty) ...[
-              const RegularLessonSectionTitle('시간 선택'),
+              const RegularLessonSectionTitle('시간 선택', romanIndex: 3),
               const SizedBox(height: AppSpacing.space3),
-              ..._selectedDays.map((day) => RegularLessonTimeSelector(
-                    dayOfWeek: day,
-                    availableSlots: slots,
-                    selectedTime: _selectedTimesPerDay[day],
-                    lessonDuration: _selectedLessonDuration,
-                    onTimeSelected: (time) {
-                      setState(() {
-                        _selectedTimesPerDay[day] = time;
-                      });
-                    },
-                  )),
+              ..._selectedDays.map(
+                (day) => RegularLessonTimeSelector(
+                  dayOfWeek: day,
+                  availableSlots: slots,
+                  selectedTime: _selectedTimesPerDay[day],
+                  lessonDuration: _selectedLessonDuration,
+                  onTimeSelected: (time) {
+                    setState(() {
+                      _selectedTimesPerDay[day] = time;
+                    });
+                  },
+                ),
+              ),
             ],
 
             const SizedBox(height: AppSpacing.space6),
           ],
 
           // Lessons per week
-          const RegularLessonSectionTitle('레슨 횟수'),
+          const RegularLessonSectionTitle('레슨 횟수', romanIndex: 4),
           const SizedBox(height: AppSpacing.space3),
           LessonsPerWeekSelector(
             lessonsPerWeek: _lessonsPerWeek,
@@ -204,17 +209,16 @@ class _RegisterRegularLessonScreenState
             },
           ),
           const SizedBox(height: AppSpacing.space2),
+          // Notebook × Score: 부가 주석은 Gaegu handwriting 으로 marginalia 시그니처 적용 (§7.87).
           Text(
-            '* 5주차가 있는 달은 기본 휴강입니다. 추가 레슨이 필요하시면 1회 레슨을 신청해주세요.',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            '* 5주차가 있는 달은 기본 휴강이에요. 추가 레슨은 1회 레슨으로 신청!',
+            style: NotebookTypography.hand.copyWith(fontSize: 14),
           ),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Monthly fee
-          const RegularLessonSectionTitle('월 수강료'),
+          const RegularLessonSectionTitle('월 수강료', romanIndex: 5),
           const SizedBox(height: AppSpacing.space3),
           RegularLessonFeeSelector(
             monthlyFee: _monthlyFee,
@@ -224,7 +228,7 @@ class _RegisterRegularLessonScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Start date
-          const RegularLessonSectionTitle('시작일'),
+          const RegularLessonSectionTitle('시작일', romanIndex: 6),
           const SizedBox(height: AppSpacing.space3),
           RegularLessonStartDateSelector(
             startDate: _startDate,
@@ -297,15 +301,16 @@ class _RegisterRegularLessonScreenState
 
     try {
       // Create time slots from selected days and times
-      final fixedSlots = _selectedDays.map((day) {
-        final time = _selectedTimesPerDay[day]!;
-        return TimeSlot(
-          id: 'slot_$day',
-          dayOfWeek: day,
-          startTime: time,
-          endTime: addMinutes(time, _selectedLessonDuration),
-        );
-      }).toList();
+      final fixedSlots =
+          _selectedDays.map((day) {
+            final time = _selectedTimesPerDay[day]!;
+            return TimeSlot(
+              id: 'slot_$day',
+              dayOfWeek: day,
+              startTime: time,
+              endTime: addMinutes(time, _selectedLessonDuration),
+            );
+          }).toList();
 
       final registration = RegularLessonRegistration(
         studentId: widget.studentId ?? 'new_student',
@@ -316,7 +321,9 @@ class _RegisterRegularLessonScreenState
         startDate: _startDate,
       );
 
-      await ref.read(bookingsNotifierProvider.notifier).registerRegularLesson(
+      await ref
+          .read(bookingsNotifierProvider.notifier)
+          .registerRegularLesson(
             teacherId: widget.teacherId,
             teacherName: widget.teacherName,
             studentId: widget.studentId ?? 'new_student',

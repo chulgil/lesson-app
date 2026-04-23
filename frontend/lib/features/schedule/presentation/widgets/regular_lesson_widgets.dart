@@ -12,13 +12,25 @@ import 'time_slot_selector.dart';
 /// Section title widget for regular lesson forms
 class RegularLessonSectionTitle extends StatelessWidget {
   final String title;
+  final int? romanIndex;
 
-  const RegularLessonSectionTitle(this.title, {super.key});
+  const RegularLessonSectionTitle(this.title, {super.key, this.romanIndex});
 
   @override
   Widget build(BuildContext context) {
-    // Notebook × Score: 정기 레슨 폼 섹션 제목도 Playfair sectionTitle(17) 로 통일.
-    return Text(title, style: NotebookTypography.sectionTitle);
+    // Notebook × Score: 정기 레슨 폼 섹션 제목은 Playfair sectionTitle(17) + 선택적 로마숫자(§7.87).
+    if (romanIndex == null) {
+      return Text(title, style: NotebookTypography.sectionTitle);
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(romanOf(romanIndex!), style: NotebookTypography.roman),
+        const SizedBox(width: AppSpacing.space2),
+        Text(title, style: NotebookTypography.sectionTitle),
+      ],
+    );
   }
 }
 
