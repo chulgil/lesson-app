@@ -3157,6 +3157,81 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.87 학생 진입 경험 Notebook × Score 전수 감사 — 스케줄·student_home·onboarding §7.17/§7.27 포화
+
+**기간**: 2026-04-23
+**근거 감사 문서**: `docs/specs/design/notebook/student_screens_audit.md` (10 섹션, 학생 role 진입 11개 도메인 전수 매트릭스)
+**시리즈 구성**: a(샘플) → b~e(스케줄) → f(student_home) → g(onboarding). 본 §7.87 에서는 본 계획 범위인 **f/g 만 상세 기록**, a~e 는 커밋 히스토리로 추적.
+
+#### 7.87-f student_home/ §7.17 × 9 + §7.27 × 2 = 11 지점 / 10 파일 (커밋 `7b1fe0ae`)
+
+**대상**: 학생 홈 대시보드·탭·시트 전반의 정적 섹션 헤더·시트 헤더.
+
+| 파일 | 라인 | 이전 | 이후 | §7.x |
+|------|------|------|------|------|
+| widgets/weekly_practice_widget.dart | 96 | `AppTypography.headingMedium` | `NotebookTypography.sectionTitle` | §7.17 |
+| widgets/weekly_practice_widget.dart | 195 | 동일 (loading variant) | 동일 | §7.17 |
+| widgets/trial_bookings_section.dart | 44 | 동일 | 동일 | §7.17 |
+| widgets/dashboard/practice_summary_section.dart | 86 | 동일 | 동일 | §7.17 |
+| widgets/dashboard/teacher_feedback_section.dart | 29 | 동일 | 동일 | §7.17 |
+| widgets/student_subscription_summary.dart | 67 | 동일 | 동일 | §7.17 |
+| screens/student_lessons_tab.dart | 190 | 동일 | 동일 | §7.17 |
+| screens/student_practice_tab.dart | 61 | `AppTypography.headingLarge` | `NotebookTypography.sectionTitle` | §7.17 |
+| screens/app_info_screen.dart | 44 | `AppTypography.headingLarge` (`'Lessonaza'`) | `NotebookTypography.masthead` | §7.17 (브랜드 특례) |
+| widgets/language_select_sheet.dart | 43 | `AppTypography.headingMedium` | `NotebookTypography.sectionTitle` | §7.27 |
+| widgets/practice_reminder_sheet.dart | 49 | 동일 | 동일 | §7.27 |
+
+**§7.30 예외 유지 (11건)**: 감사 매트릭스 §2.3 에 확정 기록. `dashboard/next_lesson_card:147`(#4 D-Day), `student_profile_tab:191/270/607`(#2 이름 / #3 stat / #10 초대코드), `student_lessons_tab:231`(#4 날짜), `student_practice_tab:132/177/190`(#4 날짜 3 variant), `my_teachers_screen:509`(#6 이니셜), `student_subscription_summary:268`(#3 stat), `practice_reminder_sheet:147`(#3 dynamic time). **모두 Playfair 승격 불가** — 동적 데이터·개체 식별자·수치는 Gothic 서체가 판독성 규칙.
+
+**브랜드 특례 기록 (`'Lessonaza'`)**: `app_info_screen:44` 는 "섹션 타이틀"이 아니라 **페이지 중앙 브랜드 로고**. `sectionTitle`(17) 은 크기 부족, `masthead`(38) 가 적정. §7.17 을 "브랜드 식별자" 로 확장 적용한 **첫 사례** — 이후 동종 화면(splash·about 류)이 생길 때 동일 스타일 적용.
+
+**검증**: `flutter analyze lib/features/student_home/` → No issues found (11.8s).
+
+**판정 전환**: 감사 §7 섹션의 FLAG 4종 (연습 탭·레슨 탭·연습 리마인더 시트·언어 설정 시트) **모두 PASS 로 전환**. 학생 홈 쉘·대시보드·프로필 탭과 함께 학생 진입 5개 주요 화면 전면 4대 시그니처 준수.
+
+#### 7.87-g onboarding/ §7.17 × 4 지점 / 2 파일 (커밋 `5fe7f3be`)
+
+**대상**: 학생/선생님 공용 온보딩 스텝 타이틀 + 악기 선택 시트.
+
+| 파일 | 라인 | 이전 | 이후 | §7.x |
+|------|------|------|------|------|
+| student_profile_setup_screen.dart | 158 | `AppTypography.headingLarge` (`'프로필 설정'`) | `NotebookTypography.sectionTitle` | §7.17 |
+| student_profile_setup_screen.dart | 438 | `AppTypography.headingMedium` (`'악기 선택'`) | 동일 | §7.27 |
+| profile_setup_screen.dart | 206 | `AppTypography.headingLarge` (`'프로필 설정'`) | 동일 | §7.17 |
+| profile_setup_screen.dart | 687 | `AppTypography.headingMedium` (`'악기 선택'`) | 동일 | §7.27 |
+
+**후보 3건 이관**: `tutorial_screen:255` / `student_tutorial_screen:252` / `phone_verification_screen:193` — §7.87-h 에서 본격 판정.
+
+**검증**: `flutter analyze lib/features/onboarding/ lib/features/student_home/` → No issues found (12.7s).
+
+#### 7.87-h onboarding 튜토리얼 + 휴대폰 인증 §7.17 × 3 지점 / 3 파일
+
+**대상**: Batch 3.E 후보 재판정 — 튜토리얼 슬라이드 헤드라인 + 휴대폰 인증 스텝 타이틀.
+
+| 파일 | 라인 | 이전 | 이후 | §7.x |
+|------|------|------|------|------|
+| tutorial_screen.dart | 253 | `AppTypography.headingLarge.copyWith(color: AppColors.ink)` (`content.title`) | `NotebookTypography.sectionTitle` | §7.17 |
+| student_tutorial_screen.dart | 250 | 동일 (`data.title`) | 동일 | §7.17 |
+| phone_verification_screen.dart | 196 | `AppTypography.headingLarge` (조건부 `'인증번호 입력'` / `'휴대폰 인증'`) | 동일 | §7.17 |
+
+**판정 근거**: 튜토리얼 페이지 제목(`content.title` / `data.title`)은 "슬라이드의 이름표" — 로컬라이즈 문자열 상수로 정의되며 한 슬라이드 내 유일 타이틀. **정적 섹션 명사** 카테고리에 해당. `phone_verification` 의 조건부 타이틀 2종(`'인증번호 입력'` / `'휴대폰 인증'`)도 **코드에 하드코딩된 유한집합** 이므로 정적 명사로 분류 — §7.30 "동적 값" 예외에 해당하지 않음.
+
+**"동적처럼 보이는 정적 명사" 패턴**: `Text(data.title, ...)` 구문은 겉보기에 §7.30 #2(동적 이름) 처럼 보이지만, `data.title` 의 **원천이 빌드 타임 상수** (튜토리얼 페이지 정의) 이면 정적이다. 판정 기준은 **런타임 값의 출처** — 사용자 입력/DB/API 에서 오면 §7.30, 코드 상수/ENUM 이면 §7.17.
+
+**검증**: `flutter analyze lib/features/onboarding/` → No issues found.
+
+**판정 전환**: 감사 매트릭스 §3.2 의 후보 3건 **모두 §7.17 확정**. onboarding 도메인 §7.17 BLOCK 확정 (4 in §7.87-g + 3 in §7.87-h) **= 7/7 포화**. onboarding 전면 PASS.
+
+#### 7.87 시리즈 관찰
+
+**1차 법칙 재확인 (§7.85 의 2차 법칙)**: 한 도메인의 §7.17 승격은 "정적 섹션 명사 소수" 에 집중된다. student_home 22 잔재 중 **11건만 §7.17/§7.27** 이고 나머지 11건은 §7.30 예외 — 즉 **"도메인 전반 확산이 아니라 명사 집중"** (22건 중 50%). onboarding 은 감사 7건 **모두 §7.17 로 확정** (§7.87-g 4건 + §7.87-h 3건 = 7/7, 100%) — 튜토리얼/프로필/인증 스크린이 전부 **정적 카피 중심** 이기 때문이다. 세 도메인(스케줄·홈·온보딩) 통합 전환율은 ~60~100% 범위로, **"도메인의 데이터 비중이 낮을수록 §7.17 전환율이 높다"** 는 3차 법칙 초기 관찰.
+
+**2차 법칙 발견 — "브랜드 식별자 특례"**: 앱 브랜드 로고 문자열(`Lessonaza`)은 §7.17 의 "섹션 타이틀" 크기 카테고리가 아니라 **매스트헤드 크기**(38 / w700)에 속한다. 섹션 헤더가 화면 내 "영역의 이름" 이라면, 브랜드 로고는 **앱 자체의 이름** 이므로 한 단계 위 타이포그래피 계층(Masthead = 페이지 매스트헤드) 을 공유. 이 분리는 **§7.17 의 "정적 명사" 규칙을 깨지 않는다** — 오히려 정적 명사의 **크기 축(scale axis)** 을 명시적으로 추가한 결과. 크기 축: `pieceTitle`(16) / `sectionTitle`(17) / `appBarTitle`(18) / `dialogTitle`(19) / `masthead`(38).
+
+**은유**: §7.87 은 **"학교 개학 첫 주의 교실 정돈"** — 교문(온보딩)에서 이름표(브랜드 로고)를 달고, 교실(student_home)에 들어가 칠판(대시보드)·사물함(레슨/연습 탭)·게시판(수강권) 을 **같은 서체의 라벨** 로 통일하는 작업. 라벨이 통일되지 않으면 "어느 교실에 왔는지" 혼란이 생긴다. Playfair 의 역할은 **공간의 이름표** 이고, Gothic 의 역할은 **그 안을 채우는 데이터**. 교실 라벨(Playfair)은 바뀌지 않고, 출석부(Gothic)는 매일 바뀐다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
