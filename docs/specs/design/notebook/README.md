@@ -3642,6 +3642,41 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### §7.97 — Batch 선생님.E: subscription/ 잔재 2차 전수 감사 (§7.91-b 로드맵 · 2026-04-23)
+
+§7.91-b 로드맵의 **Batch 선생님.E** (subscription/ 2차 감사) 실행. §7.93 (profile 2차) · §7.94 (lessons 2차) · §7.95 (students 2차) · §7.96 (schedule 2차) 에 이어 다섯 번째 2차 감사 배치. 스펙 §7.89 빈/에러 상태 헤드라인 3축 규칙 + §7.27 바텀시트 헤더 규칙을 재확인. `grep -rn "AppTypography\.heading" frontend/lib/features/subscription/` 로 **19 건** 탐지 → **9 건 §7.17 승격** + **10 건 §7.30 예외 유지** → 전환율 **47.37%**.
+
+**§7.96 법칙 재확증**: schedule/ (바텀시트 9개 집중 → 36.67%) 에 이어 subscription/ 도 **바텀시트 헤더 1 개 + §7.89 빈/에러/대기 상태 헤드라인 8 개** 로 전환율 47.37% 기록 — "2차 감사 법칙 하한(10~20%)" 을 재차 돌파. 1차 감사 법칙 "바텀시트·헤드라인 집중 도메인 > 50%" 수렴 확인.
+
+**승격 대상 (§7.17 — 9 지점)**:
+
+1. `subscription_detail_screen.dart:83` — `AppStrings.subscriptionNotFound` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
+2. `subscription_detail_screen.dart:107` — `AppStrings.errorOccurred` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
+3. `issue_form_membership_widgets.dart:223` — `'등록된 레슨이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
+4. `issue_form_membership_widgets.dart:258` — `'오류가 발생했습니다'` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
+5. `proposal_card_widgets.dart:573` — `'입금 확인 대기중'` → `NotebookTypography.sectionTitle.copyWith(fontWeight: w600)` (§7.89 변형 — 대기 상태 헤드라인)
+6. `subscription_list_screen.dart:307` — `'등록된 수강권이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
+7. `subscription_list_screen.dart:336` — `'등록된 레슨이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
+8. `subscription_list_screen.dart:371` — `'오류가 발생했습니다'` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
+9. `subscription_template_list_screen.dart:636` — `isEditing ? '수강권 수정' : '수강권 수강권 추가'` → `NotebookTypography.sectionTitle` (§7.27 바텀시트 헤더 + §7.87-h 2원 유한집합)
+
+**§7.30 예외 유지 (10 지점 — 동적 값)**:
+
+- **#2 개체명 (4)**: `proposal_card_widgets.dart:120` `template.name` · `template_choice_card.dart:72` `template.name` · `subscription_template_list_screen.dart:286` `template.name` · `student_proposal_accept_screen.dart:96` `'$teacherName 선생님'`
+- **#3 stat (6)**: `selectable_template_card.dart:147` `template.formattedPrice` · `proposal_confirm_screen.dart:253` `_formatPrice(price)` · `proposal_card_widgets.dart:329` `_formatPrice(discountedPrice)` · `subscription_list_screen.dart:462` `'$count'` · `proposal_detail_screen.dart:444` `template.formattedPrice` · `renewal_detail_screen.dart:337` `template.formattedPrice`
+
+**관찰 1 — "바텀시트 밀도 가설" 정량 비교**: schedule/ (바텀시트 9 / §7.30 19) = 32.14% 바텀시트 비중, 전환율 36.67%. subscription/ (바텀시트 1 / §7.30 10) = 9.09% 바텀시트 비중, 전환율 47.37%. 바텀시트 수치 자체보다 **"§7.89 빈/에러/대기 상태 헤드라인의 절대 밀도"** 가 더 강한 전환율 결정 인자. subscription/ 는 수강권이라는 **"상태가 명확히 분기되는 도메인"** (없음·로딩·에러·대기·활성) 특성상 상태 헤드라인이 8 건 집중 → 전환율 47.37%.
+
+**관찰 2 — "§7.89 변형" 케이스 확립**: `proposal_card_widgets.dart:573 '입금 확인 대기중'` 은 `Container > Column > (Icon + Text)` 구조로 `MainAxisAlignment.center` 명시 없이 컨테이너 내부 정렬만 있음. 그러나 Column 기본 `crossAxis` 가 center 이고 Icon + Text 가 수직 중앙 스택 → **"대기 상태 헤드라인 3축 유사 통과"** 로 판정하여 승격. `request_completion_screen.dart:91` (§7.96) 의 "성공 상태 3축 경계 사례" 에 이어 **"3축 경계 사례 = 승격"** 판례 재확립.
+
+**관찰 3 — AppStrings 상수 §7.17 승격의 2 건째**: `subscription_detail_screen.dart:83·107` 이 `AppStrings.subscriptionNotFound` · `AppStrings.errorOccurred` — enum/상수 2원 유한집합으로 §7.87-h 규칙을 직접 적용한 사례. parent_home §7.92 · 선생님 프로필 §7.93 의 이니셜·AppStrings 승격 정책 연장선.
+
+**관찰 4 — 스펙 갭 발견 (시각 오타)**: `subscription_template_list_screen.dart:634` 원본이 `'수강권 수강권 추가'` (중복 단어) — [golden-principles.md §12 Surgical Changes] 규칙에 따라 **이번 감사 범위 외로 판정**. 별도 버그픽스 커밋으로 이관 필요. 감사는 **타이포그래피만 승격**, 문구 수정은 범위 외.
+
+**은유**: §7.97 은 **"교사실의 수강권 카운터 + 안내판 8 개 + 창고 문패 1 개"** — 바텀시트 헤더(§7.27, 문패 1)는 수강권 양식 창고의 명패로, 빈·에러·대기 상태 헤드라인 8 개(§7.89, 안내판)는 카운터 옆 안내문으로 모두 필기체(Playfair) 승격. 반면 카운터 위에서 오고 가는 금액·횟수·템플릿명·선생님명(§7.30)은 명조체(Gothic) 유지. 선생님 감사 8 배치 중 **"상태 헤드라인 밀집형 도메인의 첫 표본"** — 수강권 라이프사이클(없음→대기→활성→소진→만료) 이 §7.89 상태 헤드라인의 자연스러운 밀집 구조를 형성.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

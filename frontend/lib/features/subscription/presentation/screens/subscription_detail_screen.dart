@@ -78,9 +78,10 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           children: [
             Icon(Icons.search_off, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
+            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
               AppStrings.subscriptionNotFound,
-              style: AppTypography.headingSmall.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
@@ -104,7 +105,11 @@ class SubscriptionDetailScreen extends ConsumerWidget {
             children: [
               Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
               const SizedBox(height: AppSpacing.space3),
-              Text(AppStrings.errorOccurred, style: AppTypography.headingSmall),
+              // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
+              Text(
+                AppStrings.errorOccurred,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 error,

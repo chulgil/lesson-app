@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/selectors/selectors.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -629,9 +630,11 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
               const SizedBox(height: AppSpacing.space4),
 
               // Title
+              // Notebook × Score: 바텀시트 헤더 Playfair 승격 (§7.27 + §7.87-h
+              // 2원 유한집합).
               Text(
                 isEditing ? '수강권 수정' : '수강권 수강권 추가',
-                style: AppTypography.headingMedium,
+                style: NotebookTypography.sectionTitle,
               ),
               const SizedBox(height: AppSpacing.space4),
 

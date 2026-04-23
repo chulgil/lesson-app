@@ -303,9 +303,10 @@ class SubscriptionListScreen extends ConsumerWidget {
             color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
           Text(
             '등록된 수강권이 없습니다',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
@@ -331,9 +332,10 @@ class SubscriptionListScreen extends ConsumerWidget {
           children: [
             Icon(Icons.school_outlined, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
+            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
               '등록된 레슨이 없습니다',
-              style: AppTypography.headingSmall.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
@@ -366,7 +368,8 @@ class SubscriptionListScreen extends ConsumerWidget {
           children: [
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space3),
-            Text('오류가 발생했습니다', style: AppTypography.headingSmall),
+            // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
+            Text('오류가 발생했습니다', style: NotebookTypography.sectionTitle),
             const SizedBox(height: AppSpacing.space2),
             Text(
               error,

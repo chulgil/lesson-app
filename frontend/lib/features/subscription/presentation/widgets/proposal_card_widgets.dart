@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -265,7 +266,11 @@ class ProposalDiscountCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.local_offer, size: 18, color: AppColors.paperAccent),
+              const Icon(
+                Icons.local_offer,
+                size: 18,
+                color: AppColors.paperAccent,
+              ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 proposal.discountReason ?? '할인 적용',
@@ -450,7 +455,10 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                   )
                   .toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(6),
@@ -562,9 +570,10 @@ class ProposalWaitingCard extends StatelessWidget {
         children: [
           const Icon(Icons.hourglass_empty, size: 48, color: AppColors.ink),
           const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 대기 상태 헤드라인 3축 통과 (§7.89 변형) — Playfair 승격.
           Text(
             '입금 확인 대기중',
-            style: AppTypography.headingSmall.copyWith(
+            style: NotebookTypography.sectionTitle.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
