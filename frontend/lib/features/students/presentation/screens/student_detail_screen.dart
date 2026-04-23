@@ -242,8 +242,8 @@ class _StudentDetailContent extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withValues(alpha: 0.1),
-                Colors.black.withValues(alpha: 0.5),
+                AppColors.ink.withValues(alpha: 0.1),
+                AppColors.ink.withValues(alpha: 0.5),
               ],
             ),
           ),

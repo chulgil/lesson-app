@@ -60,7 +60,7 @@ class StatusBubble extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: AppColors.ink.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -147,7 +147,7 @@ class CatSpeechBubble extends StatelessWidget {
         borderRadius: BorderRadius.circular(20 * adjustedScale), // More rounded
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: AppColors.ink.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -209,7 +209,9 @@ class NoteWithCent extends StatelessWidget {
     final centColor =
         isPerfect
             ? AppColors.paperOk
-            : (note.centDeviation < 0 ? AppColors.paperAccent : AppColors.paperAccent);
+            : (note.centDeviation < 0
+                ? AppColors.paperAccent
+                : AppColors.paperAccent);
 
     final centText =
         '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';

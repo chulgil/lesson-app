@@ -265,7 +265,10 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                   width: 2,
                 ),
               ),
@@ -424,7 +427,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

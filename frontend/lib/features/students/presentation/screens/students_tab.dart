@@ -207,10 +207,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkTertiary,
           ),
-          prefixIcon: const Icon(
-            Icons.search,
-            color: AppColors.inkTertiary,
-          ),
+          prefixIcon: const Icon(Icons.search, color: AppColors.inkTertiary),
           suffixIcon:
               _searchController.text.isNotEmpty
                   ? IconButton(
@@ -539,7 +536,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: AppColors.ink.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -725,11 +722,13 @@ class _StudentCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border:
             isSelected
-                ? Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3))
+                ? Border.all(
+                  color: AppColors.paperAccent.withValues(alpha: 0.3),
+                )
                 : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -814,7 +813,9 @@ class _StudentCard extends ConsumerWidget {
                               vertical: 1,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.1),
+                              color: AppColors.paperAccent.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusSmall,
                               ),

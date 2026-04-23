@@ -48,7 +48,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -61,10 +61,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
           // Time and duration
           Row(
             children: [
-              const Text(
-                '🎻',
-                style: TextStyle(fontSize: 20),
-              ),
+              const Text('🎻', style: TextStyle(fontSize: 20)),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${selectedSlot.formattedTimeRange} (${selectedSlot.durationMinutes}분)',
@@ -131,9 +128,10 @@ class AvailabilityBookingPreview extends StatelessWidget {
             Text(
               '🔄 변경: $remainingReschedules/$totalReschedules회 남음',
               style: AppTypography.bodySmall.copyWith(
-                color: remainingReschedules == 1
-                    ? AppColors.paperAccent
-                    : AppColors.inkTertiary,
+                color:
+                    remainingReschedules == 1
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -154,22 +152,25 @@ class AvailabilityBookingPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
-              child: isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              child:
+                  isLoading
+                      ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                      : Text(
+                        isTrialLesson ? '체험레슨 신청하기' : '예약하기',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    )
-                  : Text(
-                      isTrialLesson ? '체험레슨 신청하기' : '예약하기',
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
           ),
         ],

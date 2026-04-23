@@ -287,13 +287,13 @@ class _BookingRescheduleScreenState
                 ),
                 decoration: BoxDecoration(
                   color:
-                      isSelected
-                          ? AppColors.paperAccent
-                          : AppColors.paperDark,
+                      isSelected ? AppColors.paperAccent : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -307,10 +307,7 @@ class _BookingRescheduleScreenState
                     Text(
                       slot.formattedStartTime,
                       style: AppTypography.bodyMedium.copyWith(
-                        color:
-                            isSelected
-                                ? Colors.white
-                                : AppColors.ink,
+                        color: isSelected ? Colors.white : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -396,7 +393,7 @@ class _BookingRescheduleScreenState
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

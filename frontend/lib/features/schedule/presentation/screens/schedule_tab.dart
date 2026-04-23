@@ -589,7 +589,7 @@ class _LessonTimeCard extends ConsumerWidget {
         border: Border(left: BorderSide(color: borderColor, width: 4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -746,9 +746,7 @@ class _LessonTimeCard extends ConsumerWidget {
         final isAcademy = lessonClass.type == LessonClassType.academy;
         contextBadge = Text(
           isAcademy ? '🏫 ${lessonClass.name}' : '👤 개인레슨',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );
@@ -812,7 +810,7 @@ class _ViewModeToggle extends StatelessWidget {
                         isSelected
                             ? [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.08),
+                                color: AppColors.ink.withValues(alpha: 0.08),
                                 blurRadius: 4,
                                 offset: const Offset(0, 1),
                               ),

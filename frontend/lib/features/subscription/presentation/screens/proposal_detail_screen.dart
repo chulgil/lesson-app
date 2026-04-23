@@ -398,9 +398,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.paperAccent.withValues(
-                                            alpha: 0.2,
-                                          ),
+                                          color: AppColors.paperAccent
+                                              .withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(
                                             AppSpacing.radiusSmall,
                                           ),
@@ -417,7 +416,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                               '추천',
                                               style: AppTypography.caption
                                                   .copyWith(
-                                                    color: AppColors.paperAccent,
+                                                    color:
+                                                        AppColors.paperAccent,
                                                   ),
                                             ),
                                           ],
@@ -646,7 +646,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

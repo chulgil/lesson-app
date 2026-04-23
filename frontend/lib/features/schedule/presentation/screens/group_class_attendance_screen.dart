@@ -213,11 +213,7 @@ class _GroupClassAttendanceScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: AppColors.inkSecondary,
-          ),
+          Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '예약된 학생이 없습니다',
@@ -287,7 +283,10 @@ class _GroupClassAttendanceScreenState
                   child: Center(
                     child: Icon(
                       isAttended ? Icons.check : Icons.close,
-                      color: isAttended ? AppColors.paperOk : AppColors.paperAccent,
+                      color:
+                          isAttended
+                              ? AppColors.paperOk
+                              : AppColors.paperAccent,
                       size: 24,
                     ),
                   ),
@@ -349,7 +348,7 @@ class _GroupClassAttendanceScreenState
         border: const Border(top: BorderSide(color: AppColors.inkQuaternary)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.ink.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
