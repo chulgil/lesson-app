@@ -2469,6 +2469,40 @@ flutter analyze <17 files>
 
 ---
 
+### 7.73 schedule/widgets 카드 헤더 Playfair 통일 — schedule/ 도메인 §7.17 배치 #1
+
+**범위**: `frontend/lib/features/schedule/presentation/widgets/` 의 `AppTypography.headingSmall` 10건 전수 분류. 1건만 변환, 9건 §7.30 제외 — 더 높은 제외율.
+
+| 파일 | 라인 | 텍스트 | 패턴 |
+|---|---:|---|:---:|
+| availability/availability_block_grid.dart | 85 | `'${date.month}/${date.day}($weekday) 가용 시간 관리'` | §7.17 |
+
+**수량**: 1 code-line edit → 1 rendered title.
+
+**§7.30 제외 9건** — schedule/widgets 의 도메인 시그니처:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| regular_lesson_widgets:47 | `studentName[0]` | avatar initial |
+| regular_lesson_widgets:660 | `formatFee(monthlyFee)` | dynamic price |
+| unified_approval_bottom_sheet:135 | `name` (프로필 행) | dynamic name |
+| request_profile_card:120 | `name[0]` | avatar initial |
+| teacher_approval_card:164,412 | `booking.studentName[0]` (2곳) | avatar initial |
+| approval_bottom_sheet:177 | `booking.studentName` | dynamic name |
+| booking_card:70 | `booking.studentName[0]` | avatar initial |
+| availability_booking_preview:68 | `'${timeRange} (${durationMinutes}분)'` | dynamic time range |
+
+**도메인 관찰**: schedule/widgets 는 **"누가·언제" 카드 렌더링 도메인**. 10건 중 **5건이 avatar initial**(50%), 2건이 dynamic name(20%), 2건이 dynamic value(20%). §7.30 의 "avatar initials" 카테고리가 왜 필요한지 정량적으로 확인 — 프로필 카드가 많은 도메인일수록 avatar initial 밀도가 높다.
+
+**schedule/ 도메인 누적 (배치 #1 screens + #1 widgets)**: 3 code-line edits → 3 rendered titles. 19건 전수 분류 중 변환률 **15.8%** — subscription/ 누적(14 edits → 25 renders, 위젯 헬퍼 배수 포함)과 뚜렷한 대비. **도메인 성격이 타이포 승격 밀도를 결정한다**.
+
+**커밋**: `8778fd9e style(schedule/widgets): Notebook × Score §7.17 배치 #1`
+**검증**: `flutter analyze` 1 file → No issues found! (ran in 2.7s)
+
+**은유**: 진열장(widgets)을 열어보니 대부분이 **명함첩**이었다 — 사람 얼굴·이름·시간이 카드마다 찍혀 있다. 명함첩 속 **이름**을 서체 하나로 통일하면 오히려 부자연스럽다(이름은 그 사람의 고유성). 그래서 대부분을 그대로 두고, **명함첩 표지**(availability 카드 헤더) 하나만 공방의 활자로 바꿨다. 속지는 속지다워야 하고, 표지는 표지다워야 한다 — 이게 §7.30 exclusion 이 매번 많아지는 이유다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
