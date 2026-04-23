@@ -12,10 +12,22 @@
 | 2. CLASSIFY | ✅ 완료 | `~/.claude/skills/harness-improve/SKILL.md` |
 | 3. APPLY | ✅ 커맨드 완료 (드라이런 기본) | `~/.claude/commands/harness-absorb.md` |
 | 4. AUDIT | ✅ 기존 | `~/.claude/commands/harness-audit.md`, `harness-audit-reminder.sh` |
-| 5. autopus 흡수 | ⏳ 대기 | `/harness-absorb autopus-patterns` 드라이런으로 시작 |
+| 5. autopus 흡수 | ✅ 완료 (4/7 반영, 2 보류, 1 기존) | `~/.claude/rules/{lore-commit, hash-anchored-edit, adaptive-quality, frontend-verify}.md` |
 | 6. 롤백 | ⏳ 대기 | Phase 5 후 |
 
-**다음 액션**: `/harness-absorb` 드라이런으로 최근 7일 신호 분류 결과 확인 → Phase 5 진입.
+**Phase 5 결과**:
+- 반영(4): Lore Commit · Hash-Anchored Edit · Adaptive Quality · Frontend Verify
+- 보류(2): @AX Annotation (범용성 약함) · Entropy Scan (improve-architecture 스킬과 범위 재검토 필요)
+- 기존(1): Git Worktrees (`using-git-worktrees` 스킬 존재)
+- 처리 이력: `~/.claude/homunculus/processed/2026-04/autopus-absorb.jsonl`
+- 원안 6번 변경: `ux-consistency-check` 스킬은 플러그인 소유 → 신규 규칙 `frontend-verify.md` 로 대체
+
+**수집기 정화 결과 (Phase 5 前)**:
+- `harness-signal-capture.sh` 패치 (시스템 프롬프트 필터, regex word-boundary, slash_command 분리)
+- `observations.jsonl` 노이즈 50건 → `observations.archive/legacy-noise-2026-04-23.jsonl` 분리
+- 백업: `*.bak.2026-04-23`
+
+**다음 액션**: Phase 6 롤백 — lesson-app 및 운영 프로젝트의 autopus 생성물(`.autopus/`, `autopus.yaml`, `.codex/`, `.gemini/`, `AGENTS.md`, `GEMINI.md` 등) 제거.
 
 ## 범위
 
