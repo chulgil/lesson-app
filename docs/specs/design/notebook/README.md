@@ -2041,6 +2041,44 @@ flutter analyze lib/features/parent_home/presentation/screens/parent_dashboard_t
 
 ---
 
+### 7.62 practice/widgets 카드 섹션 제목 Playfair 통일 — practice/ 도메인 §7.17 배치 #1
+
+**트리거**: parent_home/·lessons/ 교차 도메인(§7.60) 완료 후, practice/widgets/ 레이어의 잔존 `AppTypography.headingSmall` 카드 제목을 §7.17 로 맞추기 위한 첫 배치.
+
+**변경 파일 (4 files / 5 transfers)**:
+
+| 파일 | 라인 | 카드 제목 | 호출부 | 렌더 수 |
+|---|---|---|---|---|
+| `practice/widgets/goal/goal_progress_widget.dart` | 75 | "오늘의 목표" | 직접 | 1 |
+| `practice/widgets/pitch_analysis_card.dart` | 47 | "피치 분석" | 직접 | 1 |
+| `practice/widgets/section_form/date_range_section.dart` | 65 | "연습 기간" | 직접 | 1 |
+| `practice/widgets/section_form/add_section_widgets.dart` | 43 (`SectionHeader`) | `title` prop | `edit_repertoire_screen:283` | 1 |
+| `practice/widgets/section_form/add_section_widgets.dart` | 144 (`SettingSectionHeader`) | `title` prop | `edit_repertoire_screen:362` + `RepeatCountSection` + `TargetTimeSection` | 3 |
+
+**양적 헬퍼 전파**: 5 code-line edits → **8 rendered titles** (3 direct + 1 single-call helper + 4 multi-call helper). §7.56·§7.59·§7.60 에 이어 헬퍼 우선 패턴의 네 번째 사례 — 단일 편집점이 호출 그래프를 따라 확산.
+
+**§7.30 제외 (practice/widgets/ 내부)**:
+
+| 파일 | 라인 | 사유 |
+|---|---|---|
+| `history_summary_card.dart` | 82 | 동적 stat value |
+| `practice_tools_modal.dart` | 163 | TabBar `unselectedLabelStyle` (Text 위젯 아님) |
+| `circular_tuner_indicator.dart` | 367 | cent 수치 (동적 value) |
+| `month_group_header.dart` | 43 | 캘린더 월 라벨 (동적 날짜) |
+| `section_detail/practice_stats_card.dart` | 80 | 동적 stat value |
+| `stats/stats_summary_card.dart` | 131 | 동적 stat value |
+| `tuner/tuner_cat_widgets.dart` | — | 병렬 세션 수정 진행 중 (skip) |
+
+정적 카드 제목과 동적 수치·계산값을 분리하는 §7.30 원칙 그대로 적용.
+
+**커밋**: `a4044d77 feat(notebook): practice/widgets §7.17 카드 섹션 제목 Playfair 통일`
+
+**검증**: `flutter analyze <4 files>` → `No issues found`.
+
+**은유**: 한 명의 활자공이 다섯 개 틀(frame) 을 동시에 갖고 있는데, 두 개 틀은 여러 책자에서 공용으로 쓰인다. 이 날 활자공은 다섯 틀의 활자만 바꾸면 여덟 페이지의 표제가 한꺼번에 같은 서체로 찍혀 나온다. 다섯 번의 손길로 여덟 번의 인쇄가 정돈된다 — **공용 틀(helper) 의 경제학**. 학생이 레퍼토리를 편집할 때 보이는 제목, 반복 설정을 조절할 때 보이는 제목, 목표시간을 고를 때 보이는 제목 — 세 곳의 인상이 같은 활자공의 결정 하나로 동시에 변한다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
