@@ -3477,6 +3477,48 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.93 Batch 선생님.C — profile/ 2차 §7.17 2 지점 + §7.30 예외 17 지점 확정
+
+**기간**: 2026-04-23
+**성격**: **2 지점 BLOCK 반영 + 17 지점 §7.30 예외 문서화**.
+**배경**: §7.91-b 로드맵 Batch 선생님.C. profile/ 2차 감사 — 프로필 미리보기·가시성 설정·결제 관리·확장 정보 다이얼로그·레슨 시간 설정·레퍼토리 관리를 포함. 전수 감사 결과 총 **19 지점** = 전환 **2**(10.5%) + 예외 **17**(89.5%). **예상(40%) 대비 큰 폭 하회**.
+
+#### 7.93-a §7.17 승격 2 지점
+
+| 파일 | 라인 | 전환 대상 | 근거 |
+|------|------|-----------|------|
+| screens/outstanding_payments_screen.dart | 48 | `'미수금이 없습니다'` | §7.89 3축 빈 상태: Center + mainAxisAlignment.center + Icon + 단일 헤드라인 |
+| widgets/payment_management/add_payment_sheet.dart | 122 | `'결제 추가'` | 바텀시트 헤더 (§7.27) — Playfair sectionTitle |
+
+#### 7.93-b §7.30 예외 17 지점 — 유형별 집계
+
+| 유형 | 건수 | 파일:라인 |
+|------|------|-----------|
+| #2 개체명 (사용자·학생·작품명) | 6 | profile_visibility_widgets.dart:593(profile.name)/597(비공개 = 개체명 대체), profile_tab.dart:316(name), profile_preview_screen.dart:254(profile.name), repertoire_management_widgets.dart:650(piece.title), payment_detail_sheet.dart:60(studentName) |
+| #3 stat 값 (금액·%·기간) | 7 | profile_tab.dart:602, outstanding_payments_screen.dart:224(formatWonWithComma), extended_profile_widgets.dart:77(`'$percentage%'`), lesson_time_settings_widgets.dart:549(LessonDurations.format), extended_profile_dialogs.dart:33(`'$years년'`)/177(FeeRange.formatted), payment_card.dart:128(formattedAmount) |
+| #4 date (동적 년·월) | 2 | payment_management_screen.dart:244(`'$selectedYear년'`), payment_summary_section.dart:29(`'${month}월 수강료 현황'`) |
+| #6 initial (아바타 첫 글자) | 2 | profile_tab.dart:306, payment_detail_sheet.dart:52 |
+
+#### 7.93 검증
+
+- `flutter analyze lib/features/profile/` → **No issues found** (11.1s)
+- 잔재 grep 재실행: `AppTypography.heading*` 17건 = §7.30 예외 17건 일치. §7.17 후보 0건 확인.
+- NotebookTypography import: outstanding_payments_screen.dart 기존 존재, add_payment_sheet.dart 1 파일 신규 추가.
+
+#### 7.93 관찰
+
+**예상 전환율(40%) 대비 실측(10.5%) 하회**: §7.91-b 로드맵은 profile/ 을 "설정 섹션 §7.17 + 결제 stat §7.30 혼합" 으로 예상했으나, 실제 남은 19 지점은 **이미 §7.17 섹션 헤더는 전부 변환 완료 상태** 였고 잔재는 전부 §7.30 유형에 집중됨. **profile/ 의 Playfair 시그니처는 이전 세션에서 이미 포화** 되었고 §7.93 은 **"섹션 헤더 이후의 내용물"** (프로필 이름·아바타·결제 금액·수강 기간·미수금 상태)을 확인하는 절차.
+
+**"2차 감사" 의 새로운 의미**: profile/ 같은 이미 감사된 도메인의 2차 감사는 **"남은 것은 §7.30"** 이 기본 가설이어야 함. 새 §7.17 발견은 예외(빈 상태·바텀시트 신규 추가) 수준. §7.91-b 로드맵의 "2차" 배치 중 subscription/ · schedule/ · students/ · lessons/ 는 동일한 법칙으로 **전환율 0~20%** 수렴 예상 재확인.
+
+**profile/ 의 3대 §7.30 축 (개체명·stat·날짜)**: parent_home §7.92 와 동일한 구성 — "누구(6) + 얼마(7) + 언제(2) + 이니셜(2)" = 17. 학부모 뷰와 선생님 프로필이 공통적으로 **"사람 정보 + 수치 + 시점"** 조합으로 구성된다는 도메인 패턴이 2 배치로 확증.
+
+**결제 모듈의 §7.30 집중**: 17 예외 중 9건(53%)이 `payment_management/` · `outstanding_payments/` · `payment_detail/` 하위. 금액·이니셜·학생명의 삼중 표시가 결제 UI 의 필수 구성요소. **결제 UI 는 §7.30 전형** 이라는 스타일 가이드 시그널.
+
+**은유**: §7.93 은 **"교사 사무실의 명부와 영수증 더미"** — 표지(이미 Playfair)만 두고 내부 기록(명부의 이름, 영수증의 금액, 일자, 잔고)은 모두 명조체. 결제 추가 시트의 표지 하나와 미수금 '비어 있음' 문구 하나만 추가로 필기체 승격. 나머지 17 지점은 **"책상 위 서류의 본문"** — 빠르게 스캔해야 하는 정보이므로 명조체 유지. 선생님 감사 2 번째 배치 완료, `10.5%` 전환율로 **"2차 감사 = §7.30 집중"** 법칙 확립.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

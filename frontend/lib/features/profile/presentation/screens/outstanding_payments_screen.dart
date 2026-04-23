@@ -43,10 +43,8 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         children: [
           Icon(Icons.check_circle_outline, size: 64, color: AppColors.paperOk),
           const SizedBox(height: AppSpacing.space4),
-          Text(
-            '미수금이 없습니다',
-            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
-          ),
+          // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+          Text('미수금이 없습니다', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '모든 수강료가 수금 완료되었습니다',

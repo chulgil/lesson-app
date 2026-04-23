@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/stat_card.dart';
 import '../../../../../features/lessons/domain/entities/payment.dart';
 
@@ -24,9 +25,11 @@ class PaymentSummarySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Notebook × Score: 월별 수강료 섹션 헤더 Playfair sectionTitle (§7.92-x).
+          // 월 숫자는 1~12 유한 집합 (§7.87-h "동적처럼 보이는 정적 명사") — "수강료 현황" 정적 명사 결합.
           Text(
             '${DateTime.now().month}월 수강료 현황',
-            style: AppTypography.headingMedium,
+            style: NotebookTypography.sectionTitle,
           ),
           const SizedBox(height: AppSpacing.space4),
 
@@ -44,9 +47,10 @@ class PaymentSummarySection extends StatelessWidget {
                 title: '미납',
                 value: summary.formattedTotalPending,
                 subtitle: '${summary.unpaidStudents}명',
-                color: summary.overdueStudents > 0
-                    ? AppColors.paperAccent
-                    : AppColors.paperAccent,
+                color:
+                    summary.overdueStudents > 0
+                        ? AppColors.paperAccent
+                        : AppColors.paperAccent,
                 icon: Icons.pending,
               ),
             ],
@@ -68,10 +72,7 @@ class PaymentSummarySection extends StatelessWidget {
 
 /// Banner showing overdue payment warning.
 class _OverdueWarningBanner extends StatelessWidget {
-  const _OverdueWarningBanner({
-    required this.overdueCount,
-    this.onViewDetails,
-  });
+  const _OverdueWarningBanner({required this.overdueCount, this.onViewDetails});
 
   final int overdueCount;
   final VoidCallback? onViewDetails;
@@ -98,10 +99,7 @@ class _OverdueWarningBanner extends StatelessWidget {
           ),
           const Spacer(),
           if (onViewDetails != null)
-            TextButton(
-              onPressed: onViewDetails,
-              child: const Text('확인하기'),
-            ),
+            TextButton(onPressed: onViewDetails, child: const Text('확인하기')),
         ],
       ),
     );

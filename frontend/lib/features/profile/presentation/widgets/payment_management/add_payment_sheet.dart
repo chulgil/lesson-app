@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/lessons/domain/entities/payment.dart';
 import '../../../../lessons/presentation/providers/payment_providers.dart';
@@ -119,7 +120,8 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('결제 추가', style: AppTypography.headingMedium),
+          // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+          Text('결제 추가', style: NotebookTypography.sectionTitle),
           IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close),
@@ -334,7 +336,9 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
           const SizedBox(width: AppSpacing.space2),
           Text(
             '${_weekEnd - _weekStart + 1}주 · $_lessonCount회 레슨',
-            style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.paperAccent,
+            ),
           ),
         ],
       ),
@@ -585,10 +589,7 @@ class _PaymentTypeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? color.withValues(alpha: 0.1)
-                  : AppColors.paper,
+          color: isSelected ? color.withValues(alpha: 0.1) : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.inkQuaternary,
