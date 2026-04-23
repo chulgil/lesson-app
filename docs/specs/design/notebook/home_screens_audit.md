@@ -75,6 +75,18 @@
 
 ### 2.3 학부모 홈 (`parent_dashboard_tab.dart`)
 
+#### 2.3.1 Phase 4a 수정 후 (2026-04-23, Cycle 28)
+
+| 기준 | 측정 | 점수 | 근거 |
+|------|------|------|------|
+| 섹션 수 | N=8 | 9 | Masthead / ProgrammeTitle / ChildHeader / QuickStats / UpcomingLesson / PracticeStreak / RecentAssignments / PaymentStatus (+ Fine. 푸터) |
+| Notebook 적용 | 4/6 | 6.67 | `NotebookMasthead` · `NotebookTypography.masthead/mastheadLabel/mastheadDate` · `ThinRule` · Playfair italic "Fine." (Roman numerals 미사용 — Phase 4c 대상) |
+| 정보 계층 | 전 섹션 | 10 | "0순위~5순위" 주석 완비 (자녀 정보 → 통계 → 다음 레슨 → 스트릭 → 과제 → 결제) |
+| 색상 일관성 | Colors.white 0건 | 10 | 8건 전부 `AppColors.paper` 치환 완료 (Vermillion 위 브랜드 백색 원칙) |
+| **가중 평균** | | **8.58** | **PASS** — Notebook 4/6 + 색상 0건 + 우선순위 주석 완비 |
+
+#### 2.3.2 Phase 4a 수정 전 (2026-04-22, Cycle 26)
+
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
 | 섹션 수 | N=7 | 10 | AppBar / ChildHeader / QuickStats / UpcomingLesson / PracticeStreak / RecentAssignments / PaymentStatus |
@@ -85,26 +97,32 @@
 
 ## 3. 판정 요약
 
+**현재 상태 (2026-04-23, Cycle 28 완료 기준)**: 세 홈 모두 PASS.
+
 ```
          ┌────────────────────────────────────────────────────┐
-    10   │                                   ╱╲               │
-         │                                  ╱  ╲    선생님     │
-     9   │                                 ╱    ●  9.5 PASS   │
-         │                                ╱                    │
-     8   │                               ╱                     │
-         │                              ╱                      │
-     7   │                             ╱                       │
-         │                        학생 ●                       │
-     6   │                            ╱ 5.75 FLAG              │
-         │                           ╱                         │
-     5   │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ╱ ─ ─ ─ ─ ─ ─ ─ ─ ─ BLOCK ─│
-         │                        ╱                            │
-     4   │                 학부모 ● 4.3                         │
-         │                       ╱                             │
-     3   │                      ╱                              │
+    10   │                                                     │
+         │       선생님 9.5                                    │
+     9   │       ●─────────────●  학부모 8.58                 │
+         │                     ╲                               │
+     8   │                      ●  학생 8.59                  │
+         │                                                     │
+     7   │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ PASS ─ ─ ─│
+         │                                                     │
+     6   │                                                     │
+         │                                                     │
+     5   │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ BLOCK ─ ─ │
+         │                                                     │
+     4   │     (과거) 학부모 4.3 → 8.58 해소                   │
+         │                                                     │
+     3   │                                                     │
          └────────────────────────────────────────────────────┘
-              색상      Notebook    정보계층   섹션수
 ```
+
+**변화 궤적**:
+- 선생님: 9.5 PASS (변화 없음, 레퍼런스)
+- 학생: 5.75 FLAG → 8.59 PASS (Cycle 27)
+- 학부모: 4.30 BLOCK → 8.58 PASS (Cycle 28)
 
 ## 4. BLOCK 상세 — 학부모 홈 (4.3점)
 
@@ -172,14 +190,16 @@
 
 ## 7. 권장 수정 목록
 
-### 7.1 Phase 4a — BLOCK 해소 (학부모 홈)
+### 7.1 Phase 4a — BLOCK 해소 (학부모 홈) ✅ DONE (2026-04-23, Cycle 28 · fd564014)
 
-| 우선 | 항목 | 예상 파일 | 영향 |
+| 우선 | 항목 | 예상 파일 | 상태 |
 |------|------|-----------|------|
-| 1 | `AppBar` → `NotebookMasthead` 교체 | parent_dashboard_tab.dart | line 46-58 |
-| 2 | `Colors.white` 8건 → `AppColors.paper` 치환 | parent_dashboard_tab.dart | line 172, 262, 335, 348, 366, 391, 397, 583 |
-| 3 | 섹션 우선순위 주석 추가 (0~6순위) | parent_dashboard_tab.dart | line 78, 84, 94, 104, 114, 124 |
-| 4 | "Fine." footer 추가 | parent_dashboard_tab.dart | line 131 직후 |
+| 1 | `AppBar` → `NotebookMasthead` + Programme Title 교체 | parent_dashboard_tab.dart | DONE |
+| 2 | `Colors.white` 8건 → `AppColors.paper` 치환 | parent_dashboard_tab.dart | DONE |
+| 3 | 섹션 우선순위 주석 추가 (0~5순위) | parent_dashboard_tab.dart | DONE |
+| 4 | "Fine." footer 추가 | parent_dashboard_tab.dart | DONE |
+
+**결과**: BLOCK 4.30 → PASS 8.58 (+4.28)
 
 ### 7.2 Phase 4b — FLAG 해소 (학생 홈) ✅ DONE (2026-04-23, Cycle 27 · 1b5b3265)
 

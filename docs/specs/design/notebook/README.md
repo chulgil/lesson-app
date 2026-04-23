@@ -2003,6 +2003,42 @@ flutter analyze \
 
 **은유**: 서로 다른 장부가 나란히 책상에 놓여 있었다 — 한 장부는 학부모의 주간 점검표, 다른 장부는 선생님의 학습 자료 서랍. 두 장부의 표지는 다르지만 **인쇄 기계는 같다**. 오늘의 작업은 새로 찍어낸 활자(Playfair)를 두 장부에 동시에 얹는 일이었다. 그 사이 옆 책상에서 다른 편집자(병행 세션)가 내 활자판에 손을 대려던 찰나가 있었지만, 빠르게 인쇄기로 밀어넣으면서(`add && commit` chain) 활자를 지켜냈다. 편집실에서는 속도가 때로 논리보다 중요한 순간이 있다.
 
+### 7.61 학부모 대시보드 Notebook × Score 정리 — home_screens_audit §2.3 BLOCK 해소 (Phase 4a)
+
+**배경**: `home_screens_audit.md` Cycle 26 감사에서 학부모 홈이 **BLOCK 4.30** 판정. 선생님 9.5 / 학생 5.75 와 극단적 불균형 — Material `AppBar('학부모 홈')` + Notebook 시그니처 0/6 + Colors.white 8건 + 우선순위 주석 부재. Cycle 27 (학생 FLAG → PASS 8.59) 완료 후 남은 마지막 블로커.
+
+**수정 파일 (1)**: `frontend/lib/features/parent_home/presentation/screens/parent_dashboard_tab.dart` (+184/−82)
+
+**변경 요약**:
+
+| 항목 | Before | After |
+|------|--------|-------|
+| 헤더 스캐폴드 | `Scaffold + AppBar(title: '학부모 홈', actions: [swap_horiz])` | `ColoredBox(paper) + SafeArea + NotebookMasthead('LESSONAZA', meta: VOL/NO, trailing: swap_horiz IconButton)` |
+| Programme Title | 없음 | `'Programme for $dayLabel'` + `'$name의 레슨'` + `'$month月 $day日 · $instrument'` + ThinRule |
+| 정보 계층 주석 | 섹션명만 | 0~5순위 주석 (자녀 정보 → 통계 → 다음 레슨 → 스트릭 → 과제 → 결제) |
+| Fine. 푸터 | 없음 | ThinRule + Playfair italic "Fine." |
+| Colors.white | 8건 (line 172, 262, 335, 348, 366, 391, 397, 583) | `AppColors.paper` 8건 치환 (replace_all) |
+
+**Notebook 시그니처 적용**: 4/6 — `NotebookMasthead` ×1, `NotebookTypography.masthead/mastheadLabel/mastheadDate` ×4, `ThinRule` ×2, Playfair italic "Fine." ×1. Roman numerals 는 Phase 4c 대상으로 보류.
+
+**검증**:
+
+```bash
+flutter analyze lib/features/parent_home/presentation/screens/parent_dashboard_tab.dart
+# No issues found! (ran in 7.4s)
+```
+
+**점수 변화**: `home_screens_audit.md §2.3` BLOCK 4.30 → PASS 8.58 (+4.28). 세 홈 모두 PASS 달성:
+- 선생님 9.5 / 학생 8.59 / 학부모 8.58
+
+**결정 근거**:
+1. **AppBar 제거 우선순위 최상단**: 홈 화면 통일성의 핵심은 상단 스캐폴드. AppBar 잔존 시 "같은 앱인가?" 인지 부조화 유발.
+2. **Colors.white → paper 일괄 치환**: Vermillion 다크 히어로 위 foreground 는 원래부터 "브랜드 백색"(AppColors.paper)의 의미. Material 기본 색은 의미 누락.
+3. **Roman numerals 보류**: 자녀 전환 UI 복잡성(조건부 다중 자녀 선택) + 섹션 인덱스 가산은 별도 검토. Phase 4c 에 회송.
+4. **커밋 분리**: 코드(`fd564014`) + 문서(후속) 분리 — 병행 세션과의 파일 충돌 방지. Cycle 28 개시 시 파일 3건 우발 스테이징 → 재 커밋 사이클 학습.
+
+**은유**: 학부모 장부의 표지가 드디어 같은 활자공의 손에서 찍혔다. 전에는 학부모 장부만 다른 인쇄소의 조판 — 같은 책장에 꽂혀 있어도 시리즈 의혹을 불러일으켰다. 이제 세 장부(선생님·학생·학부모) 가 같은 활자판, 같은 잉크, 같은 종이결. 독자는 표지를 보고 "같은 시리즈" 를 망설임 없이 확인한다. 활자의 일체감은 읽기의 속도를 늘리고, 의심을 줄인다 — **통일은 주의를 해방시킨다**.
+
 ---
 
 ## 8. 구현 원칙
