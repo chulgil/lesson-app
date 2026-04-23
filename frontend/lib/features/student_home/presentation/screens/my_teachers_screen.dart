@@ -7,6 +7,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
@@ -56,9 +57,13 @@ class MyTeachersScreen extends ConsumerWidget {
           children: [
             Icon(Icons.verified, size: 18, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
+            // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
+            // (§7.17). '앱 선생님' 은 정적 그룹 헤더.
             Text(
               '앱 선생님',
-              style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
+              style: NotebookTypography.sectionTitle.copyWith(
+                color: AppColors.ink,
+              ),
             ),
           ],
         ),
@@ -166,9 +171,11 @@ class MyTeachersScreen extends ConsumerWidget {
             Icon(Icons.person_add_outlined, size: 18, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
+              // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
+              // (§7.17). '직접 등록한 선생님' 은 정적 그룹 헤더.
               child: Text(
                 '직접 등록한 선생님',
-                style: AppTypography.headingSmall.copyWith(
+                style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.ink,
                 ),
               ),
