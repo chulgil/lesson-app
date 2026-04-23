@@ -6,7 +6,9 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../../features/home/presentation/widgets/lesson_request_section.dart';
 import '../../../../features/home/presentation/widgets/time_context_banner.dart';
@@ -17,9 +19,9 @@ import '../../../gamification/presentation/widgets/gamification_header.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
 import '../widgets/dashboard/dashboard_widgets.dart';
+import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
 import '../widgets/student_subscription_summary.dart';
-import '../widgets/trial_bookings_section.dart';
 
 /// Student Dashboard Tab - main home tab showing overview
 class StudentDashboardTab extends ConsumerWidget {
@@ -35,44 +37,13 @@ class StudentDashboardTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    formatDateMDWithDayLong(now),
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    AppStrings.studentHomeGreeting,
-                    style: AppTypography.headingLarge,
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.push(AppRoutes.invite),
-                    icon: const Icon(Icons.person_add_outlined),
-                    tooltip: AppStrings.inviteTeacher,
-                  ),
-                  IconButton(
-                    onPressed: () => context.push(AppRoutes.notifications),
-                    icon: const Icon(Icons.notifications_outlined),
-                    tooltip: AppStrings.notifications,
-                  ),
-                ],
-              ),
-            ],
-          ),
+          // ── Masthead: Playfair eyebrow + 친구초대/알림 아이콘 ──
+          _buildMasthead(context),
 
-          const SizedBox(height: AppSpacing.space4),
+          // ── Programme Title: 오늘의 연습 + 인사 ──
+          _buildProgrammeTitle(context, now),
+
+          const SizedBox(height: AppSpacing.space5),
 
           // ── 0순위: 시간대 인식 배너 (student_home_master.md §2.2) ──
           _StudentTimeBanner(studentId: currentStudentId),
@@ -115,21 +86,131 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // ── 4순위: 선생님 피드백 (학생 관심사, 상단 이동) ──
-          TeacherFeedbackSection(studentId: currentStudentId),
+          // ── 4순위: 학습 기록 그룹 (피드백 + 연습요약 + 체험) ──
+          LearningRecordGroup(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space5),
+
+          // ── Fine. 페이지 종지부 ──
+          _buildFineFooter(context),
 
           const SizedBox(height: AppSpacing.space4),
-
-          // ── 5순위: 연습 요약 ──
-          PracticeSummarySection(studentId: currentStudentId),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // ── 6순위: 체험 레슨 (하단 이동) ──
-          TrialBookingsSection(studentId: currentStudentId),
         ],
       ),
     );
+  }
+
+  /// Masthead — Notebook × Score 상단 헤더.
+  /// 좌측: "LESSONAZA" (Playfair eyebrow)
+  /// 우측: 친구초대 + 알림 아이콘
+  Widget _buildMasthead(BuildContext context) {
+    return NotebookMasthead(
+      eyebrow: 'LESSONAZA',
+      meta: 'VOL. ${DateTime.now().month} · NO. ${DateTime.now().day}',
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () => context.push(AppRoutes.invite),
+            icon: const Icon(
+              Icons.person_add_outlined,
+              color: AppColors.ink,
+              size: 22,
+            ),
+            tooltip: AppStrings.inviteTeacher,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            onPressed: () => context.push(AppRoutes.notifications),
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.ink,
+              size: 22,
+            ),
+            tooltip: AppStrings.notifications,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Programme Title — "Programme for Thursday" + "오늘의 연습" + 날짜·인사.
+  Widget _buildProgrammeTitle(BuildContext context, DateTime now) {
+    final dayLabel = _englishWeekday(now.weekday);
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Programme for $dayLabel',
+            style: NotebookTypography.mastheadLabel,
+          ),
+          const SizedBox(height: 4),
+          Text('오늘의 연습', style: NotebookTypography.masthead),
+          const SizedBox(height: 6),
+          Text(
+            '${now.month}月 ${now.day}日  ·  ${AppStrings.studentHomeGreeting}',
+            style: NotebookTypography.mastheadDate,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          const ThinRule(),
+        ],
+      ),
+    );
+  }
+
+  /// "Fine." 푸터 — 악보 종지부 인용 + 연습 기록 링크.
+  Widget _buildFineFooter(BuildContext context) {
+    return Column(
+      children: [
+        const ThinRule(),
+        const SizedBox(height: AppSpacing.space3),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text('Fine.', style: NotebookTypography.fine),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () => context.push(AppRoutes.practice),
+              icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
+              label: Text(
+                '연습 기록 더보기',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  static const _englishWeekdays = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
+  String _englishWeekday(int weekday) {
+    final idx = (weekday - 1).clamp(0, 6);
+    return _englishWeekdays[idx];
   }
 }
 
