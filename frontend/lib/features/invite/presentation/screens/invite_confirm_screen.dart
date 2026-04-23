@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
@@ -79,9 +80,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.space6),
+          // Notebook × Score: 연결 실패 상태 헤드라인 Playfair sectionTitle (§7.89).
           Text(
             '연결할 수 없습니다',
-            style: AppTypography.headingSmall,
+            style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -126,10 +128,12 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Title
+          // Title — Notebook × Score: 고정 구조 섹션 헤더는 Playfair sectionTitle
+          // (§7.17 / §7.87-h). creatorRoleLabel은 enum 라벨(선생님/학생)로
+          // 유한 집합이므로 §7.30 예외 아님.
           Text(
             '$creatorRoleLabel과 연결하기',
-            style: AppTypography.headingMedium,
+            style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
 
@@ -388,9 +392,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   child: Icon(Icons.link, size: 48, color: AppColors.ink),
                 ),
                 const SizedBox(height: AppSpacing.space4),
+                // Notebook × Score: 중복 연결 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
                 Text(
                   '이미 연결되어 있습니다',
-                  style: AppTypography.headingSmall,
+                  style: NotebookTypography.sectionTitle,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.space2),
@@ -463,9 +468,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
+                // Notebook × Score: 연결 성공 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
                 Text(
                   '연결 요청이 전송되었습니다!',
-                  style: AppTypography.headingSmall,
+                  style: NotebookTypography.sectionTitle,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.space2),
