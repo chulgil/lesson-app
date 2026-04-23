@@ -2584,6 +2584,50 @@ flutter analyze <17 files>
 
 ---
 
+### 7.76 invite/ 도움말 모달 제목 Playfair 통일 — 상태 전이 피드백 도메인 §7.27 배치 #1
+
+**배경**: subscription/screens §7.70, schedule/screens §7.71, schedule/widgets §7.73 의 패턴을 잇는 다음 도메인 감사. `features/invite/` 전수 탐색 결과 `AppTypography.headingSmall` 이 8건 발견되었으나, **7/8 은 §7.30 제외 대상**(상태 아이콘 + status 텍스트 조합 or avatar initial or empty state)이고 오직 **1건만 구조적 모달 시트 타이틀**이었다. 전환율 12.5% — 지금까지 도메인 중 **최저치**.
+
+| 파일 | 라인 | 텍스트/패턴 | 변경 |
+|---|---:|---|---|
+| my_connections_screen.dart | 145 | `'선생님과 연결하는 방법'` (BottomSheetHandle + 제목 조합) | §7.27 → appBarTitle |
+
+**수량**: 1 code-line edit (+ 1 import) → 1 Playfair 승격.
+
+**§7.30 제외 7건** — 의도적 Gothic 유지:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| pending_requests_screen:237 | `requesterName[0]` | avatar initial |
+| my_connections_screen:550 | `name[0]` | avatar initial |
+| invite_history_screen:81 | `'생성한 초대가 없습니다'` (history_rounded icon) | empty-state headline |
+| my_connections_screen:104 | `'아직 연결된 X이 없습니다'` (people_outline icon) | empty-state headline |
+| invite_confirm_screen:84 | `'연결할 수 없습니다'` (warning icon) | error headline with icon |
+| invite_confirm_screen:393 | `'이미 연결되어 있습니다'` (link icon) | status headline with icon |
+| invite_confirm_screen:468 | `'연결 요청이 전송되었습니다!'` (check_circle icon) | success headline with icon |
+
+**도메인 관찰**: invite/ 는 **상태 전이 피드백** 도메인이다 — 초대 생성, 연결 요청, 수락/거절, 이미 연결됨, 전송됨 등 "전/후 상태 차이"를 사용자에게 알리는 화면이 지배적이다. 이러한 상태 알림은 반드시 **아이콘 + 제목 + 본문** 삼중 구조를 갖는데, 아이콘이 이미 "상태의 얼굴"이므로 제목은 §7.30 exclusion 카테고리(status-with-icon)에 해당한다. Playfair 는 **대상을 호명**하는 타이포(선생님·학생·레슨·수강권 등 명사)에 어울리지, **상태를 선포**하는 타이포(성공·실패·연결됨·전송됨 등 이벤트)에는 맞지 않는다.
+
+**전환율 비교** (누적 추세):
+
+| 도메인 | heading 발견 | §7.27/§7.17 변환 | §7.30 제외 | 전환율 |
+|---|---:|---:|---:|---:|
+| subscription/screens (§7.68+§7.70) | 25건 | 14건 | 11건 | 56% |
+| schedule/screens (§7.71) | 9건 | 2건 | 7건 | 22% |
+| schedule/widgets (§7.73) | 19건 | 1건 | 9건 (+9 parallel) | ~10% |
+| **invite/ (§7.76)** | **8건** | **1건** | **7건** | **12.5%** |
+
+**왜 낮은가?** invite/ 는 "명사 호명"보다 "동사 선포"가 더 많은 구조를 갖는다. 유사하게 낮은 schedule/widgets 는 "동적 시간대/이름 조합" 이 지배적이고, invite/ 는 "성공/실패 이벤트 피드백"이 지배적이다. **전환율은 도메인의 본질(명사형 vs 이벤트형)을 측정하는 지표**로 활용 가능.
+
+**커밋**: `0b8e0704` style(invite): Notebook × Score §7.27 배치 #1
+**검증**: `flutter analyze` invite/ 1 file → No issues found! (ran in 3.9s)
+
+**다음 후보**: profile/ 도메인(repertoire/payment 등 명사 호명 비중 높음, 전환율 예측 40%+), settings/ 도메인(섹션 제목 중심, 전환율 예측 50%+), 또는 search/ 도메인(teacher/academy 상세 — 부분적으로 parallel-contested).
+
+**은유**: §7.76 은 **우체통의 표지판**을 바꾸는 일에 가까웠다. 편지 자체(상태 메시지)는 이미 아이콘이라는 **그림 편지봉투**에 담겨 있어서, 그 위에 또 Playfair 라벨을 붙이면 "이중 서명"이 된다. 그래서 우리가 바꾼 건 우체통 **상단 안내판** 하나 — "선생님과 연결하는 방법". 이 안내판은 편지의 내용이 아니라, **우체통 자체의 이름**이다. Notebook × Score 의 Playfair 는 이런 **"공간의 이름"** 에 붙는 것이지, **"공간 안의 사건"** 에 붙는 것이 아니다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
