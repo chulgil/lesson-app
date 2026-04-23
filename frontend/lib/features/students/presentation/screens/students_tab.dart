@@ -381,7 +381,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('연습상태로 필터', style: AppTypography.headingSmall),
+                  // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
+                  // (§7.27). '연습상태로 필터' 는 정적 명사 헤더.
+                  Text('연습상태로 필터', style: NotebookTypography.appBarTitle),
                   const SizedBox(height: AppSpacing.space3),
                   ...StudentFilter.values.map((filter) {
                     final isSelected = _currentFilter == filter;
@@ -466,7 +468,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.space4),
-                  child: Text('정렬 기준', style: AppTypography.headingSmall),
+                  // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
+                  // (§7.27). '정렬 기준' 은 정적 명사 헤더.
+                  child: Text('정렬 기준', style: NotebookTypography.appBarTitle),
                 ),
                 ...StudentSortOption.values.map((option) {
                   final isSelected = _sortOption == option;
