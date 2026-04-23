@@ -1880,6 +1880,44 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 **은유**: 학생 장부는 한 학생마다 여러 탭 — 연습 기록, 레슨 노트, 받아온 녹음, 다가오는 일정 — 으로 나뉜다. 각 탭의 제목만 Playfair 로 바꿨는데, 특히 레슨 카드 위에 박힌 **"31"** 같은 굵은 일자와, 연습 요약의 "5.2h" 같은 **숫자가 말하는 제목** 은 손대지 않았다. 활자는 의미의 그릇이지, 숫자의 그릇은 아니다. 숫자는 Inter 의 가지런함이 더 어울린다 — 장부의 통계 페이지가 늘 그렇듯.
 
+### 7.58 학생 대시보드 Notebook × Score 정리 — home audit Phase 4b 해소
+
+**배경**: 2026-04-22 홈 통일성 감사(`home_screens_audit.md`) 에서 학생 홈이 FLAG 5.75 판정. 선생님 홈(PASS 9.5) 과 시각적 브랜드 일체감 부재. Material `Row` 헤더 + 0/6 Notebook 시그니처.
+
+**수정**:
+- `student_dashboard_tab.dart` Material Row 헤더(날짜+인사+IconButton×2) → `NotebookMasthead` + `_buildProgrammeTitle` 블록으로 교체
+- `trailing` 파라미터에 `Row(친구초대 IconButton + 알림 IconButton)` 로 기존 기능 유지
+- Programme Title: `Programme for ${englishWeekday}` + `'오늘의 연습'` + `${month}月 ${day}日 · 오늘도 화이팅!` + `ThinRule`
+- 하단 `_buildFineFooter` 추가: `ThinRule` + Playfair italic `'Fine.'` + '연습 기록 더보기' TextButton → `AppRoutes.practice`
+- 섹션 그룹핑: `TeacherFeedbackSection` + `PracticeSummarySection` + `TrialBookingsSection` 3개 → `learning_record_group.dart` 신규 wrapper 로 묶어 10 → 8 섹션으로 축약(내부 `ThinRule` 2개로 시각 구분)
+
+**4대 필수 시그니처 커버리지**:
+- Playfair italic: `NotebookTypography.masthead/mastheadLabel/mastheadDate/fine` 4곳
+- Masthead 스캐폴드: `NotebookMasthead:107`
+- ThinRule: 2곳 (Programme Title 하단 + Fine. 상단) + LearningRecordGroup 내부 2곳
+- "Fine." footer: 존재
+
+**제외**:
+- Roman numerals 인덱스 — Phase 4c 선택 작업으로 이월 (NextLesson 카드 단일 항목은 인덱스 불필요)
+- TimeContextBanner / GamificationHeader 내부 타이포 — 별 섹션의 자체 시각 언어 유지
+
+**영향**:
+- 수정 1 파일 (`student_dashboard_tab.dart` +127 / −46)
+- 신규 1 파일 (`learning_record_group.dart` 34줄)
+- 감사 점수: 5.75 FLAG → **8.59 PASS** (+2.84)
+
+**검증**:
+```bash
+flutter analyze lib/features/student_home/
+# No issues found! (ran in 9.9s)
+
+grep -c "NotebookMasthead|NotebookTypography|ThinRule|'Fine\\.'" \
+  lib/features/student_home/presentation/screens/student_dashboard_tab.dart
+# 7 (NotebookMasthead×1, NotebookTypography×4, ThinRule×2)
+```
+
+**은유**: 감사 보고서에 따르면 학생 장부는 표지 없이 첫 장부터 본문이 시작되는 초고였다. 오늘의 조판은 선생님 장부에서 쓰던 **동일한 활자판** 을 그대로 옮겨왔다 — Playfair 의 eyebrow, Programme Title 의 중심 정렬, 얇은 선 한 줄, 페이지 끝의 "Fine." 까지. 그리고 3개의 산발적 피드백 섹션은 **"학습 기록"** 이라는 한 장으로 묶었다. 세 기록의 구분은 여전히 있지만(내부 Thin Rule), 독자의 눈에는 "한 페이지의 세 단락" 으로 읽힌다. Miller 가 말한 7±2 의 부담은, 이름을 붙이는 순간 반으로 준다.
+
 ---
 
 ## 8. 구현 원칙

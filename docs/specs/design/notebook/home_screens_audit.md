@@ -53,6 +53,18 @@
 
 ### 2.2 학생 홈 (`student_dashboard_tab.dart`)
 
+#### 2.2.1 Phase 4b 수정 후 (2026-04-23, Cycle 27)
+
+| 기준 | 측정 | 점수 | 근거 |
+|------|------|------|------|
+| 섹션 수 | N=8 | 9 | Masthead+ProgrammeTitle / TimeBanner / Gamification / GettingStarted / NextLesson / Subscription / EventsGroup / LearningRecordGroup / Fine. |
+| Notebook 적용 | 4/6 | 6.7 | `NotebookMasthead:107` · `NotebookTypography.masthead/mastheadLabel/mastheadDate/fine:151,154,158,179` · `ThinRule:163,173` · "Fine." footer:179 / (Playfair·Roman 미적용은 선택) |
+| 정보 계층 | 전 섹션 | 10 | "0순위~4순위" + "학습 기록 그룹" 주석 유지 |
+| 색상 일관성 | Colors.* 0건 | 10 | AppColors 토큰만 사용 |
+| **가중 평균** | | **8.59** | **PASS** — Phase 4b 적용으로 FLAG 해소 |
+
+#### 2.2.2 Phase 4b 수정 전 (2026-04-22, Cycle 26)
+
 | 기준 | 측정 | 점수 | 근거 |
 |------|------|------|------|
 | 섹션 수 | N=10 | 7 | Header(날짜+인사+Action2) / TimeBanner / Gamification / GettingStarted / NextLesson / Subscription / EventsGroup / Feedback / PracticeSummary / Trial |
@@ -169,13 +181,15 @@
 | 3 | 섹션 우선순위 주석 추가 (0~6순위) | parent_dashboard_tab.dart | line 78, 84, 94, 104, 114, 124 |
 | 4 | "Fine." footer 추가 | parent_dashboard_tab.dart | line 131 직후 |
 
-### 7.2 Phase 4b — FLAG 해소 (학생 홈)
+### 7.2 Phase 4b — FLAG 해소 (학생 홈) ✅ DONE (2026-04-23, Cycle 27 · 1b5b3265)
 
-| 우선 | 항목 | 예상 파일 | 영향 |
+| 우선 | 항목 | 예상 파일 | 상태 |
 |------|------|-----------|------|
-| 1 | Material 헤더 → `NotebookMasthead` + `Programme Title` 블록 | student_dashboard_tab.dart | line 38-73 교체 |
-| 2 | "Fine." footer 추가 | student_dashboard_tab.dart | line 129 직후 |
-| 3 | 섹션 그룹핑 (Feedback+PracticeSummary+Trial → 1개) | student_dashboard_tab.dart + 새 wrapper 위젯 | 예상 신규 1 파일 + 수정 1 파일 |
+| 1 | Material 헤더 → `NotebookMasthead` + `Programme Title` 블록 | student_dashboard_tab.dart line 97-165 | DONE |
+| 2 | "Fine." footer 추가 | student_dashboard_tab.dart line 170-204 | DONE |
+| 3 | 섹션 그룹핑 (Feedback+PracticeSummary+Trial → 1개) | `learning_record_group.dart` 신규 + screens 수정 | DONE |
+
+**결과**: FLAG 5.75 → PASS 8.59 (+2.84)
 
 ### 7.3 Phase 4c — 일관성 강화 (선택)
 
