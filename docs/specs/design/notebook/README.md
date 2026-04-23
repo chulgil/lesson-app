@@ -3558,6 +3558,45 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.95 Batch 선생님.G — students/ 2차 §7.30 수렴 6/6 (100%) 확정
+
+**기간**: 2026-04-23
+**성격**: **0 지점 BLOCK + 6 지점 §7.30 예외 문서화**. 코드 변경 없음, 문서화만.
+**배경**: §7.91-b 로드맵 Batch 선생님.G. students/ 2차 감사 — §7.86 커밋에서 학생 form §7.50 + §7.17 스윕 완료 상태. 남은 잔재는 **학생명·초대코드·stat·레슨 일자** 로 §7.30 예외에 수렴. 전수 감사 결과 총 **6 지점** = 전환 **0**(0%) + 예외 **6**(100%).
+
+#### 7.95-a §7.17 승격 0 지점
+
+추가로 전환할 섹션 헤더 없음. `students/` 의 Playfair 후보(탭 헤더 · 학생 상세 섹션 헤드라인) 는 §7.86 이전 배치에서 처리 완료.
+
+#### 7.95-b §7.30 예외 6 지점 — 유형별 집계
+
+| 유형 | 건수 | 파일:라인 | 내용 |
+|------|------|-----------|------|
+| #2 개체명 (학생명) | 1 | screens/student_detail_screen.dart:277 | `student.name` — 학생 상세 히어로 섹션 이름 |
+| #10 코드 (초대코드 자리수) | 1 | screens/student_detail_screen.dart:767 | `digit` — `inviteCode.split('')` 6자리 숫자 개별 렌더 |
+| #3 stat 값 (선택 개수·연습·통계) | 3 | screens/students_tab.dart:155, widgets/student_detail/student_practice_tab.dart:142, widgets/student_detail/student_stats_cards.dart:72 | `${_selectedStudentIds.length}명 선택됨`, 연습 stat `value`, 학생 stat 카드 `value` |
+| #4 date (레슨 일자) | 1 | widgets/student_detail/student_lesson_card.dart:65 | `${lesson.date.day}` — 레슨 카드 일자 숫자 |
+
+#### 7.95 검증
+
+- `flutter analyze lib/features/students/` → **No issues found**
+- 잔재 grep 재실행: `AppTypography.heading*` 6건 = §7.30 예외 6건 일치. §7.17 후보 0건 확인.
+- 코드 편집 없음. README 전용 배치.
+
+#### 7.95 관찰
+
+**"2차 감사 법칙" 6번째 확증**: §7.93~§7.94 에서 확립한 **"이미 감사된 도메인의 2차 감사 = 0~20%"** 법칙이 students/ 에서 **0%** 로 하한 일치. lessons/ 에 이은 **두 번째 연속 0% 샘플**. §7.86 §7.50 스윕이 §7.17 후보를 이미 모두 흡수했음을 간접 확인.
+
+**#10 초대코드 신규 등장**: students/ 배치에서 처음으로 **§7.30 #10 "코드"** 패턴이 실제 코드에 확인됨(`digit` per-character render). 이는 §7.84 10-패턴 자동 판정에서 #10 을 별도 축으로 둔 근거를 실증 — **"개체명·stat·날짜·이니셜"** 4축에 이어 **"코드"** 가 5축으로 독립.
+
+**§7.91-b 로드맵 예측 정확도 (2연속)**: 로드맵에서 students/ 2차를 "6건 / 0~20%" 로 지정 → 실측 **6건 / 0%**. lessons/ 에 이은 두 번째 완벽 일치. §7.84 10-패턴 자동 판정의 **"파일 Read 없이도 이니셜·stat·코드 혼합 도메인은 0% 수렴"** 가설이 안정화.
+
+**students/ 의 5축 분포 (개체명·코드·stat·날짜)**: 6 예외 중 §7.30 축이 **4종**(#2 개체명·#10 코드·#3 stat·#4 date) 분산 분포 — lessons/ 의 3축(#6 이니셜·#3 stat·기호) 대비 **축 다양성이 더 넓음**. 이는 students/ 가 **"학생 + 레슨 + 초대 + 연습"** 이라는 4 도메인의 교차점에 위치한 도메인 특성에서 기인.
+
+**은유**: §7.95 는 **"학생 프로필 카드 6장"** — 이름표(개체명), 초대장의 인증번호(코드), 출석 카운터(stat), 달력 일자(date) 네 가지가 한 카드 안에 다 들어있는 구조. 카드 뒷면의 표제(§7.17)는 이미 필기체로 정리되었고, 앞면의 데이터(§7.30)는 전부 명조체 유지. 선생님 감사 8 배치 중 **"작은 배치 2연속 0% 수렴"** 패턴이 확립 — 남은 D(schedule 30) · E(subscription 19) · F(practice 28) 대형 배치에서도 동일 법칙이 성립하는지가 다음 검증 포인트.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
