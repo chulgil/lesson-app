@@ -2143,6 +2143,41 @@ flutter analyze lib/features/parent_home/presentation/widgets/section_card.dart 
 
 **은유**: 다섯 개의 작은 방(sheet, dialog) 이 각기 다른 문패를 달고 있었다 — 하나는 맨손 글씨, 하나는 인쇄 서체, 하나는 굵은 고딕. 같은 건물 안인데 방마다 다른 서체가 붙어 있으니 방문자는 각 방에 들어설 때마다 "여기는 다른 곳인가?" 의심한다. 오늘 다섯 방 문패가 모두 같은 활자공의 Playfair 로 교체되었다. 방은 여전히 다섯 개지만 건물은 하나로 느껴진다 — **시트와 다이얼로그도 같은 책의 접지(折紙)**, 펼치는 방식만 다를 뿐.
 
+### 7.65 Colors.black 그림자 → AppColors.ink 팔레트 통일 (17 files 일괄)
+
+**배경**: Cycle 25 에서 `grep -rn "Colors\.black"` 검색을 통해 `BoxShadow(color: Colors.black.withValues(alpha: 0.05~0.1))` 패턴이 17개 파일에 퍼져 있음을 식별. Notebook 팔레트 원칙(`AppColors.ink` = #14161C) 과 Material Default 팔레트(`Colors.black` = #000000) 의 혼재 — alpha 0.05 기준 시각적 차이는 거의 없지만 **토큰 레이어 분리 부재**가 디자인 시스템 감사 도구를 무력화. Cycle 25 ~ 29 간 home_screens_audit 후속 작업에 밀려 uncommitted 로 누적되었다가 Cycle 30 에 일괄 해소.
+
+**수정 파일 (17, 도메인별 묶음)**:
+
+| 도메인 | 파일 수 | 대표 파일 |
+|--------|---------|----------|
+| practice (tuner) | 1 | `tuner_cat_widgets.dart` |
+| profile | 3 | `profile_tab.dart` / `payment_card.dart` / `repertoire_management_widgets.dart` |
+| schedule (screens + widgets) | 7 | `schedule_tab.dart` / `booking_reschedule_screen.dart` / `availability_booking_preview.dart` 등 |
+| search | 2 | `academy_detail_screen.dart` / `teacher_search_filter_sheet.dart` |
+| students | 2 | `students_tab.dart` / `student_detail_screen.dart` |
+| subscription | 2 | `proposal_detail_screen.dart` / `renewal_detail_screen.dart` |
+
+**치환 패턴**: `Colors.black.withValues(alpha: X)` → `AppColors.ink.withValues(alpha: X)` (23건 전부 alpha 0.05 ~ 0.1).
+
+**보존 결정**:
+
+1. **`Colors.white` 는 치환하지 않음**: 일부 파일에 `isSelected ? Colors.white : AppColors.ink` 같은 selected-state foreground 가 있다. 이건 Vermillion 다크 히어로가 아닌 일반 Material selected state — 기존 Notebook § 규약(§7.50 Vermillion 위 foreground 만 paper) 상 보존 대상.
+2. **dart format 재배치 동반**: post-edit hook (`.claude/scripts/post-edit-check.sh`) 이 자동 실행한 공백·줄바꿈 정리. Colors.black 치환 23건 외 나머지 diff 는 포매터 결과 — 기능적 무해.
+
+**검증**:
+
+```bash
+flutter analyze <17 files>
+# Analyzing 17 items... No issues found! (3.3s + 6.7s, 두 배치)
+```
+
+**커밋**: `5bd7cf52 style(notebook): Colors.black 그림자 → AppColors.ink 팔레트 통일 (17 files)`
+
+**범위 챌린지 반성**: Cycle 25 에서 17 파일 한 번에 수정 완료 후 커밋 타이밍을 놓쳐 4~5 Cycle 간 working tree 에 누적. 다음부터는 **같은 세션에서 변경-커밋 사이클을 닫지 않으면 working tree 가 압축(compaction) 직전 잠재 쓰레기** 가 된다는 교훈. `.claude/rules/workflow.md` 의 "작업 완료 체크리스트" 에 "변경 후 세션 내 커밋" 항목 추가 검토.
+
+**은유**: 건물 17채의 그림자 색이 다 다른 게 아니라, 사실 거의 같은 검정이었다 — 그러나 페인트 통은 세 통이었다. 오늘의 작업은 "색이 다르지 않으니 되지 않느냐" 가 아니라 "**같은 통에서 찍자**" 를 택했다. 감사자(디자인 감사 도구) 는 페인트 통의 이름표를 읽지 색을 보지 않기 때문이다. 같은 통에서 찍힌 그림자는 같은 표식(`AppColors.ink`) 으로 감사되며, 같은 표식은 한 번의 결정(토큰 변경) 으로 17채의 그림자를 동시에 바꿀 수 있다 — **토큰의 경제학**.
+
 ---
 
 ## 8. 구현 원칙
