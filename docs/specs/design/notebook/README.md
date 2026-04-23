@@ -2358,6 +2358,45 @@ flutter analyze <17 files>
 
 ---
 
+### 7.70 subscription/screens 폼·모달·앱바 제목 Playfair 통일 — subscription/ 도메인 §7.17/§7.27 배치 #2
+
+**범위**: `frontend/lib/features/subscription/presentation/screens/` 7개 화면의 `AppTypography.headingSmall` 14건 전수 분류. 5건만 변환, 9건은 §7.30 제외.
+
+| 파일 | 라인 | 텍스트 | 패턴 | 비고 |
+|---|---:|---|:---:|---|
+| issue_subscription_screen.dart | 540 | '변경/취소 가능 횟수' | §7.17 | `_PolicyBadge` 형제와 Row 구성. 정적 라벨 |
+| issue_subscription_screen.dart | 610 | `rescheduleDeadlineLabel` | §7.17 | `_rescheduleAllowance > 0` 조건 섹션 |
+| subscription_list_screen.dart | 234 | `pendingRequests` | §7.17 | 페이지 서브섹션 제목 |
+| proposal_detail_screen.dart | 569 | '${profile.name} 선생님께 연락하기' | §7.27 | 모달 시트 상단 제목. `profile.name` 동적 substring 허용 |
+| subscription_detail_screen.dart | 264 | `appBarTitle` (학생 이름 + 타입 조합) | §7.27 | Scaffold.appBar title. 구조적 역할 기준 |
+
+**수량 효과**: 5개 code-line edits → 5 rendered titles (direct mapping, 이번 배치는 헬퍼 배수 없음).
+
+**§7.27 구조 기준 재확인**. 동적 substring(`profile.name`, `studentName + typeLabel`)을 포함하는 title 블록도 **구조적 역할이 모달/AppBar 제목이면 Playfair 적용**. 이는 §7.66의 `sessionCancelTitle(sessionNumber)` 선례와 동일. 반면 단일 값 렌더(가격·템플릿명·상태)는 §7.30 제외 — 구조적 역할이 "정보 표시"라서.
+
+**§7.30 제외 9건**:
+
+| 파일:라인 | 텍스트 | 제외 카테고리 |
+|---|---|---|
+| proposal_confirm_screen.dart:253 | `_formatPrice(price)` | dynamic price |
+| proposal_detail_screen.dart:443 | `template.formattedPrice` | dynamic price |
+| renewal_detail_screen.dart:337 | `template.formattedPrice` | dynamic price |
+| subscription_detail_screen.dart:86 | `subscriptionNotFound` | empty-state headline (search_off 아이콘) |
+| subscription_detail_screen.dart:110 | `errorOccurred` | error headline (error_outline 아이콘) |
+| subscription_list_screen.dart:306 | '등록된 수강권이 없습니다' | empty-state headline |
+| subscription_list_screen.dart:334 | '등록된 레슨이 없습니다' | empty-state headline |
+| subscription_list_screen.dart:367 | '오류가 발생했습니다' | error headline |
+| subscription_template_list_screen.dart:286 | `template.name` | dynamic template name |
+
+**커밋**: `f9033d62 style(subscription/screens): Notebook × Score §7.17+§7.27 배치 #2`
+**검증**: `flutter analyze` 4 files → No issues found! (ran in 3.7s)
+
+**subscription/ 도메인 누적 (배치 #1 + #2)**: 14 code-line edits → 25 rendered titles (12 direct + 1 ChipInputField 헬퍼 × 9 + 4 summary/policy direct). 위젯 레이어(배치 #1)에서 헬퍼 배수로 선도, 스크린 레이어(배치 #2)에서 직매핑으로 마감.
+
+**은유**: 창고(widgets) 9개 창구에 라벨을 달고 나니, 진열대(screens) 앞에 서서 "어떤 진열대는 라벨이 필요한 전시 공간이고, 어떤 진열대는 가격표·이름표만 달린 상품 선반이다" 하고 구분할 수 있게 되었다. 오늘은 그 분간의 날 — 전시 공간 5곳에만 공방의 활자를 새기고, 상품 선반 9곳은 그대로 두었다. 다음 방은 `schedule/` — 이번에는 어떤 방이 전시용이고 어떤 방이 창고일까.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
