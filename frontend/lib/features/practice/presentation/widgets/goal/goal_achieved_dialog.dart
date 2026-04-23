@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../providers/practice_goal_provider.dart';
 
 /// Dialog shown when a goal is achieved
@@ -61,10 +62,11 @@ class GoalAchievedDialog extends StatelessWidget {
             Text(isWeekly ? '🏆' : '🎉', style: const TextStyle(fontSize: 48)),
             const SizedBox(height: AppSpacing.space3),
 
-            // Title
+            // Notebook × Score: 다이얼로그 헤드라인 (§7.89 3축 center+emoji+단일 헤드라인).
+            // isWeekly 2원 유한집합 + 정적 명사 "목표 달성!" — §7.87-h 동적처럼 보이는 정적 명사.
             Text(
               isWeekly ? '이번 주 목표 달성!' : '오늘 목표 달성!',
-              style: AppTypography.headingMedium.copyWith(
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.paperAccent,
               ),
             ),

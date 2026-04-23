@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/metronome_settings.dart';
 
@@ -54,12 +55,8 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
             // Title
             Padding(
               padding: EdgeInsets.all(AppSpacing.space4),
-              child: Text(
-                '서브디비전 선택',
-                style: AppTypography.headingMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+              child: Text('서브디비전 선택', style: NotebookTypography.sectionTitle),
             ),
             // Scrollable content
             Flexible(
@@ -103,7 +100,11 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.music_note, size: 20, color: AppColors.paperAccent),
+                  Icon(
+                    Icons.music_note,
+                    size: 20,
+                    color: AppColors.paperAccent,
+                  ),
                   SizedBox(width: AppSpacing.space2),
                   Text(
                     '패턴: ${_selected.visualPattern}',

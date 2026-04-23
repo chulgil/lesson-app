@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/practice_repertoire.dart';
@@ -205,7 +206,8 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
             ),
           Icon(Icons.compare_arrows, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
-          Text('녹음 비교', style: AppTypography.headingMedium),
+          // Notebook × Score: 바텀시트 헤더 Playfair 승격 (§7.27).
+          Text('녹음 비교', style: NotebookTypography.sectionTitle),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.close),
@@ -252,7 +254,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                         : AppColors.paper,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -361,10 +366,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               label: Text(
                 '번갈아 듣기',
                 style: AppTypography.bodyMedium.copyWith(
-                  color:
-                      _alternateMode
-                          ? Colors.white
-                          : AppColors.ink,
+                  color: _alternateMode ? Colors.white : AppColors.ink,
                 ),
               ),
               selected: _alternateMode,
@@ -372,10 +374,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               avatar: Icon(
                 Icons.repeat,
                 size: 18,
-                color:
-                    _alternateMode
-                        ? Colors.white
-                        : AppColors.inkSecondary,
+                color: _alternateMode ? Colors.white : AppColors.inkSecondary,
               ),
               onSelected: (v) => setState(() => _alternateMode = v),
             ),
@@ -455,9 +454,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               label,
               style: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
+                    isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -638,7 +635,9 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                   ),
                 ),
                 child: Text(

@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../../../settings/presentation/providers/orphan_recording_provider.dart';
 
@@ -19,10 +20,7 @@ class SectionPickerResult {
   final PracticeRepertoire repertoire;
   final PracticeSection section;
 
-  SectionPickerResult({
-    required this.repertoire,
-    required this.section,
-  });
+  SectionPickerResult({required this.repertoire, required this.section});
 }
 
 /// Reusable screen for selecting a section.
@@ -46,14 +44,11 @@ class SectionPickerScreen extends ConsumerStatefulWidget {
   /// Optional recording to show info about (for orphan recording flow)
   final PracticeRecording? recording;
 
-  const SectionPickerScreen({
-    super.key,
-    this.title,
-    this.recording,
-  });
+  const SectionPickerScreen({super.key, this.title, this.recording});
 
   @override
-  ConsumerState<SectionPickerScreen> createState() => _SectionPickerScreenState();
+  ConsumerState<SectionPickerScreen> createState() =>
+      _SectionPickerScreenState();
 }
 
 class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
@@ -88,15 +83,16 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               decoration: InputDecoration(
                 hintText: '레퍼토리 또는 섹션 검색...',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
+                suffixIcon:
+                    _searchQuery.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                        : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: const BorderSide(color: AppColors.inkQuaternary),
@@ -111,7 +107,10 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4, vertical: AppSpacing.space3),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space4,
+                  vertical: AppSpacing.space3,
+                ),
               ),
               onChanged: (value) {
                 setState(() => _searchQuery = value.toLowerCase());
@@ -128,23 +127,36 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                 }
 
                 // Filter by search query
-                final filtered = _searchQuery.isEmpty
-                    ? sections
-                    : sections.where((item) {
-                        final repertoireName = item.repertoire.name.toLowerCase();
-                        final sectionName = item.section.pieceName.toLowerCase();
-                        final rangeText = item.section.rangeText.toLowerCase();
-                        return repertoireName.contains(_searchQuery) ||
-                            sectionName.contains(_searchQuery) ||
-                            rangeText.contains(_searchQuery);
-                      }).toList();
+                final filtered =
+                    _searchQuery.isEmpty
+                        ? sections
+                        : sections.where((item) {
+                          final repertoireName =
+                              item.repertoire.name.toLowerCase();
+                          final sectionName =
+                              item.section.pieceName.toLowerCase();
+                          final rangeText =
+                              item.section.rangeText.toLowerCase();
+                          return repertoireName.contains(_searchQuery) ||
+                              sectionName.contains(_searchQuery) ||
+                              rangeText.contains(_searchQuery);
+                        }).toList();
 
                 if (filtered.isEmpty) {
                   return _buildNoResultsState();
                 }
 
                 // Group by repertoire
-                final grouped = <String, List<({PracticeRepertoire repertoire, PracticeSection section})>>{};
+                final grouped =
+                    <
+                      String,
+                      List<
+                        ({
+                          PracticeRepertoire repertoire,
+                          PracticeSection section,
+                        })
+                      >
+                    >{};
                 for (final item in filtered) {
                   grouped.putIfAbsent(item.repertoire.id, () => []).add(item);
                 }
@@ -160,23 +172,32 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                     return _RepertoireGroup(
                       repertoire: repertoire,
                       sections: items,
-                      onSectionTap: (section) => _selectSection(repertoire, section),
+                      onSectionTap:
+                          (section) => _selectSection(repertoire, section),
                       searchQuery: _searchQuery,
                     );
                   },
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-                    const SizedBox(height: AppSpacing.space4),
-                    const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.paperAccent)),
-                  ],
-                ),
-              ),
+              error:
+                  (e, _) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.paperAccent,
+                        ),
+                        const SizedBox(height: AppSpacing.space4),
+                        const Text(
+                          '오류가 발생했습니다.',
+                          style: TextStyle(color: AppColors.paperAccent),
+                        ),
+                      ],
+                    ),
+                  ),
             ),
           ),
         ],
@@ -197,10 +218,10 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
+            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
               '섹션이 없습니다',
-              style: AppTypography.headingSmall.copyWith(
-                fontWeight: FontWeight.w500,
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
@@ -225,11 +246,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.search_off, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '"$_searchQuery" 검색 결과 없음',
@@ -253,7 +270,8 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
 
 class _RepertoireGroup extends StatelessWidget {
   final PracticeRepertoire repertoire;
-  final List<({PracticeRepertoire repertoire, PracticeSection section})> sections;
+  final List<({PracticeRepertoire repertoire, PracticeSection section})>
+  sections;
   final void Function(PracticeSection) onSectionTap;
   final String searchQuery;
 
@@ -272,7 +290,12 @@ class _RepertoireGroup extends StatelessWidget {
         // Repertoire header
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(AppSpacing.space4, AppSpacing.space4, AppSpacing.space4, AppSpacing.space2),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space2,
+          ),
           color: AppColors.paperDark,
           child: Row(
             children: [
@@ -302,11 +325,13 @@ class _RepertoireGroup extends StatelessWidget {
           ),
         ),
         // Sections
-        ...sections.map((item) => _SectionTile(
-              section: item.section,
-              onTap: () => onSectionTap(item.section),
-              searchQuery: searchQuery,
-            )),
+        ...sections.map(
+          (item) => _SectionTile(
+            section: item.section,
+            onTap: () => onSectionTap(item.section),
+            searchQuery: searchQuery,
+          ),
+        ),
       ],
     );
   }
@@ -373,16 +398,12 @@ class _SectionTile extends StatelessWidget {
       title: _buildHighlightedText(
         section.pieceName,
         searchQuery,
-        AppTypography.bodyMedium.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
+        AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: _buildHighlightedText(
         section.rangeText,
         searchQuery,
-        AppTypography.bodySmall.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
       ),
       trailing: const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
       onTap: onTap,

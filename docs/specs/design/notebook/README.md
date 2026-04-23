@@ -3677,6 +3677,58 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.98 Batch 선생님.F — practice/ 2차 §7.17 5 지점 + §7.30 예외 23 지점 확정
+
+**기간**: 2026-04-23
+**성격**: **5 지점 Playfair 승격 + 23 지점 §7.30 예외 문서화**. 선생님 감사 로드맵(§7.91-b)의 **마지막 배치**.
+**배경**: §7.91-b 로드맵 Batch 선생님.F. practice/ 2차 감사 — 연습/메트로놈/튜너/녹음/섹션/레퍼토리/목표 7 서브모듈 혼재 도메인. 전수 감사 결과 총 **28 지점** = 전환 **5**(17.86%) + 예외 **23**(82.14%). **예상(0~20%) 상한 근접**.
+
+#### 7.98-a §7.17 승격 5 지점
+
+| 파일 | 라인 | 전환 대상 | 근거 |
+|------|------|-----------|------|
+| widgets/recording_comparison_sheet.dart | 210 | `'녹음 비교'` | §7.27 바텀시트 헤더 (Icon + Title 한 줄 구성) |
+| widgets/goal/goal_achieved_dialog.dart | 68 | `'이번 주 목표 달성!' / '오늘 목표 달성!'` | §7.89 3축: Column center + Emoji + 단일 헤드라인. §7.87-h 2원 유한집합 + 정적 명사 "목표 달성!" |
+| widgets/metronome/subdivision_picker.dart | 59 | `'서브디비전 선택'` | §7.27 바텀시트 헤더 (BottomSheetHandle 아래) |
+| widgets/metronome/time_signature_picker.dart | 50 | `'박자표 선택'` | §7.27 바텀시트 헤더 (BottomSheetHandle 아래) |
+| screens/section_picker_screen.dart | 223 | `'섹션이 없습니다'` | §7.89 빈 상태 3축: Center + Icon + 단일 헤드라인 + 보조 설명 |
+
+**패턴 구성**: §7.27 바텀시트 3건 + §7.89 빈/다이얼로그 2건. §7.97 subscription/ 의 "8 §7.89 + 1 §7.27" 역전 비율 — practice/ 는 **도구(메트로놈/튜너)의 설정 시트 집중 도메인**이므로 §7.27 바텀시트가 더 많음.
+
+#### 7.98-b §7.30 예외 23 지점 — 유형별 집계
+
+| 유형 | 건수 | 대표 파일:라인 |
+|------|------|-----------|
+| #2 개체명 (레퍼토리명·곡명) | 3 | repertoire_detail_screen.dart:111(`repertoire.name`), edit_section_screen.dart:302·add_section_screen.dart:320(`_repertoire!.name`), section_info_card.dart:79(`section.pieceName`) |
+| #3 stat (BPM·시간·횟수·% ·등급) | 16 | metronome_controller_bar.dart:151·176, metronome_panel.dart:464, circular_tuner_indicator.dart:367, pitch_analysis_card.dart:64, history_summary_card.dart:82, practice_stats_card.dart:80, stats_summary_card.dart:131, practice_stats_editor.dart:343·364(TextField stat input), recording_control.dart:241, range_picker_button.dart:52, range_picker_sheet.dart:112, repertoire_detail_screen.dart:221, quick_add_screen.dart:439(`'섹션 ${index+1}'` 오디널) |
+| #4 date (월 그룹 라벨) | 1 | month_group_header.dart:43(`monthGroup.label` — "2026년 3월" 형) |
+| #2 정적 기호 (범위 구분자) | 1 | add_section_widgets.dart:102(`'~'`) |
+| #3 stat (TabBar 라벨 스타일) | 2 | practice_tools_modal.dart:160(labelStyle)·163(unselectedLabelStyle) — Tabs("메트로놈"/"튜너") 스타일, 헤드라인 아닌 탭 라벨 |
+
+#### 7.98 검증
+
+- `flutter analyze lib/features/practice/` → **No issues found** (11.8s)
+- 잔재 grep 재실행: `AppTypography.heading*` 23건 = §7.30 예외 23건 일치.
+- NotebookTypography import 4 파일 신규 추가 (recording_comparison_sheet · goal_achieved_dialog · subdivision_picker · time_signature_picker). section_picker_screen 기존 존재.
+
+#### 7.98 관찰
+
+**"2차 감사 법칙" 상한 샘플 (17.86%)**: §7.93 profile/ 15.8% · §7.97 subscription/ 47.37% 사이. 2차 감사에서 §7.17 발견율이 15~20% 범위일 경우 **"도구 설정 시트 밀집 도메인"** 의 전형. §7.97 의 50% 근접은 "상태 헤드라인 밀집" 이라는 subscription 도메인 특수성이었음을 상대 비교로 재확인.
+
+**practice/ 의 7 서브모듈 구조와 §7.17 분포**: 5 승격 중 **메트로놈 2(subdivision·time_signature picker) + 녹음 1(comparison sheet) + 목표 1(achieved dialog) + 섹션 1(empty picker)**. 튜너·레퍼토리·통계·스탯에디터 4 서브모듈은 §7.17 승격 0건 — **"도구 설정 UI 집중"** 시그널. 연습/튜너 본연의 실시간 피드백 UI 는 §7.30 stat 집중.
+
+**§7.89 빈 상태 vs 다이얼로그의 동등 처리**: section_picker(빈 상태) 와 goal_achieved(다이얼로그) 모두 §7.89 3축(Center + Icon/Emoji + 단일 헤드라인) 로 통합. §7.89 는 원래 빈/에러/대기 상태에서 출발했으나 **"다이얼로그도 동일 3축이면 승격"** 법칙이 재확증 — §7.97 `'수강권 수정/추가'` AppStrings 확장과 함께 §7.89 의 **"다이얼로그 3축 확장"** 이 규범화.
+
+**"섹션 ${i+1}" §7.30 유지 판정**: 동적 인덱스 + "섹션" 정적 명사 조합이지만, 오디널 인덱스(1-N)는 **"데이터 크기 의존 유한집합"** 으로 payment_summary `${month}월 수강료 현황` 의 **"보편 유한집합(1-12) + 정적 명사"** 과 구분. §7.87-h 는 **"보편 유한집합"** 에 한정 적용 — 오디널 인덱스는 #3 stat 로 유지. 판례 확립.
+
+**TabBar 라벨 §7.30 유지 판정**: practice_tools_modal TabBar 의 labelStyle 이 `AppTypography.headingMedium` 을 상속받은 이유는 **"탭 텍스트 시각 무게 매칭"** 용도. Tabs 자체는 정적(메트로놈/튜너)이지만 **"탭 라벨은 섹션 헤더가 아님"** 이라는 UX 패턴 원칙으로 §7.30 유지. lessons/ `'~'` 기호(§7.94) 와 동일한 "시각 무게 매칭 §7.30 변형" 계열.
+
+**은유**: §7.98 은 **"음악실의 악기 보관함 5 개 + 연주 중 실시간 계기판 23 개"** — 서브디비전 선택 함(§7.27), 박자표 선택 함(§7.27), 녹음 비교 함(§7.27), 목표 달성 트로피(§7.89), 빈 섹션 안내판(§7.89) 5 문패는 필기체(Playfair)로, BPM 계기판·센트 편차계·등급표·시간 스톱워치·녹음 파형 23 개 데이터 출력부(§7.30)는 명조체(Gothic) 유지. 선생님 감사 8 배치 중 **"도구 설정 시트 밀집형"** 을 대표 — subscription/ 의 "상태 헤드라인 밀집형" 과 대비되는 두 번째 도메인 아키타입 확립.
+
+**선생님 감사 종결**: §7.91-b 로드맵의 8 배치(A analytics · B parent_home · C profile · D schedule · E subscription · F practice · G students · H lessons) 전부 완료. 집계: **§7.17 승격 57 지점 + §7.30 예외 156 지점 = 213 감사 지점**. 선생님 화면 감사 종결. 남은 잔재는 `AppTypography.heading*` 23 + 10 + 19 + 기타 ≈ 전부 §7.30 확정.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
