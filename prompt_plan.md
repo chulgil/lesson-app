@@ -2,7 +2,7 @@
 
 > 작성일: 2026-04-23
 > 모드: `/plan --eng`
-> 상태: ✅ 완료 (Phase 1~4 전부 반영 — §7.87-a~h + §7.88 README 기록)
+> 상태: ✅ 완료 (Phase 1~4 전부 반영 — §7.87-a~i + §7.88/§7.89/§7.90 README 기록, 학생 화면 17 도메인 전수 감사 종결)
 
 ## 요구사항
 
@@ -24,10 +24,11 @@
 | 2. 리뷰 | 매트릭스 제시 → 우선순위 확정 | 0 | ✅ 완료 |
 | 3.A | student_home §7.17×9 + §7.27×2 (11 지점 / 10 파일) | 7 | ✅ 커밋 `7b1fe0ae` |
 | 3.B | onboarding §7.17 BLOCK 4건 (2 파일) | 2 | ✅ 커밋 `5fe7f3be` |
-| 3.C | invite §7.17 후보 재확인 | 0 | ✅ §7.30 예외 전원 확정, 코드 변경 없음 |
+| 3.C | invite §7.17 × 4 + §7.30 × 8 지점 재분류 | 1 | ✅ 커밋 `e6fd7f15` + §7.87-i/§7.89 재분류 |
 | 3.D | gamification 6 + search 2 + auth 2 §7.30 재검증 | 0 | ✅ README §7.88 기록 |
 | 3.E | onboarding 후보 3건 (tutorial·student_tutorial·phone_verification) | 3 | ✅ 커밋 `f5b7b488` |
-| 4. 검증 | flutter analyze 전체 + README §7.87+/§7.88 추가 | 1 | ✅ 완료 (No issues found, 20.4s) |
+| 3.F | 경계 6 도메인(notifications·follow·relationship·booking·settings·home) 재검증 | 0 | ✅ 커밋 `bb087761` — §7.90 기록 |
+| 4. 검증 | flutter analyze 전체 + README §7.87~§7.90 추가 | 1 | ✅ 완료 (No issues found, 19.9s) |
 
 각 배치는 사용자 승인 후 단일 커밋.
 
