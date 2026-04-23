@@ -55,12 +55,8 @@ class _AllLessonRequestsScreenState
     final academyNames = ref.watch(academyNameMapProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        title: const Text(AppStrings.lessonRequestTitle),
-      ),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text(AppStrings.lessonRequestTitle)),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -279,8 +275,7 @@ class _AllLessonRequestsScreenState
           Text(
             displayLabel,
             style: AppTypography.captionSmall.copyWith(
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

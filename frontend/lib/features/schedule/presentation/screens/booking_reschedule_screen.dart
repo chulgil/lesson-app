@@ -74,12 +74,8 @@ class _BookingRescheduleScreenState
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('예약 변경'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('예약 변경')),
       body: SafeArea(
         child: Column(
           children: [

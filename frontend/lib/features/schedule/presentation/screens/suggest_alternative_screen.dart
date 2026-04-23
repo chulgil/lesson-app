@@ -145,12 +145,8 @@ class _SuggestAlternativeScreenState
     );
 
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        title: Text(AppStrings.counterPropose),
-      ),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: Text(AppStrings.counterPropose)),
       body: Column(
         children: [
           // Student's preferred slots (if any)

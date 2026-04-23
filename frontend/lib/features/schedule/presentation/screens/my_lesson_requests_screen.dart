@@ -16,10 +16,7 @@ import '../widgets/request_list_item.dart';
 class MyLessonRequestsScreen extends ConsumerWidget {
   final String studentId;
 
-  const MyLessonRequestsScreen({
-    super.key,
-    required this.studentId,
-  });
+  const MyLessonRequestsScreen({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,28 +24,27 @@ class MyLessonRequestsScreen extends ConsumerWidget {
     final teacherNames = ref.watch(teacherNameMapProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        title: const Text(AppStrings.lessonRequestTitle),
-      ),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text(AppStrings.lessonRequestTitle)),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Text(
-            AppStrings.requestLoadError,
-            style: AppTypography.bodyMedium
-                .copyWith(color: AppColors.inkSecondary),
-          ),
-        ),
+        error:
+            (_, __) => Center(
+              child: Text(
+                AppStrings.requestLoadError,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ),
         data: (requests) {
           if (requests.isEmpty) {
             return Center(
               child: Text(
                 AppStrings.noHistory,
-                style: AppTypography.bodyMedium
-                    .copyWith(color: AppColors.inkTertiary),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
               ),
             );
           }
@@ -59,15 +55,14 @@ class MyLessonRequestsScreen extends ConsumerWidget {
               vertical: AppSpacing.space3,
             ),
             itemCount: requests.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.space2),
+            separatorBuilder:
+                (_, __) => const SizedBox(height: AppSpacing.space2),
             itemBuilder: (context, index) {
               final request = requests[index];
               return Container(
                 decoration: BoxDecoration(
                   color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: RequestListItem(
@@ -75,10 +70,11 @@ class MyLessonRequestsScreen extends ConsumerWidget {
                   studentName: AppStrings.student,
                   teacherName: teacherNames[request.teacherId],
                   viewerRole: 'student',
-                  onTap: () => context.push(
-                    AppRoutes.requestDetail.replaceFirst(':id', request.id),
-                    extra: {'viewerRole': 'student'},
-                  ),
+                  onTap:
+                      () => context.push(
+                        AppRoutes.requestDetail.replaceFirst(':id', request.id),
+                        extra: {'viewerRole': 'student'},
+                      ),
                 ),
               );
             },

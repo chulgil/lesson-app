@@ -89,12 +89,8 @@ class _UnifiedLessonRequestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: Text(AppStrings.lessonRequestFormTitle),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: Text(AppStrings.lessonRequestFormTitle)),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

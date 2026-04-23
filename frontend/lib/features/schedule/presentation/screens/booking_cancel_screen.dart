@@ -65,12 +65,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         !widget.isTeacherCancel && widget.remainingReschedules == 1;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('예약 취소'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('예약 취소')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),

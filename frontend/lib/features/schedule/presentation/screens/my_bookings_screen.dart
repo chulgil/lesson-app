@@ -52,12 +52,8 @@ class MyBookingsScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('내 레슨 예약'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('내 레슨 예약')),
       body: SafeArea(
         child: Column(
           children: [
@@ -258,9 +254,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   booking.formattedDate,
                   style: AppTypography.bodySmall.copyWith(
                     color:
-                        isPast
-                            ? AppColors.inkSecondary
-                            : AppColors.paperAccent,
+                        isPast ? AppColors.inkSecondary : AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -270,10 +264,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 '${booking.formattedStartTime} - ${booking.formattedEndTime}',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color:
-                      isPast
-                          ? AppColors.inkSecondary
-                          : AppColors.ink,
+                  color: isPast ? AppColors.inkSecondary : AppColors.ink,
                 ),
               ),
               const Spacer(),

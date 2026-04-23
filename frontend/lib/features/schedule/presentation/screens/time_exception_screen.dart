@@ -29,12 +29,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('휴무 및 예외 설정'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-      ),
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
+      appBar: AppBar(title: const Text('휴무 및 예외 설정')),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),

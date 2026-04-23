@@ -51,11 +51,9 @@ class RequestCompletionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: const Text('신청 완료'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
