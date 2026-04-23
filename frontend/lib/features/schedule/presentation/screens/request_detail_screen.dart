@@ -111,11 +111,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     return requestAsync.when(
       loading:
           () => Scaffold(
+            backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => Scaffold(
+            backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: Center(
               child: Text(
@@ -129,6 +131,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       data: (request) {
         if (request == null) {
           return Scaffold(
+            backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: Center(
               child: Text(
@@ -161,6 +164,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 : AppStrings.teacherDisplayName(teacherName);
 
         return Scaffold(
+          backgroundColor: AppColors.paper,
           appBar: _buildChatAppBar(context, request, opponentName, academyName),
           body: Column(
             children: [

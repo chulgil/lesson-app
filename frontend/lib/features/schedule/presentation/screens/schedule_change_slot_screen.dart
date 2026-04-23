@@ -79,6 +79,7 @@ class _ScheduleChangeSlotScreenState
     );
 
     return Scaffold(
+      backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: Text(
           params.isBulkChange
@@ -130,7 +131,9 @@ class _ScheduleChangeSlotScreenState
           Expanded(
             child: Text(
               AppStrings.bulkChangeSlotGuide,
-              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
         ],
