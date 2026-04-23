@@ -346,7 +346,8 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                               ? const Icon(
                                 Icons.check,
                                 size: 14,
-                                color: Colors.white,
+                                // Notebook × Score §7.50: Vermillion 체크 foreground = paper.
+                                color: AppColors.paper,
                               )
                               : null,
                     ),
@@ -419,7 +420,8 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                             ? const Icon(
                               Icons.check,
                               size: 14,
-                              color: Colors.white,
+                              // Notebook × Score §7.50: Vermillion 체크 foreground = paper.
+                              color: AppColors.paper,
                             )
                             : null,
                   ),

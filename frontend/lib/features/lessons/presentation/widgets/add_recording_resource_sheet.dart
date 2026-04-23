@@ -155,7 +155,8 @@ class _AddRecordingResourceSheetState
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            // Notebook × Score §7.50: Vermillion CTA foreground = paper.
+                            color: AppColors.paper,
                           ),
                         )
                         : const Text('추가'),

@@ -55,10 +55,7 @@ class LessonRecurringSection extends StatelessWidget {
                   ],
                 ),
               ),
-              Switch(
-                value: isRecurring,
-                onChanged: onRecurringChanged,
-              ),
+              Switch(value: isRecurring, onChanged: onRecurringChanged),
             ],
           ),
 
@@ -84,18 +81,21 @@ class LessonRecurringSection extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.paperAccent
-                          : AppColors.paperDark,
+                      color:
+                          isSelected
+                              ? AppColors.paperAccent
+                              : AppColors.paperDark,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Text(
                         dayNames[index],
                         style: AppTypography.bodySmall.copyWith(
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.inkSecondary,
+                          // Notebook × Score §7.50: selected day circle = paper (Vermillion bg).
+                          color:
+                              isSelected
+                                  ? AppColors.paper
+                                  : AppColors.inkSecondary,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),

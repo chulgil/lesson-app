@@ -283,7 +283,8 @@ class _AttendanceConfirmationSheetState
             ),
             child: Text(
               AppStrings.confirm,
-              style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+              // Notebook × Score §7.50: Vermillion CTA foreground = paper.
+              style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
             ),
           ),
         ),

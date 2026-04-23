@@ -51,7 +51,8 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            // Notebook × Score: 바텀시트 배경은 Notebook paper (§7.50 팔레트 일관성).
+            color: AppColors.paper,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(

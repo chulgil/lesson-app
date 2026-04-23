@@ -72,10 +72,7 @@ class LessonReminderSection extends StatelessWidget {
                   ],
                 ),
               ),
-              Switch(
-                value: enableReminder,
-                onChanged: onReminderChanged,
-              ),
+              Switch(value: enableReminder, onChanged: onReminderChanged),
             ],
           ),
 
@@ -123,30 +120,36 @@ class _ReminderTimeSelector extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: LessonReminderSection.reminderOptions.map((option) {
-          final isSelected = selectedMinutes == option.$1;
-          return GestureDetector(
-            onTap: () => onChanged(option.$1),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.paperAccent : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Text(
-                option.$2,
-                style: AppTypography.caption.copyWith(
-                  color:
-                      isSelected ? Colors.white : AppColors.inkSecondary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        children:
+            LessonReminderSection.reminderOptions.map((option) {
+              final isSelected = selectedMinutes == option.$1;
+              return GestureDetector(
+                onTap: () => onChanged(option.$1),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected ? AppColors.paperAccent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                  child: Text(
+                    option.$2,
+                    style: AppTypography.caption.copyWith(
+                      // Notebook × Score §7.50: selected chip foreground = paper (Vermillion bg).
+                      color:
+                          isSelected ? AppColors.paper : AppColors.inkSecondary,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }

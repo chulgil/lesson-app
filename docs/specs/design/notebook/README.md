@@ -2778,6 +2778,51 @@ flutter analyze <17 files>
 
 ---
 
+### 7.80 lessons/widgets §7.50 Vermillion foreground 일괄 정리 — 3대 잔재 패턴 5개로 확장
+
+**배경**: §7.78 이 예고한 `Colors.white` 8건 전수 배치 사이클. `grep -rn "Colors.white" lessons/presentation/widgets/` 로 8건 확정 → 분류: **§7.50 Vermillion foreground 7건 + 바텀시트 배경 팔레트 일관성 1건**. §7.78 의 이름표(제목) 정리에 이은 **이름 아래 층의 작은 잔재 정리** — 같은 도메인에서 이름 → 속살 순서로 내려가는 2단계 배치.
+
+| 파일 | 라인 | 요소 | 이전 → 이후 | 패턴 |
+|---|---:|---|---|:---:|
+| add_recording_resource_sheet | 158 | FilledButton spinner | `Colors.white` → `AppColors.paper` | §7.50 CTA spinner |
+| add_external_link_sheet | 156 | FilledButton spinner | `Colors.white` → `AppColors.paper` | §7.50 CTA spinner |
+| add_practice_item_sheet | 349 | `Icons.check` (레퍼토리 선택) | `Colors.white` → `AppColors.paper` | §7.50 check glyph |
+| add_practice_item_sheet | 422 | `Icons.check` (신규 레퍼토리) | `Colors.white` → `AppColors.paper` | §7.50 check glyph |
+| attendance_confirmation_sheet | 286 | ElevatedButton Text | `Colors.white` → `AppColors.paper` | §7.50 CTA text |
+| lesson_form/lesson_reminder_section | 143 | selected chip text | `Colors.white` → `AppColors.paper` | §7.50 chip selection |
+| lesson_form/lesson_recurring_section | 97 | selected day circle text | `Colors.white` → `AppColors.paper` | §7.50 chip selection |
+| ai_notes_result_sheet | 54 | BottomSheet Container 배경 | `Colors.white` → `AppColors.paper` | 팔레트 일관성 |
+
+**수량**: 8 code-line edits (0 imports — 전 파일 `app_colors.dart` 기 임포트). 0 단위 테스트 영향 (순수 디자인 토큰 교체).
+
+**§7.50 잔재 패턴 확장** — §7.75 에서 식별된 3대 패턴(avatar initial / badge count / loading spinner)에 §7.80 에서 **2개 패턴 추가**:
+
+| # | 패턴 | 최초 발견 | §7.80 사례 |
+|:-:|---|---|---|
+| 1 | avatar initial | §7.72 | (없음) |
+| 2 | badge count | §7.75 | (없음) |
+| 3 | loading spinner | §7.75 | add_recording_resource_sheet, add_external_link_sheet |
+| **4** | **check glyph** (체크박스 선택) | **§7.80** | add_practice_item_sheet x2 |
+| **5** | **chip/pill selection** (선택된 상태) | **§7.80** | lesson_reminder_section, lesson_recurring_section, attendance_confirmation_sheet |
+
+**경계 케이스**: `ai_notes_result_sheet:54` 는 바텀시트 Container 배경 — Vermillion 층위가 아닌 **paper 층위** 이므로 엄밀히 §7.50 적용 대상은 아니지만, `Colors.white` 는 Notebook cream paper 톤(F2ECDD)과 어긋나므로 **팔레트 일관성** 관점에서 `AppColors.paper` 로 교체. 향후 "§7.50 근방 위반" 이라는 별도 태그로 분류 가능.
+
+**프로필 컬러 예외 재확인**: Cycle 35 에서 판정한 `add_lesson_screen:324 ActionChip` (student.profileColor 배경)은 §7.50 범위 밖으로 유지 — §7.50 은 오직 `AppColors.paperAccent` (Vermillion) 배경에만 적용된다.
+
+**커밋**: (Cycle 37 진행 중)
+**검증**: `flutter analyze lib/features/lessons/presentation/widgets/` → No issues found! (ran in 4.1s). 8 Edit 모두 성공, 후처리 hook 자동 포맷팅 포함.
+
+**도메인 관찰**: lessons/widgets §7.50 잔재는 **"Vermillion 버튼/체크박스 위의 글자·아이콘"** 층위에 집중 — 즉 **CTA(spinner/text)**, **선택 마커(check glyph)**, **선택 상태(chip/day-circle)**. 이 세 층위에서 `Colors.white` 잔재는 Flutter Material 기본값의 관성 — 개발자가 Vermillion 배경을 토큰으로 교체했지만, 그 위 foreground 는 무심코 Material 기본값을 썼던 흔적.
+
+**다음 후보**:
+1. `lesson_notes_widgets.dart` 서브 탐색 (500+ 줄, §7.78 §7.30 제외에서 언급됨)
+2. `features/lessons/presentation/widgets/lesson_detail/` 서브도메인 전수 감사
+3. 다른 도메인(home/, parent/, auth/) §7.50 잔재 `Colors.white` 확인
+
+**은유**: §7.80 은 **이름 아래 속살의 색 정리**다. §7.78 에서 바텀시트 제목을 Playfair 로 승격했다면, §7.80 은 그 안의 **체크표시, 스피너, 선택된 요일 동그라미** — 사용자가 실제로 **터치하는 순간에 보는 피드백 층위** 를 정리했다. Material 기본값 `Colors.white` 는 디지털 스크린의 **"LED 광택 백"** 이고, `AppColors.paper` 는 **"종이에 찍힌 흰 잉크"** 다. Vermillion(주홍)과 짝을 이룰 때, 전자는 **디지털 버튼** 이고 후자는 **스탬프 인장** 이다. 음악 레슨 앱은 **인장을 찍는 의례** 에 가까우므로, 이 8건의 교체는 **디지털 버튼을 인장으로 되돌리는 작업** 이었다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
