@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../../../core/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
@@ -21,12 +22,12 @@ class _SectionInput {
   int endLine;
 
   _SectionInput()
-      : pieceNameController = TextEditingController(),
-        rangeType = SectionRangeType.full,
-        startMeasure = 1,
-        endMeasure = 4,
-        startLine = 1,
-        endLine = 2;
+    : pieceNameController = TextEditingController(),
+      rangeType = SectionRangeType.full,
+      startMeasure = 1,
+      endMeasure = 4,
+      startLine = 1,
+      endLine = 2;
 
   void dispose() {
     pieceNameController.dispose();
@@ -40,10 +41,7 @@ class _SectionInput {
 class QuickAddScreen extends ConsumerStatefulWidget {
   final String studentId;
 
-  const QuickAddScreen({
-    super.key,
-    required this.studentId,
-  });
+  const QuickAddScreen({super.key, required this.studentId});
 
   @override
   ConsumerState<QuickAddScreen> createState() => _QuickAddScreenState();
@@ -159,35 +157,54 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     try {
       // 1. Create repertoire
-      final repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
+      final repertoire = await ref
+          .read(repertoireCrudProvider.notifier)
+          .createRepertoire(
             studentId: widget.studentId,
             name: _repertoireNameController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
+            description:
+                _descriptionController.text.trim().isEmpty
+                    ? null
+                    : _descriptionController.text.trim(),
             startDate: _startDate,
             endDate: _endDate,
           );
 
       // 2. Create all sections
       for (final section in _sections) {
-        await ref.read(sectionCrudProvider.notifier).createSection(
+        await ref
+            .read(sectionCrudProvider.notifier)
+            .createSection(
               repertoireId: repertoire.id,
               pieceName: section.pieceName,
               rangeType: section.rangeType,
-              startMeasure: section.rangeType == SectionRangeType.measure ? section.startMeasure : 1,
-              endMeasure: section.rangeType == SectionRangeType.measure ? section.endMeasure : 1,
-              startLine: section.rangeType == SectionRangeType.line ? section.startLine : null,
-              endLine: section.rangeType == SectionRangeType.line ? section.endLine : null,
+              startMeasure:
+                  section.rangeType == SectionRangeType.measure
+                      ? section.startMeasure
+                      : 1,
+              endMeasure:
+                  section.rangeType == SectionRangeType.measure
+                      ? section.endMeasure
+                      : 1,
+              startLine:
+                  section.rangeType == SectionRangeType.line
+                      ? section.startLine
+                      : null,
+              endLine:
+                  section.rangeType == SectionRangeType.line
+                      ? section.endLine
+                      : null,
             );
       }
 
       // Invalidate providers to refresh
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
       final today = DateTime.now();
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: widget.studentId, date: today),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: widget.studentId, date: today),
+        ),
+      );
 
       if (mounted) {
         context.pop(true);
@@ -215,24 +232,25 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 마디' : '끝 마디',
-        unit: '마디',
-        initialValue: initialValue,
-        maxValue: 100,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              section.startMeasure = value;
-              if (section.endMeasure < section.startMeasure) {
-                section.endMeasure = section.startMeasure;
-              }
-            } else {
-              section.endMeasure = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 마디' : '끝 마디',
+            unit: '마디',
+            initialValue: initialValue,
+            maxValue: 100,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  section.startMeasure = value;
+                  if (section.endMeasure < section.startMeasure) {
+                    section.endMeasure = section.startMeasure;
+                  }
+                } else {
+                  section.endMeasure = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -242,33 +260,32 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 줄' : '끝 줄',
-        unit: '줄',
-        initialValue: initialValue,
-        maxValue: 10,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              section.startLine = value;
-              if (section.endLine < section.startLine) {
-                section.endLine = section.startLine;
-              }
-            } else {
-              section.endLine = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 줄' : '끝 줄',
+            unit: '줄',
+            initialValue: initialValue,
+            maxValue: 10,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  section.startLine = value;
+                  if (section.endLine < section.startLine) {
+                    section.endLine = section.startLine;
+                  }
+                } else {
+                  section.endLine = value;
+                }
+              });
+            },
+          ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('레퍼토리 추가'),
-      ),
+      appBar: AppBar(title: const Text('레퍼토리 추가')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -298,13 +315,14 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space1,
-                children: _repertoireSuggestions.map((name) {
-                  return ActionChip(
-                    label: Text(name, style: AppTypography.bodySmall),
-                    onPressed: () => _repertoireNameController.text = name,
-                    visualDensity: VisualDensity.compact,
-                  );
-                }).toList(),
+                children:
+                    _repertoireSuggestions.map((name) {
+                      return ActionChip(
+                        label: Text(name, style: AppTypography.bodySmall),
+                        onPressed: () => _repertoireNameController.text = name,
+                        visualDensity: VisualDensity.compact,
+                      );
+                    }).toList(),
               ),
 
               const SizedBox(height: AppSpacing.space4),
@@ -344,9 +362,15 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               // Section header
               Row(
                 children: [
-                  const Icon(Icons.queue_music, size: 20, color: AppColors.paperAccent),
+                  const Icon(
+                    Icons.queue_music,
+                    size: 20,
+                    color: AppColors.paperAccent,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
-                  Text('섹션 목록', style: AppTypography.headingSmall),
+                  // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
+                  // 로 통일 (§7.17).
+                  Text('섹션 목록', style: NotebookTypography.sectionTitle),
                 ],
               ),
 
@@ -374,16 +398,17 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('저장하기'),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('저장하기'),
                 ),
               ),
 
@@ -442,14 +467,17 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             Wrap(
               spacing: AppSpacing.space1,
               runSpacing: AppSpacing.space1,
-              children: _pieceSuggestions.take(5).map((name) {
-                return ActionChip(
-                  label: Text(name, style: AppTypography.caption),
-                  onPressed: () => section.pieceNameController.text = name,
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
-                );
-              }).toList(),
+              children:
+                  _pieceSuggestions.take(5).map((name) {
+                    return ActionChip(
+                      label: Text(name, style: AppTypography.caption),
+                      onPressed: () => section.pieceNameController.text = name,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space1,
+                      ),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: AppSpacing.space4),
 
@@ -494,9 +522,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             onSelectionChanged: (selection) {
               setState(() => section.rangeType = selection.first);
             },
-            style: const ButtonStyle(
-              visualDensity: VisualDensity.compact,
-            ),
+            style: const ButtonStyle(visualDensity: VisualDensity.compact),
           ),
         ),
       ],
@@ -512,9 +538,11 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
         // Start picker
         Expanded(
           child: OutlinedButton(
-            onPressed: () => isMeasure
-                ? _showMeasurePicker(index, isStart: true)
-                : _showLinePicker(index, isStart: true),
+            onPressed:
+                () =>
+                    isMeasure
+                        ? _showMeasurePicker(index, isStart: true)
+                        : _showLinePicker(index, isStart: true),
             child: Text(
               isMeasure ? '${section.startMeasure}마디' : '${section.startLine}줄',
             ),
@@ -527,9 +555,11 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
         // End picker
         Expanded(
           child: OutlinedButton(
-            onPressed: () => isMeasure
-                ? _showMeasurePicker(index, isStart: false)
-                : _showLinePicker(index, isStart: false),
+            onPressed:
+                () =>
+                    isMeasure
+                        ? _showMeasurePicker(index, isStart: false)
+                        : _showLinePicker(index, isStart: false),
             child: Text(
               isMeasure ? '${section.endMeasure}마디' : '${section.endLine}줄',
             ),

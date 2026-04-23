@@ -7,6 +7,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/presentation/providers/metronome_provider.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
@@ -175,7 +176,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           const SizedBox(height: AppSpacing.space4),
 
           // Practice stats section (moved above notes)
-          Text('연습기록', style: AppTypography.headingSmall),
+          // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
+          // 로 통일 (§7.17).
+          Text('연습기록', style: NotebookTypography.sectionTitle),
           const SizedBox(height: AppSpacing.space2),
           PracticeStatsEditor(
             section: section,
@@ -197,7 +200,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           // Recording section
           Row(
             children: [
-              Text('녹음', style: AppTypography.headingSmall),
+              // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
+              // 로 통일 (§7.17).
+              Text('녹음', style: NotebookTypography.sectionTitle),
               const Spacer(),
               if (sortedRecordings.length >= 2)
                 TextButton.icon(

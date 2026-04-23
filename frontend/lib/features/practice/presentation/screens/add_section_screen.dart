@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/add_section_widgets.dart';
@@ -418,7 +419,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('범위 유형', style: AppTypography.headingSmall),
+        // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text('범위 유형', style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space2),
         SegmentedButton<SectionRangeType>(
           segments: const [
@@ -458,9 +461,11 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: AppSpacing.space4),
+        // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
+        // 로 통일. ternary 는 라벨 텍스트만 분기 (§7.17).
         Text(
           isMeasure ? '마디 범위 *' : '줄 범위 *',
-          style: AppTypography.headingSmall,
+          style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(

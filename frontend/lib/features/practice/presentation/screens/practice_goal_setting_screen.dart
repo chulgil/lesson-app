@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/entities.dart';
 import '../providers/practice_goal_provider.dart';
 import '../widgets/goal/goal_setting_chips.dart';
@@ -262,7 +263,10 @@ class _PracticeGoalSettingScreenState
       children: [
         Icon(icon, color: AppColors.paperAccent, size: 22),
         const SizedBox(width: AppSpacing.space2),
-        Text(title, style: AppTypography.headingSmall),
+        // Notebook × Score: _buildSectionHeader helper 의 title 은 Playfair
+        // sectionTitle 로 통일. 호출부 2곳(일일 목표 / 주간 목표) 에
+        // 일괄 반영 (§7.17).
+        Text(title, style: NotebookTypography.sectionTitle),
       ],
     );
   }

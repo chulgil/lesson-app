@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/add_section_widgets.dart';
@@ -339,7 +340,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Range type selector (전체/줄/마디)
-              Text('범위 유형', style: AppTypography.headingSmall),
+              // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
+              // 로 통일 (§7.17).
+              Text('범위 유형', style: NotebookTypography.sectionTitle),
               const SizedBox(height: AppSpacing.space2),
               SegmentedButton<SectionRangeType>(
                 segments: const [
@@ -370,7 +373,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // Range input based on type (hidden when 'full' is selected)
               if (_rangeType == SectionRangeType.measure) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Text('마디 범위 *', style: AppTypography.headingSmall),
+                // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
+                // 로 통일 (§7.17).
+                Text('마디 범위 *', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '연습할 마디 구간을 선택하세요',
@@ -390,7 +395,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 ),
               ] else if (_rangeType == SectionRangeType.line) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Text('줄 범위 *', style: AppTypography.headingSmall),
+                // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
+                // 로 통일 (§7.17).
+                Text('줄 범위 *', style: NotebookTypography.sectionTitle),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '연습할 줄 구간을 선택하세요 (1~10줄)',
