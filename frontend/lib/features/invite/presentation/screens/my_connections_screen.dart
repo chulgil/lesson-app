@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
@@ -142,7 +143,9 @@ class MyConnectionsScreen extends ConsumerWidget {
               children: [
                 const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space6),
-                Text('선생님과 연결하는 방법', style: AppTypography.headingSmall),
+                // Notebook × Score: BottomSheetHandle + 상단 제목 조합은
+                // §7.27 패턴. Playfair appBarTitle 로 통일.
+                Text('선생님과 연결하는 방법', style: NotebookTypography.appBarTitle),
                 const SizedBox(height: AppSpacing.space4),
                 _HelpItem(
                   icon: Icons.dialpad,
