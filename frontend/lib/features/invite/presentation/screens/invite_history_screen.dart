@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -73,12 +74,19 @@ class InviteHistoryScreen extends ConsumerWidget {
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.history, size: 40, color: AppColors.paperAccent),
+              child: Icon(
+                Icons.history,
+                size: 40,
+                color: AppColors.paperAccent,
+              ),
             ),
             const SizedBox(height: AppSpacing.space6),
+            // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
             Text(
               '생성한 초대가 없습니다',
-              style: AppTypography.headingSmall,
+              style: NotebookTypography.sectionTitle.copyWith(
+                color: AppColors.inkSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -184,7 +192,9 @@ class InviteHistoryScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text('취소하기'),
               ),
             ],
@@ -282,17 +292,18 @@ class _InviteCard extends StatelessWidget {
                 invite.inviteCode,
                 style: AppTypography.headingMedium.copyWith(
                   letterSpacing: 4,
-                  color:
-                      isInactive
-                          ? AppColors.inkSecondary
-                          : AppColors.ink,
+                  color: isInactive ? AppColors.inkSecondary : AppColors.ink,
                 ),
               ),
               if (!isInactive && onCopyCode != null) ...[
                 const SizedBox(width: AppSpacing.space2),
                 IconButton(
                   onPressed: onCopyCode,
-                  icon: Icon(Icons.copy, size: 18, color: AppColors.paperAccent),
+                  icon: Icon(
+                    Icons.copy,
+                    size: 18,
+                    color: AppColors.paperAccent,
+                  ),
                   tooltip: '코드 복사',
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.all(AppSpacing.space1),

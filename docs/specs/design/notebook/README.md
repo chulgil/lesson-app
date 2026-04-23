@@ -3725,7 +3725,58 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 **은유**: §7.98 은 **"음악실의 악기 보관함 5 개 + 연주 중 실시간 계기판 23 개"** — 서브디비전 선택 함(§7.27), 박자표 선택 함(§7.27), 녹음 비교 함(§7.27), 목표 달성 트로피(§7.89), 빈 섹션 안내판(§7.89) 5 문패는 필기체(Playfair)로, BPM 계기판·센트 편차계·등급표·시간 스톱워치·녹음 파형 23 개 데이터 출력부(§7.30)는 명조체(Gothic) 유지. 선생님 감사 8 배치 중 **"도구 설정 시트 밀집형"** 을 대표 — subscription/ 의 "상태 헤드라인 밀집형" 과 대비되는 두 번째 도메인 아키타입 확립.
 
-**선생님 감사 종결**: §7.91-b 로드맵의 8 배치(A analytics · B parent_home · C profile · D schedule · E subscription · F practice · G students · H lessons) 전부 완료. 집계: **§7.17 승격 57 지점 + §7.30 예외 156 지점 = 213 감사 지점**. 선생님 화면 감사 종결. 남은 잔재는 `AppTypography.heading*` 23 + 10 + 19 + 기타 ≈ 전부 §7.30 확정.
+**선생님 감사 종결**: §7.91-b 로드맵의 8 배치(A analytics · B parent_home · C profile · D schedule · E subscription · F practice · G students · H lessons) 전부 완료. 집계: **§7.17 승격 57 지점 + §7.30 예외 156 지점 = 213 감사 지점**. 선생님 화면 감사 종결. 남은 잔재 `AppTypography.heading*` 34건은 비선생님 배치 도메인(invite·auth·student_home·gamification·settings·search·home) — §7.99 에서 전수 감사 진행.
+
+---
+
+### 7.99 비선생님 도메인 전수 감사 — §7.98 "전부 §7.30" 주장 반증 + 4 §7.17 추가 승격
+
+**기간**: 2026-04-23
+**성격**: **4 지점 Playfair 승격 + 30 지점 §7.30 예외 문서화**. §7.98 의 "남은 34 잔재는 전부 §7.30" 주장 **반증**. 7 도메인(invite·auth·student_home·gamification·settings·search·home) 34 지점 전수 분류.
+**배경**: §7.91-b 선생님 로드맵 종결 후 남은 34 잔재의 전수 감사. §7.98 결론이 practice/ 내부 추세를 전체로 외삽한 **편향 결론** 이었음을 확인. 34 지점 = 전환 **4**(11.76%) + 예외 **30**(88.24%).
+
+#### 7.99-a §7.17 승격 4 지점
+
+| 파일 | 라인 | 전환 대상 | 근거 |
+|------|------|-----------|------|
+| invite/my_connections_screen.dart | 105 | `'아직 연결된 학생/선생님이 없습니다'` | §7.89 3축(Center + Icon + 단일 헤드라인) + §7.87-h 2원 유한집합(teacher/parent·student) |
+| invite/invite_history_screen.dart | 81 | `'생성한 초대가 없습니다'` | §7.89 빈 상태 3축 + 정적 명사 단일 헤드라인 |
+| gamification/badge_award_sheet.dart | 126 | `'뱃지 수여'` (`\uBDF3\uC9C0 \uC218\uC5EC`) | §7.27 바텀시트 헤더 (Icon + Title Row 구성) + 정적 명사 |
+| gamification/level_up_dialog.dart | 84 | `'레벨 업!'` | §7.89 변형 다이얼로그 헤드라인 + 정적 명사 |
+
+**패턴 구성**: §7.89 3건(빈 상태 2 + 다이얼로그 1) + §7.27 바텀시트 1건. §7.98 practice/ 와 동일한 "빈/다이얼로그 + 바텀시트" 혼합 — **§7.87-h 2원 유한집합 + §7.89 3축** 이 도메인 경계를 가로질러 재확증.
+
+#### 7.99-b §7.30 예외 30 지점 — 유형별 집계
+
+| 유형 | 건수 | 대표 파일:라인 |
+|------|------|-----------|
+| #2 개체명 (이름·타이틀) | 7 | my_connections_screen.dart:315(`otherName`), student_profile_tab.dart:191(`name`), badge_collection_screen.dart:103(`data.levelTitle`), academy_detail_screen.dart:145(`academy.name`), teacher_detail_screen.dart:158(`profile.name ?? '익명 선생님'`), 외 2건 |
+| #3 stat (숫자·퍼센트·레벨·점수) | 12 | all_recordings_screen.dart:263(`'$count'`), backup_widgets.dart:127(`value`), student_profile_tab.dart:270(stat value), student_subscription_summary.dart:269(`'${usedLessons}/$_totalSessions'`), level_up_dialog.dart:72(`'Lv.$newLevel'`), badge_collection_screen.dart:94(`'Lv.${data.level}'`), assignment_dashboard_screen.dart:185(`'${(rate*100).round()}%'`)·268(`value`), 외 4건 |
+| #4 date/time | 5 | practice_reminder_sheet.dart:143(`settings.formattedTime`), student_practice_tab.dart:133·178·191(`_formatDate`), student_lessons_tab.dart:228(`formatDateMDWithDayLong`), next_lesson_card.dart:147(`dDayText`) |
+| #6 이니셜 (CircleAvatar) | 4 | pending_requests_screen.dart:237(`requesterName[0]`), my_connections_screen.dart:309·553(`otherName[0]`·`name[0]`), my_teachers_screen.dart:509(`teacher.initial`) |
+| #10 코드·이모지 (입력·출력) | 4 | invite_screen.dart:239(`invite.inviteCode`), code_input_screen.dart:221(TextField digit), student_invite_code_screen.dart:96·parent_invite_code_screen.dart:97(TextFormField 코드 입력), student_profile_tab.dart:607(code digit), weekly_ranking_card.dart:87(`_tierEmoji`) |
+
+#### 7.99 검증
+
+- `flutter analyze lib/features/invite/.../my_connections_screen.dart lib/features/invite/.../invite_history_screen.dart lib/features/gamification/.../badge_award_sheet.dart lib/features/gamification/.../level_up_dialog.dart` → **No issues found** (4.5s)
+- 잔재 grep 재실행: `AppTypography.heading*` 비선생님 도메인 30건 = §7.30 예외 30건 일치.
+- NotebookTypography import 3 파일 신규 추가(invite_history_screen · badge_award_sheet · level_up_dialog). my_connections_screen 기존 존재.
+
+#### 7.99 관찰
+
+**§7.98 편향 결론 반증**: §7.98 의 "남은 34 잔재는 전부 §7.30 확정" 주장이 **부분 표본(practice/ 내부)을 전체로 외삽한 추세 편향**이었음. 실제 비선생님 7 도메인에 4 §7.17 후보 생존. **교훈: 배치 경계 바깥의 잔재는 전수 감사 전까지 분류 주장 금지.**
+
+**invite/ 도메인의 §7.17 밀도(2/9 = 22.2%)**: invite/ 는 "초대 상태 전이(없음→생성→수락/거절)" 중심 도메인으로 **상태 페이지 헤드라인** 이 자연스럽게 많음. 역으로 auth/ 는 2 지점 전부 §7.30(코드 입력 TextField) — 입력 도메인 vs 상태 도메인 구분.
+
+**gamification/ 도메인의 §7.17 밀도(2/6 = 33.3%)**: 뱃지/레벨 축하 UI 는 본질적으로 **"축하 헤드라인 + 동적 스탯"** 구조 — "뱃지 수여"/"레벨 업!" 헤드라인(§7.17) + "Lv.$level"/"총 ${points}P" 스탯(§7.30). **축하형 도메인 아키타입** 확립.
+
+**§7.87-h 의 도메인 경계 초월**: my_connections_screen 의 `teacher/parent·student` 2원 유한집합이 선생님 감사 §7.87(payment_summary의 `${month}월 수강료 현황`) 과 **같은 법칙** 으로 §7.17 승격. §7.87-h 는 스케줄/결제만의 법칙이 아니라 **앱 전체 역할 분기 UI 에 일반 적용**.
+
+**"2차 감사 법칙" 하한 샘플(11.76%)**: §7.93(profile/) 15.8% · §7.98(practice/) 17.86% · **§7.99(비선생님 7 도메인 혼합) 11.76%** — 혼합 도메인은 **11~18% 구간 수렴**. §7.95·§7.94(lessons/students/) 0% 와 §7.97(subscription/) 47% 는 "동질 도메인 내 양 극단". 전환율 11~18%는 **"혼합 도메인의 구조적 상수"**.
+
+**은유**: §7.99 는 **"여러 학년 교실 7 개 순회 감사"** — 1 학년 교실(invite/) 과 특별활동실(gamification/)에만 필기체 문패 후보 4 개 생존, 나머지 5 개 교실(auth·student_home·settings·search·home)은 전부 숫자판/시계/이름표 등 계기판 30 개. 선생님 교실 8 개 전수 감사(§7.91~7.98) 완결 후의 **"경계 바깥 확인"** 작업 — §7.98 의 "전부 §7.30" 이라는 성급한 결론을 실증으로 교정.
+
+**전체 감사 집계**: §7.91-b 선생님 8 배치(213 지점) + §7.99 비선생님 7 도메인(34 지점) = **247 감사 지점 · §7.17 승격 61 지점 · §7.30 예외 186 지점**. 전환율 24.7%. 앱 전역 `AppTypography.heading*` Notebook × Score 2 차 감사 **완결**.
 
 ---
 

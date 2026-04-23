@@ -98,11 +98,14 @@ class MyConnectionsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.space6),
+            // Notebook × Score: 빈 상태 3축(§7.89) 통과 + §7.87-h 2원 유한집합 (teacher/parent·student).
             Text(
               userRole == InviteUserRole.teacher
                   ? '아직 연결된 학생이 없습니다'
                   : '아직 연결된 선생님이 없습니다',
-              style: AppTypography.headingSmall,
+              style: NotebookTypography.sectionTitle.copyWith(
+                color: AppColors.inkSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space2),

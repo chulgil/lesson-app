@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Result returned when a badge is awarded.
@@ -121,9 +122,10 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                         color: AppColors.paperAccent,
                       ),
                       const SizedBox(width: AppSpacing.space2),
+                      // Notebook × Score: 바텀시트 헤더 §7.27 + 정적 명사 → Playfair 승격.
                       Text(
                         '\uBDF3\uC9C0 \uC218\uC5EC',
-                        style: AppTypography.headingMedium,
+                        style: NotebookTypography.sectionTitle,
                       ),
                     ],
                   ),
@@ -196,12 +198,15 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             color:
-                isSelected ? AppColors.paperAccent.withValues(alpha: 0.05) : null,
+                isSelected
+                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                    : null,
           ),
           child: Row(
             children: [
@@ -254,9 +259,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                     ? Icons.radio_button_checked
                     : Icons.radio_button_off,
                 color:
-                    isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkTertiary,
+                    isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
                 size: AppSpacing.iconSM,
               ),
             ],

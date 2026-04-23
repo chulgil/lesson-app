@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// Shows a level-up celebration dialog.
 Future<void> showLevelUpDialog(
@@ -15,10 +16,8 @@ Future<void> showLevelUpDialog(
   return showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (context) => LevelUpDialog(
-      newLevel: newLevel,
-      levelTitle: levelTitle,
-    ),
+    builder:
+        (context) => LevelUpDialog(newLevel: newLevel, levelTitle: levelTitle),
   );
 }
 
@@ -78,11 +77,11 @@ class LevelUpDialog extends StatelessWidget {
 
             const SizedBox(height: AppSpacing.space5),
 
-            // Title
+            // Notebook × Score: 다이얼로그 헤드라인 §7.89 변형 + 정적 명사 → Playfair 승격.
             Text(
               '레벨 업!',
-              style: AppTypography.headingLarge.copyWith(
-                fontWeight: FontWeight.w800,
+              style: NotebookTypography.sectionTitle.copyWith(
+                color: AppColors.paperAccent,
               ),
             ),
 
