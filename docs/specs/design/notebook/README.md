@@ -2114,6 +2114,37 @@ flutter analyze lib/features/parent_home/presentation/widgets/section_card.dart 
 
 ---
 
+### 7.64 practice/widgets 바텀시트·다이얼로그 제목 Playfair 통일 — practice/ 도메인 §7.27 배치 #1
+
+**트리거**: §7.62(practice/widgets/ §7.17 배치) 에 이어, 같은 도메인의 바텀시트·다이얼로그 상단 제목 5종을 §7.27 / dialogTitle 패턴으로 맞추기 위한 배치.
+
+**변경 파일 (5 files / 5 transfers)**:
+
+| 파일 | 라인 | 제목 | 패턴 | 토큰 |
+|---|---|---|---|---|
+| `practice/widgets/teacher_feedback_sheet.dart` | 153 | `AppStrings.recordingFeedbackTitle` | BottomSheetHandle + `_Header` | `appBarTitle` (§7.27) |
+| `practice/widgets/notes/note_edit_dialog.dart` | 85 | `isEditing ? '연습노트 수정' : '연습노트 추가'` | `Dialog` 위젯 헤더 Row | `dialogTitle` |
+| `practice/widgets/metronome/metronome_full_screen_modal.dart` | 195 | `'메트로놈'` | BottomSheetHandle + `_Header` | `appBarTitle` (§7.27) |
+| `practice/widgets/tuner/tuner_settings_sheet.dart` | 51 | `'튜너 설정'` | BottomSheetHandle + 상단 Padding+Text | `appBarTitle` (§7.27) — `.copyWith(bold)` 제거 (이미 w700) |
+| `practice/widgets/section_form/range_picker_sheet.dart` | 79 | `widget.title` | modal sheet + Cancel/Title/Confirm Row | `appBarTitle` (§7.27) |
+
+**패턴 확장**:
+- §7.27 은 지금까지 "BottomSheetHandle + 상단 제목" 으로 좁게 기술되었으나, 이 배치는 **Cancel/Title/Confirm 3열 Row 헤더(handle 없음)** 도 같은 범주에 포함. 핵심 기준은 handle 유무가 아니라 **모달 시트의 최상단 제목 블록** 인지 여부.
+- dialogTitle: `showDialog` + `Dialog` 위젯의 헤더는 `appBarTitle`(18) 이 아니라 한 단계 위 `dialogTitle`(19) 적용. Dialog 는 화면 중앙에 떠오르는 독립 컨텍스트로, 시트(sheet) 보다 높은 위계를 가진다 (§7.x dialogTitle 패턴 강화).
+
+**§7.30 제외 (practice/widgets/ 내부, 이 배치 범위 외)**:
+- `tuner/tuner_settings_sheet.dart` 내부 섹션 제목 (Reference Frequency 등) 은 정적이면 §7.17 대상. 다음 배치에서 처리.
+- `metronome_full_screen_modal.dart` 내부 세부 섹션 (BPM, Time Signature 라벨 등) — 동적 수치는 §7.30, 정적 레이블은 §7.17 대상.
+- `tuner/tuner_cat_widgets.dart` 는 병렬 세션 수정 진행 중 (skip 유지).
+
+**커밋**: `ee7b229e feat(notebook): practice/widgets §7.27 바텀시트·다이얼로그 제목 Playfair 통일`
+
+**검증**: `flutter analyze <5 files>` → `No issues found`.
+
+**은유**: 다섯 개의 작은 방(sheet, dialog) 이 각기 다른 문패를 달고 있었다 — 하나는 맨손 글씨, 하나는 인쇄 서체, 하나는 굵은 고딕. 같은 건물 안인데 방마다 다른 서체가 붙어 있으니 방문자는 각 방에 들어설 때마다 "여기는 다른 곳인가?" 의심한다. 오늘 다섯 방 문패가 모두 같은 활자공의 Playfair 로 교체되었다. 방은 여전히 다섯 개지만 건물은 하나로 느껴진다 — **시트와 다이얼로그도 같은 책의 접지(折紙)**, 펼치는 방식만 다를 뿐.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
