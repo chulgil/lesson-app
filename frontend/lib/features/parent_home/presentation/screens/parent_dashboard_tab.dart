@@ -6,7 +6,10 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/child_profile_provider.dart';
@@ -43,99 +46,196 @@ class ParentDashboardTab extends ConsumerWidget {
       });
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('학부모 홈'),
-        centerTitle: true,
-        actions: [
-          // Child selector button
-          IconButton(
-            onPressed: () => _showChildSelector(context, ref, parentId),
-            icon: const Icon(Icons.swap_horiz),
-            tooltip: '자녀 전환',
-          ),
-        ],
-      ),
-      body: childrenAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-        data: (profiles) {
-          if (profiles.isEmpty) {
-            return _buildEmptyState(context, parentId);
-          }
+    return ColoredBox(
+      color: AppColors.paper,
+      child: SafeArea(
+        bottom: false,
+        child: childrenAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+          data: (profiles) {
+            if (profiles.isEmpty) {
+              return _buildEmptyState(context, parentId);
+            }
 
-          final profile = selectedProfile ?? profiles.first;
+            final profile = selectedProfile ?? profiles.first;
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(childProfilesProvider(parentId));
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Child info header
-                  _buildChildHeader(context, profile),
-
-                  const SizedBox(height: AppSpacing.space4),
-
-                  // Quick stats
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+            return RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(childProfilesProvider(parentId));
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Masthead: Playfair eyebrow + 자녀 전환 아이콘 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildMasthead(context, ref, parentId),
                     ),
-                    child: _buildQuickStats(),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Upcoming lesson
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+                    // ── Programme Title: "오늘의 자녀" + 자녀 이름 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildProgrammeTitle(context, profile),
                     ),
-                    child: _buildUpcomingLesson(),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space6),
+                    // ── 0순위: 자녀 정보 히어로 카드 ──────────────
+                    _buildChildHeader(context, profile),
 
-                  // Practice streak
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+                    const SizedBox(height: AppSpacing.space4),
+
+                    // ── 1순위: 빠른 통계 (이번주 레슨 / 과제 / 스트릭) ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildQuickStats(),
                     ),
-                    child: _buildPracticeStreak(),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space6),
+                    const SizedBox(height: AppSpacing.space6),
 
-                  // Recent assignments
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+                    // ── 2순위: 다음 레슨 ──────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildUpcomingLesson(),
                     ),
-                    child: _buildRecentAssignments(),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space6),
+                    const SizedBox(height: AppSpacing.space6),
 
-                  // Payment status
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+                    // ── 3순위: 이번 주 연습 스트릭 ────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildPracticeStreak(),
                     ),
-                    child: _buildPaymentStatus(),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space8),
-                ],
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // ── 4순위: 과제 현황 ─────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildRecentAssignments(),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // ── 5순위: 결제 현황 ─────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildPaymentStatus(),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space5),
+
+                    // ── Fine. 페이지 종지부 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _buildFineFooter(context),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
+  }
+
+  /// Masthead — Notebook × Score 상단 헤더.
+  /// 좌측: "LESSONAZA" (Playfair eyebrow)
+  /// 우측: 자녀 전환 IconButton
+  Widget _buildMasthead(BuildContext context, WidgetRef ref, String parentId) {
+    return NotebookMasthead(
+      eyebrow: 'LESSONAZA',
+      meta: 'VOL. ${DateTime.now().month} · NO. ${DateTime.now().day}',
+      trailing: IconButton(
+        onPressed: () => _showChildSelector(context, ref, parentId),
+        icon: const Icon(Icons.swap_horiz, color: AppColors.ink, size: 22),
+        tooltip: '자녀 전환',
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      ),
+    );
+  }
+
+  /// Programme Title — "Parent's Programme" + 자녀 이름 + 날짜·인사.
+  Widget _buildProgrammeTitle(BuildContext context, ChildProfile profile) {
+    final now = DateTime.now();
+    final dayLabel = _englishWeekday(now.weekday);
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Programme for $dayLabel',
+            style: NotebookTypography.mastheadLabel,
+          ),
+          const SizedBox(height: 4),
+          Text('${profile.name}의 레슨', style: NotebookTypography.masthead),
+          const SizedBox(height: 6),
+          Text(
+            '${now.month}月 ${now.day}日  ·  ${profile.instrumentLabel}',
+            style: NotebookTypography.mastheadDate,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          const ThinRule(),
+        ],
+      ),
+    );
+  }
+
+  /// "Fine." 푸터 — 악보 종지부 + 자녀 프로필 관리 링크.
+  Widget _buildFineFooter(BuildContext context) {
+    return Column(
+      children: [
+        const ThinRule(),
+        const SizedBox(height: AppSpacing.space3),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text('Fine.', style: NotebookTypography.fine),
+            const Spacer(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  static const _englishWeekdays = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
+  String _englishWeekday(int weekday) {
+    final idx = (weekday - 1).clamp(0, 6);
+    return _englishWeekdays[idx];
   }
 
   Widget _buildEmptyState(BuildContext context, String parentId) {
@@ -169,7 +269,7 @@ class ParentDashboardTab extends ConsumerWidget {
               label: const Text('자녀 추가하기'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.paper,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space6,
                   vertical: AppSpacing.space3,
@@ -259,7 +359,7 @@ class ParentDashboardTab extends ConsumerWidget {
                                     child: Text(
                                       profile.initial,
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.paper,
                                       ),
                                     ),
                                   ),
@@ -332,7 +432,9 @@ class ParentDashboardTab extends ConsumerWidget {
               backgroundColor: AppColors.paper.withValues(alpha: 0.2),
               child: Text(
                 profile.initial,
-                style: AppTypography.headingLarge.copyWith(color: Colors.white),
+                style: AppTypography.headingLarge.copyWith(
+                  color: AppColors.paper,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.space4),
@@ -345,7 +447,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       Text(
                         profile.name,
                         style: AppTypography.headingMedium.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -363,7 +465,7 @@ class ParentDashboardTab extends ConsumerWidget {
                         child: Text(
                           '만 ${profile.age}세',
                           style: AppTypography.caption.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -388,13 +490,13 @@ class ParentDashboardTab extends ConsumerWidget {
                         Icon(
                           profile.instrumentIcon,
                           size: 14,
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${profile.instrumentLabel} • ${profile.levelLabel}',
                           style: AppTypography.caption.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         ),
                       ],
@@ -580,7 +682,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           ? const Icon(
                             Icons.check,
                             size: 18,
-                            color: Colors.white,
+                            color: AppColors.paper,
                           )
                           : Text(
                             '${day.day}',
