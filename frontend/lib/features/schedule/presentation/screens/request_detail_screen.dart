@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
@@ -320,11 +321,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               opponentName,
               academyName,
             ),
+        // Notebook × Score: AppBar title 는 Playfair appBarTitle 로 통일
+        // (§7.27). academyName/opponentName/typeDisplayLabel 동적 조합이지만
+        // 구조적 역할은 동일.
         child: Text(
           request.isAcademy && academyName != null
               ? '$academyName $opponentName (${request.typeDisplayLabel})'
               : '$opponentName (${request.typeDisplayLabel})',
-          style: AppTypography.headingSmall,
+          style: NotebookTypography.appBarTitle,
         ),
       ),
     );
@@ -1399,7 +1403,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     request.studentId,
                   );
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.cancelRequestAction),
               ),
             ],

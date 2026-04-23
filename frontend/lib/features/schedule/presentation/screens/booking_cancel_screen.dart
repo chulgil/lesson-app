@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -586,9 +587,11 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Notebook × Score: 모달 시트 상단 제목 블록은 Playfair
+                  // appBarTitle 로 통일 (§7.27). teacherName 동적 substring 허용.
                   Text(
                     '${widget.teacherName} 연락처',
-                    style: AppTypography.headingSmall,
+                    style: NotebookTypography.appBarTitle,
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
