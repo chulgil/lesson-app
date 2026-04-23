@@ -6,6 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/child_profile.dart';
 import '../screens/child_profile_form_screen.dart';
 import 'add_child_option.dart';
@@ -204,7 +205,8 @@ class ProfileChildrenSection extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('자녀 추가 방법', style: AppTypography.headingSmall),
+                  // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+                  Text('자녀 추가 방법', style: NotebookTypography.sectionTitle),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     '자녀를 추가할 방법을 선택하세요',

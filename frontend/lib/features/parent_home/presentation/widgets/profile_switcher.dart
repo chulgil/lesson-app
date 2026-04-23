@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
@@ -388,10 +389,11 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+            // (BottomSheetHandle 없이 showModalBottomSheet 사용 → 일반 sectionTitle 적용.)
             Text(
               '프로필 전환',
-              style: AppTypography.headingSmall.copyWith(
-                fontWeight: FontWeight.bold,
+              style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.ink,
               ),
             ),

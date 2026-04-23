@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// Section card widget for parent dashboard sections
 class SectionCard extends StatelessWidget {
@@ -41,7 +41,9 @@ class SectionCard extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
-              Text(title, style: AppTypography.headingSmall),
+              // Notebook × Score: SectionCard 의 title 은 Playfair sectionTitle
+              // 로 통일. 4개 호출부(parent_dashboard_tab) 에 일괄 반영 (§7.17).
+              Text(title, style: NotebookTypography.sectionTitle),
               const Spacer(),
               if (trailing != null) trailing!,
             ],
