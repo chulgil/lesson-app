@@ -3088,6 +3088,41 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.85 subscription/ 잔재 15건 전수 감사 — §7.30 10-패턴 자동 판정 성공 (0건 변환, 3번째 포화 도메인)
+
+**기간**: 2026-04-23
+**대상**: `features/subscription/presentation/` 의 `AppTypography.headingSmall` 잔재 15건 (screens 9 + widgets 6)
+
+**배경**: §7.84 에서 확정한 **"§7.30 자동 판정 10-패턴"** 을 실전 적용. subscription 도메인은 §7.40–§7.62 전후에 이미 핵심 템플릿·제안 카드 승격이 끝났고, 남은 15건은 **동적 가격·동적 이름·빈 상태·에러 상태·대기 상태** 로 구성될 것으로 예측. 파일 Read 없이 컨텍스트 스캐닝만으로 100% §7.30 판정 가능한지 검증.
+
+**결과**: **15건 전원 §7.30** — 예측 적중. 10-패턴 중 **#2(동적 이름), #3(stat value ≈ 가격), #7(빈 상태), #8(에러 headline), status with icon(새 서브패턴)** 로 구성:
+
+| 파일 | 라인 | 분류 | 세부 |
+|------|------|------|------|
+| `screens/proposal_confirm_screen.dart` | 253 | #3 | `_formatPrice(price)` 결제가 |
+| `screens/proposal_detail_screen.dart` | 444 | #3 | `template.formattedPrice` |
+| `screens/subscription_template_list_screen.dart` | 286 | #2 | `template.name` (비활성 상태 inkTertiary 분기) |
+| `screens/renewal_detail_screen.dart` | 337 | #3 | `template.formattedPrice` |
+| `screens/subscription_detail_screen.dart` | 83 | #7 | `AppStrings.subscriptionNotFound` + `Icons.search_off` 빈 상태 |
+| `screens/subscription_detail_screen.dart` | 107 | #8 | `AppStrings.errorOccurred` + `Icons.error_outline` |
+| `screens/subscription_list_screen.dart` | 308 | #7 | `'등록된 수강권이 없습니다'` + `Icons.confirmation_number_outlined` |
+| `screens/subscription_list_screen.dart` | 336 | #7 | `'등록된 레슨이 없습니다'` + `Icons.school_outlined` |
+| `screens/subscription_list_screen.dart` | 369 | #8 | `'오류가 발생했습니다'` + `Icons.error_outline` |
+| `widgets/issue_form_membership_widgets.dart` | 223 | #7 | `'등록된 레슨이 없습니다'` + `Icons.school_outlined` |
+| `widgets/issue_form_membership_widgets.dart` | 258 | #8 | `'오류가 발생했습니다'` + `Icons.error_outline` |
+| `widgets/selectable_template_card.dart` | 147 | #3 | `template.formattedPrice` (선택 여부로 색상 분기) |
+| `widgets/template_choice_card.dart` | 72 | #2 | `template.name` (추천 뱃지 옆) |
+| `widgets/proposal_card_widgets.dart` | 329 | #3 | `_formatPrice(discountedPrice)` 할인 결제가 |
+| `widgets/proposal_card_widgets.dart` | 567 | status+icon | `'입금 확인 대기중'` + `Icons.hourglass_empty` (대기 상태 headline) |
+
+**포화 도메인 계보**: parent_home(§7.81 0/11) → settings+gamification(§7.79 0/6) → practice(§7.84 0/9) → **subscription-잔재(§7.85 0/15)** 로 4번째. subscription 은 §7.40 이전 배치에서 핵심 템플릿 이름을 이미 승격했으므로, **"한 도메인을 두 세션 걸쳐 감사"** 할 경우 후반부는 §7.30 로 수렴한다는 2차 법칙 관찰. — **Playfair 승격은 도메인 전반 확산이 아니라 "소수 정적 명사 집중"** 에서 완결된다.
+
+**검증**: 파일 Read 없이 Grep + 컨텍스트 스캐닝만으로 15/15 판정 성공. 판단 근거는 `Text(` 직전·직후 **2~3줄만** 확인: 아이콘 동반 (§7.30 #7/#8), 변수명 (`_formatPrice`, `template.*`, `booking.*` — §7.30 #2/#3), 색상 분기 (isSelected·isActive — §7.30 #2/#3). **자동 판정 프로토콜 실전 검증 완료.**
+
+**은유**: §7.85 는 **"도서관 반납함을 비우는 일"** — 이미 정식 서가(Playfair 승격 완료분)에 꽂혀 있는 책은 건드리지 않고, 반납함(잔재 15건)에 남은 것들이 모두 **일일 재고 전표** (가격)·**학생 출석부** (이름)·**비어 있음 안내판** (빈 상태)·**"안내 직원 부재중"** (에러)·**"반납 확인 대기중"** (상태) 임을 확인. 전표·출석부·안내판은 서가에 올라갈 수 없다 — 책이 아니기 때문이다.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
