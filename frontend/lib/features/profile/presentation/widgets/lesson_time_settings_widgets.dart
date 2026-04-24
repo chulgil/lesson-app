@@ -180,6 +180,7 @@ class DaySectionCard extends StatelessWidget {
           hasSlots ? Icons.check_circle : Icons.cancel,
           color: hasSlots ? AppColors.paperOk : AppColors.inkTertiary,
         ),
+        // Notebook × Score: 요일명은 동적 개체명 → §7.30 #2 + bodyLarge+w600 평행 패턴 §7.104 예외.
         title: Text(
           dayName,
           style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),

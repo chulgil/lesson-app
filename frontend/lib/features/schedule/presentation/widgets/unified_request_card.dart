@@ -132,9 +132,7 @@ class UnifiedRequestCard extends StatelessWidget {
         const Spacer(),
         Text(
           _formatRelativeTime(request.createdAt),
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
@@ -144,7 +142,7 @@ class UnifiedRequestCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Student name + instrument
+        // Notebook × Score: 학생명+악기 동적 개체명 → §7.30 #2 + bodyLarge+w600 평행 패턴 §7.104 예외.
         Text(
           '${studentName ?? '학생'} · ${request.instrument}',
           style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
@@ -218,9 +216,7 @@ class UnifiedRequestCard extends StatelessWidget {
       ),
       child: Text(
         request.message!,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
       ),
@@ -399,11 +395,7 @@ class UnifiedRequestCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.sell_outlined,
-                size: 14,
-                color: AppColors.inkTertiary,
-              ),
+              Icon(Icons.sell_outlined, size: 14, color: AppColors.inkTertiary),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '참고 가격: ${_formatPrice(request.suggestedPrice!)}원',
@@ -454,7 +446,10 @@ class UnifiedRequestCard extends StatelessWidget {
         AppColors.paperOk,
         AppColors.paperDark,
       ),
-      UnifiedRequestStatus.rejected => (AppColors.paperAccent, AppColors.paperAccentSoft),
+      UnifiedRequestStatus.rejected => (
+        AppColors.paperAccent,
+        AppColors.paperAccentSoft,
+      ),
       UnifiedRequestStatus.cancelled || UnifiedRequestStatus.expired => (
         AppColors.inkTertiary,
         AppColors.paperDark,
@@ -561,9 +556,7 @@ class _InfoChip extends StatelessWidget {
         const SizedBox(width: 3),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );

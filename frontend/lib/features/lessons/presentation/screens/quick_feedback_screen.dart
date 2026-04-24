@@ -9,6 +9,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../domain/entities/feedback_preset.dart';
@@ -230,10 +231,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       children: [
         Icon(icon, size: 20, color: AppColors.paperAccent),
         const SizedBox(width: AppSpacing.space2),
-        Text(
-          title,
-          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-        ),
+        // Notebook × Score: 섹션 헤더 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
+        Text(title, style: NotebookTypography.sectionTitle),
       ],
     );
   }

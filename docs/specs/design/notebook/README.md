@@ -3961,6 +3961,64 @@ rg "color: AppColors.ink(Secondary|Tertiary).*headingSmall|headingSmall.*inkSeco
 
 ---
 
+### §7.104 — 평행 타이포 축 감사: `AppTypography.bodyLarge + w600` 의사-헤드라인 (2026-04-24)
+
+**배경**: §7.91-b~§7.101 의 15 도메인 포화 감사는 **`AppTypography.heading*` 타이포 축**에 국한되었다. §7.17 승격과 §7.30 예외 체계 전체가 그 한 축 위에 구축되었음. 그러나 코드베이스에는 **"의사-헤드라인 (quasi-headline)"** 이라는 평행 패턴이 존재 — `AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600)` 로 섹션 제목·리스트 그룹 헤더를 표현하는 방식. 크기 16pt/w600 Pretendard 는 시각적으로 `headingSmall`(18pt/w600) 과 유사한 권위를 지니지만 **타이포 정의상 별개** — 따라서 §7.17 자동 적용 대상이 아님. §7.104 는 이 축을 **최초로 전수 감사**.
+
+**검사 트리거**: `§7.102`(Gaegu) 와 `§7.103`(Roman) 이 §1.1 4대 시그니처의 다른 축을 감사했다는 관찰 → §7.104 는 **타이포 축 확장 감사**. `rg "AppTypography.bodyLarge.copyWith\(.*FontWeight\."` → 10 지점 발견.
+
+#### 7.104-a §7.17 승격 7 지점
+
+| 파일 | 라인 | 헤드라인 | 분류 근거 |
+|------|------|---------|----------|
+| `features/lessons/presentation/screens/quick_feedback_screen.dart` | 235 | "레슨 피드백" | _buildSectionHeader 정적 명사 단일 헤드라인 |
+| `features/invite/presentation/screens/invite_history_screen.dart` | 153 | "활성 초대" / "만료/취소된 초대" | _buildSectionHeader 정적 명사 (2 callers) |
+| `features/practice/presentation/widgets/tuner/tuner_settings_sheet.dart` | 167 | "기준 주파수 (A4)" | 바텀시트 설정 섹션 헤더 |
+| 동일 파일 | 263 | "조옮김 (관악기용)" | 바텀시트 설정 섹션 헤더 |
+| 동일 파일 | 330 | "판정 난이도" | 바텀시트 설정 섹션 헤더 |
+| 동일 파일 | 402 | "이명동음 표시" | 바텀시트 설정 섹션 헤더 |
+| 동일 파일 | 461 | "음자리표" | 바텀시트 설정 섹션 헤더 |
+
+변환: `AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600)` → `NotebookTypography.sectionTitle` (Playfair 17 / w600). 16pt Pretendard → 17pt Playfair 로 1pt 상향 + serif 전환 = §7.17 기존 승격과 동일한 위계 확립.
+
+#### 7.104-b §7.30 예외 3 지점
+
+| 파일 | 라인 | 내용 | §7.30 패턴 |
+|------|------|------|-----------|
+| `features/profile/presentation/widgets/lesson_time_settings_widgets.dart` | 185 | `dayName` (월/화/수…) | #2 동적 개체명 |
+| `features/practice/presentation/widgets/recording_comparison_sheet.dart` | 236 | `'Step 1/2: ...' / 'Step 2/2: ...'` | #4 변형 시퀀스 라벨 |
+| `features/schedule/presentation/widgets/unified_request_card.dart` | 150 | `'${studentName} · ${instrument}'` | #2 동적 개체명 |
+
+#### 7.104 검증
+
+```bash
+# 승격 후 평행 패턴 잔존 확인
+rg "AppTypography.bodyLarge.copyWith\(.*FontWeight\." frontend/lib/features/ | wc -l  # 3 (모두 §7.30 예외)
+# NotebookTypography.sectionTitle 사용 증가 확인
+rg "NotebookTypography.sectionTitle" frontend/lib/features/ | wc -l  # 7 지점 신규 + 기존
+flutter analyze 4 파일 → No issues found
+```
+
+#### 7.104 관찰
+
+**"평행 타이포 축 포화"**: 10 지점 중 7 승격 + 3 예외 = **전환율 70.0%**. 이는 §7.91-b~§7.98 의 선생님 8 배치 평균(22.5%) 보다 현저히 높음. 원인: `bodyLarge + w600` 은 `heading*` 보다 **더 엄격한 의도성** 을 요구하는 스타일 — 개발자가 명시적으로 `fontWeight.w600` 를 지정한 경우는 "이것은 제목이다" 라는 의도 자체가 강함. 따라서 §7.30 예외 비율이 낮음.
+
+**"5 설정 섹션 단일 파일 편중"**: 7 승격 중 5 지점이 `tuner_settings_sheet.dart` 한 파일에 집중. §7.96 의 "바텀시트 밀집형 도메인" 법칙이 **단일 파일 수준**에서도 성립 — 튜너 설정은 한 시트 안에 5 개 섹션을 쌓아 올린 **극도의 밀집형 구조**. 이는 §7.97 의 "5 개 이상 섹션 = 자동 §7.17 후보" 휴리스틱을 확증.
+
+**"세 축 평행 감사 완결"**: §7.102(Gaegu) + §7.103(Roman) + §7.104(평행 타이포) = **§1.1 4대 시그니처 중 3 축에 대한 전수 감사 완료**. Vermillion (#3) 은 색 팔레트 축이라 타이포 감사 대상에서 제외 — 별도 스캐폴드 감사에 속함. 4대 시그니처 중 **타이포 기반 3 축(Playfair/Gaegu/Roman) + 평행 타이포 축** 이 모두 감사됨.
+
+**최종 집계 업데이트**: §7.91-b(213) + §7.99(34) + §7.100(1) + §7.101(0 소급) + §7.102(3) + §7.103(0 소급) + §7.104(10) = **258 감사 지점 · §7.17/등가 승격 72 지점 · §7.30 예외 189 지점 + Gaegu 전용 3 지점 승격**. 평행 타이포 포함 전환율 27.9%.
+
+**은유**: §7.104 는 **"같은 음을 다른 악기로 연주하는지 확인"** — Playfair 피아노(heading*) 는 이미 조율했지만, 바이올린(bodyLarge+w600) 도 같은 화성 위계를 지키는지 점검. 7 지점은 바이올린이 피아노에 합류했고, 3 지점은 솔로 유지 (§7.30).
+
+**Lore-directive**: **"감사 축은 타이포 상수 이름에 묶이지 않고 시각적 역할에 묶인다"**. `heading*` 대신 `bodyLarge + w600` 를 써서 같은 역할(섹션 헤더) 을 수행하는 것은 법칙 회피가 아니라 **법칙 재발견** — §7.104 의 존재 자체가 "타이포 축 확장 감사" 라는 새 감사 유형을 정의.
+
+**Lore-constraint**: `AppTypography.bodyLarge + FontWeight.w600` 은 §7.17 승격 전제에 해당. 정적 명사 + 단일 헤드라인 + 시각 위계(섹션 헤더 이상) 3 조건 충족 시 `NotebookTypography.sectionTitle` 로 변환 의무.
+
+**Lore-rejected**: `unified_request_card.dart:150` 승격 — `studentName · instrument` 은 완전 동적 개체명 결합이라 §7.30 #2 확정. 의사-헤드라인이지만 데이터 주도.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

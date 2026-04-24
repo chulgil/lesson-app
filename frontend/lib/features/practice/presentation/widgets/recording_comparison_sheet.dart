@@ -231,6 +231,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       controller: widget.scrollController,
       padding: const EdgeInsets.all(AppSpacing.space4),
       children: [
+        // Notebook × Score: 'Step N/M' 시퀀스 라벨 → §7.30 #4 변형 + bodyLarge+w600 평행 패턴 §7.104 예외.
         Text(
           label,
           style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),

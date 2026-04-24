@@ -148,10 +148,8 @@ class InviteHistoryScreen extends ConsumerWidget {
   Widget _buildSectionHeader(String title, int count) {
     return Row(
       children: [
-        Text(
-          title,
-          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-        ),
+        // Notebook × Score: 초대 섹션 헤더 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
+        Text(title, style: NotebookTypography.sectionTitle),
         const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(
