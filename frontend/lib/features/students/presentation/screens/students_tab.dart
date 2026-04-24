@@ -869,120 +869,126 @@ class _StudentCard extends ConsumerWidget {
             horizontal: AppSpacing.space4,
             vertical: AppSpacing.space3,
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Checkbox (selection mode only)
-              if (isSelectionMode) ...[
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Checkbox(
-                    value: isSelected,
-                    onChanged: (value) => onSelectionChanged(value ?? false),
-                    activeColor: AppColors.paperAccent,
-                    shape: const RoundedRectangleBorder(),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space2),
-              ],
-
-              // Avatar
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
-                child: Text(
-                  swm.initial,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.paperAccent,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.space3),
-
-              // Info section (flexible)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Row 1: Name · Instrument + connection badge + [N] badge
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            '${swm.name} · ${swm.instrument}',
-                            style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        // Subject count badge (복수 과목 힌트)
-                        if (subjectCount > 1) ...[
-                          const SizedBox(width: AppSpacing.space1),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(
-                                alpha: 0.1,
-                              ),
-                            ),
-                            child: Text(
-                              '$subjectCount과목',
-                              style: AppTypography.captionSmall.copyWith(
-                                color: AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(width: AppSpacing.space1),
-                        Icon(
-                          swm.isAppConnected ? Icons.link : Icons.edit_note,
-                          size: 14,
-                          color:
-                              swm.isAppConnected
-                                  ? AppColors.paperOk
-                                  : AppColors.inkTertiary,
-                        ),
-                      ],
-                    ),
-                    // Row 2: Schedule
-                    Text(
-                      swm.lessonSchedule ?? '스케줄 미등록',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    // Row 3: Weekly practice dots
-                    _PracticeDots(studentId: swm.studentId),
-                  ],
-                ),
-              ),
-
-              // Status section
-              if (!isSelectionMode) ...[
-                _buildSubscriptionStatus(context, ref, swm.studentId),
-                const SizedBox(width: AppSpacing.space1),
-                // Arrow
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.inkTertiary,
-                  size: 20,
-                ),
-              ],
+              Row(children: _buildHeaderRow(context, ref, swm)),
+              if (!isSelectionMode) _EnrollmentExtras(studentId: swm.studentId),
             ],
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildHeaderRow(
+    BuildContext context,
+    WidgetRef ref,
+    StudentWithMembership swm,
+  ) {
+    return [
+      // Checkbox (selection mode only)
+      if (isSelectionMode) ...[
+        SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            value: isSelected,
+            onChanged: (value) => onSelectionChanged(value ?? false),
+            activeColor: AppColors.paperAccent,
+            shape: const RoundedRectangleBorder(),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+      ],
+
+      // Avatar
+      CircleAvatar(
+        radius: 20,
+        backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+        child: Text(
+          swm.initial,
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.paperAccent,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+
+      const SizedBox(width: AppSpacing.space3),
+
+      // Info section (flexible)
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row 1: Name · Instrument + connection badge + [N] badge
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    '${swm.name} · ${swm.instrument}',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Subject count badge (복수 과목 힌트)
+                if (subjectCount > 1) ...[
+                  const SizedBox(width: AppSpacing.space1),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.paperAccent.withValues(alpha: 0.1),
+                    ),
+                    child: Text(
+                      '$subjectCount과목',
+                      style: AppTypography.captionSmall.copyWith(
+                        color: AppColors.paperAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(width: AppSpacing.space1),
+                Icon(
+                  swm.isAppConnected ? Icons.link : Icons.edit_note,
+                  size: 14,
+                  color:
+                      swm.isAppConnected
+                          ? AppColors.paperOk
+                          : AppColors.inkTertiary,
+                ),
+              ],
+            ),
+            // Row 2: Schedule
+            Text(
+              swm.lessonSchedule ?? '스케줄 미등록',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            // Row 3: Weekly practice dots
+            _PracticeDots(studentId: swm.studentId),
+          ],
+        ),
+      ),
+
+      // Status section
+      if (!isSelectionMode) ...[
+        _buildSubscriptionStatus(context, ref, swm.studentId),
+        const SizedBox(width: AppSpacing.space1),
+        // Arrow
+        const Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
+      ],
+    ];
   }
 
   Widget _buildSubscriptionStatus(
@@ -1114,6 +1120,243 @@ class _PracticeDots extends ConsumerWidget {
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+/// Student card 의 수강권 확장 영역 — 진행 bar + D-day + 인라인 CTA.
+///
+/// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.3
+///
+/// 3가지 모드:
+/// - normal  : 진행 bar + D-day + [갱신 제안][레슨 추가]
+/// - expiring: D-day 강조 색상 + [갱신 제안][레슨 추가]
+/// - archive : 진행 bar 숨김 + "YYYY-MM-DD 만료" 메타 + [재등록 제안]
+class _EnrollmentExtras extends ConsumerWidget {
+  final String studentId;
+
+  const _EnrollmentExtras({required this.studentId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subsAsync = ref.watch(studentSubscriptionsProvider(studentId));
+
+    return subsAsync.when(
+      data: (subs) {
+        if (subs.isEmpty) return const SizedBox.shrink();
+
+        final active =
+            subs
+                .where(
+                  (s) =>
+                      s.status == SubscriptionStatus.active ||
+                      s.status == SubscriptionStatus.expiringSoon,
+                )
+                .toList();
+        final isArchive = active.isEmpty;
+
+        if (isArchive) {
+          // Archive 모드: 가장 최근 만료된 수강권 메타 + 재등록 CTA
+          final latestExpired = _latestByEndDate(subs);
+          return Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
+            child: _buildArchiveFooter(context, ref, latestExpired),
+          );
+        }
+
+        // Normal / expiring 모드
+        final primary = active.first;
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.space2),
+          child: _buildActiveFooter(context, ref, primary),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildActiveFooter(
+    BuildContext context,
+    WidgetRef ref,
+    Subscription sub,
+  ) {
+    final total = sub.totalLessonsForDisplay;
+    final used = sub.usedLessons;
+    final progress =
+        (total != null && total > 0) ? (used / total).clamp(0.0, 1.0) : 0.0;
+    final daysLeft = sub.daysUntilExpiration;
+    final barColor =
+        progress >= 0.8 || (daysLeft != null && daysLeft <= 7)
+            ? AppColors.paperAccent
+            : AppColors.inkSecondary;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 진행 bar (2px)
+        if (total != null && total > 0) ...[
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 2,
+                  color: AppColors.inkQuaternary,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress,
+                    child: Container(color: barColor),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '$used/$total회',
+                style: AppTypography.captionSmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space1),
+        ],
+        // D-day chip + CTA row
+        Row(
+          children: [
+            if (daysLeft != null) _DdayChip(daysLeft: daysLeft),
+            const Spacer(),
+            _InlineCta(
+              label: '갱신 제안',
+              onTap: () {
+                UnifiedSubscriptionSheet.show(
+                  context,
+                  teacherId: '',
+                  studentIds: [studentId],
+                );
+              },
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            _InlineCta(
+              label: '레슨 추가',
+              onTap: () {
+                context.push('${AppRoutes.addLesson}?studentId=$studentId');
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArchiveFooter(
+    BuildContext context,
+    WidgetRef ref,
+    Subscription? latest,
+  ) {
+    final expiredDateText =
+        latest?.endDate != null
+            ? '${latest!.endDate!.year}-${latest.endDate!.month.toString().padLeft(2, '0')}-${latest.endDate!.day.toString().padLeft(2, '0')} 만료'
+            : '만료됨';
+    return Row(
+      children: [
+        Text(
+          expiredDateText,
+          style: AppTypography.captionSmall.copyWith(
+            color: AppColors.inkTertiary,
+          ),
+        ),
+        const Spacer(),
+        _InlineCta(
+          label: '재등록 제안',
+          onTap: () {
+            final teacherId = ref.read(currentUserIdProvider);
+            UnifiedSubscriptionSheet.show(
+              context,
+              teacherId: teacherId,
+              studentIds: [studentId],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Subscription? _latestByEndDate(List<Subscription> subs) {
+    final withDates =
+        subs.where((s) => s.endDate != null).toList()
+          ..sort((a, b) => b.endDate!.compareTo(a.endDate!));
+    return withDates.isEmpty ? null : withDates.first;
+  }
+}
+
+class _DdayChip extends StatelessWidget {
+  final int daysLeft;
+
+  const _DdayChip({required this.daysLeft});
+
+  @override
+  Widget build(BuildContext context) {
+    if (daysLeft > 14) return const SizedBox.shrink();
+
+    final Color color;
+    if (daysLeft <= 0) {
+      color = AppColors.paperAccent;
+    } else if (daysLeft <= 7) {
+      color = AppColors.paperAccent;
+    } else {
+      color = AppColors.inkSecondary;
+    }
+
+    final label = daysLeft <= 0 ? '만료' : 'D-$daysLeft 만료';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: color,
+          strokeAlign: BorderSide.strokeAlignInside,
+        ),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.captionSmall.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _InlineCta extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _InlineCta({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: 4,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.ink,
+            strokeAlign: BorderSide.strokeAlignInside,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.captionSmall.copyWith(
+            color: AppColors.ink,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }
