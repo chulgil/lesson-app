@@ -22,9 +22,11 @@ import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../widgets/bulk_message_sheet.dart';
 import '../widgets/practice_sparkline.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
+import 'bulk_cancel_screen.dart';
 
 /// Students management tab with Riverpod state management
 class StudentsTab extends ConsumerStatefulWidget {
@@ -240,7 +242,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 color: AppColors.ink,
                 size: 22,
               ),
-              tooltip: '선택',
+              tooltip: '일괄 작업',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
@@ -629,7 +631,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   Widget _buildBottomActionBar() {
-    final teacherId = ref.watch(currentUserIdProvider);
+    // §7.119 선생님 일괄 작업: 휴강 공지(B1) + 일괄 메시지(B2).
+    // "수강권 발급" 경로는 제거됨 — studentIds.first silent drop 버그 + 수강권은 학생별 개별 설계 필요.
+    final hasSelection = _selectedStudentIds.isNotEmpty;
 
     return Positioned(
       left: 0,
@@ -652,30 +656,81 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         ),
         child: SafeArea(
           top: false,
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '${_selectedStudentIds.length}명 선택됨',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '${_selectedStudentIds.length}명 선택됨',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
               ),
-              const Spacer(),
-              FilledButton(
-                onPressed: () {
-                  UnifiedSubscriptionSheet.show(
-                    context,
-                    teacherId: teacherId,
-                    studentIds: _selectedStudentIds.toList(),
-                  );
-                },
-                child: const Text('수강권 발급'),
+              const SizedBox(height: AppSpacing.space2),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: hasSelection ? _onBulkCancel : null,
+                      icon: const Icon(Icons.event_busy, size: 18),
+                      label: const Text('휴강 공지'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeight,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: hasSelection ? _onBulkMessage : null,
+                      icon: const Icon(Icons.send, size: 18),
+                      label: const Text('메시지 보내기'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeight,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _onBulkCancel() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder:
+            (_) => BulkCancelScreen(studentIds: _selectedStudentIds.toList()),
+      ),
+    );
+    if (result == true && mounted) {
+      setState(() {
+        _isSelectionMode = false;
+        _selectedStudentIds.clear();
+      });
+    }
+  }
+
+  void _onBulkMessage() async {
+    final result = await BulkMessageSheet.show(
+      context,
+      studentIds: _selectedStudentIds.toList(),
+    );
+    if (result == true && mounted) {
+      setState(() {
+        _isSelectionMode = false;
+        _selectedStudentIds.clear();
+      });
+    }
   }
 
   Widget _buildErrorState(Object error) {
@@ -1228,7 +1283,7 @@ class _EnrollmentExtras extends ConsumerWidget {
               onTap: () {
                 UnifiedSubscriptionSheet.show(
                   context,
-                  teacherId: '',
+                  teacherId: ref.read(currentUserIdProvider),
                   studentIds: [studentId],
                 );
               },
