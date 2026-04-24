@@ -70,6 +70,8 @@ enum NotificationType {
   // Reschedule allowance notifications
   rescheduleAllowanceUsed, // Student used reschedule allowance
   rescheduleAllowanceDepleted, // All reschedule allowances used
+  // Bulk teacher actions (§7.119)
+  generalAnnouncement, // Teacher broadcast message (non-urgent)
 }
 
 /// Notification priority levels

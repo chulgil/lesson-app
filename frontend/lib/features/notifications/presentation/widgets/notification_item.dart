@@ -91,7 +91,7 @@ class NotificationItem extends StatelessWidget {
                         vertical: AppSpacing.space1,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1)
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
                       ),
                       child: Text(
                         notification.actionLabel!,
@@ -128,9 +128,7 @@ class NotificationItem extends StatelessWidget {
     return Container(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(
-        color: _getIconBackgroundColor()
-      ),
+      decoration: BoxDecoration(color: _getIconBackgroundColor()),
       child: Center(
         child: Text(_getIcon(), style: const TextStyle(fontSize: 20)),
       ),
@@ -236,6 +234,10 @@ class NotificationItem extends StatelessWidget {
         return '🔄';
       case NotificationType.rescheduleAllowanceDepleted:
         return '⚠️';
+
+      // Bulk teacher actions (§7.119)
+      case NotificationType.generalAnnouncement:
+        return '📣';
     }
   }
 
