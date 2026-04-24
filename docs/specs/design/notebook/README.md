@@ -4019,6 +4019,67 @@ flutter analyze 4 파일 → No issues found
 
 ---
 
+### §7.105 — §1.1 #3 Vermillion Red 색 서명 SSOT 감사 · 4대 시그니처 포화 완결 (2026-04-24)
+
+**배경**: §7.102(Gaegu) · §7.103(Roman) · §7.104(평행 타이포) 로 §1.1 4대 시그니처 중 **타이포 3 축** 전수 감사가 마무리됨. 남은 축은 **#3 Vermillion Red(`paperAccent` = `#9B1B12`)** 단 하나. Vermillion 은 색 토큰 축이라 감사 방법론이 다름 — "헤드라인 승격 조건" 이 아니라 **"SSOT 일관성 + 드리프트 부재"** 를 검증해야 함. §7.105 는 **색 팔레트 축의 최초 · 유일 감사 배치**.
+
+**검사 3 단계**:
+1. **밀도 분석** — `rg "paperAccent" frontend/lib/` = 2,294 지점 (features 2,111 + core 183). §7.91-b(213) · §7.104(10) 과 비교하면 **색 토큰 밀도는 타이포 밀도의 10 배 이상**. 이는 색이 전 화면에 편재(ubiquitous) 하기 때문 — 개별 감사 대신 **테마 체제 + 드리프트 부재** 를 검증하는 것이 합리적.
+2. **테마 체제 검증** — `frontend/lib/core/theme/app_theme.dart:106-120` 이 `FilledButton.backgroundColor = paperAccent` · `ColorScheme.secondary = paperAccent` · `ColorScheme.error = paperAccent` 로 **단일지점 테마 주입**. 주석 "74 개 호출부 중 21 개 인라인 반복 · 53 개는 테마 자동 보급" 이 이미 **Vermillion 포화 의지** 를 명문화.
+3. **드리프트 부재 검증** — 대체 색(red/deepOrange/pink 계열 Flutter Material Color) 이 features/ 에 하드코딩되었는지 전수 검색 → **0 건**. 서명 hex(`0xFF9B1B12`) 리터럴 전수 검색 → **1 건**(`core/utils/instrument_colors.dart:9`).
+
+#### 7.105-a 1 SSOT 위반 해소
+
+| 파일 | 라인 | 위반 | 수정 |
+|------|------|------|------|
+| `core/utils/instrument_colors.dart` | 9 | `InstrumentColorPair(Color(0xFFF2ECDD), Color(0xFF9B1B12))` — 바이올린 색 페어가 `paper` / `paperAccent` 와 동일 hex 지만 하드코딩 리터럴 사용 | `InstrumentColorPair(AppColors.paper, AppColors.paperAccent)` + `import '../theme/app_colors.dart';` 추가. 바이올린 = **서명 악기** 라는 의미가 색 표현 레벨에서 SSOT 로 고정. |
+
+#### 7.105-b 3 의미 축 확증
+
+Vermillion 이 **paperAccent** 라는 단일 토큰으로 세 가지 다른 의미 역할을 동시에 담당:
+
+| 역할 | 대표 지점 | 시각 패턴 |
+|------|----------|----------|
+| **핵심 액션** (primary CTA) | `FilledButton` 전역 자동 | `paperAccent` 배경 + `paper` 텍스트. 테마 강제 |
+| **현재 진행** (active/selected) | `time_signature_picker.dart:143` · `paperAccent` chip border + fill | 선택 상태 자기-표지 |
+| **하이라이트** (warning/important) | `lesson_notes_widgets.dart` 피드백 액센트 · `paperAccentSoft` 배경 24% alpha | 본문에 끼어드는 주의 표지 |
+
+세 역할이 **단일 색 토큰** 을 공유하는 것이 규범이며, 별도 warning/action/selected 토큰 분화는 **역-SSOT**. §7.105 는 이 3-in-1 구조가 전 코드베이스에 견고히 유지되고 있음을 확증.
+
+#### 7.105 검증
+
+```bash
+rg "Color\(0xFF9B1B12\)|Color\(0xff9b1b12\)" frontend/lib/ | wc -l  # 1 (app_colors.dart 정의 자체만)
+rg "Colors\.(red|deepOrange|orange|pink)" frontend/lib/features/ | wc -l  # 0 (드리프트 부재)
+rg "paperAccent" frontend/lib/ | wc -l  # 2,294 (테마 + features 포화)
+flutter analyze lib/core/utils/instrument_colors.dart  # No issues found
+```
+
+#### 7.105 관찰
+
+**"색 서명의 테마 단일지점 주입 법칙"**: Vermillion 이 2,294 지점에 편재함에도 감사가 가능했던 이유 = `app_theme.dart` 가 **`FilledButton` 전역 배경** 을 테마 레벨에서 강제했기 때문. 만약 각 버튼이 `FilledButton.styleFrom(backgroundColor: ...)` 를 개별 지정했다면 감사는 불가능. **색 토큰의 SSOT 강제는 테마 레벨 정의 + 호출부 인라인 금지** 의 2-조건 충족이 필수.
+
+**"서명 색 토큰 = 의미 번들링"**: Vermillion 한 토큰이 CTA · 선택 · 경고 3 의미를 담는 것은 Bauhaus/Pentagram 식의 **"신호 간결주의"** 와 일치. 3 역할을 3 토큰(actionColor/selectedColor/warningColor) 으로 분리하면 Flutter Material 과 동일해지지만 서명성은 사라짐. 이 긴장관계는 §7.104 의 "타이포 상수 이름 ≠ 시각 역할" 과 **정반대 구조** — 타이포는 역할별 상수 분화, 색은 역할별 상수 통합.
+
+**"§1.1 4대 시그니처 전수 감사 포화"**:
+- §7.101: #1 Playfair serif — 타이포 헤드라인 포화 ✓
+- §7.102: #4 Gaegu 손글씨 — 3 지점 신규 승격 포화 ✓
+- §7.103: #2 Roman 기보 — 14 선행 + 4 경계 케이스 (#11~#14) 포화 ✓
+- §7.104: 평행 타이포 축 — 10 지점 포화 (#1 확장) ✓
+- **§7.105: #3 Vermillion Red — 1 SSOT 위반 해소 · 2,294 지점 테마 주도 포화 ✓**
+
+4 축 모두 감사되었으며, 각 축은 **고유한 감사 방법론** 으로 검증됨 (Playfair/Gaegu/Roman = 헤드라인 승격, Vermillion = SSOT + 드리프트 부재). 이후 §7.106+ 배치는 **신규 배치 · 축 교차 · 재감사** 중 하나여야 하며, 단일 축 최초 감사는 **더 이상 가능하지 않음** (남은 축 없음).
+
+**은유**: §7.105 는 **"오케스트라 튜닝 최종 확인"** — 각 악기(§7.101~§7.104 의 4 축) 가 개별 조율되었고, 마지막으로 **전체 합주에서 공통 기준음(A=440Hz)** 이 흔들리지 않는지 점검. 색은 음높이 같은 연속 스펙트럼이라 **기준점 일탈 = 1 위반 발견 → 1 수정** 이라는 이산 사건으로 감지됨.
+
+**Lore-directive**: **"서명 색 토큰은 hex 리터럴 금지, AppColors 참조 필수"**. `Color(0xFF9B1B12)` 같은 서명 hex 문자열은 **`AppColors.paperAccent`** 로만 참조. 이는 §7.102 의 "Gaegu 는 `NotebookTypography.hand` 로만" 과 동형의 SSOT 법칙 — 어느 차원이든 **서명 상수명이 유일 접근 경로**.
+
+**Lore-constraint**: Vermillion 의 3 의미 역할(CTA / 선택 / 경고) 은 별도 토큰으로 분화 금지. 의미를 구분해야 할 경우 **배경 alpha(`paperAccentSoft` 24% alpha) + 주변 강세** 로 구분 — 색 자체의 서명성은 유지.
+
+**Lore-rejected**: 서명 Vermillion 을 warning-specific 토큰으로 복제 — Material Design 의 `colorScheme.error` 분화 패턴에 해당. Riman Lesson-App 은 `ColorScheme.error = paperAccent` 로 **역-Material** 을 선택했고, 이 선택이 서명성을 지킴.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

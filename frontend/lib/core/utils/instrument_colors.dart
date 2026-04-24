@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Instrument color mapping for schedule views.
 /// Each instrument gets a unique background + accent color pair.
 class InstrumentColors {
   InstrumentColors._();
 
   static const _colorMap = <String, InstrumentColorPair>{
-    '바이올린': InstrumentColorPair(Color(0xFFF2ECDD), Color(0xFF9B1B12)),
+    // Notebook × Score: 바이올린 = 서명 악기 (paper + Vermillion) §1.1 · §7.104.
+    '바이올린': InstrumentColorPair(AppColors.paper, AppColors.paperAccent),
     '피아노': InstrumentColorPair(Color(0xFFE3F2FD), Color(0xFF1976D2)),
     '첼로': InstrumentColorPair(Color(0xFFFFF3E0), Color(0xFFF57C00)),
     '플루트': InstrumentColorPair(Color(0xFFE8F5E9), Color(0xFF388E3C)),
