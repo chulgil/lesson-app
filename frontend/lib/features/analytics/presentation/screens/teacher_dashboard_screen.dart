@@ -244,7 +244,6 @@ class _TeacherDashboardScreenState
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
@@ -278,8 +277,7 @@ class _TeacherDashboardScreenState
                   color: (isPositive
                           ? AppColors.paperOk
                           : AppColors.paperAccent)
-                      .withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                      .withValues(alpha: 0.1)
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -323,7 +321,6 @@ class _TeacherDashboardScreenState
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(

@@ -171,7 +171,7 @@ class MyTeachersScreen extends ConsumerWidget {
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
-              // (§7.17). '직접 등록한 선생님' 은 정적 그룹 헤더.
+              // (§7.17). '직접 등록한 선생님' 은 정적 그룹 헤더.,
               child: Text(
                 '직접 등록한 선생님',
                 style: NotebookTypography.sectionTitle.copyWith(
@@ -314,7 +314,6 @@ class _AppTeacherCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           onTap:
               () => context.push(
                 AppRoutes.teacherDetail.replaceFirst(':id', relation.teacherId),
@@ -487,7 +486,6 @@ class _ManualTeacherCard extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           onTap: () => context.push(AppRoutes.addManualTeacher, extra: teacher),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),

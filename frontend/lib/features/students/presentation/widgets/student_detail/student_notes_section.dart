@@ -85,10 +85,7 @@ class StudentNotesSection extends ConsumerWidget {
   Widget _buildEmptyState() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           Icon(Icons.notes, color: AppColors.inkTertiary),
@@ -123,12 +120,10 @@ class _NotePreviewCard extends StatelessWidget {
           () => context.push(
             AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
           ),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -175,9 +170,6 @@ class _NotePreviewCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: AppColors.paperAccent.withValues(
                                 alpha: 0.08,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
                               ),
                             ),
                             child: Text(

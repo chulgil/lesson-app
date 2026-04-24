@@ -39,7 +39,6 @@ class LevelAndTuitionSection extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -135,18 +134,12 @@ class LevelAndTuitionSection extends StatelessWidget {
                           vertical: AppSpacing.space2,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
                           borderSide:
                               const BorderSide(color: AppColors.inkQuaternary),
                         ),
                         disabledBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
                           borderSide:
                               const BorderSide(color: AppColors.inkQuaternary),
                         ),
@@ -252,8 +245,7 @@ class LevelAndTuitionSection extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: (isLinked ? AppColors.ink : AppColors.paperAccent)
-                  .withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  .withValues(alpha: 0.08)
             ),
             child: Row(
               children: [

@@ -59,10 +59,7 @@ class AddressFields extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.paperAccent,
                     side: const BorderSide(color: AppColors.paperAccent),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
-                    ),
+                    shape: const RoundedRectangleBorder(),
                   ),
                 ),
               ),

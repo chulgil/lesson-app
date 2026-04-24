@@ -53,7 +53,6 @@ class StudentPracticeSection extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
                   color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: Row(
@@ -111,7 +110,6 @@ class StudentPracticeSection extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: const Text('연습 정보를 불러올 수 없습니다'),
               ),

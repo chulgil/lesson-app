@@ -168,7 +168,6 @@ class StudentSubscriptionSection extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -200,7 +199,6 @@ class StudentSubscriptionSection extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -251,8 +249,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        color: AppColors.paper
       ),
       child: const Center(child: CircularProgressIndicator()),
     );
@@ -288,8 +285,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        color: AppColors.paper
       ),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',

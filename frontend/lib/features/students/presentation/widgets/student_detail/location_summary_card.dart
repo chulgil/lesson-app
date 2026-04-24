@@ -30,9 +30,7 @@ class LocationSummaryCard extends ConsumerWidget {
       margin: EdgeInsets.zero,
       elevation: 0,
       color: AppColors.paperDark,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
@@ -127,8 +125,7 @@ class LocationSummaryCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        color: AppColors.paperAccent.withValues(alpha: 0.1)
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

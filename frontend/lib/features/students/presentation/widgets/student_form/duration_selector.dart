@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 /// Duration selector buttons.
@@ -20,10 +19,7 @@ class DurationSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children:
@@ -39,9 +35,6 @@ class DurationSelector extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isSelected ? AppColors.paperAccent : Colors.transparent,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Text(
                     '$duration',

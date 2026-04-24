@@ -242,9 +242,6 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
                       child: LinearProgressIndicator(
                         value: _progressValue,
                         minHeight: 6,

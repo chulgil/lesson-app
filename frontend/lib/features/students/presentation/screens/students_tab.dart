@@ -271,10 +271,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   : null,
           filled: true,
           fillColor: AppColors.paperDark,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            borderSide: BorderSide.none,
-          ),
+          border: const OutlineInputBorder(borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
             vertical: AppSpacing.space3,
@@ -459,9 +456,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   void _showSortOptions() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Column(
@@ -774,7 +769,6 @@ class _StudentCard extends ConsumerWidget {
             isSelected
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border:
             isSelected
                 ? Border.all(
@@ -799,7 +793,6 @@ class _StudentCard extends ConsumerWidget {
                     extra: {'membershipId': swm.membership?.id},
                   );
                 },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
@@ -816,11 +809,7 @@ class _StudentCard extends ConsumerWidget {
                     value: isSelected,
                     onChanged: (value) => onSelectionChanged(value ?? false),
                     activeColor: AppColors.paperAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    shape: const RoundedRectangleBorder(),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space2),
@@ -870,9 +859,6 @@ class _StudentCard extends ConsumerWidget {
                             decoration: BoxDecoration(
                               color: AppColors.paperAccent.withValues(
                                 alpha: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
                               ),
                             ),
                             child: Text(
@@ -953,7 +939,6 @@ class _StudentCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color: AppColors.paperAccent.withValues(alpha: 0.4),
                   ),
@@ -984,7 +969,6 @@ class _StudentCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color: AppColors.paperAccent.withValues(alpha: 0.4),
                   ),

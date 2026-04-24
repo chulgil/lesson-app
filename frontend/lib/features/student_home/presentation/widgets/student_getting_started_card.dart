@@ -127,7 +127,6 @@ class _StepItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,

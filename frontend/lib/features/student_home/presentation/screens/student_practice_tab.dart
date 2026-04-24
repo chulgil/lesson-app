@@ -144,7 +144,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           decoration: BoxDecoration(
                             color: AppColors.paperAccentSoft,
                           ),
-                          // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
+                          // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).,
                           child: Text(
                             '오늘',
                             style: NotebookTypography.handEmphasis,
@@ -436,7 +436,6 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                         '&date=${widget.selectedDate.toIso8601String()}',
                       );
                     },
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                     child: Row(
                       children: [
                         Icon(Icons.menu_book, color: AppColors.ink, size: 24),

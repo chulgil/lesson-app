@@ -34,7 +34,6 @@ class FrequencyOption extends StatelessWidget {
           color: isSelected
               ? AppColors.paperAccent.withValues(alpha: 0.1)
               : AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,

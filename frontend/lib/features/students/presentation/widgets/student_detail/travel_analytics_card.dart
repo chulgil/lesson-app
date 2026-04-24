@@ -23,9 +23,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
           margin: EdgeInsets.zero,
           elevation: 0,
           color: AppColors.paperDark,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(

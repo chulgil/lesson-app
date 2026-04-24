@@ -29,7 +29,6 @@ class MonthlyTrendChart extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: CustomPaint(

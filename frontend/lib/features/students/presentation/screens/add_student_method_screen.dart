@@ -97,7 +97,6 @@ class _MethodCard extends StatelessWidget {
             isPrimary
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isPrimary ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isPrimary ? 1.5 : 1,
@@ -118,9 +117,6 @@ class _MethodCard extends StatelessWidget {
                         isPrimary
                             ? AppColors.paperAccent.withValues(alpha: 0.15)
                             : AppColors.paperDark,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Icon(
                     icon,
@@ -146,11 +142,8 @@ class _MethodCard extends StatelessWidget {
                       horizontal: AppSpacing.space2,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.paperAccent,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
                     ),
                     child: Text(
                       badge!,

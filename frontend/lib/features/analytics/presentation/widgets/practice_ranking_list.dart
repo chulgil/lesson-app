@@ -25,7 +25,6 @@ class PracticeRankingList extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child:
@@ -132,7 +131,6 @@ class PracticeRankingList extends StatelessWidget {
           Expanded(
             flex: 3,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               child: LinearProgressIndicator(
                 value: student.practiceRate,
                 minHeight: 8,

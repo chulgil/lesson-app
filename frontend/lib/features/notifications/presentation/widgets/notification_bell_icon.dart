@@ -61,7 +61,6 @@ class NotificationBellIcon extends ConsumerWidget {
       constraints: const BoxConstraints(minWidth: 16),
       decoration: BoxDecoration(
         color: AppColors.paperAccent,
-        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Text(

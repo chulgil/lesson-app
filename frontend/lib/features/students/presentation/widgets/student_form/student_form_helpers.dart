@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/app_spacing.dart';
 
 /// Standard input decoration for student form fields.
 InputDecoration studentInputDecoration({
@@ -14,20 +13,16 @@ InputDecoration studentInputDecoration({
     labelText: isRequired ? '$label *' : label,
     hintText: hint,
     prefixIcon: Icon(prefixIcon),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      borderSide: const BorderSide(color: AppColors.inkQuaternary),
+    border: const OutlineInputBorder(
+      borderSide: BorderSide(color: AppColors.inkQuaternary),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       borderSide: const BorderSide(color: AppColors.inkQuaternary),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
     ),
     errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       borderSide: BorderSide(color: AppColors.paperAccent),
     ),
     filled: true,
@@ -53,7 +48,10 @@ String formatCurrencyInMan(int amount) {
 }
 
 /// Show time picker and return selected time.
-Future<TimeOfDay?> selectTime(BuildContext context, TimeOfDay initialTime) async {
+Future<TimeOfDay?> selectTime(
+  BuildContext context,
+  TimeOfDay initialTime,
+) async {
   return showTimePicker(
     context: context,
     initialTime: initialTime,

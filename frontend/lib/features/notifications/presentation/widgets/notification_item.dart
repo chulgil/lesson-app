@@ -91,10 +91,7 @@ class NotificationItem extends StatelessWidget {
                         vertical: AppSpacing.space1,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        color: AppColors.paperAccent.withValues(alpha: 0.1)
                       ),
                       child: Text(
                         notification.actionLabel!,
@@ -132,8 +129,7 @@ class NotificationItem extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: _getIconBackgroundColor(),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        color: _getIconBackgroundColor()
       ),
       child: Center(
         child: Text(_getIcon(), style: const TextStyle(fontSize: 20)),

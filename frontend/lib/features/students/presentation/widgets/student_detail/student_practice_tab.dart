@@ -68,7 +68,6 @@ class _WeeklySummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -167,7 +166,6 @@ class _WeeklyPracticeGrid extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -250,10 +248,9 @@ class _DayColumn extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Container(
                 height: barHeight,
-                width: 14, // 고정 막대 너비 (seconds-level readability)
+                width: 14, // 고정 막대 너비 (seconds-level readability),
                 decoration: BoxDecoration(
-                  color: barColor,
-                  borderRadius: BorderRadius.circular(AppSpacing.space1),
+                  color: barColor
                 ),
               ),
             ),
@@ -268,8 +265,7 @@ class _DayColumn extends StatelessWidget {
             decoration:
                 isToday
                     ? BoxDecoration(
-                      color: AppColors.paperAccent,
-                      borderRadius: BorderRadius.circular(AppSpacing.space1),
+                      color: AppColors.paperAccent
                     )
                     : null,
             child: Text(
@@ -302,7 +298,6 @@ class _SharedRecordingsSection extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -357,7 +352,6 @@ class _RecordingTile extends ConsumerWidget {
               studentId: studentId,
               teacherId: 'teacher_current',
             ),
-        borderRadius: BorderRadius.circular(AppSpacing.space2),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space2,
@@ -445,8 +439,7 @@ class _TileLeading extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(AppSpacing.space2),
+            color: AppColors.paperAccentSoft.withValues(alpha: 0.2)
           ),
           child: const Icon(
             Icons.chat_bubble_outline,
@@ -462,7 +455,6 @@ class _TileLeading extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(color: AppColors.paper, width: 1.5),
               ),
               child: Text(
@@ -507,9 +499,7 @@ class _DetailStatsButton extends StatelessWidget {
           vertical: AppSpacing.space3,
           horizontal: AppSpacing.space4,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.space2),
-        ),
+        shape: const RoundedRectangleBorder(),
       ),
     );
   }

@@ -62,7 +62,6 @@ class StudentStatCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(

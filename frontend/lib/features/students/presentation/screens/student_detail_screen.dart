@@ -288,9 +288,6 @@ class _StudentDetailContent extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: student.status.color.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
                       border: Border.all(
                         color: AppColors.paper.withValues(alpha: 0.5),
                         width: 1,
@@ -312,9 +309,6 @@ class _StudentDetailContent extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paper.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
                     ),
                     child: Text(
                       student.instrument,
@@ -332,9 +326,6 @@ class _StudentDetailContent extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: student.practiceStatus.color.withValues(
                         alpha: 0.3,
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
                       ),
                     ),
                     child: Row(
@@ -410,11 +401,7 @@ class _StudentDetailContent extends ConsumerWidget {
   void _showMoreOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
-      ),
+      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Column(
@@ -749,9 +736,6 @@ class _StudentDetailContent extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(

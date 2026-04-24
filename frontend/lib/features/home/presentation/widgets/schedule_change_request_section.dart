@@ -207,7 +207,6 @@ class _ScheduleChangeListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,

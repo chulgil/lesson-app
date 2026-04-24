@@ -30,7 +30,6 @@ class FollowCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -82,10 +81,7 @@ class FollowCard extends StatelessWidget {
                         color:
                             isTeacher
                                 ? AppColors.paperAccent.withValues(alpha: 0.1)
-                                : AppColors.paperAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
+                                : AppColors.paperAccent.withValues(alpha: 0.1)
                       ),
                       child: Text(
                         follow.targetType.displayName,

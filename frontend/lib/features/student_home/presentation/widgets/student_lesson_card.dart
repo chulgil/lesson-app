@@ -39,7 +39,6 @@ class StudentLessonCard extends StatelessWidget {
         onTap: () {
           context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
         },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Column(
           children: [
             // Main content
@@ -203,7 +202,7 @@ class StudentLessonCard extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
-                      // Notebook × Score: 피드백 프리뷰는 손글씨 주석처럼 Gaegu로.
+                      // Notebook × Score: 피드백 프리뷰는 손글씨 주석처럼 Gaegu로.,
                       child: Text(
                         lesson.feedback!,
                         style: NotebookTypography.hand.copyWith(

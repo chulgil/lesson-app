@@ -28,7 +28,6 @@ class StudentLessonCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isUpcoming
@@ -40,7 +39,6 @@ class StudentLessonCard extends StatelessWidget {
         onTap: () {
           context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
         },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
@@ -56,7 +54,6 @@ class StudentLessonCard extends StatelessWidget {
                       isUpcoming
                           ? AppColors.paperAccent.withValues(alpha: 0.1)
                           : AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Column(
                   children: [

@@ -154,7 +154,6 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -256,8 +255,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        color: color.withValues(alpha: 0.08)
       ),
       child: Column(
         children: [
@@ -288,8 +286,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           width: 4,
           height: 16,
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(2),
+            color: color
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
@@ -322,17 +319,14 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Material(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: InkWell(
           onTap:
               () => context.push(
                 AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
               ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(
@@ -392,7 +386,6 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                     SizedBox(
                       width: 60,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
                         child: LinearProgressIndicator(
                           value: rate,
                           minHeight: 4,

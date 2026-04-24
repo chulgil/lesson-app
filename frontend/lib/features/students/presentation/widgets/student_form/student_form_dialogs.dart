@@ -62,11 +62,7 @@ Future<ImagePickerAction?> showImagePickerBottomSheet(
 }) async {
   return showModalBottomSheet<ImagePickerAction>(
     context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusXLarge),
-      ),
-    ),
+    shape: const RoundedRectangleBorder(),
     builder:
         (context) => SafeArea(
           child: Column(
@@ -124,11 +120,7 @@ void showImagePickerOptions(
 }) {
   showModalBottomSheet(
     context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusXLarge),
-      ),
-    ),
+    shape: const RoundedRectangleBorder(),
     builder:
         (context) => SafeArea(
           child: Column(
@@ -199,7 +191,9 @@ void showExitConfirmation(
                 Navigator.pop(context);
                 onExit();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.paperAccent,
+              ),
               child: const Text('나가기'),
             ),
           ],
@@ -233,7 +227,9 @@ void showDeleteStudentConfirmation(
                 Navigator.pop(context);
                 onDelete();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.paperAccent,
+              ),
               child: const Text(AppStrings.delete),
             ),
           ],
