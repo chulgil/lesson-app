@@ -4527,6 +4527,46 @@ flutter analyze lib/features/auth/  # No issues found!
 
 ---
 
+### §7.115 — 일간 스케쥴 뷰모드 토글 + "오늘" 뱃지 + availability 블록 각진 동기화 (2026-04-24)
+
+§7.112 (스케줄 타임라인 + 그리드) 와 §7.114 (auth 포화) 이후, 일간 스케쥴 경로의 **뷰모드 토글 + 일자 헤더 뱃지 + availability 블록** 3 요소가 각진 매트릭스 미적용 상태였다. 사용자 요청: "일간스케쥴" — 일간 경로의 모든 라운드 컨테이너 감사.
+
+| 파일 | 지점 | 변환 전 | 변환 후 |
+|------|------|---------|---------|
+| `schedule_tab.dart:305` | "오늘" 마지널리아 뱃지 bg | `BorderRadius.circular(radiusSmall)` | `BorderRadius.zero` |
+| `schedule_tab.dart:584` | `_ViewModeToggle` 외곽 컨테이너 | `BorderRadius.circular(radiusMedium)` | `BorderRadius.zero` |
+| `schedule_tab.dart:602` | `_ViewModeToggle` 선택 세그먼트 bg | `BorderRadius.circular(6)` | `BorderRadius.zero` |
+| `schedule_tab.dart:603-611` | `_ViewModeToggle` 선택 세그먼트 그림자 | `BoxShadow(ink 0.08, blur 4, offset 0,1)` | 제거 |
+| `timeline_availability_block.dart:31` | 가용 슬롯 블록 bg | `BorderRadius.circular(radiusMedium)` | `BorderRadius.zero` (유휴 `AppSpacing` import 정리) |
+
+#### 7.115 검증
+
+```bash
+rg "BorderRadius\.circular" lib/features/schedule/presentation/screens/schedule_tab.dart  # 0 건
+rg "BoxShadow|boxShadow" lib/features/schedule/presentation/screens/schedule_tab.dart  # 0 건
+flutter analyze lib/features/schedule/presentation/screens/schedule_tab.dart lib/features/schedule/presentation/widgets/timeline_availability_block.dart  # No issues found!
+```
+
+#### 7.115 관찰
+
+**"뷰모드 토글 = 악보 섹션 인덱스 탭"**: 리스트·타임라인·그리드 3 뷰 스위처는 악보의 "악장 인덱스"(I · II · III) 에 해당. Material pill segmented control 의 rounded + drop shadow 는 디지털 OS 위젯 신호 → 제거. 각진 세그먼트 + 선택 시 paper 단순 배경 교체 → 악보 섹션 표지가 펼쳐진 느낌.
+
+**"BoxShadow = Material 회귀 신호 (§7.114 관찰 재확인)"**: §7.113 각진 매트릭스는 라디우스만 명문화했으나 **BoxShadow 역시 종이 메타포 위반**. 종이는 "떠있는 material"이 아니라 **평면 위 잉크**. §7.114 에서 함축적으로 제거한 원칙을 §7.115 에서 명시적으로 실행. 향후 §8 구현원칙 7번 후보: "BoxShadow 금지 — 각진 원칙의 짝".
+
+**"dead code도 정책 대상"**: `timeline_availability_block.dart` 는 현재 import 되는 곳 0 건이지만, availability 슬롯이 일간 타임라인에 후속 노출될 때를 대비해 각진 선반영. 유휴 `AppSpacing` import 동시 정리.
+
+**"now indicator dot 보류"**: `schedule_timeline_view.dart:401-408` 의 8×8 `BoxShape.circle` 빨간 "지금" 점은 각진 매트릭스 3 예외(아바타·오브젝트·의례) 에 해당하지 않지만, **"지점 표시자"(point marker) 의 관습적 원형** 이라 각진 전환 시 가독성 손실 위험. 이번 배치 보류, **§7.x "dot indicator" 4 번째 예외 카테고리 추가 논의** 후보로 기록.
+
+**"schedule_timeline_view 본체 이미 깔끔"**: §7.112 에서 `_TravelTimeBlock` 처리 후 본체의 `Container/Decoration` 은 모두 테두리 기반(Border.bottom/left) 으로 확립됨. 이번 감사 재검증 결과 추가 각진 지점 0 건 — §7.112 의 선제 처리가 포화에 기여.
+
+**Lore-directive**: 일간 스케쥴 경로(탭 상단 뷰 스위처 · 일자 헤더 뱃지 · availability 블록) 를 전부 `BorderRadius.zero` 로 통일. 뷰 스위처의 `BoxShadow` 는 동시 제거 — 종이 위 평면 잉크 원칙.
+
+**Lore-constraint**: `BoxShadow` 는 §7.113 에 명시되지 않았으나 **각진 전환과 동반되는 Material 회귀 요소** 로 함께 처리. §8 구현원칙에 추가 고려.
+
+**Lore-rejected**: 뷰 스위처 선택 세그먼트에 pill + 그림자 유지 — 종이 섹션 표지가 "떠있는 카드"가 되어 Notebook × Score 메타포 상실. Material 세그먼트 컨트롤 관습이라도 악보 메타포 우선.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
@@ -4534,4 +4574,4 @@ flutter analyze lib/features/auth/  # No issues found!
 3. **Feature-preserving**: 기능 위젯 재사용. 기능 변경 금지.
 4. **3px 규칙 불가침**: §3의 여백선 규칙은 전 화면에서 동일.
 5. **4대 시그니처 필수**: 어느 화면이든 Notebook × Score를 적용했다면 Playfair · 로마숫자 · Vermillion · Gaegu 네 가지가 모두 관찰되어야 한다.
-6. **각진 원칙 (§7.112 · §7.113 · §7.114)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. 시스템 매크로(바텀시트 상단) 만 시스템 기본 유지. `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지.
+6. **각진 원칙 (§7.112 · §7.113 · §7.114 · §7.115)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. 시스템 매크로(바텀시트 상단) 만 시스템 기본 유지. `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.

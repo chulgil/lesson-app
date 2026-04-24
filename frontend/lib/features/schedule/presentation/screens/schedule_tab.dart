@@ -300,11 +300,11 @@ class ScheduleTab extends ConsumerWidget {
             const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              // Notebook × Score: 각진 뱃지 (§7.113 매트릭스 — 컨테이너 bg zero)
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
+              // "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
               child: Text('오늘', style: NotebookTypography.handEmphasis),
             ),
           ],
@@ -578,11 +578,10 @@ class _ViewModeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score: 각진 토글 + 그림자 제거 (§7.113/§7.114)
+    // 종이 위 직사각 세그먼트 — 선택 시 paper 배경으로 대비만 유지
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.scheduleMutedBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: const BoxDecoration(color: AppColors.scheduleMutedBackground),
       padding: const EdgeInsets.all(2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -599,17 +598,6 @@ class _ViewModeToggle extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.white : Colors.transparent,
-                    borderRadius: BorderRadius.circular(6),
-                    boxShadow:
-                        isSelected
-                            ? [
-                              BoxShadow(
-                                color: AppColors.ink.withValues(alpha: 0.08),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ]
-                            : null,
                   ),
                   child: Icon(
                     _getIcon(mode),
