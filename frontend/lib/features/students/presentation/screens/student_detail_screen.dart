@@ -13,6 +13,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/parent_home/domain/entities/parent.dart';
 import '../../../../features/students/domain/entities/student.dart';
@@ -176,6 +177,7 @@ class _StudentDetailContent extends ConsumerWidget {
     return SliverAppBar(
       expandedHeight: 270,
       pinned: true,
+      titleSpacing: 0,
       forceElevated: innerBoxIsScrolled,
       // 접힐 때 흰색 배경 → 흰색 아이콘/탭 겹침 방지 (M3 surfaceTint 포함).
       backgroundColor: student.profileColor,
@@ -184,6 +186,10 @@ class _StudentDetailContent extends ConsumerWidget {
       leading: IconButton(
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
+      ),
+      title: Text(
+        '${student.name} (학생)',
+        style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
       ),
       actions: [
         IconButton(
