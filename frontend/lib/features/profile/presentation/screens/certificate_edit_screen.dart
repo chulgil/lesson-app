@@ -78,9 +78,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   Future<void> _pickImage() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Column(
@@ -338,7 +336,6 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.inkQuaternary),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -381,7 +378,6 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                     color: AppColors.inkQuaternary,
                     style: BorderStyle.solid,
                   ),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   color: AppColors.paperDark,
                 ),
                 clipBehavior: Clip.hardEdge,
@@ -419,7 +415,6 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.ink.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,9 +444,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 child:
                     _isLoading
@@ -594,23 +587,17 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      border: const OutlineInputBorder(),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
     );

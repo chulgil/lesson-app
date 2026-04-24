@@ -119,10 +119,7 @@ class TimeSlotsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space6),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: Center(
         child: Column(
           children: [
@@ -280,7 +277,6 @@ class TimePickerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
@@ -288,7 +284,6 @@ class TimePickerButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,11 +358,9 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
           const SizedBox(height: AppSpacing.space2),
           DropdownButtonFormField<int>(
             initialValue: _selectedDay,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space3,
               ),
@@ -541,7 +534,6 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                   _isDuplicate
                       ? AppColors.paperAccent.withValues(alpha: 0.1)
                       : AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Column(
               children: [
@@ -685,9 +677,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 hintText: '예: 50',
                 helperText:
                     '${LessonDurations.minDuration}~${LessonDurations.maxDuration}분',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                border: const OutlineInputBorder(),
                 suffixText: '분',
               ),
               onChanged: (value) {

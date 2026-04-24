@@ -36,7 +36,6 @@ class ProfileCompletionCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +56,6 @@ class ProfileCompletionCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paper.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Text(
                   levelLabel,
@@ -139,7 +137,6 @@ class ProfileInfoCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color:
                 isEmpty
@@ -203,7 +200,6 @@ class EducationCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -212,7 +208,6 @@ class EducationCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(Icons.school, color: AppColors.paperOk, size: 24),
           ),
@@ -283,7 +278,6 @@ class CareerCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -292,7 +286,6 @@ class CareerCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
           ),
@@ -402,7 +395,6 @@ class CertificateCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -411,7 +403,6 @@ class CertificateCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               getCertificateStatusIcon(certificate.status),
@@ -538,7 +529,6 @@ class ProfileEmptyCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: AppColors.inkQuaternary,
           style: BorderStyle.solid,

@@ -110,7 +110,6 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Column(
           children: [
@@ -160,7 +159,6 @@ class _UnpaidCard extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color:
                 daysOverdue > 0

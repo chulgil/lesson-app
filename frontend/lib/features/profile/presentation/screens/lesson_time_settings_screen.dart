@@ -137,10 +137,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
         // Duration list with switches
         Container(
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: RadioGroup<int>(
             groupValue: settings.defaultLessonDuration,
             onChanged: (value) {
@@ -236,10 +233,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space4),
 
         Container(
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: Column(
             children: [
               // Break time setting
@@ -469,10 +463,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -496,21 +487,11 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                   ),
                   filled: true,
                   fillColor: AppColors.paperDark,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                    borderSide: const BorderSide(
-                      color: AppColors.inkQuaternary,
-                    ),
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                    borderSide: const BorderSide(
-                      color: AppColors.inkQuaternary,
-                    ),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                   counterText: '',
                 ),
@@ -541,10 +522,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         LessonTimeSettingsSectionTitle(title: '체험레슨 설정'),
         const SizedBox(height: AppSpacing.space2),
         Container(
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: SwitchListTile(
             title: const Text('체험레슨 무료'),
             subtitle: Text(
@@ -605,10 +583,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space4),
         Container(
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           padding: const EdgeInsets.all(AppSpacing.space3),
           child: Column(
             children: [
@@ -670,7 +645,6 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                                           alpha: 0.1,
                                         )
                                         : null,
-                                borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
                                   color:
                                       price != null

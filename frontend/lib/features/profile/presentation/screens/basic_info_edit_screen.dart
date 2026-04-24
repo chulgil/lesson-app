@@ -100,17 +100,17 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     );
     if (action == null || !mounted) return;
 
-    final notifier =
-        ref.read(profileImageNotifierProvider(userId).notifier);
+    final notifier = ref.read(profileImageNotifierProvider(userId).notifier);
 
     if (action == ImagePickerAction.delete) {
       await notifier.removeImage();
       return;
     }
 
-    final source = action == ImagePickerAction.camera
-        ? ImageSource.camera
-        : ImageSource.gallery;
+    final source =
+        action == ImagePickerAction.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
 
     if (!mounted) return;
     await notifier.pickAndSaveImage(source, context);
@@ -128,17 +128,17 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     );
     if (action == null || !mounted) return;
 
-    final notifier =
-        ref.read(backgroundImageNotifierProvider(userId).notifier);
+    final notifier = ref.read(backgroundImageNotifierProvider(userId).notifier);
 
     if (action == ImagePickerAction.delete) {
       await notifier.removeImage();
       return;
     }
 
-    final source = action == ImagePickerAction.camera
-        ? ImageSource.camera
-        : ImageSource.gallery;
+    final source =
+        action == ImagePickerAction.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
 
     if (!mounted) return;
     await notifier.pickAndSaveImage(source, context);
@@ -174,9 +174,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
-          ),
+          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
         );
       }
     } finally {
@@ -199,140 +197,139 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return PopScope(
       canPop: !_isLoading,
       child: Scaffold(
-      appBar: AppBar(
-        title: const Text('기본 정보 수정'),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _save,
-            child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    '저장',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-          ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.screenPadding,
-            AppSpacing.screenPadding,
-            AppSpacing.screenPadding + MediaQuery.of(context).padding.bottom + 32,
-          ),
-          children: [
-            // Photo header (profile + background)
-            ProfilePhotoHeader(
-              profileImagePath: profileImagePath,
-              backgroundImagePath: backgroundImagePath,
-              initial: initial,
-              avatarColor: AppColors.paperAccentSoft,
-              onTapProfile: _onTapProfileImage,
-              onTapBackground: _onTapBackgroundImage,
+        appBar: AppBar(
+          title: const Text('기본 정보 수정'),
+          actions: [
+            TextButton(
+              onPressed: _isLoading ? null : _save,
+              child:
+                  _isLoading
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(
+                        '저장',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
             ),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Name field
-            _buildLabel('이름', required: true),
-            const SizedBox(height: AppSpacing.space2),
-            TextFormField(
-              controller: _nameController,
-              decoration: _inputDecoration(
-                hintText: '예: 홍길동',
-              ),
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return '이름을 입력해주세요';
-                }
-                return null;
-              },
-            ),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Introduction field
-            _buildLabel('소개글', required: true),
-            const SizedBox(height: AppSpacing.space2),
-            TextFormField(
-              controller: _introductionController,
-              decoration: _inputDecoration(
-                hintText: '선생님을 소개해주세요 (최소 $_minIntroductionLength자)',
-              ),
-              maxLines: 6,
-              minLines: 4,
-              textInputAction: TextInputAction.newline,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return '소개글을 입력해주세요';
-                }
-                if (value.trim().length < _minIntroductionLength) {
-                  return '소개글은 최소 $_minIntroductionLength자 이상 입력해주세요';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            _buildCharacterCount(),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Teaching style field
-            _buildLabel('교수 스타일'),
-            const SizedBox(height: AppSpacing.space2),
-            TextFormField(
-              controller: _teachingStyleController,
-              decoration: _inputDecoration(
-                hintText: '레슨 방식과 철학을 설명해주세요',
-              ),
-              maxLines: 4,
-              minLines: 3,
-              textInputAction: TextInputAction.newline,
-            ),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Specialties field
-            _buildLabel('전문 분야'),
-            const SizedBox(height: AppSpacing.space1),
-            Text(
-              '최대 $_maxSpecialties개까지 선택할 수 있습니다',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            _buildSpecialtyChips(),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Lesson areas field
-            _buildLabel('활동 지역'),
-            const SizedBox(height: AppSpacing.space1),
-            Text(
-              '최대 $_maxAreas개까지 추가할 수 있습니다',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            _buildAreaInput(),
-            const SizedBox(height: AppSpacing.space2),
-            _buildAreaChips(),
           ],
         ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.screenPadding,
+              AppSpacing.screenPadding,
+              AppSpacing.screenPadding +
+                  MediaQuery.of(context).padding.bottom +
+                  32,
+            ),
+            children: [
+              // Photo header (profile + background)
+              ProfilePhotoHeader(
+                profileImagePath: profileImagePath,
+                backgroundImagePath: backgroundImagePath,
+                initial: initial,
+                avatarColor: AppColors.paperAccentSoft,
+                onTapProfile: _onTapProfileImage,
+                onTapBackground: _onTapBackgroundImage,
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Name field
+              _buildLabel('이름', required: true),
+              const SizedBox(height: AppSpacing.space2),
+              TextFormField(
+                controller: _nameController,
+                decoration: _inputDecoration(hintText: '예: 홍길동'),
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '이름을 입력해주세요';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Introduction field
+              _buildLabel('소개글', required: true),
+              const SizedBox(height: AppSpacing.space2),
+              TextFormField(
+                controller: _introductionController,
+                decoration: _inputDecoration(
+                  hintText: '선생님을 소개해주세요 (최소 $_minIntroductionLength자)',
+                ),
+                maxLines: 6,
+                minLines: 4,
+                textInputAction: TextInputAction.newline,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '소개글을 입력해주세요';
+                  }
+                  if (value.trim().length < _minIntroductionLength) {
+                    return '소개글은 최소 $_minIntroductionLength자 이상 입력해주세요';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              _buildCharacterCount(),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Teaching style field
+              _buildLabel('교수 스타일'),
+              const SizedBox(height: AppSpacing.space2),
+              TextFormField(
+                controller: _teachingStyleController,
+                decoration: _inputDecoration(hintText: '레슨 방식과 철학을 설명해주세요'),
+                maxLines: 4,
+                minLines: 3,
+                textInputAction: TextInputAction.newline,
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Specialties field
+              _buildLabel('전문 분야'),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '최대 $_maxSpecialties개까지 선택할 수 있습니다',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+              _buildSpecialtyChips(),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Lesson areas field
+              _buildLabel('활동 지역'),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '최대 $_maxAreas개까지 추가할 수 있습니다',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+              _buildAreaInput(),
+              const SizedBox(height: AppSpacing.space2),
+              _buildAreaChips(),
+            ],
+          ),
+        ),
       ),
-    ),
     );
   }
 
@@ -340,47 +337,48 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: _specialtyOptions.map((specialty) {
-        final isSelected = _selectedSpecialties.contains(specialty);
-        return FilterChip(
-          label: Text(specialty),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              if (selected) {
-                if (_selectedSpecialties.length >= _maxSpecialties) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('최대 $_maxSpecialties개까지 선택할 수 있습니다'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                  return;
-                }
-                _selectedSpecialties.add(specialty);
-              } else {
-                _selectedSpecialties.remove(specialty);
-              }
-            });
-          },
-          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
-          checkmarkColor: AppColors.paperAccent,
-          labelStyle: AppTypography.bodyMedium.copyWith(
-            color: isSelected
-                ? AppColors.paperAccent
-                : AppColors.ink,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-            side: BorderSide(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-            ),
-          ),
-          backgroundColor: AppColors.paper,
-        );
-      }).toList(),
+      children:
+          _specialtyOptions.map((specialty) {
+            final isSelected = _selectedSpecialties.contains(specialty);
+            return FilterChip(
+              label: Text(specialty),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    if (_selectedSpecialties.length >= _maxSpecialties) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('최대 $_maxSpecialties개까지 선택할 수 있습니다'),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+                    _selectedSpecialties.add(specialty);
+                  } else {
+                    _selectedSpecialties.remove(specialty);
+                  }
+                });
+              },
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.paperAccent,
+              labelStyle: AppTypography.bodyMedium.copyWith(
+                color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
+                ),
+              ),
+              backgroundColor: AppColors.paper,
+            );
+          }).toList(),
     );
   }
 
@@ -390,9 +388,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         Expanded(
           child: TextFormField(
             controller: _areaController,
-            decoration: _inputDecoration(
-              hintText: '예: 강남구, 서초구',
-            ),
+            decoration: _inputDecoration(hintText: '예: 강남구, 서초구'),
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _addArea(),
           ),
@@ -446,23 +442,23 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: _lessonAreas.map((area) {
-        return Chip(
-          label: Text(area),
-          deleteIcon: const Icon(Icons.close, size: 16),
-          onDeleted: () {
-            setState(() => _lessonAreas.remove(area));
-          },
-          labelStyle: AppTypography.bodySmall.copyWith(
-            color: AppColors.ink,
-          ),
-          backgroundColor: AppColors.paperDark,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-            side: BorderSide(color: AppColors.inkQuaternary),
-          ),
-        );
-      }).toList(),
+      children:
+          _lessonAreas.map((area) {
+            return Chip(
+              label: Text(area),
+              deleteIcon: const Icon(Icons.close, size: 16),
+              onDeleted: () {
+                setState(() => _lessonAreas.remove(area));
+              },
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.ink,
+              ),
+              backgroundColor: AppColors.paperDark,
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: AppColors.inkQuaternary),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -471,9 +467,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       children: [
         Text(
           text,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         if (required)
           Text(
@@ -496,11 +490,12 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         return Align(
           alignment: Alignment.centerRight,
           child: Text(
-            isSufficient ? '$length자' : '$length자 (최소 $_minIntroductionLength자)',
+            isSufficient
+                ? '$length자'
+                : '$length자 (최소 $_minIntroductionLength자)',
             style: AppTypography.caption.copyWith(
-              color: isSufficient
-                  ? AppColors.inkTertiary
-                  : AppColors.paperAccent,
+              color:
+                  isSufficient ? AppColors.inkTertiary : AppColors.paperAccent,
             ),
           ),
         );
@@ -511,23 +506,17 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      border: const OutlineInputBorder(),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
     );

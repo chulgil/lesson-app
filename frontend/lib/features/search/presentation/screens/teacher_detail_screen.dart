@@ -378,9 +378,6 @@ class _TeacherDetailContent extends ConsumerWidget {
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
                                 color: AppColors.paperOk.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium,
-                                ),
                                 border: Border.all(
                                   color: AppColors.paperOk.withValues(
                                     alpha: 0.3,
@@ -455,11 +452,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space3,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusLarge,
-                          ),
-                        ),
+                        shape: const RoundedRectangleBorder(),
                       ),
                     ),
                   ),
@@ -497,7 +490,6 @@ class _TeacherDetailContent extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.ink.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
           ),
           child: Row(
@@ -554,9 +546,7 @@ class _TeacherDetailContent extends ConsumerWidget {
               backgroundColor: AppColors.paperAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              ),
+              shape: const RoundedRectangleBorder(),
             ),
           ),
         ),

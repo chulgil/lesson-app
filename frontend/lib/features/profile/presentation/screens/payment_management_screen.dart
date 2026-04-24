@@ -170,11 +170,7 @@ class _PaymentManagementScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.receipt_long,
-            size: 64,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.receipt_long, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '결제 내역이 없습니다',
@@ -295,9 +291,6 @@ class _PaymentManagementScreenState
                                       isSelected
                                           ? AppColors.paperAccent
                                           : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusMedium,
-                                  ),
                                   border:
                                       isSelected
                                           ? null
@@ -369,9 +362,6 @@ class _PaymentManagementScreenState
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
                       color: AppColors.paperOk.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     child: Row(
                       children: [

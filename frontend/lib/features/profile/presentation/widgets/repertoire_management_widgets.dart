@@ -65,13 +65,11 @@ class RepertoireSearchAndFilter extends StatelessWidget {
           // Search bar
           TextField(
             onChanged: onSearchChanged,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: '곡 제목 또는 작곡가 검색',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space3,
               ),
@@ -192,7 +190,6 @@ class PieceCard extends StatelessWidget {
                 height: 60,
                 decoration: BoxDecoration(
                   color: getDifficultyColor(piece.difficulty),
-                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -225,9 +222,6 @@ class PieceCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paperAccent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
                         ),
                         child: Text(
                           piece.opus!,
@@ -252,7 +246,6 @@ class PieceCard extends StatelessWidget {
                     color: getDifficultyColor(
                       piece.difficulty,
                     ).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     piece.difficulty!,

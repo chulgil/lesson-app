@@ -133,7 +133,9 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -322,9 +324,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 child:
                     _isLoading
@@ -370,27 +370,20 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      border: const OutlineInputBorder(),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       disabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: BorderSide(
           color: AppColors.inkQuaternary.withValues(alpha: 0.5),
         ),

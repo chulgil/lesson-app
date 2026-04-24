@@ -111,11 +111,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                         side: BorderSide(
                           color: AppColors.paperAccent.withValues(alpha: 0.2),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusRound,
-                          ),
-                        ),
+                        shape: const RoundedRectangleBorder(),
                       );
                     }).toList(),
               ),
@@ -193,9 +189,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                   side: const BorderSide(color: AppColors.paperAccent),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
               ),
             ),
@@ -312,10 +306,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   horizontal: AppSpacing.space3,
                   vertical: AppSpacing.space2,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-                ),
+                decoration: const BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

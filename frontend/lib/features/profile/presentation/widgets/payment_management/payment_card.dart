@@ -26,7 +26,6 @@ class PaymentCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isOverdue
@@ -153,7 +152,6 @@ class PaymentCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -207,10 +205,7 @@ class PaymentTypeBadge extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.15)),
       child: Text(
         type.label,
         style: AppTypography.captionSmall.copyWith(
@@ -258,10 +253,7 @@ class PaymentStatusBadge extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.15)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -307,7 +299,6 @@ class PaymentActionButton extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

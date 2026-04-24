@@ -219,7 +219,6 @@ class _StudentConfirmedBanner extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -290,7 +289,9 @@ class _DeleteButton extends StatelessWidget {
       },
       icon: Icon(Icons.delete, color: AppColors.paperAccent),
       label: Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
-      style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.paperAccent)),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: AppColors.paperAccent),
+      ),
     );
   }
 }

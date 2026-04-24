@@ -95,7 +95,6 @@ class ProfileCompletionCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: levelColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: levelColor.withValues(alpha: 0.3)),
       ),
       child: Column(
@@ -108,10 +107,7 @@ class ProfileCompletionCard extends StatelessWidget {
                   horizontal: AppSpacing.space2,
                   vertical: AppSpacing.space1,
                 ),
-                decoration: BoxDecoration(
-                  color: levelColor,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
+                decoration: BoxDecoration(color: levelColor),
                 child: Text(
                   levelLabel,
                   style: AppTypography.caption.copyWith(
@@ -165,10 +161,7 @@ class SearchToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           Icon(
@@ -242,7 +235,6 @@ class VisibilityTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.inkQuaternary),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: ListTile(
         leading: Icon(icon, color: AppColors.inkSecondary),
@@ -262,7 +254,6 @@ class VisibilityTile extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: getVisibilityColor(value).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -329,10 +320,7 @@ class VisibilityInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -388,7 +376,6 @@ class PreviewSection extends StatelessWidget {
             isVisible
                 ? AppColors.paperDark
                 : AppColors.paperDark.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +397,6 @@ class PreviewSection extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.inkTertiary.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '비공개',
@@ -451,7 +437,6 @@ class BadgeChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -120,16 +120,15 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                           },
                         )
                         : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                ),
+                border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
+                  borderSide: BorderSide(
+                    color: AppColors.paperAccent,
+                    width: 2,
+                  ),
                 ),
                 filled: true,
                 fillColor: AppColors.paperDark,

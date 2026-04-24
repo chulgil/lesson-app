@@ -107,10 +107,7 @@ class _InstrumentManagementScreenState
         if (instruments.isEmpty)
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Center(
               child: Column(
                 children: [
@@ -239,14 +236,12 @@ class _InstrumentManagementScreenState
             Expanded(
               child: TextField(
                 controller: _customInstrumentController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: '악기 이름 입력',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: AppSpacing.space4,
                     vertical: AppSpacing.space3,
                   ),

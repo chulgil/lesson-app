@@ -167,10 +167,7 @@ class _TipTemplateManagementScreenState
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperAccent),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (direction) async {
@@ -218,9 +215,6 @@ class _TipTemplateManagementScreenState
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
                       ),
                       child: Text(
                         template.category.label,
@@ -239,9 +233,6 @@ class _TipTemplateManagementScreenState
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paperAccent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
                         ),
                         child: Text(
                           template.instrument!,

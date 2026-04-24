@@ -41,10 +41,7 @@ class _TeacherSearchFilterSheetState
       expand: false,
       builder:
           (context, scrollController) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
+            decoration: const BoxDecoration(color: Colors.white),
             child: Column(
               children: [
                 // Handle
@@ -192,11 +189,7 @@ class _TeacherSearchFilterSheetState
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.paperAccent,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusLarge,
-                            ),
-                          ),
+                          shape: const RoundedRectangleBorder(),
                         ),
                         child: const Text('필터 적용'),
                       ),

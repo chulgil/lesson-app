@@ -127,12 +127,7 @@ class AcademyDetailScreen extends ConsumerWidget {
                   Container(
                     width: 64,
                     height: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.paper.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusXLarge,
-                      ),
-                    ),
+                    decoration: const BoxDecoration(color: AppColors.paper),
                     child: const Icon(
                       Icons.school,
                       size: 36,
@@ -160,7 +155,6 @@ class AcademyDetailScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -256,7 +250,6 @@ class AcademyDetailScreen extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Text(
             '${academy.teacherCount}명',
@@ -347,7 +340,6 @@ class _AcademyTeacherCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -358,7 +350,6 @@ class _AcademyTeacherCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onProfileTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
@@ -424,11 +415,7 @@ class _AcademyTeacherCard extends StatelessWidget {
                     horizontal: AppSpacing.space3,
                     vertical: AppSpacing.space2,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 child: const Text('체험 신청'),
               ),

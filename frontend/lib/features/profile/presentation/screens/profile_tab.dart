@@ -390,9 +390,7 @@ class ProfileTab extends ConsumerWidget {
             ),
             foregroundColor: AppColors.paperAccent,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            shape: const RoundedRectangleBorder(),
           ),
         ),
       ),
@@ -426,7 +424,6 @@ class ProfileTab extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -572,13 +569,12 @@ class ProfileTab extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.paperAccent, AppColors.paperAccent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [
@@ -641,7 +637,6 @@ class ProfileTab extends ConsumerWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.ink.withValues(alpha: 0.05),
@@ -788,7 +783,6 @@ class _ShortcutCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(

@@ -328,7 +328,6 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         children: [
@@ -590,7 +589,6 @@ class _PaymentTypeCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,

@@ -26,7 +26,6 @@ class TeacherSearchCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         // Highlight previous teacher with a subtle border
         side:
             isPreviousTeacher
@@ -41,7 +40,6 @@ class TeacherSearchCard extends StatelessWidget {
             () => context.push(
               AppRoutes.teacherDetail.replaceFirst(':id', teacher.id),
             ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space3),
           child: Row(
@@ -131,10 +129,7 @@ class TeacherSearchCard extends StatelessWidget {
   Widget _buildPreviousTeacherBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -157,7 +152,6 @@ class TeacherSearchCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -205,11 +199,7 @@ class TeacherSearchCard extends StatelessWidget {
     return Row(
       children: [
         if (publicProfile.experienceYears != null) ...[
-          Icon(
-            Icons.work_outline,
-            size: 14,
-            color: AppColors.inkSecondary,
-          ),
+          Icon(Icons.work_outline, size: 14, color: AppColors.inkSecondary),
           const SizedBox(width: AppSpacing.space1),
           Text(
             '${publicProfile.experienceYears}년',
@@ -245,10 +235,7 @@ class TeacherSearchCard extends StatelessWidget {
           lessonAreas.take(3).map((area) {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              ),
+              decoration: const BoxDecoration(color: AppColors.paperDark),
               child: Text(
                 area,
                 style: AppTypography.caption.copyWith(
