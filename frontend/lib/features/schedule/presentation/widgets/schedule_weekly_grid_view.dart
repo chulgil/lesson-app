@@ -373,13 +373,12 @@ class _ScheduleWeeklyGridViewState
             : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
 
     // Preview border: wider dashed-like accent border
+    // Flutter 3.29: strokeAlign != strokeAlignInside 는 uniform border 에서만 허용됨.
+    // Border(left: ...) 는 한 변만 있는 non-uniform border 이므로 반드시 strokeAlignInside.
     final leftBorder = BorderSide(
       color: colors.accent,
       width: lesson.isPreview ? 2.5 : 2,
-      strokeAlign:
-          lesson.isPreview
-              ? BorderSide.strokeAlignInside
-              : BorderSide.strokeAlignCenter,
+      strokeAlign: BorderSide.strokeAlignInside,
     );
 
     if (!isStartSlot) {
