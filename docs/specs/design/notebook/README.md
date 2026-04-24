@@ -4651,6 +4651,95 @@ MyMusicStaff / Teachworks / Duet / Mindbody / 클라스팅 5개 유사 서비스
 
 ---
 
+### §7.118 — 테마 레이어 전수 각진 포화 (app_theme.dart + 인라인 override, 2026-04-24)
+
+**전제**: §7.113~115 각진 원칙은 위젯 레벨(`Container`, `BoxDecoration`, `OutlineInputBorder`)에만 적용된 상태였다. Flutter 테마 레이어 — `elevatedButtonTheme`, `filledButtonTheme`, `cardTheme`, `dialogTheme`, `bottomSheetTheme`, `inputDecorationTheme`, `popupMenuTheme`, `dropdownMenuTheme`, `datePickerTheme`, `timePickerTheme`, `snackBarTheme`, `checkboxTheme`, `floatingActionButtonTheme` — 는 여전히 `radiusLarge (20px)` / `radiusMedium (8px)` / `radiusSmall (4px)` 로 Material 디폴트 라운드를 그대로 사용. 첫인상 "Material 앱" 회귀가 잠재적으로 지속되는 상태.
+
+**사용자 요구 (2026-04-24, `/plan --ceo`)**: "학생 추가버튼 등 다른 버튼도 마찬가지이겠지만 둥근버튼이 아니라 실제 노트 x 악보 디자인처럼 각지게 표현해야합니다." 범위 선택: **10x Vision** — BottomSheet·FAB·Dialog 모두 각진.
+
+**Phase 1 — app_theme 테마 단일 지점 전환 (커밋 `146cdcf4`)**
+
+`frontend/lib/core/theme/app_theme.dart` 의 light + dark 테마 각 14 property (총 28 지점) 의 `shape` / `borderRadius` 를 `BorderRadius.zero` 로 전환:
+
+| 속성 | 이전 | 이후 |
+|------|------|------|
+| elevatedButtonTheme / filledButtonTheme / outlinedButtonTheme | `radiusLarge` | `BorderRadius.zero` |
+| cardTheme / dialogTheme | `radiusLarge` | `BorderRadius.zero` |
+| bottomSheetTheme (상단 radius) | `radiusLarge` | `BorderRadius.zero` |
+| inputDecorationTheme (4 border) | `radiusMedium` | `BorderRadius.zero` |
+| popupMenuTheme / dropdownMenuTheme | 4px | `BorderRadius.zero` |
+| datePickerTheme | 8px | `BorderRadius.zero` |
+| timePickerTheme + hourMinuteShape | 8px / 4px | `BorderRadius.zero` |
+| snackBarTheme | `radiusMedium` | `BorderRadius.zero` |
+| checkboxTheme | `radiusSmall` | `BorderRadius.zero` |
+| floatingActionButtonTheme | `StadiumBorder` | `RoundedRectangleBorder(zero)` 명시 |
+
+**Phase 2 — 인라인 override 일괄 각진화 (커밋 `98a19be9`, 98 파일)**
+
+정규식 기반 기계적 변환:
+- `BorderRadius.circular(AppSpacing.radius*)` → `BorderRadius.zero`
+- `BorderRadius.circular(NNN)` → `BorderRadius.zero`
+- `BorderRadius.vertical(top: Radius.circular(...))` → `BorderRadius.zero` (바텀시트 상단 제외 해제)
+
+**예외 매트릭스 (§7.113 확장)**
+
+| 카테고리 | 유지 이유 | 예시 |
+|----------|----------|------|
+| 애니메이션 캐릭터 | 고양이 body 곡률은 감정 표현 | `tuner_cat_widgets.dart` `BorderRadius.circular(20 * adjustedScale)` |
+| 드래그 핸들 pill | "끌어올리기" 어포던스는 둥근 pill 로 표현 | `bottom_sheet_handle.dart` `BorderRadius.circular(height / 2)` |
+| 변수 표현식 (`height / 2`, `size.width / 2` 등) | 정적 값이 아니므로 자동 변환 대상 아님 | `BoxShape.circle` 대체 위한 BorderRadius 계산 |
+| `BoxShape.circle` 자체 | §7.113 원형 매트릭스 (avatar·이모지·아이콘 bg) | `CircleAvatar`, 이모지 bubble |
+
+**§7.113 바텀시트 예외 해제**: §7.114 에서는 "바텀시트 상단 `Radius.circular(radiusXLarge)` 는 시스템 매크로로 유지" 라고 명시했으나, §7.118 의 10x Vision 모드에서는 **일관성 우위** 선택. 사용자 결정 "BottomSheet 각진" — "올라오는 시트" 메타포는 top 영역의 배경 차이(paperAccent 등) 와 handle pill 로 충분히 표현 가능.
+
+**왜 테마 레이어 포화가 중요한가**
+
+1. **첫인상 코히어런스**: Material 기본 라운드가 한 번이라도 화면에 나타나면 "평범한 Flutter 앱" 의 잔상이 남는다. §7.113 은 이를 auth 도메인에서 관찰한 관찰의 연장.
+2. **회귀 방지의 물리적 기반**: 테마 레이어가 angular 이면, 신규 위젯을 추가할 때 shape override 를 잊어도 기본값이 angular. "잊어도 안전" 이 포화의 본질.
+3. **Flutter 속성 우선순위 활용**: 인라인 shape override 는 여전히 테마 위 — 예외 카테고리(cat·handle·avatar) 는 인라인 override 로 명시적으로 유지 가능. 테마 변경은 0 회귀.
+
+**기계적 변환의 안전성**
+
+정규식이 SKIP 한 패턴:
+- `BorderRadius.circular(height / 2)` — 변수 표현식
+- `BorderRadius.circular(anyVariable)` — 변수만 있는 경우
+- `BoxShape.circle` — 전혀 다른 속성
+
+정규식이 CONVERT 한 패턴은 모두 **정적 상수** 로만 구성된 라운드 — 이는 "특정 메타포 없이 단순히 둥글게" 선택된 것으로, 각진 전환이 안전.
+
+**부산물 정리**
+
+변환 후 `AppSpacing` import 가 더 이상 사용되지 않는 4 파일의 import 제거:
+- `app_date_picker.dart`, `compact_week_strip.dart`, `practice_center_button.dart`, `profile_photo_header.dart`
+
+formatter 가 `shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)` 를 `RoundedRectangleBorder()` 로 자동 축약 (동등 기본값).
+
+**검증**: `flutter analyze --no-pub` "No issues found!" 통과.
+
+**범위**
+
+| 영역 | 파일 수 | 지점 수 |
+|------|--------|---------|
+| app_theme.dart (light+dark) | 1 | 28 |
+| lib/features/ 전체 도메인 | 84 | ~220 |
+| lib/core/widgets/ 공통 위젯 | 14 | ~35 |
+| **합계** | **99** | **~283** |
+
+**Lore-directive**: `app_theme` 기본 shape 는 `BorderRadius.zero` — Notebook × Score 앱의 기하 기본값. 라운드는 명시적 메타포(애니메이션·pill·원형 오브젝트) 에만 사용.
+
+**Lore-constraint**: 신규 위젯 추가 시 `BorderRadius.circular(...)` 사용 금지 — 예외 카테고리 3종(캐릭터·handle·원형 오브젝트) 이외에는 `BorderRadius.zero` 또는 shape override 생략(테마 기본). PR 리뷰에서 회귀 감지.
+
+**Lore-rejected**: 예외 카테고리별 수동 분류 — 282 지점의 의미론적 분류는 비효율. 정규식이 정적 상수만 CONVERT 하고 변수 표현식을 자동 SKIP 하는 설계가 안전하면서 비용 0.
+
+**Lore-rejected**: 바텀시트 상단 radius 유지 (§7.113 예외 매트릭스 잔재) — 시스템 매크로 보존보다 **전역 기하 일관성** 우선. 사용자 10x Vision 결정.
+
+**후속**
+
+- Phase 4 수동 확인 포인트: 홈 · 학생 추가 · 다이얼로그 · 레슨 상세 4 스폿에서 라운드 회귀 없음 확인 (실기).
+- 프로젝트 §8 구현원칙 7번 후보: "`BorderRadius.circular` 사용 금지 — 각진 원칙의 물리적 강제" (훅·lint 후보).
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
@@ -4658,4 +4747,5 @@ MyMusicStaff / Teachworks / Duet / Mindbody / 클라스팅 5개 유사 서비스
 3. **Feature-preserving**: 기능 위젯 재사용. 기능 변경 금지.
 4. **3px 규칙 불가침**: §3의 여백선 규칙은 전 화면에서 동일.
 5. **4대 시그니처 필수**: 어느 화면이든 Notebook × Score를 적용했다면 Playfair · 로마숫자 · Vermillion · Gaegu 네 가지가 모두 관찰되어야 한다.
-6. **각진 원칙 (§7.112 · §7.113 · §7.114 · §7.115)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. 시스템 매크로(바텀시트 상단) 만 시스템 기본 유지. `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.
+6. **각진 원칙 (§7.112 · §7.113 · §7.114 · §7.115 · §7.118)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. **app_theme 테마 레이어 전체가 `BorderRadius.zero`** (§7.118, 2026-04-24 포화). 바텀시트 상단도 각진 (10x Vision). `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.
+7. **라운드 예외 명시화 (§7.118)**: `BorderRadius.circular` 사용은 다음 3 예외에만 허용 — (a) 애니메이션 캐릭터(고양이·이모지 등), (b) 드래그 핸들 pill(`height / 2`), (c) 변수 표현식 기반 원형 오브젝트. 정적 상수(`radiusMedium` 등) 사용 금지.
