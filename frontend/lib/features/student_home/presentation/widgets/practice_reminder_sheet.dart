@@ -64,10 +64,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(
@@ -123,9 +120,6 @@ class PracticeReminderSheet extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.paperDark,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
@@ -229,7 +223,6 @@ class PracticeReminderSheet extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color: AppColors.ink.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   children: [

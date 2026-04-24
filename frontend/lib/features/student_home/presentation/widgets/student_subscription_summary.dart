@@ -119,7 +119,6 @@ class StudentSubscriptionSummary extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -149,10 +148,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
   Widget _buildLoadingState() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: const Center(child: CircularProgressIndicator()),
     );
   }
@@ -160,10 +156,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
   Widget _buildErrorState() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
@@ -197,7 +190,6 @@ class _SubscriptionMiniCard extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color:
                 subscription.isExpiringSoon
@@ -354,10 +346,7 @@ class _SubscriptionMiniCard extends ConsumerWidget {
         horizontal: AppSpacing.space2,
         vertical: 2,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
       child: Text(
         label,
         style: AppTypography.caption.copyWith(

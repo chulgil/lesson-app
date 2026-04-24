@@ -19,7 +19,6 @@ class CompactTrialBookingCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
@@ -74,12 +73,7 @@ class CompactTrialBookingCard extends StatelessWidget {
                             horizontal: 6,
                             vertical: 2,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.paperDark,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
-                          ),
+                          decoration: BoxDecoration(color: AppColors.paperDark),
                           child: Text(
                             booking.instrument!,
                             style: AppTypography.caption.copyWith(
@@ -110,7 +104,6 @@ class CompactTrialBookingCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: booking.status.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: Text(
                 booking.status.label,

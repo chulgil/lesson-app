@@ -33,7 +33,6 @@ class StudentLessonCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
@@ -57,9 +56,6 @@ class StudentLessonCard extends StatelessWidget {
                           isUpcoming
                               ? AppColors.paperAccentSoft
                               : AppColors.paperDark,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -110,9 +106,6 @@ class StudentLessonCard extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.paperDark,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusSmall,
-                                ),
                               ),
                               child: Text(
                                 lesson.instrument,
@@ -174,9 +167,6 @@ class StudentLessonCard extends StatelessWidget {
                             daysUntil <= 1
                                 ? AppColors.ink
                                 : AppColors.paperDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusXLarge,
-                        ),
                       ),
                       child: Text(
                         daysUntil == 0

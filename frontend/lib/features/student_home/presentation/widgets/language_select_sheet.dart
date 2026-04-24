@@ -109,7 +109,6 @@ class LanguageSelectSheet extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
@@ -134,7 +133,6 @@ class LanguageSelectSheet extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.inkTertiary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '준비 중',

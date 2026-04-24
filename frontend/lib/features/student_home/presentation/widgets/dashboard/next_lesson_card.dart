@@ -46,7 +46,6 @@ class NextLessonCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: const Center(
@@ -64,7 +63,6 @@ class NextLessonCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -125,10 +123,7 @@ class NextLessonCard extends ConsumerWidget {
       },
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.ink,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+        decoration: BoxDecoration(color: AppColors.ink),
         child: Row(
           children: [
             Container(
@@ -138,7 +133,6 @@ class NextLessonCard extends ConsumerWidget {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paper.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Column(
                 children: [
@@ -190,9 +184,6 @@ class NextLessonCard extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paper.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
                         ),
                         child: Text(
                           typeText,

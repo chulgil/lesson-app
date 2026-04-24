@@ -95,7 +95,6 @@ class TrialBookingsSection extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: AppColors.inkQuaternary,
           style: BorderStyle.solid,

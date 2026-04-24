@@ -37,10 +37,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
   Widget _buildLoadingState() {
     return Container(
       height: 200,
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: const Center(child: CircularProgressIndicator()),
     );
   }
@@ -48,10 +45,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
   Widget _buildErrorState(WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         children: [
           Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
@@ -104,17 +98,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
         ],
 
         Container(
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.ink.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          decoration: BoxDecoration(color: AppColors.paper),
           child: Column(
             children: [
               // Progress header
@@ -155,20 +139,15 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                     const SizedBox(width: AppSpacing.space2),
                     SizedBox(
                       width: 80,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
+                      child: LinearProgressIndicator(
+                        value: total > 0 ? completed / total : 0,
+                        backgroundColor: AppColors.inkQuaternary,
+                        valueColor: AlwaysStoppedAnimation(
+                          completed == total
+                              ? AppColors.paperOk
+                              : AppColors.paperAccent,
                         ),
-                        child: LinearProgressIndicator(
-                          value: total > 0 ? completed / total : 0,
-                          backgroundColor: AppColors.inkQuaternary,
-                          valueColor: AlwaysStoppedAnimation(
-                            completed == total
-                                ? AppColors.paperOk
-                                : AppColors.paperAccent,
-                          ),
-                          minHeight: 8,
-                        ),
+                        minHeight: 8,
                       ),
                     ),
                   ],
@@ -199,10 +178,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
         ],
         Container(
           padding: const EdgeInsets.all(AppSpacing.space6),
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          decoration: BoxDecoration(color: AppColors.paper),
           child: Center(
             child: Column(
               children: [
@@ -239,10 +215,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: priority.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: priority.color.withValues(alpha: 0.15)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -340,9 +313,6 @@ class _PracticeItemTile extends ConsumerWidget {
                           color: _getTypeColor(
                             item.type,
                           ).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
                         ),
                         child: Text(
                           item.type.label,
@@ -422,9 +392,6 @@ class _PracticeItemTile extends ConsumerWidget {
                             item.practiceCount > 0
                                 ? AppColors.paperAccentSoft
                                 : AppColors.paperDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
                       ),
                       child: Text(
                         '${item.practiceCount}회',

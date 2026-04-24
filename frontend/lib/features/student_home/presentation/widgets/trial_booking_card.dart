@@ -22,7 +22,6 @@ class TrialBookingCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -59,9 +58,6 @@ class TrialBookingCard extends ConsumerWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.paperAccentSoft,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
                           ),
                           child: Text(
                             '체험레슨',
@@ -92,7 +88,6 @@ class TrialBookingCard extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: booking.status.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -121,10 +116,7 @@ class TrialBookingCard extends ConsumerWidget {
           // Lesson time
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Row(
               children: [
                 Icon(
@@ -141,12 +133,7 @@ class TrialBookingCard extends ConsumerWidget {
                       horizontal: 6,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paper,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paper),
                     child: Text(
                       booking.instrument!,
                       style: AppTypography.caption.copyWith(
@@ -167,7 +154,6 @@ class TrialBookingCard extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperHighlight.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: Row(
@@ -192,7 +178,6 @@ class TrialBookingCard extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: booking.status.color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

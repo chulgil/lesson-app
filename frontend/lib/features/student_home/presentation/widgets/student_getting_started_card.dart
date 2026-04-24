@@ -40,7 +40,6 @@ class StudentGettingStartedCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -139,7 +138,6 @@ class _StepItem extends StatelessWidget {
               isCompleted
                   ? AppColors.paperOk.withValues(alpha: 0.08)
                   : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color:
                 isCompleted

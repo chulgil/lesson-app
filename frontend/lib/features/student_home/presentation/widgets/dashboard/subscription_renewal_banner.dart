@@ -85,7 +85,6 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
                 color: bannerColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(color: bannerColor.withValues(alpha: 0.3)),
               ),
               child: Row(
@@ -129,12 +128,7 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                       horizontal: AppSpacing.space3,
                       vertical: AppSpacing.space2,
                     ),
-                    decoration: BoxDecoration(
-                      color: bannerColor,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    decoration: BoxDecoration(color: bannerColor),
                     child: Text(
                       ctaText,
                       style: AppTypography.caption.copyWith(
