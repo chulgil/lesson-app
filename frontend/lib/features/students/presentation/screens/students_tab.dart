@@ -124,6 +124,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     return swm.practiceStatus == PracticeStatus.poor;
                   case StudentFilter.paused:
                     return swm.practiceStatus == PracticeStatus.paused;
+                  // Enrollment filters are applied via RosterSummary ID sets
+                  // in Phase 3; until then they pass through.
+                  case StudentFilter.expiring:
+                  case StudentFilter.unpaid:
+                  case StudentFilter.trial:
+                  case StudentFilter.archive:
+                    return true;
                 }
               }).toList();
           return StudentGroup(
@@ -653,10 +660,21 @@ enum StudentFilter {
   good('우수'),
   normal('보통'),
   poor('부족'),
-  paused('휴강');
+  paused('휴강'),
+  expiring('만료임박'),
+  unpaid('미결제'),
+  trial('체험'),
+  archive('보관');
 
   final String label;
   const StudentFilter(this.label);
+
+  /// True if this filter uses subscription/membership state (not practice status).
+  bool get isEnrollmentFilter =>
+      this == StudentFilter.expiring ||
+      this == StudentFilter.unpaid ||
+      this == StudentFilter.trial ||
+      this == StudentFilter.archive;
 }
 
 /// Section header + student cards for a single class group.

@@ -904,7 +904,7 @@ class _RequestEventsProviderElement
   String get requestId => (origin as RequestEventsProvider).requestId;
 }
 
-String _$todayRequestsHash() => r'080dcdf67f1e4cccd8bbc7c8aec53c0ff10a3229';
+String _$todayRequestsHash() => r'11491e42ca79fe62975d55fe4149a7e976b0e761';
 
 /// Today's requests for a teacher: active + completed today, pending first.
 ///
