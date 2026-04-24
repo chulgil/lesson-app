@@ -233,10 +233,7 @@ class StudentLessonsTab extends ConsumerWidget {
             const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
               child: Text('오늘', style: NotebookTypography.handEmphasis),
             ),

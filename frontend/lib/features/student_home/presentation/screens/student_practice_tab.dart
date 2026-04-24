@@ -143,9 +143,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.paperAccentSoft,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
                           ),
                           // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
                           child: Text(
@@ -281,7 +278,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -420,7 +416,6 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -478,10 +473,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                   child: Container(
                     width: 28,
                     height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.ink,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    decoration: BoxDecoration(color: AppColors.ink),
                     child: const Icon(
                       Icons.add,
                       color: AppColors.paper,

@@ -4567,6 +4567,53 @@ flutter analyze lib/features/schedule/presentation/screens/schedule_tab.dart lib
 
 ---
 
+### §7.116 — student_home 4탭 각진 원칙 + 다크모드 NO-OP 제거 (2026-04-24)
+
+**전제**: §7.17/§7.87 에서 학생 화면의 픽셀 규격(Playfair·Roman·pieceTitle 등)은 감사·적용 완료. 그러나 `§7.113 각진 원칙` 확정(2026-04-24) 이후 학생 홈 4탭에는 `BorderRadius.circular(...)` 11건이 잔존. 학생은 앱 진입 후 홈 4탭에 가장 오래 머문다 — 이 영역에서 각진 메타포가 깨지면 Notebook × Score 전체 컨셉이 흔들린다.
+
+**작업 — 11 지점 각진 전환**
+
+| 파일 | 지점 | 이전 | 이후 |
+|------|------|------|------|
+| `student_profile_tab.dart:213` | 악기 태그 pill | `radiusXLarge` | `BorderRadius.zero` |
+| `student_profile_tab.dart:248` | stats summary card | `radiusLarge` | `BorderRadius.zero` |
+| `student_profile_tab.dart:307` | menu section card | `radiusLarge` | `BorderRadius.zero` |
+| `student_profile_tab.dart:373` | settings section card | `radiusLarge` | `BorderRadius.zero` |
+| `student_profile_tab.dart:461` | menu icon bg 36×36 | `radiusMedium` | `BorderRadius.zero` |
+| `student_profile_tab.dart:588` | invite code box | `radiusMedium` | `BorderRadius.zero` |
+| `student_practice_tab.dart:145` | "오늘" 마지널리아 뱃지 | `radiusSmall` | `BorderRadius.zero` |
+| `student_practice_tab.dart:281` | 정렬 dropdown trigger | `radiusSmall` | `BorderRadius.zero` |
+| `student_practice_tab.dart:419` | RepertoireCard 외곽 | `radiusMedium` | `BorderRadius.zero` |
+| `student_practice_tab.dart:478` | + 버튼 28×28 | `circular(6)` | `BorderRadius.zero` |
+| `student_lessons_tab.dart:238` | "오늘" 마지널리아 뱃지 | `radiusSmall` | `BorderRadius.zero` |
+
+**동반 작업 — NO-OP 제거**
+
+`student_profile_tab.dart:393-410` 다크모드 메뉴 항목 제거. Switch 의 `onChanged` 와 항목 자체 `onTap` 이 모두 "준비 중" SnackBar 만 뿌리는 **플레이스홀더 UI**. `ux-rules.md §15` 금지 규칙에 직접 위반. 다크 모드 스펙 확정 후 재도입.
+
+**예외 유지**
+
+- `student_lessons_tab.dart:357` EmptyState 아이콘 bg `shape: BoxShape.circle` — §7.113 오브젝트 예외 (event_available 아이콘 = 의례 모먼트). 유지.
+- `student_practice_tab.dart:439` `InkWell(borderRadius:...)` — 터치 ripple 모양 결정자. `BoxDecoration.borderRadius` 와 구분. 유지.
+- `CircleAvatar` (`student_profile_tab.dart:156`) — 아바타, §7.113 사람 예외. 유지.
+
+**모델 위임 실험**
+
+Phase 1 은 Haiku 4.5 서브에이전트 3개 병렬 위임으로 실행 (사용자 속도 개선 요청 반영). 결과:
+- Agent 1 (profile 6건): 105s, 8 tool calls
+- Agent 2 (practice 4건): 146s, 12 tool calls (`InkWell.borderRadius` 예외 정확히 식별)
+- Agent 3 (lessons 1건): 43s, 3 tool calls
+
+**관찰**: Haiku 는 라인 지정 + 예외 명시 + 검증 grep 3종 지침만 주면 정확히 수행. 특히 Agent 2 가 L439 `InkWell.borderRadius` 를 스스로 구분한 것은 "검증 grep 결과 1건 남음 (InkWell 유지 예정)" 보고로 확인. 단순 패턴 수정 작업에서 Opus 대비 처리 속도 유사하나 **토큰 비용 절감** 효과.
+
+**Lore-directive**: student_home 4탭 영역은 `BorderRadius.zero` 포화. 플레이스홀더 UI 는 `ux-rules.md §15` 위반이므로 스펙 미확정 기능은 메뉴에 노출하지 않는다.
+
+**Lore-constraint**: 단순 패턴 코드 편집은 Haiku 서브에이전트 위임 가능. 조건: (a) 라인 번호 명시, (b) 예외 규칙 명시, (c) 검증 grep 지시.
+
+**Lore-rejected**: "다크 모드 메뉴 비활성화로 유지" — 회색 Switch 로 남겨두면 사용자는 "곧 켜질 기능" 으로 오인. 완전 제거가 신뢰 유지에 우월.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

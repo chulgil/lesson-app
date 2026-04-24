@@ -46,3 +46,40 @@
 ## 이전 계획
 
 자가 개선 하네스 계획 (2026-04-22, Phase 1-6 완료) — `git log prompt_plan.md`로 추적.
+
+---
+
+# 2026-04-24 후속 — 학생 화면 §7.113 각진 전수 + NO-OP 제거
+
+> 모드: `/plan --eng` + Haiku 위임 속도 검증
+> 배경: §7.17 픽셀 감사는 완료, but §7.113 각진 원칙(2026-04-24 확정)은 학생 화면 미적용. 91건 radius + NO-OP 다크모드 + BoxShadow 2건 잔존.
+
+## 감사 요약 (Phase 0)
+
+| 영역 | BorderRadius.circular | BoxShadow | 기능 이슈 |
+|------|----------------------|-----------|-----------|
+| 4탭 본체 | 12건 | 0 | NO-OP 다크모드 Switch (profile_tab L398-414) |
+| 2차 화면 (8) | ~22건 | 0 | 미확인 |
+| 공통 위젯 (~15) | ~40건 | 2건 (weekly_practice L111) | 미확인 |
+| 온보딩 (3) | ~18건 | 0 | 미확인 |
+| **합계** | **91건** | **2건** | **1건 확인** |
+
+## Phase 실행
+
+| Phase | 내용 | 위임 |
+|------|------|------|
+| 1. 4탭 본체 | lessons + practice + profile radius 제거 + NO-OP 제거 | Haiku 병렬 3 + Opus 후처리 |
+| 2. 2차 화면 | my_teachers·help·app_info·notif·profile_edit·legal·proposal·invite 8화면 | Haiku 병렬 4 |
+| 3. 공통 위젯 | dashboard/* + lesson_card + subscription + trial + weekly_practice ~15개 | Haiku 병렬 5 |
+| 4. 온보딩 | profile_setup + tutorial + phone_verification | Haiku 병렬 3 |
+
+## 모델 위임 전략 (속도 검증)
+
+- **Haiku 4.5**: radius/BoxShadow 제거 (패턴 단순, 라인 지정)
+- **Opus 4.7 (본체)**: 계획·감사·NO-OP 판단·README 업데이트·Masthead 결정·검증
+
+## Masthead 결정: B안 (홈만 Masthead 유지)
+
+lessons/practice/profile 탭은 현재 `sectionTitle`만 — 변경 안 함. 탭별 차별화 유지.
+
+## 예상 복잡도: HIGH (누적 18h) — Phase 1만 먼저 ~4h

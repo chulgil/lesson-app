@@ -210,7 +210,6 @@ class StudentProfileTab extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: AppColors.paper.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -246,7 +245,6 @@ class StudentProfileTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -305,7 +303,6 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -372,7 +369,6 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -392,25 +388,6 @@ class StudentProfileTab extends ConsumerWidget {
                     ? reminderSettings.formattedTime
                     : '꺼짐',
             onTap: () => PracticeReminderSheet.show(context),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.dark_mode_outlined,
-            title: '다크 모드',
-            trailing: Switch(
-              value: false,
-              onChanged: (value) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('다크 모드는 준비 중입니다')));
-              },
-              activeThumbColor: AppColors.paperAccent,
-            ),
-            onTap: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('다크 모드는 준비 중입니다')));
-            },
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -460,7 +437,6 @@ class StudentProfileTab extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: iconColor?.withValues(alpha: 0.1) ?? AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(
                 icon,
@@ -589,9 +565,6 @@ class StudentProfileTab extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccentSoft,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(
