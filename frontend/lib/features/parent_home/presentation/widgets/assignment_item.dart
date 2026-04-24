@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 /// Assignment item widget for parent dashboard
 class AssignmentItem extends StatelessWidget {
@@ -29,13 +30,12 @@ class AssignmentItem extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color:
-                  isCompleted
-                      ? AppColors.paperOk
-                      : AppColors.paperDark,
+              color: isCompleted ? AppColors.paperOk : AppColors.paperDark,
               shape: BoxShape.circle,
               border:
-                  isCompleted ? null : Border.all(color: AppColors.inkQuaternary),
+                  isCompleted
+                      ? null
+                      : Border.all(color: AppColors.inkQuaternary),
             ),
             child:
                 isCompleted
@@ -51,10 +51,7 @@ class AssignmentItem extends StatelessWidget {
                   title,
                   style: AppTypography.bodyMedium.copyWith(
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color:
-                        isCompleted
-                            ? AppColors.inkTertiary
-                            : AppColors.ink,
+                    color: isCompleted ? AppColors.inkTertiary : AppColors.ink,
                   ),
                 ),
                 Text(
@@ -78,13 +75,8 @@ class AssignmentItem extends StatelessWidget {
                 color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Text(
-                '필수',
-                style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Notebook × Score: "필수" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
+              child: Text('필수', style: NotebookTypography.handEmphasis),
             ),
         ],
       ),

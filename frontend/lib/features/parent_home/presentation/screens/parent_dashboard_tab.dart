@@ -615,11 +615,11 @@ class ParentDashboardTab extends ConsumerWidget {
             color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
+          // Notebook × Score: "D-N" = 임박 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
           child: Text(
             'D-1',
-            style: AppTypography.caption.copyWith(
+            style: NotebookTypography.handEmphasis.copyWith(
               color: AppColors.paperOk,
-              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -781,13 +781,8 @@ class ParentDashboardTab extends ConsumerWidget {
                         AppSpacing.radiusSmall,
                       ),
                     ),
-                    child: Text(
-                      '미결제',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.paperAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    // Notebook × Score: "미결제" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
+                    child: Text('미결제', style: NotebookTypography.handEmphasis),
                   ),
                 ],
               ),

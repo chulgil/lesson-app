@@ -4184,6 +4184,51 @@ flutter analyze # 4 파일 모두 No issues found
 
 ---
 
+### §7.108 — parent_home Gaegu 시그니처 확장 (긴급도 마지널리아 축 추가, 2026-04-24)
+
+**배경**: §7.107 의 "서명 씨앗 → 평행 검색" 후속. `parent_home/` 도메인 전체에서 `handEmphasis` 사용 0 건 확인 → **학부모 홈 전 탭에서 §1.1 #4 Gaegu 시그니처 부재**. 동일한 `paperAccentSoft` 배경 + `caption/captionSmall w600 paperAccent` 패턴의 뱃지가 부모 대시보드/과제 위젯에 분포. 시간 인디케이터("D-1")와 긴급도 인디케이터("미결제·필수") 양쪽을 Gaegu 축으로 승격.
+
+#### 7.108-a 승격 3 지점
+
+| 파일 | 라인 | 텍스트 | 변경 전 | 변경 후 |
+|------|------|--------|---------|---------|
+| `parent_home/.../parent_dashboard_tab.dart` | 619 | "D-1" | `caption + paperOk + bold` | `handEmphasis.copyWith(color: paperOk)` |
+| `parent_home/.../parent_dashboard_tab.dart` | 785 | "미결제" | `caption + paperAccent + bold` | `handEmphasis` |
+| `parent_home/.../assignment_item.dart` | 81 | "필수" | `captionSmall + paperAccent + bold` | `handEmphasis` |
+
+#### 7.108-b 축 확장
+
+**§7.107 축(시간 인디케이터)** → **§7.108 축(긴급도 마지널리아)**: Gaegu 전용 축을 "오늘·지금·곧·내일" 시간 슬롯에서 **"D-N·미결제·필수" 긴급도 슬롯**으로 확장. 두 축의 공통점은 **"지금 주목해야 하는 순간"** — §1.1 #4 정의와 부합.
+
+**예외 1 ("D-1" 색 유지)**: "D-1" 은 임박 인디케이터이지만 색은 **paperOk(완료 색)** 으로 렌더 중 — 레슨이 확정되어 다가옴을 긍정적으로 표지. handEmphasis 의 기본색(paperAccent) 을 `copyWith(color: paperOk)` 로 오버라이드. Gaegu 축은 지키되 **색상 시맨틱은 도메인 맞춤 허용**.
+
+#### 7.108-c 검증
+
+```bash
+# parent_home 도메인 Gaegu 적용 확인
+rg "NotebookTypography\.handEmphasis" frontend/lib/features/parent_home/ | wc -l  # 3 지점
+# Gaegu 회피 신호 잔존 확인
+rg "caption.*paperAccent.*w600|captionSmall.*paperAccent.*bold" frontend/lib/features/parent_home/  # 0 건
+flutter analyze lib/features/parent_home/presentation/screens/parent_dashboard_tab.dart \
+               lib/features/parent_home/presentation/widgets/assignment_item.dart  # No issues found
+```
+
+#### 7.108 관찰
+
+**"Gaegu 축의 슬롯 확대"**: §7.107 은 "오늘·진행 중" 시간 리터럴을 Gaegu 로 승격하며 **시간 축**을 확립했다. §7.108 은 "D-1·미결제·필수" 의 **긴급도 슬롯**을 동일 축에 편입 → Gaegu 전용 축 = **"시간 + 긴급도" 2차원**으로 확장. 두 슬롯은 의미상 모두 "손으로 덧붙인 주의 마커" 로 통합.
+
+**"parent_home 4대 시그니처 완결 경로"**: parent_dashboard_tab 은 §7.61·§7.63 에서 Playfair(섹션) + Roman(인덱스) + Vermillion(paperAccent) 을 이미 획득. §7.108 로 Gaegu 를 획득 → **학부모 대시보드 화면 §1.1 4축 완결**. 구현 원칙 5 (§1.1 4대 시그니처 필수) 준수 화면이 하나 더 추가.
+
+**"상태 뱃지 vs 시간 뱃지 구분선"**: 동일 파일 내 "취소"(parent_lessons_tab:607) 는 상태 분류 뱃지로 **Gaegu 승격 대상에서 제외**. "취소" 는 레슨의 최종 상태를 가리키는 분류 레이블이지 "주목해야 하는 순간" 이 아님. 반면 "미결제" 는 **지금 해결해야 하는 보류 상태** → 긴급도 마지널리아. 구분선: **"분류(noun)" vs "호소(call)"**.
+
+**Lore-directive**: "D-N·미결제·필수" 류 **긴급도 인디케이터 뱃지**도 `NotebookTypography.handEmphasis` 전용. §7.107 시간 축과 통합해 **"마지널리아 = Gaegu 전용 축(2차원: 시간 + 긴급도)"** 법칙 확정.
+
+**Lore-constraint**: `copyWith(color: ...)` 로 handEmphasis 의 기본색을 오버라이드해도 Gaegu 축 준수로 인정. 색상 시맨틱은 도메인 맞춤(완료 = paperOk, 경고 = paperAccent).
+
+**Lore-rejected**: 상태 분류 뱃지("취소·완료·대기") 를 Gaegu 로 승격 — 긴급도 호소가 아닌 분류 레이블이므로 손글씨 축이 과잉. **Vermillion/neutral 색 축** 으로 충분.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
