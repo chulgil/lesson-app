@@ -374,7 +374,6 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: AppColors.scheduleMutedBackground,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
       );
     }
@@ -387,7 +386,6 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
             color: _priorityColor(priority),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
             child: Text(
@@ -409,7 +407,6 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.2),
             width: 0.5,

@@ -60,7 +60,6 @@ class TrialLessonInfoSection extends StatelessWidget {
                 color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             );
           }).toList(),
@@ -95,7 +94,6 @@ class TrialLessonInfoSection extends StatelessWidget {
                 color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             );
           }).toList(),
@@ -131,15 +129,12 @@ class TrialLessonInfoSection extends StatelessWidget {
             filled: true,
             fillColor: AppColors.paper,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.paperAccent, width: 1.5),
             ),
             contentPadding: const EdgeInsets.all(AppSpacing.space3),

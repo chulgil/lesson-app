@@ -122,7 +122,6 @@ class _ScheduleChangeSlotScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
@@ -151,7 +150,6 @@ class _ScheduleChangeSlotScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -327,7 +325,6 @@ class _ScheduleChangeSlotScreenState
                   color: AppColors.inkTertiary,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),

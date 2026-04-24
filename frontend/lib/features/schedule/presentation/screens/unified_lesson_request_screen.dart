@@ -140,7 +140,6 @@ class _UnifiedLessonRequestScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -194,7 +193,6 @@ class _UnifiedLessonRequestScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -227,7 +225,6 @@ class _UnifiedLessonRequestScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: AppColors.paperAccent.withValues(alpha: 0.15),
         ),
@@ -352,15 +349,12 @@ class _UnifiedLessonRequestScreenState
           filled: true,
           fillColor: AppColors.paper,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(
               color: AppColors.paperAccent,
               width: 2,
@@ -458,7 +452,6 @@ class _UnifiedLessonRequestScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -492,7 +485,6 @@ class _UnifiedLessonRequestScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
       ),
       child: Row(
@@ -529,15 +521,12 @@ class _UnifiedLessonRequestScreenState
           filled: true,
           fillColor: AppColors.paper,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             borderSide: const BorderSide(
               color: AppColors.paperAccent,
               width: 2,
@@ -562,7 +551,6 @@ class _UnifiedLessonRequestScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -622,7 +610,6 @@ class _UnifiedLessonRequestScreenState
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           disabledBackgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
         ),

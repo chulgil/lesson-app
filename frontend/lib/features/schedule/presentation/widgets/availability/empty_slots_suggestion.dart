@@ -136,14 +136,12 @@ class _SuggestionCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onSelect,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space3),
             child: Row(

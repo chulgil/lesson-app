@@ -187,7 +187,6 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: cellConfig.backgroundColor,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border:
               isSelected
                   ? Border.all(color: AppColors.paperAccent, width: 1.5)

@@ -65,14 +65,11 @@ class _ScheduleTypeCard extends StatelessWidget {
           isSelected
               ? AppColors.paperAccent.withValues(alpha: 0.08)
               : AppColors.paper,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
               color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
@@ -88,7 +85,6 @@ class _ScheduleTypeCard extends StatelessWidget {
                       isSelected
                           ? AppColors.paperAccent.withValues(alpha: 0.15)
                           : AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Icon(
                   type == ScheduleType.fixed
@@ -127,9 +123,6 @@ class _ScheduleTypeCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: AppColors.paperOk.withValues(
                                 alpha: 0.15,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
                               ),
                             ),
                             child: Text(

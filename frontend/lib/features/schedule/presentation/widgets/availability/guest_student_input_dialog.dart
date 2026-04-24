@@ -71,9 +71,6 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -173,9 +170,6 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
                       color: AppColors.ink.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     child: Row(
                       children: [
@@ -267,19 +261,15 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
       hintText: hintText,
       prefixIcon: Icon(prefixIcon, size: 20, color: AppColors.inkSecondary),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: const BorderSide(color: AppColors.inkQuaternary),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: const BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: const BorderSide(color: AppColors.paperAccent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         borderSide: const BorderSide(color: AppColors.paperAccent),
       ),
       contentPadding: const EdgeInsets.symmetric(

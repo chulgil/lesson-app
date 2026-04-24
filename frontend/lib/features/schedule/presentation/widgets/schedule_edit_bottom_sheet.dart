@@ -62,9 +62,6 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -215,7 +212,6 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
   Widget _buildTimePicker(String label, TimeOfDay time, bool isStart) {
     return InkWell(
       onTap: () => _selectTime(isStart),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -223,7 +219,6 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

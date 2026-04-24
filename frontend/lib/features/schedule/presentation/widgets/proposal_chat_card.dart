@@ -36,7 +36,6 @@ class ProposalChatCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Row(
               children: [
@@ -73,7 +72,6 @@ class ProposalChatCard extends StatelessWidget {
           color: isRecommended
               ? AppColors.paperAccent.withValues(alpha: 0.06)
               : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color: isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isRecommended ? 1.5 : 1,

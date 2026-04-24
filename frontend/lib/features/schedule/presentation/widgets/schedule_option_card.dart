@@ -66,7 +66,6 @@ class ScheduleOptionCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: borderColor,
           width: isSelected ? 2 : 1,
@@ -76,7 +75,6 @@ class ScheduleOptionCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: isDisabled ? null : onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Row(
@@ -156,7 +154,6 @@ class ScheduleOptionCard extends StatelessWidget {
         color: isPrimary
             ? AppColors.paperAccent.withValues(alpha: 0.1)
             : AppColors.inkSecondary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -187,7 +184,6 @@ class ScheduleOptionCard extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space1),
         child: Icon(
@@ -378,11 +374,9 @@ class AddScheduleOptionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: AppColors.inkQuaternary,
             style: BorderStyle.solid,

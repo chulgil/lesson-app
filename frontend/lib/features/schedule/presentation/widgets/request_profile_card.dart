@@ -99,7 +99,6 @@ class RequestProfileCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -185,7 +184,6 @@ class RequestProfileCard extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               AppStrings.returning,
@@ -221,7 +219,6 @@ class RequestProfileCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: typeColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         request.typeDisplayLabel,
@@ -242,7 +239,6 @@ class RequestProfileCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         request.statusChipLabel,

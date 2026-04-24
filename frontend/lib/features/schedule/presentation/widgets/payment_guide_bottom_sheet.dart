@@ -72,9 +72,6 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -159,11 +156,9 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                   color: AppColors.inkTertiary,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
@@ -181,9 +176,6 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                 ),
                 child: Text(
@@ -212,7 +204,6 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
         decoration: BoxDecoration(
           color: selected ? AppColors.paperAccent : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: selected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
@@ -260,11 +251,9 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                 color: AppColors.inkSecondary,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: const BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: const BorderSide(color: AppColors.inkQuaternary),
               ),
               contentPadding: const EdgeInsets.symmetric(

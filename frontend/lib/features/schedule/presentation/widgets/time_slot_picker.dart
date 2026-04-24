@@ -93,17 +93,14 @@ class _TimeSlotChip extends StatelessWidget {
       color: isSelected
           ? AppColors.paperAccent
           : AppColors.paper,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
             vertical: AppSpacing.space3,
           ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
@@ -197,7 +194,6 @@ class WeekDaySelector extends StatelessWidget {
                   : isAvailable
                       ? Colors.transparent
                       : AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Column(
               children: [

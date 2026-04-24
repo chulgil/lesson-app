@@ -46,7 +46,6 @@ class RegularLessonStudentInfo extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
@@ -326,7 +325,6 @@ class RegularLessonTimeSelector extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -349,7 +347,6 @@ class RegularLessonTimeSelector extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   '${formatTimeOfDay(daySlot.startTime)}-${formatTimeOfDay(daySlot.endTime)} 가능',
@@ -385,7 +382,6 @@ class RegularLessonTimeSelector extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperOk.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color: AppColors.paperOk.withValues(alpha: 0.3),
                 ),
@@ -476,14 +472,11 @@ class OptionCard extends StatelessWidget {
           isSelected
               ? AppColors.paperAccent.withValues(alpha: 0.1)
               : AppColors.paper,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
               color:
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -570,12 +563,10 @@ class RegularLessonStartDateSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -631,7 +622,6 @@ class RegularLessonSummary extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -745,7 +735,6 @@ class FirstMonthFeeSection extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color: AppColors.paperAccent.withValues(alpha: 0.3),
             ),

@@ -191,13 +191,10 @@ class _TimeSlotButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: _getBackgroundColor(),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color: _getBorderColor(),
               width: isSelected ? 2 : 1,

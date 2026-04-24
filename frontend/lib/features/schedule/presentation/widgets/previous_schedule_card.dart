@@ -45,7 +45,6 @@ class PreviousScheduleCard extends ConsumerWidget {
           ),
           color: AppColors.ink.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             side: BorderSide(
               color: AppColors.ink.withValues(alpha: 0.3),
             ),
@@ -93,7 +92,6 @@ class PreviousScheduleCard extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                     border: Border.all(
                       color: AppColors.inkQuaternary,
                     ),

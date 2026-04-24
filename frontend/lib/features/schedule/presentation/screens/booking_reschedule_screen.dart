@@ -127,7 +127,6 @@ class _BookingRescheduleScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -177,7 +176,6 @@ class _BookingRescheduleScreenState
         ),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
@@ -208,7 +206,6 @@ class _BookingRescheduleScreenState
             isLastChance
                 ? AppColors.paperAccent.withValues(alpha: 0.1)
                 : AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -284,7 +281,6 @@ class _BookingRescheduleScreenState
                 decoration: BoxDecoration(
                   color:
                       isSelected ? AppColors.paperAccent : AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color:
                         isSelected
@@ -403,7 +399,6 @@ class _BookingRescheduleScreenState
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
@@ -441,7 +436,6 @@ class _BookingRescheduleScreenState
                   vertical: AppSpacing.space4,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               child:

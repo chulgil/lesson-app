@@ -43,9 +43,6 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -226,7 +223,6 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -258,9 +254,6 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
                       border: Border.all(color: AppColors.inkQuaternary),
                     ),
                     child: Text(slot, style: AppTypography.bodySmall),

@@ -144,7 +144,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ),
       decoration: BoxDecoration(
         color: booking.lessonType.color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
       ),
       child: Text(
         '${booking.lessonType.label}레슨 신청',
@@ -193,9 +192,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Row(
                     children: [
@@ -229,7 +225,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent, width: 2),
       ),
       child: Column(
@@ -273,7 +268,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -316,7 +310,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 ),
                 side: BorderSide(color: AppColors.inkQuaternary),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               child: Text(
@@ -339,7 +332,6 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 disabledBackgroundColor: AppColors.inkSecondary
                     .withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               child:

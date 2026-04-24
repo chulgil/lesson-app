@@ -44,7 +44,6 @@ class AvailabilityBookingPreview extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
@@ -78,7 +77,6 @@ class AvailabilityBookingPreview extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '⭐ 평소 시간',
@@ -149,7 +147,6 @@ class AvailabilityBookingPreview extends StatelessWidget {
                   vertical: AppSpacing.space3,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               child:

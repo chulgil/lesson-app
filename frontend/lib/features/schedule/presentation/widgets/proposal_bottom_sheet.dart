@@ -85,9 +85,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -163,17 +160,11 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                         color: AppColors.inkTertiary,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                         borderSide: const BorderSide(
                           color: AppColors.inkQuaternary,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                         borderSide: const BorderSide(
                           color: AppColors.inkQuaternary,
                         ),
@@ -193,9 +184,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(
@@ -239,7 +227,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
   Widget _buildPaymentMethodSelector() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -273,7 +260,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.paperAccent : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium - 1),
           ),
           child: Text(
             label,
@@ -314,7 +300,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Center(
@@ -359,7 +344,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Text(
@@ -395,7 +379,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButton<String>(

@@ -83,7 +83,6 @@ class _ScheduleChangeResponseBottomSheetState
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -139,9 +138,6 @@ class _ScheduleChangeResponseBottomSheetState
                         ),
                         side: const BorderSide(color: AppColors.inkQuaternary),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(
@@ -163,9 +159,6 @@ class _ScheduleChangeResponseBottomSheetState
                         ),
                         side: const BorderSide(color: AppColors.paperAccent),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(
@@ -187,9 +180,6 @@ class _ScheduleChangeResponseBottomSheetState
                         ),
                         backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(
@@ -230,7 +220,6 @@ class _ScheduleChangeResponseBottomSheetState
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [

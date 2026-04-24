@@ -133,7 +133,6 @@ class _GroupClassAttendanceScreenState
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Center(
               child: Text('🎻', style: TextStyle(fontSize: 24)),

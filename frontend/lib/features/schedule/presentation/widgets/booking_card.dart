@@ -27,12 +27,10 @@ class BookingCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(
@@ -109,7 +107,6 @@ class BookingCard extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   children: [
@@ -150,9 +147,6 @@ class BookingCard extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(
                       color: AppColors.paperAccent.withValues(alpha: 0.2),
                     ),
@@ -223,7 +217,6 @@ class BookingCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: booking.lessonType.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         booking.lessonType.label,
@@ -243,7 +236,6 @@ class BookingCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: booking.status.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -306,7 +298,6 @@ class BookingCardCompact extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: booking.status.color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Text(
           booking.status.label,

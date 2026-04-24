@@ -40,13 +40,11 @@ class UnifiedRequestCard extends StatelessWidget {
         vertical: AppSpacing.space2,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       elevation: 0,
       color: AppColors.paper,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(
@@ -96,7 +94,6 @@ class UnifiedRequestCard extends StatelessWidget {
                 request.type == LessonRequestType.trial
                     ? AppColors.paperDark
                     : AppColors.paperAccentSoft.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             request.type.label,
@@ -118,7 +115,6 @@ class UnifiedRequestCard extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               '복귀',
@@ -212,7 +208,6 @@ class UnifiedRequestCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         request.message!,
@@ -286,7 +281,6 @@ class UnifiedRequestCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Text(
               latestProposal.message!,
@@ -358,7 +352,6 @@ class UnifiedRequestCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
@@ -462,7 +455,6 @@ class UnifiedRequestCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         request.teacherActionLabel,
@@ -504,7 +496,6 @@ class _AlternativeSlotCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.space1),
       child: InkWell(
         onTap: onAccept,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space3,
@@ -512,7 +503,6 @@ class _AlternativeSlotCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.inkQuaternary),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [

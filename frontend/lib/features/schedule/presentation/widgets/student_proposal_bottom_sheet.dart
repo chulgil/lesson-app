@@ -70,7 +70,6 @@ class _StudentProposalBottomSheetState
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SingleChildScrollView(
         controller: widget.scrollController,
@@ -94,9 +93,6 @@ class _StudentProposalBottomSheetState
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,9 +135,6 @@ class _StudentProposalBottomSheetState
                   padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: InkWell(
                     onTap: () => setState(() => _selectedIndex = index),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space4,
@@ -152,9 +145,6 @@ class _StudentProposalBottomSheetState
                             isSelected
                                 ? AppColors.paperAccent.withValues(alpha: 0.1)
                                 : AppColors.paperDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                         border: Border.all(
                           color:
                               isSelected

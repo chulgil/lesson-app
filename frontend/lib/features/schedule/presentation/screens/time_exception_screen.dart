@@ -117,7 +117,6 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
       ),
       child: Row(
@@ -157,7 +156,6 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
@@ -166,7 +164,6 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           height: 40,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Icon(icon, size: 20, color: color),
         ),
@@ -375,9 +372,6 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -448,9 +442,6 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                   decoration: InputDecoration(
                     hintText: '휴무 사유를 입력하세요',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space4,
@@ -534,7 +525,6 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   Widget _buildDatePicker(String label, DateTime date, bool isStart) {
     return InkWell(
       onTap: () => _selectDate(isStart),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -542,7 +532,6 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [

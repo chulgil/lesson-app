@@ -176,14 +176,6 @@ class RequestHistoryChat extends StatelessWidget {
                     color: event.actorType == ProposerRole.teacher
                         ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paperDark,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(AppSpacing.radiusLarge),
-                      topRight: const Radius.circular(AppSpacing.radiusLarge),
-                      bottomLeft: Radius.circular(
-                          isMyMessage ? AppSpacing.radiusLarge : 4),
-                      bottomRight: Radius.circular(
-                          isMyMessage ? 4 : AppSpacing.radiusLarge),
-                    ),
                   ),
                   child: _buildBubbleContent(event, isMessageOnly: isMessageOnly),
                 ),
@@ -381,7 +373,6 @@ class RequestHistoryChat extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.ink.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -67,7 +67,6 @@ class AvailabilityDateNavigator extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: Row(

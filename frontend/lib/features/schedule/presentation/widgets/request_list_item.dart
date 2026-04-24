@@ -42,7 +42,6 @@ class RequestListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
@@ -202,7 +201,6 @@ class RequestListItem extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Text(
             label,

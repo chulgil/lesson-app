@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/availability_slot.dart';
 
@@ -30,7 +29,6 @@ class AvailabilityBlock extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: _backgroundColor,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : _borderColor,
             width: isSelected ? 2 : 1,

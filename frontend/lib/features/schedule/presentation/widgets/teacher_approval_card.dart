@@ -52,7 +52,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
     return Card(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: Padding(
@@ -128,7 +127,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
           ),
           decoration: BoxDecoration(
             color: booking.lessonType.color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
           ),
           child: Text(
             '${booking.lessonType.label}레슨 신청',
@@ -234,7 +232,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: AppColors.paperAccent,
           width: 2,
@@ -292,7 +289,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child: Text(
@@ -313,7 +309,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               disabledBackgroundColor:
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child: Text(
@@ -333,7 +328,6 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -391,12 +385,10 @@ class TeacherApprovalListItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(

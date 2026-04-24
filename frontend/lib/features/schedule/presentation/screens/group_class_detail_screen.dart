@@ -125,7 +125,6 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -169,7 +168,6 @@ class _GroupClassDetailScreenState
                   widget.groupClass.type == GroupClassType.regular
                       ? AppColors.ink.withValues(alpha: 0.1)
                       : AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
@@ -194,7 +192,6 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -267,7 +264,6 @@ class _GroupClassDetailScreenState
                 : isAlmostFull
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : AppColors.paperOk.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isFull
@@ -351,7 +347,6 @@ class _GroupClassDetailScreenState
             isWaitlist
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isWaitlist
@@ -425,7 +420,6 @@ class _GroupClassDetailScreenState
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Column(
           children: [
@@ -486,7 +480,6 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -511,7 +504,6 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

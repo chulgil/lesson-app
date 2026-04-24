@@ -205,7 +205,6 @@ class _TimeChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: _backgroundColor,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: _borderColor,
             width: isSelected ? 2 : 1,

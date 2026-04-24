@@ -254,11 +254,9 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               vertical: AppSpacing.space2,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
@@ -277,9 +275,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.inkQuaternary),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space3,
@@ -314,9 +309,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                     backgroundColor: AppColors.paperAccent,
                     disabledBackgroundColor: AppColors.scheduleMutedAccent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space3,
@@ -360,7 +352,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                       isSelected
                           ? AppColors.paperAccent.withValues(alpha: 0.08)
                           : AppColors.paper,
-                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color:
                         isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -421,7 +412,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space2,
@@ -626,7 +616,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               isSelected
                   ? AppColors.paperAccent.withValues(alpha: 0.06)
                   : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 1.5 : 1,
@@ -776,7 +765,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
           ),
@@ -825,7 +813,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
         ),
@@ -853,7 +840,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: AppColors.inkQuaternary),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
         ),

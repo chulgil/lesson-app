@@ -177,7 +177,6 @@ class _TeacherAvailabilityScreenState
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
@@ -227,7 +226,6 @@ class _TeacherAvailabilityScreenState
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
@@ -241,7 +239,6 @@ class _TeacherAvailabilityScreenState
                     : isWeekend
                     ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
             child: Text(
@@ -302,7 +299,6 @@ class _TeacherAvailabilityScreenState
               schedule.isActive
                   ? AppColors.paperOk.withValues(alpha: 0.1)
                   : AppColors.inkTertiary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color:
                 schedule.isActive
@@ -327,12 +323,10 @@ class _TeacherAvailabilityScreenState
   Widget _buildLessonSettings(TeacherAvailability avail) {
     return InkWell(
       onTap: () => _showLessonSettingsDialog(avail),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -432,7 +426,6 @@ class _TeacherAvailabilityScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -476,9 +469,6 @@ class _TeacherAvailabilityScreenState
                               color: AppColors.inkTertiary.withValues(
                                 alpha: 0.15,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
-                              ),
                             ),
                             child: Center(
                               child: Text(
@@ -501,9 +491,6 @@ class _TeacherAvailabilityScreenState
                                     decoration: BoxDecoration(
                                       color: AppColors.paperAccent.withValues(
                                         alpha: 0.15,
-                                      ),
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusSmall,
                                       ),
                                       border: Border.all(
                                         color: AppColors.paperAccent.withValues(
@@ -559,7 +546,6 @@ class _TeacherAvailabilityScreenState
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
@@ -599,7 +585,6 @@ class _TeacherAvailabilityScreenState
                 color: AppColors.paperAccent.withValues(alpha: 0.3),
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
             ),
           ),
@@ -620,7 +605,6 @@ class _TeacherAvailabilityScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -633,7 +617,6 @@ class _TeacherAvailabilityScreenState
                   isHoliday
                       ? AppColors.paperAccent.withValues(alpha: 0.1)
                       : AppColors.paperOk.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               isHoliday ? Icons.event_busy : Icons.add_circle_outline,

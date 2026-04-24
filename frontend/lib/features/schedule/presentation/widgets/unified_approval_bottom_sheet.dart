@@ -47,9 +47,6 @@ class _UnifiedApprovalBottomSheetState
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
       ),
       child: Column(
         children: [
@@ -91,7 +88,6 @@ class _UnifiedApprovalBottomSheetState
             ),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
             ),
             child: Text(
               '${widget.request.type.label} 신청',
@@ -198,7 +194,6 @@ class _UnifiedApprovalBottomSheetState
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.scheduleMutedBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Text(
               '희망 시간이 없습니다',
@@ -295,7 +290,6 @@ class _UnifiedApprovalBottomSheetState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(

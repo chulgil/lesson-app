@@ -106,7 +106,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -125,7 +124,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: const Icon(
                   Icons.event_busy,
@@ -165,7 +163,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
           ),
@@ -210,7 +207,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
           ),
@@ -263,7 +259,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -299,7 +294,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -350,15 +344,12 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
           ),
@@ -382,7 +373,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               backgroundColor: AppColors.paperAccent,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child:
@@ -415,7 +405,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               side: const BorderSide(color: AppColors.inkQuaternary),
             ),
@@ -571,9 +560,6 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
       ),
       builder:
           (context) => SafeArea(

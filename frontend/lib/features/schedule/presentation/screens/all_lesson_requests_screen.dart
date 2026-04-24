@@ -133,9 +133,6 @@ class _AllLessonRequestsScreenState
                             return Container(
                               decoration: BoxDecoration(
                                 color: AppColors.paper,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium,
-                                ),
                                 border: Border.all(
                                   color: AppColors.inkQuaternary,
                                 ),
@@ -483,7 +480,6 @@ class _AllLessonRequestsScreenState
         ),
         decoration: BoxDecoration(
           color: selected ? AppColors.paperAccent : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
           border: Border.all(
             color: selected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),

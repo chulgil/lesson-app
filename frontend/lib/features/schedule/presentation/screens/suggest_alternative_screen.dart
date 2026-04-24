@@ -263,9 +263,6 @@ class _SuggestAlternativeScreenState
                         isSelected
                             ? AppColors.paperOk.withValues(alpha: 0.08)
                             : AppColors.paper,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(
                       color:
                           isSelected
@@ -395,11 +392,9 @@ class _SuggestAlternativeScreenState
                 vertical: AppSpacing.space2,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
@@ -470,7 +465,6 @@ class _SuggestAlternativeScreenState
           backgroundColor: bgColor,
           disabledBackgroundColor: AppColors.scheduleMutedAccent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
         ),
       ),
@@ -488,7 +482,6 @@ class _SuggestAlternativeScreenState
               minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
               side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child: Text(
@@ -508,7 +501,6 @@ class _SuggestAlternativeScreenState
               backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child: Text(
@@ -657,7 +649,6 @@ class _SuggestAlternativeScreenState
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color: AppColors.paperAccent.withValues(alpha: 0.3),
                   ),
@@ -826,9 +817,6 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
       ),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
@@ -899,7 +887,6 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
                 ),
                 backgroundColor: AppColors.paperAccent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               child: Text(

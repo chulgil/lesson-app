@@ -99,12 +99,10 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
 
     return InkWell(
       onTap: () => _showLessonSettingsDialog(availability),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.2),
           ),
@@ -171,7 +169,6 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
                 children: [
@@ -260,7 +257,6 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
@@ -274,7 +270,6 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                     : isWeekend
                     ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
             child: Text(
@@ -335,7 +330,6 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               schedule.isActive
                   ? AppColors.paperOk.withValues(alpha: 0.1)
                   : AppColors.inkTertiary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color:
                 schedule.isActive

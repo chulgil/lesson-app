@@ -59,7 +59,6 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -112,9 +111,6 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                         ),
                         side: const BorderSide(color: AppColors.inkQuaternary),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(
@@ -136,9 +132,6 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                         ),
                         backgroundColor: AppColors.paperAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                       ),
                       child: Text(

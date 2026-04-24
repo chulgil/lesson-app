@@ -105,7 +105,6 @@ class NoSubscriptionView extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
                 color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +136,6 @@ class NoSubscriptionView extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.ink.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
           ),
           child: Row(
@@ -173,7 +171,6 @@ class NoSubscriptionView extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paperOk.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.paperOk.withValues(alpha: 0.3)),
           ),
           child: Row(

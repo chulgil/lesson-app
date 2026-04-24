@@ -39,7 +39,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       ),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
           color: AppColors.paperOk.withValues(alpha: 0.3),
           width: 1.5,
@@ -47,7 +46,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -90,7 +88,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
             color: AppColors.paperOk.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: const Icon(
             Icons.celebration,
@@ -134,7 +131,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -234,7 +230,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         color: isRecommended
             ? AppColors.paperAccent.withValues(alpha: 0.08)
             : AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isRecommended
               ? AppColors.paperAccent.withValues(alpha: 0.3)
@@ -248,7 +243,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(Icons.star, color: AppColors.paperAccent, size: 16),
             )
@@ -257,7 +251,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: AppColors.inkTertiary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(
                 Icons.access_time,
@@ -299,7 +292,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: AppColors.ink.withValues(alpha: 0.3),
         ),
@@ -358,7 +350,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
           ),
         ),
@@ -376,7 +367,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
             child: const Text('다른 시간'),
@@ -403,7 +393,6 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
           ),

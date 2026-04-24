@@ -62,7 +62,6 @@ class MyLessonRequestsScreen extends ConsumerWidget {
               return Container(
                 decoration: BoxDecoration(
                   color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: RequestListItem(

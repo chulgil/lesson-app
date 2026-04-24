@@ -357,9 +357,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusLarge),
-            ),
           ),
           padding: EdgeInsets.fromLTRB(
             0,
@@ -392,9 +389,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                           request.type == LessonRequestType.trial
                               ? AppColors.paperAccent.withValues(alpha: 0.04)
                               : AppColors.paperDark,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
                       border:
                           request.type == LessonRequestType.trial
                               ? Border(
