@@ -90,7 +90,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         top: false,

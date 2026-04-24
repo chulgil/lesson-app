@@ -147,7 +147,7 @@ class _UnifiedApprovalBottomSheetState
                   decoration: BoxDecoration(
                     color: AppColors.paper,
                     borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                        BorderRadius.zero,
                   ),
                   child: Row(
                     children: [
@@ -221,7 +221,7 @@ class _UnifiedApprovalBottomSheetState
                         ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paper,
                     borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                        BorderRadius.zero,
                     border: Border.all(
                       color: isSelected
                           ? AppColors.paperAccent
@@ -384,7 +384,7 @@ class _UnifiedApprovalBottomSheetState
               side: const BorderSide(color: AppColors.paperAccent),
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                    BorderRadius.zero,
               ),
             ),
             child: Text(
@@ -411,7 +411,7 @@ class _UnifiedApprovalBottomSheetState
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                    BorderRadius.zero,
               ),
             ),
             child: _isProcessing
@@ -451,7 +451,7 @@ class _UnifiedApprovalBottomSheetState
               side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                    BorderRadius.zero,
               ),
             ),
             child: Text(
@@ -477,7 +477,7 @@ class _UnifiedApprovalBottomSheetState
                   AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                    BorderRadius.zero,
               ),
             ),
             child: _isProcessing

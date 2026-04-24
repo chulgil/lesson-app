@@ -59,7 +59,7 @@ class ProfileChildrenSection extends ConsumerWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -123,7 +123,7 @@ class ProfileChildrenSection extends ConsumerWidget {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      borderRadius: BorderRadius.zero,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
@@ -172,7 +172,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                     profile.isActive
                         ? AppColors.paperDark
                         : AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 profile.status.label,
@@ -195,7 +195,7 @@ class ProfileChildrenSection extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => SafeArea(

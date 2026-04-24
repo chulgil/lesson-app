@@ -87,9 +87,7 @@ class ProfileCompletionCard extends StatelessWidget {
                       backgroundColor: AppColors.paper.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                       minHeight: 8,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     if (profile.nextSteps.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.space2),
@@ -132,7 +130,7 @@ class ProfileInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -150,7 +148,7 @@ class ProfileInfoCard extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: AppColors.paperAccent, size: 24),
             ),
@@ -312,9 +310,7 @@ class CareerCard extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paperOk.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
                           '재직중',
@@ -432,9 +428,7 @@ class CertificateCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                       child: Text(
                         getCertificateStatusLabel(certificate.status),

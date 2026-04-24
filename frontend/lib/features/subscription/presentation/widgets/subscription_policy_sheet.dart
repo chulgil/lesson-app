@@ -140,9 +140,7 @@ class _SheetFrame extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

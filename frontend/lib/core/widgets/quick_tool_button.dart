@@ -30,7 +30,7 @@ class QuickToolButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.zero,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),

@@ -73,7 +73,7 @@ class AssignmentItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               // Notebook × Score: "필수" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
               child: Text('필수', style: NotebookTypography.handEmphasis),

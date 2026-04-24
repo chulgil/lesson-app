@@ -43,9 +43,7 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,

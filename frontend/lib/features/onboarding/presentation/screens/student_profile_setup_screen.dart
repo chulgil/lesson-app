@@ -114,9 +114,7 @@ class _StudentProfileSetupScreenState
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => _InstrumentSelectorSheet(

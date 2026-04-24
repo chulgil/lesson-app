@@ -35,7 +35,7 @@ class TunerSettingsSheet extends ConsumerWidget {
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         child: Column(

@@ -57,7 +57,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -125,9 +125,7 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
                         vertical: AppSpacing.space2,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                     ),
                     onChanged: (value) {

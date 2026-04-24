@@ -179,7 +179,7 @@ class PieceCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(

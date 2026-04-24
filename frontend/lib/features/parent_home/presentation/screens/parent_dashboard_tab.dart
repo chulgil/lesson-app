@@ -293,7 +293,7 @@ class ParentDashboardTab extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (sheetContext) => Consumer(
@@ -460,9 +460,7 @@ class ParentDashboardTab extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paper.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
                           '만 ${profile.age}세',
@@ -482,9 +480,7 @@ class ParentDashboardTab extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paper.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -579,7 +575,7 @@ class ParentDashboardTab extends ConsumerWidget {
           height: 48,
           decoration: BoxDecoration(
             color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.zero,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -613,7 +609,7 @@ class ParentDashboardTab extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            borderRadius: BorderRadius.zero,
           ),
           // Notebook × Score: "D-N" = 임박 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
           child: Text(
@@ -777,9 +773,7 @@ class ParentDashboardTab extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paperAccentSoft,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     // Notebook × Score: "미결제" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
                     child: Text('미결제', style: NotebookTypography.handEmphasis),

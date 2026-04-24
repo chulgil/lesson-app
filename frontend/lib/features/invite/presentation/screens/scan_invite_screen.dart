@@ -114,7 +114,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               height: 280,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.paperAccent, width: 3),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.zero,
               ),
               child: Stack(
                 children: [
@@ -150,7 +150,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               // Notebook × Score: 카메라 프리뷰 위 안내 패널 — Material Colors.black54
               // 대신 ink 55% alpha. 스크림 계열은 §7.47 패턴으로 통일.
               color: AppColors.inkTertiary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Column(
               children: [

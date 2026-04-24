@@ -122,7 +122,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Row(
               children: [
@@ -174,7 +174,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -219,7 +219,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -276,7 +276,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
             ),
           ),
@@ -296,9 +296,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                     vertical: AppSpacing.space3,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    borderRadius: BorderRadius.zero,
                   ),
                 ),
               ),
@@ -317,9 +315,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                     vertical: AppSpacing.space3,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    borderRadius: BorderRadius.zero,
                   ),
                 ),
               ),
@@ -363,7 +359,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.qr_code_scanner, color: AppColors.paperAccent),
           ),
@@ -381,7 +377,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.dialpad, color: AppColors.ink),
           ),
@@ -396,7 +392,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(Icons.search, color: AppColors.paperAccent),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 
 /// Shared date picker utility with improved UX visibility.
 ///
@@ -109,11 +108,7 @@ class AppDatePicker {
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
               ),
             ),
@@ -195,11 +190,7 @@ class AppDatePicker {
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
               ),
             ),

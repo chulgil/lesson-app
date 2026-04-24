@@ -440,7 +440,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       children: [
         InkWell(
           onTap: onToggle,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
             child: Row(

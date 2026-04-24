@@ -102,9 +102,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => SafeArea(
@@ -165,9 +163,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => _InstrumentSelectorSheet(
@@ -241,9 +237,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         padding: const EdgeInsets.all(AppSpacing.space3),
                         decoration: BoxDecoration(
                           color: AppColors.paperAccent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         child: Row(
                           children: [
@@ -282,9 +276,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                   ),
                   child:
@@ -423,14 +415,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           decoration: InputDecoration(
             hintText: '선생님 이름을 입력해주세요',
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
@@ -463,7 +455,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.inkQuaternary),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child:
                 _selectedInstruments.isEmpty
@@ -552,14 +544,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             hintText: '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)',
             counterText: '',
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),

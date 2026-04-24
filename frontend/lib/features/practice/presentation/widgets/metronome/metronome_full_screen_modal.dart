@@ -53,7 +53,7 @@ class _MetronomeFullScreenModalState
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [

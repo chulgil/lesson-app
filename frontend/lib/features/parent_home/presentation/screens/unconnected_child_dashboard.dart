@@ -79,7 +79,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           height: 60,
           decoration: BoxDecoration(
             color: child.profileColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.zero,
           ),
           child: Center(
             child: Text(
@@ -114,7 +114,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                       color: child.connectionStatus.color.withValues(
                         alpha: 0.1,
                       ),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -188,7 +188,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -200,7 +200,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.space2),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: const Icon(
                   Icons.school,
@@ -337,7 +337,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                         : isPast
                         ? AppColors.paperDark
                         : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
                 border:
                     isToday
                         ? null
@@ -439,7 +439,7 @@ class _FeatureCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.zero,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -456,7 +456,7 @@ class _FeatureCard extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: color, size: 24),
             ),

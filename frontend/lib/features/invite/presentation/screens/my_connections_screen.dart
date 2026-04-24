@@ -134,9 +134,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => Padding(
@@ -292,9 +290,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => Padding(
@@ -452,12 +448,12 @@ class _HelpItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -467,7 +463,7 @@ class _HelpItem extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: AppColors.paperAccent, size: 20),
             ),
@@ -527,7 +523,7 @@ class _ConnectionCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -535,7 +531,7 @@ class _ConnectionCard extends StatelessWidget {
               isActive
                   ? Colors.white
                   : AppColors.inkTertiary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -657,7 +653,7 @@ class _StatusBadge extends StatelessWidget {
             isActive
                 ? AppColors.paperOk.withValues(alpha: 0.1)
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
       ),
       child: Text(
         isActive ? '연결됨' : '해제됨',

@@ -75,7 +75,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            borderRadius: BorderRadius.zero,
           ),
           child: Row(
             children: [
@@ -147,7 +147,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            borderRadius: BorderRadius.zero,
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -199,7 +199,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                         : item.isRecommended
                         ? AppColors.paperOk.withValues(alpha: 0.15)
                         : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 item.suffix,

@@ -213,7 +213,7 @@ class _RequestCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
@@ -281,7 +281,7 @@ class _RequestCard extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 request.message!,
@@ -364,7 +364,7 @@ class _RequestCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
       ),
       child: Text(text, style: AppTypography.caption.copyWith(color: color)),
     );

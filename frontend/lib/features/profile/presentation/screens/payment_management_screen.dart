@@ -207,7 +207,7 @@ class _PaymentManagementScreenState
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.zero,
       ),
       builder: (context) {
         int selectedYear = _selectedMonth.year;

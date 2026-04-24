@@ -195,7 +195,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                   decoration: BoxDecoration(
                     color: AppColors.paperDark,
                     borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                        BorderRadius.zero,
                   ),
                   child: Row(
                     children: [
@@ -432,7 +432,7 @@ class TeacherApprovalListItem extends StatelessWidget {
                             color: booking.lessonType.color
                                 .withValues(alpha: 0.1),
                             borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusRound),
+                                BorderRadius.zero,
                           ),
                           child: Text(
                             booking.lessonType.label,

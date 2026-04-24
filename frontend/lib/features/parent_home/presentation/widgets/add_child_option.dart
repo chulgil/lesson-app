@@ -25,12 +25,12 @@ class AddChildOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
         ),
         child: Row(
           children: [

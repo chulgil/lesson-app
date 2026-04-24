@@ -583,7 +583,7 @@ class _TeacherDetailContent extends ConsumerWidget {
               ),
               decoration: BoxDecoration(
                 color: _getBadgeColor(badge).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+                borderRadius: BorderRadius.zero,
                 border: Border.all(
                   color: _getBadgeColor(badge).withValues(alpha: 0.3),
                 ),

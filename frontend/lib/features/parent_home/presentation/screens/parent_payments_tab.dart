@@ -377,7 +377,7 @@ class _StatCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [
@@ -433,7 +433,7 @@ class _ChildSelectorSheet extends ConsumerWidget {
           (context, controller) => Container(
             decoration: const BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.zero,
             ),
             child: Column(
               children: [

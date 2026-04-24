@@ -112,7 +112,7 @@ class ParentLessonsTab extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => DraggableScrollableSheet(
@@ -164,9 +164,7 @@ class ParentLessonsTab extends ConsumerWidget {
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
                                 color: AppColors.paperDark,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium,
-                                ),
+                                borderRadius: BorderRadius.zero,
                               ),
                               child: Row(
                                 children: [
@@ -217,9 +215,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                 color: AppColors.paperAccentSoft.withValues(
                                   alpha: 0.2,
                                 ),
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium,
-                                ),
+                                borderRadius: BorderRadius.zero,
                                 border: Border.all(
                                   color: AppColors.paperAccentSoft,
                                 ),
@@ -270,9 +266,7 @@ class ParentLessonsTab extends ConsumerWidget {
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
                                 color: AppColors.paperDark,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium,
-                                ),
+                                borderRadius: BorderRadius.zero,
                               ),
                               child: Row(
                                 children: [
@@ -347,7 +341,7 @@ class ParentLessonsTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -356,7 +350,7 @@ class ParentLessonsTab extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: priorityColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Text(
               priorityLabel,
@@ -399,7 +393,7 @@ class ParentLessonsTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -498,12 +492,12 @@ class _LessonCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -517,7 +511,7 @@ class _LessonCard extends StatelessWidget {
                     isPast
                         ? AppColors.paperDark
                         : AppColors.paperAccentSoft.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Column(
                 children: [
@@ -612,7 +606,7 @@ class _LessonCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
       ),
       child: Text(
         label,

@@ -15,9 +15,7 @@ void showParentLoginSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusXLarge),
-      ),
+      borderRadius: BorderRadius.zero,
     ),
     isScrollControlled: true,
     builder:
@@ -114,9 +112,7 @@ void showRoleSelectSheet(
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusXLarge),
-      ),
+      borderRadius: BorderRadius.zero,
     ),
     builder:
         (dialogContext) => SafeArea(

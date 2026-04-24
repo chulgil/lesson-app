@@ -98,9 +98,7 @@ class _UnifiedSubscriptionSheetState
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusXLarge),
-            ),
+            borderRadius: BorderRadius.zero,
           ),
           child: Column(
             children: [

@@ -127,7 +127,7 @@ class ProfileCompletionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: percentage / 100,
               backgroundColor: levelColor.withValues(alpha: 0.2),
@@ -476,7 +476,7 @@ void showProfilePreviewSheet({
               (context, scrollController) => Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Column(
                   children: [

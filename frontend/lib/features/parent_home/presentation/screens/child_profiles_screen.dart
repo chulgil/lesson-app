@@ -204,12 +204,12 @@ class _ChildProfileCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
@@ -249,9 +249,7 @@ class _ChildProfileCard extends StatelessWidget {
                             color: AppColors.paperAccentSoft.withValues(
                               alpha: 0.2,
                             ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
+                            borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
                             '만 ${profile.age}세',

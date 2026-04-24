@@ -105,7 +105,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         top: false,

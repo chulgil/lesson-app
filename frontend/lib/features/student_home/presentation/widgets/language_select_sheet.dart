@@ -25,7 +25,7 @@ class LanguageSelectSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         child: Padding(

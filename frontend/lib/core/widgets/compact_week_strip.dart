@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 /// Compact week date strip — shared across teacher and student views.
@@ -93,9 +92,7 @@ class CompactWeekStrip extends StatelessWidget {
                               color: AppColors.paperAccent.withValues(
                                 alpha: 0.08,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
+                              borderRadius: BorderRadius.zero,
                             )
                             : null,
                     child: Column(
@@ -240,7 +237,7 @@ class CompactWeekStrip extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 '오늘',

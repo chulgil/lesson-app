@@ -310,7 +310,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surfaceDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         child: Padding(

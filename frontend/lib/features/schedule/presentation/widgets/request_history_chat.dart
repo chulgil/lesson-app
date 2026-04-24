@@ -393,7 +393,7 @@ class RequestHistoryChat extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.ink.withValues(alpha: 0.12),
                       borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                          BorderRadius.zero,
                     ),
                     child: Text(
                       guide.title,

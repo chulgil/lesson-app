@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../features/practice/presentation/widgets/practice_tools_modal.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
 
 /// SVG icon for metronome (simple pyramid style)
 const _metronomeIconSvg = '''
@@ -69,7 +68,7 @@ class _PracticeCenterButtonState extends State<PracticeCenterButton> {
           height: widget.size,
           decoration: BoxDecoration(
             color: AppColors.paperAccentSoft,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+            borderRadius: BorderRadius.zero,
             boxShadow: [
               BoxShadow(
                 color: AppColors.paperAccent.withValues(alpha: 0.2),

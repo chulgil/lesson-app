@@ -255,9 +255,7 @@ class _BankAccountCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Text(
                       '기본',
@@ -505,7 +503,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paper,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
                 border: Border.all(
                   color:
                       _consentChecked
@@ -596,9 +594,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         vertical: AppSpacing.space3,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                     ),
                     items: [

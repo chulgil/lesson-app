@@ -42,7 +42,7 @@ class _RankingContent extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
@@ -144,7 +144,7 @@ class _ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+      borderRadius: BorderRadius.zero,
       child: LinearProgressIndicator(
         value: value.clamp(0.0, 1.0),
         minHeight: 8,

@@ -422,9 +422,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           (context) => Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusLarge),
-              ),
+              borderRadius: BorderRadius.zero,
             ),
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: SafeArea(

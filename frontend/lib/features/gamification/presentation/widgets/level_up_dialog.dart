@@ -36,7 +36,7 @@ class LevelUpDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+        borderRadius: BorderRadius.zero,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space6),
@@ -95,7 +95,7 @@ class LevelUpDialog extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 levelTitle,

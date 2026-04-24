@@ -75,7 +75,7 @@ class _ProfileDropdown extends ConsumerWidget {
     return PopupMenuButton<_ProfileOption>(
       offset: const Offset(0, 40),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
       ),
       onSelected: (option) => _handleProfileSwitch(ref, option),
       itemBuilder: (context) => _buildMenuItems(userProfile, availableProfiles),
@@ -86,7 +86,7 @@ class _ProfileDropdown extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -225,7 +225,7 @@ class _ProfileDropdown extends ConsumerWidget {
             height: 32,
             decoration: BoxDecoration(
               color: option.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(option.icon, size: 18, color: option.color),
           ),
@@ -256,9 +256,7 @@ class _ProfileDropdown extends ConsumerWidget {
                           color:
                               option.badgeColor?.withValues(alpha: 0.1) ??
                               AppColors.paper,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
                           option.badge!,
@@ -346,7 +344,7 @@ class ProfileSwitcherCompact extends ConsumerWidget {
         height: 40,
         decoration: BoxDecoration(
           color: userProfile.activeProfile.color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.zero,
           border: Border.all(
             color: userProfile.activeProfile.color.withValues(alpha: 0.3),
           ),
@@ -364,9 +362,7 @@ class ProfileSwitcherCompact extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       builder: (context) => const ProfileSwitcherBottomSheet(),
     );
@@ -502,12 +498,12 @@ class _ProfileTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border:
               isSelected
                   ? Border.all(color: color.withValues(alpha: 0.3))
@@ -520,7 +516,7 @@ class _ProfileTile extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: color, size: 24),
             ),
@@ -550,9 +546,7 @@ class _ProfileTile extends StatelessWidget {
                             color:
                                 badgeColor?.withValues(alpha: 0.1) ??
                                 AppColors.paper,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
+                            borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
                             badge!,

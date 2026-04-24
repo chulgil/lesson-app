@@ -27,7 +27,7 @@ class ChildCard extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.zero,
             border: Border.all(color: AppColors.inkQuaternary),
             boxShadow: [
               BoxShadow(
@@ -79,9 +79,7 @@ class ChildCard extends ConsumerWidget {
                                   color: AppColors.paperAccent.withValues(
                                     alpha: 0.1,
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSmall,
-                                  ),
+                                  borderRadius: BorderRadius.zero,
                                 ),
                                 child: Text(
                                   '주 보호자',
@@ -115,9 +113,7 @@ class ChildCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -184,7 +180,7 @@ class ChildCard extends ConsumerWidget {
             height: 120,
             decoration: BoxDecoration(
               color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
             ),
             child: const Center(child: CircularProgressIndicator()),
           ),
@@ -193,7 +189,7 @@ class ChildCard extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
             ),
             child: Text(
               '정보를 불러올 수 없습니다',

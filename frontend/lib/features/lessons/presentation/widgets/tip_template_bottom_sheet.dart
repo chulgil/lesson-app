@@ -57,9 +57,7 @@ class _TipTemplateBottomSheetState
         return Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusXLarge),
-            ),
+            borderRadius: BorderRadius.zero,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

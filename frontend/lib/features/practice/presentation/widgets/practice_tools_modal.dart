@@ -123,7 +123,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [

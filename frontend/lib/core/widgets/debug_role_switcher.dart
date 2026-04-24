@@ -50,7 +50,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
             ),
             decoration: BoxDecoration(
               color: _getRoleColor(currentRole),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.2),
@@ -245,7 +245,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: const Icon(
                     Icons.bug_report,
@@ -293,9 +293,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                               context.go(role.homeRoute);
                             }
                           },
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
+                          borderRadius: BorderRadius.zero,
                           child: Container(
                             padding: const EdgeInsets.all(AppSpacing.space2),
                             decoration: BoxDecoration(
@@ -303,9 +301,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                                   isSelected
                                       ? roleColor.withValues(alpha: 0.1)
                                       : AppColors.paperDark,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
+                              borderRadius: BorderRadius.zero,
                               border: Border.all(
                                 color:
                                     isSelected ? roleColor : Colors.transparent,

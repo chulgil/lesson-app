@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 /// Header widget showing background image + profile avatar overlay.
@@ -51,9 +50,7 @@ class ProfilePhotoHeader extends StatelessWidget {
                 child: Container(
                   height: backgroundHeight,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.zero),
                   clipBehavior: Clip.antiAlias,
                   child: Stack(
                     fit: StackFit.expand,

@@ -120,7 +120,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: rate / 100,
               minHeight: 8,
@@ -157,7 +157,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           Expanded(
             flex: 5,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.zero,
               child: LinearProgressIndicator(
                 value: rate / 100,
                 minHeight: 6,

@@ -108,9 +108,7 @@ class _AddYoutubeResourceSheetState
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,

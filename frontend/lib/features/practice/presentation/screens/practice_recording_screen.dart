@@ -445,7 +445,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   widget.isRecording ? AppColors.paperAccent : AppColors.paper,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+              borderRadius: BorderRadius.zero,
               child: RecordingWaveform(
                 style: waveformStyle,
                 isActive: waveformIsActive,

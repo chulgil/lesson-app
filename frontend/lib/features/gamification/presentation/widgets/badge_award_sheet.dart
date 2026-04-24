@@ -88,9 +88,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusLarge),
-            ),
+            borderRadius: BorderRadius.zero,
           ),
           child: SingleChildScrollView(
             controller: scrollController,
@@ -147,9 +145,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                         color: AppColors.inkTertiary,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                       contentPadding: const EdgeInsets.all(AppSpacing.space3),
                     ),
@@ -165,9 +161,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                         backgroundColor: AppColors.paperAccent,
                         disabledBackgroundColor: AppColors.scheduleMutedAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                       ),
                       child: Text(
@@ -193,7 +187,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: InkWell(
         onTap: () => setState(() => _selectedBadgeId = badge.id),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
@@ -202,7 +196,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            borderRadius: BorderRadius.zero,
             color:
                 isSelected
                     ? AppColors.paperAccent.withValues(alpha: 0.05)

@@ -506,7 +506,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 // Notebook × Score: 이미지 썸네일 위 '탭하여 변경' 배지 — Material
                 // Colors.black54 대신 ink 55% alpha 토큰 사용 (§7.47 grey 이식 패턴).
                 color: AppColors.inkTertiary,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 '탭하여 변경',
@@ -542,7 +542,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               decoration: BoxDecoration(
                 // Notebook × Score: 같은 '탭하여 변경' 배지 — ink 55% alpha 토큰.
                 color: AppColors.inkTertiary,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Text(
                 '탭하여 변경',

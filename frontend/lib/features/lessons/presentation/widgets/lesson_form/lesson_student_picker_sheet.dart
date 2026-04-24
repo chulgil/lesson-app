@@ -18,9 +18,7 @@ void showLessonStudentPicker({
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusXLarge),
-      ),
+      borderRadius: BorderRadius.zero,
     ),
     builder:
         (context) => DraggableScrollableSheet(

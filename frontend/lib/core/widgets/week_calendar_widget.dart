@@ -156,7 +156,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         boxShadow: [
           BoxShadow(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
@@ -237,7 +237,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
             ),
             child: Column(
               children: [
@@ -282,7 +282,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
       ),
       child: IconButton(
         onPressed: onPressed,
@@ -301,7 +301,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.zero,
         ),
         child: Text(
           '오늘',
@@ -403,7 +403,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                   : isToday
                   ? Colors.white.withValues(alpha: 0.25)
                   : null,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

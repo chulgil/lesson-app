@@ -53,7 +53,7 @@ class ProfileNotificationSection extends ConsumerWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -177,9 +177,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.paperAccent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
                           '필수',
@@ -262,7 +260,7 @@ class ProfileNotificationSection extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       builder:
           (context) => DraggableScrollableSheet(

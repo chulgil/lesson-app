@@ -149,9 +149,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.inkQuaternary),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusLarge,
-                            ),
+                            borderRadius: BorderRadius.zero,
                           ),
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
@@ -176,9 +174,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         backgroundColor: AppColors.paperAccent,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusLarge,
-                          ),
+                          borderRadius: BorderRadius.zero,
                         ),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
@@ -302,7 +298,7 @@ class _PageIndicator extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
       ),
     );
   }

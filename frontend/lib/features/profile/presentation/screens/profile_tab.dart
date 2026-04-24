@@ -449,7 +449,7 @@ class ProfileTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
               child: LinearProgressIndicator(
                 value: percent / 100,
                 minHeight: 6,
@@ -674,7 +674,7 @@ class ProfileTab extends ConsumerWidget {
   Widget _buildMenuItem(_MenuItem item) {
     return InkWell(
       onTap: item.onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      borderRadius: BorderRadius.zero,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
@@ -775,7 +775,7 @@ class _ShortcutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: AppSpacing.space4,

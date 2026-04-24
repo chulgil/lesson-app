@@ -272,7 +272,7 @@ class _UnpaidCard extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paperAccentSoft,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          borderRadius: BorderRadius.zero,
         ),
         child: Text(
           'D+$daysOverdue',

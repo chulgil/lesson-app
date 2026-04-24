@@ -60,9 +60,7 @@ class _AttendanceConfirmationSheetState
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusLarge),
-            ),
+            borderRadius: BorderRadius.zero,
           ),
           child: SingleChildScrollView(
             controller: scrollController,
@@ -294,7 +292,7 @@ class _AttendanceConfirmationSheetState
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -328,7 +326,7 @@ class _AttendanceConfirmationSheetState
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(

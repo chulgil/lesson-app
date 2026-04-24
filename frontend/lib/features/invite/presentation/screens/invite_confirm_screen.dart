@@ -155,7 +155,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
@@ -189,7 +189,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.zero,
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
@@ -213,21 +213,15 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       color: AppColors.inkSecondary,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                       borderSide: BorderSide(color: AppColors.inkQuaternary),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                       borderSide: BorderSide(color: AppColors.inkQuaternary),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                       borderSide: BorderSide(color: AppColors.paperAccent),
                     ),
                     contentPadding: const EdgeInsets.all(AppSpacing.space3),
@@ -251,7 +245,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   vertical: AppSpacing.space4,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                 ),
               ),
               child:
@@ -376,7 +370,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       builder:
           (dialogContext) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -448,7 +442,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       builder:
           (dialogContext) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -488,9 +482,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
                       color: AppColors.ink.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Row(
                       children: [

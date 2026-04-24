@@ -53,7 +53,7 @@ class ProfileMenuSection extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              borderRadius: BorderRadius.zero,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -98,7 +98,7 @@ class ProfileMenuItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: item.onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      borderRadius: BorderRadius.zero,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(

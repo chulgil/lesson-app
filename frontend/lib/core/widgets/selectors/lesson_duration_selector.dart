@@ -151,15 +151,15 @@ class LessonDurationSelector extends StatelessWidget {
                   vertical: AppSpacing.space2,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: AppColors.paperAccent),
                 ),
               ),

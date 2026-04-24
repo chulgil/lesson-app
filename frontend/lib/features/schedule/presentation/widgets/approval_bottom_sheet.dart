@@ -51,9 +51,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [
@@ -190,9 +188,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 const SizedBox(height: AppSpacing.space2),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paper,
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paper),
                   child: Row(
                     children: [
                       Icon(
@@ -249,11 +245,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 18,
-                color: AppColors.inkSecondary,
-              ),
+              Icon(Icons.access_time, size: 18, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space2),
               Text(booking.timeRange, style: AppTypography.bodyMedium),
             ],
@@ -276,7 +268,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
           Expanded(
             child: Text(
               '모든 일정이 불가능하면 거절 후 메시지로 대안을 제안해주세요',
-              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
         ],
@@ -309,8 +303,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                   vertical: AppSpacing.space3,
                 ),
                 side: BorderSide(color: AppColors.inkQuaternary),
-                shape: RoundedRectangleBorder(
-                ),
+                shape: RoundedRectangleBorder(),
               ),
               child: Text(
                 '거절하기',
@@ -329,10 +322,10 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                   vertical: AppSpacing.space3,
                 ),
                 backgroundColor: AppColors.paperAccent,
-                disabledBackgroundColor: AppColors.inkSecondary
-                    .withValues(alpha: 0.3),
-                shape: RoundedRectangleBorder(
+                disabledBackgroundColor: AppColors.inkSecondary.withValues(
+                  alpha: 0.3,
                 ),
+                shape: RoundedRectangleBorder(),
               ),
               child:
                   _isProcessing

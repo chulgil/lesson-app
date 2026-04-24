@@ -102,7 +102,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [
@@ -124,7 +124,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paper.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
                   '71% 완료',
@@ -139,7 +139,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: 0.71,
               backgroundColor: AppColors.paper.withValues(alpha: 0.2),
@@ -192,7 +192,7 @@ class _SectionHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.zero,
           ),
           child: Text(
             '$count개',
@@ -257,7 +257,7 @@ class _AssignmentCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(
           color:
               isCompleted
@@ -376,7 +376,7 @@ class _AssignmentCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: _getPriorityColor().withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        borderRadius: BorderRadius.zero,
       ),
       child: Text(
         _getPriorityLabel(),

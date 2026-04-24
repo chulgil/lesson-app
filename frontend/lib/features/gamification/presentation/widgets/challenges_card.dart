@@ -38,7 +38,7 @@ class ChallengesCard extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.zero,
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -89,7 +89,7 @@ class _ChallengeItem extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,7 @@ class _ChallengeItem extends StatelessWidget {
                       challenge.period == ChallengePeriod.weekly
                           ? AppColors.ink.withValues(alpha: 0.1)
                           : AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
                   challenge.period.displayName,
@@ -137,7 +137,7 @@ class _ChallengeItem extends StatelessWidget {
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.zero,
                   child: LinearProgressIndicator(
                     value: challenge.progress,
                     backgroundColor: AppColors.inkQuaternary,

@@ -158,7 +158,7 @@ class _ChildProfileFormScreenState
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
               ),
               child: Row(
                 children: [
@@ -237,11 +237,11 @@ class _ChildProfileFormScreenState
                 filled: true,
                 fillColor: AppColors.paper,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
               ),
@@ -271,7 +271,7 @@ class _ChildProfileFormScreenState
               ),
               decoration: BoxDecoration(
                 color: AppColors.paper,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
                 border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
@@ -301,7 +301,7 @@ class _ChildProfileFormScreenState
                 padding: const EdgeInsets.all(AppSpacing.space2),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccentSoft,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Row(
                   children: [
@@ -339,7 +339,7 @@ class _ChildProfileFormScreenState
               ),
               decoration: BoxDecoration(
                 color: AppColors.paper,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
                 border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
@@ -377,7 +377,7 @@ class _ChildProfileFormScreenState
               ),
               decoration: BoxDecoration(
                 color: AppColors.paper,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.zero,
                 border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: DropdownButtonHideUnderline(
@@ -411,9 +411,7 @@ class _ChildProfileFormScreenState
                   backgroundColor: AppColors.paperAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    borderRadius: BorderRadius.zero,
                   ),
                 ),
                 child:

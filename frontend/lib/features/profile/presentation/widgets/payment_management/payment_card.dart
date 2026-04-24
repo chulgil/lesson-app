@@ -44,7 +44,7 @@ class PaymentCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.zero,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(

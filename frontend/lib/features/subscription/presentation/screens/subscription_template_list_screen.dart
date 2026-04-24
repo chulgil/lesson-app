@@ -602,9 +602,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
+        borderRadius: BorderRadius.zero,
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,

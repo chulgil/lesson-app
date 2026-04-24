@@ -75,9 +75,7 @@ class ProfileHeader extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                       child: Text(
                         '학부모',

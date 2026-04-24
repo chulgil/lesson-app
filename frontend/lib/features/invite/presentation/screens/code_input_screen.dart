@@ -166,9 +166,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                       vertical: AppSpacing.space4,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                   ),
                   child:
@@ -226,19 +224,19 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             borderSide: BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             borderSide: BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             borderSide: BorderSide(color: AppColors.paperAccent),
           ),
         ),

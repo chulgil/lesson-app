@@ -150,7 +150,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         children: [

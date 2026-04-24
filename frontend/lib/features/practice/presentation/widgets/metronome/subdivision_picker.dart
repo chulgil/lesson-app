@@ -44,7 +44,7 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
       constraints: BoxConstraints(maxHeight: screenHeight * 0.75),
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         child: Column(

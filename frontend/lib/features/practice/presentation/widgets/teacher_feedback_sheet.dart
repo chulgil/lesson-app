@@ -104,7 +104,7 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
           (context, scrollController) => Container(
             decoration: const BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.zero,
             ),
             padding: EdgeInsets.only(bottom: bottomInset),
             child: Column(

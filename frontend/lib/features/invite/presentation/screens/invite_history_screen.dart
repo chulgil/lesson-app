@@ -158,7 +158,7 @@ class InviteHistoryScreen extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.zero,
           ),
           child: Text(
             count.toString(),
@@ -242,7 +242,7 @@ class _InviteCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: isInactive ? AppColors.paperDark : Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(
           color:
               isInactive
@@ -263,7 +263,7 @@ class _InviteCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: invite.status.color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
                   invite.status.label,

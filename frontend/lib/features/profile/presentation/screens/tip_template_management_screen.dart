@@ -199,7 +199,7 @@ class _TipTemplateManagementScreenState
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap: () => _showEditTemplateDialog(template),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.zero,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(

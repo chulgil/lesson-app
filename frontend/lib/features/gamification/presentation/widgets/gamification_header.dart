@@ -38,7 +38,7 @@ class GamificationHeader extends ConsumerWidget {
             end: Alignment.bottomRight,
             colors: _getLevelGradient(data.level),
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.zero,
         ),
         child: Column(
           children: [
@@ -96,9 +96,7 @@ class GamificationHeader extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paper.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -128,7 +126,7 @@ class GamificationHeader extends ConsumerWidget {
             Column(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                   child: LinearProgressIndicator(
                     value: data.levelProgress,
                     minHeight: 6,
@@ -170,7 +168,7 @@ class GamificationHeader extends ConsumerWidget {
       height: 100,
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
       ),
       child: const Center(child: CircularProgressIndicator()),
     );

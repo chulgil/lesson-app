@@ -244,7 +244,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.zero,
       ),
       builder: (context) {
         return DraggableScrollableSheet(

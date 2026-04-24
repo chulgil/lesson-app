@@ -55,7 +55,7 @@ class BottomSheetContainer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(borderRadius)),
+        borderRadius: BorderRadius.zero,
       ),
       child: child,
     );

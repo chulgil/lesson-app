@@ -75,7 +75,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -115,7 +115,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: data.levelProgress,
               minHeight: 8,
@@ -170,7 +170,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: badge.isEarned ? AppColors.paper : AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(
           color:
               badge.isEarned
@@ -233,7 +233,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
               color: rarityColor.withValues(
                 alpha: badge.isEarned ? 0.15 : 0.05,
               ),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Text(
               _getRarityLabel(badge.rarity),
@@ -254,7 +254,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
         ),
         child: Center(
           child: Text(
@@ -270,7 +270,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(

@@ -35,7 +35,7 @@ class TimeSignaturePicker extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
         child: Column(
