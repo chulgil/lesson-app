@@ -54,17 +54,12 @@ class AppTheme {
         backgroundColor: AppColors.paper,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         titleTextStyle: NotebookTypography.dialogTitle,
       ),
 
-      // BottomSheet — Notebook × Score: 앱 전반 showModalBottomSheet 호출부에 paper 표면과 flat elevation 을 단일 지점으로 보급.
-      // 기존 호출부 다수는 backgroundColor: Colors.transparent 로 sheet 내부 컨테이너가 배경을 그리는 패턴(오버라이드 유지).
-      // 오버라이드 없는 호출부는 Material 기본 흰 배경이 노출돼 Notebook 질감이 끊겼는데, 테마 기본값을 paper 로 올려 승격.
-      // surfaceTintColor: transparent 로 M3 tint 제거, elevation 0 으로 flat Notebook 유지.
-      bottomSheetTheme: BottomSheetThemeData(
+      // BottomSheet — §7.117 각진 전수: top edge 도 zero 로 전환.
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.paper,
         modalBackgroundColor: AppColors.paper,
         surfaceTintColor: Colors.transparent,
@@ -72,63 +67,48 @@ class AppTheme {
         elevation: 0,
         modalElevation: 0,
         dragHandleColor: AppColors.inkQuaternary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppSpacing.radiusLarge),
-          ),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
-      // Card
-      cardTheme: CardThemeData(
+      // Card — §7.117 각진.
+      cardTheme: const CardThemeData(
         elevation: 0,
         color: AppColors.paper,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         margin: EdgeInsets.zero,
       ),
 
-      // ElevatedButton
+      // ElevatedButton — §7.117 각진.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.ink,
           foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
 
-      // FilledButton — Notebook × Score: M3 primary action 버튼의 기본 채움색을 Vermillion(paperAccent) 으로 승격.
-      // 전 코드베이스 74개 호출부 중 21개가 `style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent)` 인라인을 반복.
-      // 테마 단일지점 등록으로 동일한 Notebook CTA 를 53개 오버라이드 없는 호출부에도 자동 보급.
-      // elevation 0 · shape radiusLarge · AppTypography.button — ElevatedButton 테마와 시그니처 통일.
+      // FilledButton — §7.117 각진.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.paperAccent,
           foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
 
-      // OutlinedButton
+      // OutlinedButton — §7.117 각진.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
           side: const BorderSide(color: AppColors.ink),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
@@ -157,13 +137,14 @@ class AppTheme {
         hoverElevation: 0,
         highlightElevation: 0,
         disabledElevation: 0,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         extendedTextStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,
           color: AppColors.paper,
         ),
       ),
 
-      // Input
+      // Input — §7.117 각진.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.paper,
@@ -171,21 +152,21 @@ class AppTheme {
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.inkQuaternary),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.inkQuaternary),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.ink, width: 2),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.ink, width: 2),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.paperAccent),
+        errorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.paperAccent),
         ),
         hintStyle: AppTypography.bodyMedium.copyWith(
           color: AppColors.inkTertiary,
@@ -225,7 +206,7 @@ class AppTheme {
         space: 0,
       ),
 
-      // Checkbox
+      // Checkbox — §7.117 각진.
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -233,9 +214,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         side: const BorderSide(color: AppColors.inkQuaternary, width: 2),
       ),
 
@@ -316,8 +295,7 @@ class AppTheme {
         linearTrackColor: AppColors.inkQuaternary,
       ),
 
-      // SnackBar — Notebook × Score: ink 배경 + paper 텍스트 + Vermillion 액션.
-      // 앱 전반 알림의 4대 시그니처 통일 (Material 기본 회색 SnackBar 제거).
+      // SnackBar — §7.117 각진.
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.ink,
         contentTextStyle: AppTypography.bodyMedium.copyWith(
@@ -325,9 +303,7 @@ class AppTheme {
         ),
         actionTextColor: AppColors.paperAccent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
       // Switch — Notebook × Score: 활성 thumb/track 을 Vermillion 으로 통일.
@@ -386,31 +362,31 @@ class AppTheme {
 
       // PopupMenu — Notebook × Score: 메뉴 배경을 종이색, 테두리 2px ink.
       // 21 파일의 `PopupMenuButton` / `showMenu` 호출에 일괄 적용.
-      popupMenuTheme: PopupMenuThemeData(
+      popupMenuTheme: const PopupMenuThemeData(
         color: AppColors.paper,
         surfaceTintColor: AppColors.paper,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.ink, width: 2),
         ),
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           color: AppColors.ink,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
       ),
 
-      // DropdownMenu — Notebook × Score: 15 파일 DropdownMenu/DropdownButton 에 적용.
+      // DropdownMenu — §7.117 각진.
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
           backgroundColor: WidgetStateProperty.all(AppColors.paper),
           surfaceTintColor: WidgetStateProperty.all(AppColors.paper),
           elevation: WidgetStateProperty.all(2),
           shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-              side: const BorderSide(color: AppColors.ink, width: 2),
+            const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+              side: BorderSide(color: AppColors.ink, width: 2),
             ),
           ),
         ),
@@ -429,9 +405,9 @@ class AppTheme {
         headerBackgroundColor: AppColors.paper,
         headerForegroundColor: AppColors.ink,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.ink, width: 2),
         ),
         dayForegroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return AppColors.paper;
@@ -470,13 +446,13 @@ class AppTheme {
         dividerColor: AppColors.ink,
       ),
 
-      // TimePicker — Notebook × Score: Vermillion 선택 + paperAccentSoft 기본.
+      // TimePicker — §7.117 각진.
       timePickerTheme: TimePickerThemeData(
         backgroundColor: AppColors.paper,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.ink, width: 2),
         ),
         hourMinuteColor: WidgetStateColor.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -505,8 +481,8 @@ class AppTheme {
           return AppColors.ink;
         }),
         entryModeIconColor: AppColors.ink,
-        hourMinuteShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
+        hourMinuteShape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
         ),
       ),
     );
@@ -556,18 +532,14 @@ class AppTheme {
         backgroundColor: AppColors.surfaceDark,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         titleTextStyle: NotebookTypography.dialogTitle.copyWith(
           color: AppColors.textPrimaryDark,
         ),
       ),
 
-      // BottomSheet — Notebook × Score: dark 테마의 modal 시트는 surfaceDark 를 paper 대체로 사용.
-      // drag handle 은 borderDark — dark 표면 위에서 inkQuaternary 보다 가독성 확보.
-      // modalBarrierColor 는 black87 로 dark 환경 강조 (light 는 black54).
-      bottomSheetTheme: BottomSheetThemeData(
+      // BottomSheet — §7.117 각진.
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceDark,
         modalBackgroundColor: AppColors.surfaceDark,
         surfaceTintColor: Colors.transparent,
@@ -575,62 +547,48 @@ class AppTheme {
         elevation: 0,
         modalElevation: 0,
         dragHandleColor: AppColors.borderDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppSpacing.radiusLarge),
-          ),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
-      // Card
-      cardTheme: CardThemeData(
+      // Card — §7.117 각진.
+      cardTheme: const CardThemeData(
         elevation: 0,
         color: AppColors.surfaceDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         margin: EdgeInsets.zero,
       ),
 
-      // ElevatedButton
+      // ElevatedButton — §7.117 각진.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.paper,
           foregroundColor: AppColors.backgroundDark,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
 
-      // FilledButton — Notebook × Score: dark 테마에서도 Vermillion(paperAccent) CTA 유지.
-      // dark surface 위의 paperAccent 는 충분한 대비 확보 — foregroundColor 는 paper 로 밝은 라벨 유지.
-      // light 테마와 동일 시그니처로 라이트/다크 전환 시 CTA 색상 일관성 보장.
+      // FilledButton — §7.117 각진.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.paperAccent,
           foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
 
-      // OutlinedButton
+      // OutlinedButton — §7.117 각진.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.paper,
           minimumSize: Size(double.infinity, AppSpacing.buttonHeight),
           side: const BorderSide(color: AppColors.paper),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           textStyle: AppTypography.button,
         ),
       ),
@@ -659,13 +617,14 @@ class AppTheme {
         hoverElevation: 0,
         highlightElevation: 0,
         disabledElevation: 0,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         extendedTextStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,
           color: AppColors.paper,
         ),
       ),
 
-      // Input
+      // Input — §7.117 각진.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceSecondaryDark,
@@ -673,17 +632,17 @@ class AppTheme {
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.borderDark),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.borderDark),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.borderDark),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.borderDark),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.paper, width: 2),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppColors.paper, width: 2),
         ),
         hintStyle: AppTypography.bodyMedium.copyWith(
           color: AppColors.textTertiaryDark,
@@ -720,7 +679,7 @@ class AppTheme {
         space: 0,
       ),
 
-      // Checkbox
+      // Checkbox — §7.117 각진.
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -728,9 +687,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         side: const BorderSide(color: AppColors.borderDark, width: 2),
       ),
 
@@ -809,7 +766,7 @@ class AppTheme {
         linearTrackColor: AppColors.borderDark,
       ),
 
-      // SnackBar — Notebook × Score: dark 테마는 surfaceDark 배경 + paper 텍스트. 액션은 Vermillion 유지.
+      // SnackBar — §7.117 각진.
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.surfaceDark,
         contentTextStyle: AppTypography.bodyMedium.copyWith(
@@ -817,9 +774,7 @@ class AppTheme {
         ),
         actionTextColor: AppColors.paperAccent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
       // Switch — Notebook × Score: Vermillion active 유지, unselected 는 dark palette.
@@ -870,32 +825,32 @@ class AppTheme {
         selectedTileColor: AppColors.paperAccentSoft,
       ),
 
-      // PopupMenu — Notebook × Score: dark 에서는 surfaceDark 배경 + paper 테두리.
-      popupMenuTheme: PopupMenuThemeData(
+      // PopupMenu — §7.117 각진.
+      popupMenuTheme: const PopupMenuThemeData(
         color: AppColors.surfaceDark,
         surfaceTintColor: AppColors.surfaceDark,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-          side: const BorderSide(color: AppColors.paper, width: 2),
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.paper, width: 2),
         ),
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           color: AppColors.textPrimaryDark,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
       ),
 
-      // DropdownMenu — Notebook × Score: dark 대응.
+      // DropdownMenu — §7.117 각진.
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
           backgroundColor: WidgetStateProperty.all(AppColors.surfaceDark),
           surfaceTintColor: WidgetStateProperty.all(AppColors.surfaceDark),
           elevation: WidgetStateProperty.all(2),
           shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-              side: const BorderSide(color: AppColors.paper, width: 2),
+            const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+              side: BorderSide(color: AppColors.paper, width: 2),
             ),
           ),
         ),
@@ -906,16 +861,16 @@ class AppTheme {
         ),
       ),
 
-      // DatePicker — Notebook × Score: dark 에서는 surfaceDark + paper 텍스트.
+      // DatePicker — §7.117 각진.
       datePickerTheme: DatePickerThemeData(
         backgroundColor: AppColors.surfaceDark,
         surfaceTintColor: AppColors.surfaceDark,
         headerBackgroundColor: AppColors.surfaceDark,
         headerForegroundColor: AppColors.textPrimaryDark,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.paper, width: 2),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.paper, width: 2),
         ),
         dayForegroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return AppColors.paper;
@@ -954,13 +909,13 @@ class AppTheme {
         dividerColor: AppColors.paper,
       ),
 
-      // TimePicker — Notebook × Score: dark 대응.
+      // TimePicker — §7.117 각진.
       timePickerTheme: TimePickerThemeData(
         backgroundColor: AppColors.surfaceDark,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.paper, width: 2),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.paper, width: 2),
         ),
         hourMinuteColor: WidgetStateColor.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -989,8 +944,8 @@ class AppTheme {
           return AppColors.textPrimaryDark;
         }),
         entryModeIconColor: AppColors.paper,
-        hourMinuteShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
+        hourMinuteShape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
         ),
       ),
     );

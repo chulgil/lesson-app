@@ -1,74 +1,70 @@
-# 수강 관리 탭 UX 재설계 계획 (Status Triage 모델)
+# §7.117 테마 전수 각진화 — Notebook × Score Theme Layer Saturation
 
 > 작성일: 2026-04-24
-> 모드: `/plan --ceo` → `--eng` 전환
-> 상태: Phase 1~4 + 6 완료 · Phase 5 실기 확인 후 진행
-> 스펙 문서: [docs/specs/student/enrollment_management_ux_spec.md](docs/specs/student/enrollment_management_ux_spec.md)
-> 완료 커밋: Phase 1 `24c631f3` · Phase 2 `a744d891` · Phase 3 `3f0800d2` · Phase 4 `13e95096`
+> 모드: `/plan --ceo` → 10x Vision 확정
+> 사용자 결정: BottomSheet·FAB·Dialog 모두 각진
 
-## 요구사항 (확정)
+## 배경
 
-1. 설계 방향: **A (Status Triage)** — 학생 primary, 수강권 visual layer
-2. 범위: **A + B + 자동 갱신 알림** (10x Vision minus AI 이탈 예측)
-3. 배너 3칸: 만료임박 / 미결제 / 체험중
-4. 보관 정책: 영구 보관 (삭제 없음)
-5. 인라인 CTA: [갱신 제안] [레슨 추가] (추가 없음)
+§7.113~115 각진 원칙이 위젯 레벨(`Container`, `BoxDecoration`, `OutlineInputBorder`)만 적용 → Flutter 테마의 FilledButton/ElevatedButton/OutlinedButton/Card/Dialog/BottomSheet/Input/Popup/Dropdown/DatePicker/TimePicker/SnackBar/Checkbox 가 여전히 `radiusLarge (20px)` / `radiusMedium (8px)` / `radiusSmall (4px)` 로 라운드 처리. 첫인상 "Material 앱" 회귀 지속.
 
-## Phase 실행 계획
+## Phase 1: app_theme.dart 테마 단일 지점 전환 (light + dark)
 
-| Phase | 내용 | 파일 | 복잡도 | 상태 |
-|------|------|-----|--------|------|
-| 1. Foundation | `StudentRosterSummary` provider + `RosterSummary` 엔티티 + 필터 enum 확장 | 3 | L | ✅ `24c631f3` |
-| 2. Triage Banner | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | 2 | M | ✅ `a744d891` |
-| 3. Filter Chip 확장 | expiring/unpaid/trial/archive 필터 로직 | 2 | L | ✅ `3f0800d2` |
-| 4. Card 재설계 | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | 1 | M | ✅ `13e95096` |
-| 5. 자동 갱신 알림 | `SubscriptionExpiryNotificationService` + 설정 토글 | 3-4 | M | ⏸️ 실기 확인 후 |
-| 6. 문서 동기화 | 스펙 완료 처리 + notebook §7.117 기록 | 2 | XS | ✅ 본 커밋 |
+| 대상 | 현재 | 변경 |
+|------|------|------|
+| elevatedButtonTheme | radiusLarge | **zero** |
+| filledButtonTheme | radiusLarge | **zero** |
+| outlinedButtonTheme | radiusLarge | **zero** |
+| cardTheme | radiusLarge | **zero** |
+| dialogTheme | radiusLarge | **zero** |
+| bottomSheetTheme (top) | radiusLarge | **zero** |
+| inputDecorationTheme (4 borders) | radiusMedium | **zero** |
+| popupMenuTheme | 4px | **zero** |
+| dropdownMenuTheme | 4px | **zero** |
+| datePickerTheme | 8px | **zero** |
+| timePickerTheme + hourMinuteShape | 8px / 4px | **zero** |
+| snackBarTheme | radiusMedium | **zero** |
+| checkboxTheme | radiusSmall | **zero** |
+| floatingActionButtonTheme | StadiumBorder 기본 | `shape: RoundedRectangleBorder(zero)` 명시 |
 
-**총 예상 파일**: 10-12 / **총 공수**: 12-16h
+예외 (§7.113 원형 매트릭스 유지):
+- CircleAvatar · BoxShape.circle · 웰컴 waving_hand · 이모지 가족 bg · now-indicator dot
 
-## Phase 순서 논리
+## Phase 2: 인라인 shape override 감사 (141 지점)
 
-```
-Phase 1 (데이터)
-   ↓
-Phase 2 (배너 가시화) ← 첫 가시 가치
-   ↓
-Phase 3 (필터 연결) ← 배너 클릭 동작 완성
-   ↓
-Phase 4 (카드 재설계) ← 디테일 완성
-   ↓
-Phase 5 (알림 시스템) ← 화면 밖으로 확장
-   ↓
-Phase 6 (문서)
-```
+grep 으로 `shape: RoundedRectangleBorder(BorderRadius.circular(...))` 141 지점 전수 검토:
+- 유지 카테고리: FAB·avatar·chip·이모지·ticket/pill 은유
+- 잔재 제거: 스케줄·학생·수강권·연습 도메인의 테마 override 가 아닌 것
+
+목표: 제거 가능한 지점을 zero 로 전환. Flutter 속성 우선순위로 인라인 override 는 테마 뒤 — Phase 1 만으로도 회귀 0 보장.
+
+## Phase 3: §7.117 스펙 문서화
+
+`docs/specs/design/notebook/README.md` 에 §7.117 섹션 추가:
+- app_theme 기본 shape 는 `BorderRadius.zero`
+- 예외 카테고리 명문화
+- Lore-directive: 테마 단일 지점 각진이 §7.113~115 포화의 종착점
+
+## Phase 4: 검증 + 커밋
+
+1. `flutter analyze --no-pub` 통과
+2. 수동 실기 확인 안내 (홈 · 학생 추가 · 다이얼로그 · 레슨 상세 4개 스폿)
+3. 커밋 분할:
+   - `feat(notebook): §7.117 Phase 1 — app_theme 테마 전수 각진화`
+   - `feat(notebook): §7.117 Phase 2 — 인라인 shape override 감사`
+   - `docs(notebook): §7.117 스펙 추가`
 
 ## 리스크
 
-| 리스크 | 등급 | 완화 |
-|-------|------|------|
-| 카운트 계산 성능 | MED | 기존 Provider 재사용, 로컬 계산 |
-| 카드 높이 증가 | MED | 카드 +12px 이내 유지 |
-| 영구 보관 리스트 비대화 | LOW | archive 기본 숨김 |
-| 알림 권한 미부여 | MED | in-app 뱃지 fallback |
+| 리스크 | 완화 |
+|-------|------|
+| 141 인라인 override 미분류 시 시각 회귀 | Flutter 속성 우선순위로 인라인이 테마 위 — 회귀 0 |
+| flutter analyze 는 시각 검증 못함 | 실기 확인 (`flutter run` 스폿 체크) |
+| Dialog 완전 각진이 OS 네이티브 감성에 이질적 | 사용자 결정 "각진" 확정 |
 
-## 예상 복잡도: HIGH (12-16시간)
+## 복잡도 총합
 
-## 게이트 정책
-
-- Phase 1~4 (UI 중심) 완료 후 사용자 실기 확인
-- Phase 5 (알림) 는 별도 세션 분리 가능
-- 각 Phase 완료 = 단일 커밋 + analyze 통과
-
-## Lore (비가역 결정)
-
-- **Lore-directive**: 학생 = primary entity. 리스트 행 단위는 절대 수강권으로 전환하지 않음.
-- **Lore-constraint**: 만료 학생 영구 보관 — 자동 삭제 없음.
-- **Lore-rejected**: Two-tab 완전 분리 — 필터 chip 으로 충분.
-- **Lore-rejected**: AI 이탈 예측 — 데이터 부족.
-
----
-
-## 이전 계획
-
-학생 화면 Notebook × Score 전수 감사 (2026-04-23~24) — Phase 1~5 전부 반영 완료. `git log prompt_plan.md` 로 추적.
+- Phase 1: 30분
+- Phase 2: 1시간 (141 지점 스캔)
+- Phase 3: 20분
+- **총 2시간**
