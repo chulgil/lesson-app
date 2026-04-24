@@ -4080,6 +4080,64 @@ flutter analyze lib/core/utils/instrument_colors.dart  # No issues found
 
 ---
 
+### §7.106 — `AppTypography.display*` 전수 감사: 15 지점 §7.30 전용 축 확정 (2026-04-24)
+
+**배경**: §7.104 가 `bodyLarge + w600` 평행 타이포 축을 감사했지만, **`displayLarge/displayMedium`** 축은 미감사. display* 는 앱에서 **가장 큰 타이포 위계**(48~64pt) 로, 의미상 "화면의 절대 주인공" 역할 — BPM 숫자, 스톱워치 duration, 사용자 이니셜, 금액 합계 등. §7.106 은 이 최상위 타이포 축이 §7.17 혹은 §7.30 중 어느 축에 속하는지를 **법칙 수준에서 확정**.
+
+**검사 범위**: `rg "AppTypography.display(Large|Medium)"` → 15 지점 / 12 파일.
+
+#### 7.106-a 전수 분류
+
+| 파일 | 라인 | 내용 | §7.30 패턴 |
+|------|------|------|-----------|
+| `students/.../student_detail_screen.dart` | 266 | `student.initial` | #6 이니셜 |
+| `students/.../student_profile_section.dart` | 31 | `displayName[0]` | #6 이니셜 (기 주석) |
+| `student_home/.../student_profile_tab.dart` | 161 | `initial` | #6 이니셜 |
+| `student_home/.../student_profile_edit_screen.dart` | 350 | `_nameController.text[0]` | #6 이니셜 |
+| `practice/.../time_signature_picker.dart` | 196 | `numerator` | #10 코드/숫자 |
+| `practice/.../time_signature_picker.dart` | 209 | `denominator` | #10 코드/숫자 |
+| `practice/.../metronome_full_screen_modal.dart` | 220 | `'$bpm'` | #3 stat |
+| `practice/.../metronome_full_screen_modal.dart` | 339 | `'$currentBeat'` | #3 stat |
+| `practice/.../practice_recording_screen.dart` | 466 | `_formatDuration(...)` | #4 duration |
+| `practice/.../practice_streak_card.dart` | 81 | `streak.currentStreak` | #3 stat |
+| `practice/.../metronome_panel.dart` | 278 | `'${state.settings.bpm}'` | #3 stat |
+| `practice/.../metronome_panel.dart` | 323 | `'${state.currentBeat}'` | #3 stat |
+| `practice/.../practice_stats_editor.dart` | 229 | `'$_count회'` | #3 stat |
+| `profile/.../outstanding_payments_screen.dart` | 126 | `formatWonWithComma(totalAmount)` | #3 stat |
+| `profile/.../profile_preview_screen.dart` | 245 | `initial` | #6 이니셜 |
+
+**15 지점 전부 §7.30 예외 · 0 §7.17 승격 · 전환율 0%**.
+
+#### 7.106-b 의미론적 법칙
+
+display* 15 지점의 의미 역할 분포:
+- **#3 stat (수치)** : 9 지점 (60%) — BPM · 카운터 · 금액
+- **#6 이니셜** : 5 지점 (33%) — 프로필 아바타 이니셜
+- **#10 코드/숫자** : 2 지점 (13%) — 박자 분자/분모
+- **#4 duration** : 1 지점 (7%) — 녹음 시간
+
+모두 **"동적으로 변하는 거대 숫자·기호"** — display* 의 48~64pt 크기는 **"한 번에 눈에 들어와야 하는 정량 정보"** 를 위한 것이지, **"정적 고유 명사"** 용이 아님. 이는 display* 의 타이포 정의 자체가 의미론적으로 §7.17 을 배제한다는 증거.
+
+#### 7.106 관찰
+
+**"display* = §7.30 전용 축 법칙"**: §7.104 의 `bodyLarge+w600` 는 70% 전환율(의사-헤드라인 비중 높음) 이었지만, display* 는 **0% 전환율** — 타이포 축마다 §7.17/§7.30 비율의 **의미론적 천장·바닥**이 존재. display* 는 바닥(0%), `heading*` 은 중간(약 25%), `bodyLarge+w600` 은 천장(70%).
+
+**"크기 ↔ 동적 가능성 역비례"**: 타이포 크기가 클수록 §7.30 비율 증가 — 48pt 는 "이것은 숫자이다" 라는 강한 시각 시그널, "이것은 고유명이다" 라는 의도는 14~18pt 에서 최대화. §7.17 은 **중간 크기 타이포의 특권**.
+
+**"4대 시그니처 포화 + 평행 타이포 포화 = 전체 타이포 감사 완결"**: §7.102(Gaegu 4개축 외 손글씨) + §7.103(Roman 4개축 외 숫자) + §7.104(bodyLarge+w600 평행) + §7.106(display* 최상위) = **앱 전역 타이포 축 감사 100% 완결**. §7.91-b~§7.101 의 `heading*` 축과 합쳐서 **"Notebook × Score 타이포 축 전수 감사 수렴"**.
+
+**최종 집계 업데이트**: §7.91-b(213) + §7.99(34) + §7.100(1) + §7.101(0) + §7.102(3) + §7.103(0) + §7.104(10) + §7.105(색 SSOT 무-변경) + §7.106(15 전부 §7.30) = **273 감사 지점 · §7.17/등가 72 · §7.30 204 · 전환율 26.4%**.
+
+**은유**: §7.106 은 **"가장 큰 글자는 항상 숫자다" 를 증명하는 도서관 감사** — 도서관 벽 상단 큰 표지판은 "제1열람실" 이 아니라 "2026" 이다. 현실 공간의 크기 위계와 동일하게, 앱의 display* 는 정량 정보의 차지.
+
+**Lore-directive**: **"타이포 크기 축의 양 끝(display* 와 caption*) 은 §7.30 전용, 중간 축(heading* · bodyLarge+w600) 이 §7.17 ↔ §7.30 혼합 전장"**. 감사 우선순위는 양 끝보다 중간 축에 둔다.
+
+**Lore-constraint**: 신규 display* 사용 시 동적 값(변수/formatters) 만 전달. 정적 문자열 리터럴을 display* 에 바인딩하는 것은 §7.106 규범 위반.
+
+**Lore-rejected**: display* 에 정적 명사 쓰기(예: "안녕하세요") → 의도된 위계를 파괴하고 가독성을 낮춤. headingLarge 이하 축에 속함.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
