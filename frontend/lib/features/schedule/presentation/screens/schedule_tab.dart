@@ -7,18 +7,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
-import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../home/presentation/widgets/lesson_card.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../student_home/presentation/screens/student_lessons_tab.dart';
-import '../../../students/domain/entities/lesson_class.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../providers/schedule_view_mode_provider.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
@@ -384,19 +379,15 @@ class ScheduleTab extends ConsumerWidget {
       return _buildEmptyState();
     }
 
-    return ListView.separated(
+    // Notebook × Score: 갭 + 둥근카드 + 그림자 패턴을 제거하고, LessonCard 의
+    // 하단 1px 잉크 라인이 항목 구분을 담당하도록 ListView.builder 로 전환
+    // (§7.X 리스트 항목 = 악보 프로그램 행 — ThinRule 경계·paper 질감 일관).
+    return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space3,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       itemCount: dayLessons.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
       itemBuilder: (context, index) {
-        return _LessonTimeCard(
-          lesson: dayLessons[index],
-          selectedDate: selectedDate,
-        );
+        return _SwipeableLessonCard(lesson: dayLessons[index]);
       },
     );
   }
@@ -432,11 +423,13 @@ class ScheduleTab extends ConsumerWidget {
   }
 }
 
-class _LessonTimeCard extends ConsumerWidget {
+/// Notebook × Score: 공용 `LessonCard` 를 재사용하고, 교사만 예정 레슨에 한해
+/// 좌/우 스와이프로 완료/취소 액션을 노출하도록 Dismissible 로 래핑.
+/// 카드 본체 디자인(좌 3px 상태선 + 하단 1px 잉크 라인)은 LessonCard 에서 관리.
+class _SwipeableLessonCard extends ConsumerWidget {
   final Lesson lesson;
-  final DateTime selectedDate;
 
-  const _LessonTimeCard({required this.lesson, required this.selectedDate});
+  const _SwipeableLessonCard({required this.lesson});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -444,7 +437,13 @@ class _LessonTimeCard extends ConsumerWidget {
         lesson.displayStatus == LessonStatus.scheduled ||
         lesson.displayStatus == LessonStatus.reschedulePending;
 
-    final card = _buildCard(context, ref);
+    final card = LessonCard(
+      lesson: lesson,
+      onTap:
+          () => context.push(
+            AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+          ),
+    );
 
     if (!isScheduled) return card;
 
@@ -452,7 +451,6 @@ class _LessonTimeCard extends ConsumerWidget {
       key: ValueKey('lesson-swipe-${lesson.id}'),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          // Right swipe → Complete
           return await _showConfirmDialog(
             context,
             ref,
@@ -468,7 +466,6 @@ class _LessonTimeCard extends ConsumerWidget {
             },
           );
         } else {
-          // Left swipe → Cancel
           return await _showConfirmDialog(
             context,
             ref,
@@ -484,21 +481,20 @@ class _LessonTimeCard extends ConsumerWidget {
           );
         }
       },
+      // Notebook × Score: 스와이프 배경도 paper 톤 + 둥근 모서리 제거로
+      // 카드 경계(좌 3px · 하단 1px)와 같은 평면 질감을 유지.
       background: Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSpacing.space5),
-        decoration: BoxDecoration(
-          color: AppColors.paperOk,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
+        color: AppColors.paperOk,
+        child: Row(
+          children: const [
+            Icon(Icons.check_circle, color: AppColors.paper),
             SizedBox(width: AppSpacing.space2),
             Text(
               '완료',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.paper,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -508,22 +504,19 @@ class _LessonTimeCard extends ConsumerWidget {
       secondaryBackground: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.space5),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: const Row(
+        color: AppColors.paperAccent,
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: [
+          children: const [
             Text(
               '취소',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.paper,
                 fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(width: AppSpacing.space2),
-            Icon(Icons.cancel, color: Colors.white),
+            Icon(Icons.cancel, color: AppColors.paper),
           ],
         ),
       ),
@@ -570,238 +563,9 @@ class _LessonTimeCard extends ConsumerWidget {
           ),
         );
       }
-      return false; // Don't dismiss the widget, let the state change handle it
+      return false;
     }
     return false;
-  }
-
-  Widget _buildCard(BuildContext context, WidgetRef ref) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final selDay = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-    );
-    final isPastDay = selDay.isBefore(today);
-    final isToday = selDay.isAtSameMomentAs(today);
-
-    // Instrument-based color (aligned with grid/timeline views)
-    final instrumentColors = InstrumentColors.getColor(lesson.instrument);
-
-    final Color cardBgColor;
-    final Color borderColor;
-
-    if (lesson.displayStatus == LessonStatus.completed || isPastDay) {
-      // Past/completed → muted grey (same as grid view)
-      cardBgColor = AppColors.scheduleMutedBackground;
-      borderColor = AppColors.scheduleMutedAccent;
-    } else if (isToday) {
-      // Today → vivid instrument colors
-      cardBgColor = instrumentColors.background;
-      borderColor = instrumentColors.accent;
-    } else {
-      // Future → softened instrument colors (50% lerp toward white)
-      cardBgColor = Color.lerp(instrumentColors.background, Colors.white, 0.5)!;
-      borderColor = instrumentColors.accent.withValues(alpha: 0.45);
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBgColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border(left: BorderSide(color: borderColor, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space4,
-            vertical: AppSpacing.space3,
-          ),
-          child: Row(
-            children: [
-              // Time column (fixed width)
-              SizedBox(
-                width: 56,
-                child: Text(
-                  lesson.startTime,
-                  style: AppTypography.headingSmall.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color:
-                        (isPastDay ||
-                                lesson.displayStatus == LessonStatus.completed)
-                            ? AppColors.inkTertiary
-                            : null,
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.space3),
-
-              // Info column (flexible)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${lesson.studentName} · ${lesson.instrument}',
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color:
-                            (isPastDay ||
-                                    lesson.displayStatus ==
-                                        LessonStatus.completed)
-                                ? AppColors.inkSecondary
-                                : null,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    _buildBadgesRow(ref),
-                    if (lesson.pieces.isNotEmpty)
-                      // Notebook × Score: 곡명 = Playfair pieceTitle (§1.1 #1 · §7.17).
-                      Text(
-                        lesson.pieces.first.displayName,
-                        style: NotebookTypography.pieceTitle.copyWith(
-                          color:
-                              (isPastDay ||
-                                      lesson.displayStatus ==
-                                          LessonStatus.completed)
-                                  ? AppColors.inkTertiary
-                                  : AppColors.inkSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-
-              // Status (fixed width)
-              SizedBox(
-                width: 36,
-                child: Text(
-                  _getStatusLabel(),
-                  style: AppTypography.caption.copyWith(
-                    color: _getStatusColor(),
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.end,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.space1),
-
-              // Arrow
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.inkTertiary,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getStatusLabel() {
-    switch (lesson.displayStatus) {
-      case LessonStatus.scheduled:
-      case LessonStatus.reschedulePending:
-        return '예정';
-      case LessonStatus.completed:
-        return '완료';
-      case LessonStatus.cancelled:
-      case LessonStatus.cancelledByStudentAdvance:
-      case LessonStatus.cancelledByTeacher:
-      case LessonStatus.cancelledMutual:
-        return '취소';
-      case LessonStatus.noShow:
-      case LessonStatus.cancelledByStudentLate:
-      case LessonStatus.studentAbsent:
-        return '결석';
-    }
-  }
-
-  Color _getStatusColor() {
-    switch (lesson.displayStatus) {
-      case LessonStatus.scheduled:
-      case LessonStatus.reschedulePending:
-        return AppColors.paperAccent;
-      case LessonStatus.completed:
-        return AppColors.paperOk;
-      case LessonStatus.cancelled:
-      case LessonStatus.cancelledByStudentAdvance:
-      case LessonStatus.cancelledByTeacher:
-      case LessonStatus.cancelledMutual:
-        return AppColors.inkTertiary;
-      case LessonStatus.noShow:
-      case LessonStatus.cancelledByStudentLate:
-      case LessonStatus.studentAbsent:
-        return AppColors.paperAccent;
-    }
-  }
-
-  /// Build context badge (🏫/👤) and subscription badge row.
-  Widget _buildBadgesRow(WidgetRef ref) {
-    final memberships =
-        ref
-            .watch(activeStudentMembershipsProvider(lesson.studentId))
-            .valueOrNull;
-    final subscriptions =
-        ref
-            .watch(activeStudentSubscriptionsProvider(lesson.studentId))
-            .valueOrNull;
-
-    // Context badge from lesson class
-    Widget? contextBadge;
-    if (memberships != null && memberships.isNotEmpty) {
-      final lessonClass =
-          ref
-              .watch(lessonClassProvider(memberships.first.lessonClassId))
-              .valueOrNull;
-      if (lessonClass != null) {
-        final isAcademy = lessonClass.type == LessonClassType.academy;
-        contextBadge = Text(
-          isAcademy ? '🏫 ${lessonClass.name}' : '👤 개인레슨',
-          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        );
-      }
-    }
-
-    final subscription =
-        (subscriptions?.isNotEmpty == true) ? subscriptions!.first : null;
-
-    if (contextBadge == null && subscription == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 2),
-      child: Row(
-        children: [
-          if (contextBadge != null) Flexible(child: contextBadge),
-          if (contextBadge != null && subscription != null)
-            const SizedBox(width: 6),
-          if (subscription != null)
-            SubscriptionBadge(subscription: subscription, showIcon: false),
-        ],
-      ),
-    );
   }
 }
 

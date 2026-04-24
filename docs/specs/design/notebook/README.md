@@ -4286,6 +4286,64 @@ rg "NotebookTypography\.handEmphasis" lib/features/ | wc -l  # 7 지점
 
 ---
 
+### §7.110 — 스케쥴 리스트 UI Notebook × Score 동기화 (LessonCard 재사용, 2026-04-24)
+
+**배경**: 사용자 보고 "스케쥴의 리스트 UI... 지금 현재 리스트가 예전 UI로 그대로 표기되고 있습니다". `schedule_tab.dart` 의 `_LessonTimeCard` 가 **3 장식 축**(둥근 모서리 · 박스 그림자 · 악기 색 배경) 으로 Notebook × Score 시그니처 4종 중 **어느 것도** 적용되지 않은 채 잔존. §3(3px 좌 상태선 · 1px 하단 잉크 라인) 과 §1.1 #1(Playfair 타이포) 모두 미적용. 홈 도메인 `LessonCard` (2026-04 §7.X 시리즈로 이미 Notebook × Score 포화) 와 시각적 분리 발생.
+
+#### 7.110-a 변환 전 상태
+
+| 축 | `_LessonTimeCard` 구현 | Notebook × Score 기준 | 상태 |
+|------|------------------------|-----------------------|------|
+| 카드 모서리 | `BorderRadius.circular(radiusLarge)` | 직사각 (모서리 라운드 금지) | 위반 |
+| 카드 그림자 | `BoxShadow(blurRadius: 8, offset: (0, 2))` | 그림자 금지 (평면 종이 질감) | 위반 |
+| 카드 배경 | `InstrumentColors.getColor(instrument).withAlpha(0.08)` | `Colors.transparent` + 1px 잉크 경계 | 위반 |
+| 항목 간격 | `SizedBox(height: space3)` 갭 | 하단 1px 잉크 라인 (갭 0) | 위반 |
+| 시간 타이포 | `AppTypography.headingLarge` (Pretendard) | `GoogleFonts.ibmPlexMono` (악보 템포 라벨 은유) | 위반 |
+| 이름 타이포 | `AppTypography.bodyLarge + w600` | `NotebookTypography.pieceTitle` (Playfair) | 위반 |
+| 상태 라벨 | `AppTypography.caption + bold + colored bg` | `NotebookTypography.sectionLabel` (대문자 레터스페이싱) | 위반 |
+
+#### 7.110-b 변환 방법
+
+1. `_LessonTimeCard` 와 헬퍼 메서드(`_buildCard`, `_getStatusLabel`, `_getStatusColor`, `_buildBadgesRow`) **전체 제거** (~370 줄 감소).
+2. `features/home/presentation/widgets/lesson_card.dart` 의 **공용 `LessonCard` 를 직접 재사용**. 홈 도메인과 스케쥴 도메인이 **동일한 카드 위젯 SSOT** 공유.
+3. `_SwipeableLessonCard` 래퍼만 유지: 예정 상태(`scheduled`/`reschedulePending`) 일 때만 좌/우 스와이프로 완료/취소 액션 노출. 다른 상태는 카드만 렌더.
+4. `ListView.separated(separator: SizedBox)` → `ListView.builder` 로 변경. 분리선은 `LessonCard` 의 하단 1px 잉크 라인이 담당 (§3 규칙).
+5. Dismissible 배경도 Notebook 질감으로: `BorderRadius` 제거, 아이콘/텍스트 색상을 `Colors.white` → `AppColors.paper` (크림) 로.
+6. 미사용 import 6개 제거: `instrument_colors`, `lesson_class`, `lesson_class_providers`, `membership_providers`, `subscription_facade`, `subscription_badge`.
+
+#### 7.110-c 검증 grep
+
+```bash
+# 스케쥴 도메인에 둥근 카드 / 그림자 / 악기 색 배경 잔존 확인
+rg "BorderRadius\.circular\(AppSpacing\.radius(Large|Medium)\)" \
+  lib/features/schedule/presentation/screens/schedule_tab.dart  # 0 건
+rg "BoxShadow\(" lib/features/schedule/presentation/screens/schedule_tab.dart  # 0 건
+rg "InstrumentColors" lib/features/schedule/presentation/screens/schedule_tab.dart  # 0 건
+# 홈 - 스케쥴 SSOT 공유 증명
+rg "import.*features/home/presentation/widgets/lesson_card.dart" \
+  lib/features/schedule/  # 1 건 (schedule_tab.dart)
+# flutter analyze 0 issues 확인
+flutter analyze lib/features/schedule/presentation/screens/schedule_tab.dart  # No issues found!
+```
+
+#### 7.110 관찰
+
+**"SSOT 카드 = 도메인 경계 넘는 재사용"**: `LessonCard` 를 홈 도메인에만 두고 스케쥴 도메인이 자체 카드를 만들면 **두 도메인이 서로 다른 속도로 진화**해 Notebook × Score 동기화가 깨진다. 같은 엔티티(Lesson) 를 렌더하는 카드는 **단일 위젯 SSOT** 가 원칙. Feature-based 아키텍처의 "features 간 참조 금지" 는 **presentation 위젯 공용 예외** 를 허용 — 공용 도메인 위젯은 도메인 간 SSOT 역할.
+
+**"ListView.builder = 악보 프로그램 행 은유"**: `ListView.separated` 로 갭을 주면 항목이 **분리된 카드 묶음** 으로 읽힌다. `ListView.builder` + 하단 1px 잉크 라인은 **연속된 악보 프로그램** (1부·2부·3부 가 나란히 나열된 연주회 팜플렛) 처럼 읽힌다. Notebook × Score 의 "악보 레이아웃" 은유는 갭 0 + 경계선 1 의 조합으로만 성립.
+
+**"구식 UI 1 → 다수 화면 연쇄 동기화 트리거"**: 사용자가 1 화면("지금 현재 리스트") 만 언급했지만, 동일 패턴이 `my_bookings_screen` / `booking_card` / `unified_request_card` 등 최소 10개 화면에 잔존 가능. §7.110 은 1 화면 변환 + 추후 감사 트리거의 첫 지점.
+
+**"AppColors.paperAccent 이 스와이프 배경 색으로 남는 이유"**: 완료는 `paperOk` (녹색), 취소는 `paperAccent` (Vermillion) — §1.1 #3 시그니처 색. 스와이프 배경조차 4대 시그니처 팔레트 내에서 선택. `Colors.red` 같은 Material 기본색은 금지.
+
+**Lore-directive**: 같은 엔티티를 렌더하는 리스트 카드는 **도메인 간 단일 위젯 SSOT** 로 통합. 스케쥴 `_LessonTimeCard` → 홈 `LessonCard` 재사용 (§7.110 전례).
+
+**Lore-constraint**: Notebook × Score 리스트는 `ListView.builder` + 하단 1px 잉크 라인 조합만 허용. `ListView.separated` + `SizedBox` 갭 금지 (§3 "여백은 여백으로, 경계는 경계로" 원칙).
+
+**Lore-rejected**: 둥근 모서리 + 박스 그림자 + 악기 색 배경 3 축 조합 — Notebook × Score 4 시그니처 어느 것도 적용 못 하게 막는 **Material 디폴트 회귀 패턴**. §3 경계 규칙과 직접 충돌.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
