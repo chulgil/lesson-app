@@ -286,7 +286,122 @@ List<StudentWithMembership> _applyFilter(
 
 ---
 
-## 10. 변경 이력
+## 10. 선생님 일괄 작업 (Bulk Teacher Actions, §7.119)
+
+> **도입 배경**: 수강 관리 탭의 "선택 모드" 는 기존 "수강권 일괄 발급" 경로였으나 실시나리오에서 거의 사용되지 않음 — 수강권은 학생별 조건이 다르고, 인라인 "갱신 제안"/"재등록 제안" CTA 로 1:1 발급이 자연스러움. 다중 선택이 실제로 가치 있는 업무 2종으로 **재설계** (2026-04-24).
+
+### 10.1 유스케이스 (B1·B2)
+
+| 기능 | 빈도 | 트리거 |
+|------|------|--------|
+| **B1. 휴강 공지** | 주 1회+ | "이번 금요일 개인사정으로 휴강" — 특정 날짜에 레슨이 있는 학생들에게 자동 공지 + 레슨 상태 `cancelledByTeacher` 전환 |
+| **B2. 일괄 메시지** | 월 1~2회 | "발표회 7월 12일 참가 여부" — 선택 학생들에게 자유 메시지 발송 |
+
+**삭제**: 기존 "수강권 일괄 발급" 경로 (`UnifiedSubscriptionSheet.show(studentIds: [a, b, c])` → `studentIds.first` silent drop 버그 포함).
+
+### 10.2 UX 플로우
+
+```
+수강 관리 탭 헤더 [일괄 작업 아이콘 (tooltip: 일괄 작업)]
+  ↓ 탭
+선택 모드 ON (기존 Checkbox UI 재사용)
+  ↓ N명 체크
+하단 액션바: [휴강 공지] [메시지 보내기]
+  ↓ 갈라짐
+┌────────────────────┐    ┌────────────────────┐
+│ 휴강 공지 화면     │    │ 메시지 바텀시트    │
+│ 1. 날짜 선택       │    │ 1. multiline 입력  │
+│ 2. 영향 레슨 프리뷰│    │ 2. [보내기]        │
+│    (N명 · M건)     │    └────────────────────┘
+│ 3. 사유 입력 (선택)│              ↓
+│ 4. [휴강 확정]     │    AppNotification(generalAnnouncement)
+└────────────────────┘    각 학생별로 fan-out
+            ↓
+  - 해당 주 target date 에 각 학생 레슨 탐색
+  - status → cancelledByTeacher
+  - lessonCancelled 알림 학생에게 전송
+  - SnackBar "N명 · M건 레슨 휴강 완료"
+```
+
+### 10.3 도메인 서비스
+
+```dart
+abstract class BulkTeacherActionService {
+  /// B1 — 특정 날짜에 `studentIds` 의 레슨이 있으면 `cancelledByTeacher` 로 전환하고 학생별 알림 발송.
+  /// 반환: 실제로 취소된 레슨 수 (studentId 에 해당 날짜 레슨 없으면 스킵).
+  Future<BulkCancelResult> cancelLessonsOnDate({
+    required String teacherId,
+    required List<String> studentIds,
+    required DateTime targetDate,
+    String? reason,
+  });
+
+  /// B2 — 선택 학생들에게 generalAnnouncement 알림 발송.
+  /// 반환: 실제 발송된 알림 수 (= studentIds.length).
+  Future<int> broadcastMessage({
+    required String teacherId,
+    required List<String> studentIds,
+    required String title,
+    required String body,
+  });
+
+  /// B1 프리뷰 — 실제 취소 전 영향 레슨 조회.
+  Future<List<Lesson>> previewAffectedLessons({
+    required List<String> studentIds,
+    required DateTime targetDate,
+  });
+}
+
+class BulkCancelResult {
+  final int cancelledLessonCount;
+  final int notifiedStudentCount;
+  final List<String> skippedStudentIds;  // 해당 날짜 레슨 없음
+}
+```
+
+### 10.4 알림 타입
+
+기존 `NotificationType.lessonCancelled` 재사용 (B1). B2 는 `NotificationType.generalAnnouncement` — 없으면 새로 추가.
+
+### 10.5 제거/수정 범위
+
+| 변경 | 위치 |
+|------|------|
+| 제거 | `_buildBottomActionBar` 의 "수강권 발급" FilledButton (students_tab.dart) |
+| 추가 | `_buildBottomActionBar` 의 [휴강 공지][메시지 보내기] 2 버튼 |
+| 수정 | `Icons.check_box_outlined` tooltip "선택" → "일괄 작업" |
+| 버그 픽스 | `_buildActiveFooter` line 1229: `teacherId: ''` → `ref.read(currentUserIdProvider)` |
+| 신규 | `bulk_cancel_screen.dart`, `bulk_message_sheet.dart` |
+| 신규 | `bulk_teacher_action_service.dart` + 테스트 |
+| 신규 | `bulk_teacher_action_providers.dart` |
+
+### 10.6 감정 설계
+
+| 시점 | 감정 | 설계 응답 |
+|------|------|----------|
+| 헤더 아이콘 tooltip "일괄 작업" | **안심** (명확한 목적) | tooltip 재라벨 |
+| 선택 모드 진입 | **집중** | 2 CTA 로 의사결정 축 단순화 |
+| "휴강 공지" 탭 | **약간 불안** ("실수로 다 취소될까") | 확인 다이얼로그 + 영향 레슨 프리뷰 (N명 · M건) |
+| 발송 완료 | **성취감** | SnackBar "N명 · M건 레슨 휴강 완료" |
+
+### 10.7 리스크
+
+| 리스크 | 완화 |
+|-------|------|
+| 휴강 공지 실수로 다수 레슨 상태 오염 | 프리뷰 다이얼로그 + 2단계 확인 ("정말 휴강 처리할까요?") |
+| 알림 발송 부분 실패 | 개별 try/catch 로 부분 성공 허용 · SnackBar 로 실패 건 수 고지 |
+| notification 권한 미부여 | in-app 뱃지 fallback (기존 §3.4 알림 인프라 재사용) |
+
+### 10.8 Lore
+
+- **Lore-directive**: 수강 관리 탭의 선택 모드는 "수강권 발급" 이 아닌 "일괄 공지/메시지" 를 위한 경로다. 수강권 발급은 1:1 인라인 CTA 로만 수행.
+- **Lore-constraint**: 휴강 공지는 반드시 프리뷰 → 확인 2단계. 1탭 실행 금지.
+- **Lore-rejected**: 수강권 일괄 발급 유지 — `studentIds.first` silent drop 버그가 있었고, 실제로 이 경로를 쓰는 선생님이 사실상 없음. 과감히 제거.
+- **Lore-rejected**: B3 일괄 레슨 이동 / B4 일괄 결석 처리 — 기본 확장 범위에서 제외. 휴강+메시지 2종이 batch 수요의 90%+ 커버.
+
+---
+
+## 11. 변경 이력
 
 | 날짜 | 변경 | 작성자 |
 |-----|-----|-------|
@@ -295,3 +410,4 @@ List<StudentWithMembership> _applyFilter(
 | 2026-04-24 | Phase 6 문서 동기화 완료 (커밋 `d45c8c6d`) | Claude |
 | 2026-04-24 | Phase 5a 자동 갱신 알림 서비스 계층 완료 (service + settings + providers + 13 tests GREEN) — 설정 UI 는 후속 세션 | Claude |
 | 2026-04-24 | Phase 5b 설정 UI 토글 완료 (선생님 전용 섹션 + Hive 영속). Status Triage 전 Phase 종결 | Claude |
+| 2026-04-24 | §10 선생님 일괄 작업 (§7.119) 설계 — 선택 모드 재설계: 수강권 일괄 발급 제거 → B1 휴강 공지 + B2 일괄 메시지 | Claude (CEO 리뷰) |
