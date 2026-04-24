@@ -15,7 +15,9 @@ import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../domain/entities/grouped_students.dart';
+import '../../domain/entities/roster_summary.dart';
 import '../providers/student_crud_provider.dart';
+import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
@@ -58,6 +60,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   Widget build(BuildContext context) {
     final teacherId = ref.watch(currentUserIdProvider);
     final groupedAsync = ref.watch(filteredGroupedStudentsProvider(teacherId));
+    final summaryAsync = ref.watch(studentRosterSummaryProvider);
 
     return Stack(
       children: [
@@ -81,12 +84,16 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               const SliverToBoxAdapter(
                 child: SizedBox(height: AppSpacing.space2),
               ),
-              SliverToBoxAdapter(child: _buildCountAndSort(groupedAsync)),
+              SliverToBoxAdapter(
+                child: _buildCountAndSort(groupedAsync, summaryAsync.value),
+              ),
               const SliverToBoxAdapter(
                 child: SizedBox(height: AppSpacing.space2),
               ),
               groupedAsync.when(
-                data: (groups) => _buildGroupedStudentSliver(groups),
+                data:
+                    (groups) =>
+                        _buildGroupedStudentSliver(groups, summaryAsync.value),
                 loading:
                     () => const SliverFillRemaining(
                       hasScrollBody: false,
@@ -113,8 +120,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
-  List<StudentGroup> _applyPracticeFilter(List<StudentGroup> groups) {
+  List<StudentGroup> _applyPracticeFilter(
+    List<StudentGroup> groups,
+    RosterSummary? summary,
+  ) {
     if (_currentFilter == StudentFilter.all) return groups;
+
+    // Enrollment 필터는 RosterSummary ID set 기반 — summary 미도달 시 빈 결과.
+    final enrollmentIds = _enrollmentFilterIds(summary);
 
     return groups
         .map((group) {
@@ -131,13 +144,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     return swm.practiceStatus == PracticeStatus.poor;
                   case StudentFilter.paused:
                     return swm.practiceStatus == PracticeStatus.paused;
-                  // Enrollment filters are applied via RosterSummary ID sets
-                  // in Phase 3; until then they pass through.
                   case StudentFilter.expiring:
                   case StudentFilter.unpaid:
                   case StudentFilter.trial:
                   case StudentFilter.archive:
-                    return true;
+                    return enrollmentIds?.contains(swm.studentId) ?? false;
                 }
               }).toList();
           return StudentGroup(
@@ -147,6 +158,19 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         })
         .where((group) => group.students.isNotEmpty)
         .toList();
+  }
+
+  /// Enrollment 계열 필터(expiring/unpaid/trial/archive)에 해당하는 학생 ID set 반환.
+  /// 기타 필터(all/good/normal/poor/paused) 또는 summary 미도달 시 null.
+  Set<String>? _enrollmentFilterIds(RosterSummary? summary) {
+    if (summary == null) return null;
+    return switch (_currentFilter) {
+      StudentFilter.expiring => summary.expiringStudentIds,
+      StudentFilter.unpaid => summary.unpaidStudentIds,
+      StudentFilter.trial => summary.trialStudentIds,
+      StudentFilter.archive => summary.archivedStudentIds,
+      _ => null,
+    };
   }
 
   void _exitSelectionMode() {
@@ -410,8 +434,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
-                  // (§7.27). '연습상태로 필터' 는 정적 명사 헤더.
-                  Text('연습상태로 필터', style: NotebookTypography.appBarTitle),
+                  // (§7.27). '필터' 는 정적 명사 헤더 — 연습/수강 상태 통합.
+                  Text('필터', style: NotebookTypography.appBarTitle),
                   const SizedBox(height: AppSpacing.space3),
                   ...StudentFilter.values.map((filter) {
                     final isSelected = _currentFilter == filter;
@@ -447,10 +471,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     }
   }
 
-  Widget _buildCountAndSort(AsyncValue<List<StudentGroup>> groupedAsync) {
+  Widget _buildCountAndSort(
+    AsyncValue<List<StudentGroup>> groupedAsync,
+    RosterSummary? summary,
+  ) {
     final count = groupedAsync.when(
       data: (groups) {
-        final filtered = _applyPracticeFilter(groups);
+        final filtered = _applyPracticeFilter(groups, summary);
         return filtered.fold<int>(0, (sum, g) => sum + g.count);
       },
       loading: () => 0,
@@ -542,8 +569,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     }).toList();
   }
 
-  Widget _buildGroupedStudentSliver(List<StudentGroup> groups) {
-    final filtered = _applySortToGroups(_applyPracticeFilter(groups));
+  Widget _buildGroupedStudentSliver(
+    List<StudentGroup> groups,
+    RosterSummary? summary,
+  ) {
+    final filtered = _applySortToGroups(_applyPracticeFilter(groups, summary));
 
     if (filtered.isEmpty) {
       return SliverFillRemaining(
