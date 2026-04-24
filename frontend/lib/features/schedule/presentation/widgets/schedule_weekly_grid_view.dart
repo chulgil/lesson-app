@@ -160,7 +160,13 @@ class _ScheduleWeeklyGridViewState
               final dayDate = _weekStart.add(Duration(days: dayIndex));
               final dayType = _getDayType(dayDate, todayDate);
               final isRestDay = restDays.contains(dayIndex);
-              final columnBg = _getColumnBackground(dayType, isRestDay);
+              final isWeekend = dayIndex >= 5;
+              final columnBg = _getColumnBackground(
+                dayType,
+                isRestDay,
+                isWeekend,
+                dayIndex,
+              );
 
               return SizedBox(
                 width: cellWidth,
@@ -355,7 +361,7 @@ class _ScheduleWeeklyGridViewState
           );
         case _DayType.future:
           colors = InstrumentColorPair(
-            Color.lerp(baseColors.background, Colors.white, 0.5)!,
+            Color.lerp(baseColors.background, Colors.white, 0.35)!,
             baseColors.accent.withValues(alpha: 0.45),
           );
       }
@@ -594,12 +600,28 @@ class _ScheduleWeeklyGridViewState
     return _DayType.future;
   }
 
-  /// Column background color — only today highlighted, everything else default
-  Color? _getColumnBackground(_DayType dayType, bool isRestDay) {
-    if (dayType == _DayType.today) {
-      return AppColors.paperAccent.withValues(alpha: 0.04);
+  /// Column background color — 4단 우선순위 시각 계층.
+  ///
+  /// 우선순위: 쉬는 날 > 오늘 > 주말 > zebra(홀수 인덱스).
+  /// alpha 상한 0.10 유지로 레슨 카드 가독성 보호.
+  ///
+  /// Spec: docs/specs/design/notebook/README.md §7.120
+  Color? _getColumnBackground(
+    _DayType dayType,
+    bool isRestDay,
+    bool isWeekend,
+    int dayIndex,
+  ) {
+    if (isRestDay) {
+      return AppColors.scheduleMutedBackground.withValues(alpha: 0.5);
     }
-    return null;
+    if (dayType == _DayType.today) {
+      return AppColors.paperAccent.withValues(alpha: 0.10);
+    }
+    if (isWeekend) {
+      return AppColors.paperAccentSoft.withValues(alpha: 0.06);
+    }
+    return dayIndex.isOdd ? AppColors.ink.withValues(alpha: 0.025) : null;
   }
 
   void _navigateToAddLesson(DateTime date, int hour, int minute) {

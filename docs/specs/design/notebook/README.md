@@ -4740,6 +4740,50 @@ formatter 가 `shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)` �
 
 ---
 
+### §7.120 — 주간 그리드 배경 시각 계층 재설계 (4단 우선순위, 2026-04-24)
+
+**전제**: §7.118 이후 앱 전역 각진 원칙은 포화. 그러나 주간 스케쥴 뷰는 7 일 컬럼이 **모두 동일한 배경**(오늘만 `paperAccent × 0.04`) 이라 선생님이 "이번 주 어느 요일을 보는지" 를 스캔 없이 파악하기 어려움. 사용자 CEO 리뷰 요청: "주간스케쥴의 경우 배경색 구분이 같아서 보기 힘든점이 있습니다. 이부분의 개선을 UX전문가 관점 선생님 인지관점에서 다시 검토해주세요."
+
+**근본 문제 (Preattentive Scanning 실패)**:
+
+1. 7 컬럼 중 오늘을 제외한 6 컬럼이 동일 색 → 시선이 격자선만 따라가 정보 단위(일자) 를 구분 못 함
+2. `restDays` 가 이미 계산되고 있었으나 `_getColumnBackground` 에서 **미사용** (로직 버그) — 쉬는 날이 근무일과 동일한 배경
+3. 주말 / 평일 시각 구분 부재 — 선생님의 "주말 근무" 여부가 레슨 카드 유무로만 판단 가능
+
+**해결: 4단 우선순위 배경 계층**
+
+`schedule_weekly_grid_view.dart:_getColumnBackground` 를 `(dayType, isRestDay, isWeekend, dayIndex)` 4 파라미터 시그니처로 확장. 우선순위 순차 분기:
+
+| 순위 | 조건 | 색상 | alpha | 이유 |
+|------|------|------|-------|------|
+| 1 | `isRestDay` | `scheduleMutedBackground` | 0.50 | 명시적 휴무 — 가장 강한 시각 억제 |
+| 2 | `today` | `paperAccent` | 0.10 | 오늘 위치 파악 — 기존 0.04 → 0.10 강화 |
+| 3 | `isWeekend` (토·일) | `paperAccentSoft` | 0.06 | 주말 약한 톤 |
+| 4 | `dayIndex.isOdd` | `ink` | 0.025 | Zebra column — 월/수/금 약한 회색 |
+| 기본 | (짝수 평일) | `null` | — | 투명 배경 |
+
+**alpha 상한 0.10 Lore-constraint**: 배경이 레슨 카드(특히 `_DayType.future` 의 `Color.lerp(bg, white, 0.35)`) 보다 강해지면 카드가 "먹힘". alpha 0.10 상한은 배경 < 카드 < 테두리 3 층 대비 보존.
+
+**future 레슨 블렌드 조정 (0.5 → 0.35)**: 배경 alpha 를 0.10 까지 올리면서 `Color.lerp(baseColors.background, Colors.white, 0.5)` 는 반대로 너무 흐려져 zebra/weekend 배경 위에서 카드 경계가 사라짐. 0.35 로 낮춰 카드 색상 채도를 복원.
+
+**예외 매트릭스**
+- `_DayType.past` 레슨은 자체 `scheduleMutedAccent` 로 처리 — 배경 계층과 독립
+- 통근 슬롯(`_TravelTimeBlock`) 은 자체 색상 유지 — 배경 위에 오버레이
+
+**Lore-directive**: 주간 뷰 컬럼 배경은 **정보 인코딩 레이어** — 단순 장식이 아니라 "쉬는 날·오늘·주말·평일" 4 상태를 사전 주의(preattentive) 수준에서 구분하는 시각 어휘. 4 단 우선순위 분기는 **배타적** (한 컬럼은 한 상태만).
+
+**Lore-constraint**: 배경 alpha 상한 0.10 — 레슨 카드 가독성 보호. 신규 상태 추가 시(예: 휴일·시험 주간) alpha 0.10 내 색상 다양성으로 해결, 채도·명도 증가 금지.
+
+**Lore-rejected**: 주말 전체를 `paperAccentSoft × 0.15` (진한 파란 톤) — 주 5 일 근무 선생님에게는 "주말 강조" 가 유효하나, 주 6 일(토요일 레슨) 근무자가 다수. 강한 주말 톤 = 정상 근무일을 "비정상" 으로 오인코딩. alpha 0.06 으로 완화.
+
+**Lore-rejected**: 요일별 고정 색상 (월=빨강, 화=주황 등 무지개) — 일정 정보 외에 **색상 의미 오버로드**. 각 요일에 고유 색을 할당하면 레슨 카드 색상(악기별) 과 충돌, 인지 부하 증가.
+
+**후속**
+- Phase 4 수동 확인 포인트: 월요일 오늘·목요일 오늘·일요일 오늘 3 스폿 + 수요일 쉬는 날 1 스폿 실기 확인
+- 향후 일간 뷰(`schedule_daily_view.dart`) 에도 "쉬는 날 강조" 패턴 이식 검토 (§7.x 후보)
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
