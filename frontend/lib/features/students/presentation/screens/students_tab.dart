@@ -175,9 +175,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: AppSpacing.space2),
-          // ── Masthead: "STUDENTS" eyebrow + 학생 추가 아이콘 ──
+          // ── Masthead: "ENROLLMENTS" eyebrow + 수강 추가 아이콘 ──
           NotebookMasthead(
-            eyebrow: 'STUDENTS',
+            eyebrow: 'ENROLLMENTS',
             meta: _volumeIssueString(DateTime.now()),
             trailing: IconButton(
               onPressed: () => setState(() => _isSelectionMode = true),
@@ -191,18 +191,18 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
           ),
-          // ── Programme Title — "학생 관리" Playfair ──
+          // ── Programme Title — "수강 관리" Playfair ──
           Padding(
             padding: const EdgeInsets.only(top: 18, bottom: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Programme of Students',
+                  'Programme of Enrollments',
                   style: NotebookTypography.mastheadLabel,
                 ),
                 const SizedBox(height: 4),
-                Text('학생 관리', style: NotebookTypography.masthead),
+                Text('수강 관리', style: NotebookTypography.masthead),
                 const SizedBox(height: AppSpacing.space3),
                 const ThinRule(),
               ],
