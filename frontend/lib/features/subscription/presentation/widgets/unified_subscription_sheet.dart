@@ -192,7 +192,6 @@ class _UnifiedSubscriptionSheetState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -336,7 +335,6 @@ class _UnifiedSubscriptionSheetState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -426,7 +424,6 @@ class _UnifiedSubscriptionSheetState
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
@@ -526,7 +523,7 @@ class _UnifiedSubscriptionSheetState
                             : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                    
                   ),
                 ),
                 child: Text(
@@ -552,7 +549,7 @@ class _UnifiedSubscriptionSheetState
                   vertical: AppSpacing.space3,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                  
                 ),
                 disabledBackgroundColor: AppColors.paperAccent.withValues(
                   alpha: 0.3,
@@ -735,7 +732,6 @@ class _TemplateChip extends StatelessWidget {
             isSelected
                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isSelected ? 2 : 1,
@@ -754,7 +750,6 @@ class _TemplateChip extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.space1),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '추천',

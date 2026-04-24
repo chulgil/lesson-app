@@ -45,7 +45,6 @@ class ScheduleGuideInfoBox extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: guide.color.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +63,6 @@ class ScheduleGuideInfoBox extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: guide.color.withValues(alpha: 0.12),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
                     ),
                     child: Text(
                       guide.title,

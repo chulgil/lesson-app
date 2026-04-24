@@ -47,7 +47,6 @@ class SubscriptionTicketCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
                 color: accentColor.withValues(alpha: 0.15),
@@ -91,7 +90,6 @@ class SubscriptionTicketCard extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: accentColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(_instrumentIcon, size: 24, color: accentColor),
           ),
@@ -213,7 +211,7 @@ class SubscriptionTicketCard extends StatelessWidget {
 
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(3),
+            
             child: LinearProgressIndicator(
               value: total > 0 ? (total - remaining) / total : 0,
               minHeight: 6,
@@ -251,7 +249,6 @@ class SubscriptionTicketCard extends StatelessWidget {
                       subscription.canReschedule
                           ? accentColor.withValues(alpha: 0.1)
                           : AppColors.inkQuaternary.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   '${AppStrings.rescheduleLabel} ${subscription.remainingReschedule}${AppStrings.countSuffix}',
@@ -283,7 +280,6 @@ class SubscriptionTicketCard extends StatelessWidget {
             isActive
                 ? accentColor.withValues(alpha: 0.15)
                 : SubscriptionStatusColors.getBadgeBackground(subscription),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         SubscriptionStatusColors.getLabel(subscription),

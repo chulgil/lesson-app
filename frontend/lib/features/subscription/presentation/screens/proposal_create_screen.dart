@@ -237,7 +237,6 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButtonFormField<String>(
@@ -361,7 +360,6 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -402,7 +400,6 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
@@ -437,7 +434,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                
               ),
             ),
             child:
@@ -471,7 +468,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   color: canSubmit ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                  
                 ),
               ),
               child: const Text('즉시 발급'),

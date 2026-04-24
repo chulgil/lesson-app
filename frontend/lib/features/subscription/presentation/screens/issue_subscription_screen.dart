@@ -595,11 +595,7 @@ class _IssueSubscriptionScreenState
                             ? AppColors.paperAccent
                             : AppColors.inkQuaternary,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
               ),
           ],
@@ -648,11 +644,7 @@ class _IssueSubscriptionScreenState
                               ? AppColors.paperAccent
                               : AppColors.inkQuaternary,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
-                    ),
+                    shape: const RoundedRectangleBorder(),
                   ),
                 ),
             ],
@@ -770,7 +762,6 @@ class _PolicyBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(

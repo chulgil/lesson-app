@@ -34,7 +34,6 @@ class TemplateChoiceCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -53,10 +52,7 @@ class TemplateChoiceCard extends StatelessWidget {
                     horizontal: AppSpacing.space2,
                     vertical: AppSpacing.space1,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccent),
                   child: Text(
                     '추천',
                     style: AppTypography.caption.copyWith(
@@ -125,11 +121,7 @@ class TemplateChoiceCard extends StatelessWidget {
                           ? AppColors.paperAccent
                           : AppColors.paperDark,
                   foregroundColor: isRecommended ? Colors.white : AppColors.ink,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                   elevation: 0,
                 ),
                 child: Text('선택하기', style: AppTypography.buttonSmall),

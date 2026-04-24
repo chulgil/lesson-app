@@ -81,7 +81,6 @@ class _SubscriptionChapterLessonsState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: statusColor.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         children: [
@@ -105,7 +104,7 @@ class _SubscriptionChapterLessonsState
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(3),
+            
             child: LinearProgressIndicator(
               value: total > 0 ? used / total : 0,
               minHeight: 8,
@@ -133,7 +132,6 @@ class _SubscriptionChapterLessonsState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,8 +375,6 @@ class _SubscriptionChapterLessonsState
               decoration: isCurrent
                   ? BoxDecoration(
                       color: AppColors.paperAccent.withValues(alpha: 0.06),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
                       border: Border.all(
                         color: AppColors.paperAccent.withValues(alpha: 0.2),
                       ),
@@ -477,7 +473,6 @@ class _SubscriptionChapterLessonsState
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         AppStrings.noChangeHistory,

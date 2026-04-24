@@ -146,7 +146,6 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -197,7 +196,6 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -234,7 +232,6 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -305,7 +302,6 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -400,7 +396,6 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: AppSpacing.space3,

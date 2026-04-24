@@ -450,10 +450,7 @@ class _SummaryStatCard extends StatelessWidget {
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space4,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08)),
       child: Column(
         children: [
           Text(label, style: AppTypography.caption.copyWith(color: color)),

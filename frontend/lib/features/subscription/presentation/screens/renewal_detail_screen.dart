@@ -153,7 +153,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
@@ -163,7 +162,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.autorenew,
@@ -242,7 +240,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -250,7 +247,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               isSelected
                   ? AppColors.paperAccent.withValues(alpha: 0.05)
                   : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
@@ -308,9 +304,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.paperAccent.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
                           ),
                           child: Text(
                             '추천',
@@ -370,7 +363,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       ),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         children: [
@@ -451,7 +443,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                     vertical: AppSpacing.space4,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                    
                   ),
                 ),
                 icon:

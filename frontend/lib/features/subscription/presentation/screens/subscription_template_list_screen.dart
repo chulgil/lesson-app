@@ -256,7 +256,7 @@ class _TemplateCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        
         side: BorderSide(
           color:
               template.isActive
@@ -267,7 +267,6 @@ class _TemplateCard extends StatelessWidget {
       color: template.isActive ? Colors.white : AppColors.paperDark,
       child: InkWell(
         onTap: onEdit,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(
@@ -302,9 +301,6 @@ class _TemplateCard extends StatelessWidget {
                                   color: AppColors.inkTertiary.withValues(
                                     alpha: 0.2,
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSmall,
-                                  ),
                                 ),
                                 child: Text(
                                   '비활성',
@@ -326,9 +322,6 @@ class _TemplateCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: AppColors.paperOk.withValues(
                                     alpha: 0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSmall,
                                   ),
                                 ),
                                 child: Row(
@@ -500,7 +493,6 @@ class _DetailChip extends StatelessWidget {
             isActive
                 ? AppColors.paperAccent.withValues(alpha: 0.1)
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -784,7 +776,6 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
             _isAutoProposalEnabled
                 ? AppColors.paperOk.withValues(alpha: 0.05)
                 : AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               _isAutoProposalEnabled

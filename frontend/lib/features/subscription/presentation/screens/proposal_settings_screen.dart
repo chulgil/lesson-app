@@ -110,7 +110,6 @@ class _ProposalSettingsScreenState
             _autoProposalEnabled
                 ? AppColors.paperOk.withValues(alpha: 0.1)
                 : AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               _autoProposalEnabled
@@ -160,7 +159,6 @@ class _ProposalSettingsScreenState
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.ink.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 children: [
@@ -214,7 +212,6 @@ class _ProposalSettingsScreenState
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
                   color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: Row(
@@ -271,9 +268,6 @@ class _ProposalSettingsScreenState
                             }
                           });
                         },
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.space3),
                           decoration: BoxDecoration(
@@ -283,9 +277,6 @@ class _ProposalSettingsScreenState
                                       alpha: 0.05,
                                     )
                                     : AppColors.paper,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusLarge,
-                            ),
                             border: Border.all(
                               color:
                                   isSelected
@@ -301,9 +292,7 @@ class _ProposalSettingsScreenState
                                 width: 20,
                                 height: 20,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSmall,
-                                  ),
+                                  
                                   border: Border.all(
                                     color:
                                         isSelected
@@ -381,9 +370,6 @@ class _ProposalSettingsScreenState
                                               ? AppColors.paperAccent
                                                   .withValues(alpha: 0.2)
                                               : AppColors.paperDark,
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusSmall,
-                                      ),
                                     ),
                                     child: Text(
                                       isRecommended ? '추천' : '추천',
@@ -427,7 +413,6 @@ class _ProposalSettingsScreenState
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '전환율 UP',
@@ -449,7 +434,6 @@ class _ProposalSettingsScreenState
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -525,9 +509,6 @@ class _ProposalSettingsScreenState
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Row(
                     children: [
@@ -574,7 +555,6 @@ class _ProposalSettingsScreenState
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
@@ -616,7 +596,7 @@ class _ProposalSettingsScreenState
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            
           ),
         ),
         child:

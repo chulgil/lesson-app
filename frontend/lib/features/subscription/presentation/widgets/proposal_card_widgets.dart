@@ -62,7 +62,6 @@ class ProposalStatusBanner extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
@@ -97,7 +96,6 @@ class ProposalHeaderCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -159,7 +157,6 @@ class ProposalDetailsCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -207,7 +204,6 @@ class ProposalMessageCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -258,7 +254,6 @@ class ProposalDiscountCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Column(
@@ -394,7 +389,6 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -461,7 +455,6 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
         ),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -524,7 +517,6 @@ class _PaymentInfoRow extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -532,7 +524,6 @@ class _PaymentInfoRow extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '복사',
@@ -563,7 +554,6 @@ class ProposalWaitingCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.ink.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
       ),
       child: Column(

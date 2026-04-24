@@ -128,9 +128,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                       alpha: 0.3,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
+                      
                     ),
                   ),
                   child: Text(

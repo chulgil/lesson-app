@@ -20,7 +20,6 @@ class DevSectionHeader extends StatelessWidget {
           height: 16,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: AppSpacing.space2),

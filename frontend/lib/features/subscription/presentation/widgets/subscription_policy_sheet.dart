@@ -155,7 +155,6 @@ class _SheetFrame extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: AppColors.inkQuaternary,
-                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),

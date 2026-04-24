@@ -233,7 +233,6 @@ class _StudentProposalAcceptScreenState
         children: [
           InkWell(
             onTap: () => _copyToClipboard(accountText),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space2,

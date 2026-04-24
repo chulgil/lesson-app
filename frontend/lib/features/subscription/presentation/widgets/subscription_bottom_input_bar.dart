@@ -77,11 +77,11 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
@@ -100,9 +100,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.inkQuaternary),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
+                        
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
@@ -128,9 +126,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
+                        
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,

@@ -125,7 +125,7 @@ class _DiagnosticCard extends StatelessWidget {
       elevation: 0,
       color: AppColors.paperAccent.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        
         side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Padding(
@@ -356,7 +356,6 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(

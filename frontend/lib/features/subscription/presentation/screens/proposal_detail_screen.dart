@@ -212,7 +212,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -223,7 +222,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.card_giftcard,
@@ -256,9 +254,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.ink.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
                         ),
                         child: Text(
                           '자동 발송',
@@ -327,7 +322,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                         _selectedTemplateId = templateId;
                       });
                     },
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     child: Container(
                       padding: const EdgeInsets.all(AppSpacing.space4),
                       decoration: BoxDecoration(
@@ -335,9 +329,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                             isSelected
                                 ? AppColors.paperAccent.withValues(alpha: 0.05)
                                 : AppColors.paper,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
                         border: Border.all(
                           color:
                               isSelected
@@ -401,9 +392,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                         decoration: BoxDecoration(
                                           color: AppColors.paperAccent
                                               .withValues(alpha: 0.2),
-                                          borderRadius: BorderRadius.circular(
-                                            AppSpacing.radiusSmall,
-                                          ),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -670,7 +658,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -705,9 +692,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space4,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 icon:
                     _isProcessing

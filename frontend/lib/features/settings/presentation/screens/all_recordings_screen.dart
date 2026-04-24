@@ -238,7 +238,7 @@ class _RecordingsList extends StatelessWidget {
       elevation: 0,
       color: AppColors.paperAccent.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        
         side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Padding(
@@ -285,7 +285,6 @@ class _RecordingsList extends StatelessWidget {
             height: 20,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -304,7 +303,6 @@ class _RecordingsList extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '$count개',
@@ -436,7 +434,6 @@ class _RecordingCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isOrphaned ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),

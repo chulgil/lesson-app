@@ -64,7 +64,6 @@ class SubscriptionTypeSelector extends StatelessWidget {
                 isSelected
                     ? AppColors.paperAccent.withValues(alpha: 0.1)
                     : AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color:
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -117,7 +116,6 @@ class SubscriptionTypeSelector extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +232,6 @@ class PaymentStatusSection extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
@@ -288,7 +285,6 @@ class _PaymentStatusChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
@@ -384,9 +380,7 @@ class AmountInputSection extends StatelessWidget {
                                 : AppColors.inkQuaternary,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        
                       ),
                     ),
                   );
@@ -409,11 +403,11 @@ class AmountInputSection extends StatelessWidget {
             filled: true,
             fillColor: AppColors.paper,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
@@ -478,7 +472,6 @@ class StartDatePickerField extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(

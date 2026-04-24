@@ -203,7 +203,7 @@ class _LocationTravelSelectorState
                         : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                
               ),
             );
           }).toList(),
@@ -260,7 +260,6 @@ class _LocationTravelSelectorState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: isWarning ? AppColors.paperAccentSoft : AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isWarning ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
@@ -295,14 +294,14 @@ class _LocationTravelSelectorState
         hintText: '예: 강남 OO 스튜디오',
         prefixIcon: const Icon(Icons.music_note, size: AppSpacing.iconSM),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          
           borderSide: const BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          
           borderSide: const BorderSide(color: AppColors.paperAccent),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -349,14 +348,14 @@ class _LocationTravelSelectorState
                   },
           decoration: InputDecoration(
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              
               borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
             contentPadding: const EdgeInsets.symmetric(

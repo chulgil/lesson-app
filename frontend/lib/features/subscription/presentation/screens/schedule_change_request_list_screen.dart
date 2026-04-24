@@ -15,10 +15,7 @@ import '../providers/subscription_providers.dart';
 class ScheduleChangeRequestListScreen extends ConsumerStatefulWidget {
   final String teacherId;
 
-  const ScheduleChangeRequestListScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const ScheduleChangeRequestListScreen({super.key, required this.teacherId});
 
   @override
   ConsumerState<ScheduleChangeRequestListScreen> createState() =>
@@ -57,26 +54,24 @@ class _ScheduleChangeRequestListScreenState
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Text(
-            AppStrings.errorOccurred,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
+        error:
+            (_, __) => Center(
+              child: Text(
+                AppStrings.errorOccurred,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
             ),
-          ),
-        ),
         data: (allRequests) => _buildContent(allRequests),
       ),
     );
   }
 
   Widget _buildContent(List<RequestEvent> allRequests) {
-    final pending = allRequests
-        .where((e) => _isPending(e.eventType))
-        .toList();
-    final completed = allRequests
-        .where((e) => !_isPending(e.eventType))
-        .toList();
+    final pending = allRequests.where((e) => _isPending(e.eventType)).toList();
+    final completed =
+        allRequests.where((e) => !_isPending(e.eventType)).toList();
 
     return Column(
       children: [
@@ -85,16 +80,10 @@ class _ScheduleChangeRequestListScreenState
           margin: const EdgeInsets.symmetric(
             horizontal: AppSpacing.screenPadding,
           ),
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: const BoxDecoration(color: AppColors.paperDark),
           child: TabBar(
             controller: _tabController,
-            indicator: BoxDecoration(
-              color: AppColors.paperAccent,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            indicator: const BoxDecoration(color: AppColors.paperAccent),
             indicatorSize: TabBarIndicatorSize.tab,
             labelColor: Colors.white,
             unselectedLabelColor: AppColors.inkSecondary,
@@ -164,16 +153,19 @@ class _ScheduleChangeRequestListScreenState
   Widget _buildRequestItem(RequestEvent event) {
     final isPending = _isPending(event.eventType);
     final changeTypeLabel = _changeTypeLabel(event.eventType);
-    final sessionLabel = event.sessionNumber != null
-        ? AppStrings.sessionNumberLabel(event.sessionNumber!)
-        : '';
+    final sessionLabel =
+        event.sessionNumber != null
+            ? AppStrings.sessionNumberLabel(event.sessionNumber!)
+            : '';
 
     return GestureDetector(
       onTap: () {
         if (event.subscriptionId != null) {
           context.push(
-            AppRoutes.subscriptionDetail
-                .replaceFirst(':id', event.subscriptionId!),
+            AppRoutes.subscriptionDetail.replaceFirst(
+              ':id',
+              event.subscriptionId!,
+            ),
             extra: {'viewerRole': 'teacher'},
           );
         }
@@ -182,7 +174,6 @@ class _ScheduleChangeRequestListScreenState
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -238,10 +229,7 @@ class _ScheduleChangeRequestListScreenState
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
       child: Text(
         label,
         style: AppTypography.caption.copyWith(

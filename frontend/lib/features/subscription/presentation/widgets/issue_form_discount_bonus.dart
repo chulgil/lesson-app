@@ -114,11 +114,11 @@ class BonusSection extends StatelessWidget {
                 filled: true,
                 fillColor: AppColors.paper,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.symmetric(

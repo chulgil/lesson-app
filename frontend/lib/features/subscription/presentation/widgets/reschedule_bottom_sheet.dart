@@ -198,7 +198,6 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
@@ -236,7 +235,6 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
@@ -301,7 +299,6 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color:
               isSelected
                   ? AppColors.paperAccent.withValues(alpha: 0.05)
@@ -353,7 +350,6 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
           ),
@@ -396,7 +392,6 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperOk.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [

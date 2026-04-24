@@ -186,7 +186,6 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: InkWell(
         onTap: () => setState(() => _selectedReason = reason),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
@@ -195,7 +194,6 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             color:
                 isSelected
                     ? AppColors.paperAccent.withValues(alpha: 0.05)
@@ -254,7 +252,6 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
@@ -280,7 +277,6 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [

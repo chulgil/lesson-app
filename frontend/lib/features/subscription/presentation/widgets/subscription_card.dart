@@ -48,7 +48,6 @@ class SubscriptionCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
               color: SubscriptionStatusColors.getBorderColor(subscription),
               width: SubscriptionStatusColors.getBorderWidth(subscription),
@@ -176,7 +175,6 @@ class SubscriptionCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Icon(icon, size: 20, color: color),
     );
@@ -190,7 +188,6 @@ class SubscriptionCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: SubscriptionStatusColors.getBadgeBackground(subscription),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         SubscriptionStatusColors.getLabel(subscription),
@@ -210,7 +207,6 @@ class SubscriptionCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(
           color: AppColors.paperAccent.withValues(alpha: 0.3),
         ),
@@ -262,7 +258,7 @@ class SubscriptionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(2),
+          
           child: LinearProgressIndicator(
             value: percentage / 100,
             minHeight: 6,
@@ -302,7 +298,6 @@ class SubscriptionCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,8 +497,6 @@ class SubscriptionCard extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: w.color.withValues(alpha: 0.1),
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
                 children: [

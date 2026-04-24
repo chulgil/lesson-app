@@ -313,7 +313,6 @@ class _SessionSection extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         AppStrings.noChangeHistory,

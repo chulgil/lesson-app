@@ -29,7 +29,6 @@ class StatusCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -41,7 +40,6 @@ class StatusCard extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   Icons.storage,
@@ -156,7 +154,6 @@ class ProgressCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
       child: Column(
@@ -189,7 +186,7 @@ class ProgressCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: AppColors.ink.withValues(alpha: 0.2),
@@ -215,7 +212,6 @@ class ErrorCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -420,14 +416,12 @@ class ActionButton extends StatelessWidget {
 
     return Material(
       color: AppColors.paper,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
@@ -439,7 +433,6 @@ class ActionButton extends StatelessWidget {
                       isDisabled
                           ? AppColors.inkQuaternary.withValues(alpha: 0.2)
                           : AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   icon,
@@ -519,7 +512,6 @@ class BackupListSection extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
                   color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: const Center(
                   child: Column(
@@ -582,7 +574,6 @@ class BackupItem extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
@@ -594,7 +585,6 @@ class BackupItem extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: const Icon(Icons.archive, color: AppColors.paperAccent),
         ),
@@ -774,7 +764,6 @@ class OrphanRecordingsButton extends ConsumerWidget {
 
         return Material(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           child: InkWell(
             onTap: () {
               Navigator.push(
@@ -784,11 +773,10 @@ class OrphanRecordingsButton extends ConsumerWidget {
                 ),
               );
             },
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                
                 border: Border.all(
                   color: hasOrphans ? AppColors.paperAccent : AppColors.inkQuaternary,
                 ),
@@ -802,7 +790,6 @@ class OrphanRecordingsButton extends ConsumerWidget {
                           hasOrphans
                               ? AppColors.paperAccent.withValues(alpha: 0.1)
                               : AppColors.paperAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       hasOrphans ? Icons.link_off : Icons.link,
@@ -845,9 +832,6 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
                       ),
                       child: Text(
                         '$count',

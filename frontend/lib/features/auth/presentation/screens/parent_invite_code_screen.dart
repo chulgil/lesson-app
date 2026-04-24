@@ -60,9 +60,6 @@ class _ParentInviteCodeScreenState
                         height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.ink.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusXLarge,
-                          ),
                         ),
                         child: const Center(
                           child: Text(
@@ -105,24 +102,18 @@ class _ParentInviteCodeScreenState
                             filled: true,
                             fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
+                              
                               borderSide: BorderSide.none,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
+                              
                               borderSide: BorderSide(
                                 color: AppColors.ink,
                                 width: 2,
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
+                              
                               borderSide: BorderSide(
                                 color: AppColors.paperAccent,
                                 width: 2,
@@ -171,9 +162,7 @@ class _ParentInviteCodeScreenState
                             backgroundColor: AppColors.ink,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
-                              ),
+                              
                             ),
                           ),
                           child:

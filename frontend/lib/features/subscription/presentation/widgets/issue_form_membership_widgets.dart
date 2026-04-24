@@ -50,9 +50,6 @@ class MembershipSelectorWidget extends ConsumerWidget {
                         isSelected
                             ? AppColors.paperAccent.withValues(alpha: 0.1)
                             : AppColors.paper,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(
                       color:
                           isSelected
@@ -126,7 +123,6 @@ class MembershipInfoCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -139,7 +135,6 @@ class MembershipInfoCard extends ConsumerWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Center(
                   child: Text(
@@ -155,9 +150,6 @@ class MembershipInfoCard extends ConsumerWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                 ),
             error:
@@ -166,9 +158,6 @@ class MembershipInfoCard extends ConsumerWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: const Icon(Icons.person),
                 ),

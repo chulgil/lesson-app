@@ -141,15 +141,11 @@ class ChipInputField extends StatelessWidget {
                     vertical: AppSpacing.space2,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    
                     borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
+                    
                     borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                 ),
