@@ -209,28 +209,29 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             ),
           ),
           // ── 액션 Row — 학생 추가 ──
+          // 테마 FilledButton.minimumSize 가 Size(∞, 48) 이라 Row+end 단독 자식 배치시
+          // BoxConstraints(w=Infinity) 크래시. 컴팩트 트레일링 버튼이므로 minWidth 0 으로 override.
           Padding(
             padding: const EdgeInsets.only(
               top: AppSpacing.space2,
               bottom: AppSpacing.space2,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FilledButton.icon(
-                  onPressed: () {
-                    context.push(AppRoutes.addStudentMethod);
-                  },
-                  icon: const Icon(Icons.person_add, size: 18),
-                  label: const Text('학생 추가'),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space4,
-                      vertical: AppSpacing.space2,
-                    ),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.icon(
+                onPressed: () {
+                  context.push(AppRoutes.addStudentMethod);
+                },
+                icon: const Icon(Icons.person_add, size: 18),
+                label: const Text('학생 추가'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space2,
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ],
