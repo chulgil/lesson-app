@@ -4138,6 +4138,52 @@ display* 15 지점의 의미 역할 분포:
 
 ---
 
+### §7.107 — 선생님 스케쥴 Gaegu 마지널리아 뱃지 교차-화면 승격 (2026-04-24)
+
+**배경**: 사용자 검증에서 **선생님 스케쥴 탭(`schedule_tab.dart`) 에 §1.1 #4 Gaegu 시그니처가 부재** 라는 지적. schedule_tab 은 Masthead(Playfair), 섹션 Roman(teacher_availability 경유), Vermillion(paperAccent 배지) 까지 3 시그니처는 관찰되지만 Gaegu 손글씨 마지널리아가 없음 → **§1.1 4대 시그니처 필수(구현 원칙 5)** 위반. §7.107 은 이 공백을 메우면서 동일 패턴을 전 화면에 전파.
+
+**발견 패턴**: `paperAccentSoft` 배경 + `AppTypography.caption.copyWith(color: paperAccent, fontWeight: w600)` 텍스트 조합의 **"시간 인디케이터 뱃지"** 가 여러 날짜 헤더/타임라인 섹션에 분포. 이 조합은 기능상 **"지금 현재 주목해야 하는 순간"** 을 표지 — §1.1 #4 Gaegu 의 "지금·발표회!" 정의와 동형. Pretendard caption 대신 **`NotebookTypography.handEmphasis`**(Gaegu 13 / w700 / paperAccent) 로 교체하면 4대 시그니처 동시 관찰 확보.
+
+#### 7.107-a 교차-화면 승격 4 지점 + 1 Playfair
+
+| 파일 | 라인 | 변경 전 | 변경 후 | 시그니처 보충 |
+|------|------|--------|--------|-------------|
+| `schedule/.../schedule_tab.dart` | 313 | "오늘" caption + paperAccent w600 | `handEmphasis` | 선생님 스케쥴 탭 §1.1 #4 신규 획득 |
+| `schedule/.../schedule_tab.dart` | 678 | `lesson.pieces.first.displayName` bodySmall | `NotebookTypography.pieceTitle` | 레슨 카드 §1.1 #1 Playfair 곡명 강화 |
+| `student_home/.../student_lessons_tab.dart` | 241 | "오늘" caption + paperAccent w600 | `handEmphasis` | 학생 레슨 탭 §1.1 #4 신규 획득 |
+| `student_home/.../student_practice_tab.dart` | 151 | "오늘" caption + paperAccent w600 | `handEmphasis` | 학생 연습 탭 §1.1 #4 신규 획득 |
+| `practice/.../month_group_header.dart` | 59 | "진행 중" caption + paperAccent w600 | `handEmphasis` | 월별 그룹 헤더 §1.1 #4 신규 획득 |
+
+#### 7.107-b 검증
+
+```bash
+# "오늘/진행 중" 리터럴 중 paperAccent caption 패턴 잔존 확인
+rg "Text\('(오늘|진행 중)'.*caption.*paperAccent" frontend/lib/features/  # 0 건
+# Gaegu 마지널리아 렌더 총합
+rg "NotebookTypography\.handEmphasis" frontend/lib/ | wc -l  # 신규 4 지점 확보
+flutter analyze # 4 파일 모두 No issues found
+```
+
+#### 7.107 관찰
+
+**"시간 마지널리아 = Gaegu 전용 축"**: "오늘·진행 중·내일·지금" 처럼 **시간을 가리키는 뱃지성 단어** 는 §1.1 #4 Gaegu 전용. Pretendard caption 로 렌더하면 Material Design 캘린더와 구분되지 않아 Notebook × Score 서명성 상실. §7.107 은 이 법칙을 **4 파일 동시 시행** 으로 확정.
+
+**"pieces.first.displayName = Playfair pieceTitle"**: 스케쥴 카드의 곡명은 레슨의 "연주될 작품명" — 프로그램 북의 pieceTitle 과 동일 역할. 기존 bodySmall 렌더는 §1.1 #1 Playfair 시그니처를 낭비. §7.17 정적 단일 헤드라인 승격 조건 충족(`pieces.first` 는 리스트 첫 요소 추출이므로 기능상 정적 슬롯).
+
+**"4 대 시그니처 실사용 검증 전환"**: §7.105 로 4 축 감사는 포화되었지만, §7.107 은 **실제 개별 화면에서 4 시그니처가 동시 관찰되는지** 라는 **구현 원칙 5 (§1.1 4대 시그니처 필수)** 준수 검증으로 축을 이동. 감사 축 = **"토큰 정의 완결" → "화면별 4대 관찰" 전환 시점**.
+
+**"교차-화면 동형 패턴 발견이 배치 트리거"**: schedule_tab 에서 발견한 "오늘" 뱃지 패턴이 student_lessons_tab · student_practice_tab · month_group_header 까지 **4 파일에 동일 코드 반복**. 이는 §7.102 의 "서명 씨앗 → 평행 검색" 방법론의 **두 번째 성공 사례** — 한 파일의 누락은 대개 전파된 누락.
+
+**은유**: §7.107 은 **"오케스트라 리허설에서 4명의 소리가 모두 들리는지 확인하는 과정"** — 4 대 시그니처는 악기 4 종과 같아서, 한 화면에 모두 등장해야 **완전한 앙상블**. "오늘" 한 단어를 caption 에서 Gaegu 로 바꾸는 것은 **조용했던 바이올린이 합류** 하는 순간.
+
+**Lore-directive**: **"시간 인디케이터 뱃지('오늘·진행 중·내일·지금·곧') 는 `NotebookTypography.handEmphasis` 전용"**. `AppTypography.caption.copyWith(color: paperAccent, fontWeight: w600)` 조합은 §1.1 #4 Gaegu 회피 신호로 간주, 코드리뷰에서 승격 의무.
+
+**Lore-constraint**: 화면 단위 "§1.1 4대 시그니처 필수" 검증은 **4 시그니처 중 한 축 누락 = 해당 화면 Notebook × Score 미완성** 으로 간주. 섹션 헤더(Playfair) + 인덱스(Roman) + 액센트(Vermillion) 3 축은 흔히 갖추지만 Gaegu 가 **가장 자주 누락**되므로 리뷰 체크리스트에 Gaegu 관찰 유무를 별도 항목으로.
+
+**Lore-rejected**: "오늘·지금" 류 단어를 Vermillion 배경 + Pretendard caption 조합으로 표현 — 색만 시그니처고 타이포는 Material 식이라 **반쪽 서명**. Gaegu 전환 의무.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

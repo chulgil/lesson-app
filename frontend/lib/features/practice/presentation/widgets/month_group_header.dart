@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../domain/entities/repertoire_timeline.dart';
 
@@ -55,13 +56,8 @@ class MonthGroupHeader extends StatelessWidget {
                     color: AppColors.paperAccent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
-                  child: Text(
-                    '진행 중',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  // Notebook × Score: "진행 중" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
+                  child: Text('진행 중', style: NotebookTypography.handEmphasis),
                 ),
               ],
             ],

@@ -237,13 +237,8 @@ class StudentLessonsTab extends ConsumerWidget {
                 color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Text(
-                '오늘',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
+              child: Text('오늘', style: NotebookTypography.handEmphasis),
             ),
           ],
           const Spacer(),

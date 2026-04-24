@@ -309,13 +309,8 @@ class ScheduleTab extends ConsumerWidget {
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
-              child: Text(
-                '오늘',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
+              child: Text('오늘', style: NotebookTypography.handEmphasis),
             ),
           ],
           const Spacer(),
@@ -675,10 +670,16 @@ class _LessonTimeCard extends ConsumerWidget {
                     ),
                     _buildBadgesRow(ref),
                     if (lesson.pieces.isNotEmpty)
+                      // Notebook × Score: 곡명 = Playfair pieceTitle (§1.1 #1 · §7.17).
                       Text(
                         lesson.pieces.first.displayName,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.inkSecondary,
+                        style: NotebookTypography.pieceTitle.copyWith(
+                          color:
+                              (isPastDay ||
+                                      lesson.displayStatus ==
+                                          LessonStatus.completed)
+                                  ? AppColors.inkTertiary
+                                  : AppColors.inkSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
