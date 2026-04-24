@@ -21,23 +21,22 @@ class RoleOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score §7.113: 역할 카드(바텀시트) 는 BorderRadius.zero (악보·종이 직선 기하).
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [
             Container(
               width: 48,
               height: 48,
+              // Notebook × Score §7.113: 아이콘 bg 도 각진 (카드 내부 컨테이너 규칙).
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(icon, color: AppColors.paperAccent),
             ),

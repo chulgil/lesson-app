@@ -4423,6 +4423,56 @@ flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.da
 
 ---
 
+### §7.113 — auth 도메인 각진 원칙 확장 (로그인 역할 선택 UI, 2026-04-24)
+
+§7.112 에서 스케줄 도메인에 "라디우스 제거 = Notebook × Score 기하" 를 확립한 뒤, 로그인 플로우의 **역할 선택 UI** 가 여전히 `radiusLarge/Medium/XLarge` 로 라운드 처리됨을 발견. 사용자 요청: "기존 로그인화면의 역할선택UI도 둥글게 되어있는데 각진형태로 기존 notebook x score 컨셉에 맞게 고쳐주세요."
+
+**전제**: 로그인은 앱 최초 진입점 — 여기서 라운드 Material 카드를 먼저 보면 사용자는 "일반 Material 앱" 으로 인식한다. 이후 Notebook × Score 메타포가 아무리 정교해도 첫인상이 덮는다. 따라서 각진 원칙의 **시작점은 auth** 이어야 한다.
+
+| 파일 | 대상 | 변환 전 | 변환 후 |
+|------|------|---------|---------|
+| `role_select_screen.dart` | Welcome icon bg (80×80) | `BorderRadius.circular(radiusXLarge)` | `BoxShape.circle` (의례 모먼트 예외) |
+| `role_select_screen.dart` | `_RoleCard` InkWell | `BorderRadius.circular(radiusLarge)` | `BorderRadius.zero` |
+| `role_select_screen.dart` | `_RoleCard` Container | `BorderRadius.circular(radiusLarge)` | `BorderRadius.zero` |
+| `role_select_screen.dart` | `_RoleCard` Icon bg (48×48) | `BorderRadius.circular(radiusMedium)` | `BorderRadius.zero` |
+| `role_option_card.dart` | InkWell | `BorderRadius.circular(radiusLarge)` | `BorderRadius.zero` |
+| `role_option_card.dart` | Container | `BorderRadius.circular(radiusLarge)` | `BorderRadius.zero` |
+| `role_option_card.dart` | Icon bg (48×48) | `BorderRadius.circular(radiusMedium)` | `BorderRadius.zero` |
+
+#### 7.113 각진 원칙 매트릭스 (Notebook × Score Angular Rule)
+
+§7.112 에서 암묵적으로 확립된 규칙을 **명시적 매트릭스** 로 고정:
+
+| 요소 | 기본 모서리 | 예외 허용 사유 |
+|------|------------|----------------|
+| 카드 (역할, 레슨, 수강권, 예약) | `BorderRadius.zero` | — |
+| 컨테이너 (아이콘 bg, 뱃지 bg, 배너 bg) | `BorderRadius.zero` | — |
+| **아바타·프로필 이미지** | `BoxShape.circle` | 사람·오브젝트 표현 전용 |
+| **웰컴·의례적 진입 아이콘** | `BoxShape.circle` | 의례성 강조 모먼트 (최초 진입 환영 1 지점만) |
+| 다이얼로그·바텀시트 | 시스템 Material 기본 유지 | 시스템 위젯 구조는 건드리지 않음 |
+| FAB·시스템 버튼 | 시스템 Material 기본 유지 | 기능상 원형·필 shape 이 기능과 결합 |
+
+**판정 휴리스틱**: "이 모서리가 라운드여야 할 **기하학적·의례적 이유** 가 있는가?"
+- 사람 얼굴·악기 몸체 → 원형 필연 → `BoxShape.circle`
+- 최초 환영 순간 (앱 최초 로그인) → 의례적 원 → `BoxShape.circle`
+- 종이·카드·뱃지 → 직선 필연 → `BorderRadius.zero`
+
+#### 7.113 관찰
+
+**"첫인상 각진 → Notebook 앱, 첫인상 둥근 → Material 앱"**: 사용자 뇌는 로그인 직후 3 초 내 앱 장르를 분류. 각진 카드는 "종이 문서" 로, 둥근 카드는 "스마트폰 UI" 로 인식. Notebook × Score 의 메타포가 성립하려면 **로그인부터 각진** 이어야 한다.
+
+**"웰컴 아이콘만 원형 예외"**: 역할 선택 카드는 모두 각진으로 전환하되, **상단 웰컴 아이콘(waving_hand)** 은 `BoxShape.circle` 유지. 이유 — (1) 웰컴은 의례 모먼트, (2) 원형 바탕은 "인사 제스처" 의 시각적 강조, (3) 카드의 직사각과 원형이 **대비** 를 만들어 웰컴 영역의 시선 집중을 돕는다.
+
+**"라운드 예외 화이트리스트 명문화"**: §7.112 에서는 스케줄 도메인 내부 결정이었지만, 이제 전 앱에 적용되는 **정책** 으로 승격. `BoxShape.circle` 예외는 아바타·오브젝트·웰컴 의례 3 사유로 한정.
+
+**Lore-directive**: Notebook × Score 카드/컨테이너는 `BorderRadius.zero` 기본. 라운드 코너는 노트 기하 위반이자 Material 회귀 신호 — auth (로그인 플로우) 부터 각진 적용.
+
+**Lore-constraint**: `BoxShape.circle` 예외는 **사람·오브젝트·의례적 진입 모먼트** 3 사유에 한정. 그 외 컨테이너는 모두 `BorderRadius.zero`.
+
+**Lore-rejected**: `radiusMedium/Large/XLarge` 를 Notebook × Score 카드에 사용 — 종이·노트의 직선 기하 위반. "부드러워 보인다" 는 이유로 Material 디폴트를 따르는 것은 컨셉 상실. §7.112 에서 암묵적으로 거절된 규칙을 §7.113 에서 전 앱 정책으로 확정.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
@@ -4430,3 +4480,4 @@ flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.da
 3. **Feature-preserving**: 기능 위젯 재사용. 기능 변경 금지.
 4. **3px 규칙 불가침**: §3의 여백선 규칙은 전 화면에서 동일.
 5. **4대 시그니처 필수**: 어느 화면이든 Notebook × Score를 적용했다면 Playfair · 로마숫자 · Vermillion · Gaegu 네 가지가 모두 관찰되어야 한다.
+6. **각진 원칙 (§7.112 · §7.113)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. `radiusMedium/Large/XLarge` 를 Notebook × Score 카드에 사용 금지.

@@ -67,13 +67,14 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
             children: [
               const Spacer(flex: 2),
 
-              // Welcome icon
+              // Notebook × Score §7.113: 웰컴 아이콘만 BoxShape.circle 예외 (의례 모먼트).
+              // 인사 제스처의 원형 바탕 ≠ 카드 모서리. 각진 카드와 대비로 시선 집중.
               Container(
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+                  shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.waving_hand_rounded,
@@ -160,15 +161,14 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score §7.113: 역할 카드는 BorderRadius.zero (악보·종이 직선 기하).
     return InkWell(
       onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           border: Border.all(color: color.withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           color: color.withValues(alpha: 0.05),
         ),
         child: Row(
@@ -176,10 +176,8 @@ class _RoleCard extends StatelessWidget {
             Container(
               width: 48,
               height: 48,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              // Notebook × Score §7.113: 아이콘 bg 도 각진 (카드 내부 컨테이너 규칙).
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: AppSpacing.space4),
