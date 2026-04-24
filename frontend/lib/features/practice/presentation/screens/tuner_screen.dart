@@ -171,7 +171,6 @@ class CompactTunerWidget extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
           border: Border.all(
             color: isListening ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),

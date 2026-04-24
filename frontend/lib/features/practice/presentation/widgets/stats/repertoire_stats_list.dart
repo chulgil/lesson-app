@@ -19,7 +19,6 @@ class RepertoireStatsList extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Center(
@@ -37,7 +36,6 @@ class RepertoireStatsList extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -75,8 +73,7 @@ class RepertoireStatsList extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -101,8 +98,7 @@ class RepertoireStatsList extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withAlpha(20),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
+                  ),
                 child: Text(
                   stat.practiceTimeText,
                   style: AppTypography.caption.copyWith(
@@ -125,8 +121,7 @@ class RepertoireStatsList extends StatelessWidget {
                       height: 6,
                       decoration: BoxDecoration(
                         color: AppColors.inkQuaternary,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
+                        ),
                     ),
                     FractionallySizedBox(
                       widthFactor: stat.completionRate.clamp(0.0, 1.0),
@@ -139,8 +134,7 @@ class RepertoireStatsList extends StatelessWidget {
                               AppColors.paperAccent,
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
+                          ),
                       ),
                     ),
                   ],

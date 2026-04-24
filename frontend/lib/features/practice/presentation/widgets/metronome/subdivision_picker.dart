@@ -92,7 +92,6 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(
                   color: AppColors.paperAccent.withValues(alpha: 0.3),
                 ),
@@ -189,7 +188,6 @@ class _SubdivisionChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.paperAccent : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,

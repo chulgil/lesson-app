@@ -69,9 +69,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
@@ -112,16 +110,11 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 ),
                 filled: true,
                 fillColor: AppColors.paperDark,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: const OutlineInputBorder(borderSide: BorderSide.none),
+                enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(
                     color: AppColors.paperAccent,
                     width: 2,

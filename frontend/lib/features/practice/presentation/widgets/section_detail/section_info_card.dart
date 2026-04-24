@@ -37,8 +37,7 @@ class SectionInfoCard extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+                ),
               child: const Icon(
                 Icons.music_note,
                 color: AppColors.paperAccent,

@@ -49,7 +49,6 @@ class CompletionToggle extends StatelessWidget {
           : null,
       child: InkWell(
         onTap: onToggle,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
@@ -111,7 +110,6 @@ class CompletionToggle extends StatelessWidget {
       color: isAllCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
       child: InkWell(
         onTap: onToggle,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(

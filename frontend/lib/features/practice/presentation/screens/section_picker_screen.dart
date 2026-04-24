@@ -93,17 +93,14 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                           },
                         )
                         : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
+                border: const OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: const BorderSide(color: AppColors.paperAccent),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.paperAccent),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -387,8 +384,7 @@ class _SectionTile extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.paperAccent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+          ),
         child: const Icon(
           Icons.music_note,
           color: AppColors.paperAccent,

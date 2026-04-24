@@ -40,7 +40,6 @@ class PracticeStreakCard extends ConsumerWidget {
             end: Alignment.bottomRight,
             colors: _getGradientColors(streak.streakLevel),
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           boxShadow: [
             BoxShadow(
               color: _getGradientColors(
@@ -200,8 +199,7 @@ class PracticeStreakCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+        ),
       height: 180,
       child: const Center(child: CircularProgressIndicator()),
     );
@@ -212,8 +210,7 @@ class PracticeStreakCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+        ),
       child: Column(
         children: [
           const Icon(Icons.error_outline, color: AppColors.paperAccent),
@@ -251,8 +248,7 @@ class PracticeStreakBadge extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: _getBadgeColor(streak.streakLevel),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+            ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -313,7 +309,6 @@ class RecordPracticeButton extends ConsumerWidget {
             ),
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(
                 color: AppColors.paperOk.withValues(alpha: 0.3),
               ),

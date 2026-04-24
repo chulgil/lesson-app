@@ -244,7 +244,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               '${rec.createdAt.hour.toString().padLeft(2, '0')}:${rec.createdAt.minute.toString().padLeft(2, '0')}';
           return InkWell(
             onTap: () => onSelect(rec),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               margin: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -253,7 +252,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                     isSelected
                         ? AppColors.paperAccent.withValues(alpha: 0.08)
                         : AppColors.paper,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color:
                       isSelected
@@ -436,7 +434,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               isSelected
                   ? AppColors.paperAccent.withValues(alpha: 0.08)
                   : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
@@ -522,9 +519,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                shape: const RoundedRectangleBorder(),
               ),
             ),
           ],
@@ -546,7 +541,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isPlaying ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
@@ -633,7 +627,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                       isSelected
                           ? AppColors.paperAccent.withValues(alpha: 0.1)
                           : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color:
                         isSelected
@@ -678,7 +671,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isPlaying ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
@@ -696,7 +688,6 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           const SizedBox(height: AppSpacing.space3),
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(2),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               backgroundColor: AppColors.inkQuaternary,
@@ -738,8 +729,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

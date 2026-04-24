@@ -29,12 +29,10 @@ class RepertoireTimelineCard extends StatelessWidget {
             '?studentId=${repertoire.studentId}',
           );
         },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -80,7 +78,6 @@ class RepertoireTimelineCard extends StatelessWidget {
 
               // Progress bar
               ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 child: LinearProgressIndicator(
                   value: repertoire.completionRate.clamp(0.0, 1.0),
                   minHeight: 6,
@@ -119,8 +116,7 @@ class RepertoireTimelineCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Text(
         label,
         style: AppTypography.caption.copyWith(

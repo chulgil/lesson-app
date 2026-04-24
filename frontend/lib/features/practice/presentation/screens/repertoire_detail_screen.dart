@@ -207,10 +207,7 @@ class _RepertoireDetailScreenState
   }) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -266,8 +263,7 @@ class _RepertoireDetailScreenState
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
               color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            ),
+              ),
             child: Center(
               child: Column(
                 children: [
@@ -491,7 +487,6 @@ class _SectionListTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
@@ -501,7 +496,6 @@ class _SectionListTile extends StatelessWidget {
             '?repertoireId=$repertoireId&studentId=$studentId',
           );
         },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space3),
           child: Row(
@@ -560,8 +554,7 @@ class _SectionListTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -600,7 +593,6 @@ class _ReorderableSectionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -696,8 +688,7 @@ class _ReorderableSectionTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -28,7 +28,6 @@ class SectionHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -239,8 +238,7 @@ class _RepeatCountHint extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Row(
         children: [
           const Text('🐾', style: TextStyle(fontSize: 18)),
@@ -334,8 +332,7 @@ class _TargetTimeHint extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Row(
         children: [
           const Icon(
@@ -371,8 +368,7 @@ class RangePreviewBox extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Row(
         children: [
           const Icon(

@@ -26,11 +26,7 @@ class TunerColors {
 /// - Active note highlighting with glow effect
 /// - Enharmonic display option (C#/Db)
 class CircularTunerIndicator extends ConsumerWidget {
-  const CircularTunerIndicator({
-    super.key,
-    this.size = 280,
-    this.centerChild,
-  });
+  const CircularTunerIndicator({super.key, this.size = 280, this.centerChild});
 
   /// Size of the indicator (diameter).
   final double size;
@@ -88,10 +84,11 @@ class _CircleBackgroundPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 10; // Circle close to edge (1.4x bigger)
 
-    final paint = Paint()
-      ..color = TunerColors.circleStroke
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+    final paint =
+        Paint()
+          ..color = TunerColors.circleStroke
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
 
     canvas.drawCircle(center, radius, paint);
   }
@@ -130,11 +127,12 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
   Widget build(BuildContext context) {
     // Watch tuner state for perfect highlight
     final tunerState = ref.watch(tunerProvider);
-    final isPerfectMatch = tunerState.isPerfect &&
-        tunerState.currentNote?.name == widget.note;
+    final isPerfectMatch =
+        tunerState.isPerfect && tunerState.currentNote?.name == widget.note;
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
-    final angle = (2 * math.pi * widget.index / widget.totalNotes) - (math.pi / 2);
+    final angle =
+        (2 * math.pi * widget.index / widget.totalNotes) - (math.pi / 2);
     final radius = widget.circleSize / 2 - 25; // Position inside the circle
 
     final x = radius * math.cos(angle);
@@ -145,18 +143,20 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
 
     // Determine colors
     final baseColor =
-        widget.note.isAccidental ? AppColors.tunerAccidentalNote : AppColors.tunerNaturalNote;
-    final activeColor = widget.note.isAccidental
-        ? AppColors.tunerAccidentalNoteActive
-        : AppColors.tunerNaturalNoteActive;
+        widget.note.isAccidental
+            ? AppColors.tunerAccidentalNote
+            : AppColors.tunerNaturalNote;
+    final activeColor =
+        widget.note.isAccidental
+            ? AppColors.tunerAccidentalNoteActive
+            : AppColors.tunerNaturalNoteActive;
 
     // Scale sizes based on circle size (base size 280), increased by 1.2x
     final scale = widget.circleSize / 280.0;
-    final normalFontSize = 14.4 * scale;  // 12 * 1.2
-    final tappedFontSize = 16.8 * scale;  // 14 * 1.2
-    final horizontalPadding = 10.8 * scale;  // 9 * 1.2
-    final verticalPadding = 6.0 * scale;  // 5 * 1.2
-    final borderRadius = 6.0 * scale;  // 5 * 1.2
+    final normalFontSize = 14.4 * scale; // 12 * 1.2
+    final tappedFontSize = 16.8 * scale; // 14 * 1.2
+    final horizontalPadding = 10.8 * scale; // 9 * 1.2
+    final verticalPadding = 6.0 * scale; // 5 * 1.2
 
     // Only change style when tapped, not on pitch match
     final isEnlarged = _isTapped;
@@ -203,7 +203,6 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
           ),
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(borderRadius),
             boxShadow: boxShadow,
           ),
           child: Text(
@@ -226,18 +225,16 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
       case EnharmonicMode.flatOnly:
         return widget.note.flatName;
       case EnharmonicMode.both:
-        return widget.note.isAccidental ? widget.note.enharmonicName : widget.note.sharpName;
+        return widget.note.isAccidental
+            ? widget.note.enharmonicName
+            : widget.note.sharpName;
     }
   }
 }
 
 /// Cent gauge showing flat/sharp deviation.
 class TunerCentGauge extends ConsumerWidget {
-  const TunerCentGauge({
-    super.key,
-    this.width = 200,
-    this.height = 30,
-  });
+  const TunerCentGauge({super.key, this.width = 200, this.height = 30});
 
   final double width;
   final double height;
@@ -251,18 +248,14 @@ class TunerCentGauge extends ConsumerWidget {
       width: width,
       height: height,
       child: CustomPaint(
-        painter: _CentGaugePainter(
-          centDeviation: centDeviation,
-        ),
+        painter: _CentGaugePainter(centDeviation: centDeviation),
       ),
     );
   }
 }
 
 class _CentGaugePainter extends CustomPainter {
-  _CentGaugePainter({
-    required this.centDeviation,
-  });
+  _CentGaugePainter({required this.centDeviation});
 
   final double centDeviation;
 
@@ -272,11 +265,12 @@ class _CentGaugePainter extends CustomPainter {
     final maxWidth = size.width / 2 - 10;
 
     // Background track
-    final trackPaint = Paint()
-      ..color = AppColors.inkQuaternary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
-      ..strokeCap = StrokeCap.round;
+    final trackPaint =
+        Paint()
+          ..color = AppColors.inkQuaternary
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 8
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(
       Offset(10, center.dy),
@@ -285,10 +279,11 @@ class _CentGaugePainter extends CustomPainter {
     );
 
     // Center marker
-    final centerMarkerPaint = Paint()
-      ..color = AppColors.tunerCentPerfect
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+    final centerMarkerPaint =
+        Paint()
+          ..color = AppColors.tunerCentPerfect
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3;
 
     canvas.drawLine(
       Offset(center.dx, center.dy - 12),
@@ -303,19 +298,17 @@ class _CentGaugePainter extends CustomPainter {
       final indicatorX = center.dx + (normalizedCent / 50) * maxWidth;
 
       // Color based on deviation (flat=red, sharp=orange)
-      final indicatorColor = centDeviation < 0
-          ? AppColors.tunerCentFlat
-          : AppColors.tunerCentSharp;
+      final indicatorColor =
+          centDeviation < 0
+              ? AppColors.tunerCentFlat
+              : AppColors.tunerCentSharp;
 
-      final indicatorPaint = Paint()
-        ..color = indicatorColor
-        ..style = PaintingStyle.fill;
+      final indicatorPaint =
+          Paint()
+            ..color = indicatorColor
+            ..style = PaintingStyle.fill;
 
-      canvas.drawCircle(
-        Offset(indicatorX, center.dy),
-        8,
-        indicatorPaint,
-      );
+      canvas.drawCircle(Offset(indicatorX, center.dy), 8, indicatorPaint);
     }
   }
 
@@ -344,10 +337,12 @@ class TunerInfoBar extends ConsumerWidget {
     final centText = note != null ? '${note.centDisplayString}¢' : '--';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -366,13 +361,14 @@ class TunerInfoBar extends ConsumerWidget {
             centText,
             style: AppTypography.headingSmall.copyWith(
               fontWeight: FontWeight.bold,
-              color: note != null
-                  ? (tunerState.isPerfect
-                      ? AppColors.paperOk
-                      : (note.centDeviation < 0
-                          ? AppColors.tunerCentFlat
-                          : AppColors.tunerCentSharp))
-                  : AppColors.inkTertiary,
+              color:
+                  note != null
+                      ? (tunerState.isPerfect
+                          ? AppColors.paperOk
+                          : (note.centDeviation < 0
+                              ? AppColors.tunerCentFlat
+                              : AppColors.tunerCentSharp))
+                      : AppColors.inkTertiary,
             ),
           ),
         ],

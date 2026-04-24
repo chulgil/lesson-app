@@ -467,8 +467,7 @@ class _SubdivisionSelector extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+            ),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Row(
@@ -519,7 +518,6 @@ class _SubdivisionChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.paperAccent : AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),

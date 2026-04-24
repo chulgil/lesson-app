@@ -268,7 +268,6 @@ class _FeedbackBubble extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.space3),
         border: Border.all(
           color: AppColors.paperAccentSoft.withValues(alpha: 0.24),
         ),
@@ -335,10 +334,7 @@ class _InputBar extends StatelessWidget {
                   ),
                   filled: true,
                   fillColor: AppColors.paperDark,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.space3),
-                    borderSide: BorderSide.none,
-                  ),
+                  border: const OutlineInputBorder(borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space3,
                     vertical: AppSpacing.space2,
@@ -355,9 +351,7 @@ class _InputBar extends StatelessWidget {
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.space3),
-                ),
+                shape: const RoundedRectangleBorder(),
               ),
               child: Text(
                 AppStrings.recordingFeedbackSave,

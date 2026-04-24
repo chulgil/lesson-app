@@ -494,7 +494,6 @@ class _ClefSection extends StatelessWidget {
         // Auto-switch toggle
         InkWell(
           onTap: onAutoSwitchChanged,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
             child: Row(

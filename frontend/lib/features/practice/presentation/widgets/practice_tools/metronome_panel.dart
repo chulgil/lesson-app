@@ -365,7 +365,6 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
@@ -440,7 +439,6 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
@@ -454,10 +452,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             height: 48,
                             decoration: BoxDecoration(
                               color: AppColors.paperAccent.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
                               ),
-                            ),
                             child: Center(
                               child: Text(
                                 state.settings.subdivision.noteSymbol,
@@ -550,8 +545,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       height: 48,
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -639,7 +633,6 @@ class TapTempoSpeechBubble extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),

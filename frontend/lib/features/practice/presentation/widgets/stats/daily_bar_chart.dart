@@ -34,7 +34,6 @@ class DailyBarChart extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -112,8 +111,7 @@ class DailyBarChart extends StatelessWidget {
           height: stat.hasPracticed ? barHeight * heightPercent : 4,
           decoration: BoxDecoration(
             color: barColor,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-          ),
+            ),
         ),
         const SizedBox(height: AppSpacing.space2),
 
@@ -122,8 +120,7 @@ class DailyBarChart extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: isToday ? AppColors.paperAccent : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-          ),
+            ),
           child: Text(
             stat.dayLabel,
             style: AppTypography.caption.copyWith(

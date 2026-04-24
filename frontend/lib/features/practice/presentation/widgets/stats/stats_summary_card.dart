@@ -18,7 +18,6 @@ class StatsSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
@@ -122,8 +121,7 @@ class StatsSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: color.withAlpha(15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),

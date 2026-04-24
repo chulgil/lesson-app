@@ -166,14 +166,12 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
     return SizedBox(
       width: double.infinity,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           decoration: BoxDecoration(
             color:
                 widget.isRecording
                     ? AppColors.paperAccent.withValues(alpha: 0.15)
                     : AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border:
                 widget.isRecording
                     ? Border.all(

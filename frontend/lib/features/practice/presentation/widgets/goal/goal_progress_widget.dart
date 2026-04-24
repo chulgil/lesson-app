@@ -25,7 +25,6 @@ class GoalProgressWidget extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
@@ -85,8 +84,7 @@ class GoalProgressWidget extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperOk.withAlpha(25),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                    ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -229,7 +227,6 @@ class GoalProgressWidget extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context) {
     return InkWell(
       onTap: onSettingsTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
@@ -238,8 +235,7 @@ class GoalProgressWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withAlpha(25),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+                ),
               child: Icon(
                 Icons.flag_outlined,
                 color: AppColors.paperAccent,
@@ -319,8 +315,7 @@ class GoalProgressWidget extends ConsumerWidget {
               height: 8,
               decoration: BoxDecoration(
                 color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              ),
+                ),
             ),
             FractionallySizedBox(
               widthFactor: clampedProgress,
@@ -333,8 +328,7 @@ class GoalProgressWidget extends ConsumerWidget {
                             ? [AppColors.paperOk, AppColors.paperOk]
                             : [AppColors.paperAccent, AppColors.paperAccent],
                   ),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
+                  ),
               ),
             ),
           ],

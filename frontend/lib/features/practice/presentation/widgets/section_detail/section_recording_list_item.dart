@@ -152,10 +152,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             color: AppColors.inkSecondary.withValues(
                               alpha: 0.2,
                             ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
                             ),
-                          ),
                           child: Text(
                             '${widget.recording.bpm} BPM',
                             style: AppTypography.caption.copyWith(
@@ -228,7 +225,6 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
     return Card(
       child: InkWell(
         onTap: widget.onPlay,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space3),
           child: Row(
@@ -264,10 +260,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.paperAccent.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
                               ),
-                            ),
                             child: Text(
                               '${widget.recording.bpm} BPM',
                               style: AppTypography.caption.copyWith(
@@ -286,10 +279,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.paperOk,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
                               ),
-                            ),
                             child: Text(
                               '대표',
                               style: AppTypography.caption.copyWith(

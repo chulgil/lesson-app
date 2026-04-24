@@ -106,7 +106,11 @@ class LogarithmicBpmSlider extends StatelessWidget {
   /// Get color based on BPM intensity (darker = faster).
   Color _getSliderColor(int bpm) {
     final intensity = ((bpm - _minBpm) / (_maxBpm - _minBpm)).clamp(0.0, 1.0);
-    return Color.lerp(AppColors.paperAccentSoft, AppColors.paperAccent, intensity)!;
+    return Color.lerp(
+      AppColors.paperAccentSoft,
+      AppColors.paperAccent,
+      intensity,
+    )!;
   }
 
   @override
@@ -176,8 +180,9 @@ class SmallButton extends StatelessWidget {
           foregroundColor: AppColors.paperAccent,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+            side: BorderSide(
+              color: AppColors.paperAccent.withValues(alpha: 0.3),
+            ),
           ),
         ),
         child: Text(

@@ -53,7 +53,6 @@ class SmartRecordingIndicator extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(

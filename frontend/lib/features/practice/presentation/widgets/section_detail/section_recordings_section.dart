@@ -72,8 +72,7 @@ class SectionRecordingsSection extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         children: [
           Icon(Icons.mic_none, size: 48, color: AppColors.inkTertiary),

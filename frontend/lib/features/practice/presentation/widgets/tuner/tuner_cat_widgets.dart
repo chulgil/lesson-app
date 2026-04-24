@@ -57,7 +57,6 @@ class StatusBubble extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.1),

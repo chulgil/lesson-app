@@ -29,7 +29,6 @@ class PracticeStatsEditor extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -113,7 +112,6 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space2,
@@ -222,8 +220,7 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                  ),
                 child: Text(
                   '$_count회',
                   style: AppTypography.displayMedium.copyWith(
@@ -344,11 +341,7 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
                   decoration: InputDecoration(
                     suffixText: '시간',
                     suffixStyle: AppTypography.bodyMedium,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ),
@@ -365,11 +358,7 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
                   decoration: InputDecoration(
                     suffixText: '분',
                     suffixStyle: AppTypography.bodyMedium,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ),

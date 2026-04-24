@@ -144,9 +144,6 @@ class _PracticeGoalSettingScreenState
                       padding: const EdgeInsets.all(AppSpacing.space3),
                       decoration: BoxDecoration(
                         color: AppColors.ink.withAlpha(25),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                         border: Border.all(color: AppColors.ink.withAlpha(50)),
                       ),
                       child: Row(
@@ -276,7 +273,6 @@ class _PracticeGoalSettingScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withAlpha(15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.paperAccent.withAlpha(30)),
       ),
       child: Column(
@@ -352,8 +348,7 @@ class _PracticeGoalSettingScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+        ),
       child: Text(
         text,
         style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500),

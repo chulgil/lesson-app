@@ -181,10 +181,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccentSoft,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
                     ),
-                  ),
                   child: Row(
                     children: [
                       Icon(
@@ -249,8 +246,7 @@ class _InfoChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+        ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

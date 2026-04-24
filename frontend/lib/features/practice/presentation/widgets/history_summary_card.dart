@@ -29,7 +29,6 @@ class HistorySummaryCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),

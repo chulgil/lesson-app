@@ -298,7 +298,6 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(
                       color: AppColors.paperAccent.withValues(alpha: 0.2),
                     ),

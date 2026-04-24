@@ -389,8 +389,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                               _abLoop.isActive
                                   ? AppColors.paperAccent
                                   : AppColors.textTertiaryDark,
-                          borderRadius: BorderRadius.circular(1),
-                        ),
+                          ),
                       ),
                       SizedBox(width: AppSpacing.space1),
                       _ABButton(
@@ -431,10 +430,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
                         ),
-                      ),
                       child: Text(
                         _speed.label,
                         style: AppTypography.bodyMedium.copyWith(
@@ -456,10 +452,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
                         ),
-                      ),
                       child: Icon(
                         Icons.ios_share,
                         size: 20,
@@ -559,7 +552,6 @@ class _ABButton extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border:
               isSet
                   ? null

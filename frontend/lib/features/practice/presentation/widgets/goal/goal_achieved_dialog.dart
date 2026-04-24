@@ -50,9 +50,7 @@ class GoalAchievedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space5),
         child: Column(
@@ -91,8 +89,7 @@ class GoalAchievedDialog extends StatelessWidget {
                       AppColors.paperAccent.withValues(alpha: 0.2),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                  ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -117,7 +114,6 @@ class GoalAchievedDialog extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color: AppColors.amberLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color: AppColors.amber.withValues(alpha: 0.4),
                   ),
@@ -173,8 +169,7 @@ class GoalAchievedDialog extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         children: [
           if (goal.dailyTimeMinutes != null)
@@ -205,8 +200,7 @@ class GoalAchievedDialog extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: Column(
         children: [
           if (goal.weeklyTimeMinutes != null)

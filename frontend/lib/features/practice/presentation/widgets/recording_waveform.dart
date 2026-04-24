@@ -117,8 +117,7 @@ class StaticWaveform extends StatelessWidget {
               height: max(4, barHeight),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(1),
-              ),
+                ),
             ),
           );
         }),

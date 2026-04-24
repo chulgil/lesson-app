@@ -286,15 +286,11 @@ class _ZoomableWaveformProgressBarState
               onScaleUpdate: (details) => _handleScaleUpdate(details, width),
               onScaleEnd: (details) => _handleScaleEnd(details, width),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 child: Container(
                   height: widget.height,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceSecondaryDark,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
                     ),
-                  ),
                   child: CustomPaint(
                     painter: _ZoomableWaveformPainter(
                       progress: widget.progress.clamp(0.0, 1.0),
@@ -580,8 +576,7 @@ class _MiniMapState extends State<_MiniMap> {
             height: 20,
             decoration: BoxDecoration(
               color: AppColors.surfaceDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
+              ),
             child: CustomPaint(
               painter: _MiniMapPainter(
                 progress: widget.progress,

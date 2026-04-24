@@ -207,7 +207,9 @@ class _PracticeRecordingScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -412,7 +414,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -441,10 +442,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
             height: 100,
             decoration: BoxDecoration(
               color:
-                  widget.isRecording
-                      ? AppColors.paperAccent
-                      : AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+                  widget.isRecording ? AppColors.paperAccent : AppColors.paper,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
@@ -684,10 +682,7 @@ class _RecordingItem extends StatelessWidget {
                   horizontal: AppSpacing.space2,
                   vertical: 2,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
+                decoration: const BoxDecoration(color: AppColors.paperAccent),
                 child: Text(
                   '대표',
                   style: AppTypography.caption.copyWith(
@@ -764,7 +759,10 @@ class _RecordingItem extends StatelessWidget {
                     children: [
                       Icon(Icons.delete_outline, color: AppColors.paperAccent),
                       SizedBox(width: AppSpacing.space2),
-                      Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                      Text(
+                        '삭제',
+                        style: TextStyle(color: AppColors.paperAccent),
+                      ),
                     ],
                   ),
                 ),

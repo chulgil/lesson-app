@@ -24,12 +24,10 @@ class NotePreviewCard extends ConsumerWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: notesAsync.when(
@@ -119,8 +117,7 @@ class NotePreviewCard extends ConsumerWidget {
             height: 16,
             decoration: BoxDecoration(
               color: AppColors.inkQuaternary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
+              ),
           ),
         ),
       ],

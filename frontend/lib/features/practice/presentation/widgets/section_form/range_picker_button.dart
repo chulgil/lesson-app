@@ -25,7 +25,6 @@ class RangePickerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
@@ -33,8 +32,7 @@ class RangePickerButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+          ),
         child: Column(
           children: [
             Text(

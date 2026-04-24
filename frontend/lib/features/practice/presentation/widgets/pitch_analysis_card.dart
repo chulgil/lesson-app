@@ -35,7 +35,6 @@ class PitchAnalysisCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -57,8 +56,7 @@ class PitchAnalysisCard extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: gradeColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
+                  ),
                 child: Text(
                   metrics.grade,
                   style: AppTypography.headingMedium.copyWith(
@@ -155,7 +153,6 @@ class PitchAnalysisCard extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space1),
         ClipRRect(
-          borderRadius: BorderRadius.circular(3),
           child: LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
             backgroundColor: AppColors.inkQuaternary,
@@ -177,8 +174,7 @@ class PitchAnalysisCard extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space2),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+          ),
         child: Row(
           children: [
             Icon(icon, size: 16, color: AppColors.inkTertiary),
@@ -230,7 +226,6 @@ class PitchAnalysisCard extends ConsumerWidget {
                 color: AppColors.paperAccent.withValues(
                   alpha: 0.05 + ratio * 0.2,
                 ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 border: Border.all(
                   color: AppColors.paperAccent.withValues(
                     alpha: 0.1 + ratio * 0.3,

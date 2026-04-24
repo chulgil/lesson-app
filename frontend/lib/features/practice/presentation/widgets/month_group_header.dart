@@ -35,8 +35,7 @@ class MonthGroupHeader extends StatelessWidget {
                 height: 20,
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                  ),
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -54,8 +53,7 @@ class MonthGroupHeader extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                    ),
                   // Notebook × Score: "진행 중" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
                   child: Text('진행 중', style: NotebookTypography.handEmphasis),
                 ),

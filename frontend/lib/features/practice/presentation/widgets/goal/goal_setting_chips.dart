@@ -171,7 +171,6 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
           color: isSelected ? AppColors.paperAccent : Colors.transparent,
         ),
@@ -213,7 +212,6 @@ class _GoalSettingChipsState extends State<GoalSettingChips> {
                 : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
           color:
               _showCustomInput || isCustomSelected

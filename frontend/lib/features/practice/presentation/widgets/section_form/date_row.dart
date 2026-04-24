@@ -36,8 +36,7 @@ class DateRow extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+          ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
           vertical: AppSpacing.space3,
@@ -101,11 +100,9 @@ class DateRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+        ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space3,

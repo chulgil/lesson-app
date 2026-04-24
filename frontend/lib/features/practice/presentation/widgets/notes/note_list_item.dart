@@ -23,12 +23,10 @@ class NoteListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onEdit,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -44,8 +42,7 @@ class NoteListItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                    ),
                   child: Text(
                     note.timeText,
                     style: AppTypography.caption.copyWith(
