@@ -3812,6 +3812,61 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 ---
 
+### 7.101 §7.100 보완 — 3-법칙 소급 감사 (§7.87-h · §7.89 변형 · §7.27) 영-후보 확정
+
+§7.100 의 Lore-directive("법칙 진화에 따른 이전 배치 자동 재분류")를 §7.89 외의 나머지 확장 법칙 3종에도 동일하게 적용. §7.91-b 선생님 8 배치 + §7.99 비선생님 7 도메인 = **감사 완료 15 도메인 전체**에서 다음을 소급 재검사:
+
+- **§7.87-h**: enum/AppStrings 상수 · 2원 유한집합(teacher/parent·student, active/completed 등) 은 §7.30 아닌 §7.17 승격 대상
+- **§7.89 변형**: Dialog 헤드라인(성공/완료 축하) 은 §7.89 의 빈 상태 3축과 동등한 법칙으로 확장
+- **§7.27**: Bottom sheet section header (고정 섹션 제목) 는 §7.17 승격 대상
+
+#### 7.101-a 스캔 방법론
+
+| 스캔 축 | 쿼리 패턴 | 대상 파일 수 | 결과 |
+|---|---|---|---|
+| 역할 기반 삼항 + heading | `role == .*? '.+?' : '.+?'` + AppTypography.heading | 47 | 0 후보 |
+| Dialog 파일 + 정적 헤드라인 | `*_dialog.dart` + AppTypography.heading + 한글 리터럴 | 12 | 0 후보 |
+| Bottom sheet + 정적 헤드라인 | `*_sheet.dart` + AppTypography.heading + 한글 리터럴 | 9 | 0 후보 |
+| 빈 상태 패턴 (icon + inkSecondary/Tertiary + heading) | icon 근접 + heading + muted color | 34 | 1 매치 (§7.30 확정) |
+
+**매치된 1 건**: `frontend/lib/features/profile/presentation/widgets/profile_visibility_widgets.dart:597` 의 `'비공개'` — 이미 §7.30 #시각 무게 매칭 변형으로 확정. 바로 위 line 593 에서 동적 값 `profile.name` 이 같은 `AppTypography.headingSmall` 을 사용 중이므로 "하위 위젯 시각 무게 일치" 예외. 법칙 진화와 무관한 기존 §7.30 분류 유지.
+
+#### 7.101-b 영-후보 확정
+
+15 도메인(lessons/students/practice/subscription/schedule/analytics/parent_home/profile + invite/gamification/notifications/auth/home/teachers/search) 에서 §7.87-h · §7.89 변형 · §7.27 의 3-법칙 확장 이후 소급 재분류 후보 **0 지점**.
+
+**해석**:
+1. §7.87-h 확장은 §7.97 단일 법칙 발견 이후 **진행 중인 배치 내 즉시 적용**되었음 (소급 대상 없음)
+2. §7.89 변형(Dialog) 은 §7.99 비선생님 도메인에서 최초로 발견되어 **gamification 내 level_up_dialog 1 건만 해당** (이미 §7.99 에 포함)
+3. §7.27 Bottom sheet 는 §7.99 에서 badge_award_sheet 1 건만 발견되었고 **이미 §7.99 에 포함**
+
+#### 7.101 검증
+
+```bash
+# 3-법칙 교차 스캔: 역할 삼항 · dialog · bottom sheet
+rg "role == .*'.+?' : '.+?'" -l -g"*.dart" frontend/lib/features/ | wc -l  # 0
+rg "AppTypography.heading" -l -g"*_dialog.dart" frontend/lib/features/ | wc -l  # 0
+rg "AppTypography.heading" -l -g"*_sheet.dart" frontend/lib/features/ | wc -l  # 0
+# 빈 상태 패턴: inkSecondary/Tertiary + heading
+rg "color: AppColors.ink(Secondary|Tertiary).*headingSmall|headingSmall.*inkSecondary" -g"*.dart" frontend/lib/features/ | wc -l  # 1 (§7.30 확정)
+```
+
+#### 7.101 관찰
+
+**"법칙 진화의 수렴점"**: §7.87~§7.89 법칙 확장 4 차(§7.87-h · §7.89 3축 · §7.89 변형 · §7.27) 중 **3 차까지는 진행 중인 배치 내 동기 적용** 되었고, §7.100 에서 §7.89 1 차(3축) 에 대해서만 소급 감사 필요했음. §7.101 은 **나머지 3 법칙 확장은 동기 적용이 성공적이었음** 을 확정.
+
+**"§7.100 의 진정한 의의"**: §7.100 을 통해 확인된 **1 지점** 은 특별한 사례가 아니라 **"법칙 진화 시점에 가장 큰 진화 격차를 일으킨 §7.89 1 차"** 에 기인. §7.101 영-후보는 **"§7.89 1 차만 격차가 있었고 그 이후 확장은 모두 실시간 수렴"** 이라는 법칙 진화 동역학의 증거.
+
+**"앱 전역 감사 포화 선언"**: §7.100 + §7.101 = **15 도메인 전수에서 4 차 법칙 확장 전체에 대한 재분류 완료**. 이제 이후 발견될 법칙 확장(§7.102+) 은 새 배치(신규 화면 추가 시) 에만 적용되며, 기존 배치는 "법칙 진화 → 소급 재검사" 사이클이 종료된 **"Notebook × Score 포화 상태"** 에 도달.
+
+**최종 집계 업데이트**: §7.91-b(213) + §7.99(34) + §7.100(1) + §7.101(0 소급) = **248 감사 지점 유지 · §7.17 62 지점 · §7.30 186 지점 · 전환율 25.0%**. §7.101 은 **"영-결과 검증 배치"** — 법칙 진화 이후 무-변동을 증명하여 이전 배치의 완결성을 확정.
+
+**은유**: §7.101 은 **"백신 접종 후 전수 항체 검사"** — §7.100 에서 1 명의 감염 발견 후 15 명 전체를 검사했고, 나머지 법칙 3 종에 대해서는 14 명 모두 항체 보유 확인. **감염 없음 = 법칙이 살아 움직이는 중에도 감사 시스템이 건강하다는 증거**.
+
+**Lore-directive**: **"영-결과 소급 감사는 감사 완결 선언의 필수 구성요소"**. 변동이 없었다는 사실 자체가 증명되어야 감사 시스템의 자기 정합성이 보장됨. §7.100 의 Lore-directive("가장 마지막 법칙 확장 이전 배치 재검사") 는 §7.101 에 의해 **"모든 법칙 확장 이전 배치 재검사"** 로 확장 완료.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
