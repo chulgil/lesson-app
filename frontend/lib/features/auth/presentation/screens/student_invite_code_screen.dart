@@ -62,9 +62,6 @@ class _StudentInviteCodeScreenState
                         height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.paperAccent.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusXLarge,
-                          ),
                         ),
                         child: const Center(
                           child: Text('🎵', style: TextStyle(fontSize: 40)),
@@ -104,24 +101,15 @@ class _StudentInviteCodeScreenState
                             filled: true,
                             fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
                               borderSide: BorderSide.none,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
                               borderSide: BorderSide(
                                 color: AppColors.paperAccent,
                                 width: 2,
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMedium,
-                              ),
                               borderSide: BorderSide(
                                 color: AppColors.paperAccent,
                                 width: 2,
@@ -170,11 +158,7 @@ class _StudentInviteCodeScreenState
                             backgroundColor: AppColors.paperAccent,
                             // Notebook × Score §7.50: Vermillion CTA foreground = paper.
                             foregroundColor: AppColors.paper,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
-                              ),
-                            ),
+                            shape: RoundedRectangleBorder(),
                           ),
                           child:
                               _isLoading
@@ -203,9 +187,6 @@ class _StudentInviteCodeScreenState
                         padding: const EdgeInsets.all(AppSpacing.space4),
                         decoration: BoxDecoration(
                           color: AppColors.ink.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
                         ),
                         child: Row(
                           children: [
@@ -238,11 +219,7 @@ class _StudentInviteCodeScreenState
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(color: AppColors.inkQuaternary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
-                              ),
-                            ),
+                            shape: RoundedRectangleBorder(),
                           ),
                           child: Text(
                             '코드 없이 시작하기',

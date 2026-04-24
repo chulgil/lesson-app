@@ -131,7 +131,6 @@ class NotificationSettingsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
             ),
             child: Row(
@@ -175,7 +174,6 @@ class NotificationSettingsScreen extends ConsumerWidget {
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(

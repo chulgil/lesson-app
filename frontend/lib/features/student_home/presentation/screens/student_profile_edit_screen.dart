@@ -218,7 +218,6 @@ class _StudentProfileEditScreenState
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
             ),
             child: Row(
@@ -276,15 +275,12 @@ class _StudentProfileEditScreenState
           vertical: AppSpacing.space3,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           borderSide: BorderSide(color: AppColors.ink, width: 1.5),
         ),
       ),
@@ -296,7 +292,6 @@ class _StudentProfileEditScreenState
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButtonHideUnderline(

@@ -70,7 +70,6 @@ class HelpScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
@@ -99,7 +98,6 @@ class HelpScreen extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space5),
             decoration: BoxDecoration(
               color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(

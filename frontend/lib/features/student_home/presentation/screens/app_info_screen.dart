@@ -29,10 +29,7 @@ class AppInfoScreen extends StatelessWidget {
                 Container(
                   width: 80,
                   height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.ink,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.ink),
                   child: const Icon(
                     Icons.music_note,
                     size: 40,
@@ -59,7 +56,6 @@ class AppInfoScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
@@ -100,12 +96,7 @@ class AppInfoScreen extends StatelessWidget {
                           child: Container(
                             width: 48,
                             height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.ink,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
-                              ),
-                            ),
+                            decoration: BoxDecoration(color: AppColors.ink),
                             child: const Icon(
                               Icons.music_note,
                               color: AppColors.paper,
@@ -159,10 +150,7 @@ class AppInfoScreen extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(AppSpacing.space2),
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
               child: Icon(icon, size: 20, color: AppColors.inkSecondary),
             ),
             const SizedBox(width: AppSpacing.space3),

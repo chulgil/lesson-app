@@ -19,10 +19,7 @@ import '../widgets/template_choice_card.dart';
 class StudentProposalAcceptScreen extends ConsumerStatefulWidget {
   final String proposalId;
 
-  const StudentProposalAcceptScreen({
-    super.key,
-    required this.proposalId,
-  });
+  const StudentProposalAcceptScreen({super.key, required this.proposalId});
 
   @override
   ConsumerState<StudentProposalAcceptScreen> createState() =>
@@ -35,36 +32,34 @@ class _StudentProposalAcceptScreenState
 
   @override
   Widget build(BuildContext context) {
-    final proposalAsync =
-        ref.watch(subscriptionProposalProvider(widget.proposalId));
+    final proposalAsync = ref.watch(
+      subscriptionProposalProvider(widget.proposalId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('수강권 선택'),
-        centerTitle: true,
-      ),
-      body: _isProcessing
-          ? const Center(child: CircularProgressIndicator())
-          : proposalAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-              data: (proposal) {
-                if (proposal == null) {
-                  return const Center(child: Text('제안을 찾을 수 없습니다'));
-                }
-                return _buildBody(proposal);
-              },
-            ),
+      appBar: AppBar(title: const Text('수강권 선택'), centerTitle: true),
+      body:
+          _isProcessing
+              ? const Center(child: CircularProgressIndicator())
+              : proposalAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                data: (proposal) {
+                  if (proposal == null) {
+                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                  }
+                  return _buildBody(proposal);
+                },
+              ),
     );
   }
 
   Widget _buildBody(SubscriptionProposal proposal) {
-    final teacherAsync =
-        ref.watch(teacherFullProfileProvider(proposal.teacherId));
-    final teacherName = teacherAsync.whenOrNull(
-          data: (profile) => profile?.name,
-        ) ??
-        '선생님';
+    final teacherAsync = ref.watch(
+      teacherFullProfileProvider(proposal.teacherId),
+    );
+    final teacherName =
+        teacherAsync.whenOrNull(data: (profile) => profile?.name) ?? '선생님';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -93,9 +88,7 @@ class _StudentProposalAcceptScreenState
         const SizedBox(height: AppSpacing.space4),
         Text(
           '$teacherName 선생님',
-          style: AppTypography.headingMedium.copyWith(
-            color: AppColors.ink,
-          ),
+          style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -118,7 +111,6 @@ class _StudentProposalAcceptScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Text(
         '"$message"',
@@ -135,34 +127,37 @@ class _StudentProposalAcceptScreenState
     final templateIds = proposal.allTemplateIds;
 
     return Column(
-      children: templateIds.map((templateId) {
-        final templateAsync =
-            ref.watch(subscriptionTemplateProvider(templateId));
-        final isRecommended = proposal.isRecommended(templateId);
-
-        return templateAsync.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.only(bottom: AppSpacing.space3),
-            child: SizedBox(
-              height: 140,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          ),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (template) {
-            if (template == null) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: TemplateChoiceCard(
-                template: template,
-                isRecommended: isRecommended,
-                isProcessing: _isProcessing,
-                onAccept: () => _handleAccept(proposal, templateId),
-              ),
+      children:
+          templateIds.map((templateId) {
+            final templateAsync = ref.watch(
+              subscriptionTemplateProvider(templateId),
             );
-          },
-        );
-      }).toList(),
+            final isRecommended = proposal.isRecommended(templateId);
+
+            return templateAsync.when(
+              loading:
+                  () => const Padding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.space3),
+                    child: SizedBox(
+                      height: 140,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (template) {
+                if (template == null) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                  child: TemplateChoiceCard(
+                    template: template,
+                    isRecommended: isRecommended,
+                    isProcessing: _isProcessing,
+                    onAccept: () => _handleAccept(proposal, templateId),
+                  ),
+                );
+              },
+            );
+          }).toList(),
     );
   }
 
@@ -171,16 +166,15 @@ class _StudentProposalAcceptScreenState
       onPressed: _isProcessing ? null : () => _handleReject(proposal),
       child: Text(
         '다음에 할게요',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }
 
   Widget _buildBankAccountSection(SubscriptionProposal proposal) {
-    final teacherProfileAsync =
-        ref.watch(teacherFullProfileProvider(proposal.teacherId));
+    final teacherProfileAsync = ref.watch(
+      teacherFullProfileProvider(proposal.teacherId),
+    );
 
     return teacherProfileAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -220,9 +214,7 @@ class _StudentProposalAcceptScreenState
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
           child: Text(
             label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ),
         const Expanded(child: Divider(color: AppColors.inkQuaternary)),
@@ -235,7 +227,6 @@ class _StudentProposalAcceptScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -250,7 +241,6 @@ class _StudentProposalAcceptScreenState
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

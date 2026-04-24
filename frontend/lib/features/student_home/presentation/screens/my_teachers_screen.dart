@@ -128,7 +128,6 @@ class MyTeachersScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -234,7 +233,6 @@ class MyTeachersScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -309,7 +307,6 @@ class _AppTeacherCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isActive ? AppColors.ink : AppColors.inkQuaternary,
         ),
@@ -413,10 +410,7 @@ class _AppTeacherCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
       child: Text(
         label,
         style: AppTypography.captionSmall.copyWith(
@@ -488,7 +482,6 @@ class _ManualTeacherCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(

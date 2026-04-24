@@ -31,7 +31,6 @@ class LegalDocumentScreen extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: Row(
