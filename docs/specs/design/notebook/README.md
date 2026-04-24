@@ -3904,6 +3904,61 @@ rg "color: AppColors.ink(Secondary|Tertiary).*headingSmall|headingSmall.*inkSeco
 
 **다음 차원 후보**: §1.1 #2 로마숫자 (PieceTitle / 로마 기보법), §1.1 #3 Vermillion Red (paperAccent 악센트) 두 축이 미-감사 상태. §7.103+ 배치에서 동일 3-step 으로 개시 가능.
 
+### §7.103 — §1.1 #2 로마숫자 서명 전수 감사 영-후보 + 경계 케이스 4 분류 (2026-04-24)
+
+**배경**: §7.102 Gaegu 감사의 "서명 씨앗 → 평행 검색" 프로토콜을 §1.1 #2 로마숫자 서명에 적용. `NotebookTypography.roman` / `romanActive` / `romanOf()` 의 기존 14 파일 사용처가 서명 규범의 선행 사례이고, 그 중 `schedule/regular_lesson_widgets.dart:29`("I. 제목" 형), `teacher_availability_screen.dart:158`("I. 제목" 형), `home/getting_started_card.dart:145`(원형 없는 step 프리픽스) 세 패턴이 핵심 선행 사례.
+
+**평행 후보 검색 범위**:
+- `\$\{(index|idx|i|step)\s*\+\s*1\}` (숫자 + 1 전개)
+- `'제\d+조'`, `'\d+회차'`, `'\d+주차'`, `'\d+위'`, `'\d+번째'` (Korean 한자/접사)
+- `ListView.builder` 의 `index` 기반 prefix
+
+**결과: 의미론적 평행 후보 0 건**. 15 지점 잠재 후보 발견했으나 **전원 §7.30 경계 케이스**로 분류. 직접 승격 대상 없음.
+
+**경계 케이스 4 축 정의** (§7.30 확장):
+
+| 신규 축 | 패턴 | 예시 | 아라비아 유지 이유 |
+|--------|------|-----|-----------------|
+| §7.30 #11 편집 상태 섹션 인덱스 | 사용자가 동적으로 추가/삭제하는 섹션의 임시 라벨 | `practice/quick_add_screen.dart:438` `'섹션 ${index + 1}'` | 편집 흐름에서 "현재 작업 인덱스" 인식 속도가 고전적 열거보다 우선. `_sections.length` 가 12 초과 가능 (romanOf 폴백 발생) |
+| §7.30 #12 원형 뱃지 내부 단일 숫자 | 24px 이하 원형 배경 + 중앙 정렬 숫자 | `onboarding/tutorial_screen.dart:344` `_ProgressStep` · `schedule/suggest_alternative_screen.dart:298` 선택 뱃지 | 좁은 원형 공간 (20~24px) 에서 Playfair italic "IV/VIII" 가독성 저하. material 정통 진행 표시기 관례 우선 |
+| §7.30 #13 한글 순위/회차 접사 결합 | `${n}순위`, `${n}회차`, `${n}주차` | `schedule/weekly_calendar_picker.dart:498` 순위 · `schedule/schedule_change_response_bottom_sheet.dart:247` 순위 · `current_request_box.dart:371` 순위 chip · `AppStrings.sessionNumberLabel` 회차 | Korean 접사와 Roman numeral 혼재 ("I순위", "I회차") 는 부자연스러운 다국 혼종. 접사 의미론(순위 ≠ 섹션 index) 상 부적합 |
+| §7.30 #14 법률 조문 표기 | `제1조`, `제2조`, `제3장` | `auth/terms_agreement_screen.dart:294+` · `student_home/legal_document_screen.dart:73+` | 법률 standard 표기법이고 법적 content 자체. 서명 대체 금지 |
+
+**선행 사례 14 지점 재분류 확정** (현행 로마숫자 적용의 의미론):
+
+| 의미론 축 | 파일 수 | 설명 |
+|----------|--------|-----|
+| 매스트헤드 메타(VOL./NO.) | 3 | `students_tab` · `schedule_tab` · `dashboard_tab` — 신문 vol/no 포맷 |
+| 매스트헤드 인사 prefix | 3 | `home_screen` · `student_home_screen` · `parent_home_screen` — "${roman}" 인사말 악센트 |
+| 섹션 목록 제목 prefix | 3 | `regular_lesson_widgets` · `teacher_availability_screen` · `parent_home/section_card` — "I. 제목" |
+| 단계별 가이드 prefix | 1 | `getting_started_card` — step 프리픽스 |
+| 대시보드 카운터 | 2 | `dashboard_tab` (레슨 수, 스텝 인덱스) |
+| next lesson 장식 | 2 | `student_home/next_lesson_card` — roman + "I." 과 romanActive |
+
+**의미론 수렴**: **"고전적 서지(bibliographic) 맥락의 고정 프리픽스"** — 월/호수, 인사, 섹션 목록 헤더, 단계별 가이드. 모두 **① 최대 12 이하 소수 ② 읽기 전용 렌더 ③ 디자인 악센트 역할**. 편집·입력·동적 카운트 시나리오는 포함되지 않음.
+
+**의미론 경계 정의 (§1.1 #2 규범 완결)**:
+
+| 조건 | 로마숫자 적용 | 아라비아 유지 |
+|------|------------|-------------|
+| 목록 전체 개수 | ≤ 12 (romanOf 폴백 없음) | > 12 가능성 |
+| 렌더 시점 | 읽기 전용 display | 편집/입력 상태 |
+| 한글 접사 결합 | 없음 (독립 prefix) | 있음 (순위·회차·주차) |
+| 공간 여유 | 플로팅 텍스트 | 원형 24px 이하 뱃지 내부 |
+| 문서 성격 | UI 장식 | 법률 standard 표기 |
+
+**은유**: §7.103 은 **"암호 해독의 경계선 확인"** — §7.102 의 "지문 감식" 이 숨은 흔적을 드러냈다면 §7.103 은 **"지문으로 오해할 수 있는 자국 4 종을 명시적으로 구분"**. 서명 signature 가 강해지려면 *적용되는 곳의 규범*뿐 아니라 *적용되지 않는 곳의 규범*이 동시에 명확해야 함. 양쪽 경계 모두 문서화되어야 서명이 "흉내낼 수 있지만 잘못 흉내낸" 오용을 방지.
+
+**감사 포화 선언 2차**: §7.102 Gaegu(#4) 와 §7.103 Roman(#2) = **§1.1 4대 시그니처 중 2 축 포화**. 남은 축은 **#3 Vermillion Red(paperAccent)** 단 1 개. Vermillion 은 색 토큰이므로 타이포그래피 시그니처와 감사 방법론이 다름 — color token usage density 분석이 필요 (§7.104+ 후보).
+
+**최종 누적 집계**: §7.91-b~§7.101 Playfair 차원 248 지점 + §7.102 Gaegu 차원 4 지점 + §7.103 Roman 차원 0 승격·14 선행 사례 재분류·4 경계 축 정의 = **서명 3 축 전수 감사 완료**.
+
+**Lore-directive**: **"서명 signature 의 강도 = 적용 규범 + 비-적용 규범의 곱"**. 한 축의 signature 가 완결되려면 "쓰는 곳"뿐 아니라 "안 쓰는 곳"의 법칙이 동시에 문서화되어야 함. 경계 케이스 목록은 signature 감사의 필수 산출물.
+
+**Lore-constraint**: 로마숫자는 ① 소수(≤ 12) ② 읽기 전용 ③ 한글 접사 없음 ④ 플로팅 공간 4 조건 모두 만족할 때만 발화. 하나라도 불충족 시 §7.30 #11~#14 로 분류.
+
+**Lore-rejected**: `quick_add_screen:438` "섹션 ${index+1}" 로마숫자 승격 — 편집 상태 흐름에서 아라비아의 "현재 작업 인덱스" 인식 속도 우위, 그리고 12 초과 잠재 폴백 위험 때문에 거절.
+
 ---
 
 ## 8. 구현 원칙
