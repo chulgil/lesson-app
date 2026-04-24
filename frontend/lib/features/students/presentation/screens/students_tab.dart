@@ -21,6 +21,7 @@ import '../providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/practice_sparkline.dart';
+import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management
@@ -69,6 +70,12 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(child: _buildHeader()),
+              if (!_isSelectionMode)
+                SliverToBoxAdapter(
+                  child: RosterTriageBanner(
+                    onFilterSelected: _onTriageFilterSelected,
+                  ),
+                ),
               SliverToBoxAdapter(child: _buildSearchBar()),
               SliverToBoxAdapter(child: _buildFilterChips()),
               const SliverToBoxAdapter(
@@ -146,6 +153,22 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     setState(() {
       _isSelectionMode = false;
       _selectedStudentIds.clear();
+    });
+  }
+
+  /// Triage 배너 칸 탭 → 동일 필터가 이미 선택돼 있으면 해제, 아니면 적용.
+  /// Phase 3 에서 ID set 기반 실제 필터 로직이 연결되기 전까지는 enum 전환만 수행.
+  void _onTriageFilterSelected(
+    RosterTriageCategory category,
+    Set<String> studentIds,
+  ) {
+    final target = switch (category) {
+      RosterTriageCategory.expiring => StudentFilter.expiring,
+      RosterTriageCategory.unpaid => StudentFilter.unpaid,
+      RosterTriageCategory.trial => StudentFilter.trial,
+    };
+    setState(() {
+      _currentFilter = _currentFilter == target ? StudentFilter.all : target;
     });
   }
 
