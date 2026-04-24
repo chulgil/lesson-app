@@ -64,10 +64,12 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: Text(
           widget.selectedDate != null
               ? '섹션 · ${_formatDateForTitle(widget.selectedDate!)}'
               : '섹션',
+          style: NotebookTypography.appBarTitle,
         ),
         actions: [
           PopupMenuButton<String>(

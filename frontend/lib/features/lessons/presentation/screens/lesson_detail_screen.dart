@@ -10,6 +10,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
@@ -203,11 +204,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   PreferredSizeWidget _buildAppBar(Lesson lesson) {
     return AppBar(
+      titleSpacing: 0,
       leading: IconButton(
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
       ),
-      title: const Text('레슨 상세'),
+      title: Text(
+        '${lesson.studentName} (레슨)',
+        style: NotebookTypography.appBarTitle,
+      ),
       actions: [
         IconButton(
           onPressed: () {

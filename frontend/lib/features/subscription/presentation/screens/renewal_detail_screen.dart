@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -39,7 +40,10 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('수강권 갱신 제안'), centerTitle: true),
+      appBar: AppBar(
+        titleSpacing: 0,
+        title: Text('수강권 갱신 제안', style: NotebookTypography.appBarTitle),
+      ),
       body:
           _isProcessing
               ? const Center(child: CircularProgressIndicator())
@@ -361,9 +365,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.08),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.08)),
       child: Row(
         children: [
           Icon(Icons.lightbulb_outline, size: 16, color: AppColors.ink),
@@ -442,9 +444,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space4,
                   ),
-                  shape: RoundedRectangleBorder(
-                    
-                  ),
+                  shape: RoundedRectangleBorder(),
                 ),
                 icon:
                     _isProcessing

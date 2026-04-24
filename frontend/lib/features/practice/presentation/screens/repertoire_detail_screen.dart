@@ -41,10 +41,12 @@ class _RepertoireDetailScreenState
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: Text(
           widget.selectedDate != null
               ? '레퍼토리 · ${_formatDateForTitle(widget.selectedDate!)}'
               : '레퍼토리',
+          style: NotebookTypography.appBarTitle,
         ),
         actions: [
           // More menu with edit and archive options
@@ -261,9 +263,7 @@ class _RepertoireDetailScreenState
         if (sortedSections.isEmpty)
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Center(
               child: Column(
                 children: [
@@ -552,9 +552,7 @@ class _SectionListTile extends StatelessWidget {
   Widget _buildMiniStat({required IconData icon, required String value}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -686,9 +684,7 @@ class _ReorderableSectionTile extends StatelessWidget {
   Widget _buildMiniStat({required IconData icon, required String value}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

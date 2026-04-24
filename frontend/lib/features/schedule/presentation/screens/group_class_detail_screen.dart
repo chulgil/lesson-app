@@ -52,7 +52,13 @@ class _GroupClassDetailScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('그룹 레슨')),
+      appBar: AppBar(
+        titleSpacing: 0,
+        title: Text(
+          '${widget.groupClass.name} (그룹)',
+          style: NotebookTypography.appBarTitle,
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -418,9 +424,7 @@ class _GroupClassDetailScreenState
     if (isFull && !canWaitlist) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperDark,
-        ),
+        decoration: BoxDecoration(color: AppColors.paperDark),
         child: Column(
           children: [
             const Icon(Icons.block, size: 48, color: AppColors.inkTertiary),
@@ -502,9 +506,7 @@ class _GroupClassDetailScreenState
   Widget _buildPolicyInfo() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.05),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.05)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
