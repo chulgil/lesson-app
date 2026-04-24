@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -110,28 +112,18 @@ class MyBookingsScreen extends ConsumerWidget {
     final canReschedule = remainingReschedules > 0;
     final isLastChance = remainingReschedules == 1;
 
+    // Notebook × Score: 둥근 카드 + 채운 아이콘 배경 제거 → 하단 1px 잉크 라인만
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.space4),
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.inkQuaternary),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space4,
+      ),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
-            child: const Icon(
-              Icons.music_note,
-              color: AppColors.paperAccent,
-              size: 24,
-            ),
-          ),
+          Icon(Icons.music_note, color: AppColors.paperAccent, size: 20),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -139,9 +131,7 @@ class MyBookingsScreen extends ConsumerWidget {
               children: [
                 Text(
                   '$teacherName${instrument != null ? ' · $instrument' : ''}',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: NotebookTypography.pieceTitle.copyWith(fontSize: 15),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Row(
@@ -201,8 +191,9 @@ class MyBookingsScreen extends ConsumerWidget {
     final sortedBookings = List<AvailabilitySlot>.from(bookings)
       ..sort((a, b) => a.startDateTime.compareTo(b.startDateTime));
 
+    // Notebook × Score: ListView.builder + 하단 1px 잉크 라인으로 구분 (갭 0)
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
+      padding: EdgeInsets.zero,
       itemCount: sortedBookings.length,
       itemBuilder: (context, index) {
         final booking = sortedBookings[index];
@@ -211,6 +202,10 @@ class MyBookingsScreen extends ConsumerWidget {
     );
   }
 
+  /// Notebook × Score booking card
+  /// - 좌측 3px 세로선: 완료=paperOk / 예정=ink
+  /// - 하단 1px 잉크 라인 = 다음 예약과 구분
+  /// - 둥근 모서리 · 색 배경 · 그림자 제거
   Widget _buildBookingCard(
     BuildContext context,
     WidgetRef ref,
@@ -218,144 +213,123 @@ class MyBookingsScreen extends ConsumerWidget {
   ) {
     final canReschedule = remainingReschedules > 0;
     final isPast = booking.startDateTime.isBefore(DateTime.now());
+    final leftColor = isPast ? AppColors.paperOk : AppColors.ink;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.space3),
-      padding: const EdgeInsets.all(AppSpacing.space4),
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(
-          color:
-              isPast
-                  ? AppColors.inkQuaternary
-                  : AppColors.paperAccent.withValues(alpha: 0.3),
+        border: Border(
+          left: BorderSide(color: leftColor, width: 3),
+          bottom: const BorderSide(color: AppColors.inkQuaternary),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Date and time
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isPast
-                          ? AppColors.paper
-                          : AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Text(
-                  booking.formattedDate,
-                  style: AppTypography.bodySmall.copyWith(
-                    color:
-                        isPast ? AppColors.inkSecondary : AppColors.paperAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                '${booking.formattedStartTime} - ${booking.formattedEndTime}',
-                style: AppTypography.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isPast ? AppColors.inkSecondary : AppColors.ink,
-                ),
-              ),
-              const Spacer(),
-              if (isPast)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space2,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperOk.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Text(
-                    '완료',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperOk,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-
-          if (!isPast) ...[
-            const SizedBox(height: AppSpacing.space3),
-            const Divider(height: 1),
-            const SizedBox(height: AppSpacing.space3),
-
-            // Action buttons
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.space4,
+          AppSpacing.space3,
+          AppSpacing.space4,
+          AppSpacing.space3,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Date + Time row
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed:
-                        canReschedule
-                            ? () => _navigateToReschedule(context, booking)
-                            : null,
-                    icon: const Icon(Icons.swap_horiz, size: 18),
-                    label: const Text('변경'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.paperAccent,
-                      side: BorderSide(
-                        color:
-                            canReschedule
-                                ? AppColors.paperAccent
-                                : AppColors.inkQuaternary,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.space2,
-                      ),
-                    ),
+                // Plex Mono 시간 — 악보 템포 라벨 은유
+                Text(
+                  '${booking.formattedStartTime}–${booking.formattedEndTime}',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isPast ? AppColors.inkSecondary : AppColors.ink,
+                    letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
+                // 날짜 — Playfair pieceTitle
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed:
-                        canReschedule
-                            ? () => _navigateToCancel(context, booking)
-                            : null,
-                    icon: const Icon(Icons.close, size: 18),
-                    label: const Text(AppStrings.cancel),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.paperAccent,
-                      side: BorderSide(
-                        color:
-                            canReschedule
-                                ? AppColors.paperAccent
-                                : AppColors.inkQuaternary,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.space2,
-                      ),
+                  child: Text(
+                    booking.formattedDate,
+                    style: NotebookTypography.pieceTitle.copyWith(
+                      fontSize: 15,
+                      color: isPast ? AppColors.inkSecondary : AppColors.ink,
                     ),
                   ),
                 ),
+                if (isPast)
+                  Text(
+                    '완료',
+                    style: NotebookTypography.sectionLabel.copyWith(
+                      color: AppColors.paperOk,
+                    ),
+                  ),
               ],
             ),
 
-            if (!canReschedule) ...[
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '변경/취소 횟수를 모두 사용했습니다',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
+            if (!isPast) ...[
+              const SizedBox(height: AppSpacing.space3),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed:
+                          canReschedule
+                              ? () => _navigateToReschedule(context, booking)
+                              : null,
+                      icon: const Icon(Icons.swap_horiz, size: 18),
+                      label: const Text('변경'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.paperAccent,
+                        side: BorderSide(
+                          color:
+                              canReschedule
+                                  ? AppColors.paperAccent
+                                  : AppColors.inkQuaternary,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.space2,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed:
+                          canReschedule
+                              ? () => _navigateToCancel(context, booking)
+                              : null,
+                      icon: const Icon(Icons.close, size: 18),
+                      label: const Text(AppStrings.cancel),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.paperAccent,
+                        side: BorderSide(
+                          color:
+                              canReschedule
+                                  ? AppColors.paperAccent
+                                  : AppColors.inkQuaternary,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.space2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              if (!canReschedule) ...[
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '변경/취소 횟수를 모두 사용했습니다',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              ],
             ],
           ],
-        ],
+        ),
       ),
     );
   }

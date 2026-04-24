@@ -4344,6 +4344,55 @@ flutter analyze lib/features/schedule/presentation/screens/schedule_tab.dart  # 
 
 ---
 
+### §7.111 — my_bookings (학생 내 예약) 리스트 UI Notebook × Score 승격 (2026-04-24)
+
+**배경**: §7.110 에서 교사 `schedule_tab` 은 공용 `LessonCard` 재사용으로 변환했으나, 학생 도메인의 `my_bookings_screen` 은 **동일 엔티티가 아닌 `AvailabilitySlot`** (체험 예약 슬롯) 을 렌더하므로 `LessonCard` 재사용 불가. 직접 §7.110 의 **패턴(3px 좌 상태선 + 1px 하단 잉크 라인 + IBM Plex Mono 시간 + Playfair 날짜)** 을 복제 적용.
+
+#### 7.111-a 변환 지점
+
+| 지점 | 전 | 후 |
+|------|----|------|
+| `_buildSubscriptionHeader` | `Colors.white` + `radiusMedium` 카드 + 둥근 아이콘 배경 | 하단 1px 잉크 라인 헤더, `NotebookTypography.pieceTitle` |
+| `_buildBookingCard` 외곽 | `Colors.white` + `radiusMedium` + tinted border | `Border.left(3px)` + `Border.bottom(1px)` 직사각 |
+| 시간 타이포 | `AppTypography.bodyLarge + w600` (Pretendard) | `GoogleFonts.ibmPlexMono` (13px · w600 · ls 0.5) |
+| 날짜 뱃지 | `paperAccent` tinted 배경 + 둥근 모서리 | 평문 + `NotebookTypography.pieceTitle` 15px |
+| "완료" 뱃지 | tinted paperOk 배경 + radiusSmall | 평문 + `NotebookTypography.sectionLabel` (대문자 ls) |
+| ListView padding | `horizontal: space4` (카드 외 간격) | `EdgeInsets.zero` (경계선이 구분 담당) |
+| 항목 간 갭 | `margin: bottom: space3` | 갭 0 + 하단 1px 잉크 라인 |
+
+#### 7.111-b 좌측 상태선 색 규칙
+
+- **완료(isPast)**: `AppColors.paperOk` (녹색) — 지나간 성취
+- **예정(active)**: `AppColors.ink` (검정) — 중립 진행 중
+
+§7.110 LessonCard 의 4색 규칙(scheduled=ink · completed=paperOk · cancelled=inkTertiary · noShow=paperAccent) 의 **축약 2색 버전**. AvailabilitySlot 은 `cancelled`/`noShow` 상태가 없으므로 2색으로 충분.
+
+#### 7.111-c 검증 grep
+
+```bash
+rg "BorderRadius\.circular" lib/features/schedule/presentation/screens/my_bookings_screen.dart  # 0 건
+rg "Colors\.white" lib/features/schedule/presentation/screens/my_bookings_screen.dart  # 0 건
+rg "GoogleFonts\.ibmPlexMono" lib/features/schedule/presentation/screens/my_bookings_screen.dart  # 1 건
+rg "NotebookTypography" lib/features/schedule/presentation/screens/my_bookings_screen.dart  # 3 건
+flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.dart  # No issues found!
+```
+
+#### 7.111 관찰
+
+**"다른 엔티티 → 패턴 복제"**: `Lesson` ≠ `AvailabilitySlot` 이므로 §7.110 의 SSOT 재사용 전략 적용 불가. 대신 **디자인 패턴(3px 좌 + 1px 하)** 을 직접 복제. 이는 Notebook × Score **패턴 자체가 SSOT** 이며, 구체 위젯은 엔티티 타입마다 별개일 수 있음을 보여준다 — §7.110 이 위젯 수준 SSOT, §7.111 은 패턴 수준 SSOT.
+
+**"체험 예약 ≠ 정기 레슨 → 2 상태로 축약"**: AvailabilitySlot 은 예약/완료 2 상태만 존재. 4 상태 색(ink · paperOk · inkTertiary · paperAccent) 을 억지로 적용하지 않고 필요한 2 색으로 축약. 시그니처 색 규칙은 **최대 4색** 이 기본이지 **모두 써야 하는 의무** 가 아니다.
+
+**"헤더도 리스트의 첫 행"**: `_buildSubscriptionHeader` 를 둥근 카드로 분리하지 않고 **동일한 1px 잉크 라인으로 리스트의 첫 행처럼** 렌더. 악보의 "프로그램 번호·곡목" 헤더가 1부 프로그램과 같은 가로선 아래 있는 구조와 일치.
+
+**Lore-directive**: 다른 엔티티 타입의 리스트 UI 도 Notebook × Score 패턴(3px 좌 + 1px 하 + Plex Mono + Playfair) 을 직접 복제. 위젯 SSOT 가 아닌 **패턴 SSOT** 적용.
+
+**Lore-constraint**: 상태 수에 맞춰 색을 축약 사용. AvailabilitySlot 2 상태 → 2 색(ink · paperOk). 4 색 억지 적용 금지.
+
+**Lore-rejected**: `_buildSubscriptionHeader` 를 둥근 카드로 분리 — 악보 프로그램 행의 연속성 깨짐, 리스트 상단과 본문 사이 시각적 단절.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
