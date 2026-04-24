@@ -4229,6 +4229,63 @@ flutter analyze lib/features/parent_home/presentation/screens/parent_dashboard_t
 
 ---
 
+### §7.109 — 전 도메인 Gaegu 축 감사 포화 증명 (0건 변환, 2026-04-24)
+
+**배경**: 사용자 질의 "다른화면들도 확인후 고쳐졌나요". §7.107·§7.108 로 **4 도메인**(schedule · student_home · practice · parent_home) 이 Gaegu 축을 획득한 상태에서, 나머지 **16 도메인**(analytics · auth · booking · follow · gamification · home · invite · lessons · notifications · onboarding · profile · relationship · search · settings · students · subscription) 에 §7.107/§7.108 패턴과 부합하는 추가 승격 후보가 있는지 전수 감사. 결과: **0 건 추가 후보**. 감사 축 포화.
+
+#### 7.109-a 감사 방법
+
+1. **전역 handEmphasis 분포 맵**: `rg "NotebookTypography\.handEmphasis" lib/features/ -l | sed 's|/.*||' | uniq` → 4 도메인 확인.
+2. **Gaegu 회피 신호 패턴 3종** 전체 검색:
+   - `paperAccentSoft` 배경 + `caption/captionSmall` + `paperAccent` + `w600/bold` 조합
+   - "오늘·지금·곧·내일·방금·진행 중·임박·마감·D-N·미결제·필수·주의·긴급" 류 리터럴
+   - `paperOk/paperOkSoft` 배경 + `caption + bold` 조합
+3. **후보 선별**: 위 검색에서 매칭된 지점 중 §7.107/§7.108 의 "마지널리아 2 축(시간 + 긴급도)" 정의에 부합하는지 판정.
+
+#### 7.109-b 매칭 지점 및 승격/제외 판정
+
+| 파일 | 라인 | 텍스트 | 판정 | 사유 |
+|------|------|--------|------|------|
+| `lessons/.../lesson_header_card.dart` | 82 | `lesson.instrument` | **제외** | 분류 뱃지(악기명) — §7.108 Lore-rejected |
+| `lessons/.../edit_lesson_widgets.dart` | 75 | `student.instrument` | **제외** | 분류 뱃지(악기명) |
+| `schedule/.../group_class_detail_screen.dart` | 304 | "마감임박" | **제외** | bodyLarge w700 메인 텍스트 — 마지널리아 아닌 섹션 주제 |
+| `schedule/.../my_bookings_screen.dart` | 282 | "완료" | **제외** | 상태 분류 뱃지 — §7.108 Lore-rejected |
+| `subscription/.../subscription_card.dart` | 511–517 | "마지막 레슨·만료 임박·D-day" 경고 | **제외** | `AppStrings.expirationUrgent(days)` 파라미터화 문장형 경고 — 짧은 뱃지 아닌 설명문 (§7.108 constraint 반례) |
+| `students/.../add_student_method_screen.dart` | 157 | 동적 `badge!` | **제외** | §7.50 Vermillion badge foreground 역방향 (paperAccent 배경 + paper 텍스트) — 분류 뱃지 |
+
+#### 7.109-c 감사 포화 증명
+
+```bash
+# Gaegu 회피 신호 직계 패턴 (§7.107/§7.108 매칭 후보)
+rg "Text\(\s*'(오늘|진행 중|미결제|필수|D-[0-9])'" lib/features/ | rg -v "handEmphasis"  # 0 건
+# paperAccentSoft 배경 + caption + paperAccent + w600 조합의 짧은 리터럴
+rg -B 3 -A 5 "color: AppColors\.paperAccentSoft" lib/features/ | \
+  rg -B 6 "color: AppColors\.paperAccent[,)]" | \
+  rg "Text\(['\"][가-힣]{1,4}['\"]" | rg -v "handEmphasis\|instrument"  # 0 건
+# handEmphasis 렌더 총합 (§7.107 4 + §7.108 3)
+rg "NotebookTypography\.handEmphasis" lib/features/ | wc -l  # 7 지점
+```
+
+#### 7.109 관찰
+
+**"Gaegu 축 = 뱃지 전용, 문장은 제외"**: subscription_card 경고("수강권이 3일 후 만료됩니다") 가 Gaegu 승격 대상이 아닌 이유는 **문장형 설명문**. handEmphasis 는 Gaegu 13/w700 으로 2–4자 뱃지 길이에 최적. 긴 문장을 Gaegu 로 렌더하면 **"손글씨 긴 편지"** 가 되어 가독성 저하. 즉 **Gaegu 는 짧은 호출어 전용 축**.
+
+**"메인 텍스트(bodyLarge) 는 마지널리아 아님"**: group_class_detail_screen 의 "마감임박" 은 위계상 주요 콘텐츠(bodyLarge w700) 로, **여백의 손글씨**가 아닌 **화면의 주체**. Gaegu 마지널리아 정의("여백에 덧붙인 주의 마커") 와 충돌.
+
+**"분류 뱃지 폭증 방지"**: 악기·상태·카테고리 뱃지는 앱 전반에 수십 지점 — 모두 Gaegu 로 바꾸면 Gaegu 가 **흔한 레이블 타이포**가 되어 시그니처 희소성 상실. §7.108 구분선("분류 vs 호소") 이 **Gaegu 희소성 방어**의 본질.
+
+**"감사 축 종결선 = 3 포화 도메인 이상"**: §7.79(my_teachers), §7.85(subscription), §7.88(gamification·search·auth) 에 이어 §7.109 는 **Gaegu 축 감사의 4번째 포화 검증**. 코드베이스에 동일 패턴이 반복되면 변환 배치(§7.107/§7.108), 고유 의미로 분산되면 포화 배치(§7.109) — 두 모드의 교대로 감사가 전진.
+
+**"사용자 검증 트리거 → 검색 방법론 재증명"**: 사용자의 "다른화면들도 확인" 질의는 §7.102 "서명 씨앗 → 평행 검색" 방법론의 **네번째 적용**. 결과가 0 건이어도 감사는 **의미 있는 종결** — "남은 화면은 Gaegu 슬롯이 없거나 이미 처리됨" 을 증명.
+
+**Lore-directive**: "Gaegu 회피 신호 3 패턴(paperAccentSoft/paperOk 배경 + caption + paperAccent + w600 조합, 특정 시간·긴급도 리터럴, 짧은 호출어 2–4자 뱃지)" 검색에서 0 건 → **Gaegu 축 감사 포화**. 신규 화면 추가 시 이 3 패턴 중 하나라도 부합하면 handEmphasis 승격 의무.
+
+**Lore-constraint**: Gaegu 는 **2–4자 호출어 전용 축**. 5자 이상 문장형 경고는 Pretendard caption 유지, **Gaegu 승격 금지**. Gaegu 희소성이 시그니처의 본질.
+
+**Lore-rejected**: subscription_card 경고("3일 후 만료됩니다") Gaegu 승격 — 문장형이라 Gaegu 가 "손글씨 편지" 로 오역, **독자 가독성 저하**.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
