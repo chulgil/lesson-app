@@ -130,10 +130,7 @@ class _AttendanceConfirmationSheetState
         // Lesson info card
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: Column(
             children: [
               Text(
@@ -247,9 +244,7 @@ class _AttendanceConfirmationSheetState
             hintStyle: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: OutlineInputBorder(),
             contentPadding: const EdgeInsets.all(AppSpacing.space3),
           ),
         ),
@@ -277,9 +272,7 @@ class _AttendanceConfirmationSheetState
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              shape: const RoundedRectangleBorder(),
             ),
             child: Text(
               AppStrings.confirm,
@@ -309,7 +302,6 @@ class _AttendanceConfirmationSheetState
         ),
         decoration: BoxDecoration(
           border: Border.all(color: color.withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Column(
           children: [
@@ -344,7 +336,6 @@ class _AttendanceConfirmationSheetState
             color: isSelected ? reason.color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color: isSelected ? reason.color.withValues(alpha: 0.05) : null,
         ),
         child: Row(

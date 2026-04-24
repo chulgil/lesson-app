@@ -10,10 +10,7 @@ import '../../../../../core/theme/app_typography.dart';
 class AISummaryCard extends StatelessWidget {
   final String summary;
 
-  const AISummaryCard({
-    super.key,
-    required this.summary,
-  });
+  const AISummaryCard({super.key, required this.summary});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +25,6 @@ class AISummaryCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -48,12 +44,7 @@ class AISummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
-          Text(
-            summary,
-            style: AppTypography.bodyMedium.copyWith(
-              height: 1.6,
-            ),
-          ),
+          Text(summary, style: AppTypography.bodyMedium.copyWith(height: 1.6)),
         ],
       ),
     );

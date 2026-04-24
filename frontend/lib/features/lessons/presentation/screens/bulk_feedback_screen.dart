@@ -119,7 +119,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.ink.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
@@ -177,9 +176,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                             });
                           },
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusLarge,
-                            ),
                             side: BorderSide(color: AppColors.inkQuaternary),
                           ),
                           tileColor: AppColors.paper,
@@ -253,7 +249,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: TextField(
@@ -298,9 +293,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.paper,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                         border: Border.all(color: AppColors.inkQuaternary),
                       ),
                       child: TextField(
@@ -347,10 +339,14 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           return ActionChip(
             label: Text(
               preset.text,
-              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
             backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
-            side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+            side: BorderSide(
+              color: AppColors.paperAccent.withValues(alpha: 0.2),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () {
@@ -393,7 +389,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Column(
@@ -454,9 +449,6 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           onPressed: enabled ? onPressed : null,
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            ),
           ),
           child: Text(label),
         ),

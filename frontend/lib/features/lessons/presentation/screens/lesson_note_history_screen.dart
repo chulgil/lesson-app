@@ -76,10 +76,7 @@ class _LessonNoteHistoryScreenState
                         : null,
                 filled: true,
                 fillColor: AppColors.paperDark,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: BorderSide.none,
-                ),
+                border: OutlineInputBorder(borderSide: BorderSide.none),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,
@@ -231,12 +228,10 @@ class _NoteCard extends StatelessWidget {
           () => context.push(
             AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
           ),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
@@ -290,9 +285,6 @@ class _NoteCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: AppColors.paperAccent.withValues(
                                 alpha: 0.08,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusLarge,
                               ),
                             ),
                             child: Text(

@@ -168,9 +168,6 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
       child: AnimatedSize(
         duration: const Duration(milliseconds: 200),
         child:
@@ -209,10 +206,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           // Lesson info
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Column(
               children: [
                 Text(
@@ -348,9 +342,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             maxLines: 2,
             decoration: InputDecoration(
               hintText: '추가 메모를 입력하세요',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              border: OutlineInputBorder(),
               contentPadding: const EdgeInsets.all(AppSpacing.space3),
             ),
           ),
@@ -398,7 +390,6 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(color: color.withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
@@ -443,7 +434,6 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             color: isSelected ? reason.color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color: isSelected ? reason.color.withValues(alpha: 0.05) : null,
         ),
         child: Row(

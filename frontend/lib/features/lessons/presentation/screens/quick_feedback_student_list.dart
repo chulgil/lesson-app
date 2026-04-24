@@ -28,20 +28,19 @@ class _QuickFeedbackStudentListState
     final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('피드백 보내기'),
-      ),
+      appBar: AppBar(title: const Text('피드백 보내기')),
       body: lessonsAsync.when(
         data: (lessons) => _buildBody(lessons),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text(
-            '데이터를 불러오는데 실패했습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
+        error:
+            (error, _) => Center(
+              child: Text(
+                '데이터를 불러오는데 실패했습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -51,22 +50,31 @@ class _QuickFeedbackStudentListState
     final today = DateTime(now.year, now.month, now.day);
 
     // Separate today's lessons and recent lessons
-    final todayLessons = allLessons
-        .where((l) =>
-            DateTime(l.date.year, l.date.month, l.date.day) == today)
-        .toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+    final todayLessons =
+        allLessons
+            .where(
+              (l) => DateTime(l.date.year, l.date.month, l.date.day) == today,
+            )
+            .toList()
+          ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
     final todayStudentIds = todayLessons.map((l) => l.studentId).toSet();
 
     // Recent lessons: not today, unique by student, sorted by date desc
     final recentByStudent = <String, Lesson>{};
-    final sortedPast = allLessons
-        .where((l) =>
-            DateTime(l.date.year, l.date.month, l.date.day).isBefore(today) &&
-            !todayStudentIds.contains(l.studentId))
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final sortedPast =
+        allLessons
+            .where(
+              (l) =>
+                  DateTime(
+                    l.date.year,
+                    l.date.month,
+                    l.date.day,
+                  ).isBefore(today) &&
+                  !todayStudentIds.contains(l.studentId),
+            )
+            .toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
 
     for (final lesson in sortedPast) {
       recentByStudent.putIfAbsent(lesson.studentId, () => lesson);
@@ -91,11 +99,9 @@ class _QuickFeedbackStudentListState
               ),
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               filled: true,
@@ -139,9 +145,11 @@ class _QuickFeedbackStudentListState
     if (_searchQuery.isEmpty) return lessons;
     final query = _searchQuery.toLowerCase();
     return lessons
-        .where((l) =>
-            l.studentName.toLowerCase().contains(query) ||
-            l.instrument.toLowerCase().contains(query))
+        .where(
+          (l) =>
+              l.studentName.toLowerCase().contains(query) ||
+              l.instrument.toLowerCase().contains(query),
+        )
         .toList();
   }
 
@@ -157,24 +165,24 @@ class _QuickFeedbackStudentListState
 
   Widget _buildTodayLessonTile(Lesson lesson) {
     final isCompleted = lesson.displayStatus == LessonStatus.completed;
-    final hasFeedback =
-        lesson.feedback != null && lesson.feedback!.isNotEmpty;
+    final hasFeedback = lesson.feedback != null && lesson.feedback!.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
-        onTap: () => context.push(
-          AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
-        ),
+        onTap:
+            () => context.push(
+              AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
+            ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           side: BorderSide(color: AppColors.inkQuaternary),
         ),
         tileColor: AppColors.paper,
         leading: CircleAvatar(
-          backgroundColor: isCompleted
-              ? AppColors.paperOk.withValues(alpha: 0.2)
-              : AppColors.paperAccent.withValues(alpha: 0.1),
+          backgroundColor:
+              isCompleted
+                  ? AppColors.paperOk.withValues(alpha: 0.2)
+                  : AppColors.paperAccent.withValues(alpha: 0.1),
           child: Icon(
             isCompleted ? Icons.check_circle : Icons.schedule,
             color: isCompleted ? AppColors.paperOk : AppColors.paperAccent,
@@ -183,9 +191,7 @@ class _QuickFeedbackStudentListState
         ),
         title: Text(
           '${lesson.studentName} · ${lesson.instrument}',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           '${lesson.startTime} 레슨 (${isCompleted ? "완료" : "예정"})',
@@ -193,26 +199,29 @@ class _QuickFeedbackStudentListState
             color: AppColors.inkSecondary,
           ),
         ),
-        trailing: hasFeedback
-            ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
-            : Icon(Icons.edit_outlined,
-                color: AppColors.inkTertiary, size: 20),
+        trailing:
+            hasFeedback
+                ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
+                : Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.inkTertiary,
+                  size: 20,
+                ),
       ),
     );
   }
 
   Widget _buildRecentLessonTile(Lesson lesson) {
-    final hasFeedback =
-        lesson.feedback != null && lesson.feedback!.isNotEmpty;
+    final hasFeedback = lesson.feedback != null && lesson.feedback!.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
-        onTap: () => context.push(
-          AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
-        ),
+        onTap:
+            () => context.push(
+              AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
+            ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           side: BorderSide(color: AppColors.inkQuaternary),
         ),
         tileColor: AppColors.paper,
@@ -226,9 +235,7 @@ class _QuickFeedbackStudentListState
         ),
         title: Text(
           '${lesson.studentName} · ${lesson.instrument}',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           '${lesson.date.month}월 ${lesson.date.day}일 마지막 레슨',
@@ -236,10 +243,14 @@ class _QuickFeedbackStudentListState
             color: AppColors.inkSecondary,
           ),
         ),
-        trailing: hasFeedback
-            ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
-            : Icon(Icons.edit_outlined,
-                color: AppColors.inkTertiary, size: 20),
+        trailing:
+            hasFeedback
+                ? Icon(Icons.check, color: AppColors.paperOk, size: 20)
+                : Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.inkTertiary,
+                  size: 20,
+                ),
       ),
     );
   }
@@ -256,9 +267,7 @@ class _QuickFeedbackStudentListState
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            _searchQuery.isEmpty
-                ? '피드백을 보낼 레슨이 없습니다'
-                : '검색 결과가 없습니다',
+            _searchQuery.isEmpty ? '피드백을 보낼 레슨이 없습니다' : '검색 결과가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),

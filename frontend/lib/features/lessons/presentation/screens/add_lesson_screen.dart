@@ -123,7 +123,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               ),
           icon: const Icon(Icons.close),
         ),
-        actions: [TextButton(onPressed: _saveLesson, child: const Text(AppStrings.save))],
+        actions: [
+          TextButton(
+            onPressed: _saveLesson,
+            child: const Text(AppStrings.save),
+          ),
+        ],
       ),
       body: Form(
         key: _formKey,
@@ -410,10 +415,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           padding: const EdgeInsets.only(top: AppSpacing.space2),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Row(
               children: [
                 Icon(Icons.info_outline, color: AppColors.ink, size: 18),
@@ -421,9 +423,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 Expanded(
                   child: Text(
                     '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.ink,
-                    ),
+                    style: AppTypography.caption.copyWith(color: AppColors.ink),
                   ),
                 ),
               ],
@@ -458,12 +458,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 const SizedBox(height: AppSpacing.space3),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperDark,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperDark),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

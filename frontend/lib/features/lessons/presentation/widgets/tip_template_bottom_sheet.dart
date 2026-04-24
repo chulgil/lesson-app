@@ -104,11 +104,7 @@ class _TipTemplateBottomSheetState
                               },
                             )
                             : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
-                    ),
+                    border: OutlineInputBorder(),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 12,
@@ -238,12 +234,10 @@ class _TipTemplateBottomSheetState
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _selectTemplate(template),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -258,9 +252,6 @@ class _TipTemplateBottomSheetState
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
                     ),
                     child: Text(
                       template.category.label,
@@ -374,12 +365,10 @@ class _TipTemplateBottomSheetState
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _selectTemplate(template),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -394,9 +383,6 @@ class _TipTemplateBottomSheetState
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
                     ),
                     child: Text(
                       template.category.label,
@@ -415,9 +401,6 @@ class _TipTemplateBottomSheetState
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
                       ),
                       child: Text(
                         template.instrument!,

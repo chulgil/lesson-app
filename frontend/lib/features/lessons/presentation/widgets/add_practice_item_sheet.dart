@@ -161,11 +161,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: '예: 메트로놈 60으로 정확하게!',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -227,7 +223,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Text(
                   '레퍼토리를 불러올 수 없습니다',
@@ -252,9 +247,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             controller: _newRepertoireNameController,
             decoration: InputDecoration(
               hintText: '예: 스즈키 5권',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -270,9 +263,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           controller: _pieceNameController,
           decoration: InputDecoration(
             hintText: '예: 라폴리아',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: OutlineInputBorder(),
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
@@ -293,7 +284,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.inkQuaternary),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         children: [
@@ -507,7 +497,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -517,7 +506,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.paper,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: DropdownButtonHideUnderline(
@@ -560,9 +548,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     horizontal: AppSpacing.space2,
                     vertical: AppSpacing.space2,
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                  border: OutlineInputBorder(),
                   filled: true,
                   fillColor: AppColors.paper,
                 ),
@@ -592,9 +578,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     horizontal: AppSpacing.space2,
                     vertical: AppSpacing.space2,
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                  border: OutlineInputBorder(),
                   filled: true,
                   fillColor: AppColors.paper,
                 ),
@@ -613,7 +597,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   _practiceRanges.removeAt(index);
                 });
               },
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.space1),
                 child: Icon(

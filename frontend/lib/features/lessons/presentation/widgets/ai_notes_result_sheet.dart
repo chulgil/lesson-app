@@ -53,7 +53,6 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
           decoration: const BoxDecoration(
             // Notebook × Score: 바텀시트 배경은 Notebook paper (§7.50 팔레트 일관성).
             color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
             children: [
@@ -167,9 +166,6 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                           ),
                           elevation: 0,
                           color: AppColors.paperDark,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(AppSpacing.space3),
                             child: Column(
@@ -226,10 +222,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
     return InputDecoration(
       filled: true,
       fillColor: AppColors.paperDark,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
+      border: const OutlineInputBorder(borderSide: BorderSide.none),
       contentPadding: const EdgeInsets.all(AppSpacing.space3),
     );
   }

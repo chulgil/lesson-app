@@ -100,9 +100,6 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.ink.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                   ),
                   child: Row(
                     children: [
@@ -132,13 +129,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               const SizedBox(height: AppSpacing.space2),
               TextField(
                 controller: _titleController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
-                ),
+                decoration: InputDecoration(border: OutlineInputBorder()),
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -153,13 +144,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               TextField(
                 controller: _descriptionController,
                 maxLines: 2,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
-                ),
+                decoration: InputDecoration(border: OutlineInputBorder()),
               ),
               const SizedBox(height: AppSpacing.space4),
 

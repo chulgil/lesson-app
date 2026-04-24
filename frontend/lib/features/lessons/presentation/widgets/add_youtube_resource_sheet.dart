@@ -144,11 +144,7 @@ class _AddYoutubeResourceSheetState
                 decoration: InputDecoration(
                   hintText: 'https://youtube.com/watch?v=...',
                   prefixIcon: const Icon(Icons.link, size: 20),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
@@ -157,9 +153,6 @@ class _AddYoutubeResourceSheetState
               if (_urlParsed && _parsedThumbnail != null) ...[
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
                     border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -216,11 +209,7 @@ class _AddYoutubeResourceSheetState
                 controller: _titleController,
                 decoration: InputDecoration(
                   hintText: '예: 힐러리 한 - 바흐 파르티타',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -283,11 +272,7 @@ class _AddYoutubeResourceSheetState
                 maxLines: 2,
                 decoration: InputDecoration(
                   hintText: '예: 1:32~2:05 구간의 보잉 방향 전환을 관찰하세요',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppSpacing.space6),
@@ -356,11 +341,7 @@ class _AddYoutubeResourceSheetState
                       horizontal: AppSpacing.space2,
                       vertical: AppSpacing.space2,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    border: const OutlineInputBorder(),
                   ),
                   style: AppTypography.bodySmall,
                 ),
@@ -388,11 +369,7 @@ class _AddYoutubeResourceSheetState
                       horizontal: AppSpacing.space2,
                       vertical: AppSpacing.space2,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
-                    ),
+                    border: const OutlineInputBorder(),
                   ),
                   style: AppTypography.bodySmall,
                 ),

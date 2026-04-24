@@ -74,9 +74,6 @@ class LessonHeaderCard extends StatelessWidget {
                             color: AppColors.paperAccentSoft.withValues(
                               alpha: 0.3,
                             ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSmall,
-                            ),
                           ),
                           child: Text(
                             lesson.instrument,
@@ -118,12 +115,7 @@ class LessonHeaderCard extends StatelessWidget {
                         horizontal: 10,
                         vertical: 6,
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.paperDark,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
-                      ),
+                      decoration: BoxDecoration(color: AppColors.paperDark),
                       child: Text(
                         piece.displayName,
                         style: AppTypography.bodySmall,
@@ -168,10 +160,7 @@ class _StatusBadge extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.15)),
       child: Text(
         status.label,
         style: AppTypography.caption.copyWith(

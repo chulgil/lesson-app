@@ -51,7 +51,6 @@ class _ResourceChip extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.space1),
       child: InkWell(
         onTap: () => _launchResource(context),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space2,
@@ -59,7 +58,6 @@ class _ResourceChip extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: _chipColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             border: Border.all(color: _chipColor.withValues(alpha: 0.2)),
           ),
           child: Row(
@@ -229,7 +227,6 @@ class _AttachedResourceList extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -260,7 +257,6 @@ class _AttachedResourceList extends ConsumerWidget {
           ),
           InkWell(
             onTap: () => onRemove(resource.id),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.space1),
               child: Icon(Icons.close, size: 18, color: AppColors.inkTertiary),
@@ -354,9 +350,6 @@ class _AddResourceButton extends ConsumerWidget {
       leading: Icon(icon, color: color ?? AppColors.inkSecondary),
       title: Text(label, style: AppTypography.bodyMedium),
       onTap: onTap,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
     );
   }
 
@@ -451,11 +444,6 @@ class _AddResourceButton extends ConsumerWidget {
                                   Navigator.pop(ctx);
                                   onResourceSelected(r);
                                 },
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusMedium,
-                                  ),
-                                ),
                               );
                             },
                           );

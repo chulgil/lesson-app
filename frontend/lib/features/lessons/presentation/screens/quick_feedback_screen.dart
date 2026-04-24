@@ -194,10 +194,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   Widget _buildLessonHeader(Lesson lesson) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           Icon(Icons.music_note, color: AppColors.paperAccent, size: 20),
@@ -411,7 +408,6 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: TextField(
@@ -466,7 +462,6 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '$count',
@@ -503,10 +498,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space3,
               ),
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
               child: Row(
                 children: [
                   Icon(
@@ -556,7 +548,6 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
@@ -659,11 +650,9 @@ class _KeyPointInputState extends State<_KeyPointInput> {
               filled: true,
               fillColor: AppColors.paper,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               contentPadding: const EdgeInsets.symmetric(

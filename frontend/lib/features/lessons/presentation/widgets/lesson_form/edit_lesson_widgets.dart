@@ -38,7 +38,6 @@ class EditLessonStudentCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -69,7 +68,6 @@ class EditLessonStudentCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     student.instrument,
@@ -109,10 +107,15 @@ class LessonActionButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onCancel,
             icon: Icon(Icons.event_busy, color: AppColors.paperAccent),
-            label: Text('레슨 취소', style: TextStyle(color: AppColors.paperAccent)),
+            label: Text(
+              '레슨 취소',
+              style: TextStyle(color: AppColors.paperAccent),
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
+              side: BorderSide(
+                color: AppColors.paperAccent.withValues(alpha: 0.5),
+              ),
             ),
           ),
         ),
@@ -121,10 +124,15 @@ class LessonActionButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onDelete,
             icon: Icon(Icons.delete_outline, color: AppColors.paperAccent),
-            label: Text('레슨 삭제', style: TextStyle(color: AppColors.paperAccent)),
+            label: Text(
+              '레슨 삭제',
+              style: TextStyle(color: AppColors.paperAccent),
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
+              side: BorderSide(
+                color: AppColors.paperAccent.withValues(alpha: 0.5),
+              ),
             ),
           ),
         ),
@@ -154,10 +162,7 @@ void showCancelLessonDialog({
               const SizedBox(height: AppSpacing.space4),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -195,7 +200,9 @@ void showCancelLessonDialog({
                 Navigator.pop(context);
                 onConfirm();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.paperAccent,
+              ),
               child: const Text('레슨 취소'),
             ),
           ],
@@ -227,7 +234,9 @@ void showDeleteLessonDialog({
                 Navigator.pop(context);
                 onConfirm();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.paperAccent,
+              ),
               child: const Text(AppStrings.delete),
             ),
           ],
@@ -262,7 +271,9 @@ void showEditLessonExitConfirmation({
                 Navigator.pop(context);
                 onExit();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.paperAccent,
+              ),
               child: const Text('나가기'),
             ),
           ],

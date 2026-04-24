@@ -29,17 +29,7 @@ class LessonRecordingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         children: [
           Row(
@@ -49,7 +39,6 @@ class LessonRecordingCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Icon(Icons.audio_file, color: AppColors.paperAccent),
               ),
@@ -87,10 +76,7 @@ class LessonRecordingCard extends StatelessWidget {
               onTap: onViewTranscript,
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(

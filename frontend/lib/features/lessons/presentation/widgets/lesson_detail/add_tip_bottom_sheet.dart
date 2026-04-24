@@ -93,13 +93,9 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
                 controller: _controller,
                 maxLines: 4,
                 autofocus: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: '직접 입력하세요...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
               ),
 

@@ -75,7 +75,6 @@ class _AddRecordingResourceSheetState
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
                   color: AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(
                     color:
                         _selectedFilePath != null

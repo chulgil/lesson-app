@@ -21,7 +21,6 @@ class LessonStudentSelector extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
@@ -66,9 +65,6 @@ class LessonStudentSelector extends StatelessWidget {
                               color: AppColors.paperAccentSoft.withValues(
                                 alpha: 0.3,
                               ),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
-                              ),
                             ),
                             child: Text(
                               selectedStudent!.instrument,
@@ -98,10 +94,7 @@ class LessonStudentSelector extends StatelessWidget {
                     color: AppColors.paperDark,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.person_add,
-                    color: AppColors.inkTertiary,
-                  ),
+                  child: Icon(Icons.person_add, color: AppColors.inkTertiary),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(

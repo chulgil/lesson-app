@@ -51,19 +51,16 @@ class AiNotesButton extends ConsumerWidget {
             AppColors.paperAccent.withValues(alpha: 0.03),
           ],
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: () => _pickAndGenerate(context, ref),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: const Icon(
                 Icons.auto_awesome,
@@ -110,7 +107,6 @@ class AiNotesButton extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
       ),
       child: Row(
@@ -137,12 +133,10 @@ class AiNotesButton extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperOk.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperOk.withValues(alpha: 0.3)),
       ),
       child: InkWell(
         onTap: () => _showResults(context, result),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Row(
           children: [
             const Icon(Icons.check_circle, color: AppColors.paperOk, size: 24),
@@ -180,17 +174,22 @@ class AiNotesButton extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.paperAccent, size: 24),
+          const Icon(
+            Icons.error_outline,
+            color: AppColors.paperAccent,
+            size: 24,
+          ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               error ?? 'AI 노트 생성에 실패했습니다',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
           TextButton(

@@ -143,10 +143,7 @@ class PracticeItemsSection extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           // Progress indicator
@@ -206,13 +203,11 @@ class PracticeItemsSection extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           onTap:
               isTeacher ? () => _showEditItemDialog(context, ref, item) : null,
           child: Padding(

@@ -167,7 +167,6 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: TextField(
@@ -255,10 +254,7 @@ class TeacherFeedbackCard extends StatelessWidget {
     if (lesson.feedback == null || lesson.feedback!.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperDark),
         child: Row(
           children: [
             Icon(Icons.chat_bubble_outline, color: AppColors.inkTertiary),
@@ -278,7 +274,6 @@ class TeacherFeedbackCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -322,10 +317,7 @@ class KeyPointsList extends StatelessWidget {
     if (lesson.keyPoints == null || lesson.keyPoints!.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperDark),
         child: Row(
           children: [
             Icon(Icons.lightbulb_outline, color: AppColors.inkTertiary),
@@ -403,10 +395,7 @@ class PracticeTipsCard extends StatelessWidget {
     if (!hasTips) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperDark),
         child: Row(
           children: [
             Icon(Icons.tips_and_updates_outlined, color: AppColors.inkTertiary),
@@ -426,10 +415,7 @@ class PracticeTipsCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -477,7 +463,6 @@ class RecordingStatusIndicator extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -520,10 +505,7 @@ class RecordingsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           Icon(Icons.mic_off, color: AppColors.inkTertiary),
@@ -690,7 +672,6 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperAccent.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color: AppColors.paperAccent.withValues(alpha: 0.2),
             ),

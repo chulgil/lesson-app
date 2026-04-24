@@ -383,7 +383,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color: AppColors.paperAccent.withValues(alpha: 0.3),
                 ),
@@ -544,7 +543,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   AppColors.paperAccent.withValues(alpha: 0.08),
                 ],
               ),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(
                 color: AppColors.paperAccent.withValues(alpha: 0.3),
               ),
@@ -602,11 +600,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       backgroundColor: AppColors.paperAccent,
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space3,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
                       ),
                     ),
                   ),

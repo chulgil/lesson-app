@@ -25,9 +25,7 @@ class LessonContentFields extends StatelessWidget {
             labelText: '레슨 곡',
             hintText: '레슨할 곡이나 내용을 입력하세요',
             prefixIcon: const Icon(Icons.music_note),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: const OutlineInputBorder(),
             filled: true,
             fillColor: AppColors.paper,
           ),
@@ -42,9 +40,7 @@ class LessonContentFields extends StatelessWidget {
             labelText: '메모',
             hintText: '레슨 시 참고할 내용을 입력하세요',
             prefixIcon: const Icon(Icons.note_alt_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: const OutlineInputBorder(),
             filled: true,
             fillColor: AppColors.paper,
           ),

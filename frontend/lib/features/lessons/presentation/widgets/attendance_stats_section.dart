@@ -47,7 +47,6 @@ class AttendanceStatsSection extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paper,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -171,11 +170,7 @@ class AttendanceStatsSection extends ConsumerWidget {
           deducted: true,
         ),
         const SizedBox(height: AppSpacing.space2),
-        _buildStatusRow(
-          '선생님 취소',
-          stats.cancelledByTeacherCount,
-          AppColors.ink,
-        ),
+        _buildStatusRow('선생님 취소', stats.cancelledByTeacherCount, AppColors.ink),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow('상호 합의 취소', stats.mutualCancelledCount, AppColors.ink),
       ],
@@ -203,7 +198,9 @@ class AttendanceStatsSection extends ConsumerWidget {
               if (deducted)
                 Text(
                   ' (수강권 차감)',
-                  style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.paperAccent,
+                  ),
                 ),
             ],
           ),
