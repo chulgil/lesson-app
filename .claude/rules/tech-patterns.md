@@ -49,6 +49,7 @@
 - **ListView in SliverToBoxAdapter → 크래시** — `shrinkWrap: true` + `NeverScrollableScrollPhysics` 필수. 안 하면 무한 높이 → Null check 크래시 + mouse_tracker (#Cherry)
 - **바텀시트 scrim 패턴** — `showModalBottomSheet(isScrollControlled: true)` 사용 시 반드시 `backgroundColor: Colors.transparent` + `DraggableScrollableSheet(expand: false)`. `FractionallySizedBox`는 scrim 삼켜서 배경 탭 닫기 불가 (#Cherry)
 - **Column > Expanded > 긴 위젯 + 하단 고정** — Expanded 안에 긴 콘텐츠 + 바깥에 TextField/Button → overflow. `SingleChildScrollView`로 감싸고 Button만 Column 하단 고정 (#Cherry)
+- **테마 FilledButton.minimumSize=Size(∞,h) × 컴팩트 배치 → BoxConstraints 크래시** — `app_theme.dart` 의 FilledButton/ElevatedButton/OutlinedButton 테마는 풀폭 CTA 전제로 `minimumSize: Size(double.infinity, buttonHeight)` 이 걸려 있음. Row(mainAxisAlignment.end) 단독 자식, Align, Wrap 등 **loose 폭 환경**에 그대로 놓으면 `BoxConstraints(w=Infinity)` 크래시로 화면 전체 렌더 실패. **대응**: 컴팩트 버튼(트레일링/인라인)은 반드시 `FilledButton.styleFrom(minimumSize: Size(0, AppSpacing.buttonHeight))` 로 override. 배치 선호: `Align(centerRight)` > `Row + end`. **감지**: `.claude/hooks/check-button-compact-layout.sh` 가 Align/Row-end/Wrap 컨텍스트에 minimumSize override 없는 버튼을 경고 (Expanded/SizedBox(width:)/ConstrainedBox 내부는 제외). 의도적 예외는 `// ignore: button-compact-minsize`. **재발**: 2026-04-24 students_tab.dart §7.67 Masthead 승격에서 "학생 추가" Row+end 배치 → 수강관리 탭 전체 렌더 실패 (커밋 83c4787e 에서 Align+Size(0,h) override 로 수정)
 
 ## 설정 필드
 

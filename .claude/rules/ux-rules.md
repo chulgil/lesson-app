@@ -73,7 +73,17 @@ grep -rn "onPressed: null" --include="*.dart" features/
 
 # 액션 박스 하드코딩 메시지 (AppStrings 미사용)
 grep -rn "message: '[가-힣]" --include="*.dart" features/
+
+# 테마 minWidth=∞ × 컴팩트 배치 크래시 감지 — Align/Row-end/Wrap 내부 버튼에 minimumSize override 없음
+# 훅(check-button-compact-layout.sh)이 자동 검출하나 수동 회귀 grep
+grep -rn -B 3 -A 5 "FilledButton\|ElevatedButton\|OutlinedButton" --include="*.dart" features/ \
+  | grep -E "(Align\(|mainAxisAlignment.*\.end|Wrap\()" | head
 ```
+
+## 레이아웃 크래시 방지 (HARD-GATE)
+
+- **탭/화면 레벨 위젯은 widget smoke test 필수** — `CustomScrollView` + `Sliver*` + 트레일링 버튼 같은 복합 레이아웃은 `flutter analyze` 가 BoxConstraints 크래시를 잡지 못함. tab/screen 추가 시 `test/features/<domain>/<name>_layout_test.dart` 에 최소 1개 `testWidgets` (`pumpWidget` + `pumpAndSettle` + `tester.takeException() isNull`) 필수 (2026-04-24 수강관리 탭 재발)
+- **컴팩트 버튼 배치 규칙** — 트레일링/인라인 FilledButton/ElevatedButton/OutlinedButton 은 반드시 `styleFrom(minimumSize: Size(0, AppSpacing.buttonHeight))` override. 테마가 `Size(∞, h)` 인데 Row/Align/Wrap 은 loose 폭을 주기 때문 → [tech-patterns.md](tech-patterns.md#flutter-레이아웃) 참조
 
 ## 상세 화면 일관성 규칙 (HARD-GATE)
 
