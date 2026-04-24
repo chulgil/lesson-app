@@ -28,26 +28,6 @@ final subscriptionExpiryNotificationServiceProvider =
 
 typedef SubscriptionExpiryNotificationServiceRef
     = ProviderRef<SubscriptionExpiryNotificationService>;
-String _$subscriptionExpiryReminderSettingsHash() =>
-    r'41253d5bc792d7963144f9cad432b964e3170a4f';
-
-/// 현재 설정값 — TODO: 설정 저장소 연동 시 교체. 현재는 defaults.
-///
-/// Copied from [subscriptionExpiryReminderSettings].
-@ProviderFor(subscriptionExpiryReminderSettings)
-final subscriptionExpiryReminderSettingsProvider =
-    AutoDisposeProvider<SubscriptionExpiryReminderSettings>.internal(
-  subscriptionExpiryReminderSettings,
-  name: r'subscriptionExpiryReminderSettingsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$subscriptionExpiryReminderSettingsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef SubscriptionExpiryReminderSettingsRef
-    = AutoDisposeProviderRef<SubscriptionExpiryReminderSettings>;
 String _$subscriptionExpiryReminderRefreshHash() =>
     r'e534c125fe3cff5311a9278eac6b30eafcd91e4f';
 

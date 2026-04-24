@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../notifications/presentation/providers/subscription_expiry_providers.dart';
 import '../providers/notification_settings_provider.dart';
 
 /// Notification settings screen with category-based ON/OFF switches.
@@ -15,6 +17,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(notificationSettingsProvider);
+    final role = ref.watch(currentUserRoleProvider);
+    final isTeacher = role == UserRole.teacher;
 
     return Scaffold(
       appBar: AppBar(title: const Text('알림 설정')),
@@ -96,6 +100,16 @@ class NotificationSettingsScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: AppSpacing.space4),
+
+          // Teacher-only: Subscription expiry reminders (D-14 / D-7 / D-1 / D-0)
+          // Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
+          if (isTeacher) ...[
+            _buildSubscriptionExpirySection(
+              ref,
+              enabled: settings.allNotifications,
+            ),
+            const SizedBox(height: AppSpacing.space4),
+          ],
 
           // Practice notifications
           _buildSection(
@@ -190,6 +204,59 @@ class NotificationSettingsScreen extends ConsumerWidget {
               ],
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  /// Teacher-only section: master + D-14/D-7/D-1/D-0 individual toggles.
+  Widget _buildSubscriptionExpirySection(
+    WidgetRef ref, {
+    required bool enabled,
+  }) {
+    final expiry = ref.watch(subscriptionExpiryReminderSettingsProvider);
+    final notifier = ref.read(
+      subscriptionExpiryReminderSettingsProvider.notifier,
+    );
+    final masterOn = enabled && expiry.enabled;
+
+    return _buildSection(
+      title: '수강권 만료 자동 알림 (선생님)',
+      children: [
+        _SwitchTile(
+          title: '만료 자동 알림',
+          subtitle: '활성 수강권의 만료 시점에 자동으로 알림',
+          value: expiry.enabled,
+          enabled: enabled,
+          onChanged: notifier.toggleEnabled,
+        ),
+        _SwitchTile(
+          title: 'D-14 (14일 전)',
+          subtitle: '여유 있게 재등록 제안 시점',
+          value: expiry.remindAtD14,
+          enabled: masterOn,
+          onChanged: notifier.toggleD14,
+        ),
+        _SwitchTile(
+          title: 'D-7 (7일 전)',
+          subtitle: '재등록 유도 주차 알림',
+          value: expiry.remindAtD7,
+          enabled: masterOn,
+          onChanged: notifier.toggleD7,
+        ),
+        _SwitchTile(
+          title: 'D-1 (하루 전)',
+          subtitle: '만료 임박 최종 알림',
+          value: expiry.remindAtD1,
+          enabled: masterOn,
+          onChanged: notifier.toggleD1,
+        ),
+        _SwitchTile(
+          title: 'D-0 (당일)',
+          subtitle: '만료 당일 보관 이동 알림',
+          value: expiry.remindAtD0,
+          enabled: masterOn,
+          onChanged: notifier.toggleD0,
         ),
       ],
     );

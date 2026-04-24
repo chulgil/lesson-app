@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -38,12 +42,72 @@ SubscriptionExpiryNotificationService subscriptionExpiryNotificationService(
   );
 }
 
-/// 현재 설정값 — TODO: 설정 저장소 연동 시 교체. 현재는 defaults.
-@riverpod
-SubscriptionExpiryReminderSettings subscriptionExpiryReminderSettings(
-  SubscriptionExpiryReminderSettingsRef ref,
-) {
-  return SubscriptionExpiryReminderSettings.defaults;
+/// 수강권 만료 알림 설정 — Hive `settings` 박스에 JSON 영속.
+///
+/// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
+///
+/// Phase 5b: master + D14/D7/D1/D0 개별 토글 제공.
+final subscriptionExpiryReminderSettingsProvider = StateNotifierProvider<
+  SubscriptionExpiryReminderSettingsNotifier,
+  SubscriptionExpiryReminderSettings
+>((ref) => SubscriptionExpiryReminderSettingsNotifier());
+
+class SubscriptionExpiryReminderSettingsNotifier
+    extends StateNotifier<SubscriptionExpiryReminderSettings> {
+  SubscriptionExpiryReminderSettingsNotifier()
+    : super(SubscriptionExpiryReminderSettings.defaults) {
+    _loadFromHive();
+  }
+
+  static const _boxName = 'settings';
+  static const _hiveKey = 'subscription_expiry_reminder_settings';
+
+  Future<void> _loadFromHive() async {
+    try {
+      final box = await Hive.openBox(_boxName);
+      final raw = box.get(_hiveKey) as String?;
+      if (raw != null) {
+        final map = jsonDecode(raw) as Map<String, dynamic>;
+        state = SubscriptionExpiryReminderSettings.fromJson(map);
+      }
+    } catch (_) {
+      // Silently default to defaults
+    }
+  }
+
+  Future<void> _persist() async {
+    try {
+      final box = await Hive.openBox(_boxName);
+      await box.put(_hiveKey, jsonEncode(state.toJson()));
+    } catch (_) {
+      // Persist failure is non-critical
+    }
+  }
+
+  void toggleEnabled(bool value) {
+    state = state.copyWith(enabled: value);
+    _persist();
+  }
+
+  void toggleD14(bool value) {
+    state = state.copyWith(remindAtD14: value);
+    _persist();
+  }
+
+  void toggleD7(bool value) {
+    state = state.copyWith(remindAtD7: value);
+    _persist();
+  }
+
+  void toggleD1(bool value) {
+    state = state.copyWith(remindAtD1: value);
+    _persist();
+  }
+
+  void toggleD0(bool value) {
+    state = state.copyWith(remindAtD0: value);
+    _persist();
+  }
 }
 
 /// 교사의 전체 활성 수강권에 대해 만료 알림을 자동 재등록한다.

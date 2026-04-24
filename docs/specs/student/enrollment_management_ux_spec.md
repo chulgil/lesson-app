@@ -246,12 +246,12 @@ List<StudentWithMembership> _applyFilter(
 | **2. Triage Banner** | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | `a744d891` | ✅ 완료 |
 | **3. Filter Chip 확장** | expiring/unpaid/trial/archive chip + ID set 기반 필터 로직 | `3f0800d2` | ✅ 완료 |
 | **4. Card 재설계** | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | `13e95096` | ✅ 완료 |
-| **5a. 자동 갱신 알림 (서비스 계층)** | `SubscriptionExpiryNotificationService` + `SubscriptionExpiryReminderSettings` + Riverpod 프로바이더 + 단위 테스트 13건 | 본 커밋 | ✅ 완료 |
-| **5b. 설정 UI 토글** | 선생님 설정 화면에 수강권 만료 알림 master + D14/D7/D1/D0 개별 토글 + 저장소 영속화 | — | ⏸️ 후속 |
+| **5a. 자동 갱신 알림 (서비스 계층)** | `SubscriptionExpiryNotificationService` + `SubscriptionExpiryReminderSettings` + Riverpod 프로바이더 + 단위 테스트 13건 | `11fb106e` | ✅ 완료 |
+| **5b. 설정 UI 토글** | `NotificationSettingsScreen` 선생님 전용 섹션 + Hive `settings` 박스 영속 + master + D14/D7/D1/D0 개별 토글 | 본 커밋 | ✅ 완료 |
 | **6. 문서 동기화** | enrollment_management_ux_spec 완료 처리 + notebook §7.117 기록 | `d45c8c6d` | ✅ 완료 |
 
-**실제 파일**: Phase 1~4 (신규 3 + 수정 2 = 5) + Phase 5a (신규 3 + 테스트 1 = 4) = 9 파일
-**게이트**: Phase 5a 로직 완료. 5b 설정 UI 는 설정 화면 정리 세션에서 진행.
+**실제 파일**: Phase 1~4 (신규 3 + 수정 2 = 5) + Phase 5a (신규 3 + 테스트 1 = 4) + Phase 5b (수정 2 = 2) = 11 파일
+**게이트**: Status Triage 모델 전 Phase 완료.
 
 ---
 
@@ -294,3 +294,4 @@ List<StudentWithMembership> _applyFilter(
 | 2026-04-24 | Phase 1~4 구현 완료 · Phase 5 대기로 상태 갱신 (커밋 `24c631f3` `a744d891` `3f0800d2` `13e95096`) | Claude |
 | 2026-04-24 | Phase 6 문서 동기화 완료 (커밋 `d45c8c6d`) | Claude |
 | 2026-04-24 | Phase 5a 자동 갱신 알림 서비스 계층 완료 (service + settings + providers + 13 tests GREEN) — 설정 UI 는 후속 세션 | Claude |
+| 2026-04-24 | Phase 5b 설정 UI 토글 완료 (선생님 전용 섹션 + Hive 영속). Status Triage 전 Phase 종결 | Claude |
