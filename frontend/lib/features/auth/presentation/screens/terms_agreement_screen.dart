@@ -153,9 +153,9 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
   }
 
   Widget _buildSelectAllItem() {
+    // Notebook × Score §7.113·§7.114: 전체 동의 카드 각진화 (약관 종이 기하).
     return InkWell(
       onTap: () => _toggleAll(!_allChecked),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -163,7 +163,6 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
         ),
         decoration: BoxDecoration(
           color: AppColors.paper,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color:
                 _allChecked
@@ -201,9 +200,9 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
     final tag = required ? '[필수]' : '[선택]';
     final tagColor = required ? AppColors.paperAccent : AppColors.inkTertiary;
 
+    // Notebook × Score §7.113·§7.114: 약관 개별 항목 각진화.
     return InkWell(
       onTap: () => onChanged(!value),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space1,

@@ -26,9 +26,9 @@ class ParentLoginOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score §7.113·§7.114: 학부모 로그인 옵션 카드 각진화.
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
@@ -38,7 +38,6 @@ class ParentLoginOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border.all(color: borderColor ?? backgroundColor, width: 1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Row(
           children: [

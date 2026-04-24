@@ -4473,6 +4473,60 @@ flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.da
 
 ---
 
+### §7.114 — auth 도메인 각진 원칙 포화 완결 (로그인 플로우 전수 감사, 2026-04-24)
+
+§7.113 에서 역할 선택 UI 2 파일만 전환 후, auth 도메인의 나머지 **6 파일 10 지점** 도 각진 전환하여 **로그인 플로우 전체 포화** 를 달성. 사용자 요청: "다음 진행해주세요" — 이전 세션에서 내가 제시한 auth 하위 위젯 후보 목록을 바로 실행.
+
+**왜 auth 포화가 중요한가**: §7.113 관찰("첫인상 각진 → Notebook 앱") 은 역할 선택 화면 한 장에만 적용하면 불완전. 로그인 → 약관 → 바텀시트 → dev 로그인 까지의 **전체 진입 여정(entry journey)** 에서 Material 라운드 카드가 한 번이라도 나타나면 메타포가 깨진다.
+
+| 파일 | 지점 | 변환 전 | 변환 후 |
+|------|------|--------|--------|
+| `social_login_button.dart:35` | OutlinedButton shape | `RoundedRectangleBorder(radiusLarge)` | `RoundedRectangleBorder(BorderRadius.zero)` |
+| `parent_login_option.dart:31` | InkWell borderRadius | `radiusLarge` | 제거 (기본 null) |
+| `parent_login_option.dart:41` | Container borderRadius | `radiusLarge` | 제거 |
+| `login_bottom_sheets.dart:40` | Parent icon bg (56×56, 이모지 가족) | `radiusLarge` | `BoxShape.circle` (오브젝트·사람 예외) |
+| `dev_account_widgets.dart:66` | DevAccountCard InkWell | `radiusMedium` | 제거 |
+| `dev_account_widgets.dart:74` | DevAccountCard Container | `radiusMedium` | 제거 |
+| `dev_login_section.dart:37` | DEV MODE 뱃지 bg | `radiusSmall` | 제거 |
+| `terms_agreement_screen.dart:158` | 전체 동의 InkWell | `radiusMedium` | 제거 |
+| `terms_agreement_screen.dart:166` | 전체 동의 Container | `radiusMedium` | 제거 |
+| `terms_agreement_screen.dart:206` | 약관 개별 항목 InkWell | `radiusSmall` | 제거 |
+
+**바텀시트 상단 예외 유지**: `showModalBottomSheet(shape: RoundedRectangleBorder(top: radiusXLarge))` 는 **시스템 매크로 패턴**. 바텀시트는 "올라오는 시트" 메타포 자체가 상단 라디우스로 구성되므로, 이를 제거하면 바텀시트가 "페이지" 처럼 보여 기능 혼동. §7.113 예외 매트릭스의 "다이얼로그·바텀시트 = 시스템 Material 기본 유지" 항목에 해당.
+
+**이모지 가족 아이콘 예외**: `login_bottom_sheets.dart:40` 의 56×56 이모지 가족 배경은 `BoxShape.circle` 로 전환 (제거 아님). 이모지 `👨‍👩‍👧` 는 **사람·오브젝트 표현** 이므로 원형 필연. 각진 사각 bg 에 원형 이모지를 넣으면 시각적 충돌.
+
+#### 7.114 검증
+
+```bash
+# auth 도메인 라디우스 잔재 검증
+rg "BorderRadius\.circular\(AppSpacing\.radius" lib/features/auth/  # 0 건
+# 단 바텀시트 상단 radiusXLarge 는 Radius.circular() 이므로 별개 패턴 (유지)
+rg "Radius\.circular\(AppSpacing\." lib/features/auth/  # 2 건 (바텀시트 상단, 의도적)
+
+flutter analyze lib/features/auth/  # No issues found!
+```
+
+#### 7.114 관찰
+
+**"진입 여정 포화(entry journey saturation)"**: 로그인 페이지 → (소셜 버튼·바텀시트·약관·dev 로그인) → 역할 선택 → 홈 의 **모든 중간 화면** 에서 각진 카드만 보이는 상태. 중간 한 지점이라도 라운드 카드가 남으면 "아 역시 Material 앱이네" 라는 인식으로 회귀.
+
+**"시스템 매크로 vs 사용자 정의 컨테이너"**: `showModalBottomSheet` 의 shape 는 시스템 매크로 — 바꿀 수 있지만 바꾸면 "시트 메타포" 자체가 깨짐. 반면 `Container(decoration: BoxDecoration(borderRadius))` 는 사용자 정의 — 모양이 순전히 디자인 선택이므로 각진이 기본값이 되어야 함. **사용자 정의 모든 컨테이너는 각진** 으로 일반화.
+
+**"이모지 bg = 오브젝트 예외의 확장"**: §7.113 의 BoxShape.circle 예외 매트릭스에 "이모지·이모지피커 배경" 을 추가. 이모지 `👨‍👩‍👧·🎻·🎵·👩‍🏫` 등은 사람·악기·오브젝트 그래픽이므로 원형 bg 가 자연스럽다. 단 `📝·📋` 같은 **문서·종이 이모지** 는 각진 bg 유지 (기하 일치).
+
+**"dev mode 뱃지도 각진"**: DEV MODE 뱃지는 시스템 알림이지만, Notebook × Score 에서는 "악보에 찍힌 스탬프" 로 은유 가능. 스탬프는 직사각이므로 각진. 이 결정으로 §1.1 #3 Vermillion(paperAccent 색) + 각진 스탬프 = 악보 주석 신호 일관성 확보.
+
+**Lore-directive**: auth 도메인의 사용자 정의 컨테이너는 전부 `BorderRadius.zero`. 시스템 매크로(바텀시트 상단) 와 이모지·사람 오브젝트 배경은 예외 허용.
+
+**Lore-constraint**: 바텀시트 상단 `Radius.circular(radiusXLarge)` 는 Material 시스템 매크로로 유지 — "시트" 메타포 유지. 이 예외는 §7.113 의 "다이얼로그·바텀시트 = 시스템 기본 유지" 조항에 해당.
+
+**Lore-rejected**: 바텀시트 상단을 `BorderRadius.zero` 로 전환 — "올라오는 시트" 메타포 깨짐, 페이지 전환과 구분 불가. 시스템 매크로는 건드리지 않는다.
+
+**Lore-rejected**: DEV MODE 뱃지를 `radiusSmall` 로 유지 — "뱃지" 도 컨테이너이므로 예외 없음. 악보 스탬프 메타포가 오히려 더 적합.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.
@@ -4480,4 +4534,4 @@ flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.da
 3. **Feature-preserving**: 기능 위젯 재사용. 기능 변경 금지.
 4. **3px 규칙 불가침**: §3의 여백선 규칙은 전 화면에서 동일.
 5. **4대 시그니처 필수**: 어느 화면이든 Notebook × Score를 적용했다면 Playfair · 로마숫자 · Vermillion · Gaegu 네 가지가 모두 관찰되어야 한다.
-6. **각진 원칙 (§7.112 · §7.113)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. `radiusMedium/Large/XLarge` 를 Notebook × Score 카드에 사용 금지.
+6. **각진 원칙 (§7.112 · §7.113 · §7.114)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. 시스템 매크로(바텀시트 상단) 만 시스템 기본 유지. `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지.

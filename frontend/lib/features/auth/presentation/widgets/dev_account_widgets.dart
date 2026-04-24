@@ -9,11 +9,7 @@ class DevSectionHeader extends StatelessWidget {
   final String label;
   final Color color;
 
-  const DevSectionHeader({
-    super.key,
-    required this.label,
-    required this.color,
-  });
+  const DevSectionHeader({super.key, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +57,9 @@ class DevAccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score §7.113·§7.114: DevAccountCard 각진화 (종이 직선 기하).
     return InkWell(
       onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
@@ -71,7 +67,6 @@ class DevAccountCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: color.withValues(alpha: 0.2)),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color: color.withValues(alpha: 0.04),
         ),
         child: Row(

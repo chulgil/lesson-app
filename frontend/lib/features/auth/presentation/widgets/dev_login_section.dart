@@ -13,7 +13,8 @@ class DevLoginSection extends StatelessWidget {
     required String email,
     required String role,
     String? name,
-  }) onDevLogin;
+  })
+  onDevLogin;
 
   const DevLoginSection({
     super.key,
@@ -26,6 +27,7 @@ class DevLoginSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Notebook × Score §7.113·§7.114: DEV MODE 뱃지 각진화 (악보 스탬프 기하).
         Center(
           child: Container(
             padding: const EdgeInsets.symmetric(
@@ -34,7 +36,6 @@ class DevLoginSection extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: AppColors.paperAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               'DEV MODE — 테스트 계정 선택',

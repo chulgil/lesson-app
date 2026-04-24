@@ -31,13 +31,13 @@ void showParentLoginSheet(BuildContext context) {
                 const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space4),
 
-                // Parent icon
+                // Notebook × Score §7.113·§7.114: 이모지 가족(사람·오브젝트) → BoxShape.circle 예외.
                 Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
                     color: AppColors.ink.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                    shape: BoxShape.circle,
                   ),
                   child: const Center(
                     child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 28)),
