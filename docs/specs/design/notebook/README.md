@@ -3865,6 +3865,45 @@ rg "color: AppColors.ink(Secondary|Tertiary).*headingSmall|headingSmall.*inkSeco
 
 **Lore-directive**: **"영-결과 소급 감사는 감사 완결 선언의 필수 구성요소"**. 변동이 없었다는 사실 자체가 증명되어야 감사 시스템의 자기 정합성이 보장됨. §7.100 의 Lore-directive("가장 마지막 법칙 확장 이전 배치 재검사") 는 §7.101 에 의해 **"모든 법칙 확장 이전 배치 재검사"** 로 확장 완료.
 
+### §7.102 — §1.1 #4 Gaegu 손글씨 서명 최초 전수 감사 (2026-04-24)
+
+**배경**: §7.91-b~§7.101 의 15 도메인 전수 감사는 **§1.1 4대 시그니처 중 #1 Playfair** 한 축에만 초점을 맞추었다. §7.17 static-noun headline 승격과 §7.30 10-패턴 예외는 모두 Playfair 축의 법칙이다. **§1.1 #4 Gaegu (16px/400 손글씨 주석)** 서명은 `lesson_notes_widgets.dart:290` 의 선행 사례("레슨 상세 피드백 본문도 선생님 손글씨 주석(Gaegu)으로 렌더") 단 1 건으로만 규범이 암묵적으로 확립되어 있었고, **같은 의미론적 대상(선생님의 학생 대상 주관적 글쓰기)이 다른 파일에서 `AppTypography.bodyMedium` 으로 남아 있을 가능성**을 전수 검사한 적이 없었다.
+
+**검사 트리거**: `NotebookTypography.hand*` grep → 17 occurrences / 13 files. 선행 사례와 **의미론적 평행(선생님 → 학생 주관적 글쓰기)** 이 성립하는 widget 중 `AppTypography.bodyMedium` 스타일을 쓰는 3 지점 특정.
+
+**승격 3 지점**:
+
+| 파일 | 라인 | 의미론적 대상 | 변환 |
+|------|------|--------------|------|
+| `practice/.../teacher_feedback_sheet.dart` | 279 | `feedback.content` — 녹음 공유에 대한 선생님 피드백 본문 | `bodyMedium` → `NotebookTypography.hand` |
+| `profile/.../tip_template_management_screen.dart` | 275 | `template.content` — 선생님 팁 템플릿 본문 | `bodyMedium` → `NotebookTypography.hand` |
+| `lessons/.../tip_template_bottom_sheet.dart` | 440 | `template.content` — 레슨 기록 작성 중 팁 템플릿 선택 본문 | `bodyMedium` → `NotebookTypography.hand` |
+
+**선행 사례 일치**: `lesson_notes_widgets.dart:290` 의 `lesson.feedback!` 와 3 후보 모두 **"선생님이 학생에게 남기는 주관적 글쓰기 본문"** 이라는 의미론을 공유. 헤드라인 구조나 유한집합 법칙이 아니라 **작성자-수신자 관계** 가 Gaegu 서명의 발화 조건. §7.101 의 "Playfair 법칙 포화 선언" 은 이 축에 무관.
+
+**의미론적 분류표 (§1.1 #4 Gaegu 서명 규범 문서화)**:
+
+| 서명 발화 조건 | Gaegu 적용 | 적용 안 함 |
+|--------------|----------|----------|
+| 선생님 → 학생 주관적 글쓰기 본문 | `NotebookTypography.hand` | — |
+| 시스템 생성 정적 텍스트 (메뉴, 라벨) | — | `AppTypography.*` |
+| 사용자 입력 중성 텍스트 (검색어, 이름) | — | `AppTypography.*` |
+| 수치/날짜/상태 (메타데이터) | — | `AppTypography.caption` |
+
+**감사 포맷 진화**: §7.x Playfair 감사는 `grep AppTypography.heading*` 로 후보 집합을 만든 후 §7.17 승격 · §7.30 예외 2-way 분류였다. §7.102 Gaegu 감사는 `grep NotebookTypography.hand*` 선행 사례 집합에서 **"의미론적 평행 대상"** 을 역추적해 **grep AppTypography.bodyMedium** 후보를 걸러내는 **"서명 씨앗(seed) → 평행 검색"** 패턴. 같은 파일 내에 이미 `NotebookTypography` 사용이 있는 선행 파일은 import 생략 가능하여 편집 비용도 낮음.
+
+**tip_template 2 지점의 중요성**: `tip_template_bottom_sheet` 는 **레슨 기록 작성 중 팁을 선택하는 순간** 의 preview 이고, `tip_template_management_screen` 은 **팁 라이브러리 관리** 화면의 본문 표시. 둘 다 선생님이 학생에게 남길 **미래의 주관적 글쓰기 초안(draft)** 이므로 본문 렌더링 시점에 이미 Gaegu 서명이 일관되어야 한다. 서명이 바뀌면 선생님이 "이건 시스템 텍스트" 로 오인해 편집 감각이 깨진다.
+
+**최종 집계 확장**: 기존 §7.91-b~§7.101 의 **248 Playfair 감사 지점** 과 별도로, §7.102 는 **§1.1 #4 Gaegu 서명 차원** 의 최초 전수 감사 **4 지점**(1 선행 + 3 승격) 을 확정. **"감사 포화" 는 차원별 선언**이며, Gaegu 차원은 §7.102 로 포화에 도달.
+
+**은유**: §7.102 는 **"보이지 않는 지문 감식"** — Playfair 는 돋보이는 헤드라인이지만 Gaegu 는 본문에 섞여 있어 육안으로 잡히지 않는다. 선행 사례 1 건이 남긴 서명(지문) 을 현상액(평행 검색) 으로 드러내어 같은 범인(의미론적 대상) 의 다른 흔적 3 건을 확정. Playfair 감사가 "건물 외벽 도장 전수 조사" 였다면 Gaegu 감사는 "건물 내부 손때 자국 전수 조사".
+
+**Lore-directive**: **"서명 차원은 축별로 독립 감사한다"**. §1.1 4대 시그니처는 병렬적이며, 한 축(Playfair) 의 포화 선언은 다른 축(Gaegu · 로마숫자 · Vermillion) 의 감사 면책을 의미하지 않는다. §1.1 시그니처 규범 중 시스템 감사가 부재한 축이 있다면 **"선행 사례 1 건 → 평행 검색 → 전수 확정"** 3-step 으로 신규 감사 배치를 개시.
+
+**Lore-constraint**: Gaegu 서명은 **"작성자-수신자 관계"** 로만 발화되며, 헤드라인 구조(§7.17) 나 유한집합(§7.87-h) 과는 독립된 발화 조건. 서명 법칙을 구조 법칙과 섞으면 규범이 오염됨.
+
+**다음 차원 후보**: §1.1 #2 로마숫자 (PieceTitle / 로마 기보법), §1.1 #3 Vermillion Red (paperAccent 악센트) 두 축이 미-감사 상태. §7.103+ 배치에서 동일 3-step 으로 개시 가능.
+
 ---
 
 ## 8. 구현 원칙

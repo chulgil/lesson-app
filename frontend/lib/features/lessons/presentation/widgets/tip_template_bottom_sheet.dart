@@ -437,7 +437,8 @@ class _TipTemplateBottomSheetState
                 ],
               ),
               const SizedBox(height: AppSpacing.space3),
-              Text(template.content, style: AppTypography.bodyMedium),
+              // Notebook × Score: 팁 템플릿 본문 = Gaegu 손글씨 주석 (§1.1 · §7.101).
+              Text(template.content, style: NotebookTypography.hand),
               if (template.usageCount > 0) ...[
                 const SizedBox(height: AppSpacing.space2),
                 Text(

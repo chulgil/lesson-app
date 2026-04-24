@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/tip_template.dart';
 import '../../../lessons/presentation/providers/tip_template_providers.dart';
 
@@ -272,7 +273,8 @@ class _TipTemplateManagementScreenState
                 const SizedBox(height: AppSpacing.space3),
 
                 // Content
-                Text(template.content, style: AppTypography.bodyMedium),
+                // Notebook × Score: 팁 템플릿 본문 = Gaegu 손글씨 주석 (§1.1 · §7.101).
+                Text(template.content, style: NotebookTypography.hand),
 
                 const SizedBox(height: AppSpacing.space2),
 

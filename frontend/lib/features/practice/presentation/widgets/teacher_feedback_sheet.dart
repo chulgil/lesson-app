@@ -276,7 +276,11 @@ class _FeedbackBubble extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(feedback.content, style: AppTypography.bodyMedium),
+          Text(
+            // Notebook × Score: 선생님 피드백 본문 = Gaegu 손글씨 주석 (§1.1 · §7.101).
+            feedback.content,
+            style: NotebookTypography.hand,
+          ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             _formatTimestamp(feedback.createdAt),
