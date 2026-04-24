@@ -160,11 +160,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.inkQuaternary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusLarge,
-                            ),
-                          ),
+                          shape: RoundedRectangleBorder(),
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
                         child: Text(
@@ -187,11 +183,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusLarge,
-                          ),
-                        ),
+                        shape: RoundedRectangleBorder(),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
                       child: Text(
@@ -284,7 +276,6 @@ class _PageIndicator extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
     );
   }

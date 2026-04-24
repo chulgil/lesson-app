@@ -237,11 +237,7 @@ class _PhoneVerificationScreenState
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLarge,
-                        ),
-                      ),
+                      shape: RoundedRectangleBorder(),
                     ),
                     child:
                         _isLoading
@@ -310,15 +306,11 @@ class _PhoneVerificationScreenState
           decoration: InputDecoration(
             hintText: '010-0000-0000',
             prefixIcon: const Icon(Icons.phone_android),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
@@ -365,15 +357,11 @@ class _PhoneVerificationScreenState
           decoration: InputDecoration(
             hintText: '6자리 인증번호',
             prefixIcon: const Icon(Icons.lock_outline),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),

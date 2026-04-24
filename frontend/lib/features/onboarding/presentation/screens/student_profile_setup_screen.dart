@@ -192,11 +192,7 @@ class _StudentProfileSetupScreenState
                     backgroundColor: AppColors.paperAccent,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inkQuaternary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
-                    ),
+                    shape: const RoundedRectangleBorder(),
                   ),
                   child:
                       _isLoading
@@ -257,15 +253,11 @@ class _StudentProfileSetupScreenState
           },
           decoration: InputDecoration(
             hintText: '이름을 입력해주세요',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            border: const OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
             ),
           ),
@@ -298,7 +290,6 @@ class _StudentProfileSetupScreenState
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.inkQuaternary),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child:
                 _selectedInstrument == null
@@ -457,9 +448,6 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                           isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusRound,
-                      ),
                       side: BorderSide(
                         color:
                             isSelected
