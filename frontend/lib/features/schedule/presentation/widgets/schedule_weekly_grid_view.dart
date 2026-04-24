@@ -409,16 +409,13 @@ class _ScheduleWeeklyGridViewState
         HapticFeedback.lightImpact();
         context.push(tapRoute);
       },
+      // Notebook × Score: 시작 셀 topLeft/topRight 4px 라운드 제거 → 직사각
       child: Container(
         width: width - 2,
         height: height,
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
           color: colors.background,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           border: Border(left: leftBorder),
         ),
         alignment: Alignment.center,
@@ -440,11 +437,7 @@ class _ScheduleWeeklyGridViewState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.event_available,
-            size: 48,
-            color: AppColors.inkTertiary,
-          ),
+          Icon(Icons.event_available, size: 48, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '이번 주는 레슨이 없습니다',
@@ -477,9 +470,7 @@ class _ScheduleWeeklyGridViewState
       ),
       child: Text(
         '이번 주: ${lessons.length}레슨 · 총 $timeStr',
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkTertiary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         textAlign: TextAlign.center,
       ),
     );

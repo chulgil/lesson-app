@@ -4393,6 +4393,36 @@ flutter analyze lib/features/schedule/presentation/screens/my_bookings_screen.da
 
 ---
 
+### §7.112 — 주간 스케쥴 타임라인 + 그리드 Notebook × Score 동기화 (2026-04-24)
+
+리스트 UI(§7.110 · §7.111) 를 Notebook × Score 패턴으로 승격한 뒤, **같은 스케줄 도메인의 세로 타임라인 + 주간 그리드** 까지 동일 원칙을 확장. 사용자 요청: "주간스케쥴의 경우도 마찬가지 입니다." 단, **색상외** 라는 명시적 예외 — `InstrumentColors` 는 그리드 스캐닝의 주된 시각 채널이므로 보존.
+
+| 대상 | 변환 전 | 변환 후 |
+|------|---------|---------|
+| `timeline_lesson_block.dart` 메인 블록 | `BorderRadius.circular(radiusMedium)` + `Border.all(accent, 1.5)` (isNow 만) | 라디우스 제거. 4 면 `Border` — !isNow: 좌/상/우 `transparent`, 하 `inkQuaternary 0.5px` 잉크 라인. isNow: 4 면 `accent 1.5px` 박스. |
+| `timeline_lesson_block.dart` `_buildNextBadge` | `Container(BorderRadius.circular(10), paperAccent.withValues(alpha: 0.15))` | `Padding` + `Text("$분 후")` 언더라인 (악보 temp 마커). |
+| `timeline_lesson_block.dart` `_AccentBar` | `Container(width: 4, BorderRadius.only(topLeft/bottomLeft: 8))` | `Container(width: 3, color)` — §3 3px 직사각 규칙. |
+| `schedule_weekly_grid_view.dart` 그리드 시작 셀 | `BorderRadius.only(topLeft: 4, topRight: 4)` | 라디우스 제거 — 악보 마디 직사각 셀. `InstrumentColors` 보존. |
+| `schedule_timeline_view.dart` `_TravelTimeBlock` | `BorderRadius.circular(6)` + `Border.left(scheduleTravelAccent, 3)` | 라디우스 제거. `Border.left(3px)` 만 유지. |
+
+#### 7.112 관찰
+
+**"색상은 그리드의 wayfinding 채널"**: 주간 그리드는 한 주 레슨 분포를 **악기 색으로 색인** 한다 — 피아노 vs 바이올린 vs 첼로 를 **색상 블록** 으로 한눈에. 라디우스·그림자 같은 chrome 은 노이즈이므로 제거하되, `InstrumentColors` 는 핵심 정보 구조라 보존. 사용자의 "색상외" 지시와 일치.
+
+**"isNow 박스 vs !isNow 하단 라인"**: 타임라인 블록에 4 면 Border 를 쓰되 !isNow 에서는 좌/상/우 `transparent` 로 **구조상 존재하지만 시각적으로는 하단 1px 만 보이는** 상태를 만듦. 이렇게 하면 isNow 로 전환 시 **모든 BorderSide 의 두께/색만 바뀌는 단일 위젯** 이 되어 애니메이션 / 리빌드 비용 최소. Flutter `Border` 는 네 면을 필수 지정할 필요 없으므로 가능한 트릭.
+
+**"next 뱃지는 악보 tempo 마커"**: "3 분 후" 같은 카운트다운은 시간 임박을 **악보의 템포 변경 마커**(Allegro ma non troppo 등) 로 은유. 둥근 pill → 언더라인 텍스트로 바뀌면 "책의 주석" 처럼 읽히며, 배경색을 삼키지 않아 블록의 악기 색이 유지됨.
+
+**"라디우스 제거 ≠ 평면화"**: 평면 직사각이라도 Border.bottom(0.5px) · Border.left(3px) · 악기 배경색의 **깊이 없는 레이어링** 만으로 충분히 질감 확보. 그림자·라디우스 없이도 "종이 위 잉크 선" 메타포로 구분 가능.
+
+**Lore-directive**: 스케줄 도메인의 모든 레슨 블록 (리스트 · 타임라인 · 주간 그리드) 는 동일 Notebook × Score 규칙 적용 — 라디우스 제거, 3px 좌 / 1px 하 조합, 악보 직사각.
+
+**Lore-constraint**: `InstrumentColors` 는 그리드 wayfinding 채널로 보존. "색상외" 사용자 지시에 따라 chrome(라디우스 · 그림자) 만 제거하고 색은 건드리지 않음.
+
+**Lore-rejected**: `_buildNextBadge` 를 pill + 배경색 유지 — 악기 배경색 위에 또 다른 배경색이 올라가 색이 중첩됨. 악보 메타포에서 "주석" 은 텍스트 장식(언더라인) 이지 별도 박스가 아님.
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

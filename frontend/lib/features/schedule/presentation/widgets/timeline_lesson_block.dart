@@ -78,14 +78,31 @@ class TimelineLessonBlock extends StatelessWidget {
         HapticFeedback.mediumImpact();
         onLongPress?.call();
       },
+      // Notebook × Score: 둥근 모서리 제거 + 하단 1px 잉크 라인으로 블록 구분
+      // (§7.112 주간 스케쥴 — 악보 템포 마디선 은유)
       child: Container(
         height: blockHeight,
         margin: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
           color: colors.background,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border:
-              isNow ? Border.all(color: baseColors.accent, width: 1.5) : null,
+          border: Border(
+            left: BorderSide(
+              color: isNow ? baseColors.accent : Colors.transparent,
+              width: isNow ? 1.5 : 0,
+            ),
+            top:
+                isNow
+                    ? BorderSide(color: baseColors.accent, width: 1.5)
+                    : BorderSide.none,
+            right:
+                isNow
+                    ? BorderSide(color: baseColors.accent, width: 1.5)
+                    : BorderSide.none,
+            bottom: BorderSide(
+              color: isNow ? baseColors.accent : AppColors.inkQuaternary,
+              width: isNow ? 1.5 : 0.5,
+            ),
+          ),
         ),
         child: Row(
           children: [
@@ -165,17 +182,16 @@ class TimelineLessonBlock extends StatelessWidget {
   }
 
   Widget _buildNextBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-      ),
+    // Notebook × Score: 둥근 뱃지 → 평문 + 언더라인 (악보 temp 마커)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       child: Text(
         '$minutesUntilNext분 후',
         style: AppTypography.captionSmall.copyWith(
           color: AppColors.paperAccent,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
+          decoration: TextDecoration.underline,
+          decorationColor: AppColors.paperAccent,
         ),
       ),
     );
@@ -190,15 +206,7 @@ class _AccentBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 4,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          bottomLeft: Radius.circular(8),
-        ),
-      ),
-    );
+    // Notebook × Score: 둥근 accent bar → 직사각 3px 세로선 (§3 3px 규칙)
+    return Container(width: 3, color: color);
   }
 }

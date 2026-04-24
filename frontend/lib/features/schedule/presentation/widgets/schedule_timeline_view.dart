@@ -263,9 +263,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           width: 40,
           child: Text(
             '${hour.toString().padLeft(2, '0')}:00',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
             textAlign: TextAlign.right,
           ),
         ),
@@ -460,9 +458,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           // Stats line
           Text(
             '${_isToday ? "오늘" : ""} ${widget.lessons.length}레슨 · $timeStr',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -537,7 +533,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.cancel, color: AppColors.paperAccent),
+                  leading: const Icon(
+                    Icons.cancel,
+                    color: AppColors.paperAccent,
+                  ),
                   title: const Text(AppStrings.cancel),
                   onTap: () {
                     Navigator.of(ctx).pop();
@@ -585,11 +584,11 @@ class _TravelTimeBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notebook × Score: 둥근 모서리 6px 제거 → 직사각 + 좌 3px 세로선만 유지
     return Container(
       height: height.clamp(18.0, double.infinity),
       decoration: BoxDecoration(
         color: AppColors.scheduleTravelBackground,
-        borderRadius: BorderRadius.circular(6),
         border: Border(
           left: BorderSide(color: AppColors.scheduleTravelAccent, width: 3),
         ),
