@@ -113,10 +113,15 @@ class _TeacherDetailContent extends ConsumerWidget {
         SliverAppBar(
           expandedHeight: 200,
           pinned: true,
+          titleSpacing: 0,
           backgroundColor: AppColors.paperAccent,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => context.pop(),
+          ),
+          title: Text(
+            '${profile.name ?? '익명 선생님'} (선생님)',
+            style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
           ),
           flexibleSpace: FlexibleSpaceBar(
             background: Container(

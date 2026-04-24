@@ -101,10 +101,15 @@ class AcademyDetailScreen extends ConsumerWidget {
     return SliverAppBar(
       expandedHeight: 160,
       pinned: true,
+      titleSpacing: 0,
       backgroundColor: AppColors.paperAccent,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => context.pop(),
+      ),
+      title: Text(
+        '${academy.name} (학원)',
+        style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
