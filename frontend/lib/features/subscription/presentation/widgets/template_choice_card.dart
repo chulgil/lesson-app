@@ -36,7 +36,8 @@ class TemplateChoiceCard extends StatelessWidget {
         color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
+          color:
+              isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isRecommended ? 2 : 1,
         ),
       ),
@@ -54,8 +55,7 @@ class TemplateChoiceCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '추천',
@@ -81,9 +81,7 @@ class TemplateChoiceCard extends StatelessWidget {
           // Price and validity
           Text(
             '${formatWonWithComma(template.price)}  ·  유효 ${template.validityDays}일',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           ),
 
           const SizedBox(height: AppSpacing.space1),
@@ -102,11 +100,11 @@ class TemplateChoiceCard extends StatelessWidget {
             Text(
               '회당 ${formatWonWithComma(unitPrice)}',
               style: AppTypography.bodySmall.copyWith(
-                color: isRecommended
-                    ? AppColors.paperAccent
-                    : AppColors.inkTertiary,
-                fontWeight:
-                    isRecommended ? FontWeight.w600 : FontWeight.w400,
+                color:
+                    isRecommended
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
+                fontWeight: isRecommended ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
           ],
@@ -121,21 +119,20 @@ class TemplateChoiceCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: isProcessing ? null : onAccept,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isRecommended
-                      ? AppColors.paperAccent
-                      : AppColors.paperDark,
-                  foregroundColor:
-                      isRecommended ? Colors.white : AppColors.ink,
+                  minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                  backgroundColor:
+                      isRecommended
+                          ? AppColors.paperAccent
+                          : AppColors.paperDark,
+                  foregroundColor: isRecommended ? Colors.white : AppColors.ink,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   elevation: 0,
                 ),
-                child: Text(
-                  '선택하기',
-                  style: AppTypography.buttonSmall,
-                ),
+                child: Text('선택하기', style: AppTypography.buttonSmall),
               ),
             ),
           ),
