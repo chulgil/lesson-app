@@ -1,7 +1,7 @@
 # 수강 관리 탭 UX 재설계 스펙 (Status Triage 모델)
 
 > 작성일: 2026-04-24
-> 상태: 설계 확정 (사용자 승인 대기)
+> 상태: Phase 1~4 완료 (커밋 `24c631f3` `a744d891` `3f0800d2` `13e95096`) · Phase 5 대기
 > 담당 화면: `features/students/presentation/screens/students_tab.dart`
 > 관련 스펙:
 > - [student_class_system.md](./student_class_system.md)
@@ -240,19 +240,17 @@ List<StudentWithMembership> _applyFilter(
 
 ## 6. Phase 분해
 
-| Phase | 내용 | 파일 (예상) | 복잡도 |
-|------|------|-----------|--------|
-| **1. Foundation** | `StudentRosterSummary` provider + `RosterSummary` 엔티티 + 필터 enum 확장 | 3 (신규 2 + 수정 1) | L |
-| **2. Triage Banner** | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | 2 (신규 1 + 수정 1) | M |
-| **3. Filter Chip 확장** | expiring/unpaid/trial/archive chip + 필터 로직 | 2 수정 | L |
-| **4. Card 재설계** | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | 1 수정 (students_tab) + widget 재사용 | M |
-| **5. 자동 갱신 알림** | `SubscriptionExpiryNotificationService` + 설정 토글 | 3-4 (신규) | M |
-| **6. 문서 동기화** | enrollment_management_ux_spec 완료 처리 + notebook §7.117 기록 | 2 | XS |
+| Phase | 내용 | 커밋 | 상태 |
+|------|------|------|------|
+| **1. Foundation** | `RosterSummary` 엔티티 + `studentRosterSummaryProvider` + `StudentFilter` enum 4축 확장 | `24c631f3` | ✅ 완료 |
+| **2. Triage Banner** | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | `a744d891` | ✅ 완료 |
+| **3. Filter Chip 확장** | expiring/unpaid/trial/archive chip + ID set 기반 필터 로직 | `3f0800d2` | ✅ 완료 |
+| **4. Card 재설계** | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | `13e95096` | ✅ 완료 |
+| **5. 자동 갱신 알림** | `SubscriptionExpiryNotificationService` + 설정 토글 | — | ⏸️ 대기 |
+| **6. 문서 동기화** | enrollment_management_ux_spec 완료 처리 + notebook §7.117 기록 | 본 커밋 | ✅ 완료 |
 
-**총 예상 파일**: 10-12 파일
-**총 예상 공수**: 12-16 시간
-
-**게이트**: 각 Phase 완료 후 사용자 승인.
+**실제 파일**: Phase 1~4 합계 신규 3 + 수정 2 = 5 파일 (예상 8-10 대비 축소)
+**게이트**: Phase 5 는 별도 세션 — 사용자 Phase 1~4 실기 확인 후 진행.
 
 ---
 
@@ -292,3 +290,4 @@ List<StudentWithMembership> _applyFilter(
 | 날짜 | 변경 | 작성자 |
 |-----|-----|-------|
 | 2026-04-24 | 최초 작성 (v1 설계 확정) | Claude (CEO 리뷰) |
+| 2026-04-24 | Phase 1~4 구현 완료 · Phase 5 대기로 상태 갱신 (커밋 `24c631f3` `a744d891` `3f0800d2` `13e95096`) | Claude |

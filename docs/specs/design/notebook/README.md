@@ -4614,6 +4614,43 @@ Phase 1 은 Haiku 4.5 서브에이전트 3개 병렬 위임으로 실행 (사용
 
 ---
 
+### §7.117 — 수강 관리 탭 Status Triage 재설계 (2026-04-24)
+
+**전제**: §7.116 이후 학생 4탭 각진 원칙은 안정화. 선생님 수강 관리 탭(`students_tab.dart`)은 라벨 통일(§7.116 마감 커밋 `93b0dc7a`) 만 끝난 상태 — 진입 시 "만료임박·미결제·체험" 컨텍스트가 한눈에 안 보이는 구조. 선생님의 3 근본 질문(Q1 찾기 / Q2 만료 파악 / Q3 미결제 파악 / Q4 만료 학생 재등록) 중 Q2~Q4 가 깊이 숨어 있음.
+
+**설계 — Status Triage 모델 (UX 전문가 관점 병용)**
+
+MyMusicStaff / Teachworks / Duet / Mindbody / 클라스팅 5개 유사 서비스 분석 결과, **"학생 = primary entity, 수강권 = visual layer"** 패턴이 공통. 학생 단위 리스트를 유지하되 상태는 배너·chip·카드 뱃지로 시각화하는 구조가 검색·식별 편의를 보존하면서 상태 가시성을 올림.
+
+**작업 — Phase 1~4 (UI 중심)**
+
+| Phase | 커밋 | 파일 | 내용 |
+|-------|------|------|------|
+| 1 Foundation | `24c631f3` | 3 신규 + 1 수정 | `RosterSummary` 엔티티 + `studentRosterSummaryProvider` + `StudentFilter` enum 4축 확장 |
+| 2 Triage Banner | `a744d891` | 1 신규 + 1 수정 | `RosterTriageBanner` — 만료임박·미결제·체험 3-칸 카드, 탭 시 필터 토글 |
+| 3 Filter Chip 연결 | `3f0800d2` | 1 수정 | `_applyPracticeFilter` 가 `RosterSummary` ID set 기반 enrollment 필터 라우팅 |
+| 4 Card 재설계 | `13e95096` | 1 수정 | `_EnrollmentExtras` — 진행 bar + D-day chip + 인라인 CTA, archive 모드 자동 전환 |
+
+**각진 원칙 준수**
+
+- `RosterTriageBanner` 3-칸 카드: `BorderRadius.zero` + `Border.strokeAlignInside` + 3색 semantic(`paperAccent/paperHighlight/paperOk`)
+- `_DdayChip`, `_InlineCta` 모두 각진 border 만 — BoxShadow 없음
+- 진행 bar: 2px 라인, 종이 위의 잉크 자국 메타포
+
+**Lore-directive**: 수강 관리 탭은 학생 단위 리스트 유지. 수강권 단위 전환은 Q1(검색·식별) 훼손으로 비가역 거절.
+
+**Lore-constraint**: archive 학생 영구 보관 — 재등록 유도 CTA 를 최우선 노출.
+
+**Lore-rejected**: Two-tab (Active/Archive) 완전 분리 — 선생님 탭 구조 복잡도 증가, 필터 chip 으로 충분.
+
+**Lore-rejected**: AI 이탈 예측 스코어 — 데이터 부족(월 단위 레슨 기록 < 6개월). 현 시점 검증 불가.
+
+**후속 작업**: Phase 5 (자동 갱신 알림 서비스 `SubscriptionExpiryNotificationService` + 설정 토글) 는 별도 세션.
+
+**스펙**: [docs/specs/student/enrollment_management_ux_spec.md](../../student/enrollment_management_ux_spec.md)
+
+---
+
 ## 8. 구현 원칙
 
 1. **Additive**: 기존 `AppColors`/`AppTypography` 유지. Notebook 팔레트·타이포는 추가.

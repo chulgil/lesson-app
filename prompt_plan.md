@@ -2,8 +2,9 @@
 
 > 작성일: 2026-04-24
 > 모드: `/plan --ceo` → `--eng` 전환
-> 상태: 스펙 완료 — 사용자 승인 대기
+> 상태: Phase 1~4 + 6 완료 · Phase 5 실기 확인 후 진행
 > 스펙 문서: [docs/specs/student/enrollment_management_ux_spec.md](docs/specs/student/enrollment_management_ux_spec.md)
+> 완료 커밋: Phase 1 `24c631f3` · Phase 2 `a744d891` · Phase 3 `3f0800d2` · Phase 4 `13e95096`
 
 ## 요구사항 (확정)
 
@@ -17,12 +18,12 @@
 
 | Phase | 내용 | 파일 | 복잡도 | 상태 |
 |------|------|-----|--------|------|
-| 1. Foundation | `StudentRosterSummary` provider + `RosterSummary` 엔티티 + 필터 enum 확장 | 3 | L | ⏸️ 대기 |
-| 2. Triage Banner | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | 2 | M | ⏸️ |
-| 3. Filter Chip 확장 | expiring/unpaid/trial/archive 필터 로직 | 2 | L | ⏸️ |
-| 4. Card 재설계 | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | 1 | M | ⏸️ |
-| 5. 자동 갱신 알림 | `SubscriptionExpiryNotificationService` + 설정 토글 | 3-4 | M | ⏸️ |
-| 6. 문서 동기화 | 스펙 완료 처리 + notebook §7.117 기록 | 2 | XS | ⏸️ |
+| 1. Foundation | `StudentRosterSummary` provider + `RosterSummary` 엔티티 + 필터 enum 확장 | 3 | L | ✅ `24c631f3` |
+| 2. Triage Banner | `RosterTriageBanner` 위젯 + students_tab 통합 + 탭→필터 연결 | 2 | M | ✅ `a744d891` |
+| 3. Filter Chip 확장 | expiring/unpaid/trial/archive 필터 로직 | 2 | L | ✅ `3f0800d2` |
+| 4. Card 재설계 | 진행 bar + D-day chip + 인라인 CTA + archive 모드 | 1 | M | ✅ `13e95096` |
+| 5. 자동 갱신 알림 | `SubscriptionExpiryNotificationService` + 설정 토글 | 3-4 | M | ⏸️ 실기 확인 후 |
+| 6. 문서 동기화 | 스펙 완료 처리 + notebook §7.117 기록 | 2 | XS | ✅ 본 커밋 |
 
 **총 예상 파일**: 10-12 / **총 공수**: 12-16h
 
