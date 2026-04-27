@@ -4828,6 +4828,74 @@ bool _isRestDay(TeacherAvailability? availability) {
 - 수동 확인: 선생님 계정으로 일요일(weeklySchedules 미설정 가정) 진입 → 배너 + 회색 배경 노출 확인
 - §7.x 후보: `schedule_tab.dart` 의 일간/주간 뷰 토글 시 휴무 표시 일관성 회귀 테스트
 
+### §7.122 — 주간 그리드 컬럼 배경 단순화 (4단 → 2단, 2026-04-27)
+
+**전제**: §7.120 에서 4단 우선순위(쉬는 날 > 오늘 > 주말 > zebra) 를 도입했으나, **zebra alpha 0.025 가 인지되지 않으면서 미세 인지 부담만 주는 노이즈**로 작용. 사용자 피드백: "월화 격색상이 같아 보여 보기 힘들다." 진단: 격색상 자체가 변별력을 못 만들고, 동시에 컬럼 경계가 흐려 시선이 옆 컬럼으로 샘.
+
+**문제 재정의**
+
+| 항목 | §7.120 의도 | 실제 인지 |
+|---|---|---|
+| zebra (화/목 0.025) | 평일 변별 보조 | 안 보이면서 카드와 경쟁 |
+| 주말 (0.06) | 토/일 약화 | 약화도 아니고 강조도 아닌 모호 톤 |
+| today (0.10) | 오늘 강조 | 약함 — 카드 색이 더 강함 |
+
+**해결**: 컬럼 변별을 **배경 alpha 가 아닌 1px 수직 디바이더**가 담당. 본문은 평탄화하고 today/쉬는 날만 배경 톤으로 표시.
+
+```dart
+// schedule_visual_helpers.dart §7.122
+Color? weeklyColumnBackground({
+  required ScheduleDayType dayType,
+  required bool isRestDay,
+}) {
+  if (isRestDay) {
+    return AppColors.scheduleMutedBackground.withValues(alpha: 0.5);
+  }
+  if (dayType == ScheduleDayType.today) {
+    return AppColors.paperAccent.withValues(alpha: 0.06);
+  }
+  return null;
+}
+```
+
+**시그니처 변경**: `isWeekend`, `dayIndex` 인자 삭제 (zebra/주말 분기 제거). 호출처 `schedule_weekly_grid_view.dart:164` 동시 갱신.
+
+**수직 디바이더** (`schedule_weekly_grid_view.dart:174` 근처):
+
+```dart
+DecoratedBox(
+  decoration: BoxDecoration(
+    color: columnBg,
+    border: dayIndex > 0
+        ? Border(
+            left: BorderSide(
+              color: AppColors.scheduleGridLine,
+              width: 0.5,
+              strokeAlign: BorderSide.strokeAlignInside,  // ⚠️ 필수
+            ),
+          )
+        : null,
+  ),
+  ...
+)
+```
+
+`strokeAlignInside` 누락 시 부분 Border (left only) paint assertion → render tree 전파로 무관한 화면까지 하얗게 뜸 (2026-04-24 학생상세 사례 참조). 메모리 노트 `feedback_border_strokealign_non_uniform.md` 강제.
+
+**Lore-directive**: 컬럼 변별은 alpha 가 아닌 1px 디바이더 — 카드(인스트루먼트 색) 가독성 우선.
+
+**Lore-constraint**: today alpha 0.10 → 0.06 으로 하향. 헤더(`CompactWeekStrip`) 의 vermillion 칩이 이미 today 강조를 담당하므로 본문은 보조만.
+
+**Lore-rejected**: 시간대 가로 밴딩(오전/오후/저녁) — 정보량 추가 매력적이나 음악 레슨 수업 시간대(15-22시)가 좁아 차별화 효과 미미. 향후 `schedule_daily_view` 에서 검토.
+
+**Lore-rejected**: today 헤더 4px 바 추가 — `CompactWeekStrip` 은 5개 화면(선생님 주간/일간, 학생 레슨/연습, 전체 신청) 공유. 헤더 변경 시 회귀 범위 큼. 본문 평탄화로 today 컬럼이 자연스럽게 도드라지므로 헤더는 손대지 않음.
+
+**테스트**: `schedule_visual_helpers_test.dart` 갱신 — 8 → 5 케이스 (zebra/주말 분기 제거, 단순화 검증 추가). `flutter test` 12/12 통과.
+
+**후속**
+- 사용자 실기 확인: zebra 제거 후 컬럼 변별이 디바이더로 충분한지
+- §7.x 후보: 일간 타임라인의 시간대 밴딩(오전/오후/저녁) 검토
+
 ---
 
 ## 8. 구현 원칙

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
@@ -27,177 +26,62 @@ TeacherAvailability _availability(List<WeeklySchedule> schedules) =>
     );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// §7.120 — weeklyColumnBackground
+// §7.122 — weeklyColumnBackground (단순화 후 2단)
 // ═══════════════════════════════════════════════════════════════════════════
 
 void main() {
-  group('§7.120 weeklyColumnBackground — 4단 우선순위', () {
-    test('우선순위 1: 쉬는 날은 다른 모든 조건을 무시', () {
+  group('§7.122 weeklyColumnBackground — 2단 우선순위 (zebra/주말 제거)', () {
+    test('우선순위 1: 쉬는 날은 today 보다 우선', () {
       final color = weeklyColumnBackground(
-        dayType: ScheduleDayType.today, // today 더라도
+        dayType: ScheduleDayType.today,
         isRestDay: true,
-        isWeekend: true, // 주말이더라도
-        dayIndex: 5,
       );
       expect(color, AppColors.scheduleMutedBackground.withValues(alpha: 0.5));
     });
 
-    test('우선순위 2: 오늘은 주말/zebra 보다 우선', () {
+    test('우선순위 2: 오늘은 paperAccent 0.06 tint', () {
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         isRestDay: false,
-        isWeekend: true,
-        dayIndex: 5,
       );
-      expect(color, AppColors.paperAccent.withValues(alpha: 0.10));
+      expect(color, AppColors.paperAccent.withValues(alpha: 0.06));
     });
 
-    test('우선순위 3: 주말은 zebra 보다 우선', () {
-      final color = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        isRestDay: false,
-        isWeekend: true,
-        dayIndex: 5, // 홀수지만 주말 우선
-      );
-      expect(color, AppColors.paperAccentSoft.withValues(alpha: 0.06));
-    });
-
-    test('우선순위 4: 평일 홀수 인덱스는 zebra 톤', () {
-      final color = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        isRestDay: false,
-        isWeekend: false,
-        dayIndex: 1, // 화요일
-      );
-      expect(color, AppColors.ink.withValues(alpha: 0.025));
-    });
-
-    test('평일 짝수 인덱스는 투명(null)', () {
-      final color = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        isRestDay: false,
-        isWeekend: false,
-        dayIndex: 0, // 월요일
-      );
-      expect(color, isNull);
-    });
-
-    test('과거 평일 짝수도 투명(null) — past 는 별도 처리 없음', () {
-      final color = weeklyColumnBackground(
+    test('과거/미래 평일은 투명(null) — 디바이더가 컬럼 경계 담당', () {
+      final past = weeklyColumnBackground(
         dayType: ScheduleDayType.past,
         isRestDay: false,
-        isWeekend: false,
-        dayIndex: 2, // 수요일 (짝수)
       );
-      expect(color, isNull);
+      final future = weeklyColumnBackground(
+        dayType: ScheduleDayType.future,
+        isRestDay: false,
+      );
+      expect(past, isNull);
+      expect(future, isNull);
     });
 
-    test('4단 시각 계층은 4개의 서로 다른 색상을 만든다 (계층 붕괴 방지)', () {
-      final restDay = weeklyColumnBackground(
+    test('주말도 평일과 동일 — 헤더에서만 변별, 본문 평탄화', () {
+      // §7.120 에서는 주말 0.06 alpha 였으나, §7.122 에서 제거.
+      // 이유: 토/일도 레슨 카드 가독성을 위해 본문은 평탄.
+      final saturday = weeklyColumnBackground(
         dayType: ScheduleDayType.future,
-        isRestDay: true,
-        isWeekend: false,
-        dayIndex: 0,
+        isRestDay: false,
       );
-      final today = weeklyColumnBackground(
+      final sunday = weeklyColumnBackground(
+        dayType: ScheduleDayType.future,
+        isRestDay: false,
+      );
+      expect(saturday, isNull);
+      expect(sunday, isNull);
+    });
+
+    test('alpha 상한 — today 색상은 0.10 이하 (카드 가독성 보호)', () {
+      final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         isRestDay: false,
-        isWeekend: false,
-        dayIndex: 0,
       );
-      final weekend = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        isRestDay: false,
-        isWeekend: true,
-        dayIndex: 5,
-      );
-      final zebra = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        isRestDay: false,
-        isWeekend: false,
-        dayIndex: 1,
-      );
-
-      final colors = {restDay, today, weekend, zebra};
-      expect(
-        colors.length,
-        4,
-        reason: '4단 계층(쉬는 날/오늘/주말/zebra)은 모두 다른 색상이어야 함',
-      );
-    });
-
-    test('계층별 시각 강도 순서: restDay > today > weekend > zebra (alpha)', () {
-      final restDayAlpha =
-          weeklyColumnBackground(
-            dayType: ScheduleDayType.future,
-            isRestDay: true,
-            isWeekend: false,
-            dayIndex: 0,
-          )!.a;
-      final todayAlpha =
-          weeklyColumnBackground(
-            dayType: ScheduleDayType.today,
-            isRestDay: false,
-            isWeekend: false,
-            dayIndex: 0,
-          )!.a;
-      final weekendAlpha =
-          weeklyColumnBackground(
-            dayType: ScheduleDayType.future,
-            isRestDay: false,
-            isWeekend: true,
-            dayIndex: 5,
-          )!.a;
-      final zebraAlpha =
-          weeklyColumnBackground(
-            dayType: ScheduleDayType.future,
-            isRestDay: false,
-            isWeekend: false,
-            dayIndex: 1,
-          )!.a;
-
-      expect(restDayAlpha, greaterThan(todayAlpha));
-      expect(todayAlpha, greaterThan(weekendAlpha));
-      expect(weekendAlpha, greaterThan(zebraAlpha));
-    });
-
-    test('dayIndex 경계 — 0~4=평일, 5~6=주말 매핑 (호출자 계약 검증)', () {
-      // weeklyColumnBackground 자체는 isWeekend 를 매개변수로 받지만
-      // 호출 측 (schedule_weekly_grid_view.dart line 164: `dayIndex >= 5`)
-      // 이 평일/주말을 결정한다. 이 경계가 깨지지 않는지 가드.
-      bool weekendByIndex(int i) => i >= 5;
-      expect(weekendByIndex(0), isFalse, reason: '월요일');
-      expect(weekendByIndex(4), isFalse, reason: '금요일');
-      expect(weekendByIndex(5), isTrue, reason: '토요일');
-      expect(weekendByIndex(6), isTrue, reason: '일요일');
-    });
-
-    test('alpha 상한 0.10 constraint — 모든 색상이 0.5 이하', () {
-      final colors = <Color?>[
-        weeklyColumnBackground(
-          dayType: ScheduleDayType.today,
-          isRestDay: false,
-          isWeekend: false,
-          dayIndex: 0,
-        ),
-        weeklyColumnBackground(
-          dayType: ScheduleDayType.future,
-          isRestDay: false,
-          isWeekend: true,
-          dayIndex: 5,
-        ),
-        weeklyColumnBackground(
-          dayType: ScheduleDayType.future,
-          isRestDay: false,
-          isWeekend: false,
-          dayIndex: 1,
-        ),
-      ];
-      for (final c in colors) {
-        expect(c, isNotNull);
-        // 쉬는 날(0.5) 제외, 다른 모든 색상은 alpha 0.10 이하
-        expect(c!.a, lessThanOrEqualTo(0.10));
-      }
+      expect(color, isNotNull);
+      expect(color!.a, lessThanOrEqualTo(0.10));
     });
   });
 

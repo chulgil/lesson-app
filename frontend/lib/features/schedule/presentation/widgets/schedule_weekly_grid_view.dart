@@ -161,19 +161,31 @@ class _ScheduleWeeklyGridViewState
               final dayDate = _weekStart.add(Duration(days: dayIndex));
               final dayType = _getDayType(dayDate, todayDate);
               final isRestDay = restDays.contains(dayIndex);
-              final isWeekend = dayIndex >= 5;
               final columnBg = weeklyColumnBackground(
                 dayType: _toScheduleDayType(dayType),
                 isRestDay: isRestDay,
-                isWeekend: isWeekend,
-                dayIndex: dayIndex,
               );
 
+              // §7.122 — 컬럼 사이 1px 수직 디바이더로 경계 명확화.
+              // dayIndex 0(월) 은 시간 라벨과 인접해 디바이더 생략.
+              // strokeAlignInside: 부분 Border paint assertion 방지.
               return SizedBox(
                 width: cellWidth,
                 height: cellHeight * 2,
                 child: DecoratedBox(
-                  decoration: BoxDecoration(color: columnBg),
+                  decoration: BoxDecoration(
+                    color: columnBg,
+                    border:
+                        dayIndex > 0
+                            ? Border(
+                              left: BorderSide(
+                                color: AppColors.scheduleGridLine,
+                                width: 0.5,
+                                strokeAlign: BorderSide.strokeAlignInside,
+                              ),
+                            )
+                            : null,
+                  ),
                   child: Column(
                     children: [
                       Container(height: 0.5, color: AppColors.scheduleGridLine),

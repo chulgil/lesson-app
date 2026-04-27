@@ -9,28 +9,27 @@ import '../../domain/entities/teacher_availability.dart';
 /// can be tested without instantiating the State class.
 enum ScheduleDayType { past, today, future }
 
-/// §7.120 — 주간 그리드 컬럼 배경 4단 우선순위.
+/// §7.122 — 주간 그리드 컬럼 배경 2단 우선순위.
 ///
-/// 우선순위: 쉬는 날 > 오늘 > 주말 > zebra(홀수 인덱스).
+/// 우선순위: 쉬는 날 > 오늘 (그 외 모두 투명).
 /// alpha 상한 0.10 유지로 레슨 카드 가독성 보호.
+/// 컬럼 경계는 본문이 아닌 1px 수직 디바이더가 담당 (§7.122).
 ///
-/// Spec: docs/specs/design/notebook/README.md §7.120
+/// §7.120 (4단: zebra/주말 포함) 에서 단순화. 0.025 zebra alpha 가
+/// 인지되지 않으면서 미세 부담만 주는 노이즈로 작용했기 때문.
+///
+/// Spec: docs/specs/design/notebook/README.md §7.122
 Color? weeklyColumnBackground({
   required ScheduleDayType dayType,
   required bool isRestDay,
-  required bool isWeekend,
-  required int dayIndex,
 }) {
   if (isRestDay) {
     return AppColors.scheduleMutedBackground.withValues(alpha: 0.5);
   }
   if (dayType == ScheduleDayType.today) {
-    return AppColors.paperAccent.withValues(alpha: 0.10);
+    return AppColors.paperAccent.withValues(alpha: 0.06);
   }
-  if (isWeekend) {
-    return AppColors.paperAccentSoft.withValues(alpha: 0.06);
-  }
-  return dayIndex.isOdd ? AppColors.ink.withValues(alpha: 0.025) : null;
+  return null;
 }
 
 /// §7.121 — selectedDate 가 선생님 weeklySchedules 에 등록되지 않은 요일이면 휴무.
