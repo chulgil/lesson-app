@@ -9,6 +9,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 
 /// Parent lessons tab for viewing child's lesson schedule
 class ParentLessonsTab extends ConsumerWidget {
@@ -16,93 +18,125 @@ class ParentLessonsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('레슨 일정'), centerTitle: true),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        children: [
-          // Calendar view placeholder
-          _buildCalendarHeader(),
-          const SizedBox(height: AppSpacing.space4),
+    final now = DateTime.now();
+    return ColoredBox(
+      color: AppColors.paper,
+      child: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Notebook × Score: §1.2 #5 Masthead — tier-1 진입 시그니처.
+              NotebookMasthead(
+                eyebrow: 'LESSONAZA',
+                meta: 'VOL. ${now.month} · NO. ${now.day}',
+              ),
+              const SizedBox(height: AppSpacing.space4),
+              const ThinRule(),
+              const SizedBox(height: AppSpacing.space4),
 
-          // Upcoming lessons
-          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-          Text('예정된 레슨', style: NotebookTypography.sectionTitle),
-          const SizedBox(height: AppSpacing.space3),
+              // Calendar view placeholder
+              _buildCalendarHeader(),
+              const SizedBox(height: AppSpacing.space4),
 
-          _LessonCard(
-            lessonId: 'lesson_upcoming_1',
-            date: DateTime.now().add(const Duration(days: 1)),
-            startTime: '14:00',
-            endTime: '15:00',
-            teacherName: '김선생님',
-            status: LessonStatus.confirmed,
-            onTap:
-                () => context.push(
-                  AppRoutes.lessonDetail.replaceFirst(
-                    ':id',
-                    'lesson_upcoming_1',
-                  ),
-                ),
+              // Upcoming lessons
+              // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('예정된 레슨', style: NotebookTypography.sectionTitle),
+              const SizedBox(height: AppSpacing.space3),
+
+              _LessonCard(
+                lessonId: 'lesson_upcoming_1',
+                date: now.add(const Duration(days: 1)),
+                startTime: '14:00',
+                endTime: '15:00',
+                teacherName: '김선생님',
+                status: LessonStatus.confirmed,
+                onTap:
+                    () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(
+                        ':id',
+                        'lesson_upcoming_1',
+                      ),
+                    ),
+              ),
+
+              const SizedBox(height: AppSpacing.space3),
+
+              _LessonCard(
+                lessonId: 'lesson_upcoming_2',
+                date: now.add(const Duration(days: 8)),
+                startTime: '14:00',
+                endTime: '15:00',
+                teacherName: '김선생님',
+                status: LessonStatus.confirmed,
+                onTap:
+                    () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(
+                        ':id',
+                        'lesson_upcoming_2',
+                      ),
+                    ),
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Past lessons
+              // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+              Text('지난 레슨', style: NotebookTypography.sectionTitle),
+              const SizedBox(height: AppSpacing.space3),
+
+              _LessonCard(
+                lessonId: 'lesson_1',
+                date: now.subtract(const Duration(days: 6)),
+                startTime: '14:00',
+                endTime: '15:00',
+                teacherName: '김선생님',
+                status: LessonStatus.completed,
+                hasNote: true,
+                onTap:
+                    () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1'),
+                    ),
+                onViewNote: () => _showLessonNoteSheet(context, 'lesson_1'),
+              ),
+
+              const SizedBox(height: AppSpacing.space3),
+
+              _LessonCard(
+                lessonId: 'lesson_2',
+                date: now.subtract(const Duration(days: 13)),
+                startTime: '14:00',
+                endTime: '15:00',
+                teacherName: '김선생님',
+                status: LessonStatus.completed,
+                hasNote: true,
+                onTap:
+                    () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2'),
+                    ),
+                onViewNote: () => _showLessonNoteSheet(context, 'lesson_2'),
+              ),
+
+              const SizedBox(height: AppSpacing.space5),
+
+              // Notebook × Score: §1.2 #6 "Fine." 페이지 종지부.
+              const ThinRule(),
+              const SizedBox(height: AppSpacing.space3),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text('Fine.', style: NotebookTypography.fine),
+                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space6),
+            ],
           ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          _LessonCard(
-            lessonId: 'lesson_upcoming_2',
-            date: DateTime.now().add(const Duration(days: 8)),
-            startTime: '14:00',
-            endTime: '15:00',
-            teacherName: '김선생님',
-            status: LessonStatus.confirmed,
-            onTap:
-                () => context.push(
-                  AppRoutes.lessonDetail.replaceFirst(
-                    ':id',
-                    'lesson_upcoming_2',
-                  ),
-                ),
-          ),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          // Past lessons
-          // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-          Text('지난 레슨', style: NotebookTypography.sectionTitle),
-          const SizedBox(height: AppSpacing.space3),
-
-          _LessonCard(
-            lessonId: 'lesson_1',
-            date: DateTime.now().subtract(const Duration(days: 6)),
-            startTime: '14:00',
-            endTime: '15:00',
-            teacherName: '김선생님',
-            status: LessonStatus.completed,
-            hasNote: true,
-            onTap:
-                () => context.push(
-                  AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1'),
-                ),
-            onViewNote: () => _showLessonNoteSheet(context, 'lesson_1'),
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          _LessonCard(
-            lessonId: 'lesson_2',
-            date: DateTime.now().subtract(const Duration(days: 13)),
-            startTime: '14:00',
-            endTime: '15:00',
-            teacherName: '김선생님',
-            status: LessonStatus.completed,
-            hasNote: true,
-            onTap:
-                () => context.push(
-                  AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2'),
-                ),
-            onViewNote: () => _showLessonNoteSheet(context, 'lesson_2'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -111,9 +145,7 @@ class ParentLessonsTab extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.7,
