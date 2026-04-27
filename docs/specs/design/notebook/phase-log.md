@@ -4877,3 +4877,48 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 - §7.x 후보: 라벨 칩 hover/tap 시 사유 툴팁 ("휴가: 가족 여행 (4/27-5/3)") — `TimeException.reason` 활용
 
 ---
+
+#### §7.123 Mode A++ — 컬럼 = paper, future 레슨 명도 차별화 (2026-04-27 같은 날 후속)
+
+**전제**: §7.123 Mode A+ 적용 후 사용자 연속 점검 2건:
+1. "스케쥴 색상화면이 너무 밝습니다." (#F8F2E5 → #F5EFE2 1차 조정 후에도 여전)
+2. "그리고 예정된 스케쥴 및 다른학생 스케쥴색상과도 구분이 가야합니다."
+
+**진단 (UX 관점)**
+
+| 문제 | 원인 |
+|---|---|
+| 컬럼 톤(#F8F2E5, #F5EFE2)이 흰색 방향으로 떠보임 — "종이 무드" 깨짐 | scaffold 배경(`paperDark` #E8DFC7) 대비 paper 보다 더 밝게 가면 종이가 아닌 "메모지 위 더 밝은 사각형" 으로 인지 |
+| Future 레슨(악기색 white lerp 0.35) 이 컬럼 톤과 명도 거의 동일 → "예정된 스케줄·다른 학생 스케줄" 변별 실패 | white lerp 0.35 가 채도/명도를 과도하게 희석 |
+
+**핵심 통찰**: scaffold 가 이미 `paperDark` 라는 사실을 놓침. paper(#F2ECDD) 자체가 paperDark(#E8DFC7) 위에서 자연스럽게 "콘텐츠 본문" 으로 분리됨 — 별도 밝은 톤 불필요.
+
+**결정 (Mode A++ 정렬)**
+
+| 변경 | Before (Mode A+) | After (Mode A++) |
+|---|---|---|
+| 평일 컬럼 배경 | `scheduleColumnBackground` (#F8F2E5 → #F5EFE2 시도) | `scheduleColumnBackground` = `paper` (#F2ECDD) |
+| Future 레슨 배경 | `Color.lerp(악기색, white, 0.35)` | `Color.lerp(악기색, white, 0.15)` |
+| Future 레슨 악센트 | `악기색 alpha 0.45` | `악기색 alpha 0.55` |
+| 휴가/휴무 (vacation/holiday) | `ink alpha 0.10` | 유지 |
+| 정기 휴무 (regular) | `scheduleColumnBackground` | 유지 (= paper 와 동일) |
+
+**Why 평일 = paper**: scaffold paperDark 위에 paper 컬럼이 올라가면 "노트지 위에 메인 콘텐츠 영역" 비유로 자연 분리. 흰색 방향(#F8F2E5, #F5EFE2)은 종이 무드 깨짐 + future 레슨과 명도 동일해 위계 실패.
+
+**Why future white lerp 0.15 (← 0.35)**: 0.35 는 컬럼 paper 위에서 명도 차이 거의 없어 변별 약함. 0.15 는 악기 색을 살려 컬럼/타 학생 레슨과 명확히 구분되면서도 today 의 vivid 와 위계 유지 (today > future > past).
+
+**Why accent alpha 0.55 (← 0.45)**: 배경 lerp 가 강해진 만큼 악센트(좌측 바·악기 라벨)도 함께 진해져 시각 위계 보존.
+
+**도메인 모델 보존**: §7.123 Mode A+ 의 `isRest` / `isTeacherSetRest` 분리 그대로. Mode A++ 는 색상 값 조정만 (extension/도메인 미수정).
+
+**Lore-directive**: scaffold paperDark 위 그리드 본문은 paper 자체 — 별도 밝은 톤 도입 금지. paperDark/paper/ink 3단 위계가 이미 콘텐츠 영역을 분리.
+
+**Lore-directive**: future 레슨 white lerp = 0.15. 0.35 는 컬럼과 명도 동일 → 다른 학생/예정 스케줄 변별 실패.
+
+**Lore-rejected**: 컬럼 톤을 paper 보다 밝게 (#F8F2E5, #F5EFE2) — 종이 무드 깨짐 + future 레슨과 명도 충돌로 위계 실패.
+
+**Lore-rejected**: future white lerp 0.35 유지 — 컬럼 paper 위에서 변별 불가, "예정된 스케줄" 인지 실패.
+
+**테스트**: `schedule_visual_helpers_test.dart` 41/41 통과 (테스트가 토큰 값을 참조 → 토큰 값 변경에 자동 동기화).
+
+---

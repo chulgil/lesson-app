@@ -429,9 +429,12 @@ class _ScheduleWeeklyGridViewState
             AppColors.scheduleMutedAccent,
           );
         case _DayType.future:
+          // §7.123 Mode A++ — white lerp 0.35 → 0.15.
+          // 이전 0.35 는 컬럼(#F2ECDD) 위에서 명도 차이 거의 없어 구분 약함.
+          // 0.15 는 악기 색을 살려 컬럼/다른 학생 레슨과 명확히 변별.
           colors = InstrumentColorPair(
-            Color.lerp(baseColors.background, Colors.white, 0.35)!,
-            baseColors.accent.withValues(alpha: 0.45),
+            Color.lerp(baseColors.background, Colors.white, 0.15)!,
+            baseColors.accent.withValues(alpha: 0.55),
           );
       }
     }

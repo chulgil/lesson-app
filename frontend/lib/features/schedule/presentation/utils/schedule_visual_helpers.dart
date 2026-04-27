@@ -57,23 +57,24 @@ extension ColumnRestKindExtension on ColumnRestKind {
   }
 }
 
-/// §7.123 (Mode A+) — 주간 그리드 컬럼 배경 2톤 팔레트.
+/// §7.123 (Mode A++) — 주간 그리드 컬럼 배경 2톤 팔레트.
 ///
 /// - 선생님이 명시한 휴일(vacation/holiday) → `ink alpha 0.10` (warm dark gray)
-/// - 평일 + regular(주말 등 정기 미운영) → `scheduleColumnBackground` (종이보다 살짝 밝음)
+/// - 평일 + regular(주말 등 정기 미운영) → `scheduleColumnBackground` (= paper)
 ///
-/// Why 2톤 분리: regular(매주 반복되는 토/일 휴무) 는 사용자 시각에서 강조할
-/// 필요 없음. 시각적 강조는 선생님이 의식적으로 설정한 예외(vacation/holiday) 만.
+/// Why 평일 = paper: scaffold 가 paperDark (#E8DFC7) 이므로 그리드 본문이
+/// paper (#F2ECDD) 면 자연스럽게 페이지 배경과 분리됨. 별도 "밝은 톤" 은
+/// 흰색 방향으로 떠보이고 future 레슨(옅은 악기색) 과 명도 동일해서 구분 약함.
 ///
-/// Why 평일 톤이 종이보다 밝은가: 그리드 본문이 종이 베이스(#F2ECDD)와 같으면
-/// "콘텐츠 영역" 인지가 약함. 살짝 밝은 톤(#F8F2E5)으로 본문 영역을 분리.
+/// Why 2톤 분리: regular(매주 반복되는 토/일) 는 사용자가 패턴으로 학습.
+/// 시각 강조는 선생님이 의식적으로 설정한 예외(vacation/holiday) 만.
 ///
 /// Why ink 알파 블렌딩 (휴일): 종이 위 무채색 중성 회색(#E8E8E8) 은 동시대비로
 /// cool tone 인지됨. ink 알파는 종이 톤 유지하면서 명도만 낮춰 warm dark gray.
 ///
 /// 컬럼 변별은 1px 수직 디바이더(§7.122) + 휴일 라벨 칩이 담당.
 ///
-/// Spec: docs/specs/design/notebook/README.md §7.123 Mode A+
+/// Spec: docs/specs/design/notebook/README.md §7.123 Mode A++
 Color weeklyColumnBackground({
   required ScheduleDayType dayType,
   required ColumnRestKind restKind,

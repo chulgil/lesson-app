@@ -61,9 +61,11 @@ class AppColors {
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
 
-  // Schedule: weekly grid 평일 컬럼 (종이 #F2ECDD 보다 살짝 밝음)
-  // §7.123 Mode A+ — 그리드 본문이 종이 베이스와 시각적으로 구분되도록.
-  static const scheduleColumnBackground = Color(0xFFF8F2E5);
+  // Schedule: weekly grid 평일 컬럼 (= paper #F2ECDD)
+  // §7.123 Mode A++ — scaffold 가 paperDark (#E8DFC7) 이므로 그리드 본문은
+  // paper (#F2ECDD) 자체로 페이지 배경과 자연 분리됨. 별도 밝은 톤은 흰색
+  // 방향으로 떠보여 종이 무드 깨짐 + future 레슨 (옅은 악기색) 과 명도 동일.
+  static const scheduleColumnBackground = Color(0xFFF2ECDD);
 
   // Schedule: now indicator (red line/dot for current time)
   static const scheduleNowIndicator = Color(0xFFE53935);

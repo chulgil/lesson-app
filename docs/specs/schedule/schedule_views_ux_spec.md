@@ -95,25 +95,37 @@ Line 2: 곡명                  (예: 쇼팽 녹턴)
 
 > 별도 요일 헤더 없음 — CompactWeekStrip이 요일/날짜/레슨 수를 이미 표시
 
-### 열(Column) 배경색 — 2톤 팔레트 (§7.123 Mode A+, 2026-04-27 갱신)
+### 열(Column) 배경색 — 2톤 팔레트 (§7.123 Mode A++, 2026-04-27 갱신)
 
-선생님이 의식적으로 설정한 휴일(vacation/holiday) 만 시각적으로 강조. 정기 패턴(regular: 토/일 등)은 평일과 동일 톤으로 처리.
+scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자체로 페이지 배경과 자연 분리. 시각 강조는 선생님이 의식적으로 설정한 휴일(vacation/holiday) 만.
 
 | 우선순위 | 상태 | 도메인 표현 | 컬럼 배경 | 라벨 칩 |
 |---|---|---|---|---|
-| 1 | **휴가 (다일)** | `TimeException(type=vacation)` | `ink alpha 0.10` (≈#DDD8CB warm dark gray) | "휴가" 칩 |
+| 1 | **휴가 (다일)** | `TimeException(type=vacation)` | `ink alpha 0.10` (≈#DCD7CA warm dark gray) | "휴가" 칩 |
 | 2 | **휴무 (단일)** | `TimeException(type=holiday)` | `ink alpha 0.10` | "휴무" 칩 |
-| 3 | **정기 휴무일** | weeklySchedules 미등록 요일 | `scheduleColumnBackground` (#F8F2E5) | (라벨 없음) |
+| 3 | **정기 휴무일** | weeklySchedules 미등록 요일 | `scheduleColumnBackground` (= paper #F2ECDD) | (라벨 없음) |
 | 4 | **오늘** | `_DayType.today` | `scheduleColumnBackground` (헤더 칩으로 변별) | — |
 | 5 | **과거/미래 평일** | 그 외 | `scheduleColumnBackground` | — |
 
-> **Why 2톤 분리**: regular(매주 반복되는 토/일) 는 사용자가 이미 패턴으로 학습. 선생님이 의식적으로 설정한 vacation/holiday 만 시각적 강조 가치 있음.
+> **Why 평일 = paper**: scaffold paperDark 위에 paper 컬럼이 올라가면 "노트지 위에 메인 콘텐츠 영역" 비유로 자연스럽게 분리됨. 흰색 방향(#F8F2E5, #F5EFE2) 은 종이 무드 깨짐 + future 레슨(옅은 악기색) 과 명도 동일해 구분 실패.
 >
-> **Why 평일 톤 (#F8F2E5)**: 그리드 본문이 종이 베이스(#F2ECDD) 와 동일 톤이면 "콘텐츠 영역" 인지 약함. 종이보다 살짝 밝은 톤으로 본문 영역을 분리.
+> **Why 2톤 분리**: regular(매주 반복되는 토/일) 는 사용자가 이미 패턴으로 학습. 선생님이 의식적으로 설정한 vacation/holiday 만 시각적 강조 가치 있음.
 >
 > **Why ink alpha 0.10 (휴일)**: 무채색 중성 회색(#E8E8E8) 은 종이 위 동시대비로 cool/sky-blue 인지됨. ink 알파 블렌딩은 종이 톤을 유지하면서 명도만 낮춰 warm dark gray 로 인지된다.
 >
 > **Why today 본문 톤 따로 없음**: 헤더의 요일/날짜 칩이 이미 today 변별을 담당. §1.3.2 평탄화 — 변동은 단일 채널.
+
+### 레슨 블록 색상 — Mode A++ 강화
+
+| 상태 | 배경 | 악센트 |
+|---|---|---|
+| Today (현재/예정) | 악기별 vivid 색상 (`InstrumentColors.getColor`) | 악기별 진한 색상 |
+| Today (지남) | 악기색 alpha 0.5 | 악기색 alpha 0.4 |
+| **Future (다른 날)** | **악기색 + white lerp 0.15** | **악기색 alpha 0.55** |
+| Past (다른 날) | `scheduleMutedBackground` (#F5F5F5) | `scheduleMutedAccent` |
+| Preview | 악기색 alpha 0.15 | 악기색 alpha 0.25 |
+
+> **Why future white lerp 0.15 (← 0.35)**: 0.35 는 컬럼 paper 위에서 명도 차이 거의 없어 "예정된 스케줄 + 다른 학생 스케줄" 변별 약함. 0.15 는 악기 색상을 살려 컬럼/타 학생 레슨과 명확히 구분되면서도 today 의 vivid 와 위계 유지.
 
 ### 셀(Slot) 단위 추가 톤 — §7.123 Mode A+
 
@@ -195,3 +207,4 @@ Line 2: 곡명                  (예: 쇼팽 녹턴)
 | 2026-04-27 | §7.123 4단 우선순위 도입 — vacation/holiday/regular/today + additionalSlot, 단일 색 + 라벨 칩 변별 |
 | 2026-04-27 | §7.123 Mode A 색상 보정 — `scheduleRestDayBackground` 중성 회색 → `ink alpha 0.10` (동시대비 cool 회피), today 본문 톤 + 근무시간 외 셀 톤 제거 (§1.3.2 평탄화) |
 | 2026-04-27 | §7.123 Mode A+ — 2톤 팔레트 분리. 평일 컬럼은 `scheduleColumnBackground` (#F8F2E5, 종이보다 살짝 밝음). regular(토/일 등 정기 휴무) 는 평일과 동일 처리. vacation/holiday(선생님 명시 휴일) 만 회색 강조. additionalSlot override 도 휴일 컬럼 위로 한정 |
+| 2026-04-27 | §7.123 Mode A++ — 컬럼 톤을 `paper` (#F2ECDD) 로 정렬 (scaffold paperDark 위 자연 분리). future 레슨 white lerp 0.35 → 0.15, accent alpha 0.45 → 0.55 — 컬럼/타 학생 스케줄 변별 강화 |
