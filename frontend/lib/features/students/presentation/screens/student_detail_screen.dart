@@ -15,6 +15,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/parent_home/domain/entities/parent.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -23,7 +25,17 @@ import '../../presentation/providers/student_crud_provider.dart';
 import '../providers/student_image_provider.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 
-/// Student detail screen showing profile, lessons, and practice stats
+/// Student detail screen — Notebook × Score 레이아웃.
+///
+/// 정체성 4 적용:
+/// - Playfair: NotebookMasthead eyebrow + 학생명 (pieceTitle)
+/// - 로마숫자: 탭 인덱스 (I. 정보 / II. 레슨 / III. 연습)
+/// - Vermillion: 파괴적 액션 (학생 삭제) + 체험 상태 텍스트
+/// - Gaegu: (해당 없음 — 본 화면은 메타 카드 위주)
+///
+/// 구조 2 적용:
+/// - NotebookMasthead: 상단 2px ink + 1px ink 라인 사이 헤더
+/// - "Fine." 푸터: 하단 ThinRule + 종지부 라벨 + "+ 레슨 추가" 액션
 class StudentDetailScreen extends ConsumerWidget {
   final String studentId;
   final String? membershipId;
@@ -41,31 +53,11 @@ class StudentDetailScreen extends ConsumerWidget {
     return studentAsync.when(
       data: (student) {
         if (student == null) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back),
-              ),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.person_off,
-                    size: 64,
-                    color: AppColors.inkTertiary,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '학생을 찾을 수 없습니다',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
-              ),
+          return _buildShellScaffold(
+            context,
+            child: _buildEmptyMessage(
+              icon: Icons.person_off,
+              message: '학생을 찾을 수 없습니다',
             ),
           );
         }
@@ -76,49 +68,82 @@ class StudentDetailScreen extends ConsumerWidget {
         );
       },
       loading:
-          () => Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back),
-              ),
-            ),
-            body: const Center(child: CircularProgressIndicator()),
+          () => _buildShellScaffold(
+            context,
+            child: const Center(child: CircularProgressIndicator()),
           ),
       error:
-          (error, _) => Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back),
-              ),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: AppColors.paperAccent,
+          (error, _) => _buildShellScaffold(
+            context,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.paperAccent,
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                Text(
+                  '데이터를 불러오는데 실패했습니다',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.inkSecondary,
                   ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '데이터를 불러오는데 실패했습니다',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space6),
-                  OutlinedButton.icon(
-                    onPressed: () => ref.invalidate(studentProvider(studentId)),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: AppSpacing.space5),
+                OutlinedButton.icon(
+                  onPressed: () => ref.invalidate(studentProvider(studentId)),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text(AppStrings.retry),
+                ),
+              ],
             ),
           ),
+    );
+  }
+
+  Widget _buildShellScaffold(BuildContext context, {required Widget child}) {
+    return Scaffold(
+      backgroundColor: AppColors.paper,
+      body: SafeArea(
+        child: Column(
+          children: [
+            NotebookMasthead(
+              eyebrow: 'STUDENT',
+              meta: '',
+              trailing: IconButton(
+                onPressed: () => context.pop(),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.ink,
+                  size: 22,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              ),
+            ),
+            Expanded(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyMessage({required IconData icon, required String message}) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 48, color: AppColors.inkTertiary),
+          const SizedBox(height: AppSpacing.space4),
+          Text(
+            message,
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -134,279 +159,53 @@ class _StudentDetailContent extends ConsumerWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [_buildSliverAppBar(context, ref, innerBoxIsScrolled)];
-          },
-          body: TabBarView(
-            children: [
-              // Tab 0: Info
-              StudentInfoTab(student: student, membershipId: membershipId),
-
-              // Tab 1: Lessons
-              StudentLessonsTab(studentId: student.id),
-
-              // Tab 2: Practice
-              StudentPracticeTab(studentId: student.id),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            context.push('${AppRoutes.addLesson}?studentId=${student.id}');
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('레슨 예약'),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSliverAppBar(
-    BuildContext context,
-    WidgetRef ref,
-    bool innerBoxIsScrolled,
-  ) {
-    final profileImagePath =
-        ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
-    final backgroundImagePath =
-        ref
-            .watch(studentBackgroundImageNotifierProvider(student.id))
-            .valueOrNull;
-
-    return SliverAppBar(
-      expandedHeight: 270,
-      pinned: true,
-      titleSpacing: 0,
-      forceElevated: innerBoxIsScrolled,
-      // 접힐 때 흰색 배경 → 흰색 아이콘/탭 겹침 방지 (M3 surfaceTint 포함).
-      backgroundColor: student.profileColor,
-      foregroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
-      title: Text(
-        '${student.name} (학생)',
-        style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            context.push(AppRoutes.editStudent.replaceFirst(':id', student.id));
-          },
-          icon: const Icon(Icons.edit),
-        ),
-        IconButton(
-          onPressed: () {
-            _showMoreOptions(context, ref);
-          },
-          icon: const Icon(Icons.more_vert),
-        ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: _buildAppBarBackground(
-          profileImagePath: profileImagePath,
-          backgroundImagePath: backgroundImagePath,
-        ),
-      ),
-      bottom: TabBar(
-        indicatorColor: Colors.white,
-        labelColor: Colors.white,
-        unselectedLabelColor: AppColors.paper.withValues(alpha: 0.7),
-        labelStyle: AppTypography.bodyMedium.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: AppTypography.bodyMedium,
-        tabs: const [
-          Tab(text: AppStrings.studentTabInfo),
-          Tab(text: AppStrings.studentTabLessons),
-          Tab(text: AppStrings.studentTabPractice),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppBarBackground({
-    String? profileImagePath,
-    String? backgroundImagePath,
-  }) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Background: image or gradient
-        if (backgroundImagePath != null && backgroundImagePath.isNotEmpty)
-          _buildBackgroundImage(backgroundImagePath)
-        else
-          _buildDefaultGradientBackground(),
-
-        // Dark overlay for text readability
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.ink.withValues(alpha: 0.1),
-                AppColors.ink.withValues(alpha: 0.5),
-              ],
-            ),
-          ),
-        ),
-
-        // Content
-        SafeArea(
+        backgroundColor: AppColors.paper,
+        body: SafeArea(
+          bottom: false,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // Avatar
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.white,
-                backgroundImage: _resolveStudentProfileImage(profileImagePath),
-                child:
-                    _resolveStudentProfileImage(profileImagePath) == null
-                        ? Text(
-                          student.initial,
-                          style: AppTypography.displayMedium.copyWith(
-                            color: student.profileColor,
-                          ),
-                        )
-                        : null,
+              // ── Notebook 헤더: Masthead + 신원 스트립 + 로마숫자 탭 ──
+              _NotebookHeader(
+                student: student,
+                onBack: () => context.pop(),
+                onMore: () => _showMoreOptions(context, ref),
+                profileImagePath:
+                    ref
+                        .watch(studentProfileImageNotifierProvider(student.id))
+                        .valueOrNull,
               ),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Name
-              Text(
-                student.name,
-                style: AppTypography.headingLarge.copyWith(color: Colors.white),
+              // ── 본문: 3 탭 콘텐츠 ──
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    StudentInfoTab(
+                      student: student,
+                      membershipId: membershipId,
+                    ),
+                    StudentLessonsTab(studentId: student.id),
+                    StudentPracticeTab(studentId: student.id),
+                  ],
+                ),
               ),
-
-              // Status, Instrument and Practice badges
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: student.status.color.withValues(alpha: 0.3),
-                      border: Border.all(
-                        color: AppColors.paper.withValues(alpha: 0.5),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      student.status.label,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paper.withValues(alpha: 0.2),
-                    ),
-                    child: Text(
-                      student.instrument,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: student.practiceStatus.color.withValues(
-                        alpha: 0.3,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: student.practiceStatus.color,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.space1),
-                        Text(
-                          student.practiceStatus.label,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              // ── "Fine." 푸터 + 레슨 추가 액션 ──
+              _FineActionBar(
+                onAddLesson: () {
+                  context.push(
+                    '${AppRoutes.addLesson}?studentId=${student.id}',
+                  );
+                },
               ),
-              // TabBar와 겹침 방지 여백 (TabBar 높이 ~48px)
-              const SizedBox(height: AppSpacing.space8),
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildBackgroundImage(String path) {
-    if (path.startsWith('http')) {
-      return Image.network(
-        path,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildDefaultGradientBackground(),
-      );
-    }
-    return Image.file(
-      File(path),
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => _buildDefaultGradientBackground(),
-    );
-  }
-
-  Widget _buildDefaultGradientBackground() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            student.profileColor,
-            student.profileColor.withValues(alpha: 0.7),
-          ],
-        ),
       ),
     );
-  }
-
-  ImageProvider? _resolveStudentProfileImage(String? imagePath) {
-    if (imagePath == null || imagePath.isEmpty) return null;
-    if (imagePath.startsWith('http')) return NetworkImage(imagePath);
-    final file = File(imagePath);
-    if (file.existsSync()) return FileImage(file);
-    return null;
   }
 
   void _showMoreOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.paper,
       shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
@@ -416,13 +215,24 @@ class _StudentDetailContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space2),
                 const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space4),
-                ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: const Text('전화하기'),
+                _MoreOptionTile(
+                  icon: Icons.edit_outlined,
+                  title: '학생 정보 수정',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(
+                      AppRoutes.editStudent.replaceFirst(':id', student.id),
+                    );
+                  },
+                ),
+                const _MoreOptionDivider(),
+                _MoreOptionTile(
+                  icon: Icons.phone_outlined,
+                  title: '전화하기',
                   enabled: student.phone != null && student.phone!.isNotEmpty,
-                  subtitle:
+                  hint:
                       student.phone == null || student.phone!.isEmpty
-                          ? const Text('전화번호가 등록되지 않았습니다')
+                          ? '전화번호 미등록'
                           : null,
                   onTap: () {
                     Navigator.pop(context);
@@ -431,13 +241,13 @@ class _StudentDetailContent extends ConsumerWidget {
                     }
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.message),
-                  title: const Text('메시지 보내기'),
+                _MoreOptionTile(
+                  icon: Icons.message_outlined,
+                  title: '메시지 보내기',
                   enabled: student.phone != null && student.phone!.isNotEmpty,
-                  subtitle:
+                  hint:
                       student.phone == null || student.phone!.isEmpty
-                          ? const Text('전화번호가 등록되지 않았습니다')
+                          ? '전화번호 미등록'
                           : null,
                   onTap: () {
                     Navigator.pop(context);
@@ -446,9 +256,9 @@ class _StudentDetailContent extends ConsumerWidget {
                     }
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text('레슨 기록 보기'),
+                _MoreOptionTile(
+                  icon: Icons.history,
+                  title: '레슨 기록 보기',
                   onTap: () {
                     Navigator.pop(context);
                     context.push(
@@ -456,150 +266,63 @@ class _StudentDetailContent extends ConsumerWidget {
                     );
                   },
                 ),
-                // Show status change options based on current status
-                if (student.status == StudentStatus.trial) ...[
-                  ListTile(
-                    leading: Icon(Icons.upgrade, color: AppColors.paperOk),
-                    title: Text(
-                      '정규 전환',
-                      style: TextStyle(color: AppColors.paperOk),
-                    ),
-                    subtitle: const Text('체험 학생을 정규 학생으로 전환'),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final confirmed = await _showStatusChangeConfirmation(
-                        context,
-                        '정규 전환',
-                        '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
-                      );
-                      if (confirmed == true) {
-                        try {
-                          await ref
-                              .read(studentsNotifierProvider.notifier)
-                              .updateStudentStatus(
-                                student.id,
-                                StudentStatus.active,
-                              );
-                          ref.invalidate(studentProvider(student.id));
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  '상태 변경에 실패했습니다. 다시 시도해주세요.',
-                                ),
-                                backgroundColor: AppColors.paperAccent,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
+                const _MoreOptionDivider(),
+                if (student.status == StudentStatus.trial)
+                  _MoreOptionTile(
+                    icon: Icons.upgrade,
+                    title: '정규 전환',
+                    hint: '체험 학생을 정규 학생으로',
+                    onTap:
+                        () => _confirmStatusChange(
+                          context,
+                          ref,
+                          newStatus: StudentStatus.active,
+                          dialogTitle: '정규 전환',
+                          dialogBody: '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
+                        ),
                   ),
-                ],
-                if (student.status == StudentStatus.active) ...[
-                  ListTile(
-                    leading: const Icon(Icons.pause_circle_outline),
-                    title: const Text('휴강 설정'),
-                    subtitle: const Text('일시적으로 레슨을 중단'),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final confirmed = await _showStatusChangeConfirmation(
-                        context,
-                        '휴강 설정',
-                        '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
-                      );
-                      if (confirmed == true) {
-                        try {
-                          await ref
-                              .read(studentsNotifierProvider.notifier)
-                              .updateStudentStatus(
-                                student.id,
-                                StudentStatus.paused,
-                              );
-                          ref.invalidate(studentProvider(student.id));
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  '상태 변경에 실패했습니다. 다시 시도해주세요.',
-                                ),
-                                backgroundColor: AppColors.paperAccent,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
+                if (student.status == StudentStatus.active)
+                  _MoreOptionTile(
+                    icon: Icons.pause_circle_outline,
+                    title: '휴강 설정',
+                    hint: '일시적으로 레슨을 중단',
+                    onTap:
+                        () => _confirmStatusChange(
+                          context,
+                          ref,
+                          newStatus: StudentStatus.paused,
+                          dialogTitle: '휴강 설정',
+                          dialogBody: '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
+                        ),
                   ),
-                ],
-                if (student.status == StudentStatus.paused) ...[
-                  ListTile(
-                    leading: Icon(
-                      Icons.play_circle_outline,
-                      color: AppColors.paperOk,
-                    ),
-                    title: Text(
-                      '레슨 재개',
-                      style: TextStyle(color: AppColors.paperOk),
-                    ),
-                    subtitle: const Text('휴강 상태를 해제하고 레슨 재개'),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      final confirmed = await _showStatusChangeConfirmation(
-                        context,
-                        '레슨 재개',
-                        '${student.name} 학생의 레슨을 재개하시겠습니까?',
-                      );
-                      if (confirmed == true) {
-                        try {
-                          await ref
-                              .read(studentsNotifierProvider.notifier)
-                              .updateStudentStatus(
-                                student.id,
-                                StudentStatus.active,
-                              );
-                          ref.invalidate(studentProvider(student.id));
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  '상태 변경에 실패했습니다. 다시 시도해주세요.',
-                                ),
-                                backgroundColor: AppColors.paperAccent,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    },
+                if (student.status == StudentStatus.paused)
+                  _MoreOptionTile(
+                    icon: Icons.play_circle_outline,
+                    title: '레슨 재개',
+                    hint: '휴강 해제하고 레슨 재개',
+                    onTap:
+                        () => _confirmStatusChange(
+                          context,
+                          ref,
+                          newStatus: StudentStatus.active,
+                          dialogTitle: '레슨 재개',
+                          dialogBody: '${student.name} 학생의 레슨을 재개하시겠습니까?',
+                        ),
                   ),
-                ],
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.family_restroom,
-                    color: AppColors.paperAccent,
-                  ),
-                  title: const Text('학부모 초대'),
-                  subtitle: const Text('학부모 연결을 위한 초대 코드 생성'),
+                _MoreOptionTile(
+                  icon: Icons.family_restroom,
+                  title: '학부모 초대',
+                  hint: '연결을 위한 초대 코드 생성',
                   onTap: () {
                     Navigator.pop(context);
                     _showInviteCodeDialog(context, student.name, ref);
                   },
                 ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.delete_outline,
-                    color: AppColors.paperAccent,
-                  ),
-                  title: Text(
-                    '학생 삭제',
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
+                const _MoreOptionDivider(),
+                _MoreOptionTile(
+                  icon: Icons.delete_outline,
+                  title: '학생 삭제',
+                  isDestructive: true,
                   onTap: () async {
                     Navigator.pop(context);
                     final confirmed = await _showDeleteConfirmation(context);
@@ -631,11 +354,43 @@ class _StudentDetailContent extends ConsumerWidget {
     );
   }
 
+  Future<void> _confirmStatusChange(
+    BuildContext context,
+    WidgetRef ref, {
+    required StudentStatus newStatus,
+    required String dialogTitle,
+    required String dialogBody,
+  }) async {
+    Navigator.pop(context);
+    final confirmed = await _showStatusChangeConfirmation(
+      context,
+      dialogTitle,
+      dialogBody,
+    );
+    if (confirmed != true) return;
+    try {
+      await ref
+          .read(studentsNotifierProvider.notifier)
+          .updateStudentStatus(student.id, newStatus);
+      ref.invalidate(studentProvider(student.id));
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+            backgroundColor: AppColors.paperAccent,
+          ),
+        );
+      }
+    }
+  }
+
   Future<bool?> _showDeleteConfirmation(BuildContext context) {
     return showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: AppColors.paper,
             title: const Text('학생 삭제'),
             content: Text(
               '${student.name} 학생을 삭제하시겠습니까?\n\n관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
@@ -663,6 +418,7 @@ class _StudentDetailContent extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: AppColors.paper,
             title: Text(title),
             content: Text(message),
             actions: [
@@ -684,26 +440,23 @@ class _StudentDetailContent extends ConsumerWidget {
     String studentName,
     WidgetRef ref,
   ) async {
-    // Generate a random 6-character alphanumeric invite code
     final random = Random();
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final inviteCode =
         List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
 
-    // Create and save the invitation
     final teacherId = ref.read(currentUserIdProvider);
     final invitation = ParentInvitation(
       id: 'inv_${DateTime.now().millisecondsSinceEpoch}',
       studentId: student.id,
       teacherId: teacherId,
       source: InvitationSource.teacher,
-      parentPhone: '', // Will be filled when parent registers
+      parentPhone: '',
       invitationCode: inviteCode,
       expiresAt: DateTime.now().add(const Duration(hours: 24)),
       createdAt: DateTime.now(),
     );
 
-    // Save invitation with error handling
     try {
       await ref
           .read(invitationsNotifierProvider(student.id).notifier)
@@ -726,6 +479,7 @@ class _StudentDetailContent extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: AppColors.paper,
             title: const Text('학부모 초대 코드'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -741,7 +495,7 @@ class _StudentDetailContent extends ConsumerWidget {
                     vertical: AppSpacing.space4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
+                    color: AppColors.paperAccentSoft,
                     border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(
@@ -813,6 +567,365 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
             ],
           ),
+    );
+  }
+}
+
+/// Notebook 헤더 — Masthead(2px ink) + 신원 스트립 + 로마숫자 탭.
+class _NotebookHeader extends StatelessWidget {
+  final Student student;
+  final VoidCallback onBack;
+  final VoidCallback onMore;
+  final String? profileImagePath;
+
+  const _NotebookHeader({
+    required this.student,
+    required this.onBack,
+    required this.onMore,
+    this.profileImagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.paper,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Masthead: 좌 STUDENT eyebrow + 우 back/more 아이콘 ──
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            child: NotebookMasthead(
+              eyebrow: 'STUDENT',
+              meta: '',
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: onBack,
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    onPressed: onMore,
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── 신원 스트립: 모노그램 + 학생명 + 메타 라인 ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space5,
+              AppSpacing.screenPadding,
+              AppSpacing.space4,
+            ),
+            child: Column(
+              children: [
+                _StudentMonogram(
+                  student: student,
+                  profileImagePath: profileImagePath,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  student.name,
+                  style: NotebookTypography.masthead.copyWith(fontSize: 28),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                _StudentMetaLine(student: student),
+              ],
+            ),
+          ),
+
+          const ThinRule(),
+
+          // ── 로마숫자 탭 ──
+          const _RomanTabBar(),
+          const ThinRule(),
+        ],
+      ),
+    );
+  }
+}
+
+/// 학생 모노그램 — 64dp paper bg + 1px ink stroke + Playfair initial.
+/// 프로필 이미지가 있으면 이미지로 대체.
+class _StudentMonogram extends StatelessWidget {
+  final Student student;
+  final String? profileImagePath;
+
+  const _StudentMonogram({required this.student, this.profileImagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    final image = _resolveImage(profileImagePath);
+
+    if (image != null) {
+      return Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.ink, width: 1),
+          image: DecorationImage(image: image, fit: BoxFit.cover),
+        ),
+      );
+    }
+
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.ink, width: 1),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        student.initial,
+        style: NotebookTypography.masthead.copyWith(
+          fontSize: 28,
+          color: AppColors.ink,
+        ),
+      ),
+    );
+  }
+
+  ImageProvider? _resolveImage(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return null;
+    if (imagePath.startsWith('http')) return NetworkImage(imagePath);
+    final file = File(imagePath);
+    if (file.existsSync()) return FileImage(file);
+    return null;
+  }
+}
+
+/// 학생 메타 라인 — "악기 · 상태 · 연습상태".
+/// 색 채움 칩 대신 단일 행 텍스트 (3색 이하 원칙).
+/// 체험 상태만 Vermillion 액센트로 강조.
+class _StudentMetaLine extends StatelessWidget {
+  final Student student;
+
+  const _StudentMetaLine({required this.student});
+
+  @override
+  Widget build(BuildContext context) {
+    final isTrial = student.status == StudentStatus.trial;
+    final statusColor =
+        isTrial ? AppColors.paperAccent : AppColors.inkSecondary;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          student.instrument,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+        ),
+        Text(
+          '  ·  ',
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+        ),
+        Text(
+          student.status.label,
+          style: AppTypography.bodySmall.copyWith(
+            color: statusColor,
+            fontWeight: isTrial ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+        Text(
+          '  ·  ',
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+        ),
+        Text(
+          student.practiceStatus.label,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 로마숫자 탭바 — I. 정보 / II. 레슨 / III. 연습.
+class _RomanTabBar extends StatelessWidget {
+  const _RomanTabBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      indicatorColor: AppColors.ink,
+      indicatorWeight: 2,
+      indicatorSize: TabBarIndicatorSize.label,
+      labelColor: AppColors.ink,
+      unselectedLabelColor: AppColors.inkTertiary,
+      labelStyle: AppTypography.bodyMedium.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelStyle: AppTypography.bodyMedium,
+      dividerColor: Colors.transparent,
+      tabs: [
+        Tab(child: _RomanTab(roman: 'I.', label: AppStrings.studentTabInfo)),
+        Tab(
+          child: _RomanTab(roman: 'II.', label: AppStrings.studentTabLessons),
+        ),
+        Tab(
+          child: _RomanTab(roman: 'III.', label: AppStrings.studentTabPractice),
+        ),
+      ],
+    );
+  }
+}
+
+class _RomanTab extends StatelessWidget {
+  final String roman;
+  final String label;
+
+  const _RomanTab({required this.roman, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(roman, style: NotebookTypography.roman.copyWith(fontSize: 12)),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
+  }
+}
+
+/// "Fine." 푸터 + 레슨 추가 액션 — FloatingActionButton 대체.
+class _FineActionBar extends StatelessWidget {
+  final VoidCallback onAddLesson;
+
+  const _FineActionBar({required this.onAddLesson});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.paper,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            const ThinRule(),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space2,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Fine.', style: NotebookTypography.fine),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: onAddLesson,
+                    icon: const Icon(Icons.add, size: 18, color: AppColors.ink),
+                    label: Text(
+                      '레슨 추가',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// More options 시트 섹션 구분선 — 좌우 padding 적용한 ThinRule.
+class _MoreOptionDivider extends StatelessWidget {
+  const _MoreOptionDivider();
+
+  @override
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+    child: ThinRule(),
+  );
+}
+
+/// More options 시트의 ink-only ListTile.
+/// hint = subtitle (회색), enabled=false 시 비활성, isDestructive=true 시 Vermillion.
+class _MoreOptionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? hint;
+  final bool enabled;
+  final bool isDestructive;
+  final VoidCallback onTap;
+
+  const _MoreOptionTile({
+    required this.icon,
+    required this.title,
+    this.hint,
+    this.enabled = true,
+    this.isDestructive = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        !enabled
+            ? AppColors.inkTertiary
+            : isDestructive
+            ? AppColors.paperAccent
+            : AppColors.ink;
+    return ListTile(
+      enabled: enabled,
+      leading: Icon(icon, color: color, size: 22),
+      title: Text(title, style: AppTypography.bodyLarge.copyWith(color: color)),
+      subtitle:
+          hint != null
+              ? Text(
+                hint!,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              )
+              : null,
+      onTap: enabled ? onTap : null,
     );
   }
 }
