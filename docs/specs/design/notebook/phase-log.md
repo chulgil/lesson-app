@@ -4821,6 +4821,58 @@ bool isAdditionalOpenSlot({
 **Lore-rejected (Mode C)**: today 본문 톤 유지 + 휴식 색만 보정 — 평탄화 원칙 일관성 깨짐. 한 번에 정리.
 
 **테스트 갱신**: `schedule_visual_helpers_test.dart` 6개 테스트 expected color 변경 (`ink alpha 0.10` 으로) + today none 케이스는 null 기대.
+
+---
+
+#### §7.123 Mode A+ — 2톤 분리, 평일 본문 톤 도입 (2026-04-27 같은 날 후속)
+
+**전제**: §7.123 Mode A 적용 후 사용자 추가 점검: "주간그리드에 기본 배경색은 바탕색과 달라야합니다. 공휴일 및 토, 일요일 구분도 일반 그리드와 동일하게 하고 일반그리드의 경우 바탕색보다 조금 밝은 톤으로 해주세요. 선생님이 설정한 휴일만 지금현재 휴식컬럼 중성회색으로 되어야합니다."
+
+**진단 (UX 관점)**
+
+| 문제 | 원인 |
+|---|---|
+| 그리드 본문이 종이 베이스(#F2ECDD) 와 동일 톤 → "콘텐츠 영역" 인지 약함 | 평일 컬럼이 투명(null) → 종이 그대로 노출 |
+| 토/일 등 정기 휴무가 vacation/holiday 와 동일 회색 → 매주 반복 패턴이 과도 강조됨 | regular 도 isRest=true 로 동일 처리 |
+
+**결정 (Mode A+ 2톤 팔레트)**
+
+| 변경 | Before (Mode A) | After (Mode A+) |
+|---|---|---|
+| 평일 컬럼 배경 | `null` (투명, 종이 그대로) | `scheduleColumnBackground` (#F8F2E5, 종이보다 살짝 밝음) |
+| 정기 휴무 (regular) 배경 | `ink alpha 0.10` 회색 | `scheduleColumnBackground` (평일과 동일) |
+| 휴가/휴무 (vacation/holiday) | `ink alpha 0.10` | 유지 |
+| Today 본문 톤 | 없음 (제거됨) | 없음 (유지) |
+| Additional slot override | 모든 isRest 컬럼 위 흰색 | **휴가/휴무 컬럼 위만** 흰색 |
+
+**Why 평일 톤 종이보다 밝게**: 그리드 본문이 종이 베이스와 같으면 "이 영역이 콘텐츠 영역" 인지 약함. 살짝 밝은 톤(#F8F2E5)으로 본문 영역을 분리. 흰색은 너무 강함 — 종이 무드 깨짐.
+
+**Why regular = 평일 톤**: 토/일 등 매주 반복되는 휴무는 사용자가 이미 패턴으로 학습. 시각 강조 가치 없음. 의식적으로 설정한 vacation/holiday 만 강조.
+
+**Why additionalSlot override 휴일 컬럼 한정**: regular 컬럼이 평일 톤이라 추가 오픈 슬롯도 시각적으로 평일과 동일 — override 필요 없음. 회색 휴일 컬럼 위에서만 흰색 슬롯이 의미를 가짐.
+
+**도메인 모델 보존**: `ColumnRestKind.regular.isRest = true` 유지 (타임라인 뷰의 휴일 banner 동작 보존). 시각적 분기는 새 extension `isTeacherSetRest` (vacation || holiday) 로 분리 — `weeklyColumnBackground` 와 셀 override 만 사용.
+
+**신규 색상 토큰**
+```dart
+// AppColors §schedule
+static const scheduleColumnBackground = Color(0xFFF8F2E5);
+// 종이 #F2ECDD 보다 명도 +6 정도 밝은 톤. 종이와 본문 영역 구분.
+```
+
+**Lore-directive**: 시각 강조는 의도된 변동만 — vacation/holiday (선생님 명시 휴일) 회색, regular(주말 등 정기) 평일과 동일 톤.
+
+**Lore-directive**: 그리드 본문은 종이보다 살짝 밝은 톤 (`scheduleColumnBackground` #F8F2E5) — 콘텐츠 영역 인지 분리.
+
+**Lore-directive**: 도메인 의미와 시각 의미 분리 — `isRest` (도메인) 와 `isTeacherSetRest` (시각) 두 extension 으로 책임 분리. 타임라인 뷰의 휴일 banner 동작 보존.
+
+**Lore-rejected**: regular 도 회색으로 강조 — 매주 반복 패턴 과도 강조, 본질적 변동(vacation/holiday) 의 시각 가중치 희석.
+
+**Lore-rejected**: 평일 컬럼 흰색 (#FFFFFF) — 종이 무드 깨짐. 종이 위에서 흰색은 차가움 인지.
+
+**Lore-rejected**: `ColumnRestKind.regular.isRest = false` 로 변경 — 타임라인 뷰의 휴일 banner 동작 깨짐. extension 분리가 더 안전.
+
+**테스트 갱신**: `schedule_visual_helpers_test.dart` weeklyColumnBackground 6 테스트 갱신 + isTeacherSetRest 그룹 2 테스트 추가 (총 41/41 통과).
 - §7.x 후보: 일간 타임라인에도 동일 4단 + 라벨 이식 (§7.121 의 휴무 배경 위에 휴가/추가오픈 추가)
 - §7.x 후보: 라벨 칩 hover/tap 시 사유 툴팁 ("휴가: 가족 여행 (4/27-5/3)") — `TimeException.reason` 활용
 

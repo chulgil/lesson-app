@@ -61,6 +61,10 @@ class AppColors {
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
 
+  // Schedule: weekly grid 평일 컬럼 (종이 #F2ECDD 보다 살짝 밝음)
+  // §7.123 Mode A+ — 그리드 본문이 종이 베이스와 시각적으로 구분되도록.
+  static const scheduleColumnBackground = Color(0xFFF8F2E5);
+
   // Schedule: now indicator (red line/dot for current time)
   static const scheduleNowIndicator = Color(0xFFE53935);
 

@@ -55,34 +55,36 @@ void main() {
   // §7.123 — weeklyColumnBackground (4단 우선순위, restKind 기반)
   // ═══════════════════════════════════════════════════════════════════════
 
-  group('§7.123 (Mode A) weeklyColumnBackground — 미니멀 팔레트', () {
-    final restColor = AppColors.ink.withValues(alpha: 0.10);
+  group('§7.123 (Mode A+) weeklyColumnBackground — 2톤 팔레트', () {
+    final teacherRestColor = AppColors.ink.withValues(alpha: 0.10);
+    final plainColor = AppColors.scheduleColumnBackground;
 
-    test('휴가 (vacation) > today: 휴식 색상 우선', () {
+    test('휴가 (vacation): warm dark gray', () {
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.vacation,
       );
-      expect(color, restColor);
+      expect(color, teacherRestColor);
     });
 
-    test('휴무 (holiday) > today: 휴식 색상 우선', () {
+    test('휴무 (holiday): warm dark gray', () {
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.holiday,
       );
-      expect(color, restColor);
+      expect(color, teacherRestColor);
     });
 
-    test('정기 휴무일 (regular) > today: 휴식 색상 우선', () {
+    test('정기 휴무일 (regular): 평일 톤과 동일 (강조 안 함)', () {
+      // 토/일 등 매주 반복되는 휴무는 강조하지 않고 평일과 동일 처리.
       final color = weeklyColumnBackground(
-        dayType: ScheduleDayType.today,
+        dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.regular,
       );
-      expect(color, restColor);
+      expect(color, plainColor);
     });
 
-    test('모든 휴식 종류는 동일 색상 ink alpha 0.10 (변별은 라벨 칩)', () {
+    test('vacation 과 holiday 는 동일 색상 (라벨 칩으로 변별)', () {
       final vacation = weeklyColumnBackground(
         dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.vacation,
@@ -91,25 +93,20 @@ void main() {
         dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.holiday,
       );
-      final regular = weeklyColumnBackground(
-        dayType: ScheduleDayType.future,
-        restKind: ColumnRestKind.regular,
-      );
-      expect(vacation, restColor);
-      expect(holiday, restColor);
-      expect(regular, restColor);
+      expect(vacation, teacherRestColor);
+      expect(holiday, teacherRestColor);
     });
 
-    test('today + none: 본문 톤 없음 (헤더 칩만 변별)', () {
+    test('today + none: 평일 톤 (헤더 칩만 변별)', () {
       // §1.3.2 평탄화 — today 변별은 단일 채널(헤더)에서만.
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.none,
       );
-      expect(color, isNull);
+      expect(color, plainColor);
     });
 
-    test('과거/미래 평일 (none): 투명 (null)', () {
+    test('과거/미래 평일 (none): 평일 톤 (종이보다 살짝 밝음)', () {
       final past = weeklyColumnBackground(
         dayType: ScheduleDayType.past,
         restKind: ColumnRestKind.none,
@@ -118,8 +115,36 @@ void main() {
         dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.none,
       );
-      expect(past, isNull);
-      expect(future, isNull);
+      expect(past, plainColor);
+      expect(future, plainColor);
+    });
+
+    test('regular 과 none 동일 톤 (정기 휴무 = 평일 시각적 동급)', () {
+      final regular = weeklyColumnBackground(
+        dayType: ScheduleDayType.future,
+        restKind: ColumnRestKind.regular,
+      );
+      final none = weeklyColumnBackground(
+        dayType: ScheduleDayType.future,
+        restKind: ColumnRestKind.none,
+      );
+      expect(regular, none);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // §7.123 Mode A+ — isTeacherSetRest extension
+  // ═══════════════════════════════════════════════════════════════════════
+
+  group('§7.123 ColumnRestKind.isTeacherSetRest', () {
+    test('vacation/holiday → true', () {
+      expect(ColumnRestKind.vacation.isTeacherSetRest, isTrue);
+      expect(ColumnRestKind.holiday.isTeacherSetRest, isTrue);
+    });
+
+    test('regular/none → false (정기 패턴은 강조 안 함)', () {
+      expect(ColumnRestKind.regular.isTeacherSetRest, isFalse);
+      expect(ColumnRestKind.none.isTeacherSetRest, isFalse);
     });
   });
 

@@ -31,7 +31,15 @@ enum ColumnRestKind {
 
 /// 컬럼 라벨 칩 (헤더 위 오버레이) 텍스트.
 extension ColumnRestKindExtension on ColumnRestKind {
+  /// 도메인 의미상 "휴식" — vacation/holiday/regular 모두 포함.
+  /// 타임라인 등 다른 화면의 휴일 배너 판정에 사용.
   bool get isRest => this != ColumnRestKind.none;
+
+  /// 선생님이 명시적으로 설정한 휴일 (vacation/holiday).
+  /// regular(주말/정기 미운영) 은 제외 — 시각적으로 평일과 동일 처리.
+  /// §7.123 Mode A+: 정기 패턴은 강조하지 않음.
+  bool get isTeacherSetRest =>
+      this == ColumnRestKind.vacation || this == ColumnRestKind.holiday;
 
   /// 컬럼 상단 오버레이 칩에 표시할 라벨.
   /// `regular` 은 라벨 없음 — 헤더의 요일/날짜로 이미 변별.
@@ -49,27 +57,31 @@ extension ColumnRestKindExtension on ColumnRestKind {
   }
 }
 
-/// §7.123 (Mode A) — 주간 그리드 컬럼 배경 미니멀 팔레트.
+/// §7.123 (Mode A+) — 주간 그리드 컬럼 배경 2톤 팔레트.
 ///
-/// 휴식(vacation/holiday/regular) → `ink alpha 0.10` (따뜻한 진한 회색).
-/// 그 외 (today 포함) → 투명. 변별은 라벨 칩 + 수직 디바이더(§7.122) 담당.
+/// - 선생님이 명시한 휴일(vacation/holiday) → `ink alpha 0.10` (warm dark gray)
+/// - 평일 + regular(주말 등 정기 미운영) → `scheduleColumnBackground` (종이보다 살짝 밝음)
 ///
-/// Why ink alpha 0.10: 종이 베이스(#F2ECDD, warm cream) 위 무채색 중성 회색
-/// (#E8E8E8) 은 동시대비로 cool tone 인지됨. ink 알파 블렌딩은 종이 톤을
-/// 유지하면서 채도만 낮춰 warm dark gray 로 인지된다 (≈ #DDD8CB).
+/// Why 2톤 분리: regular(매주 반복되는 토/일 휴무) 는 사용자 시각에서 강조할
+/// 필요 없음. 시각적 강조는 선생님이 의식적으로 설정한 예외(vacation/holiday) 만.
 ///
-/// Why today 톤 제거: 헤더의 요일/날짜 칩이 이미 today 변별을 담당
-/// (§1.3.2 평탄화 — 변동은 단일 채널로).
+/// Why 평일 톤이 종이보다 밝은가: 그리드 본문이 종이 베이스(#F2ECDD)와 같으면
+/// "콘텐츠 영역" 인지가 약함. 살짝 밝은 톤(#F8F2E5)으로 본문 영역을 분리.
 ///
-/// Spec: docs/specs/design/notebook/README.md §7.123
-Color? weeklyColumnBackground({
+/// Why ink 알파 블렌딩 (휴일): 종이 위 무채색 중성 회색(#E8E8E8) 은 동시대비로
+/// cool tone 인지됨. ink 알파는 종이 톤 유지하면서 명도만 낮춰 warm dark gray.
+///
+/// 컬럼 변별은 1px 수직 디바이더(§7.122) + 휴일 라벨 칩이 담당.
+///
+/// Spec: docs/specs/design/notebook/README.md §7.123 Mode A+
+Color weeklyColumnBackground({
   required ScheduleDayType dayType,
   required ColumnRestKind restKind,
 }) {
-  if (restKind.isRest) {
+  if (restKind.isTeacherSetRest) {
     return AppColors.ink.withValues(alpha: 0.10);
   }
-  return null;
+  return AppColors.scheduleColumnBackground;
 }
 
 /// §7.123 — 날짜에 적용되는 휴식 종류 판정.
