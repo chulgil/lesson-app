@@ -4780,7 +4780,53 @@ formatter 가 `shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)` �
 
 **후속**
 - Phase 4 수동 확인 포인트: 월요일 오늘·목요일 오늘·일요일 오늘 3 스폿 + 수요일 쉬는 날 1 스폿 실기 확인
-- 향후 일간 뷰(`schedule_daily_view.dart`) 에도 "쉬는 날 강조" 패턴 이식 검토 (§7.x 후보)
+- 향후 일간 뷰(`schedule_daily_view.dart`) 에도 "쉬는 날 강조" 패턴 이식 검토 (§7.x 후보) → **§7.121 에서 처리**
+
+---
+
+### §7.121 — 일간 타임라인 쉬는 날 시각 인코딩 (§7.120 패턴 이식, 2026-04-27)
+
+**전제**: §7.120 에서 주간 그리드의 4단 배경 우선순위(쉬는 날 > 오늘 > 주말 > zebra) 를 확립. 그러나 일간 타임라인(`schedule_timeline_view.dart`) 은 동일 정보 어휘 부재 — 선생님이 "오늘은 쉬는 날" 인지 즉각 인지 못 하고, 보강·예외 레슨이 정상 근무일 레슨처럼 보임.
+
+**근본 문제**:
+
+1. 선생님이 일간 뷰에서 임의 날짜를 선택했을 때 "쉬는 날" 여부가 **타임라인 외관에서 식별 불가** — 같은 흰 배경, 같은 격자
+2. 쉬는 날에 예정된 레슨(보강·시험 보충 등 예외) 이 보일 때 "왜 오늘 레슨이 있지?" 의 인지 마찰 발생
+3. 주간↔일간 뷰 전환 시 **시각 어휘 단절** — 주간에서 회색이던 컬럼이 일간에서 평범한 흰 배경
+
+**해결: 2 요소 시각 인코딩**
+
+| 요소 | 위치 | 디자인 |
+|------|------|--------|
+| **상단 배너** | 타임라인 위 | `weekend_outlined` 아이콘 + "쉬는 날" 라벨 + 보조 설명 "예정된 레슨이 있다면 보강·예외 처리 건입니다" |
+| **타임라인 배경** | `Expanded` 래퍼 | `scheduleMutedBackground × 0.5` — 주간 그리드와 정확히 동일 alpha |
+
+**`_isRestDay` 판정 로직**:
+
+```dart
+bool _isRestDay(TeacherAvailability? availability) {
+  if (availability == null) return false;
+  final dayIndex = widget.selectedDate.weekday - 1;  // Dart 1=월..7=일 → 0=월..6=일
+  final hasActiveSchedule = availability.weeklySchedules.any(
+    (s) => s.isActive && s.dayOfWeek == dayIndex,
+  );
+  return !hasActiveSchedule;
+}
+```
+
+주간 그리드의 `_getRestDays` 와 정확히 동일한 휴무 정의 — `WeeklySchedule.isActive == true` 인 항목이 없는 요일.
+
+**Lore-directive**: 일간↔주간 뷰는 **동일 시각 어휘**(같은 색·alpha·아이콘) 로 휴무를 표현 — 사용자가 뷰 전환 시 별도 학습 비용 없음.
+
+**Lore-constraint**: §7.120 의 alpha 0.10 상한은 주간 컬럼 배경에 한정. 일간 타임라인 배경은 화면 전체가 같은 톤이므로 0.5 까지 허용 — 레슨 카드(자체 색상 채도 보유) 와의 대비 충분.
+
+**Lore-rejected**: 쉬는 날 타임라인 자체를 숨기고 "쉬는 날입니다 — 일정 추가" 빈 상태로 대체 — 보강 레슨이 있을 때 시인성 손실. 운영 현실: 보강·시험 보충은 쉬는 날에 스케줄링되는 빈도 높음.
+
+**Lore-rejected**: 배너에 "휴무 해제" CTA — 일간 뷰는 단일 날짜 표시, "휴무 해제" 는 weeklySchedules 영구 변경. 의도치 않은 영구 변경 위험. 휴무 변경은 별도 설정 화면에서만.
+
+**후속**
+- 수동 확인: 선생님 계정으로 일요일(weeklySchedules 미설정 가정) 진입 → 배너 + 회색 배경 노출 확인
+- §7.x 후보: `schedule_tab.dart` 의 일간/주간 뷰 토글 시 휴무 표시 일관성 회귀 테스트
 
 ---
 

@@ -112,14 +112,79 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       teacherAvailabilityProvider('teacher_1'),
     );
     final availability = availabilityAsync.valueOrNull;
+    final isRestDay = _isRestDay(availability);
 
     return Column(
       children: [
-        // Timeline body
-        Expanded(child: _buildTimeline(availability)),
+        if (isRestDay) _buildRestDayBanner(),
+        // Timeline body — §7.121: rest day muted tint matches weekly grid.
+        Expanded(
+          child: ColoredBox(
+            color:
+                isRestDay
+                    ? AppColors.scheduleMutedBackground.withValues(alpha: 0.5)
+                    : Colors.transparent,
+            child: _buildTimeline(availability),
+          ),
+        ),
         // Context-aware summary bar
         _buildSummaryBar(),
       ],
+    );
+  }
+
+  /// §7.121 — selectedDate 가 선생님 weeklySchedules 에 등록되지 않은 요일이면 휴무.
+  ///
+  /// WeeklySchedule.dayOfWeek 는 0=월..6=일, DateTime.weekday 는 1=월..7=일.
+  bool _isRestDay(TeacherAvailability? availability) {
+    if (availability == null) return false;
+    final dayIndex = widget.selectedDate.weekday - 1;
+    final hasActiveSchedule = availability.weeklySchedules.any(
+      (s) => s.isActive && s.dayOfWeek == dayIndex,
+    );
+    return !hasActiveSchedule;
+  }
+
+  Widget _buildRestDayBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.scheduleMutedBackground.withValues(alpha: 0.6),
+        border: Border(
+          bottom: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.weekend_outlined,
+            size: 16,
+            color: AppColors.scheduleMutedAccent,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Text(
+            '쉬는 날',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.scheduleMutedAccent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              '예정된 레슨이 있다면 보강·예외 처리 건입니다',
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
