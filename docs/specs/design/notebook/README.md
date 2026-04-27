@@ -16,9 +16,9 @@
 | Notebook | 수업용 노트 / 연습일지 | 크림색 종이, 붉은 왼쪽 여백선, 손글씨 주석 |
 | Score | 클래식 악보 (17~19C) | Playfair Display serif, 로마숫자 악장 번호, 오선/Fine, 버밀리온 액센트 |
 
-### 1.1 4대 시그니처
+### 1.1 정체성 시그니처 4대
 
-이 컨셉을 식별하게 하는 **4가지 필수 요소**. 하나라도 빠지면 Notebook × Score가 아니다.
+이 컨셉을 식별하게 하는 **4가지 필수 요소**. 하나라도 빠지면 Notebook × Score가 아니다 — 점수 산식과 무관하게 1개 누락 = **BLOCK**.
 
 | # | 시그니처 | 규칙 |
 |---|---------|------|
@@ -26,6 +26,58 @@
 | 2 | **로마숫자 (I, II, III, IV…)** | 레슨 번호, 섹션 번호, 탭 아이템 인덱스 |
 | 3 | **Vermillion Red (#9B1B12)** | 강조 액션·현재 진행·하이라이트. 왼쪽 여백선은 #A83E3A (번진 잉크톤) |
 | 4 | **Gaegu 손글씨 주석** | 사용자/시스템 메모, "지금", "발표회!", 마지널리아 |
+
+### 1.2 감사 시그니처 6대 (정체성 4 + 구조 2)
+
+§1.1 4대 + 다음 2 구조 시그니처 = 감사 점수 분모. `home_screens_audit.md` 와 SSOT 정렬.
+
+| # | 시그니처 | 분류 | 규칙 |
+|---|---------|------|------|
+| 1 | Playfair italic 헤더 | 정체성 (§1.1 #1) | `NotebookTypography.masthead/mastheadLabel/pieceTitle` |
+| 2 | 로마숫자 인덱스 | 정체성 (§1.1 #2) | `NotebookTypography.roman/romanActive` + `romanOf()` |
+| 3 | Vermillion 액센트 | 정체성 (§1.1 #3) | `AppColors.paperAccent` foreground/border |
+| 4 | Gaegu 손글씨 | 정체성 (§1.1 #4) | `NotebookTypography.hand/handEmphasis/handOk` |
+| 5 | **NotebookMasthead 스캐폴드** | 구조 | 모든 화면·탭의 진입 헤더 — `AppBar` 사용 금지 |
+| 6 | **"Fine." 페이지 종지부** | 구조 | 스크롤 종료 영역의 italic 마커 (`NotebookTypography.fine`) |
+
+`ThinRule` 위젯은 `NotebookMasthead` 와 `NotebookSectionHeader` 의 부속 — 시그니처가 아닌 구성요소.
+
+**점수 임계값**:
+
+| 조건 | 판정 |
+|------|------|
+| 정체성 4 중 1+ 빠짐 | **BLOCK** (점수 산식 무시) |
+| 정체성 4 ✓ + 구조 6/6 | **PASS** (10점) |
+| 정체성 4 ✓ + 구조 5/6 | **FLAG** (8.33점) |
+| 정체성 4 ✓ + 구조 ≤4/6 | **BLOCK** |
+
+### 1.3 메타 원칙 2종
+
+시그니처가 "이 앱이 Notebook × Score 인가" 의 정체성 측정이라면, 메타 원칙은 **인지 부하 절제**의 측정. 두 원칙은 신규 화면 추가 시 시그니처와 동등하게 강제.
+
+#### 1.3.1 각진 (BorderRadius.zero) — §7.118 포화
+
+`app_theme.dart` 테마 레이어 + 인라인 override 모두 `BorderRadius.zero`. **3 예외에만** `BorderRadius.circular` 허용:
+
+| 예외 | 사유 |
+|------|------|
+| 애니메이션 캐릭터 (고양이·이모지) | 곡률은 감정 표현 |
+| 드래그 핸들 pill (`height / 2`) | "끌어올리기" 어포던스 |
+| 변수 표현식 기반 원형 오브젝트 | 정적 상수가 아님 |
+
+신규 위젯에 `BorderRadius.circular(radiusMedium)` 등 정적 상수 사용 = 위반.
+
+#### 1.3.2 평탄화 (변별 단일성) — §7.122 도출
+
+**같은 정보 차원의 변별은 헤더 OR 본문 둘 중 한 곳에서만**. 두 곳에서 동시에 변별하면 노이즈가 카드·텍스트 가독성을 침식.
+
+| 적용 사례 | 헤더 변별 | 본문 변별 |
+|----------|---------|---------|
+| 주간 그리드 today | `CompactWeekStrip` vermillion 칩 | 본문 alpha 0.06 (보조만) |
+| 일간 타임라인 휴무 | 상단 배너 `weekend_outlined` | 배경 alpha 0.5 (단색 평탄) |
+| 주간 zebra (제거됨) | — | — (둘 다 변별 안 함 = 평탄) |
+
+신규 시각 인코딩 도입 시 "변별 채널은 한 곳" 원칙으로 검토. 구체 위반 패턴: zebra 격색상, 모든 행 다른 좌측 보더 색상, 카드 배경에 채도 + 좌측 보더 + 우측 칩 동시 강조.
 
 ---
 
@@ -4904,6 +4956,6 @@ DecoratedBox(
 2. **Non-breaking**: Notebook 스캐폴드 미적용 화면은 그대로 동작.
 3. **Feature-preserving**: 기능 위젯 재사용. 기능 변경 금지.
 4. **3px 규칙 불가침**: §3의 여백선 규칙은 전 화면에서 동일.
-5. **4대 시그니처 필수**: 어느 화면이든 Notebook × Score를 적용했다면 Playfair · 로마숫자 · Vermillion · Gaegu 네 가지가 모두 관찰되어야 한다.
-6. **각진 원칙 (§7.112 · §7.113 · §7.114 · §7.115 · §7.118)**: 카드·컨테이너는 `BorderRadius.zero` 기본. `BoxShape.circle` 은 아바타·오브젝트·의례 모먼트 3 사유 전용. **app_theme 테마 레이어 전체가 `BorderRadius.zero`** (§7.118, 2026-04-24 포화). 바텀시트 상단도 각진 (10x Vision). `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.
-7. **라운드 예외 명시화 (§7.118)**: `BorderRadius.circular` 사용은 다음 3 예외에만 허용 — (a) 애니메이션 캐릭터(고양이·이모지 등), (b) 드래그 핸들 pill(`height / 2`), (c) 변수 표현식 기반 원형 오브젝트. 정적 상수(`radiusMedium` 등) 사용 금지.
+5. **감사 시그니처 6대 필수 (§1.2)**: 정체성 4 (Playfair · 로마숫자 · Vermillion · Gaegu) + 구조 2 (NotebookMasthead · "Fine.") = 감사 점수 분모. **정체성 4 중 1 누락 = 점수 무관 BLOCK**. 구조 2 누락은 FLAG 단계.
+6. **메타 원칙 2종 (§1.3)**: 모든 화면은 (a) 각진 — `BorderRadius.zero` 기본, 3 예외(캐릭터·handle·변수표현식)에만 `BorderRadius.circular` 허용, (b) 평탄화 — 변별 채널은 헤더 OR 본문 둘 중 한 곳에서만. 두 원칙은 신규 화면 추가 시 시그니처와 동등 강제. 상세: §1.3.1 / §1.3.2.
+7. **각진 원칙 구현 출처 (§7.112 · §7.113 · §7.114 · §7.115 · §7.118)**: app_theme 테마 레이어 전체가 `BorderRadius.zero` (§7.118, 2026-04-24 포화). 바텀시트 상단도 각진 (10x Vision). `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.

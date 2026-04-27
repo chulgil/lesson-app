@@ -23,21 +23,37 @@
 | **정보 계층 명확도 (복잡도)** | 20% | 0순위~N순위 주석 커버리지 | 전 섹션 주석 → 10 |
 | **색상 일관성 (통일성)** | 20% | Material `Colors.*` 잔존 0건이면 10, 1건당 −1 | 0건 → 10 |
 
-**Notebook × Score 6대 시그니처**:
-1. `NotebookMasthead` (상단 헤더 스캐폴드)
-2. `NotebookTypography.masthead/mastheadLabel/mastheadDate`
-3. `ThinRule` (섹션 구분선)
-4. Playfair italic 헤더 (serif)
-5. Roman numerals (로마숫자 인덱스)
-6. "Fine." 페이지 종지부 (italic footer)
+**Notebook × Score 6대 시그니처** (README §1.2 SSOT):
+
+| # | 시그니처 | 분류 | 검증 |
+|---|---------|------|------|
+| 1 | Playfair italic 헤더 | 정체성 | `NotebookTypography.masthead/mastheadLabel/pieceTitle` grep |
+| 2 | 로마숫자 인덱스 | 정체성 | `NotebookTypography.roman/romanActive` 또는 `romanOf()` 호출 |
+| 3 | Vermillion 액센트 | 정체성 | `AppColors.paperAccent` foreground/border 사용 |
+| 4 | Gaegu 손글씨 | 정체성 | `NotebookTypography.hand/handEmphasis/handOk` grep |
+| 5 | NotebookMasthead 스캐폴드 | 구조 | `NotebookMasthead(...)` instantiate |
+| 6 | "Fine." 페이지 종지부 | 구조 | `NotebookTypography.fine` + 텍스트 "Fine." |
+
+`ThinRule` 위젯은 `NotebookMasthead` / `NotebookSectionHeader` 의 부속 — 시그니처가 아닌 구성요소로 별도 측정하지 않는다.
 
 ### 1.3 판정 임계값
+
+**1차 게이트 — 정체성 시그니처 (점수 산식 우선)**:
+
+| 조건 | 판정 |
+|------|------|
+| 정체성 4 중 1+ 누락 | **BLOCK** — 가중 평균 무관, 즉시 수정 필요 (README §1.1) |
+| 정체성 4 ✓ | 2차 게이트(점수)로 진행 |
+
+**2차 게이트 — 가중 평균 점수**:
 
 | 점수 | 판정 |
 |------|------|
 | ≥ 7.5 | **PASS** — 통과 |
 | 5.0 – 7.4 | **FLAG** — 개선 권고 |
 | < 5.0 | **BLOCK** — 즉시 수정 필요 |
+
+> **재채점 주의**: §2 채점표는 1차 게이트 도입 이전 산식 (구 6대 = `Masthead/Typography/ThinRule/Playfair/Roman/Fine.`) 으로 매겨졌다. 정체성 #4 Gaegu 누락 시 구 산식은 5/6 PASS 였으나 신 1차 게이트로는 BLOCK. 후속 Cycle 에서 §2 재채점 필요 — 이번 SSOT 정렬은 정의만 갱신, 점수는 보존.
 
 ## 2. 채점표
 
