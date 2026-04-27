@@ -13,6 +13,7 @@ import 'package:lessonaza/features/students/domain/services/bulk_teacher_action_
 class _FakeLessonRepository implements LessonRepository {
   final Map<String, Lesson> _lessons;
   final List<String> cancelledIds = [];
+  final List<Lesson> updatedLessons = [];
 
   _FakeLessonRepository(List<Lesson> seed)
     : _lessons = {for (final l in seed) l.id: l};
@@ -64,6 +65,7 @@ class _FakeLessonRepository implements LessonRepository {
   @override
   Future<Lesson> updateLesson(Lesson lesson) async {
     _lessons[lesson.id] = lesson;
+    updatedLessons.add(lesson);
     return lesson;
   }
 
@@ -162,7 +164,16 @@ void main() {
       expect(result.cancelledLessonCount, 2);
       expect(result.notifiedStudentCount, 2);
       expect(result.skippedStudentIds, ['S3']);
-      expect(lessonRepo.cancelledIds, containsAll(['L1', 'L2']));
+      expect(
+        lessonRepo.updatedLessons.map((l) => l.id),
+        containsAll(['L1', 'L2']),
+      );
+      // 차감 없음 + reschedule 가능 보장: cancelledByTeacher 로 명시 설정
+      for (final l in lessonRepo.updatedLessons) {
+        expect(l.status, LessonStatus.cancelledByTeacher);
+        expect(l.status.isDeducted, isFalse);
+        expect(l.status.allowsReschedule, isTrue);
+      }
       expect(notificationService.shown.map((n) => n.type).toSet(), {
         NotificationType.lessonCancelled,
       });
@@ -195,7 +206,7 @@ void main() {
 
       expect(result.cancelledLessonCount, 0);
       expect(result.skippedStudentIds, ['S1']);
-      expect(lessonRepo.cancelledIds, isEmpty);
+      expect(lessonRepo.updatedLessons, isEmpty);
     });
   });
 

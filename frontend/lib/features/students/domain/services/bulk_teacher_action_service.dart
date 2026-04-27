@@ -27,6 +27,10 @@ class BulkTeacherActionService {
   ///
   /// - 대상 날짜에 scheduled 상태 레슨이 없는 학생은 [BulkCancelResult.skippedStudentIds] 에 포함
   /// - 이미 취소 상태인 레슨은 건드리지 않는다 (중복 취소 방지)
+  /// - 상태는 [LessonStatus.cancelledByTeacher] 로 명시 설정 → 차감 없음(`isDeducted=false`)
+  ///   + 학생 측 reschedule 요청 가능(`allowsReschedule=true`) 보장. 일반
+  ///   `cancelLesson()` 는 generic [LessonStatus.cancelled] 로 떨어져 reschedule 경로가
+  ///   막히기 때문에 사용하지 않는다.
   Future<BulkCancelResult> cancelLessonsOnDate({
     required String teacherId,
     required List<String> studentIds,
@@ -51,7 +55,12 @@ class BulkTeacherActionService {
     var notifiedCount = 0;
     for (final entry in lessonsByStudent.entries) {
       final lesson = entry.value;
-      await _lessonRepository.cancelLesson(lesson.id);
+      await _lessonRepository.updateLesson(
+        lesson.copyWith(
+          status: LessonStatus.cancelledByTeacher,
+          updatedAt: DateTime.now(),
+        ),
+      );
       cancelledCount++;
 
       await _notifyCancellation(

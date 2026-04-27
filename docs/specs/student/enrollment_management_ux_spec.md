@@ -392,7 +392,20 @@ class BulkCancelResult {
 | 알림 발송 부분 실패 | 개별 try/catch 로 부분 성공 허용 · SnackBar 로 실패 건 수 고지 |
 | notification 권한 미부여 | in-app 뱃지 fallback (기존 §3.4 알림 인프라 재사용) |
 
-### 10.8 Lore
+### 10.8 수강권 차감 / Reschedule 의미론
+
+**B1 휴강 공지 → 수강권 차감 없음 + 학생 reschedule 가능 보장**.
+
+| 상태 | `isDeducted` | `allowsReschedule` | 결과 |
+|------|--------------|--------------------|------|
+| `LessonStatus.cancelled` (generic) | `false` | `false` | 차감 X · reschedule X (막힘) |
+| `LessonStatus.cancelledByTeacher` | `false` | `true` | 차감 X · reschedule O (정상) |
+
+`LessonRepository.cancelLesson(id)` 의 mock/remote 구현체는 둘 다 generic `LessonStatus.cancelled` 로 떨어뜨려 학생의 reschedule 경로를 끊는다. 따라서 `BulkTeacherActionService.cancelLessonsOnDate` 는 `cancelLesson()` 대신 **`updateLesson(lesson.copyWith(status: cancelledByTeacher))`** 로 명시 설정한다 — 어떤 repo 구현이 와도 동일한 의미론을 보장한다.
+
+`useLesson()` 은 별도 호출이며 휴강에는 호출되지 않는다. → 수강권 잔여 횟수는 **변동 없음**(자동 환불도 아님, 차감도 아님). 학생이 reschedule 요청을 하면 새 레슨이 `scheduled` 로 생성되어 기존 수강권으로 진행.
+
+### 10.9 Lore
 
 - **Lore-directive**: 수강 관리 탭의 선택 모드는 "수강권 발급" 이 아닌 "일괄 공지/메시지" 를 위한 경로다. 수강권 발급은 1:1 인라인 CTA 로만 수행.
 - **Lore-constraint**: 휴강 공지는 반드시 프리뷰 → 확인 2단계. 1탭 실행 금지.
@@ -411,3 +424,4 @@ class BulkCancelResult {
 | 2026-04-24 | Phase 5a 자동 갱신 알림 서비스 계층 완료 (service + settings + providers + 13 tests GREEN) — 설정 UI 는 후속 세션 | Claude |
 | 2026-04-24 | Phase 5b 설정 UI 토글 완료 (선생님 전용 섹션 + Hive 영속). Status Triage 전 Phase 종결 | Claude |
 | 2026-04-24 | §10 선생님 일괄 작업 (§7.119) 설계 — 선택 모드 재설계: 수강권 일괄 발급 제거 → B1 휴강 공지 + B2 일괄 메시지 | Claude (CEO 리뷰) |
+| 2026-04-27 | §10.8 차감/Reschedule 의미론 추가 — `cancelLesson()` 의 generic `cancelled` 폴백 회피 위해 `updateLesson(cancelledByTeacher)` 로 명시 (서비스 + 테스트 동기화) | Claude |
