@@ -55,13 +55,15 @@ void main() {
   // §7.123 — weeklyColumnBackground (4단 우선순위, restKind 기반)
   // ═══════════════════════════════════════════════════════════════════════
 
-  group('§7.123 weeklyColumnBackground — 4단 우선순위 (restKind)', () {
+  group('§7.123 (Mode A) weeklyColumnBackground — 미니멀 팔레트', () {
+    final restColor = AppColors.ink.withValues(alpha: 0.10);
+
     test('휴가 (vacation) > today: 휴식 색상 우선', () {
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.vacation,
       );
-      expect(color, AppColors.scheduleRestDayBackground);
+      expect(color, restColor);
     });
 
     test('휴무 (holiday) > today: 휴식 색상 우선', () {
@@ -69,7 +71,7 @@ void main() {
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.holiday,
       );
-      expect(color, AppColors.scheduleRestDayBackground);
+      expect(color, restColor);
     });
 
     test('정기 휴무일 (regular) > today: 휴식 색상 우선', () {
@@ -77,10 +79,10 @@ void main() {
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.regular,
       );
-      expect(color, AppColors.scheduleRestDayBackground);
+      expect(color, restColor);
     });
 
-    test('모든 휴식 종류는 동일 색상 (변별은 라벨 칩 담당)', () {
+    test('모든 휴식 종류는 동일 색상 ink alpha 0.10 (변별은 라벨 칩)', () {
       final vacation = weeklyColumnBackground(
         dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.vacation,
@@ -93,17 +95,18 @@ void main() {
         dayType: ScheduleDayType.future,
         restKind: ColumnRestKind.regular,
       );
-      expect(vacation, AppColors.scheduleRestDayBackground);
-      expect(holiday, AppColors.scheduleRestDayBackground);
-      expect(regular, AppColors.scheduleRestDayBackground);
+      expect(vacation, restColor);
+      expect(holiday, restColor);
+      expect(regular, restColor);
     });
 
-    test('today + none: paperAccent 0.06 tint', () {
+    test('today + none: 본문 톤 없음 (헤더 칩만 변별)', () {
+      // §1.3.2 평탄화 — today 변별은 단일 채널(헤더)에서만.
       final color = weeklyColumnBackground(
         dayType: ScheduleDayType.today,
         restKind: ColumnRestKind.none,
       );
-      expect(color, AppColors.paperAccent.withValues(alpha: 0.06));
+      expect(color, isNull);
     });
 
     test('과거/미래 평일 (none): 투명 (null)', () {

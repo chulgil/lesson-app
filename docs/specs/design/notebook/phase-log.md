@@ -4776,6 +4776,51 @@ bool isAdditionalOpenSlot({
 
 **후속**
 - 사용자 실기 확인: 휴가 다일 구간이 컬럼 라벨로 식별되는지, 추가오픈 슬롯이 회색 컬럼 위 흰색으로 명확한지
+
+---
+
+#### §7.123 Mode A — 색상 보정 (2026-04-27 같은 날 후속)
+
+**전제**: §7.123 1차 구현 후 사용자 실기 점검: "색상이 하늘색 쿨톤이라 조금 이상합니다. 처음에 ux디자인 잡았을때 색상은 많지 않았어요 휴무색상은 그냥 진한 회색이 좋아보입니다."
+
+**진단 (UX 관점)**
+
+| 문제 | 원인 | 영향 |
+|---|---|---|
+| 휴무 컬럼이 sky-blue cool tone 으로 보임 | `#E8E8E8` (무채색 중성 회색) 위 종이 베이스 `#F2ECDD` (warm cream) → **동시대비**로 회색이 보색 방향(차가운 파랑)으로 인지 | 종이 무드가 깨짐, 의도치 않은 차가움 |
+| Today 본문 톤 (`paperAccent` 0.06) 과 헤더 칩이 중복 변별 | §1.3.2 평탄화 위반 — 변동(today) 을 두 채널(헤더+본문) 에서 동시 표현 | 시각 노이즈, 종이 무드 약화 |
+| 근무시간 외 셀 톤 (`ink` alpha 0.03) 이 종이 위에서 거의 안 보임 | 알파 0.03 = 거의 투명. 차이는 크롤백 픽셀 단위로만 감지됨 | 의미 전달 0, 노이즈만 추가 |
+
+**결정 (Mode A 미니멀 팔레트)**
+
+| 변경 | Before | After |
+|---|---|---|
+| 휴식 컬럼 배경 | `scheduleRestDayBackground` (#E8E8E8) | `ink alpha 0.10` (≈ #DDD8CB warm dark gray) |
+| Today 본문 톤 | `paperAccent` alpha 0.06 | **제거** (헤더 칩만 변별) |
+| 근무시간 외 셀 톤 | `ink` alpha 0.03 | **제거** (additionalSlot override 만 유지) |
+| Additional slot override | `paper` (흰색) on 휴무 컬럼 | 유지 |
+
+**Why ink alpha 블렌딩**: 종이 위에 ink (#14161C, 딥 블루-블랙) 를 알파로 얹으면 결과 색은 **종이 채도를 유지하면서 명도만 낮춘다**. 무채색 중성 회색이 일으키는 동시대비 cool 인지 회피.
+
+**Why today 본문 톤 제거**: 헤더의 요일/날짜 칩이 이미 today 변별 담당. §1.3.2 평탄화 — 변동은 단일 채널에서만.
+
+**Why 근무시간 외 셀 톤 제거**: 알파 0.03 은 의미 전달 실패 (사용자가 인지 못 함). 근무시간 경계는 **이미 빈 컬럼으로 충분 인지**. 클릭은 그대로 활성 — 보강·시험 슬롯은 영향 없음.
+
+**Lore-directive**: 휴식 색은 `ink alpha 0.10` 으로 따뜻한 진한 회색 — 동시대비로 cool 인지되는 중성 회색 회피.
+
+**Lore-directive**: today 변별은 헤더 칩 단일 채널 — §1.3.2 평탄화.
+
+**Lore-rejected**: `scheduleRestDayBackground` (#E8E8E8) 중성 회색 유지 — 따뜻한 종이 위 simultaneous contrast 로 cool tone 인지됨.
+
+**Lore-rejected**: today 본문 + 헤더 이중 변별 — §1.3.2 평탄화 위반, 종이 무드 약화.
+
+**Lore-rejected**: 근무시간 외 ink alpha 0.03 셀 톤 — 종이 위에서 거의 안 보임. 의미 전달 실패.
+
+**Lore-rejected (Mode B)**: 휴식별 톤 분리 (휴가/휴무/정기 다른 회색) — §7.123 1차 결정 유지. 톤 차이가 의미로 인지되지 않음.
+
+**Lore-rejected (Mode C)**: today 본문 톤 유지 + 휴식 색만 보정 — 평탄화 원칙 일관성 깨짐. 한 번에 정리.
+
+**테스트 갱신**: `schedule_visual_helpers_test.dart` 6개 테스트 expected color 변경 (`ink alpha 0.10` 으로) + today none 케이스는 null 기대.
 - §7.x 후보: 일간 타임라인에도 동일 4단 + 라벨 이식 (§7.121 의 휴무 배경 위에 휴가/추가오픈 추가)
 - §7.x 후보: 라벨 칩 hover/tap 시 사유 툴팁 ("휴가: 가족 여행 (4/27-5/3)") — `TimeException.reason` 활용
 

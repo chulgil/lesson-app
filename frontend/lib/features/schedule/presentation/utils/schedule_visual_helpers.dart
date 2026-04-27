@@ -49,13 +49,17 @@ extension ColumnRestKindExtension on ColumnRestKind {
   }
 }
 
-/// §7.123 — 주간 그리드 컬럼 배경 4단 우선순위.
+/// §7.123 (Mode A) — 주간 그리드 컬럼 배경 미니멀 팔레트.
 ///
-/// 우선순위: 휴식(vacation/holiday/regular) > today > 평일(투명).
-/// 모든 휴식 종류는 단일 색 `scheduleRestDayBackground` (#E8E8E8) 공유.
-/// 변별은 라벨 칩이 담당.
+/// 휴식(vacation/holiday/regular) → `ink alpha 0.10` (따뜻한 진한 회색).
+/// 그 외 (today 포함) → 투명. 변별은 라벨 칩 + 수직 디바이더(§7.122) 담당.
 ///
-/// 컬럼 경계는 본문이 아닌 1px 수직 디바이더가 담당 (§7.122).
+/// Why ink alpha 0.10: 종이 베이스(#F2ECDD, warm cream) 위 무채색 중성 회색
+/// (#E8E8E8) 은 동시대비로 cool tone 인지됨. ink 알파 블렌딩은 종이 톤을
+/// 유지하면서 채도만 낮춰 warm dark gray 로 인지된다 (≈ #DDD8CB).
+///
+/// Why today 톤 제거: 헤더의 요일/날짜 칩이 이미 today 변별을 담당
+/// (§1.3.2 평탄화 — 변동은 단일 채널로).
 ///
 /// Spec: docs/specs/design/notebook/README.md §7.123
 Color? weeklyColumnBackground({
@@ -63,10 +67,7 @@ Color? weeklyColumnBackground({
   required ColumnRestKind restKind,
 }) {
   if (restKind.isRest) {
-    return AppColors.scheduleRestDayBackground;
-  }
-  if (dayType == ScheduleDayType.today) {
-    return AppColors.paperAccent.withValues(alpha: 0.06);
+    return AppColors.ink.withValues(alpha: 0.10);
   }
   return null;
 }

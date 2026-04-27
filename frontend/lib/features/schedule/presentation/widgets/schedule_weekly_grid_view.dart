@@ -381,26 +381,14 @@ class _ScheduleWeeklyGridViewState
       );
       final isPast = cellDateTime.isBefore(DateTime.now());
 
-      // §7.123 — 셀 단위 톤
-      // - additionalSlot: 흰색 (휴무 컬럼 위 override)
-      // - 근무시간 외 (정상 컬럼 내): ink alpha 0.03 약한 회색
-      // - 그 외: 투명 (컬럼 배경 그대로)
+      // §7.123 (Mode A) — 셀 단위 톤은 additionalSlot override 만.
+      // 근무시간 경계는 시각 톤이 아닌 라벨/디바이더로 변별 (§1.3.2 평탄화).
       final isAdditional = isAdditionalOpenSlot(
         availability: availability,
         slotStart: cellDateTime,
       );
-      final inWorkHours = isWithinWorkHours(
-        availability: availability,
-        slotStart: cellDateTime,
-      );
-      final Color? cellOverlay;
-      if (isAdditional && restKind.isRest) {
-        cellOverlay = AppColors.paper;
-      } else if (!restKind.isRest && !inWorkHours) {
-        cellOverlay = AppColors.ink.withValues(alpha: 0.03);
-      } else {
-        cellOverlay = null;
-      }
+      final Color? cellOverlay =
+          (isAdditional && restKind.isRest) ? AppColors.paper : null;
 
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
