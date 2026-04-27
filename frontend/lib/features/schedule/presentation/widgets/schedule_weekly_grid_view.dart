@@ -94,8 +94,11 @@ class _ScheduleWeeklyGridViewState
                 child: SingleChildScrollView(
                   controller: _scrollController,
                   child: Padding(
+                    // §7.125 — 헤더 CompactWeekStrip 의 screenPadding 과 정렬.
+                    // weeklyGrid 좌측 36px 시간 라벨 + 본문 7컬럼이
+                    // 헤더 7컬럼과 동일 X·동일 너비로 떨어지게 통일.
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space2,
+                      horizontal: AppSpacing.screenPadding,
                     ),
                     child: _buildGridBody(
                       lessonMap,
@@ -133,8 +136,14 @@ class _ScheduleWeeklyGridViewState
     int todayIndex = -1,
     DateTime? now,
   }) {
+    // §7.125 — 외부 screenPadding(16) × 2 + 좌측 시간 라벨(36) 제외한 너비를
+    // 7 등분. 헤더 CompactWeekStrip 7컬럼 (screenPadding + 36 시작 / 동일 너비)
+    // 과 정확히 정렬.
     final cellWidth =
-        (MediaQuery.of(context).size.width - AppSpacing.space2 * 2 - 36) / 7;
+        (MediaQuery.of(context).size.width -
+            AppSpacing.screenPadding * 2 -
+            36) /
+        7;
     const cellHeight = 28.0;
     final totalGridRows = endHour - startHour + 1;
     final gridHeight = totalGridRows * cellHeight * 2;

@@ -4946,3 +4946,39 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: 기존 `scheduleGridLine` (#E8E8E8) 을 ink 알파로 일괄 변경 — 일간 타임라인·picker 등 다른 시각 컨텍스트 회귀 위험.
 
 ---
+
+#### §7.125 — 주간 헤더↔그리드 가로 정렬 (2026-04-27 같은 날 후속)
+
+**전제**: §7.124 색상 정렬 후 사용자 점검: "주간스케쥴의 경우 헤더와의 가로 위치가 적당한지 다시 검증해주세요."
+
+**진단** (W = 화면 너비, `AppSpacing.screenPadding=16`, `space2=8`)
+
+| 영역 | 좌측 외부 패딩 | 좌측 시간 라벨 | 7컬럼 시작 X | 7컬럼 너비 |
+|---|---|---|---|---|
+| CompactWeekStrip (헤더) | 16 | 없음 | 16 | (W − 32) / 7 |
+| WeeklyGrid (그리드, Before) | 8 | 36 | 44 | (W − 52) / 7 |
+
+→ 시작 X 차이 ≈28px, 너비 차이 ≈3px (W=400 기준). 헤더 "월" 글자가 그리드의 시간 라벨(36px) 영역 위에 떠 있고, 헤더 "일" 셀이 그리드 일요일 컬럼보다 우측으로 밀림.
+
+**결정 (After)**
+
+| 영역 | 좌측 외부 패딩 | 좌측 시간 라벨 | 7컬럼 시작 X | 7컬럼 너비 |
+|---|---|---|---|---|
+| CompactWeekStrip (weeklyGrid 모드) | 16 + 36 = 52 | — | 52 | (W − 68) / 7 |
+| WeeklyGrid (After) | 16 (screenPadding) | 36 | 52 | (W − 68) / 7 |
+
+**구현**:
+- `schedule_tab.dart`: `weeklyGrid` 모드일 때 `CompactWeekStrip` 좌측 패딩 = `screenPadding + 36`. 다른 모드(list/timeline)는 기존대로.
+- `schedule_weekly_grid_view.dart`: 외부 패딩 `space2` → `screenPadding`, `cellWidth` 분모 `space2 * 2` → `screenPadding * 2`.
+
+**Why weeklyGrid 모드 한정**: list·timeline 뷰는 좌측 시간 라벨이 없어 헤더 시작 X = `screenPadding` 유지가 자연스러움. 모드별 패딩 분기로 다른 뷰 회귀 방지.
+
+**Lore-directive**: 헤더(CompactWeekStrip) 7컬럼과 그리드 7컬럼은 동일 X·동일 너비여야 한다. weeklyGrid 모드 한정 좌측 패딩 +36 으로 시간 라벨 영역 보정.
+
+**Lore-rejected**: 시간 라벨을 컬럼 위 오버레이로 옮겨 라벨 영역 0 — 시간 가독성 희생, 디자인 영향 큼.
+
+**Lore-rejected**: CompactWeekStrip 자체에 좌측 들여쓰기 옵션 추가 — 다른 화면(student_lessons_tab 등) 인터페이스 오염, 모드 분기는 호출처(schedule_tab) 책임.
+
+**테스트**: schedule 전 테스트 230/230 통과 (테스트가 정렬 픽셀을 검증하지 않음 — 시각적 검증은 실기 확인).
+
+---

@@ -218,3 +218,4 @@ scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자�
 | 2026-04-27 | §7.123 Mode A+ — 2톤 팔레트 분리. 평일 컬럼은 `scheduleColumnBackground` (#F8F2E5, 종이보다 살짝 밝음). regular(토/일 등 정기 휴무) 는 평일과 동일 처리. vacation/holiday(선생님 명시 휴일) 만 회색 강조. additionalSlot override 도 휴일 컬럼 위로 한정 |
 | 2026-04-27 | §7.123 Mode A++ — 컬럼 톤을 `paper` (#F2ECDD) 로 정렬 (scaffold paperDark 위 자연 분리). future 레슨 white lerp 0.35 → 0.15, accent alpha 0.45 → 0.55 — 컬럼/타 학생 스케줄 변별 강화 |
 | 2026-04-27 | §7.124 — 주간 그리드 구분선 `scheduleGridLine` (#E8E8E8) → 신규 `scheduleWeeklyGridLine` (ink alpha 0.08). paper 컬럼 위 동시대비 cool tint 회피, 종이 위 연필선 느낌. 일간 타임라인·picker 영향 없음 |
+| 2026-04-27 | §7.125 — 헤더(CompactWeekStrip) 7컬럼과 그리드 7컬럼 가로 정렬. weeklyGrid 모드일 때 헤더 좌측 패딩 +36 (시간 라벨 폭) 추가, 그리드 외부 패딩 `space2`(8) → `screenPadding`(16) 통일. 결과: 양측 7컬럼 시작 X = 52, 너비 = (W − 68) / 7 동일 |
