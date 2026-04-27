@@ -13,6 +13,7 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
+import '../utils/schedule_visual_helpers.dart';
 
 /// Weekly summary grid showing 7-day overview of lessons.
 /// Bird's eye view with instrument-colored cells, today highlight,
@@ -161,11 +162,11 @@ class _ScheduleWeeklyGridViewState
               final dayType = _getDayType(dayDate, todayDate);
               final isRestDay = restDays.contains(dayIndex);
               final isWeekend = dayIndex >= 5;
-              final columnBg = _getColumnBackground(
-                dayType,
-                isRestDay,
-                isWeekend,
-                dayIndex,
+              final columnBg = weeklyColumnBackground(
+                dayType: _toScheduleDayType(dayType),
+                isRestDay: isRestDay,
+                isWeekend: isWeekend,
+                dayIndex: dayIndex,
               );
 
               return SizedBox(
@@ -600,28 +601,15 @@ class _ScheduleWeeklyGridViewState
     return _DayType.future;
   }
 
-  /// Column background color — 4단 우선순위 시각 계층.
-  ///
-  /// 우선순위: 쉬는 날 > 오늘 > 주말 > zebra(홀수 인덱스).
-  /// alpha 상한 0.10 유지로 레슨 카드 가독성 보호.
-  ///
-  /// Spec: docs/specs/design/notebook/README.md §7.120
-  Color? _getColumnBackground(
-    _DayType dayType,
-    bool isRestDay,
-    bool isWeekend,
-    int dayIndex,
-  ) {
-    if (isRestDay) {
-      return AppColors.scheduleMutedBackground.withValues(alpha: 0.5);
+  ScheduleDayType _toScheduleDayType(_DayType type) {
+    switch (type) {
+      case _DayType.past:
+        return ScheduleDayType.past;
+      case _DayType.today:
+        return ScheduleDayType.today;
+      case _DayType.future:
+        return ScheduleDayType.future;
     }
-    if (dayType == _DayType.today) {
-      return AppColors.paperAccent.withValues(alpha: 0.10);
-    }
-    if (isWeekend) {
-      return AppColors.paperAccentSoft.withValues(alpha: 0.06);
-    }
-    return dayIndex.isOdd ? AppColors.ink.withValues(alpha: 0.025) : null;
   }
 
   void _navigateToAddLesson(DateTime date, int hour, int minute) {

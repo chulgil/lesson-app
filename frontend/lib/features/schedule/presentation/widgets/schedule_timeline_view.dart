@@ -13,6 +13,7 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
+import '../utils/schedule_visual_helpers.dart';
 import 'timeline_lesson_block.dart';
 
 /// Height per 30-minute unit.
@@ -112,7 +113,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       teacherAvailabilityProvider('teacher_1'),
     );
     final availability = availabilityAsync.valueOrNull;
-    final isRestDay = _isRestDay(availability);
+    final isRestDay = isTeacherRestDay(
+      availability: availability,
+      date: widget.selectedDate,
+    );
 
     return Column(
       children: [
@@ -131,18 +135,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         _buildSummaryBar(),
       ],
     );
-  }
-
-  /// §7.121 — selectedDate 가 선생님 weeklySchedules 에 등록되지 않은 요일이면 휴무.
-  ///
-  /// WeeklySchedule.dayOfWeek 는 0=월..6=일, DateTime.weekday 는 1=월..7=일.
-  bool _isRestDay(TeacherAvailability? availability) {
-    if (availability == null) return false;
-    final dayIndex = widget.selectedDate.weekday - 1;
-    final hasActiveSchedule = availability.weeklySchedules.any(
-      (s) => s.isActive && s.dayOfWeek == dayIndex,
-    );
-    return !hasActiveSchedule;
   }
 
   Widget _buildRestDayBanner() {
