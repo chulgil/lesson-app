@@ -4922,3 +4922,27 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `schedule_visual_helpers_test.dart` 41/41 통과 (테스트가 토큰 값을 참조 → 토큰 값 변경에 자동 동기화).
 
 ---
+
+#### §7.124 — 주간 그리드 구분선 종이 톤 정렬 (2026-04-27 같은 날 후속)
+
+**전제**: §7.123 Mode A++ 적용 후 사용자 점검: "그리드의 구분선이 현재 배경색과 같이하면 구분이 될것같은데 현재 구분선이 밝은색이랑 같이 있어서 구분이 되지 않음" (한정: 주간 스케줄 화면).
+
+**진단**: 주간 그리드 구분선이 `scheduleGridLine` (#E8E8E8 무채색 회색). paper(#F2ECDD) 컬럼 위에서 동시대비로 cool tint + 명도 차 ≈3 → "밝은 컬럼 + 밝은 라인" 으로 거의 안 보임.
+
+**결정**
+
+| 변경 | Before | After |
+|---|---|---|
+| 주간 그리드 컬럼/시간 구분선 | `scheduleGridLine` (#E8E8E8) | 신규 `scheduleWeeklyGridLine` (ink alpha 0.08) |
+| 주간 그리드 풋터 top border | 동일 | 동일 |
+| 일간 타임라인·picker 등 다른 위젯 | `scheduleGridLine` 유지 | 영향 없음 (별도 토큰) |
+
+**Why ink alpha 0.08**: 무채색 회색은 종이 위 동시대비로 cool tint. ink 알파 블렌딩은 종이 톤 유지하면서 명도만 낮춰 warm dark line — "종이 위 연필선" 인지. §7.123 Mode A 휴일 컬럼 ink alpha 0.10 과 같은 원리, 더 약한 알파.
+
+**Why 신규 토큰 (`scheduleGridLine` 그대로 두고 별도)**: 일간 타임라인·picker 는 다른 시각 컨텍스트(흰색/연한 배경 위)에서 사용 — 한 번에 모두 변경 시 의도하지 않은 회귀. Surgical Changes 원칙: 사용자 한정("주간 스케줄") 범위만 변경.
+
+**Lore-directive**: 주간 그리드 구분선은 종이 톤 정렬 — `scheduleWeeklyGridLine` (ink alpha 0.08). 무채색 회색은 paper 위 cool tint + 변별 실패.
+
+**Lore-rejected**: 기존 `scheduleGridLine` (#E8E8E8) 을 ink 알파로 일괄 변경 — 일간 타임라인·picker 등 다른 시각 컨텍스트 회귀 위험.
+
+---

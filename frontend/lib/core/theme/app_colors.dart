@@ -70,8 +70,14 @@ class AppColors {
   // Schedule: now indicator (red line/dot for current time)
   static const scheduleNowIndicator = Color(0xFFE53935);
 
-  // Schedule: grid line color
+  // Schedule: grid line color (legacy, 일간 타임라인·picker 등에서 사용)
   static const scheduleGridLine = Color(0xFFE8E8E8);
+
+  // Schedule: 주간 그리드 구분선 (§7.124)
+  // scheduleGridLine (#E8E8E8) 은 paper(#F2ECDD) 컬럼 위에서 동시대비로
+  // 거의 안 보임 + cool tint. ink 알파 블렌딩으로 종이 톤 유지하면서
+  // 명도만 낮춰 warm dark line 으로 변별.
+  static const scheduleWeeklyGridLine = Color(0x1414161C); // ink alpha 0.08
 
   // Schedule: booking slot colors (design_master.md 5.3)
   static const slotAvailable = Color(0xFF4CAF50);

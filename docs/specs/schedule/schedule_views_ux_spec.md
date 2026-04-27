@@ -127,6 +127,15 @@ scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자�
 
 > **Why future white lerp 0.15 (← 0.35)**: 0.35 는 컬럼 paper 위에서 명도 차이 거의 없어 "예정된 스케줄 + 다른 학생 스케줄" 변별 약함. 0.15 는 악기 색상을 살려 컬럼/타 학생 레슨과 명확히 구분되면서도 today 의 vivid 와 위계 유지.
 
+### 그리드 구분선 (§7.124)
+
+| 위치 | 토큰 | 값 |
+|---|---|---|
+| 주간 그리드 컬럼/시간 구분선 | `scheduleWeeklyGridLine` | `ink alpha 0.08` (≈#DEDADDe-warm dark) |
+| 풋터 ("이번 주 N레슨") top border | `scheduleWeeklyGridLine` | 동일 |
+
+> **Why ink alpha 0.08 (← `scheduleGridLine` #E8E8E8)**: 무채색 회색은 paper(#F2ECDD) 위에서 동시대비로 cool tint + 거의 안 보임. ink 알파는 종이 톤 유지하면서 명도만 낮춰 "종이 위 연필선" 느낌. 일간 타임라인·picker 등 다른 위젯은 영향 없음 (별도 토큰).
+
 ### 셀(Slot) 단위 추가 톤 — §7.123 Mode A+
 
 | 상태 | 도메인 표현 | 셀 톤 | 클릭 |
@@ -208,3 +217,4 @@ scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자�
 | 2026-04-27 | §7.123 Mode A 색상 보정 — `scheduleRestDayBackground` 중성 회색 → `ink alpha 0.10` (동시대비 cool 회피), today 본문 톤 + 근무시간 외 셀 톤 제거 (§1.3.2 평탄화) |
 | 2026-04-27 | §7.123 Mode A+ — 2톤 팔레트 분리. 평일 컬럼은 `scheduleColumnBackground` (#F8F2E5, 종이보다 살짝 밝음). regular(토/일 등 정기 휴무) 는 평일과 동일 처리. vacation/holiday(선생님 명시 휴일) 만 회색 강조. additionalSlot override 도 휴일 컬럼 위로 한정 |
 | 2026-04-27 | §7.123 Mode A++ — 컬럼 톤을 `paper` (#F2ECDD) 로 정렬 (scaffold paperDark 위 자연 분리). future 레슨 white lerp 0.35 → 0.15, accent alpha 0.45 → 0.55 — 컬럼/타 학생 스케줄 변별 강화 |
+| 2026-04-27 | §7.124 — 주간 그리드 구분선 `scheduleGridLine` (#E8E8E8) → 신규 `scheduleWeeklyGridLine` (ink alpha 0.08). paper 컬럼 위 동시대비 cool tint 회피, 종이 위 연필선 느낌. 일간 타임라인·picker 영향 없음 |

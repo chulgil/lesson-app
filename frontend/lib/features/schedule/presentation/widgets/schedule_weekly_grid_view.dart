@@ -181,7 +181,7 @@ class _ScheduleWeeklyGridViewState
                         dayIndex > 0
                             ? Border(
                               left: BorderSide(
-                                color: AppColors.scheduleGridLine,
+                                color: AppColors.scheduleWeeklyGridLine,
                                 width: 0.5,
                                 strokeAlign: BorderSide.strokeAlignInside,
                               ),
@@ -190,7 +190,10 @@ class _ScheduleWeeklyGridViewState
                   ),
                   child: Column(
                     children: [
-                      Container(height: 0.5, color: AppColors.scheduleGridLine),
+                      Container(
+                        height: 0.5,
+                        color: AppColors.scheduleWeeklyGridLine,
+                      ),
                       Expanded(
                         child: _buildGridCell(
                           lessonMap,
@@ -542,7 +545,7 @@ class _ScheduleWeeklyGridViewState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
+          top: BorderSide(color: AppColors.scheduleWeeklyGridLine, width: 0.5),
         ),
       ),
       child: Text(
