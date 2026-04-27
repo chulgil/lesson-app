@@ -42,8 +42,11 @@ class NotebookMasthead extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
+        crossAxisAlignment:
+            trailing != null
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.baseline,
+        textBaseline: trailing != null ? null : TextBaseline.alphabetic,
         children: [
           Expanded(child: Text(eyebrow, style: NotebookTypography.eyebrow)),
           if (trailing != null)
