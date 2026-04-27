@@ -95,14 +95,36 @@ Line 2: 곡명                  (예: 쇼팽 녹턴)
 
 > 별도 요일 헤더 없음 — CompactWeekStrip이 요일/날짜/레슨 수를 이미 표시
 
-### 열(Column) 배경색
+### 열(Column) 배경색 — 4단 우선순위 (§7.123, 2026-04-27 갱신)
 
-| 날짜 유형 | 배경색 | 셀 색상 |
-|-----------|--------|---------|
-| 오늘 | `primary` alpha 0.04 | 악기별 선명한 색상 |
-| 과거/미래/쉬는날 | 투명 (기본 배경) | 과거=회색, 미래=약간 연한 악기색 |
+`TeacherAvailability` 의 `weeklySchedules` + `exceptions` + `WeeklySchedule.startTime/endTime` 을 모두 반영한 4단 우선순위.
 
-> 심플 원칙: 오늘만 하이라이트, 나머지는 모두 기본 배경
+| 우선순위 | 상태 | 도메인 표현 | 컬럼 배경 | 라벨 칩 |
+|---|---|---|---|---|
+| 1 | **휴가 (다일)** | `TimeException(type=vacation)` | `scheduleRestDayBackground` (#E8E8E8) | "휴가" 칩 |
+| 2 | **휴무 (단일)** | `TimeException(type=holiday)` | `scheduleRestDayBackground` (#E8E8E8) | "휴무" 칩 |
+| 3 | **정기 휴무일** | weeklySchedules 미등록 요일 | `scheduleRestDayBackground` (#E8E8E8) | (라벨 없음) |
+| 4 | **오늘** | `_DayType.today` | `paperAccent` alpha 0.06 | (라벨 없음) |
+| 5 | **과거/미래 평일** | 그 외 | 투명 (기본 배경) | — |
+
+> 심플 원칙: 컬럼 변별은 1px 수직 디바이더(§7.122) 가 담당. 배경 톤은 의미가 있을 때만.
+
+### 셀(Slot) 단위 추가 톤 — §7.123
+
+| 상태 | 도메인 표현 | 셀 톤 | 클릭 |
+|---|---|---|---|
+| 추가 오픈 슬롯 | `TimeException(type=additionalSlot)` | 흰색 (정상) — 휴무 컬럼 위 override | 활성 |
+| 근무시간 외 | WeeklySchedule.startTime/endTime 밖 | 약한 회색 (`ink` alpha 0.03) | 활성 (보강 가능) |
+| 근무시간 내 | startTime ≤ slot < endTime | 투명 | 활성 |
+
+> **Why 근무시간 외 클릭 활성**: 운영 현실상 보강·시험 보충은 정규 근무시간 밖에 잡히는 빈도 높음. 시각만 약화하고 클릭은 허용.
+
+### 라벨 칩 표시 (§7.123)
+
+- 위치: 컬럼 상단(시간 그리드 첫 행 위), 가로 가운데 정렬
+- 텍스트: "휴가", "휴무" (additionalSlot 은 컬럼 라벨 없음 — 슬롯 자체로 충분)
+- 색상: `inkSecondary`, `AppTypography.captionSmall`, fontWeight w500
+- 배경: 없음 (배경은 컬럼이 이미 회색)
 
 ### 현재 시간 표시 (Now Indicator)
 
@@ -113,11 +135,15 @@ Line 2: 곡명                  (예: 쇼팽 녹턴)
 ### 빈 영역 탭
 
 - 주간 그리드의 빈 셀 탭 → 레슨 추가 (날짜+시간 자동 채움)
+- 휴무/휴가 컬럼의 빈 셀도 클릭 활성 (보강 슬롯 등록 가능)
 
-### 쉬는날 감지
+### 쉬는날·예외 감지
 
-- `TeacherAvailability.weeklySchedules`에 `isActive` 스케줄이 없는 요일 = 쉬는날
-- 스케줄이 하나도 없으면 쉬는날 표시 안함 (가용시간 미설정 상태)
+- **정기 휴무일**: `TeacherAvailability.weeklySchedules`에 `isActive` 스케줄이 없는 요일
+- **단일 휴무**: `TeacherAvailability.exceptions` 중 `type=holiday` 이고 해당 날짜 `containsDate(date)`
+- **다일 휴가**: `TeacherAvailability.exceptions` 중 `type=vacation` 이고 해당 날짜 `containsDate(date)`
+- **추가 오픈**: `TeacherAvailability.exceptions` 중 `type=additionalSlot` 이고 startTime/endTime 으로 슬롯 범위 지정
+- 우선순위: 휴가 > 휴무 > 정기 휴무일 (한 날짜에 복수 적용 시 가장 강한 라벨)
 
 ---
 

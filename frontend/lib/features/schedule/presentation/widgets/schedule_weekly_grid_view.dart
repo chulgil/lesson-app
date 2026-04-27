@@ -75,8 +75,8 @@ class _ScheduleWeeklyGridViewState
     // Count unique lessons per day (not slots)
     final uniqueLessonCounts = _countUniqueLessons(lessons);
 
-    // Determine rest days from teacher availability
-    final restDays = _getRestDays(availability);
+    // §7.123 — Determine column rest kind per day (vacation > holiday > regular > none)
+    final restKinds = _getRestKinds(availability);
 
     // Check if current week contains today
     final isCurrentWeek =
@@ -103,7 +103,8 @@ class _ScheduleWeeklyGridViewState
                       startHour,
                       endHour,
                       todayDate,
-                      restDays,
+                      restKinds,
+                      availability: availability,
                       travelSlotMap: travelSlotMap,
                       todayIndex: todayIndex,
                       now: now,
@@ -126,7 +127,8 @@ class _ScheduleWeeklyGridViewState
     int startHour,
     int endHour,
     DateTime todayDate,
-    Set<int> restDays, {
+    Map<int, ColumnRestKind> restKinds, {
+    TeacherAvailability? availability,
     Map<int, Set<int>> travelSlotMap = const {},
     int todayIndex = -1,
     DateTime? now,
@@ -160,10 +162,10 @@ class _ScheduleWeeklyGridViewState
             ...List.generate(7, (dayIndex) {
               final dayDate = _weekStart.add(Duration(days: dayIndex));
               final dayType = _getDayType(dayDate, todayDate);
-              final isRestDay = restDays.contains(dayIndex);
+              final restKind = restKinds[dayIndex] ?? ColumnRestKind.none;
               final columnBg = weeklyColumnBackground(
                 dayType: _toScheduleDayType(dayType),
-                isRestDay: isRestDay,
+                restKind: restKind,
               );
 
               // §7.122 — 컬럼 사이 1px 수직 디바이더로 경계 명확화.
@@ -198,6 +200,8 @@ class _ScheduleWeeklyGridViewState
                           cellHeight,
                           dayType: dayType,
                           travelSlots: travelSlotMap,
+                          availability: availability,
+                          restKind: restKind,
                         ),
                       ),
                       Expanded(
@@ -209,6 +213,8 @@ class _ScheduleWeeklyGridViewState
                           cellHeight,
                           dayType: dayType,
                           travelSlots: travelSlotMap,
+                          availability: availability,
+                          restKind: restKind,
                         ),
                       ),
                     ],
@@ -228,6 +234,8 @@ class _ScheduleWeeklyGridViewState
         children: [
           // Grid content
           Column(children: gridRows),
+          // §7.123 — 휴가/휴무 라벨 칩 (컬럼 상단)
+          ..._buildRestChips(restKinds, cellWidth),
           // Now indicator (red line on today's column)
           if (todayIndex >= 0 && now != null)
             _buildNowIndicator(
@@ -240,6 +248,40 @@ class _ScheduleWeeklyGridViewState
         ],
       ),
     );
+  }
+
+  /// §7.123 — 휴가/휴무 컬럼에 라벨 칩 오버레이.
+  ///
+  /// 위치: 시간 그리드 첫 행 위, 컬럼 가로 가운데.
+  /// regular(정기 휴무일) 와 none 은 라벨 없음.
+  List<Widget> _buildRestChips(
+    Map<int, ColumnRestKind> restKinds,
+    double cellWidth,
+  ) {
+    final chips = <Widget>[];
+    for (final entry in restKinds.entries) {
+      final label = entry.value.chipLabel;
+      if (label == null) continue;
+      final dayIndex = entry.key;
+      final leftOffset = 36.0 + dayIndex * cellWidth;
+      chips.add(
+        Positioned(
+          top: 2,
+          left: leftOffset,
+          width: cellWidth,
+          child: Center(
+            child: Text(
+              label,
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return chips;
   }
 
   /// Build a "now" indicator line on today's column in the weekly grid.
@@ -294,6 +336,8 @@ class _ScheduleWeeklyGridViewState
     double height, {
     _DayType dayType = _DayType.future,
     Map<int, Set<int>> travelSlots = const {},
+    TeacherAvailability? availability,
+    ColumnRestKind restKind = ColumnRestKind.none,
   }) {
     final lesson = lessonMap[dayIndex]?[slotMinutes];
     if (lesson == null) {
@@ -337,6 +381,27 @@ class _ScheduleWeeklyGridViewState
       );
       final isPast = cellDateTime.isBefore(DateTime.now());
 
+      // §7.123 — 셀 단위 톤
+      // - additionalSlot: 흰색 (휴무 컬럼 위 override)
+      // - 근무시간 외 (정상 컬럼 내): ink alpha 0.03 약한 회색
+      // - 그 외: 투명 (컬럼 배경 그대로)
+      final isAdditional = isAdditionalOpenSlot(
+        availability: availability,
+        slotStart: cellDateTime,
+      );
+      final inWorkHours = isWithinWorkHours(
+        availability: availability,
+        slotStart: cellDateTime,
+      );
+      final Color? cellOverlay;
+      if (isAdditional && restKind.isRest) {
+        cellOverlay = AppColors.paper;
+      } else if (!restKind.isRest && !inWorkHours) {
+        cellOverlay = AppColors.ink.withValues(alpha: 0.03);
+      } else {
+        cellOverlay = null;
+      }
+
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap:
@@ -346,7 +411,10 @@ class _ScheduleWeeklyGridViewState
                   HapticFeedback.lightImpact();
                   _navigateToAddLesson(date, hour, minute);
                 },
-        child: SizedBox(width: width, height: height),
+        child:
+            cellOverlay == null
+                ? SizedBox(width: width, height: height)
+                : Container(width: width, height: height, color: cellOverlay),
       );
     }
 
@@ -587,22 +655,26 @@ class _ScheduleWeeklyGridViewState
     return counts.map((key, value) => MapEntry(key, value.length));
   }
 
-  /// Get rest days from teacher availability (days without WeeklySchedule)
-  Set<int> _getRestDays(TeacherAvailability? availability) {
-    if (availability == null) return {};
-
-    final workDays = <int>{};
-    for (final schedule in availability.weeklySchedules) {
-      if (schedule.isActive) {
-        workDays.add(schedule.dayOfWeek);
-      }
+  /// §7.123 — 7일 컬럼 각각의 휴식 종류 판정.
+  ///
+  /// 우선순위: vacation > holiday > regular > none.
+  /// availability null 또는 weeklySchedules 비었으면 모두 none (휴무 미표시).
+  Map<int, ColumnRestKind> _getRestKinds(TeacherAvailability? availability) {
+    if (availability == null) return const {};
+    final hasAnyWorkDay = availability.weeklySchedules.any((s) => s.isActive);
+    if (!hasAnyWorkDay && availability.exceptions.isEmpty) {
+      return const {};
     }
-
-    // If no schedules defined, no rest days to show
-    if (workDays.isEmpty) return {};
-
-    // Days not in workDays are rest days
-    return {0, 1, 2, 3, 4, 5, 6}.difference(workDays);
+    final result = <int, ColumnRestKind>{};
+    for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
+      final date = _weekStart.add(Duration(days: dayIndex));
+      final kind = columnRestKindForDate(
+        availability: availability,
+        date: date,
+      );
+      result[dayIndex] = kind;
+    }
+    return result;
   }
 
   /// Determine day type relative to today

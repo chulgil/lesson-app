@@ -126,7 +126,11 @@ class AppColors {
   static const inkTertiary = Color(0x8C14161C); // 55% alpha
   static const inkQuaternary = Color(0x4014161C); // 25% alpha
   static const paperPencil = Color(0x9914161C); // 60% alpha (손글씨)
-  static const paperMargin = Color(0xFFA83E3A); // 왼쪽 붉은 여백선 (3px 고정)
+  @Deprecated(
+    'docs/specs/design/notebook/README.md §3 사유로 제거된 토큰 (왼쪽 붉은 여백선). '
+    '신규 사용 금지. 강조 색이 필요하면 paperAccent 를 사용.',
+  )
+  static const paperMargin = Color(0xFFA83E3A);
   static const paperAccent = Color(0xFF9B1B12); // 핵심 액션
   static const paperAccentSoft = Color(0x1F9B1B12); // 12% alpha
   static const paperOk = Color(0xFF3F5D2F); // 완료 (녹색 펜)
