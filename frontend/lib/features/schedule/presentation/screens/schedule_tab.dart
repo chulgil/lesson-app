@@ -47,12 +47,12 @@ class ScheduleTab extends ConsumerWidget {
         _buildHeader(context, ref),
 
         // Calendar: unified CompactWeekStrip for all view modes
-        // §7.125 — weeklyGrid 모드는 좌측 36px 시간 라벨 영역과 정렬되도록
-        // 헤더 좌측 패딩을 +36 조정. 다른 모드는 기본 screenPadding 유지.
+        // §7.126 — 모든 모드 헤더 동일 사이즈 (screenPadding 좌우).
+        // 주간 그리드는 시간 라벨 폭(16) 을 헤더 좌측 패딩 영역에
+        // 흡수시켜 정렬 (schedule_weekly_grid_view.dart §7.126 참조).
         Padding(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding +
-                (viewMode == ScheduleViewMode.weeklyGrid ? 36 : 0),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
             AppSpacing.space2,
             AppSpacing.screenPadding,
             0,

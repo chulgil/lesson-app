@@ -219,3 +219,4 @@ scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자�
 | 2026-04-27 | §7.123 Mode A++ — 컬럼 톤을 `paper` (#F2ECDD) 로 정렬 (scaffold paperDark 위 자연 분리). future 레슨 white lerp 0.35 → 0.15, accent alpha 0.45 → 0.55 — 컬럼/타 학생 스케줄 변별 강화 |
 | 2026-04-27 | §7.124 — 주간 그리드 구분선 `scheduleGridLine` (#E8E8E8) → 신규 `scheduleWeeklyGridLine` (ink alpha 0.08). paper 컬럼 위 동시대비 cool tint 회피, 종이 위 연필선 느낌. 일간 타임라인·picker 영향 없음 |
 | 2026-04-27 | §7.125 — 헤더(CompactWeekStrip) 7컬럼과 그리드 7컬럼 가로 정렬. weeklyGrid 모드일 때 헤더 좌측 패딩 +36 (시간 라벨 폭) 추가, 그리드 외부 패딩 `space2`(8) → `screenPadding`(16) 통일. 결과: 양측 7컬럼 시작 X = 52, 너비 = (W − 68) / 7 동일 |
+| 2026-04-27 | §7.126 — 좌측 공간 축소 + 모든 모드 헤더 동일 사이즈. §7.125 의 weeklyGrid 헤더 +36 분기 되돌림. 시간 라벨 폭 36 → 16 (헤더 좌측 패딩 영역에 흡수), 그리드 외부 좌측 패딩 0 (우측 screenPadding 만 유지). 7컬럼 시작 X = 16, 너비 = (W − 32) / 7 — 헤더와 정확히 정렬, 좌측 36px 확장 |

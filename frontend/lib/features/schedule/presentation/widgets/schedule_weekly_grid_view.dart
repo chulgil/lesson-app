@@ -15,6 +15,17 @@ import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
 import '../utils/schedule_visual_helpers.dart';
 
+/// §7.126 — 주간 그리드 가로 공간 토큰.
+///
+/// 헤더 CompactWeekStrip 의 좌우 `AppSpacing.screenPadding(16)` 패딩과
+/// 7컬럼 영역을 정확히 맞춤:
+/// - 시간 라벨 폭(16) = 헤더 좌측 패딩 영역. 시간 숫자는 헤더의 비어있는
+///   좌측 외부 영역(0~16)에 자연스럽게 들어감.
+/// - 그리드 외부 좌측 패딩 0, 우측 screenPadding(16) — 비대칭.
+/// - 결과: 그리드 7컬럼 시작 X = 16 = 헤더 7컬럼 시작 X.
+///         그리드 7컬럼 너비 = (W − 32) / 7 = 헤더 7컬럼 너비.
+const double _weeklyGridTimeColumnWidth = 16;
+
 /// Weekly summary grid showing 7-day overview of lessons.
 /// Bird's eye view with instrument-colored cells, today highlight,
 /// and drill-down to timeline view.
@@ -94,11 +105,12 @@ class _ScheduleWeeklyGridViewState
                 child: SingleChildScrollView(
                   controller: _scrollController,
                   child: Padding(
-                    // §7.125 — 헤더 CompactWeekStrip 의 screenPadding 과 정렬.
-                    // weeklyGrid 좌측 36px 시간 라벨 + 본문 7컬럼이
-                    // 헤더 7컬럼과 동일 X·동일 너비로 떨어지게 통일.
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
+                    // §7.126 — 비대칭 외부 패딩.
+                    // 좌측 0: 시간 라벨이 헤더의 좌측 패딩 영역(0~16) 에 흡수.
+                    // 우측 screenPadding(16): 헤더 우측과 일치, 7번째 컬럼
+                    // 끝 X 가 헤더 7컬럼 끝 X 와 정렬.
+                    padding: const EdgeInsets.only(
+                      right: AppSpacing.screenPadding,
                     ),
                     child: _buildGridBody(
                       lessonMap,
@@ -136,13 +148,12 @@ class _ScheduleWeeklyGridViewState
     int todayIndex = -1,
     DateTime? now,
   }) {
-    // §7.125 — 외부 screenPadding(16) × 2 + 좌측 시간 라벨(36) 제외한 너비를
-    // 7 등분. 헤더 CompactWeekStrip 7컬럼 (screenPadding + 36 시작 / 동일 너비)
-    // 과 정확히 정렬.
+    // §7.126 — (W − 우측 패딩 16 − 시간 라벨 16) / 7 = (W − 32) / 7.
+    // 헤더 CompactWeekStrip 7컬럼 ((W − 32) / 7) 과 동일 너비.
     final cellWidth =
         (MediaQuery.of(context).size.width -
-            AppSpacing.screenPadding * 2 -
-            36) /
+            AppSpacing.screenPadding -
+            _weeklyGridTimeColumnWidth) /
         7;
     const cellHeight = 28.0;
     final totalGridRows = endHour - startHour + 1;
@@ -159,13 +170,17 @@ class _ScheduleWeeklyGridViewState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 36,
-              child: Text(
-                '$hour',
-                style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.inkTertiary,
+              width: _weeklyGridTimeColumnWidth,
+              child: Padding(
+                // 우측 1px gap — 시간 숫자가 첫 컬럼 라인에 붙지 않게.
+                padding: const EdgeInsets.only(right: 1),
+                child: Text(
+                  '$hour',
+                  style: AppTypography.captionSmall.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                  textAlign: TextAlign.right,
                 ),
-                textAlign: TextAlign.right,
               ),
             ),
             ...List.generate(7, (dayIndex) {
@@ -275,7 +290,7 @@ class _ScheduleWeeklyGridViewState
       final label = entry.value.chipLabel;
       if (label == null) continue;
       final dayIndex = entry.key;
-      final leftOffset = 36.0 + dayIndex * cellWidth;
+      final leftOffset = _weeklyGridTimeColumnWidth + dayIndex * cellWidth;
       chips.add(
         Positioned(
           top: 2,
@@ -311,7 +326,7 @@ class _ScheduleWeeklyGridViewState
     // Only show if within grid range
     if (top < 0) return const SizedBox.shrink();
 
-    final leftOffset = 36.0 + todayIndex * cellWidth;
+    final leftOffset = _weeklyGridTimeColumnWidth + todayIndex * cellWidth;
 
     return Positioned(
       top: top,
