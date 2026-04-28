@@ -1543,4 +1543,55 @@ class AppStrings {
     required String startTime,
     required String endTime,
   }) => '$dayName요일 $startTime - $endTime 스케줄을 삭제하시겠습니까?';
+
+  // ── Time Exception (휴무 및 예외 설정) ──────────────────────────
+
+  /// 휴무 및 예외 설정 (AppBar)
+  static const timeExceptionTitle = '휴무 및 예외 설정';
+
+  /// 휴무 추가 (FAB / 바텀시트 헤더)
+  static const addTimeException = '휴무 추가';
+
+  /// 예정된 휴무 (섹션 제목)
+  static const upcomingExceptions = '예정된 휴무';
+
+  /// 지난 휴무 (섹션 제목)
+  static const pastExceptions = '지난 휴무';
+
+  /// 휴무 설정 안내 (info 카드 제목)
+  static const exceptionInfoTitle = '휴무 설정 안내';
+
+  /// info 카드 본문
+  static const exceptionInfoBody = '휴무일로 설정된 날짜는 학생들에게 예약 가능 시간으로 표시되지 않습니다.';
+
+  /// 설정된 휴무가 없습니다 (빈 상태)
+  static const noExceptionsSet = '설정된 휴무가 없습니다';
+
+  /// 아래 버튼을 눌러 휴무일을 추가하세요
+  static const addExceptionHint = '아래 버튼을 눌러 휴무일을 추가하세요';
+
+  /// 휴무 삭제 (다이얼로그 제목)
+  static const deleteExceptionTitle = '휴무 삭제';
+
+  /// $dateRange 휴무를 삭제하시겠습니까?
+  static String deleteExceptionConfirm(String dateRange) =>
+      '$dateRange 휴무를 삭제하시겠습니까?';
+
+  /// 유형 (라벨, 일반)
+  static const typeLabel = '유형';
+
+  /// 시작일 (라벨)
+  static const startDateLabel = '시작일';
+
+  /// 종료일 (라벨)
+  static const endDateLabel = '종료일';
+
+  /// 사유 (선택) (라벨)
+  static const reasonOptionalLabel = '사유 (선택)';
+
+  /// 휴무 사유를 입력하세요 (hint)
+  static const reasonHint = '휴무 사유를 입력하세요';
+
+  /// 추가 (제출 버튼)
+  static const addAction = '추가';
 }

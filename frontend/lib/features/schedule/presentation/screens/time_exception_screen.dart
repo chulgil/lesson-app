@@ -30,7 +30,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('휴무 및 예외 설정')),
+      appBar: AppBar(title: const Text(AppStrings.timeExceptionTitle)),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -39,7 +39,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddExceptionDialog(),
         icon: const Icon(Icons.add),
-        label: const Text('휴무 추가'),
+        label: const Text(AppStrings.addTimeException),
       ),
     );
   }
@@ -86,7 +86,10 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           // Upcoming exceptions
           if (upcoming.isNotEmpty) ...[
             // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('예정된 휴무', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.upcomingExceptions,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space3),
             ...upcoming.map((e) => _buildExceptionCard(e)),
           ],
@@ -97,7 +100,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             // Notebook × Score: 과거 섹션 제목도 Playfair sectionTitle 로 통일, 차분한 톤은
             // inkSecondary copyWith 로 보존 (§7.17, color override 변형).
             Text(
-              '지난 휴무',
+              AppStrings.pastExceptions,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -128,7 +131,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '휴무 설정 안내',
+                  AppStrings.exceptionInfoTitle,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.ink,
@@ -136,7 +139,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '휴무일로 설정된 날짜는 학생들에게 예약 가능 시간으로 표시되지 않습니다.',
+                  AppStrings.exceptionInfoBody,
                   style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
                 ),
               ],
@@ -162,9 +165,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
         leading: Container(
           width: 40,
           height: 40,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-          ),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
           child: Icon(icon, size: 20, color: color),
         ),
         title: Text(
@@ -216,14 +217,14 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           Icon(Icons.event_available, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '설정된 휴무가 없습니다',
+            AppStrings.noExceptionsSet,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '아래 버튼을 눌러 휴무일을 추가하세요',
+            AppStrings.addExceptionHint,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -246,7 +247,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '데이터를 불러올 수 없습니다',
+            AppStrings.cannotLoadData,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -317,9 +318,11 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('휴무 삭제'),
+            title: const Text(AppStrings.deleteExceptionTitle),
             content: Text(
-              '${_formatDateRange(exception.startDate, exception.endDate)} 휴무를 삭제하시겠습니까?',
+              AppStrings.deleteExceptionConfirm(
+                _formatDateRange(exception.startDate, exception.endDate),
+              ),
             ),
             actions: [
               TextButton(
@@ -370,9 +373,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: const BoxDecoration(color: Colors.white),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -390,13 +391,16 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                 const SizedBox(height: AppSpacing.space5),
 
                 // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-                Text('휴무 추가', style: NotebookTypography.sectionTitle),
+                Text(
+                  AppStrings.addTimeException,
+                  style: NotebookTypography.sectionTitle,
+                ),
 
                 const SizedBox(height: AppSpacing.space6),
 
                 // Type selection
                 Text(
-                  '유형',
+                  AppStrings.typeLabel,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -408,7 +412,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
 
                 // Date selection
                 Text(
-                  '기간',
+                  AppStrings.period,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -416,14 +420,26 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                 const SizedBox(height: AppSpacing.space2),
                 Row(
                   children: [
-                    Expanded(child: _buildDatePicker('시작일', _startDate, true)),
+                    Expanded(
+                      child: _buildDatePicker(
+                        AppStrings.startDateLabel,
+                        _startDate,
+                        true,
+                      ),
+                    ),
                     const Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: AppSpacing.space2,
                       ),
                       child: Text('~'),
                     ),
-                    Expanded(child: _buildDatePicker('종료일', _endDate, false)),
+                    Expanded(
+                      child: _buildDatePicker(
+                        AppStrings.endDateLabel,
+                        _endDate,
+                        false,
+                      ),
+                    ),
                   ],
                 ),
 
@@ -431,7 +447,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
 
                 // Reason
                 Text(
-                  '사유 (선택)',
+                  AppStrings.reasonOptionalLabel,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -440,9 +456,8 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                 TextField(
                   controller: _reasonController,
                   decoration: InputDecoration(
-                    hintText: '휴무 사유를 입력하세요',
-                    border: OutlineInputBorder(
-                    ),
+                    hintText: AppStrings.reasonHint,
+                    border: OutlineInputBorder(),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space4,
                       vertical: AppSpacing.space3,
@@ -476,7 +491,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: const Text('추가'),
+                        child: const Text(AppStrings.addAction),
                       ),
                     ),
                   ],
