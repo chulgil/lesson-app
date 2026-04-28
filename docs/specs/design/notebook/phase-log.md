@@ -5085,3 +5085,50 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `flutter analyze` 0 issues, 시그니처 훅 + 신규 handwriting-tier 훅 cross-check.
 
 ---
+
+#### §7.128 — Tier 3 안내문 톤 통일 (2026-04-28 같은 날 후속)
+
+**전제**: §7.127 에서 Tier 3(논쟁 영역) 일괄 전환을 거부하고 별건 분리. 22개 hand* 사용처 전수 분류 후 §1.1.1 결정 가이드를 패턴 매트릭스로 정제.
+
+**진단** (Tier 3 전수 8지점)
+
+| 위치 | 안내문 | 분류 | 결정 |
+|------|-------|------|------|
+| `time_context_banner.dart:65` | 시간대 인사 ("오늘은 비 오는 화요일이에요" 류) | 시간대 인사·인격적 톤 | hand 유지 |
+| `getting_started_card.dart:51` | 온보딩 ("아래 단계를 따라 레슨 관리를 시작하세요") | 부드러운 온보딩 | hand 유지 |
+| `login_screen.dart:144` | 로그인 인삿말 ("— 시작하시겠어요?") | 인격적 인삿말 | hand 유지 |
+| `login_screen.dart:222` | 학부모 진입 ("학부모이신가요?") | 인격적 분기 | hand 유지 |
+| `empty_state_widget.dart:61` | 공통 빈 상태 부연 (subtitle) | 빈 상태 일반 안내 | **bodyMedium 전환** |
+| `pending_bookings_screen.dart:99` | "새로운 레슨 신청이 들어오면 여기에 표시돼요" | 빈 상태 부연 | **bodyMedium 전환** |
+| `weekly_schedule_screen.dart:376` | "아래 버튼을 눌러 레슨 가능 시간을 추가하세요" | 빈 상태 부연 | **bodyMedium 전환** |
+| `register_regular_lesson_screen.dart:215` | "* 5주차가 있는 달은 기본 휴강이에요" | 정책 footnote | **bodyMedium 전환** |
+| `group_class_attendance_screen.dart:202` | "미참석자만 탭하세요" | 인터랙션 힌트 | **bodyMedium 전환** |
+
+**결정**
+
+1. **§1.1.1 결정 가이드 매트릭스화** — 안내문 패턴 4종(시간대 인사·빈 상태 부연·정책 footnote·인터랙션 힌트)별 스타일 명시. 결정 모호 시 3단계 검사(중복/객관성/대화 톤) SSOT 추가.
+2. **5지점 `hand` → `AppTypography.bodyMedium` 전환** — 색상은 `inkSecondary`/`inkTertiary` 유지. 폰트 사이즈 14 동일 (hand fontSize:14 ≈ bodyMedium fontSize:14).
+3. **3지점(시간대 인사·온보딩·로그인 인삿말) hand 유지** — 인격적 대화 톤 의도 보존.
+4. **`empty_state_widget.dart` 공통 위젯 docstring 갱신** — "부제: Gaegu hand" → "부제: Pretendard bodyMedium". 앱 전반 빈 상태 위젯이 자동 정렬 (52 파일 사용).
+
+**Why bodyMedium (Pretendard 14pt regular)**: hand fontSize:14 와 사이즈 동일 → 시각 위계 변화 최소. Pretendard regular = 객관적 시스템 안내 톤. inkSecondary 색상으로 secondary information 위계 유지.
+
+**Why empty_state_widget 공통 위젯 정렬**: subtitle 슬롯이 자유 텍스트 받음. 호출처 52 파일 모두 다른 안내문 → 빈 상태는 정의상 시스템 공지 → 단일 위젯에서 일관 정렬이 호출처 분산 정정보다 효율 ↑.
+
+**Why 시간대 인사·온보딩·로그인 인삿말 유지**: §1.1.1 가이드 "인격적 대화 톤" 의 정확한 사례. "— 시작하시겠어요?" 의 em-dash 는 자필 노트의 dialogic 시그니처.
+
+**Lore-directive**: Tier 3 안내문 패턴 4종 매트릭스 = SSOT. 신규 안내문 추가 시 패턴 매핑 후 스타일 결정.
+
+**Lore-directive**: 빈 상태 부연(subtitle)·정책 footnote·인터랙션 힌트는 객관적 시스템 안내 → 자필 회피, Pretendard bodyMedium.
+
+**Lore-directive**: 시간대 인사·온보딩·로그인 인삿말은 인격적 대화 톤 → `hand` 유지. em-dash·물음표 형식이 자필 dialogic 시그니처.
+
+**Lore-rejected**: 8지점 모두 일괄 Pretendard 전환 — "선생님 톤" 인격적 메시지 의도 손상, time_context_banner 의 paperAccent 좌측선 + 자필 시그니처 조합 깨짐.
+
+**Lore-rejected**: 8지점 모두 hand 유지 — 빈 상태 일반 안내·정책 footnote가 자필이면 "선생님이 손으로 쓴 정책" 이라는 가짜 자필 인지, §7.127 Tier 4 reverse 와 같은 메타포 위반 패턴.
+
+**Lore-rejected**: empty_state_widget 호출처 52 파일에 호출 옵션 추가(useHandStyle bool) — 빈 상태는 정의상 시스템 공지, 옵션 분기 = 결정 가이드 공동화.
+
+**테스트**: `flutter analyze` 0 issues, 신규 handwriting-tier 훅 cross-check (시간대 인사·온보딩·로그인 hand 유지지점 false-positive 0).
+
+---

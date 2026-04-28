@@ -8,7 +8,6 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -196,10 +195,13 @@ class _GroupClassAttendanceScreenState
         children: [
           const Icon(Icons.lightbulb_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
-          // Notebook × Score: 안내 힌트는 Gaegu handwriting marginalia (§7.87).
+          // 인터랙션 힌트 = 시스템 가이드 → Tier 3 Pretendard bodyMedium
+          // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
             '미참석자만 탭하세요',
-            style: NotebookTypography.hand.copyWith(fontSize: 14),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
         ],
       ),

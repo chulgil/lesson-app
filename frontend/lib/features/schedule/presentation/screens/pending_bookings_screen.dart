@@ -93,10 +93,13 @@ class PendingBookingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
-          // 부연 설명은 Gaegu handwriting.
+          // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
+          // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
             '새로운 레슨 신청이 들어오면 여기에 표시돼요',
-            style: NotebookTypography.hand.copyWith(fontSize: 14),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

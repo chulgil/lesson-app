@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
 import '../theme/notebook_typography.dart';
 
 /// Empty state — **Notebook × Score 스타일**.
@@ -9,7 +10,7 @@ import '../theme/notebook_typography.dart';
 /// 종이 위의 "비어 있는 프로그램" 메타포:
 /// - 아이콘: `ink` 톤, 32px (기존 64px → 축소, 과장 지양)
 /// - 제목: Playfair `pieceTitle` (serif, serif italic 대신 정제형)
-/// - 부제: Gaegu `hand` (손글씨 주석)
+/// - 부제: Pretendard `bodyMedium` (시스템 일반 안내, §7.128 Tier 3 가이드)
 /// - 액션: `OutlinedButton` (ink 1px 테두리)
 ///
 /// 스펙: `docs/specs/design/notebook/README.md` §5.1 · §6
@@ -58,8 +59,9 @@ class EmptyStateWidget extends StatelessWidget {
               const SizedBox(height: AppSpacing.space2),
               Text(
                 subtitle!,
-                style: NotebookTypography.hand.copyWith(
-                  fontSize: 14,
+                // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
+                // (README §1.1.1 결정 가이드, §7.128 자필 회피).
+                style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkTertiary,
                 ),
                 textAlign: TextAlign.center,

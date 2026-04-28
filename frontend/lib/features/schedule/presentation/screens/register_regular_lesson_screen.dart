@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
@@ -209,10 +208,13 @@ class _RegisterRegularLessonScreenState
             },
           ),
           const SizedBox(height: AppSpacing.space2),
-          // Notebook × Score: 부가 주석은 Gaegu handwriting 으로 marginalia 시그니처 적용 (§7.87).
+          // 정책 footnote = 객관적 정보 → Tier 3 Pretendard bodyMedium
+          // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
             '* 5주차가 있는 달은 기본 휴강이에요. 추가 레슨은 1회 레슨으로 신청!',
-            style: NotebookTypography.hand.copyWith(fontSize: 14),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space6),

@@ -167,9 +167,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
+              decoration: BoxDecoration(color: Colors.white),
               child: Row(
                 children: [
                   Icon(
@@ -370,10 +368,13 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
-            // 부연 설명은 Gaegu handwriting.
+            // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
+            // (README §1.1.1 결정 가이드, §7.128 자필 회피).
             Text(
               '아래 버튼을 눌러 레슨 가능 시간을 추가하세요',
-              style: NotebookTypography.hand.copyWith(fontSize: 14),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
