@@ -1,0 +1,33 @@
+# lesson-app mechanical validation — Flutter 선언형 검증 명령
+#
+# cg-ralph 루프 / handoff-verify 명령이 자동 실행하는 기계적 검증.
+# 각 명령은 frontend/ 또는 backend/ 작업 디렉토리에서 실행되며,
+# exit 0 = PASS 를 기대한다.
+#
+# 사용처:
+# - .claude/agents/test-critic.md, security-reviewer.md 의 LLM 평가 직전 게이트
+# - /handoff-verify 명령
+# - cg-ralph 루프 (영속 검증)
+#
+# Adapted from cg-harness scaffold (Apache-2.0).
+
+[frontend]
+working_dir = "frontend"
+build = "flutter build apk --debug --target-platform android-arm64"
+test = "flutter test --no-pub"
+lint = "flutter analyze --no-pub"
+codegen = "dart run build_runner build --delete-conflicting-outputs"
+timeout = 900
+
+[backend]
+working_dir = "backend"
+build = "uv run python -m compileall -q ."
+test = "uv run pytest -x -q"
+lint = "uv run ruff check ."
+timeout = 600
+
+# 운영 규칙
+# - 빠른 게이트 우선: lint → test → build (실패 가능성 큰 것부터)
+# - LLM Critic 호출 전에 lint + test 모두 PASS 여야 한다
+# - Build 는 무거우므로 PR 직전 또는 ultra 모드에서만
+# - codegen 은 Riverpod / freezed 사용 도메인 변경 시 필요
