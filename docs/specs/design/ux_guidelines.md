@@ -98,6 +98,24 @@ Q: 이 색상은 무엇을 의미하나?
 
 **금지**: `fontSize: N` 직접 사용. 반드시 `AppTypography.xxx` 사용.
 
+#### 1.2.1 NotebookTypography — 자필·악보 시그니처 (Notebook × Score)
+
+> 파일: `lib/core/theme/notebook_typography.dart`
+> 폰트: Gaegu (자필) / Playfair Display (악보 헤더) / IBM Plex Mono (시간·템포)
+
+| 토큰 | 폰트 | 용도 |
+|------|------|------|
+| `hand` | Gaegu 16 | **사용자 자필 본문**: 선생님 피드백 입력/표시, 학생 메모 입력/표시, 연습노트 본문, 곡 메모 — TextField input style 도 포함 (§7.129) |
+| `handOk` | Gaegu 13 / paperOk | 자필 완료 마크 ("✓ 보잉 좋음") |
+| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "미결제") |
+| `pieceTitle` | Playfair w700 | 곡 제목, 카드 헤더 |
+| `sectionTitle` | Playfair italic | 섹션 헤더 |
+| `roman` / `romanActive` | Playfair italic | 로마숫자 인덱스 |
+
+**4계층 결정 트리**: "이 텍스트의 작성 주체는 누구인가?" → 사람=자필(Tier 1·2), 시스템=인쇄체(Tier 3·4).
+
+상세 가이드 + 회피 신호 + Tier 3 안내문 매트릭스 → `docs/specs/design/notebook/README.md` §1.1.1.
+
 ### 1.3 간격 (AppSpacing)
 
 > 파일: `lib/core/theme/app_spacing.dart`

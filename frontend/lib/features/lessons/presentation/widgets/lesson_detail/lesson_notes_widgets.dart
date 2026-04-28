@@ -173,6 +173,9 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
             maxLines: 6,
             controller: _controller,
             onChanged: _onChanged,
+            // 선생님 피드백 = 자필 본문 → Tier 1 Gaegu hand
+            // (README §1.1.1, §7.129 사용자 입력 정렬).
+            style: NotebookTypography.hand,
             decoration: InputDecoration(
               hintText: '레슨 피드백을 작성하세요...',
               hintStyle: AppTypography.bodyMedium.copyWith(
@@ -585,6 +588,9 @@ Future<String?> showEditPracticeTipDialog({
           content: TextField(
             controller: controller,
             maxLines: 4,
+            // 연습 팁 = 선생님 자필 → Tier 1 Gaegu hand
+            // (README §1.1.1, §7.129).
+            style: NotebookTypography.hand,
             decoration: const InputDecoration(
               hintText: '연습 팁을 입력하세요',
               border: OutlineInputBorder(),
@@ -692,7 +698,9 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                   contentPadding: EdgeInsets.zero,
                   isDense: true,
                 ),
-                style: AppTypography.bodyMedium,
+                // 학생 메모 = 자필 본문 → Tier 1 Gaegu hand
+                // (README §1.1.1, §7.129 사용자 입력 정렬).
+                style: NotebookTypography.hand,
               ),
               const SizedBox(height: AppSpacing.space2),
               if (_status == _SaveStatus.saving)

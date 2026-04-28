@@ -5132,3 +5132,43 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `flutter analyze` 0 issues, 신규 handwriting-tier 훅 cross-check (시간대 인사·온보딩·로그인 hand 유지지점 false-positive 0).
 
 ---
+
+#### §7.129 — 사용자 입력 영역 Tier 1 hand 정렬 (2026-04-28 후속)
+
+**전제**: §7.128 매트릭스 정착 후 사용자 의문 — "선생님이 레슨노트 적는 부분, 학생이 연습시 적는 부분도 시간대 배너(`time_context_banner.dart:65`, `NotebookTypography.hand`)와 동일한 자필 폰트로 정렬돼야 한다." Tier 4 회피 신호의 "입력 필드(TextField) 산세리프" 가 너무 광범위 → **자유 서술 자필 입력**(피드백·메모·연습노트)과 **시스템 식별자 입력**(검색·번호·메뉴)을 분리해야 한다.
+
+**진단** (사용자 자유 서술 입력/표시 9지점 전수)
+
+| 위치 | 영역 | 작성자 | 현재 | 결정 |
+|------|------|-------|------|------|
+| `lesson_notes_widgets.dart:172` | 선생님 피드백 입력 TextField | 선생님 | default style | **hand 적용** |
+| `lesson_notes_widgets.dart:585` | 연습 팁 수정 다이얼로그 입력 | 선생님 | default style | **hand 적용** |
+| `lesson_notes_widgets.dart:682` | 학생 노트 입력 TextField | 학생 | `bodyMedium` | **hand 변경** |
+| `note_edit_dialog.dart:100` | 연습노트 수정 다이얼로그 입력 | 학생 | default style | **hand 적용** |
+| `note_list_item.dart:117` | 연습노트 리스트 표시 Text | 학생 자필 표시 | `bodyMedium` | **hand 변경** |
+| `note_preview_card.dart:78` | 연습노트 미리보기 Text | 학생 자필 표시 | `bodySmall` | **hand size 13** |
+| `student_notes_section.dart:146` | 선생님 피드백 표시 (학생상세) | 선생님 자필 표시 | `hand size:13` | 유지 ✓ |
+| `lesson_note_history_screen.dart:264` | 선생님 피드백 표시 (히스토리) | 선생님 자필 표시 | `hand` | 유지 ✓ |
+| `lesson_note_history_screen.dart:346` | 학생 노트 표시 (히스토리) | 학생 자필 표시 | `hand size:13` | 유지 ✓ |
+
+**결정 1**: §1.1.1 Tier 1 예시에 **자유 서술 TextField** 명시 추가 — 표시뿐 아니라 입력 시점도 자필. 산세리프 회피 신호 항목은 **검색·식별자·번호·메뉴 입력** 으로 한정.
+
+**결정 2**: TextField input style = `NotebookTypography.hand`, hintStyle 은 §7.128 Tier 3 결정에 따라 `AppTypography.bodyMedium` 유지 (시스템 안내 톤). 입력 자체는 자필이 되어 사람의 글이라는 메타포가 살아남.
+
+**결정 3**: 표시 Text 의 fontSize 는 컨텍스트별 보존 (history 13, list default, preview 13). 사용자 강조점은 "글씨체 일관성(Gaegu)" 이고 사이즈는 정보 위계 유지.
+
+**결정 4**: 곡 메모(`repertoire_management_widgets:673`)는 §7.127 에서 이미 hand 적용됨 — 이번 §7.129 수정 대상 아님. 일관성 SSOT 정렬만 README 매트릭스에 반영.
+
+**Lore-directive**: 자유 서술 사용자 입력(피드백/메모/연습노트)은 **입력 시점부터** Tier 1 hand. 식별자·검색·번호·메뉴 입력만 Tier 4 산세리프.
+
+**Lore-directive**: TextField input style 과 hintStyle 은 분리 — input=자필(사람의 글), hint=Pretendard(시스템 안내문) 유지.
+
+**Lore-rejected**: 입력 시점은 산세리프, 저장 후 표시만 hand — 입력 → 표시 전환에서 폰트 점프 발생, 같은 텍스트 두 폰트 인지 비용.
+
+**Lore-rejected**: 사이즈도 time_context_banner 의 hand size 15 로 통일 — 정보 위계(history 13 vs body 16)가 평면화되어 스캐닝 저하. 사용자 강조점은 "폰트(글씨체)" 였고 size 는 컨텍스트별 보존.
+
+**Lore-rejected**: 식별자(이름/연락처) 입력도 hand 전환 — 고유명사·전화번호는 객관 데이터, hand 적용 시 Tier 4 reverse 패턴(가짜 자필) 재발.
+
+**테스트**: `flutter analyze` 0 issues (변경 4 파일 scope), README §1.1.1 매트릭스 Tier 1 예시 + Tier 4 회피 신호 한정 정제.
+
+---

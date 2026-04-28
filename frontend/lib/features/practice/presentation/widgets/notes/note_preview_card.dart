@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/practice_note_provider.dart';
 
@@ -73,9 +74,12 @@ class NotePreviewCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 2),
+              // 연습노트 미리보기 = 학생 자필 → Tier 1 Gaegu hand
+              // (README §1.1.1, §7.129 사용자 입력 정렬).
               Text(
                 latestNote.content,
-                style: AppTypography.bodySmall.copyWith(
+                style: NotebookTypography.hand.copyWith(
+                  fontSize: 13,
                   color: AppColors.ink,
                 ),
                 maxLines: 2,
@@ -115,9 +119,7 @@ class NotePreviewCard extends ConsumerWidget {
         Expanded(
           child: Container(
             height: 16,
-            decoration: BoxDecoration(
-              color: AppColors.inkQuaternary,
-              ),
+            decoration: BoxDecoration(color: AppColors.inkQuaternary),
           ),
         ),
       ],

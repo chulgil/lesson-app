@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
 
 /// List item widget for displaying a practice note
@@ -42,7 +43,7 @@ class NoteListItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    ),
+                  ),
                   child: Text(
                     note.timeText,
                     style: AppTypography.caption.copyWith(
@@ -111,12 +112,11 @@ class NoteListItem extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.space2),
-            // Note content
+            // 연습노트 본문 = 학생 자필 → Tier 1 Gaegu hand
+            // (README §1.1.1, §7.129 사용자 입력 정렬).
             Text(
               note.content,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.ink,
-              ),
+              style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             ),
           ],
         ),

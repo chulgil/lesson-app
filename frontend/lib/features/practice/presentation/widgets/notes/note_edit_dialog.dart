@@ -103,6 +103,9 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
               minLines: 3,
               autofocus: true,
               textInputAction: TextInputAction.newline,
+              // 연습노트 = 학생 자필 본문 → Tier 1 Gaegu hand
+              // (README §1.1.1, §7.129 사용자 입력 정렬).
+              style: NotebookTypography.hand,
               decoration: InputDecoration(
                 hintText: '연습하면서 느낀 점을 기록하세요...',
                 hintStyle: AppTypography.bodyMedium.copyWith(
