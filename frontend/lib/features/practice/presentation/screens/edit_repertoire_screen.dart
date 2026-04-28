@@ -347,7 +347,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppColors.paper,
                                 ),
                               )
                               : const Text('변경사항 저장'),

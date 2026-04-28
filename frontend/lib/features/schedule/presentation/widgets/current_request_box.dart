@@ -217,11 +217,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             padding: const EdgeInsets.only(bottom: AppSpacing.space1),
             child: Row(
               children: [
-                Icon(
-                  Icons.touch_app,
-                  size: 14,
-                  color: AppColors.inkTertiary,
-                ),
+                Icon(Icons.touch_app, size: 14, color: AppColors.inkTertiary),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   AppStrings.slotSelectionHint,
@@ -274,8 +270,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   onPressed: widget.onCounterPropose,
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.inkQuaternary),
-                    shape: RoundedRectangleBorder(
-                    ),
+                    shape: RoundedRectangleBorder(),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space3,
                     ),
@@ -308,8 +303,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
                     disabledBackgroundColor: AppColors.scheduleMutedAccent,
-                    shape: RoundedRectangleBorder(
-                    ),
+                    shape: RoundedRectangleBorder(),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space3,
                     ),
@@ -317,7 +311,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   child: Text(
                     AppStrings.accept,
                     style: AppTypography.buttonSmall.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   ),
                 ),
@@ -349,12 +343,12 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 ),
                 decoration: BoxDecoration(
                   color:
-                      isSelected
-                          ? AppColors.paperAccent.withValues(alpha: 0.08)
-                          : AppColors.paper,
+                      isSelected ? AppColors.paperAccentSoft : AppColors.paper,
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -363,10 +357,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   style: AppTypography.caption.copyWith(
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.ink,
+                    color: isSelected ? AppColors.paperAccent : AppColors.ink,
                   ),
                 ),
               ),
@@ -411,8 +402,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             ),
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space2,
               ),
@@ -612,10 +602,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.paperAccent.withValues(alpha: 0.06)
-                  : AppColors.paper,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 1.5 : 1,
@@ -626,8 +613,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 18,
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
+              color: isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
@@ -760,12 +746,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             icon: Icon(primaryIcon, size: 18),
             label: Text(
               primaryLabel,
-              style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+              style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
           ),
         ),
@@ -808,12 +793,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         icon: Icon(icon, size: 16),
         label: Text(
           label,
-          style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+          style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
-          shape: RoundedRectangleBorder(
-          ),
+          shape: RoundedRectangleBorder(),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
         ),
       ),
@@ -839,8 +823,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: AppColors.inkQuaternary),
-          shape: RoundedRectangleBorder(
-          ),
+          shape: RoundedRectangleBorder(),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
         ),
       ),

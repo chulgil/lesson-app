@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 import '../../domain/entities/request_filter.dart';
 import '../../domain/entities/unified_lesson_request.dart';
@@ -56,7 +57,12 @@ class _AllLessonRequestsScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.lessonRequestTitle)),
+      appBar: AppBar(
+        title: Text(
+          AppStrings.lessonRequestTitle,
+          style: NotebookTypography.appBarTitle,
+        ),
+      ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -258,13 +264,12 @@ class _AllLessonRequestsScreenState
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
               color: isSelected ? AppColors.paperAccent : Colors.transparent,
               border: Border.all(color: color, width: isSelected ? 2 : 1.5),
             ),
             child:
                 isSelected
-                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                    ? const Icon(Icons.check, size: 12, color: AppColors.paper)
                     : null,
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -491,14 +496,14 @@ class _AllLessonRequestsScreenState
               Icon(
                 icon,
                 size: 14,
-                color: selected ? Colors.white : AppColors.inkSecondary,
+                color: selected ? AppColors.paper : AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space1),
             ],
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: selected ? Colors.white : AppColors.inkSecondary,
+                color: selected ? AppColors.paper : AppColors.inkSecondary,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

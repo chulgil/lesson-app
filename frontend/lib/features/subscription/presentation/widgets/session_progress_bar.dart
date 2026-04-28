@@ -203,10 +203,7 @@ class _SessionDot extends StatelessWidget {
             child: Container(
               width: AppSpacing.space2,
               height: AppSpacing.space2,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.paperAccent,
-              ),
+              decoration: const BoxDecoration(color: AppColors.paperAccent),
             ),
           ),
       ],
@@ -220,11 +217,8 @@ class _SessionDot extends StatelessWidget {
         return Container(
           width: SessionProgressBar._dotSize,
           height: SessionProgressBar._dotSize,
-          decoration: const BoxDecoration(
-            color: AppColors.paperAccent,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.check, size: 12, color: Colors.white),
+          decoration: const BoxDecoration(color: AppColors.paperAccent),
+          child: const Icon(Icons.check, size: 12, color: AppColors.paper),
         );
 
       // Active: outer ring (primaryLight) + inner filled (primary)
@@ -236,17 +230,13 @@ class _SessionDot extends StatelessWidget {
               width: SessionProgressBar._ringSize,
               height: SessionProgressBar._ringSize,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
                 border: Border.all(color: AppColors.paperAccentSoft, width: 2),
               ),
             ),
             Container(
               width: SessionProgressBar._dotSize,
               height: SessionProgressBar._dotSize,
-              decoration: const BoxDecoration(
-                color: AppColors.paperAccent,
-                shape: BoxShape.circle,
-              ),
+              decoration: const BoxDecoration(color: AppColors.paperAccent),
             ),
           ],
         );
@@ -257,7 +247,6 @@ class _SessionDot extends StatelessWidget {
           width: SessionProgressBar._dotSize,
           height: SessionProgressBar._dotSize,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
             border: Border.all(color: AppColors.inkQuaternary, width: 1.5),
           ),
         );

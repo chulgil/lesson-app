@@ -149,7 +149,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
       ),
       child: Column(
@@ -248,10 +248,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               margin: const EdgeInsets.only(bottom: AppSpacing.space2),
               decoration: BoxDecoration(
-                color:
-                    isSelected
-                        ? AppColors.paperAccent.withValues(alpha: 0.08)
-                        : AppColors.paper,
+                color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
                 border: Border.all(
                   color:
                       isSelected
@@ -365,7 +362,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               label: Text(
                 '번갈아 듣기',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: _alternateMode ? Colors.white : AppColors.ink,
+                  color: _alternateMode ? AppColors.paper : AppColors.ink,
                 ),
               ),
               selected: _alternateMode,
@@ -373,7 +370,8 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               avatar: Icon(
                 Icons.repeat,
                 size: 18,
-                color: _alternateMode ? Colors.white : AppColors.inkSecondary,
+                color:
+                    _alternateMode ? AppColors.paper : AppColors.inkSecondary,
               ),
               onSelected: (v) => setState(() => _alternateMode = v),
             ),
@@ -430,10 +428,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.paperAccent.withValues(alpha: 0.08)
-                  : AppColors.paper,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
@@ -511,11 +506,13 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               onPressed: _playSynced,
               icon: Icon(
                 _playingA || _playingB ? Icons.stop : Icons.play_arrow,
-                color: Colors.white,
+                color: AppColors.paper,
               ),
               label: Text(
                 _playingA || _playingB ? '정지' : '동시 재생',
-                style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.paper,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
@@ -625,7 +622,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.paperAccent.withValues(alpha: 0.1)
+                          ? AppColors.paperAccentSoft
                           : Colors.transparent,
                   border: Border.all(
                     color:
@@ -727,9 +724,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
   Widget _buildSummaryCard(RecordingComparison comparison) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -83,9 +83,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -183,13 +181,12 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                       onPressed: _selectedIds.isNotEmpty ? _submit : null,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         _submitLabel,
                         style: AppTypography.buttonSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                     ),
@@ -265,7 +262,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
             label,
             textAlign: TextAlign.center,
             style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : AppColors.inkSecondary,
+              color: isSelected ? AppColors.paper : AppColors.inkSecondary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

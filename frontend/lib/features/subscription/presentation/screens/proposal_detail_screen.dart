@@ -220,9 +220,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: const Icon(
               Icons.card_giftcard,
               size: 24,
@@ -327,7 +325,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                                ? AppColors.paperAccentSoft
                                 : AppColors.paper,
                         border: Border.all(
                           color:
@@ -344,7 +342,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                             width: 24,
                             height: 24,
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
                               border: Border.all(
                                 color:
                                     isSelected
@@ -360,7 +357,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                         width: 12,
                                         height: 12,
                                         decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
                                           color: AppColors.paperAccent,
                                         ),
                                       ),
@@ -542,9 +538,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
         showModalBottomSheet(
           context: context,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           builder:
               (context) => SafeArea(
                 child: Padding(
@@ -564,7 +558,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       ListTile(
                         leading: const CircleAvatar(
                           backgroundColor: AppColors.paperOk,
-                          child: Icon(Icons.call, color: Colors.white),
+                          child: Icon(Icons.call, color: AppColors.paper),
                         ),
                         title: const Text('전화하기'),
                         subtitle: Text(phoneNumber),
@@ -576,7 +570,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       ListTile(
                         leading: CircleAvatar(
                           backgroundColor: AppColors.ink,
-                          child: const Icon(Icons.message, color: Colors.white),
+                          child: const Icon(
+                            Icons.message,
+                            color: AppColors.paper,
+                          ),
                         ),
                         title: const Text('문자 보내기'),
                         subtitle: Text(phoneNumber),
@@ -656,9 +653,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   horizontal: AppSpacing.space3,
                   vertical: AppSpacing.space2,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

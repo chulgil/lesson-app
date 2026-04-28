@@ -188,9 +188,7 @@ class _UnifiedSubscriptionSheetState
   Widget _buildStudentInfo() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           Icon(
@@ -391,7 +389,7 @@ class _UnifiedSubscriptionSheetState
                 _recommendedTemplateId = null;
               });
             },
-            selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+            selectedColor: AppColors.paperAccentSoft,
             labelStyle: AppTypography.bodySmall.copyWith(
               color: isSelected ? AppColors.paperAccent : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -408,7 +406,7 @@ class _UnifiedSubscriptionSheetState
               _customLessonCount != null &&
               !_lessonCountOptions.contains(_customLessonCount),
           onSelected: (_) => _showCustomLessonCountDialog(),
-          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+          selectedColor: AppColors.paperAccentSoft,
           labelStyle: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -463,7 +461,7 @@ class _UnifiedSubscriptionSheetState
                   _customValidityDays = selected ? days : null;
                 });
               },
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              selectedColor: AppColors.paperAccentSoft,
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -520,9 +518,7 @@ class _UnifiedSubscriptionSheetState
                             ? AppColors.paperAccent
                             : AppColors.inkQuaternary,
                   ),
-                  shape: RoundedRectangleBorder(
-                    
-                  ),
+                  shape: RoundedRectangleBorder(),
                 ),
                 child: Text(
                   '바로 발급',
@@ -542,16 +538,12 @@ class _UnifiedSubscriptionSheetState
               onPressed: canSubmit ? _onSendProposal : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.paper,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space3,
                 ),
-                shape: RoundedRectangleBorder(
-                  
-                ),
-                disabledBackgroundColor: AppColors.paperAccent.withValues(
-                  alpha: 0.3,
-                ),
+                shape: RoundedRectangleBorder(),
+                disabledBackgroundColor: AppColors.paperAccentSoft,
               ),
               child:
                   _isSubmitting
@@ -560,7 +552,7 @@ class _UnifiedSubscriptionSheetState
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       )
                       : Text(
@@ -568,7 +560,7 @@ class _UnifiedSubscriptionSheetState
                             ? '${_selectedTemplateIds.length}개 제안 보내기'
                             : '제안 보내기',
                         style: AppTypography.buttonSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
             ),
@@ -726,10 +718,7 @@ class _TemplateChip extends StatelessWidget {
       width: 120,
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color:
-            isSelected
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
-                : AppColors.paper,
+        color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
         border: Border.all(
           color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isSelected ? 2 : 1,
@@ -746,9 +735,7 @@ class _TemplateChip extends StatelessWidget {
                 vertical: 1,
               ),
               margin: const EdgeInsets.only(bottom: AppSpacing.space1),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.15),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Text(
                 '추천',
                 style: AppTypography.caption.copyWith(

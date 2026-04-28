@@ -140,10 +140,7 @@ class _GroupClassDetailScreenState
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Center(
               child: Text(
                 _getInstrumentEmoji(),
@@ -174,7 +171,7 @@ class _GroupClassDetailScreenState
               color:
                   widget.groupClass.type == GroupClassType.regular
                       ? AppColors.ink.withValues(alpha: 0.1)
-                      : AppColors.paperAccent.withValues(alpha: 0.1),
+                      : AppColors.paperAccentSoft,
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
@@ -269,16 +266,16 @@ class _GroupClassDetailScreenState
       decoration: BoxDecoration(
         color:
             isFull
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                ? AppColors.paperAccentSoft
                 : isAlmostFull
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                ? AppColors.paperAccentSoft
                 : AppColors.paperOk.withValues(alpha: 0.05),
         border: Border.all(
           color:
               isFull
-                  ? AppColors.paperAccent.withValues(alpha: 0.3)
+                  ? AppColors.inkQuaternary
                   : isAlmostFull
-                  ? AppColors.paperAccent.withValues(alpha: 0.3)
+                  ? AppColors.inkQuaternary
                   : AppColors.paperOk.withValues(alpha: 0.3),
         ),
       ),
@@ -298,7 +295,6 @@ class _GroupClassDetailScreenState
                           : isAlmostFull
                           ? AppColors.paperAccent
                           : AppColors.paperOk,
-                  shape: BoxShape.circle,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -356,14 +352,9 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color:
-            isWaitlist
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
-                : AppColors.paperAccent.withValues(alpha: 0.05),
+            isWaitlist ? AppColors.paperAccentSoft : AppColors.paperAccentSoft,
         border: Border.all(
-          color:
-              isWaitlist
-                  ? AppColors.paperAccent.withValues(alpha: 0.3)
-                  : AppColors.paperAccent.withValues(alpha: 0.3),
+          color: isWaitlist ? AppColors.inkQuaternary : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -469,7 +460,7 @@ class _GroupClassDetailScreenState
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     )
                     : Text(

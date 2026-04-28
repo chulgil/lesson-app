@@ -205,10 +205,10 @@ class _SessionSection extends ConsumerWidget {
             // Divider line
             Expanded(
               child: Container(
-                height: 0.5,
+                height: 1,
                 color:
                     isSelected
-                        ? AppColors.paperAccent.withValues(alpha: 0.3)
+                        ? AppColors.paperAccent
                         : AppColors.inkQuaternary,
               ),
             ),
@@ -231,10 +231,10 @@ class _SessionSection extends ConsumerWidget {
             // Divider line
             Expanded(
               child: Container(
-                height: 0.5,
+                height: 1,
                 color:
                     isSelected
-                        ? AppColors.paperAccent.withValues(alpha: 0.3)
+                        ? AppColors.paperAccent
                         : AppColors.inkQuaternary,
               ),
             ),
@@ -338,7 +338,7 @@ class _SessionSection extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         isTeacher
-                            ? AppColors.paperAccent.withValues(alpha: 0.08)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),

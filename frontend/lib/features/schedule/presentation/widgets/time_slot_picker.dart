@@ -37,11 +37,7 @@ class TimeSlotPicker extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.event_busy,
-              size: 48,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.event_busy, size: 48, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '가능한 시간이 없습니다',
@@ -64,14 +60,15 @@ class TimeSlotPicker extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: availableSlots.map((slot) {
-        final isSelected = selectedSlot?.id == slot.id;
-        return _TimeSlotChip(
-          slot: slot,
-          isSelected: isSelected,
-          onTap: () => onSlotSelected(slot),
-        );
-      }).toList(),
+      children:
+          availableSlots.map((slot) {
+            final isSelected = selectedSlot?.id == slot.id;
+            return _TimeSlotChip(
+              slot: slot,
+              isSelected: isSelected,
+              onTap: () => onSlotSelected(slot),
+            );
+          }).toList(),
     );
   }
 }
@@ -90,9 +87,7 @@ class _TimeSlotChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isSelected
-          ? AppColors.paperAccent
-          : AppColors.paper,
+      color: isSelected ? AppColors.paperAccent : AppColors.paper,
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -102,13 +97,14 @@ class _TimeSlotChip extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             ),
           ),
           child: Text(
             slot.timeRange,
             style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : AppColors.ink,
+              color: isSelected ? AppColors.paper : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -144,10 +140,10 @@ class DatePickerWithAvailability extends StatelessWidget {
       onDateChanged: onDateSelected,
       selectableDayPredicate: (date) {
         // Check if date is in available dates
-        return availableDates.any((d) =>
-            d.year == date.year &&
-            d.month == date.month &&
-            d.day == date.day);
+        return availableDates.any(
+          (d) =>
+              d.year == date.year && d.month == date.month && d.day == date.day,
+        );
       },
     );
   }
@@ -176,54 +172,62 @@ class WeekDaySelector extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: days.map((date) {
-        final isSelected = date.year == selectedDate.year &&
-            date.month == selectedDate.month &&
-            date.day == selectedDate.day;
-        final isAvailable = availableDays.contains(date.weekday);
-        final dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+      children:
+          days.map((date) {
+            final isSelected =
+                date.year == selectedDate.year &&
+                date.month == selectedDate.month &&
+                date.day == selectedDate.day;
+            final isAvailable = availableDays.contains(date.weekday);
+            final dayNames = ['월', '화', '수', '목', '금', '토', '일'];
 
-        return GestureDetector(
-          onTap: isAvailable ? () => onDateSelected(date) : null,
-          child: Container(
-            width: 44,
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.paperAccent
-                  : isAvailable
-                      ? Colors.transparent
-                      : AppColors.paperDark,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  dayNames[date.weekday - 1],
-                  style: AppTypography.caption.copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : isAvailable
-                            ? AppColors.inkSecondary
-                            : AppColors.inkTertiary,
-                  ),
+            return GestureDetector(
+              onTap: isAvailable ? () => onDateSelected(date) : null,
+              child: Container(
+                width: 44,
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space2,
                 ),
-                const SizedBox(height: AppSpacing.space1),
-                Text(
-                  '${date.day}',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : isAvailable
-                            ? AppColors.ink
-                            : AppColors.inkTertiary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : isAvailable
+                          ? Colors.transparent
+                          : AppColors.paperDark,
                 ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+                child: Column(
+                  children: [
+                    Text(
+                      dayNames[date.weekday - 1],
+                      style: AppTypography.caption.copyWith(
+                        color:
+                            isSelected
+                                ? AppColors.paper
+                                : isAvailable
+                                ? AppColors.inkSecondary
+                                : AppColors.inkTertiary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      '${date.day}',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color:
+                            isSelected
+                                ? AppColors.paper
+                                : isAvailable
+                                ? AppColors.ink
+                                : AppColors.inkTertiary,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 }

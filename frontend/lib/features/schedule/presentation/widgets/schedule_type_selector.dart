@@ -61,17 +61,15 @@ class _ScheduleTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color:
-          isSelected
-              ? AppColors.paperAccent.withValues(alpha: 0.08)
-              : AppColors.paper,
+      color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
       child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -83,7 +81,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.paperAccent.withValues(alpha: 0.15)
+                          ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
                 ),
                 child: Icon(
@@ -121,9 +119,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperOk.withValues(
-                                alpha: 0.15,
-                              ),
+                              color: AppColors.paperOk.withValues(alpha: 0.15),
                             ),
                             child: Text(
                               '권장',
@@ -146,7 +142,10 @@ class _ScheduleTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Radio<ScheduleType>(value: type, activeColor: AppColors.paperAccent),
+              Radio<ScheduleType>(
+                value: type,
+                activeColor: AppColors.paperAccent,
+              ),
             ],
           ),
         ),
@@ -181,14 +180,16 @@ class LessonGoalSelector extends StatelessWidget {
                 if (selected) onGoalSelected(goal);
               },
               backgroundColor: AppColors.paper,
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              selectedColor: AppColors.paperAccentSoft,
               checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                color:
+                    isSelected
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
-                color:
-                    isSelected ? AppColors.paperAccent : AppColors.ink,
+                color: isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );
@@ -223,16 +224,16 @@ class ExperienceLevelSelector extends StatelessWidget {
                 if (selected) onLevelSelected(level);
               },
               backgroundColor: AppColors.paper,
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              selectedColor: AppColors.paperAccentSoft,
               checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-              ),
-              labelStyle: AppTypography.bodySmall.copyWith(
                 color:
                     isSelected
                         ? AppColors.paperAccent
-                        : AppColors.ink,
+                        : AppColors.inkQuaternary,
+              ),
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color: isSelected ? AppColors.paperAccent : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );

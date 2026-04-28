@@ -85,11 +85,11 @@ class GoalAchievedDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.paperAccent.withValues(alpha: 0.2),
-                      AppColors.paperAccent.withValues(alpha: 0.2),
+                      AppColors.paperAccentSoft,
+                      AppColors.paperAccentSoft,
                     ],
                   ),
-                  ),
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -167,9 +167,7 @@ class GoalAchievedDialog extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Column(
         children: [
           if (goal.dailyTimeMinutes != null)
@@ -198,9 +196,7 @@ class GoalAchievedDialog extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Column(
         children: [
           if (goal.weeklyTimeMinutes != null)

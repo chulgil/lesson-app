@@ -60,7 +60,7 @@ class BookingCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.paperAccentSoft,
                     child: Text(
                       booking.studentName.isNotEmpty
                           ? booking.studentName[0]
@@ -105,9 +105,7 @@ class BookingCard extends StatelessWidget {
               // Date & Time
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(
@@ -146,10 +144,8 @@ class BookingCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.05),
-                    border: Border.all(
-                      color: AppColors.paperAccent.withValues(alpha: 0.2),
-                    ),
+                    color: AppColors.paperAccentSoft,
+                    border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,9 +283,7 @@ class BookingCardCompact extends StatelessWidget {
       ),
       subtitle: Text(
         '${booking.formattedDate} ${booking.timeRange}',
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(

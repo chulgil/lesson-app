@@ -42,9 +42,7 @@ class SubscriptionActionBox extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border(
-          top: BorderSide(color: AppColors.inkQuaternary),
-        ),
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: SafeArea(
         top: false,
@@ -68,9 +66,10 @@ class SubscriptionActionBox extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.paperAccent,
               side: BorderSide(
-                color: subscription.canReschedule
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
+                color:
+                    subscription.canReschedule
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
               ),
             ),
           ),
@@ -83,7 +82,7 @@ class SubscriptionActionBox extends StatelessWidget {
             label: Text(AppStrings.cancelRequest),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.paperAccent,
-              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
+              side: BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),

@@ -206,7 +206,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
     if (isSelected) {
       return const _CellConfig(
         backgroundColor: AppColors.paperAccent,
-        textColor: Colors.white,
+        textColor: AppColors.paper,
         icon: Icons.check,
       );
     }

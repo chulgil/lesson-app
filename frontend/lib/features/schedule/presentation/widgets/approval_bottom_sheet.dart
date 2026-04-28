@@ -158,7 +158,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       children: [
         CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccentSoft,
           child: Text(
             booking.studentName.isNotEmpty ? booking.studentName[0] : '?',
             style: AppTypography.headingMedium.copyWith(
@@ -220,7 +220,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
+        color: AppColors.paperAccentSoft,
         border: Border.all(color: AppColors.paperAccent, width: 2),
       ),
       child: Column(
@@ -258,9 +258,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
   Widget _buildWarningNote() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
@@ -334,13 +332,13 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       )
                       : Text(
                         '승인하기',
                         style: AppTypography.button.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
             ),

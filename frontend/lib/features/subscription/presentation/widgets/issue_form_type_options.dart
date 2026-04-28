@@ -80,7 +80,7 @@ class MonthlyOptionsSection extends StatelessWidget {
                   label: Text('$months개월'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(months),
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+                  selectedColor: AppColors.paperAccentSoft,
                   checkmarkColor: AppColors.paperAccent,
                   backgroundColor: AppColors.paper,
                   side: BorderSide(
@@ -112,9 +112,7 @@ class TrialOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           Icon(Icons.info_outline, color: AppColors.paperAccent),

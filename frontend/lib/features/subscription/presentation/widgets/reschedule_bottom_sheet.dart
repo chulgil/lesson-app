@@ -299,10 +299,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          color:
-              isSelected
-                  ? AppColors.paperAccent.withValues(alpha: 0.05)
-                  : AppColors.paper,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
         ),
         child: Row(
           children: [
@@ -349,10 +346,8 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.3),
-          ),
+          color: AppColors.paperAccentSoft,
+          border: Border.all(color: AppColors.paperAccent),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

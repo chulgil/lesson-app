@@ -36,7 +36,7 @@ class ProposalStatusBanner extends StatelessWidget {
         message = '수강권이 발급되었습니다!';
         break;
       case ProposalStatus.rejected:
-        backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+        backgroundColor = AppColors.paperAccentSoft;
         textColor = AppColors.paperAccent;
         icon = Icons.cancel;
         message = '스킵한 제안입니다';
@@ -60,9 +60,7 @@ class ProposalStatusBanner extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: Row(
         children: [
           Icon(icon, color: textColor, size: 24),
@@ -103,10 +101,7 @@ class ProposalHeaderCard extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
+            decoration: const BoxDecoration(color: AppColors.paperAccentSoft),
             child: const Icon(
               Icons.card_giftcard,
               size: 32,
@@ -203,8 +198,8 @@ class ProposalMessageCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,8 +248,8 @@ class ProposalDiscountCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,9 +448,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
           horizontal: AppSpacing.space2,
           vertical: AppSpacing.space1,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperAccentSoft),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -522,9 +515,7 @@ class _PaymentInfoRow extends StatelessWidget {
                     horizontal: 8,
                     vertical: 4,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Text(
                     '복사',
                     style: AppTypography.caption.copyWith(

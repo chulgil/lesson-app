@@ -114,11 +114,9 @@ class BonusSection extends StatelessWidget {
                 filled: true,
                 fillColor: AppColors.paper,
                 border: OutlineInputBorder(
-                  
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -140,7 +138,7 @@ class BonusSection extends StatelessWidget {
       label: Text(reason),
       selected: isSelected,
       onSelected: (_) => onBonusReasonChanged(reason),
-      selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+      selectedColor: AppColors.paperAccentSoft,
       checkmarkColor: AppColors.paperAccent,
       backgroundColor: AppColors.paper,
       side: BorderSide(

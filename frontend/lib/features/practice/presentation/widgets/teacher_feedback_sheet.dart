@@ -356,7 +356,7 @@ class _InputBar extends StatelessWidget {
               child: Text(
                 AppStrings.recordingFeedbackSave,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.w600,
                 ),
               ),

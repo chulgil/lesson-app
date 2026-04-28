@@ -301,8 +301,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccentSoft),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

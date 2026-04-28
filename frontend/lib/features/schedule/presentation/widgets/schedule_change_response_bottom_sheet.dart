@@ -180,7 +180,7 @@ class _ScheduleChangeResponseBottomSheetState
                       child: Text(
                         AppStrings.scheduleChangeAccept,
                         style: AppTypography.buttonSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                     ),
@@ -208,10 +208,7 @@ class _ScheduleChangeResponseBottomSheetState
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.paperAccent.withValues(alpha: 0.08)
-                  : AppColors.paperDark,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),

@@ -34,13 +34,14 @@ class ProposalChatCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-            ),
+            decoration: BoxDecoration(color: AppColors.paper),
             child: Row(
               children: [
-                Icon(Icons.account_balance,
-                    size: 14, color: AppColors.inkTertiary),
+                Icon(
+                  Icons.account_balance,
+                  size: 14,
+                  color: AppColors.inkTertiary,
+                ),
                 const SizedBox(width: AppSpacing.space1),
                 Expanded(
                   child: Text(
@@ -69,11 +70,10 @@ class ProposalChatCard extends StatelessWidget {
           vertical: AppSpacing.space1 + 2,
         ),
         decoration: BoxDecoration(
-          color: isRecommended
-              ? AppColors.paperAccent.withValues(alpha: 0.06)
-              : AppColors.paper,
+          color: isRecommended ? AppColors.paperAccentSoft : AppColors.paper,
           border: Border.all(
-            color: isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
+            color:
+                isRecommended ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isRecommended ? 1.5 : 1,
           ),
         ),

@@ -107,7 +107,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -346,7 +346,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               color: AppColors.inkTertiary,
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppColors.paper,
             border: OutlineInputBorder(
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
@@ -385,13 +385,15 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.paper,
+                        ),
                       ),
                     )
                     : Text(
                       AppStrings.bookingCancelAction,
                       style: AppTypography.bodyLarge.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

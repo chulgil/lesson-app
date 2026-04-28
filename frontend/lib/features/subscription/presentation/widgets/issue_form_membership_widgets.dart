@@ -48,7 +48,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         isSelected
-                            ? AppColors.paperAccent.withValues(alpha: 0.1)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paper,
                     border: Border.all(
                       color:
@@ -121,9 +121,7 @@ class MembershipInfoCard extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           lessonClassAsync.when(
@@ -133,9 +131,7 @@ class MembershipInfoCard extends ConsumerWidget {
               return Container(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Center(
                   child: Text(
                     isAcademy ? '🏫' : '👤',
@@ -148,17 +144,13 @@ class MembershipInfoCard extends ConsumerWidget {
                 () => Container(
                   width: 48,
                   height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.paper,
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paper),
                 ),
             error:
                 (_, __) => Container(
                   width: 48,
                   height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.paper,
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paper),
                   child: const Icon(Icons.person),
                 ),
           ),

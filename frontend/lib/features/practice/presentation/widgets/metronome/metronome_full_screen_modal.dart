@@ -261,7 +261,7 @@ class _BpmSlider extends StatelessWidget {
               activeTrackColor: AppColors.paperAccent,
               inactiveTrackColor: AppColors.paperAccentSoft,
               thumbColor: AppColors.paperAccent,
-              overlayColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              overlayColor: AppColors.paperAccentSoft,
             ),
             child: Slider(
               value: bpm.toDouble(),
@@ -383,7 +383,7 @@ class _TimeSignatureSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(ts),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? AppColors.paper : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -450,7 +450,7 @@ class _SubdivisionSelector extends StatelessWidget {
                     onSelected: (_) => onChanged(sub),
                     selectedColor: AppColors.paperAccent,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.ink,
+                      color: isSelected ? AppColors.paper : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -465,9 +465,7 @@ class _SubdivisionSelector extends StatelessWidget {
             horizontal: AppSpacing.space4,
             vertical: AppSpacing.space2,
           ),
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            ),
+          decoration: BoxDecoration(color: AppColors.paper),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Row(
@@ -528,7 +526,7 @@ class _SubdivisionChip extends StatelessWidget {
             Text(
               subdivision.visualPattern,
               style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.ink,
+                color: isSelected ? AppColors.paper : AppColors.ink,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -577,7 +575,7 @@ class _SoundSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(sound),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? AppColors.paper : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -620,7 +618,7 @@ class _AccentPatternSelector extends StatelessWidget {
                   onSelected: (_) => onChanged(pattern),
                   selectedColor: AppColors.paperAccent,
                   labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.ink,
+                    color: isSelected ? AppColors.paper : AppColors.ink,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
                   ),

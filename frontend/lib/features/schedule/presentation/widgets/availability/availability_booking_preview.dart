@@ -43,7 +43,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
@@ -75,9 +75,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
                     horizontal: AppSpacing.space2,
                     vertical: 2,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.15),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Text(
                     '⭐ 평소 시간',
                     style: AppTypography.caption.copyWith(
@@ -146,8 +144,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space3,
                 ),
-                shape: RoundedRectangleBorder(
-                ),
+                shape: RoundedRectangleBorder(),
               ),
               child:
                   isLoading
@@ -157,14 +154,14 @@ class AvailabilityBookingPreview extends StatelessWidget {
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            AppColors.paper,
                           ),
                         ),
                       )
                       : Text(
                         isTrialLesson ? '체험레슨 신청하기' : '예약하기',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

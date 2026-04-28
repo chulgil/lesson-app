@@ -86,15 +86,17 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
 
             // Option cards
             if (options.isNotEmpty) ...[
-              ...options.map((option) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                    child: ScheduleOptionCard(
-                      option: option,
-                      mode: ScheduleOptionCardMode.teacher,
-                      isSelected: option.id == _selectedOptionId,
-                      onTap: () => _selectOption(option.id),
-                    ),
-                  )),
+              ...options.map(
+                (option) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                  child: ScheduleOptionCard(
+                    option: option,
+                    mode: ScheduleOptionCardMode.teacher,
+                    isSelected: option.id == _selectedOptionId,
+                    onTap: () => _selectOption(option.id),
+                  ),
+                ),
+              ),
             ] else ...[
               // Fallback for legacy single-option bookings
               _buildLegacyScheduleCard(),
@@ -142,9 +144,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
         // Time since request
         Text(
           _getTimeSinceRequest(),
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );
@@ -156,7 +156,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccentSoft,
           child: Text(
             booking.studentName.isNotEmpty ? booking.studentName[0] : '?',
             style: AppTypography.headingSmall.copyWith(
@@ -175,8 +175,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (booking.lessonGoal != null ||
-                  booking.experienceLevel != null)
+              if (booking.lessonGoal != null || booking.experienceLevel != null)
                 Text(
                   [
                     if (booking.lessonGoal != null) booking.lessonGoal!.label,
@@ -194,8 +193,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
                     color: AppColors.paperDark,
-                    borderRadius:
-                        BorderRadius.zero,
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Row(
                     children: [
@@ -231,11 +229,8 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(
-          color: AppColors.paperAccent,
-          width: 2,
-        ),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,16 +254,9 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 18,
-                color: AppColors.inkSecondary,
-              ),
+              Icon(Icons.access_time, size: 18, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                booking.timeRange,
-                style: AppTypography.bodyMedium,
-              ),
+              Text(booking.timeRange, style: AppTypography.bodyMedium),
             ],
           ),
         ],
@@ -288,8 +276,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
             child: Text(
               '거절하기',
@@ -306,16 +293,14 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.paperAccent,
-              disabledBackgroundColor:
-                  AppColors.inkSecondary.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
+              disabledBackgroundColor: AppColors.inkSecondary.withValues(
+                alpha: 0.3,
               ),
+              shape: RoundedRectangleBorder(),
             ),
             child: Text(
               '승인하기',
-              style: AppTypography.button.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTypography.button.copyWith(color: AppColors.paper),
             ),
           ),
         ),
@@ -326,16 +311,10 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
   Widget _buildWarningNote() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            size: 18,
-            color: AppColors.paperAccent,
-          ),
+          Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -374,11 +353,7 @@ class TeacherApprovalListItem extends StatelessWidget {
   final LessonBooking booking;
   final VoidCallback? onTap;
 
-  const TeacherApprovalListItem({
-    super.key,
-    required this.booking,
-    this.onTap,
-  });
+  const TeacherApprovalListItem({super.key, required this.booking, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -396,11 +371,9 @@ class TeacherApprovalListItem extends StatelessWidget {
               // Student avatar
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
-                  booking.studentName.isNotEmpty
-                      ? booking.studentName[0]
-                      : '?',
+                  booking.studentName.isNotEmpty ? booking.studentName[0] : '?',
                   style: AppTypography.headingSmall.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -429,10 +402,10 @@ class TeacherApprovalListItem extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: booking.lessonType.color
-                                .withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.zero,
+                            color: booking.lessonType.color.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
                             booking.lessonType.label,
@@ -463,10 +436,7 @@ class TeacherApprovalListItem extends StatelessWidget {
               ),
 
               // Arrow
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.inkSecondary,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.inkSecondary),
             ],
           ),
         ),

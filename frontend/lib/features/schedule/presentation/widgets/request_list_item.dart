@@ -66,7 +66,7 @@ class RequestListItem extends StatelessWidget {
     final initial = _displayName.isNotEmpty ? _displayName[0] : '?';
     final avatar = CircleAvatar(
       radius: AppSpacing.avatarSmall / 2,
-      backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+      backgroundColor: AppColors.paperAccentSoft,
       child: Text(
         initial,
         style: AppTypography.bodyMedium.copyWith(
@@ -90,7 +90,6 @@ class RequestListItem extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               color: AppColors.paperAccent,
-              shape: BoxShape.circle,
               border: Border.all(color: AppColors.paper, width: 1.5),
             ),
           ),
@@ -110,9 +109,7 @@ class RequestListItem extends StatelessWidget {
         // Line 2: name · instrument · level
         Text(
           '$_displayName · ${request.instrument} · ${request.experience.label}',
-          style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -127,13 +124,13 @@ class RequestListItem extends StatelessWidget {
   /// Line 1: [학원명/개인레슨] · [체험/정규]
   Widget _buildLine1() {
     final source =
-        request.isAcademy ? (academyName ?? AppStrings.academy) : AppStrings.individualLesson;
+        request.isAcademy
+            ? (academyName ?? AppStrings.academy)
+            : AppStrings.individualLesson;
 
     return Text(
       '$source · ${request.typeDisplayLabel}',
-      style: AppTypography.caption.copyWith(
-        color: AppColors.inkTertiary,
-      ),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -145,9 +142,7 @@ class RequestListItem extends StatelessWidget {
     if (slots.isEmpty) {
       return Text(
         AppStrings.noTimeSpecified,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkTertiary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       );
     }
 
@@ -166,17 +161,13 @@ class RequestListItem extends StatelessWidget {
         const SizedBox(width: AppSpacing.space1),
         Text(
           firstSlot.displayLabel,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         if (remaining > 0) ...[
           const SizedBox(width: AppSpacing.space1),
           Text(
             AppStrings.slotsRemaining(remaining),
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ],
@@ -185,9 +176,10 @@ class RequestListItem extends StatelessWidget {
 
   /// Right column: status chip + elapsed time (vertically stacked).
   Widget _buildRightColumn() {
-    final label = _isStudentView
-        ? request.studentActionLabel
-        : request.teacherActionLabel;
+    final label =
+        _isStudentView
+            ? request.studentActionLabel
+            : request.teacherActionLabel;
     final color = _actionColor;
     final urgent = isRequestUrgent(request.createdAt);
 
@@ -199,9 +191,7 @@ class RequestListItem extends StatelessWidget {
             horizontal: AppSpacing.space2,
             vertical: AppSpacing.space1,
           ),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-          ),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.12)),
           child: Text(
             label,
             style: AppTypography.caption.copyWith(
@@ -223,9 +213,10 @@ class RequestListItem extends StatelessWidget {
   }
 
   Color get _actionColor {
-    final colorKey = _isStudentView
-        ? request.studentActionColorKey
-        : request.teacherActionColorKey;
+    final colorKey =
+        _isStudentView
+            ? request.studentActionColorKey
+            : request.teacherActionColorKey;
     return switch (colorKey) {
       'action' => AppColors.paperAccent,
       _ => AppColors.inkTertiary,

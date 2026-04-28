@@ -239,9 +239,9 @@ class _TeacherAvailabilityScreenState
           decoration: BoxDecoration(
             color:
                 hasSchedules
-                    ? AppColors.paperAccent.withValues(alpha: 0.1)
+                    ? AppColors.paperAccentSoft
                     : isWeekend
-                    ? AppColors.paperAccent.withValues(alpha: 0.1)
+                    ? AppColors.paperAccentSoft
                     : AppColors.paper,
           ),
           child: Center(
@@ -494,13 +494,9 @@ class _TeacherAvailabilityScreenState
                                       horizontal: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.paperAccent.withValues(
-                                        alpha: 0.15,
-                                      ),
+                                      color: AppColors.paperAccentSoft,
                                       border: Border.all(
-                                        color: AppColors.paperAccent.withValues(
-                                          alpha: 0.3,
-                                        ),
+                                        color: AppColors.paperAccent,
                                       ),
                                     ),
                                     child: Column(

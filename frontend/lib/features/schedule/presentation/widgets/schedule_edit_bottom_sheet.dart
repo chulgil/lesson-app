@@ -60,9 +60,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
     final isEditing = widget.existingSchedule != null;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -111,9 +109,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                                   setState(() => _selectedDay = index);
                                 }
                               },
-                      selectedColor: AppColors.paperAccent.withValues(
-                        alpha: 0.2,
-                      ),
+                      selectedColor: AppColors.paperAccentSoft,
                       labelStyle: AppTypography.bodySmall.copyWith(
                         color:
                             isSelected

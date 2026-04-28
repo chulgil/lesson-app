@@ -240,7 +240,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text('레퍼토리 추가'),

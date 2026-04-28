@@ -132,9 +132,7 @@ class _GroupClassAttendanceScreenState
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: const Center(
               child: Text('🎻', style: TextStyle(fontSize: 24)),
             ),
@@ -262,11 +260,9 @@ class _GroupClassAttendanceScreenState
             ),
             decoration: BoxDecoration(
               color:
-                  isAttended
-                      ? Colors.transparent
-                      : AppColors.paperAccent.withValues(alpha: 0.05),
+                  isAttended ? Colors.transparent : AppColors.paperAccentSoft,
               border: const Border(
-                bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
+                bottom: BorderSide(color: AppColors.inkQuaternary, width: 1),
               ),
             ),
             child: Row(
@@ -279,8 +275,7 @@ class _GroupClassAttendanceScreenState
                     color:
                         isAttended
                             ? AppColors.paperOk.withValues(alpha: 0.1)
-                            : AppColors.paperAccent.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                            : AppColors.paperAccentSoft,
                   ),
                   child: Center(
                     child: Icon(
@@ -370,7 +365,7 @@ class _GroupClassAttendanceScreenState
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   )
                   : const Text(AppStrings.finishClass),

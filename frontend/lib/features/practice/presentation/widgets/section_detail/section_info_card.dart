@@ -24,9 +24,8 @@ class SectionInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rangeText = section.rangeType != SectionRangeType.full
-        ? section.rangeText
-        : null;
+    final rangeText =
+        section.rangeType != SectionRangeType.full ? section.rangeText : null;
 
     return Card(
       child: Padding(
@@ -35,9 +34,7 @@ class SectionInfoCard extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: const Icon(
                 Icons.music_note,
                 color: AppColors.paperAccent,
@@ -111,9 +108,10 @@ class SectionInfoCard extends StatelessWidget {
   String _formatPeriodShort() {
     // Use section's startDate, fallback to repertoire's startDate
     final effectiveStartDate = section.startDate ?? repertoireStartDate;
-    final startStr = effectiveStartDate != null
-        ? '${effectiveStartDate.year}.${effectiveStartDate.month.toString().padLeft(2, '0')}.${effectiveStartDate.day.toString().padLeft(2, '0')}'
-        : '시작일 미정';
+    final startStr =
+        effectiveStartDate != null
+            ? '${effectiveStartDate.year}.${effectiveStartDate.month.toString().padLeft(2, '0')}.${effectiveStartDate.day.toString().padLeft(2, '0')}'
+            : '시작일 미정';
 
     if (section.endDate == null) {
       return '$startStr ~ 진행중';

@@ -51,14 +51,16 @@ class ScheduleOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPrimary = option.priority == 1;
-    final borderColor = isSelected
-        ? AppColors.paperAccent
-        : isDisabled
+    final borderColor =
+        isSelected
+            ? AppColors.paperAccent
+            : isDisabled
             ? AppColors.inkQuaternary
             : AppColors.inkQuaternary;
-    final backgroundColor = isSelected
-        ? AppColors.paperAccent.withValues(alpha: 0.05)
-        : isDisabled
+    final backgroundColor =
+        isSelected
+            ? AppColors.paperAccentSoft
+            : isDisabled
             ? AppColors.inkSecondary.withValues(alpha: 0.05)
             : AppColors.paperDark;
 
@@ -66,10 +68,7 @@ class ScheduleOptionCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: backgroundColor,
-        border: Border.all(
-          color: borderColor,
-          width: isSelected ? 2 : 1,
-        ),
+        border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -120,7 +119,8 @@ class ScheduleOptionCard extends StatelessWidget {
                                 onTap: onDelete!,
                               ),
                             ],
-                          ] else if (mode == ScheduleOptionCardMode.teacher) ...[
+                          ] else if (mode ==
+                              ScheduleOptionCardMode.teacher) ...[
                             _buildSelectionIndicator(),
                           ],
                         ],
@@ -151,19 +151,16 @@ class ScheduleOptionCard extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: isPrimary
-            ? AppColors.paperAccent.withValues(alpha: 0.1)
-            : AppColors.inkSecondary.withValues(alpha: 0.1),
+        color:
+            isPrimary
+                ? AppColors.paperAccentSoft
+                : AppColors.inkSecondary.withValues(alpha: 0.1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isPrimary) ...[
-            Icon(
-              Icons.star,
-              size: 14,
-              color: AppColors.paperAccent,
-            ),
+            Icon(Icons.star, size: 14, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space1),
           ],
           Text(
@@ -186,11 +183,7 @@ class ScheduleOptionCard extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space1),
-        child: Icon(
-          icon,
-          size: 20,
-          color: AppColors.inkSecondary,
-        ),
+        child: Icon(icon, size: 20, color: AppColors.inkSecondary),
       ),
     );
   }
@@ -200,20 +193,16 @@ class ScheduleOptionCard extends StatelessWidget {
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
         color: isSelected ? AppColors.paperAccent : Colors.transparent,
         border: Border.all(
           color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: 2,
         ),
       ),
-      child: isSelected
-          ? const Icon(
-              Icons.check,
-              size: 16,
-              color: Colors.white,
-            )
-          : null,
+      child:
+          isSelected
+              ? const Icon(Icons.check, size: 16, color: AppColors.paper)
+              : null,
     );
   }
 
@@ -224,19 +213,13 @@ class ScheduleOptionCard extends StatelessWidget {
         // Date
         Row(
           children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 18,
-              color: AppColors.ink,
-            ),
+            Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             Text(
               option.fullFormattedDate,
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
-                color: isDisabled
-                    ? AppColors.inkSecondary
-                    : AppColors.ink,
+                color: isDisabled ? AppColors.inkSecondary : AppColors.ink,
               ),
             ),
           ],
@@ -247,18 +230,12 @@ class ScheduleOptionCard extends StatelessWidget {
         // Time
         Row(
           children: [
-            Icon(
-              Icons.access_time,
-              size: 18,
-              color: AppColors.inkSecondary,
-            ),
+            Icon(Icons.access_time, size: 18, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space2),
             Text(
               option.timeRange,
               style: AppTypography.bodyMedium.copyWith(
-                color: isDisabled
-                    ? AppColors.inkSecondary
-                    : AppColors.ink,
+                color: isDisabled ? AppColors.inkSecondary : AppColors.ink,
               ),
             ),
           ],
@@ -274,11 +251,7 @@ class ScheduleOptionCard extends StatelessWidget {
         // Primary day
         Row(
           children: [
-            Icon(
-              Icons.repeat,
-              size: 18,
-              color: AppColors.ink,
-            ),
+            Icon(Icons.repeat, size: 18, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -287,9 +260,7 @@ class ScheduleOptionCard extends StatelessWidget {
                     : '매주 ${option.dayName}',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isDisabled
-                      ? AppColors.inkSecondary
-                      : AppColors.ink,
+                  color: isDisabled ? AppColors.inkSecondary : AppColors.ink,
                 ),
               ),
             ),
@@ -304,9 +275,7 @@ class ScheduleOptionCard extends StatelessWidget {
             child: Text(
               '+ ${option.secondShortDayName} ${option.secondTimeRange}',
               style: AppTypography.bodyMedium.copyWith(
-                color: isDisabled
-                    ? AppColors.inkSecondary
-                    : AppColors.ink,
+                color: isDisabled ? AppColors.inkSecondary : AppColors.ink,
               ),
             ),
           ),
@@ -316,18 +285,12 @@ class ScheduleOptionCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 18,
-                color: AppColors.inkSecondary,
-              ),
+              Icon(Icons.access_time, size: 18, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 option.timeRange,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: isDisabled
-                      ? AppColors.inkSecondary
-                      : AppColors.ink,
+                  color: isDisabled ? AppColors.inkSecondary : AppColors.ink,
                 ),
               ),
             ],
@@ -339,11 +302,7 @@ class ScheduleOptionCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.event,
-                size: 18,
-                color: AppColors.inkSecondary,
-              ),
+              Icon(Icons.event, size: 18, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '시작일: ${option.startDate!.month}월 ${option.startDate!.day}일',

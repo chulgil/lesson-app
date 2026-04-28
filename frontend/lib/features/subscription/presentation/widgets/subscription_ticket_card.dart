@@ -137,10 +137,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             bottom: 0,
             child: Container(
               width: 20,
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
             ),
           ),
           // Right notch
@@ -150,10 +147,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             bottom: 0,
             child: Container(
               width: 20,
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
             ),
           ),
           // Dashed line
@@ -211,7 +205,6 @@ class SubscriptionTicketCard extends StatelessWidget {
 
           // Progress bar
           ClipRRect(
-            
             child: LinearProgressIndicator(
               value: total > 0 ? (total - remaining) / total : 0,
               minHeight: 6,

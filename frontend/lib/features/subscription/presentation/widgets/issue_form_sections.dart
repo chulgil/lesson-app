@@ -60,10 +60,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
           decoration: BoxDecoration(
-            color:
-                isSelected
-                    ? AppColors.paperAccent.withValues(alpha: 0.1)
-                    : AppColors.paper,
+            color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
             border: Border.all(
               color:
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -114,17 +111,11 @@ class SubscriptionTypeSelector extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppColors.paperAccent.withValues(alpha: 0.7),
-          ),
+          Icon(icon, size: 16, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -230,9 +221,7 @@ class PaymentStatusSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Row(
               children: [
                 Icon(
@@ -379,9 +368,7 @@ class AmountInputSection extends StatelessWidget {
                                 ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                       ),
-                      shape: RoundedRectangleBorder(
-                        
-                      ),
+                      shape: RoundedRectangleBorder(),
                     ),
                   );
                 }).toList(),
@@ -403,11 +390,9 @@ class AmountInputSection extends StatelessWidget {
             filled: true,
             fillColor: AppColors.paper,
             border: OutlineInputBorder(
-              
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
-              
               borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
           ),

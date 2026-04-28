@@ -256,7 +256,6 @@ class _TemplateCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        
         side: BorderSide(
           color:
               template.isActive
@@ -264,7 +263,7 @@ class _TemplateCard extends StatelessWidget {
                   : AppColors.inkTertiary.withValues(alpha: 0.3),
         ),
       ),
-      color: template.isActive ? Colors.white : AppColors.paperDark,
+      color: template.isActive ? AppColors.paper : AppColors.paperDark,
       child: InkWell(
         onTap: onEdit,
         child: Padding(
@@ -491,7 +490,7 @@ class _DetailChip extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isActive
-                ? AppColors.paperAccent.withValues(alpha: 0.1)
+                ? AppColors.paperAccentSoft
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
       ),
       child: Row(
@@ -601,7 +600,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
       ),
       padding: EdgeInsets.only(
@@ -744,14 +743,14 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
+                                AppColors.paper,
                               ),
                             ),
                           )
                           : Text(
                             isEditing ? '수정하기' : '추가하기',
                             style: AppTypography.bodyLarge.copyWith(
-                              color: Colors.white,
+                              color: AppColors.paper,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

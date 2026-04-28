@@ -283,7 +283,7 @@ class _UnifiedLessonRequestScreenState
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return Colors.white;
+              return AppColors.paper;
             }
             return AppColors.ink;
           }),
@@ -414,7 +414,7 @@ class _UnifiedLessonRequestScreenState
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return Colors.white;
+              return AppColors.paper;
             }
             return AppColors.ink;
           }),
@@ -450,9 +450,7 @@ class _UnifiedLessonRequestScreenState
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space3,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Row(
         children: [
           const Icon(Icons.schedule, size: 18, color: AppColors.inkSecondary),
@@ -549,9 +547,7 @@ class _UnifiedLessonRequestScreenState
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         children: [
           const Icon(Icons.info_outline, size: 20, color: AppColors.ink),
@@ -596,7 +592,7 @@ class _UnifiedLessonRequestScreenState
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 )
                 : const Icon(Icons.send),
@@ -607,10 +603,9 @@ class _UnifiedLessonRequestScreenState
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.paper,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-          shape: RoundedRectangleBorder(
-          ),
+          shape: RoundedRectangleBorder(),
           disabledBackgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
         ),
       ),

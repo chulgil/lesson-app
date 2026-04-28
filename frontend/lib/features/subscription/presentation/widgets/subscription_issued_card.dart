@@ -28,10 +28,8 @@ class SubscriptionIssuedCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.06),
-        border: Border.all(
-          color: AppColors.paperAccent.withValues(alpha: 0.15),
-        ),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +97,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
   Widget _buildInfoText(String text) {
     return Text(
       text,
-      style: AppTypography.caption.copyWith(
-        color: AppColors.inkSecondary,
-      ),
+      style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
     );
   }
 
@@ -119,9 +115,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
               width: dashWidth,
               height: 1,
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.3),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccent),
               ),
             );
           }),

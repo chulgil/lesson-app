@@ -18,7 +18,6 @@ class CircleButton extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         color: AppColors.paperAccent,
-        shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
@@ -179,10 +178,8 @@ class SmallButton extends StatelessWidget {
         style: TextButton.styleFrom(
           foregroundColor: AppColors.paperAccent,
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(
-              color: AppColors.paperAccent.withValues(alpha: 0.3),
-            ),
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: AppColors.inkQuaternary),
           ),
         ),
         child: Text(

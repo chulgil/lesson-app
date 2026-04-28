@@ -109,9 +109,7 @@ class _StudentProposalAcceptScreenState
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space3,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.06),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Text(
         '"$message"',
         style: AppTypography.bodyMedium.copyWith(
@@ -238,9 +236,7 @@ class _StudentProposalAcceptScreenState
                 horizontal: AppSpacing.space2,
                 vertical: AppSpacing.space1,
               ),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

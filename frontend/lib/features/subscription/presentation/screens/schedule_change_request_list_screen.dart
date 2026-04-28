@@ -85,7 +85,7 @@ class _ScheduleChangeRequestListScreenState
             controller: _tabController,
             indicator: const BoxDecoration(color: AppColors.paperAccent),
             indicatorSize: TabBarIndicatorSize.tab,
-            labelColor: Colors.white,
+            labelColor: AppColors.paper,
             unselectedLabelColor: AppColors.inkSecondary,
             labelStyle: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,

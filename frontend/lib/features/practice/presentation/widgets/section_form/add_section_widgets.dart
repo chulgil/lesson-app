@@ -236,9 +236,7 @@ class _RepeatCountHint extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           const Text('🐾', style: TextStyle(fontSize: 18)),
@@ -330,9 +328,7 @@ class _TargetTimeHint extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           const Icon(
@@ -366,9 +362,7 @@ class RangePreviewBox extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           const Icon(

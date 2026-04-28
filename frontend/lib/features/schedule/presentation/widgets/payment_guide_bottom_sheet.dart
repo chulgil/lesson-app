@@ -70,9 +70,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
 
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -175,13 +173,12 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                 onPressed: _isValid ? _submit : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
-                  shape: RoundedRectangleBorder(
-                  ),
+                  shape: RoundedRectangleBorder(),
                 ),
                 child: Text(
                   AppStrings.sendPaymentGuide,
                   style: AppTypography.buttonSmall.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
               ),
@@ -212,7 +209,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
           child: Text(
             label,
             style: AppTypography.bodyMedium.copyWith(
-              color: selected ? Colors.white : AppColors.inkSecondary,
+              color: selected ? AppColors.paper : AppColors.inkSecondary,
               fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

@@ -185,7 +185,7 @@ class _LocationTravelSelectorState
               avatar: Icon(
                 option.icon,
                 size: 18,
-                color: isSelected ? Colors.white : AppColors.inkSecondary,
+                color: isSelected ? AppColors.paper : AppColors.inkSecondary,
               ),
               label: Text(option.label),
               selected: isSelected,
@@ -193,7 +193,7 @@ class _LocationTravelSelectorState
               selectedColor: AppColors.paperAccent,
               backgroundColor: AppColors.paper,
               labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.ink,
+                color: isSelected ? AppColors.paper : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
               side: BorderSide(
@@ -202,9 +202,7 @@ class _LocationTravelSelectorState
                         ? AppColors.paperAccent
                         : AppColors.inkQuaternary,
               ),
-              shape: RoundedRectangleBorder(
-                
-              ),
+              shape: RoundedRectangleBorder(),
             );
           }).toList(),
     );
@@ -293,15 +291,11 @@ class _LocationTravelSelectorState
         labelText: '외부 장소 주소',
         hintText: '예: 강남 OO 스튜디오',
         prefixIcon: const Icon(Icons.music_note, size: AppSpacing.iconSM),
-        border: OutlineInputBorder(
-          
-        ),
+        border: OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
-          
           borderSide: const BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
-          
           borderSide: const BorderSide(color: AppColors.paperAccent),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -347,15 +341,11 @@ class _LocationTravelSelectorState
                     }
                   },
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              
-            ),
+            border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
-              
               borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
-              
               borderSide: const BorderSide(color: AppColors.paperAccent),
             ),
             contentPadding: const EdgeInsets.symmetric(

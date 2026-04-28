@@ -77,11 +77,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               border: OutlineInputBorder(
-                
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
-                
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
@@ -99,9 +97,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     onPressed: onScheduleChange,
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.inkQuaternary),
-                      shape: RoundedRectangleBorder(
-                        
-                      ),
+                      shape: RoundedRectangleBorder(),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
                       ),
@@ -125,9 +121,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     onPressed: onSendMessage,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
-                      shape: RoundedRectangleBorder(
-                        
-                      ),
+                      shape: RoundedRectangleBorder(),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
                       ),
@@ -135,7 +129,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     child: Text(
                       AppStrings.subscriptionSendMessage,
                       style: AppTypography.buttonSmall.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     ),
                   ),

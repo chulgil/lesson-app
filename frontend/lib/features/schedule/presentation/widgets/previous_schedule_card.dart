@@ -26,10 +26,7 @@ class PreviousScheduleCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final previousScheduleAsync = ref.watch(
-      previousScheduleProvider(
-        teacherId: teacherId,
-        studentId: studentId,
-      ),
+      previousScheduleProvider(teacherId: teacherId, studentId: studentId),
     );
 
     return previousScheduleAsync.when(
@@ -45,9 +42,7 @@ class PreviousScheduleCard extends ConsumerWidget {
           ),
           color: AppColors.ink.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
-            side: BorderSide(
-              color: AppColors.ink.withValues(alpha: 0.3),
-            ),
+            side: BorderSide(color: AppColors.ink.withValues(alpha: 0.3)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
@@ -56,18 +51,14 @@ class PreviousScheduleCard extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.history,
-                      color: AppColors.ink,
-                      size: 20,
-                    ),
+                    Icon(Icons.history, color: AppColors.ink, size: 20),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '이전 스케줄 복원',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.ink,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.ink,
+                      ),
                     ),
                     const Spacer(),
                     if (onDismiss != null)
@@ -84,17 +75,15 @@ class PreviousScheduleCard extends ConsumerWidget {
                 Text(
                   '이전에 진행하던 스케줄이 있습니다.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: AppColors.inkQuaternary,
-                    ),
+                    color: AppColors.paper,
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
                     children: [
@@ -110,22 +99,14 @@ class PreviousScheduleCard extends ConsumerWidget {
                           children: [
                             Text(
                               _formatSchedule(schedule),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             if (schedule.lessonDuration != null)
                               Text(
                                 '${schedule.lessonDuration}분 레슨',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.inkSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppColors.inkSecondary),
                               ),
                           ],
                         ),
@@ -143,7 +124,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                     label: const Text('이 스케줄로 복원'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.ink,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.paper,
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space3,
                       ),
@@ -160,8 +141,6 @@ class PreviousScheduleCard extends ConsumerWidget {
 
   String _formatSchedule(PreviousSchedule schedule) {
     if (schedule.lessonSlots.isEmpty) return '';
-    return schedule.lessonSlots
-        .map((s) => '매주 ${s.displayLabel}')
-        .join(', ');
+    return schedule.lessonSlots.map((s) => '매주 ${s.displayLabel}').join(', ');
   }
 }

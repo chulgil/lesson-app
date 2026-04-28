@@ -26,10 +26,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Empty state icon
-        const Text(
-          '😢',
-          style: TextStyle(fontSize: 48),
-        ),
+        const Text('😢', style: TextStyle(fontSize: 48)),
 
         const SizedBox(height: AppSpacing.space3),
 
@@ -72,13 +69,15 @@ class EmptySlotsSuggestion extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
 
           // Suggestion cards
-          ...suggestions.map((suggestion) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-                child: _SuggestionCard(
-                  suggestion: suggestion,
-                  onSelect: () => onDateSelected(suggestion.date),
-                ),
-              )),
+          ...suggestions.map(
+            (suggestion) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: _SuggestionCard(
+                suggestion: suggestion,
+                onSelect: () => onDateSelected(suggestion.date),
+              ),
+            ),
+          ),
         ],
       ],
     );
@@ -90,10 +89,7 @@ class DateSuggestion {
   final DateTime date;
   final List<AvailabilitySlot> availableSlots;
 
-  const DateSuggestion({
-    required this.date,
-    required this.availableSlots,
-  });
+  const DateSuggestion({required this.date, required this.availableSlots});
 
   /// Get formatted date string (e.g., "2/20(목)")
   String get formattedDate {
@@ -106,11 +102,12 @@ class DateSuggestion {
   String get timesPreview {
     if (availableSlots.isEmpty) return '';
 
-    final times = availableSlots
-        .where((s) => s.status == AvailabilitySlotStatus.available)
-        .take(3)
-        .map((s) => s.formattedStartTime)
-        .toList();
+    final times =
+        availableSlots
+            .where((s) => s.status == AvailabilitySlotStatus.available)
+            .take(3)
+            .map((s) => s.formattedStartTime)
+            .toList();
 
     if (times.isEmpty) return '';
 
@@ -126,16 +123,13 @@ class _SuggestionCard extends StatelessWidget {
   final DateSuggestion suggestion;
   final VoidCallback onSelect;
 
-  const _SuggestionCard({
-    required this.suggestion,
-    required this.onSelect,
-  });
+  const _SuggestionCard({required this.suggestion, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(

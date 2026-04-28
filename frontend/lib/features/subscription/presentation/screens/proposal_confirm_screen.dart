@@ -114,10 +114,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.paperAccent,
-                  shape: BoxShape.circle,
-                ),
+                decoration: const BoxDecoration(color: AppColors.paperAccent),
               ),
               const SizedBox(width: AppSpacing.space2),
 
@@ -132,9 +129,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                       children: [
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: AppColors.paperAccent.withValues(
-                            alpha: 0.1,
-                          ),
+                          backgroundColor: AppColors.paperAccentSoft,
                           child: Text(
                             student.name[0],
                             style: AppTypography.bodySmall.copyWith(
@@ -209,9 +204,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           Expanded(

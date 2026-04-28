@@ -271,7 +271,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       final Color textColor;
 
       if (isOverlapWithHighlight) {
-        bgColor = AppColors.paperAccent.withValues(alpha: 0.15);
+        bgColor = AppColors.paperAccentSoft;
         accentColor = AppColors.paperAccent;
         textColor = AppColors.paperAccent;
       } else if (isPreview) {
@@ -348,11 +348,11 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                     : BorderSide.none,
             left: BorderSide(
               color: AppColors.paperOk.withValues(alpha: 0.3),
-              width: 0.5,
+              width: 1,
             ),
             right: BorderSide(
               color: AppColors.paperOk.withValues(alpha: 0.3),
-              width: 0.5,
+              width: 1,
             ),
           ),
         ),
@@ -379,11 +379,8 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.2),
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.5),
-            width: 0.5,
-          ),
+          color: AppColors.paperAccentSoft,
+          border: Border.all(color: AppColors.paperAccent, width: 1),
         ),
         child: Center(
           child: Text(
@@ -420,10 +417,11 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isPast ? AppColors.inkQuaternary.withValues(alpha: 0.15) : null,
+          color:
+              isPast ? AppColors.inkQuaternary.withValues(alpha: 0.15) : null,
           border: Border.all(
             color: AppColors.inkQuaternary.withValues(alpha: 0.3),
-            width: 0.5,
+            width: 1,
           ),
         ),
       ),

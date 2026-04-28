@@ -41,9 +41,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -186,7 +184,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                   onSelected: (selected) {
                     if (selected) onChanged(value);
                   },
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccentSoft,
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
                         isSelected
@@ -253,7 +251,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                       vertical: AppSpacing.space2,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       border: Border.all(color: AppColors.inkQuaternary),
                     ),
                     child: Text(slot, style: AppTypography.bodySmall),

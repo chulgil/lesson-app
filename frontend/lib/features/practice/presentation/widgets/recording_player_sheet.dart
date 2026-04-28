@@ -329,7 +329,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                 widget.recording.title ??
                     _formatDate(widget.recording.recordedAt),
                 style: AppTypography.bodyLarge.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -389,7 +389,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                               _abLoop.isActive
                                   ? AppColors.paperAccent
                                   : AppColors.textTertiaryDark,
-                          ),
+                        ),
                       ),
                       SizedBox(width: AppSpacing.space1),
                       _ABButton(
@@ -430,11 +430,11 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        ),
+                      ),
                       child: Text(
                         _speed.label,
                         style: AppTypography.bodyMedium.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -452,11 +452,11 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        ),
+                      ),
                       child: Icon(
                         Icons.ios_share,
                         size: 20,
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     ),
                   ),
@@ -467,17 +467,14 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                   Container(
                     width: 56,
                     height: 56,
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccent,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccent),
                     child: IconButton(
                       onPressed: _togglePlay,
                       icon: Icon(
                         _isPlaying ? Icons.pause : Icons.play_arrow,
                         size: 32,
                       ),
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   ),
                 ],
@@ -537,11 +534,11 @@ class _ABButton extends StatelessWidget {
     } else if (isSet) {
       // Active/set state
       backgroundColor = AppColors.paperAccent;
-      textColor = Colors.white;
+      textColor = AppColors.paper;
     } else {
       // Enabled but not set
       backgroundColor = AppColors.surfaceSecondaryDark;
-      textColor = Colors.white;
+      textColor = AppColors.paper;
     }
 
     return GestureDetector(

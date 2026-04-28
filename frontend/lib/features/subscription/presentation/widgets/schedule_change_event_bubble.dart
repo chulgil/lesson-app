@@ -96,7 +96,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isMyMessage
-                            ? AppColors.paperAccent.withValues(alpha: 0.08)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
@@ -348,7 +348,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
+        border: Border.all(color: AppColors.inkQuaternary, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,7 +366,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         i == 0
-                            ? AppColors.paperAccent.withValues(alpha: 0.12)
+                            ? AppColors.paperAccentSoft
                             : AppColors.scheduleMutedBackground,
                   ),
                   child: Text(
@@ -407,7 +407,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
+        border: Border.all(color: AppColors.inkQuaternary, width: 1),
       ),
       child: Text(
         AppStrings.fixedScheduleLabel('$dayLabel $time'),

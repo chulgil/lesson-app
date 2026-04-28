@@ -91,10 +91,8 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
                 vertical: AppSpacing.space3,
               ),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                border: Border.all(
-                  color: AppColors.paperAccent.withValues(alpha: 0.3),
-                ),
+                color: AppColors.paperAccentSoft,
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -196,7 +194,7 @@ class _SubdivisionChip extends StatelessWidget {
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.paperAccent.withValues(alpha: 0.3),
+                      color: AppColors.inkQuaternary,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -212,7 +210,7 @@ class _SubdivisionChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : AppColors.ink,
+                color: isSelected ? AppColors.paper : AppColors.ink,
                 letterSpacing: 1,
               ),
             ),
@@ -221,7 +219,7 @@ class _SubdivisionChip extends StatelessWidget {
             Text(
               subdivision.label,
               style: AppTypography.caption.copyWith(
-                color: isSelected ? Colors.white : AppColors.inkSecondary,
+                color: isSelected ? AppColors.paper : AppColors.inkSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

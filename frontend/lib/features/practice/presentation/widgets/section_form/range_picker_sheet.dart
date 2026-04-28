@@ -54,7 +54,7 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
     return Container(
       height: 350,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
       ),
       child: Column(

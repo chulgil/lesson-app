@@ -299,7 +299,7 @@ class _BookingRescheduleScreenState
                     Text(
                       slot.formattedStartTime,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isSelected ? Colors.white : AppColors.ink,
+                        color: isSelected ? AppColors.paper : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -382,7 +382,7 @@ class _BookingRescheduleScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -435,8 +435,7 @@ class _BookingRescheduleScreenState
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
                 ),
-                shape: RoundedRectangleBorder(
-                ),
+                shape: RoundedRectangleBorder(),
               ),
               child:
                   _isLoading
@@ -446,14 +445,14 @@ class _BookingRescheduleScreenState
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            AppColors.paper,
                           ),
                         ),
                       )
                       : Text(
                         '예약 변경하기',
                         style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

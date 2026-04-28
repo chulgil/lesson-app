@@ -147,7 +147,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       decoration: BoxDecoration(
         color: AppColors.scheduleMutedBackground.withValues(alpha: 0.6),
         border: Border(
-          bottom: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
+          bottom: BorderSide(color: AppColors.scheduleGridLine, width: 1),
         ),
       ),
       child: Row(
@@ -460,7 +460,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             height: 8,
             decoration: const BoxDecoration(
               color: AppColors.scheduleNowIndicator,
-              shape: BoxShape.circle,
             ),
           ),
           // Red line
@@ -493,7 +492,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
+          top: BorderSide(color: AppColors.scheduleGridLine, width: 1),
         ),
       ),
       child: Column(

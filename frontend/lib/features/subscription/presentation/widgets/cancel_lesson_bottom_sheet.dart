@@ -194,10 +194,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                   isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
-            color:
-                isSelected
-                    ? AppColors.paperAccent.withValues(alpha: 0.05)
-                    : null,
+            color: isSelected ? AppColors.paperAccentSoft : null,
           ),
           child: Row(
             children: [
@@ -250,9 +247,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+        decoration: BoxDecoration(color: AppColors.paperAccentSoft),
         child: Row(
           children: [
             Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
@@ -275,9 +270,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
     final deadlineHours = widget.subscription.rescheduleDeadlineHours;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           Icon(Icons.warning_amber, size: 18, color: AppColors.paperAccent),

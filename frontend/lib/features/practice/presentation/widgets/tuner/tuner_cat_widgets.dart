@@ -30,7 +30,7 @@ class StatusBubble extends StatelessWidget {
 
     if (errorMessage != null) {
       message = errorMessage!;
-      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+      backgroundColor = AppColors.paperAccentSoft;
       textColor = AppColors.paperAccent;
     } else if (!isListening) {
       message = '마이크를 켜주세요';
@@ -105,7 +105,7 @@ class CatSpeechBubble extends StatelessWidget {
 
     if (errorMessage != null) {
       message = errorMessage!;
-      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+      backgroundColor = AppColors.paperAccentSoft;
       textColor = AppColors.paperAccent;
     } else if (!isListening) {
       message = '마이크를 켜주세요';

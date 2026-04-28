@@ -96,7 +96,7 @@ class CatBeatIndicator extends StatelessWidget {
             child: CustomPaint(
               painter: _CatFacePainter(
                 eyesOpen: _shouldEyesOpen,
-                faceColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                faceColor: AppColors.paperAccentSoft,
                 featureColor: AppColors.paperAccent,
               ),
               size: Size.infinite,
@@ -779,7 +779,7 @@ class _CompactCatWithPulseState extends State<_CompactCatWithPulse>
               painter: _CompactCatPainter(
                 eyesOpen: widget.eyesOpen,
                 currentBeat: widget.currentBeat,
-                faceColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                faceColor: AppColors.paperAccentSoft,
                 featureColor: AppColors.paperAccent,
               ),
             ),

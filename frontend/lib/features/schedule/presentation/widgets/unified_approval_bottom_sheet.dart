@@ -8,8 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import 'weekly_calendar_picker.dart'
-    show WeeklyCalendarPicker;
+import 'weekly_calendar_picker.dart' show WeeklyCalendarPicker;
 
 /// Bottom sheet for teacher to review student's 3 preferred time slots
 /// and accept one, reject, or counter-propose.
@@ -45,9 +44,7 @@ class _UnifiedApprovalBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: Column(
         children: [
           const Center(child: BottomSheetHandle()),
@@ -86,9 +83,7 @@ class _UnifiedApprovalBottomSheetState
               horizontal: AppSpacing.space3,
               vertical: AppSpacing.space1,
             ),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Text(
               '${widget.request.type.label} 신청',
               style: AppTypography.bodySmall.copyWith(
@@ -115,7 +110,7 @@ class _UnifiedApprovalBottomSheetState
       children: [
         CircleAvatar(
           radius: 28,
-          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccentSoft,
           child: Text(
             name.isNotEmpty ? name[0] : '?',
             style: AppTypography.headingMedium.copyWith(
@@ -146,8 +141,7 @@ class _UnifiedApprovalBottomSheetState
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.paper,
-                    borderRadius:
-                        BorderRadius.zero,
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Row(
                     children: [
@@ -184,17 +178,13 @@ class _UnifiedApprovalBottomSheetState
       children: [
         Text(
           '학생 희망 시간 중 하나를 선택해주세요',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space3),
         if (slots.isEmpty)
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.scheduleMutedBackground,
-            ),
+            decoration: BoxDecoration(color: AppColors.scheduleMutedBackground),
             child: Text(
               '희망 시간이 없습니다',
               style: AppTypography.bodySmall.copyWith(
@@ -217,15 +207,16 @@ class _UnifiedApprovalBottomSheetState
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.paperAccent.withValues(alpha: 0.08)
-                        : AppColors.paper,
-                    borderRadius:
-                        BorderRadius.zero,
+                    color:
+                        isSelected
+                            ? AppColors.paperAccentSoft
+                            : AppColors.paper,
+                    borderRadius: BorderRadius.zero,
                     border: Border.all(
-                      color: isSelected
-                          ? AppColors.paperAccent
-                          : AppColors.inkQuaternary,
+                      color:
+                          isSelected
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -235,19 +226,20 @@ class _UnifiedApprovalBottomSheetState
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.scheduleMutedBackground,
-                          shape: BoxShape.circle,
+                          color:
+                              isSelected
+                                  ? AppColors.paperAccent
+                                  : AppColors.scheduleMutedBackground,
                         ),
                         child: Center(
                           child: Text(
                             '${slot.priority}',
                             style: AppTypography.bodyMedium.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.inkSecondary,
+                              color:
+                                  isSelected
+                                      ? AppColors.paper
+                                      : AppColors.inkSecondary,
                             ),
                           ),
                         ),
@@ -257,12 +249,14 @@ class _UnifiedApprovalBottomSheetState
                         child: Text(
                           slot.displayLabel,
                           style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: isSelected
-                                ? AppColors.paperAccent
-                                : AppColors.ink,
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                            color:
+                                isSelected
+                                    ? AppColors.paperAccent
+                                    : AppColors.ink,
                           ),
                         ),
                       ),
@@ -315,7 +309,11 @@ class _UnifiedApprovalBottomSheetState
       children: [
         Row(
           children: [
-            const Icon(Icons.swap_horiz, size: 20, color: AppColors.paperAccent),
+            const Icon(
+              Icons.swap_horiz,
+              size: 20,
+              color: AppColors.paperAccent,
+            ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '역제안 — 가능한 시간을 선택해주세요',
@@ -343,9 +341,7 @@ class _UnifiedApprovalBottomSheetState
           },
           icon: const Icon(Icons.arrow_back, size: 16),
           label: const Text('학생 희망 시간으로 돌아가기'),
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.inkSecondary,
-          ),
+          style: TextButton.styleFrom(foregroundColor: AppColors.inkSecondary),
         ),
       ],
     );
@@ -363,9 +359,10 @@ class _UnifiedApprovalBottomSheetState
         color: AppColors.paperDark,
         border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
-      child: _showCounterPropose
-          ? _buildCounterProposeButtons()
-          : _buildMainButtons(),
+      child:
+          _showCounterPropose
+              ? _buildCounterProposeButtons()
+              : _buildMainButtons(),
     );
   }
 
@@ -375,17 +372,14 @@ class _UnifiedApprovalBottomSheetState
         // Counter-propose
         Expanded(
           child: OutlinedButton(
-            onPressed: _isProcessing
-                ? null
-                : () => setState(() => _showCounterPropose = true),
+            onPressed:
+                _isProcessing
+                    ? null
+                    : () => setState(() => _showCounterPropose = true),
             style: OutlinedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: const BorderSide(color: AppColors.paperAccent),
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.zero,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: Text(
               '역제안',
@@ -404,30 +398,29 @@ class _UnifiedApprovalBottomSheetState
                     ? _handleAccept
                     : null,
             style: FilledButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.paperAccent,
-              disabledBackgroundColor:
-                  AppColors.inkSecondary.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.zero,
+              disabledBackgroundColor: AppColors.inkSecondary.withValues(
+                alpha: 0.3,
               ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+            child:
+                _isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.paper,
+                      ),
+                    )
+                    : Text(
+                      AppStrings.accept,
+                      style: AppTypography.button.copyWith(
+                        color: AppColors.paper,
+                      ),
                     ),
-                  )
-                : Text(
-                    AppStrings.accept,
-                    style:
-                        AppTypography.button.copyWith(color: Colors.white),
-                  ),
           ),
         ),
       ],
@@ -439,20 +432,17 @@ class _UnifiedApprovalBottomSheetState
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: _isProcessing
-                ? null
-                : () => setState(() {
+            onPressed:
+                _isProcessing
+                    ? null
+                    : () => setState(() {
                       _showCounterPropose = false;
                       _counterSlots = [];
                     }),
             style: OutlinedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: const BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.zero,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: Text(
               '취소',
@@ -466,34 +456,34 @@ class _UnifiedApprovalBottomSheetState
         Expanded(
           flex: 2,
           child: FilledButton(
-            onPressed: _counterSlots.isNotEmpty && !_isProcessing
-                ? _handleCounterPropose
-                : null,
+            onPressed:
+                _counterSlots.isNotEmpty && !_isProcessing
+                    ? _handleCounterPropose
+                    : null,
             style: FilledButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.paperAccent,
-              disabledBackgroundColor:
-                  AppColors.inkSecondary.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.zero,
+              disabledBackgroundColor: AppColors.inkSecondary.withValues(
+                alpha: 0.3,
               ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+            child:
+                _isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.paper,
+                      ),
+                    )
+                    : Text(
+                      '역제안 보내기 (${_counterSlots.length}안)',
+                      style: AppTypography.button.copyWith(
+                        color: AppColors.paper,
+                      ),
                     ),
-                  )
-                : Text(
-                    '역제안 보내기 (${_counterSlots.length}안)',
-                    style:
-                        AppTypography.button.copyWith(color: Colors.white),
-                  ),
           ),
         ),
       ],
@@ -531,14 +521,15 @@ class _UnifiedApprovalBottomSheetState
     setState(() => _isProcessing = true);
 
     try {
-      final timeSlots = _counterSlots.map((s) {
-        return TimeSlotOption(
-          id: 'alt_${DateTime.now().millisecondsSinceEpoch}_${s.priority}',
-          dayOfWeek: s.dayOfWeek ?? 0,
-          startTime: s.startTime,
-          endTime: s.endTime,
-        );
-      }).toList();
+      final timeSlots =
+          _counterSlots.map((s) {
+            return TimeSlotOption(
+              id: 'alt_${DateTime.now().millisecondsSinceEpoch}_${s.priority}',
+              dayOfWeek: s.dayOfWeek ?? 0,
+              startTime: s.startTime,
+              endTime: s.endTime,
+            );
+          }).toList();
 
       final actions = UnifiedLessonRequestActions(ref);
       await actions.proposeAlternatives(

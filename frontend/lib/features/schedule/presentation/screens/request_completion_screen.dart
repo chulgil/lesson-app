@@ -81,11 +81,8 @@ class RequestCompletionScreen extends StatelessWidget {
         Container(
           width: 72,
           height: 72,
-          decoration: const BoxDecoration(
-            color: AppColors.paperOk,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.check, size: 40, color: Colors.white),
+          decoration: const BoxDecoration(color: AppColors.paperOk),
+          child: const Icon(Icons.check, size: 40, color: AppColors.paper),
         ),
         const SizedBox(height: AppSpacing.space4),
         // Notebook × Score: 성공 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
@@ -165,7 +162,6 @@ class RequestCompletionScreen extends StatelessWidget {
                 height: 28,
                 decoration: BoxDecoration(
                   color: isActive ? AppColors.paperAccent : AppColors.paper,
-                  shape: BoxShape.circle,
                   border: Border.all(
                     color:
                         isActive
@@ -180,7 +176,7 @@ class RequestCompletionScreen extends StatelessWidget {
                           ? const Icon(
                             Icons.check,
                             size: 16,
-                            color: Colors.white,
+                            color: AppColors.paper,
                           )
                           : Text(
                             '$stepNumber',
@@ -365,10 +361,9 @@ class RequestCompletionScreen extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.paper,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-          shape: RoundedRectangleBorder(
-          ),
+          shape: RoundedRectangleBorder(),
         ),
         child: const Text('메인으로 가기'),
       ),

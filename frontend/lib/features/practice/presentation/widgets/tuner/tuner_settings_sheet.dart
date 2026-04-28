@@ -34,7 +34,7 @@ class TunerSettingsSheet extends ConsumerWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.6,
       ),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
       ),
       child: SafeArea(
@@ -184,7 +184,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
                   label: Text('${freq.toInt()}Hz'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(freq),
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccentSoft,
                   labelStyle: TextStyle(
                     color:
                         isSelected
@@ -277,7 +277,7 @@ class _TranspositionSection extends StatelessWidget {
                   label: Text(trans.label),
                   selected: isSelected,
                   onSelected: (_) => onChanged(trans),
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccentSoft,
                   labelStyle: TextStyle(
                     color:
                         isSelected
@@ -345,9 +345,7 @@ class _DifficultySection extends StatelessWidget {
                       label: Text(diff.label),
                       selected: isSelected,
                       onSelected: (_) => onChanged(diff),
-                      selectedColor: AppColors.paperAccent.withValues(
-                        alpha: 0.2,
-                      ),
+                      selectedColor: AppColors.paperAccentSoft,
                       labelStyle: TextStyle(
                         color:
                             isSelected
@@ -412,7 +410,7 @@ class _EnharmonicSection extends StatelessWidget {
                   label: Text('${mode.label} (${mode.example})'),
                   selected: isSelected,
                   onSelected: (_) => onChanged(mode),
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccentSoft,
                   labelStyle: TextStyle(
                     color:
                         isSelected
@@ -472,9 +470,7 @@ class _ClefSection extends StatelessWidget {
                       label: Text('${clef.symbol} ${clef.label}'),
                       selected: isSelected,
                       onSelected: (_) => onChanged(clef),
-                      selectedColor: AppColors.paperAccent.withValues(
-                        alpha: 0.2,
-                      ),
+                      selectedColor: AppColors.paperAccentSoft,
                       labelStyle: TextStyle(
                         color:
                             isSelected

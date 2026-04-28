@@ -108,15 +108,13 @@ class RepertoireTimelineCard extends StatelessWidget {
       textColor = AppColors.paperOk;
     } else {
       label = '진행 중';
-      backgroundColor = AppColors.paperAccent.withValues(alpha: 0.15);
+      backgroundColor = AppColors.paperAccentSoft;
       textColor = AppColors.paperAccent;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: Text(
         label,
         style: AppTypography.caption.copyWith(

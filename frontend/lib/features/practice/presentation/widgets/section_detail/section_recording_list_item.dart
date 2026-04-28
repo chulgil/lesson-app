@@ -86,10 +86,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
               child: const Center(
                 child: SizedBox(
                   width: 20,
@@ -113,7 +110,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
 
   Widget _buildFileMissingState(BuildContext context) {
     return Card(
-      color: AppColors.paperAccent.withValues(alpha: 0.05),
+      color: AppColors.paperAccentSoft,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space3),
         child: Row(
@@ -121,11 +118,11 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+              child: const Icon(
+                Icons.error_outline,
+                color: AppColors.paperAccent,
               ),
-              child: const Icon(Icons.error_outline, color: AppColors.paperAccent),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -152,7 +149,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             color: AppColors.inkSecondary.withValues(
                               alpha: 0.2,
                             ),
-                            ),
+                          ),
                           child: Text(
                             '${widget.recording.bpm} BPM',
                             style: AppTypography.caption.copyWith(
@@ -174,7 +171,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   Text(
                     '녹음 파일이 삭제되었거나 찾을 수 없습니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent.withValues(alpha: 0.8),
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ],
@@ -213,7 +210,9 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   Navigator.of(dialogContext).pop();
                   widget.onDelete();
                 },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -232,11 +231,11 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
               Container(
                 width: 44,
                 height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: AppColors.paperAccent,
                 ),
-                child: const Icon(Icons.play_arrow, color: AppColors.paperAccent),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -259,8 +258,8 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.1),
-                              ),
+                              color: AppColors.paperAccentSoft,
+                            ),
                             child: Text(
                               '${widget.recording.bpm} BPM',
                               style: AppTypography.caption.copyWith(
@@ -277,13 +276,11 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                               horizontal: 6,
                               vertical: 2,
                             ),
-                            decoration: BoxDecoration(
-                              color: AppColors.paperOk,
-                              ),
+                            decoration: BoxDecoration(color: AppColors.paperOk),
                             child: Text(
                               '대표',
                               style: AppTypography.caption.copyWith(
-                                color: Colors.white,
+                                color: AppColors.paper,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

@@ -149,7 +149,7 @@ class _TimeSignatureCard extends StatelessWidget {
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.paperAccent.withValues(alpha: 0.3),
+                      color: AppColors.inkQuaternary,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -194,20 +194,20 @@ class _TimeSignatureCard extends StatelessWidget {
           numerator,
           style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : AppColors.ink,
+            color: isSelected ? AppColors.paper : AppColors.ink,
             height: 1.0,
           ),
         ),
         Container(
           width: 24,
           height: 2,
-          color: isSelected ? Colors.white : AppColors.ink,
+          color: isSelected ? AppColors.paper : AppColors.ink,
         ),
         Text(
           denominator,
           style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : AppColors.ink,
+            color: isSelected ? AppColors.paper : AppColors.ink,
             height: 1.0,
           ),
         ),

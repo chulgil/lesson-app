@@ -54,103 +54,103 @@ class SubscriptionCard extends StatelessWidget {
             ),
           ),
           child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              children: [
-                _buildTypeIcon(),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (className != null)
-                        Text(
-                          className!,
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  _buildTypeIcon(),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (className != null)
+                          Text(
+                            className!,
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      if (instrument != null)
+                        if (instrument != null)
+                          Text(
+                            instrument!,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.inkSecondary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  _buildStatusBadge(),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.space3),
+              const Divider(height: 1),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Subscription info with progress
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Type label (기본 횟수만)
                         Text(
-                          instrument!,
+                          subscription.typeLabel,
                           style: AppTypography.caption.copyWith(
                             color: AppColors.inkSecondary,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                _buildStatusBadge(),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.space3),
-            const Divider(height: 1),
-            const SizedBox(height: AppSpacing.space3),
-
-            // Subscription info with progress
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Type label (기본 횟수만)
-                      Text(
-                        subscription.typeLabel,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.space1),
-                      // Summary text (실제 남은 횟수)
-                      Text(
-                        subscription.summaryText,
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: SubscriptionStatusColors.getSummaryTextColor(
-                              subscription),
-                        ),
-                      ),
-                      // Bonus badge (보너스 있을 때)
-                      if (subscription.hasBonus) ...[
                         const SizedBox(height: AppSpacing.space1),
-                        _buildBonusBadge(),
+                        // Summary text (실제 남은 횟수)
+                        Text(
+                          subscription.summaryText,
+                          style: AppTypography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: SubscriptionStatusColors.getSummaryTextColor(
+                              subscription,
+                            ),
+                          ),
+                        ),
+                        // Bonus badge (보너스 있을 때)
+                        if (subscription.hasBonus) ...[
+                          const SizedBox(height: AppSpacing.space1),
+                          _buildBonusBadge(),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                // Progress indicator for all types except trial
-                if (subscription.type != SubscriptionType.trial) ...[
-                  _buildProgressIndicator(),
+                  // Progress indicator for all types except trial
+                  if (subscription.type != SubscriptionType.trial) ...[
+                    _buildProgressIndicator(),
+                  ],
                 ],
+              ),
+
+              // Progress bar (all types except trial)
+              if (subscription.type != SubscriptionType.trial) ...[
+                const SizedBox(height: AppSpacing.space3),
+                _buildProgressBar(),
               ],
-            ),
 
-            // Progress bar (all types except trial)
-            if (subscription.type != SubscriptionType.trial) ...[
-              const SizedBox(height: AppSpacing.space3),
-              _buildProgressBar(),
+              // Detail section (상세 정보)
+              if (showDetails &&
+                  subscription.type != SubscriptionType.trial) ...[
+                const SizedBox(height: AppSpacing.space3),
+                _buildDetailSection(),
+              ],
+
+              // Warnings (multiple possible)
+              ..._buildWarnings(),
             ],
-
-            // Detail section (상세 정보)
-            if (showDetails &&
-                subscription.type != SubscriptionType.trial) ...[
-              const SizedBox(height: AppSpacing.space3),
-              _buildDetailSection(),
-            ],
-
-            // Warnings (multiple possible)
-            ..._buildWarnings(),
-          ],
-        ),
+          ),
         ),
       ),
     );
   }
-
 
   Widget _buildTypeIcon() {
     IconData icon;
@@ -173,9 +173,7 @@ class SubscriptionCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
       child: Icon(icon, size: 20, color: color),
     );
   }
@@ -206,10 +204,8 @@ class SubscriptionCard extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        border: Border.all(
-          color: AppColors.paperAccent.withValues(alpha: 0.3),
-        ),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Text(
         subscription.bonusText ?? '',
@@ -223,8 +219,9 @@ class SubscriptionCard extends StatelessWidget {
 
   Widget _buildProgressIndicator() {
     final percentage = subscription.usagePercentage ?? 0;
-    final progressColor =
-        SubscriptionStatusColors.getProgressColor(subscription);
+    final progressColor = SubscriptionStatusColors.getProgressColor(
+      subscription,
+    );
     return SizedBox(
       width: 48,
       height: 48,
@@ -258,7 +255,6 @@ class SubscriptionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          
           child: LinearProgressIndicator(
             value: percentage / 100,
             minHeight: 6,
@@ -276,7 +272,8 @@ class SubscriptionCard extends StatelessWidget {
               '남음: ${subscription.remainingLessons ?? 0}/$total회',
               style: AppTypography.caption.copyWith(
                 color: SubscriptionStatusColors.getSummaryTextColor(
-                    subscription),
+                  subscription,
+                ),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -311,10 +308,7 @@ class SubscriptionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           // 기본 횟수
-          _buildDetailRow(
-            '• 기본',
-            '${subscription.baseLessons ?? 0}회',
-          ),
+          _buildDetailRow('• 기본', '${subscription.baseLessons ?? 0}회'),
           // 보너스 (있을 때만)
           if (subscription.hasBonus) ...[
             _buildDetailRow(
@@ -324,17 +318,15 @@ class SubscriptionCard extends StatelessWidget {
             ),
           ],
           // 사용 횟수
-          _buildDetailRow(
-            '• 사용',
-            '${subscription.usedLessons}회',
-          ),
+          _buildDetailRow('• 사용', '${subscription.usedLessons}회'),
           // 남은 횟수
           _buildDetailRow(
             '• 잔여',
             '${subscription.remainingLessons ?? 0}회',
-            valueColor: subscription.isExpiringSoon
-                ? AppColors.paperAccent
-                : AppColors.paperAccent,
+            valueColor:
+                subscription.isExpiringSoon
+                    ? AppColors.paperAccent
+                    : AppColors.paperAccent,
             isBold: true,
           ),
           // 변경 횟수
@@ -344,34 +336,26 @@ class SubscriptionCard extends StatelessWidget {
               subscription.remainingReschedule,
               subscription.totalRescheduleAllowance,
             ),
-            valueColor: subscription.remainingReschedule <= 0
-                ? AppColors.inkTertiary
-                : subscription.remainingReschedule == 1
+            valueColor:
+                subscription.remainingReschedule <= 0
+                    ? AppColors.inkTertiary
+                    : subscription.remainingReschedule == 1
                     ? AppColors.paperAccent
                     : null,
           ),
           // 유효기간
           if (subscription.endDate != null) ...[
             const SizedBox(height: AppSpacing.space1),
-            _buildDetailRow(
-              '• 유효기간',
-              _formatDate(subscription.endDate!),
-            ),
+            _buildDetailRow('• 유효기간', _formatDate(subscription.endDate!)),
           ],
           // 결제 방식 (선생님/학원용)
           if (subscription.billingTypeLabel != null) ...[
-            _buildDetailRow(
-              '• 결제',
-              subscription.billingTypeLabel!,
-            ),
+            _buildDetailRow('• 결제', subscription.billingTypeLabel!),
           ],
           // 5주차 정책 (월정액만)
           if (subscription.type == SubscriptionType.monthly &&
               subscription.fifthWeekPolicyLabel != null) ...[
-            _buildDetailRow(
-              '• 5주차',
-              subscription.fifthWeekPolicyLabel!,
-            ),
+            _buildDetailRow('• 5주차', subscription.fifthWeekPolicyLabel!),
           ],
           // 월정액 이월 경고 (만료되지 않은 경우만)
           if (subscription.type == SubscriptionType.monthly &&
@@ -410,8 +394,12 @@ class SubscriptionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value,
-      {Color? valueColor, bool isBold = false}) {
+  Widget _buildDetailRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -491,29 +479,28 @@ class SubscriptionCard extends StatelessWidget {
 
     return [
       const SizedBox(height: AppSpacing.space3),
-      ...warnings.map((w) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.space1),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.space2),
-              decoration: BoxDecoration(
-                color: w.color.withValues(alpha: 0.1),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      w.text,
-                      style: AppTypography.caption.copyWith(
-                        color: w.color,
-                        fontWeight: FontWeight.w500,
-                      ),
+      ...warnings.map(
+        (w) => Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space2),
+            decoration: BoxDecoration(color: w.color.withValues(alpha: 0.1)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    w.text,
+                    style: AppTypography.caption.copyWith(
+                      color: w.color,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          )),
+          ),
+        ),
+      ),
     ];
   }
-
 }

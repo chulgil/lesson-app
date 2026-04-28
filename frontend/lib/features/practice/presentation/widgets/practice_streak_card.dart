@@ -78,7 +78,7 @@ class PracticeStreakCard extends ConsumerWidget {
                 Text(
                   '${streak.currentStreak}',
                   style: AppTypography.displayLarge.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                     fontSize: 48,
                   ),
@@ -150,11 +150,12 @@ class PracticeStreakCard extends ConsumerWidget {
                     isFuture
                         ? AppColors.paper.withValues(alpha: 0.2)
                         : isPracticed
-                        ? Colors.white
+                        ? AppColors.paper
                         : AppColors.paper.withValues(alpha: 0.3),
-                shape: BoxShape.circle,
                 border:
-                    isToday ? Border.all(color: Colors.white, width: 2) : null,
+                    isToday
+                        ? Border.all(color: AppColors.paper, width: 2)
+                        : null,
               ),
               child: Center(
                 child:
@@ -197,9 +198,7 @@ class PracticeStreakCard extends ConsumerWidget {
   Widget _buildLoadingCard() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       height: 180,
       child: const Center(child: CircularProgressIndicator()),
     );
@@ -208,9 +207,7 @@ class PracticeStreakCard extends ConsumerWidget {
   Widget _buildErrorCard() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Column(
         children: [
           const Icon(Icons.error_outline, color: AppColors.paperAccent),
@@ -246,9 +243,7 @@ class PracticeStreakBadge extends ConsumerWidget {
             horizontal: AppSpacing.space2,
             vertical: AppSpacing.space1,
           ),
-          decoration: BoxDecoration(
-            color: _getBadgeColor(streak.streakLevel),
-            ),
+          decoration: BoxDecoration(color: _getBadgeColor(streak.streakLevel)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -259,7 +254,7 @@ class PracticeStreakBadge extends ConsumerWidget {
               Text(
                 '${streak.currentStreak}일',
                 style: AppTypography.caption.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.bold,
                 ),
               ),

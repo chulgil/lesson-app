@@ -273,9 +273,7 @@ class _ProposalSettingsScreenState
                           decoration: BoxDecoration(
                             color:
                                 isSelected
-                                    ? AppColors.paperAccent.withValues(
-                                      alpha: 0.05,
-                                    )
+                                    ? AppColors.paperAccentSoft
                                     : AppColors.paper,
                             border: Border.all(
                               color:
@@ -292,7 +290,6 @@ class _ProposalSettingsScreenState
                                 width: 20,
                                 height: 20,
                                 decoration: BoxDecoration(
-                                  
                                   border: Border.all(
                                     color:
                                         isSelected
@@ -310,7 +307,7 @@ class _ProposalSettingsScreenState
                                         ? const Icon(
                                           Icons.check,
                                           size: 14,
-                                          color: Colors.white,
+                                          color: AppColors.paper,
                                         )
                                         : null,
                               ),
@@ -411,9 +408,7 @@ class _ProposalSettingsScreenState
             const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.2),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Text(
                 '전환율 UP',
                 style: AppTypography.captionSmall.copyWith(
@@ -507,9 +502,7 @@ class _ProposalSettingsScreenState
                 const SizedBox(height: AppSpacing.space3),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Row(
                     children: [
                       const Icon(
@@ -595,9 +588,7 @@ class _ProposalSettingsScreenState
         onPressed: _isSaving ? null : _saveSettings,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-          shape: RoundedRectangleBorder(
-            
-          ),
+          shape: RoundedRectangleBorder(),
         ),
         child:
             _isSaving

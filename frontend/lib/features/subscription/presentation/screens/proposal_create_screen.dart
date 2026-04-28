@@ -93,11 +93,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: AppColors.inkSecondary,
-          ),
+          Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '등록된 학생이 없습니다',
@@ -196,15 +192,12 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         Container(
           width: 24,
           height: 24,
-          decoration: BoxDecoration(
-            color: AppColors.paperAccent,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: AppColors.paperAccent),
           alignment: Alignment.center,
           child: Text(
             step,
             style: AppTypography.caption.copyWith(
-              color: Colors.white,
+              color: AppColors.paper,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -259,7 +252,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.paperAccentSoft,
                       child: Text(
                         student.name[0],
                         style: AppTypography.bodySmall.copyWith(
@@ -358,9 +351,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         children: [
           const Icon(Icons.info_outline, size: 16, color: AppColors.ink),
@@ -433,9 +424,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
             onPressed: canSubmit ? () => _submit(ProposalType.proposal) : null,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              shape: RoundedRectangleBorder(
-                
-              ),
+              shape: RoundedRectangleBorder(),
             ),
             child:
                 _isSubmitting
@@ -465,11 +454,12 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   vertical: AppSpacing.space4,
                 ),
                 side: BorderSide(
-                  color: canSubmit ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      canSubmit
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
-                shape: RoundedRectangleBorder(
-                  
-                ),
+                shape: RoundedRectangleBorder(),
               ),
               child: const Text('즉시 발급'),
             ),
@@ -477,9 +467,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
             textAlign: TextAlign.center,
           ),
         ],

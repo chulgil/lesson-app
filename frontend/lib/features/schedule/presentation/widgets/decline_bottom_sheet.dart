@@ -57,9 +57,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -110,8 +108,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                           AppSpacing.buttonHeightSmall,
                         ),
                         side: const BorderSide(color: AppColors.inkQuaternary),
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         AppStrings.messageOnly,
@@ -131,13 +128,12 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                           AppSpacing.buttonHeightSmall,
                         ),
                         backgroundColor: AppColors.paperAccent,
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         AppStrings.counterPropose,
                         style: AppTypography.buttonSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                     ),

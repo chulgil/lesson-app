@@ -45,10 +45,7 @@ class NoSubscriptionView extends ConsumerWidget {
             Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Icon(
                 Icons.card_membership_outlined,
                 size: 48,
@@ -103,9 +100,7 @@ class NoSubscriptionView extends ConsumerWidget {
             // Flow explanation
             Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -215,10 +210,7 @@ class NoSubscriptionView extends ConsumerWidget {
           Container(
             width: 20,
             height: 20,
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Center(
               child: Text(
                 '$number',

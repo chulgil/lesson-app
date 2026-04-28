@@ -60,8 +60,7 @@ class BookingConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-      ),
+      shape: RoundedRectangleBorder(),
       // Notebook × Score: AlertDialog title 은 전역 dialogTheme.titleTextStyle
       // (NotebookTypography.dialogTitle) 을 상속. 인라인 style 오버라이드 제거 (§7.41 cleanup 패턴).
       title: Text(
@@ -75,9 +74,7 @@ class BookingConfirmDialog extends StatelessWidget {
           // Lesson info card
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.08),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -201,9 +198,8 @@ class BookingConfirmDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(true),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.paperAccent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-            ),
+            foregroundColor: AppColors.paper,
+            shape: RoundedRectangleBorder(),
           ),
           child: Text(isReschedule ? '변경 확정' : '예약 확정'),
         ),

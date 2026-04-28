@@ -127,7 +127,7 @@ class _RepertoireCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppSpacing.radiusMedium),
                 topRight: Radius.circular(AppSpacing.radiusMedium),

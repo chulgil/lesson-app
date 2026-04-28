@@ -109,9 +109,7 @@ class DailyBarChart extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           width: 32,
           height: stat.hasPracticed ? barHeight * heightPercent : 4,
-          decoration: BoxDecoration(
-            color: barColor,
-            ),
+          decoration: BoxDecoration(color: barColor),
         ),
         const SizedBox(height: AppSpacing.space2),
 
@@ -120,11 +118,11 @@ class DailyBarChart extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: isToday ? AppColors.paperAccent : Colors.transparent,
-            ),
+          ),
           child: Text(
             stat.dayLabel,
             style: AppTypography.caption.copyWith(
-              color: isToday ? Colors.white : AppColors.inkSecondary,
+              color: isToday ? AppColors.paper : AppColors.inkSecondary,
               fontWeight: isToday ? FontWeight.w600 : null,
             ),
           ),

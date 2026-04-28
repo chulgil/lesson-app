@@ -54,11 +54,14 @@ class AvailabilityChipSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectableSlots = availableSlots.where(
-      (s) =>
-          s.status == AvailabilitySlotStatus.available ||
-          s.status == AvailabilitySlotStatus.myBooking,
-    ).toList();
+    final selectableSlots =
+        availableSlots
+            .where(
+              (s) =>
+                  s.status == AvailabilitySlotStatus.available ||
+                  s.status == AvailabilitySlotStatus.myBooking,
+            )
+            .toList();
 
     return Column(
       children: [
@@ -70,9 +73,10 @@ class AvailabilityChipSelector extends StatelessWidget {
 
         // Content
         Expanded(
-          child: selectableSlots.isEmpty
-              ? _buildEmptyState()
-              : _buildSlotChips(selectableSlots),
+          child:
+              selectableSlots.isEmpty
+                  ? _buildEmptyState()
+                  : _buildSlotChips(selectableSlots),
         ),
 
         // Booking preview (when slot selected)
@@ -164,14 +168,15 @@ class AvailabilityChipSelector extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: slots.map((slot) {
-        final isSelected = selectedSlot?.id == slot.id;
-        return _TimeChip(
-          slot: slot,
-          isSelected: isSelected,
-          onTap: () => onSlotSelected(slot),
-        );
-      }).toList(),
+      children:
+          slots.map((slot) {
+            final isSelected = selectedSlot?.id == slot.id;
+            return _TimeChip(
+              slot: slot,
+              isSelected: isSelected,
+              onTap: () => onSlotSelected(slot),
+            );
+          }).toList(),
     );
   }
 }
@@ -192,32 +197,24 @@ class _TimeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      onDoubleTap: onTap, // Double tap also selects (could trigger immediate booking)
+      onDoubleTap:
+          onTap, // Double tap also selects (could trigger immediate booking)
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        constraints: const BoxConstraints(
-          minWidth: 72,
-          minHeight: 44,
-        ),
+        constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
           color: _backgroundColor,
-          border: Border.all(
-            color: _borderColor,
-            width: isSelected ? 2 : 1,
-          ),
+          border: Border.all(color: _borderColor, width: isSelected ? 2 : 1),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (slot.isRecommended && !isSelected) ...[
-              const Text(
-                '⭐',
-                style: TextStyle(fontSize: 12),
-              ),
+              const Text('⭐', style: TextStyle(fontSize: 12)),
               const SizedBox(width: AppSpacing.space1),
             ],
             Text(
@@ -255,7 +252,7 @@ class _TimeChip extends StatelessWidget {
 
   Color get _textColor {
     if (isSelected) {
-      return Colors.white;
+      return AppColors.paper;
     }
     return AppColors.ink;
   }

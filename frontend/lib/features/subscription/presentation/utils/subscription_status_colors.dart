@@ -56,7 +56,7 @@ class SubscriptionStatusColors {
       return AppColors.paperHighlight.withValues(alpha: 0.3);
     }
     if (subscription.isExpiringSoon) {
-      return AppColors.paperAccent.withValues(alpha: 0.5);
+      return AppColors.paperAccent;
     }
     if (subscription.isExpired) {
       return AppColors.inkTertiary.withValues(alpha: 0.3);

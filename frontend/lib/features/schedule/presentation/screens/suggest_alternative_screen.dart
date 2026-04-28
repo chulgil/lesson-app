@@ -146,7 +146,12 @@ class _SuggestAlternativeScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: Text(AppStrings.counterPropose)),
+      appBar: AppBar(
+        title: Text(
+          AppStrings.counterPropose,
+          style: NotebookTypography.appBarTitle,
+        ),
+      ),
       body: Column(
         children: [
           // Student's preferred slots (if any)
@@ -281,7 +286,6 @@ class _SuggestAlternativeScreenState
                               isSelected
                                   ? AppColors.paperOk
                                   : AppColors.ink.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
                         ),
                         child: Center(
                           child:
@@ -289,7 +293,7 @@ class _SuggestAlternativeScreenState
                                   ? const Icon(
                                     Icons.check,
                                     size: 14,
-                                    color: Colors.white,
+                                    color: AppColors.paper,
                                   )
                                   : Text(
                                     '${index + 1}',
@@ -458,14 +462,13 @@ class _SuggestAlternativeScreenState
         icon: Icon(icon, size: 20),
         label: Text(
           label,
-          style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+          style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
         ),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
           backgroundColor: bgColor,
           disabledBackgroundColor: AppColors.scheduleMutedAccent,
-          shape: RoundedRectangleBorder(
-          ),
+          shape: RoundedRectangleBorder(),
         ),
       ),
     );
@@ -481,8 +484,7 @@ class _SuggestAlternativeScreenState
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
               side: const BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
             child: Text(
               AppStrings.rejectAction,
@@ -500,14 +502,13 @@ class _SuggestAlternativeScreenState
               minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
               backgroundColor: AppColors.paperAccent,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
             child: Text(
               _suggestedSlots.isEmpty
                   ? AppStrings.selectTimePrompt
                   : AppStrings.proposeAction(_suggestedSlots.length),
-              style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+              style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
             ),
           ),
         ),
@@ -815,9 +816,7 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
         AppSpacing.space3,
@@ -886,12 +885,13 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
                   AppSpacing.buttonHeightSmall,
                 ),
                 backgroundColor: AppColors.paperAccent,
-                shape: RoundedRectangleBorder(
-                ),
+                shape: RoundedRectangleBorder(),
               ),
               child: Text(
                 AppStrings.rejectSendAndClose,
-                style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.paper,
+                ),
               ),
             ),
           ),

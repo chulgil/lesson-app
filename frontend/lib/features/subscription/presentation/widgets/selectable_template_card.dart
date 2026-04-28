@@ -56,7 +56,7 @@ class SelectableTemplateCard extends StatelessWidget {
               isSelected
                   ? [
                     BoxShadow(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
+                      color: AppColors.paperAccentSoft,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -79,7 +79,7 @@ class SelectableTemplateCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.15),
+                        color: AppColors.paperAccentSoft,
                       ),
                       child: Text(
                         '⭐ 추천',
@@ -107,7 +107,6 @@ class SelectableTemplateCard extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
                       color:
                           isSelected
                               ? AppColors.paperAccent
@@ -118,7 +117,7 @@ class SelectableTemplateCard extends StatelessWidget {
                             ? const Icon(
                               Icons.check,
                               size: 16,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             )
                             : null,
                   ),

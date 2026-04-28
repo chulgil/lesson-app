@@ -158,7 +158,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
@@ -373,7 +373,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(color: AppColors.paper),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),

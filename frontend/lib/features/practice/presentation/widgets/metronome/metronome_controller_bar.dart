@@ -11,10 +11,7 @@ import 'cat_beat_indicator.dart';
 /// Shows: BPM display, play/pause button, cat indicator, expand button.
 /// Pre-warms the metronome engine on mount to reduce first-play latency.
 class MetronomeControllerBar extends ConsumerStatefulWidget {
-  const MetronomeControllerBar({
-    super.key,
-    this.onExpand,
-  });
+  const MetronomeControllerBar({super.key, this.onExpand});
 
   final VoidCallback? onExpand;
 
@@ -23,7 +20,8 @@ class MetronomeControllerBar extends ConsumerStatefulWidget {
       _MetronomeControllerBarState();
 }
 
-class _MetronomeControllerBarState extends ConsumerState<MetronomeControllerBar> {
+class _MetronomeControllerBarState
+    extends ConsumerState<MetronomeControllerBar> {
   @override
   void initState() {
     super.initState();
@@ -53,62 +51,66 @@ class _MetronomeControllerBarState extends ConsumerState<MetronomeControllerBar>
           ],
         ),
         child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Cat indicator - compact size
-              CatBeatIndicator(
-                currentBeat: state.currentBeat,
-                timeSignature: state.settings.timeSignature,
-                isPlaying: state.isPlaying,
-                bpm: state.settings.bpm,
-                size: 48,
-                compact: true,
-              ),
-              const SizedBox(width: AppSpacing.space4),
-
-              // BPM display and controls
-              Expanded(
-                child: _BpmControls(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Cat indicator - compact size
+                CatBeatIndicator(
+                  currentBeat: state.currentBeat,
+                  timeSignature: state.settings.timeSignature,
+                  isPlaying: state.isPlaying,
                   bpm: state.settings.bpm,
-                  timeSignature: state.settings.timeSignature.label,
-                  onDecrement: () =>
-                      ref.read(metronomeProvider.notifier).incrementBpm(-5),
-                  onIncrement: () =>
-                      ref.read(metronomeProvider.notifier).incrementBpm(5),
+                  size: 48,
+                  compact: true,
                 ),
-              ),
-              const SizedBox(width: AppSpacing.space4),
+                const SizedBox(width: AppSpacing.space4),
 
-              // Play/Pause button
-              _PlayPauseButton(
-                isPlaying: state.isPlaying,
-                onPressed: () =>
-                    ref.read(metronomeProvider.notifier).toggle(),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-
-              // Expand button - same size as play button
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: IconButton.outlined(
-                  icon: const Icon(Icons.fullscreen, size: 28),
-                  onPressed: widget.onExpand,
-                  tooltip: '전체 화면',
-                  style: IconButton.styleFrom(
-                    foregroundColor: AppColors.paperAccent,
-                    side: BorderSide(color: AppColors.paperAccent, width: 2),
+                // BPM display and controls
+                Expanded(
+                  child: _BpmControls(
+                    bpm: state.settings.bpm,
+                    timeSignature: state.settings.timeSignature.label,
+                    onDecrement:
+                        () => ref
+                            .read(metronomeProvider.notifier)
+                            .incrementBpm(-5),
+                    onIncrement:
+                        () => ref
+                            .read(metronomeProvider.notifier)
+                            .incrementBpm(5),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.space4),
+
+                // Play/Pause button
+                _PlayPauseButton(
+                  isPlaying: state.isPlaying,
+                  onPressed:
+                      () => ref.read(metronomeProvider.notifier).toggle(),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+
+                // Expand button - same size as play button
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: IconButton.outlined(
+                    icon: const Icon(Icons.fullscreen, size: 28),
+                    onPressed: widget.onExpand,
+                    tooltip: '전체 화면',
+                    style: IconButton.styleFrom(
+                      foregroundColor: AppColors.paperAccent,
+                      side: BorderSide(color: AppColors.paperAccent, width: 2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -136,10 +138,7 @@ class _BpmControls extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Decrement button
-          _SmallButton(
-            icon: Icons.remove,
-            onPressed: onDecrement,
-          ),
+          _SmallButton(icon: Icons.remove, onPressed: onDecrement),
           const SizedBox(width: AppSpacing.space2),
 
           // BPM display
@@ -164,10 +163,7 @@ class _BpmControls extends StatelessWidget {
           const SizedBox(width: AppSpacing.space2),
 
           // Increment button
-          _SmallButton(
-            icon: Icons.add,
-            onPressed: onIncrement,
-          ),
+          _SmallButton(icon: Icons.add, onPressed: onIncrement),
           const SizedBox(width: AppSpacing.space3),
 
           // Time signature display (same size as BPM)
@@ -185,10 +181,7 @@ class _BpmControls extends StatelessWidget {
 }
 
 class _SmallButton extends StatelessWidget {
-  const _SmallButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _SmallButton({required this.icon, required this.onPressed});
 
   final IconData icon;
   final VoidCallback onPressed;
@@ -212,10 +205,7 @@ class _SmallButton extends StatelessWidget {
 }
 
 class _PlayPauseButton extends StatelessWidget {
-  const _PlayPauseButton({
-    required this.isPlaying,
-    required this.onPressed,
-  });
+  const _PlayPauseButton({required this.isPlaying, required this.onPressed});
 
   final bool isPlaying;
   final VoidCallback onPressed;
@@ -226,14 +216,11 @@ class _PlayPauseButton extends StatelessWidget {
       width: 48,
       height: 48,
       child: IconButton.filled(
-        icon: Icon(
-          isPlaying ? Icons.pause : Icons.play_arrow,
-          size: 28,
-        ),
+        icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 28),
         onPressed: onPressed,
         style: IconButton.styleFrom(
           backgroundColor: AppColors.paperAccent,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.paper,
         ),
       ),
     );

@@ -52,7 +52,7 @@ class TimelineLessonBlock extends StatelessWidget {
 
     if (!isToday && isFuture) {
       // Future date: visibly lightened instrument colors
-      bgColor = Color.lerp(baseColors.background, Colors.white, 0.5)!;
+      bgColor = Color.lerp(baseColors.background, AppColors.paper, 0.5)!;
       accentColor = baseColors.accent.withValues(alpha: 0.45);
     } else if (!isToday) {
       // Past date: grey muted

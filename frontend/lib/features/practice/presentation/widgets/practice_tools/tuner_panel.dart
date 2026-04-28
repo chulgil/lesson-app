@@ -32,7 +32,8 @@ class _TunerPanelState extends ConsumerState<TunerPanel> {
               final availableHeight = constraints.maxHeight;
 
               // Use the smaller dimension with padding
-              final availableSize = (availableWidth < availableHeight
+              final availableSize =
+                  (availableWidth < availableHeight
                       ? availableWidth
                       : availableHeight) -
                   32; // 16px padding each side
@@ -40,7 +41,8 @@ class _TunerPanelState extends ConsumerState<TunerPanel> {
               // Circle size fills available space (indicators are inside)
               final circleSize =
                   availableSize * 1.1; // 110% for circle (bigger for font 72)
-              final catSize = circleSize * 0.40; // Cat is 40% of circle (smaller)
+              final catSize =
+                  circleSize * 0.40; // Cat is 40% of circle (smaller)
 
               return Stack(
                 alignment: Alignment.topCenter,
@@ -62,7 +64,8 @@ class _TunerPanelState extends ConsumerState<TunerPanel> {
                   Positioned(
                     top: circleSize - circleSize * 0.15 - 100,
                     child: CurrentNoteDisplay(
-                        scale: (circleSize / 280) / 1.1), // 1.1x smaller
+                      scale: (circleSize / 280) / 1.1,
+                    ), // 1.1x smaller
                   ),
                 ],
               );
@@ -87,10 +90,7 @@ class _TunerPanelState extends ConsumerState<TunerPanel> {
                 // Staff display (1.24x size)
                 const TunerStaff(width: 132, height: 99),
                 // Info bar (1.24x size)
-                Transform.scale(
-                  scale: 1.24,
-                  child: const TunerInfoBar(),
-                ),
+                Transform.scale(scale: 1.24, child: const TunerInfoBar()),
               ],
             ),
           ),
@@ -125,9 +125,10 @@ class CurrentNoteDisplay extends ConsumerWidget {
     }
 
     // Green when perfect, primary color otherwise (80% opacity)
-    final noteColor = isPerfect
-        ? AppColors.paperOk.withValues(alpha: 0.9)
-        : AppColors.paperAccent.withValues(alpha: 0.8);
+    final noteColor =
+        isPerfect
+            ? AppColors.paperOk.withValues(alpha: 0.9)
+            : AppColors.paperAccent;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

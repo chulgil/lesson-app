@@ -582,7 +582,7 @@ class _IssueSubscriptionScreenState
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
                         _rescheduleAllowance == count
-                            ? Colors.white
+                            ? AppColors.paper
                             : AppColors.ink,
                     fontWeight:
                         _rescheduleAllowance == count
@@ -631,7 +631,7 @@ class _IssueSubscriptionScreenState
                     labelStyle: AppTypography.bodySmall.copyWith(
                       color:
                           _rescheduleDeadlineHours == hours
-                              ? Colors.white
+                              ? AppColors.paper
                               : AppColors.ink,
                       fontWeight:
                           _rescheduleDeadlineHours == hours

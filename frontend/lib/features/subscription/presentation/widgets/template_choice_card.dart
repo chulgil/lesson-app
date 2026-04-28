@@ -56,7 +56,7 @@ class TemplateChoiceCard extends StatelessWidget {
                   child: Text(
                     '추천',
                     style: AppTypography.caption.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -120,7 +120,8 @@ class TemplateChoiceCard extends StatelessWidget {
                       isRecommended
                           ? AppColors.paperAccent
                           : AppColors.paperDark,
-                  foregroundColor: isRecommended ? Colors.white : AppColors.ink,
+                  foregroundColor:
+                      isRecommended ? AppColors.paper : AppColors.ink,
                   shape: const RoundedRectangleBorder(),
                   elevation: 0,
                 ),

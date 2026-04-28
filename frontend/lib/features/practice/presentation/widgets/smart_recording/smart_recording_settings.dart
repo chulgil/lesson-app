@@ -25,9 +25,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: const Icon(
                     Icons.auto_fix_high,
                     color: AppColors.paperAccent,
@@ -92,9 +90,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       horizontal: 8,
                       vertical: 4,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       '${(settings.trimThreshold * 100).toInt()}%',
                       style: AppTypography.caption.copyWith(
@@ -119,11 +115,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                         activeTrackColor: AppColors.paperAccent,
-                        inactiveTrackColor: AppColors.paperAccent.withValues(
-                          alpha: 0.2,
-                        ),
+                        inactiveTrackColor: AppColors.paperAccentSoft,
                         thumbColor: AppColors.paperAccent,
-                        overlayColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                        overlayColor: AppColors.paperAccentSoft,
                       ),
                       child: Slider(
                         value: settings.trimThreshold,
@@ -152,9 +146,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space2),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                  ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(
@@ -238,8 +230,8 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
-                        ),
+                        color: AppColors.paperAccentSoft,
+                      ),
                       child: Text(
                         '${settings.middleSilenceThreshold}초 이상',
                         style: AppTypography.caption.copyWith(
@@ -263,13 +255,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       child: SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: AppColors.paperAccent,
-                          inactiveTrackColor: AppColors.paperAccent.withValues(
-                            alpha: 0.2,
-                          ),
+                          inactiveTrackColor: AppColors.paperAccentSoft,
                           thumbColor: AppColors.paperAccent,
-                          overlayColor: AppColors.paperAccent.withValues(
-                            alpha: 0.1,
-                          ),
+                          overlayColor: AppColors.paperAccentSoft,
                         ),
                         child: Slider(
                           value: settings.middleSilenceThreshold.toDouble(),
@@ -326,12 +314,12 @@ class SmartRecordingToggle extends ConsumerWidget {
         decoration: BoxDecoration(
           color:
               settings.smartRecordingEnabled
-                  ? AppColors.paperAccent.withValues(alpha: 0.1)
+                  ? AppColors.paperAccentSoft
                   : AppColors.paperDark,
           border: Border.all(
             color:
                 settings.smartRecordingEnabled
-                    ? AppColors.paperAccent.withValues(alpha: 0.3)
+                    ? AppColors.inkQuaternary
                     : AppColors.inkQuaternary,
           ),
         ),

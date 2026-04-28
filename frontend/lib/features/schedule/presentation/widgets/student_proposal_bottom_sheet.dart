@@ -68,9 +68,7 @@ class _StudentProposalBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: SingleChildScrollView(
         controller: widget.scrollController,
         child: Padding(
@@ -91,9 +89,7 @@ class _StudentProposalBottomSheetState
                   widget.teacherProposal.message!.isNotEmpty) ...[
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.05),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -143,7 +139,7 @@ class _StudentProposalBottomSheetState
                       decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? AppColors.paperAccent.withValues(alpha: 0.1)
+                                ? AppColors.paperAccentSoft
                                 : AppColors.paperDark,
                         border: Border.all(
                           color:
@@ -221,7 +217,7 @@ class _StudentProposalBottomSheetState
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppColors.paper,
                                 ),
                               )
                               : Text(AppStrings.accept),

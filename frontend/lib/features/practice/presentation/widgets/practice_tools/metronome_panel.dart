@@ -451,8 +451,8 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: AppColors.paperAccent.withValues(alpha: 0.1),
-                              ),
+                              color: AppColors.paperAccentSoft,
+                            ),
                             child: Center(
                               child: Text(
                                 state.settings.subdivision.noteSymbol,
@@ -543,9 +543,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
     return Container(
       width: 48,
       height: 48,
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -169,7 +169,7 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
     if (_isTapped) {
       // Tapped: darker color (no border)
       backgroundColor = activeColor;
-      textColor = Colors.white;
+      textColor = AppColors.paper;
     } else if (isPerfectMatch) {
       // Perfect pitch match: instant bright highlight with subtle glow
       backgroundColor = AppColors.tunerCentPerfect.withValues(alpha: 0.7);

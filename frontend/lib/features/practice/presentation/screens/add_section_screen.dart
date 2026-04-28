@@ -297,10 +297,8 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: AppColors.paperAccent.withValues(alpha: 0.2),
-                    ),
+                    color: AppColors.paperAccentSoft,
+                    border: Border.all(color: AppColors.paperAccentSoft),
                   ),
                   child: Row(
                     children: [
@@ -400,7 +398,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text('섹션 추가'),

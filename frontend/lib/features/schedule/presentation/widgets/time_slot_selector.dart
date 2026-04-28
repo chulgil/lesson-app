@@ -6,10 +6,10 @@ import '../../../../core/theme/app_typography.dart';
 
 /// Time slot status for availability
 enum TimeSlotStatus {
-  available,    // Can be selected
-  unavailable,  // Outside teacher's available hours or lesson would exceed
-  booked,       // Already booked by another student
-  selected,     // Currently selected
+  available, // Can be selected
+  unavailable, // Outside teacher's available hours or lesson would exceed
+  booked, // Already booked by another student
+  selected, // Currently selected
 }
 
 /// Model for a time slot with status
@@ -103,12 +103,14 @@ class TimeSlotSelector extends StatelessWidget {
         final slot = slots[index];
         return _TimeSlotButton(
           slot: slot,
-          isSelected: selectedTime != null &&
+          isSelected:
+              selectedTime != null &&
               selectedTime!.hour == slot.time.hour &&
               selectedTime!.minute == slot.time.minute,
-          onTap: slot.status == TimeSlotStatus.available
-              ? () => onTimeSelected?.call(slot.time)
-              : null,
+          onTap:
+              slot.status == TimeSlotStatus.available
+                  ? () => onTimeSelected?.call(slot.time)
+                  : null,
         );
       },
     );
@@ -129,11 +131,9 @@ class TimeSlotSelector extends StatelessWidget {
       final status = _getSlotStatus(time);
       final bookedBy = _getBookedBy(time);
 
-      slots.add(SelectableTimeSlot(
-        time: time,
-        status: status,
-        bookedBy: bookedBy,
-      ));
+      slots.add(
+        SelectableTimeSlot(time: time, status: status, bookedBy: bookedBy),
+      );
     }
 
     return slots;
@@ -246,7 +246,7 @@ class _TimeSlotButton extends StatelessWidget {
 
   Color _getTextColor() {
     if (isSelected) {
-      return Colors.white;
+      return AppColors.paper;
     }
     switch (slot.status) {
       case TimeSlotStatus.available:
@@ -255,7 +255,7 @@ class _TimeSlotButton extends StatelessWidget {
       case TimeSlotStatus.booked:
         return AppColors.inkTertiary;
       case TimeSlotStatus.selected:
-        return Colors.white;
+        return AppColors.paper;
     }
   }
 

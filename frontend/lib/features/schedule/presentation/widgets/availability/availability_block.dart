@@ -66,7 +66,7 @@ class AvailabilityBlock extends StatelessWidget {
 
   Color get _backgroundColor {
     if (isSelected) {
-      return AppColors.paperAccent.withValues(alpha: 0.15);
+      return AppColors.paperAccentSoft;
     }
     switch (status) {
       case AvailabilitySlotStatus.available:
@@ -75,7 +75,7 @@ class AvailabilityBlock extends StatelessWidget {
       case AvailabilitySlotStatus.myBooking:
         return AppColors.paperDark;
       case AvailabilitySlotStatus.cancelled:
-        return AppColors.paperAccent.withValues(alpha: 0.08);
+        return AppColors.paperAccentSoft;
       case AvailabilitySlotStatus.past:
         return AppColors.paperDark;
     }
@@ -89,7 +89,7 @@ class AvailabilityBlock extends StatelessWidget {
       case AvailabilitySlotStatus.myBooking:
         return AppColors.inkQuaternary;
       case AvailabilitySlotStatus.cancelled:
-        return AppColors.paperAccent.withValues(alpha: 0.3);
+        return AppColors.inkQuaternary;
       case AvailabilitySlotStatus.past:
         return AppColors.inkQuaternary;
     }

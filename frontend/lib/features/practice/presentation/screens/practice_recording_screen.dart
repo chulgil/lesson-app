@@ -412,22 +412,20 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.9),
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccent),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     !_hasMicInput ? Icons.mic_external_off : Icons.volume_down,
                     size: 16,
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Text(
                     !_hasMicInput ? '입력 없음' : '소리가 약함',
                     style: AppTypography.caption.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -451,7 +449,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 isActive: waveformIsActive,
                 height: 100,
                 waveColor:
-                    widget.isRecording ? Colors.white : AppColors.paperAccent,
+                    widget.isRecording
+                        ? AppColors.paper
+                        : AppColors.paperAccent,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -670,7 +670,7 @@ class _RecordingItem extends StatelessWidget {
           icon: const Icon(Icons.play_arrow),
           style: IconButton.styleFrom(
             backgroundColor: AppColors.paperAccent,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.paper,
           ),
         ),
         title: Row(
@@ -686,7 +686,7 @@ class _RecordingItem extends StatelessWidget {
                 child: Text(
                   '대표',
                   style: AppTypography.caption.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

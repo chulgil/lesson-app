@@ -601,7 +601,7 @@ class _ViewModeToggle extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.white : Colors.transparent,
+                    color: isSelected ? AppColors.paper : Colors.transparent,
                   ),
                   child: Icon(
                     _getIcon(mode),

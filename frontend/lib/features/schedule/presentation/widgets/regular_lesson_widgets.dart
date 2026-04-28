@@ -45,8 +45,8 @@ class RegularLessonStudentInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.08),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -55,7 +55,9 @@ class RegularLessonStudentInfo extends StatelessWidget {
             backgroundColor: AppColors.paperAccent,
             child: Text(
               studentName[0],
-              style: AppTypography.headingSmall.copyWith(color: Colors.white),
+              style: AppTypography.headingSmall.copyWith(
+                color: AppColors.paper,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -119,7 +121,8 @@ class RegularLessonDurationSelector extends StatelessWidget {
                     Icon(
                       Icons.star,
                       size: 12,
-                      color: isSelected ? Colors.white : AppColors.paperAccent,
+                      color:
+                          isSelected ? AppColors.paper : AppColors.paperAccent,
                     ),
                   ],
                 ],
@@ -139,7 +142,7 @@ class RegularLessonDurationSelector extends StatelessWidget {
                         : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.ink,
+                color: isSelected ? AppColors.paper : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );
@@ -241,7 +244,6 @@ class DayButton extends StatelessWidget {
                   : isAvailable
                   ? AppColors.paper
                   : AppColors.paperDark,
-          shape: BoxShape.circle,
           border: Border.all(
             color:
                 isSelected
@@ -257,7 +259,7 @@ class DayButton extends StatelessWidget {
             style: AppTypography.bodyMedium.copyWith(
               color:
                   isSelected
-                      ? Colors.white
+                      ? AppColors.paper
                       : isAvailable
                       ? AppColors.ink
                       : AppColors.inkTertiary,
@@ -345,9 +347,7 @@ class RegularLessonTimeSelector extends StatelessWidget {
                   horizontal: AppSpacing.space2,
                   vertical: 2,
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Text(
                   '${formatTimeOfDay(daySlot.startTime)}-${formatTimeOfDay(daySlot.endTime)} 가능',
                   style: AppTypography.caption.copyWith(
@@ -468,10 +468,7 @@ class OptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color:
-          isSelected
-              ? AppColors.paperAccent.withValues(alpha: 0.1)
-              : AppColors.paper,
+      color: isSelected ? AppColors.paperAccentSoft : AppColors.paper,
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -534,7 +531,7 @@ class RegularLessonFeeSelector extends StatelessWidget {
             if (selected) onFeeChanged(fees[index]);
           },
           backgroundColor: AppColors.paper,
-          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+          selectedColor: AppColors.paperAccentSoft,
           side: BorderSide(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
@@ -621,8 +618,8 @@ class RegularLessonSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.08),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -734,10 +731,8 @@ class FirstMonthFeeSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.1),
-            border: Border.all(
-              color: AppColors.paperAccent.withValues(alpha: 0.3),
-            ),
+            color: AppColors.paperAccentSoft,
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             children: [
@@ -824,7 +819,7 @@ class RegularLessonSubmitButton extends StatelessWidget {
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 )
                 : const Text('정규레슨 등록하기'),

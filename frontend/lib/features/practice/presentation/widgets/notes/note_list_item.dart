@@ -41,9 +41,7 @@ class NoteListItem extends StatelessWidget {
                     horizontal: AppSpacing.space2,
                     vertical: 2,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Text(
                     note.timeText,
                     style: AppTypography.caption.copyWith(

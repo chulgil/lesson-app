@@ -405,7 +405,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text('저장하기'),

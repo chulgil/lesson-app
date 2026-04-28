@@ -103,7 +103,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                   borderSide: BorderSide(color: AppColors.paperAccent),
                 ),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.paper,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,
@@ -299,7 +299,7 @@ class _RepertoireGroup extends StatelessWidget {
               Icon(
                 Icons.folder_outlined,
                 size: 20,
-                color: AppColors.paperAccent.withValues(alpha: 0.7),
+                color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
@@ -354,7 +354,7 @@ class _RepertoireGroup extends StatelessWidget {
           TextSpan(
             text: text.substring(index, index + query.length),
             style: style.copyWith(
-              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              backgroundColor: AppColors.paperAccentSoft,
               color: AppColors.paperAccent,
             ),
           ),
@@ -382,9 +382,7 @@ class _SectionTile extends StatelessWidget {
       leading: Container(
         width: 40,
         height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
-          ),
+        decoration: BoxDecoration(color: AppColors.paperAccentSoft),
         child: const Icon(
           Icons.music_note,
           color: AppColors.paperAccent,
@@ -427,7 +425,7 @@ class _SectionTile extends StatelessWidget {
           TextSpan(
             text: text.substring(index, index + query.length),
             style: style.copyWith(
-              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              backgroundColor: AppColors.paperAccentSoft,
               color: AppColors.paperAccent,
             ),
           ),

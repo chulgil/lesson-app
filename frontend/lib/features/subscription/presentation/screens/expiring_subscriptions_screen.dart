@@ -61,8 +61,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
       ),
       body: expiringSoonAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) =>
-            const Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
         data: (subscriptions) {
           final expiredSubs = expiredAsync.valueOrNull ?? [];
           final allSubscriptions = [...subscriptions, ...expiredSubs];
@@ -78,12 +77,12 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           }
 
           // Sort by most urgent first (least remaining lessons or days)
-          final sortedEntries = grouped.entries.toList()
-            ..sort((a, b) {
-              final aMin = _getUrgency(a.value);
-              final bMin = _getUrgency(b.value);
-              return aMin.compareTo(bMin);
-            });
+          final sortedEntries =
+              grouped.entries.toList()..sort((a, b) {
+                final aMin = _getUrgency(a.value);
+                final bMin = _getUrgency(b.value);
+                return aMin.compareTo(bMin);
+              });
 
           return studentsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -125,7 +124,8 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
         final studentId = entry.key;
         final subs = entry.value;
         final studentName =
-            studentNames[studentId] ?? '학생 ${studentId.replaceAll('student_', '#')}';
+            studentNames[studentId] ??
+            '학생 ${studentId.replaceAll('student_', '#')}';
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -146,9 +146,10 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
       children: [
         // Student header
         GestureDetector(
-          onTap: () => context.push(
-            AppRoutes.studentDetail.replaceFirst(':id', studentId),
-          ),
+          onTap:
+              () => context.push(
+                AppRoutes.studentDetail.replaceFirst(':id', studentId),
+              ),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
             child: Row(
@@ -159,7 +160,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
                   child: Text(
                     studentName.isNotEmpty ? studentName[0] : 'S',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -188,9 +189,10 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: () => context.push(
-              '${AppRoutes.issueSubscription}?studentId=$studentId',
-            ),
+            onPressed:
+                () => context.push(
+                  '${AppRoutes.issueSubscription}?studentId=$studentId',
+                ),
             icon: const Icon(Icons.autorenew, size: 18),
             label: const Text('수강권 발급하기'),
           ),
@@ -204,12 +206,14 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
             child: SubscriptionCard(
               subscription: sub,
               className: sub.typeLabel,
-              onTap: () => context.push(
-                AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),
-              ),
-              onRenewalTap: () => context.push(
-                '${AppRoutes.issueSubscription}?studentId=$studentId',
-              ),
+              onTap:
+                  () => context.push(
+                    AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),
+                  ),
+              onRenewalTap:
+                  () => context.push(
+                    '${AppRoutes.issueSubscription}?studentId=$studentId',
+                  ),
             ),
           ),
         ),
@@ -224,10 +228,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Icon(
               Icons.check_circle_outline,
               size: 48,

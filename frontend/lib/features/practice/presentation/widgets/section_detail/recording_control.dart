@@ -170,13 +170,11 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
           decoration: BoxDecoration(
             color:
                 widget.isRecording
-                    ? AppColors.paperAccent.withValues(alpha: 0.15)
+                    ? AppColors.paperAccentSoft
                     : AppColors.paperDark,
             border:
                 widget.isRecording
-                    ? Border.all(
-                      color: AppColors.paperAccent.withValues(alpha: 0.3),
-                    )
+                    ? Border.all(color: AppColors.inkQuaternary)
                     : null,
           ),
           child: Stack(
@@ -216,7 +214,6 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                     widget.isPaused
                                         ? AppColors.paperAccent
                                         : AppColors.paperAccent,
-                                shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: AppSpacing.space2),
@@ -323,7 +320,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                               Icon(
                                 hasMicPermission ? Icons.mic : Icons.mic_off,
                                 size: 28,
-                                color: Colors.white,
+                                color: AppColors.paper,
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
@@ -333,7 +330,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                     ? '스마트 녹음'
                                     : '녹음 시작',
                                 style: AppTypography.bodyLarge.copyWith(
-                                  color: Colors.white,
+                                  color: AppColors.paper,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

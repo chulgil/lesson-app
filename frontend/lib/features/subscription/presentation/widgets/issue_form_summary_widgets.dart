@@ -81,10 +81,7 @@ class AppliedPolicySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 1,
-            color: AppColors.paperAccent.withValues(alpha: 0.12),
-          ),
+          Container(height: 1, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children: [
@@ -191,8 +188,8 @@ class SubscriptionSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,8 +379,8 @@ class BatchSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -74,6 +74,7 @@
 - [§7.131 알림 모듈 Notebook × Score 정렬](#7131--알림-모듈-notebook--score-정렬-2026-04-28-사용자-점검) — 이모지 → outlined Icon, alpha 변형 → ink 톤 분리, round → 사각
 - [§7.132 student_home + parent_home Notebook × Score 정렬 W1](#7132--student_home--parent_home-notebook--score-정렬-w1-2026-04-28) — round → 사각 (CircleAvatar 사람 메타포만 유지), Colors.white → AppColors.paper, paperAccent.alpha → paperAccentSoft
 - [§7.132 W1.5 child_profile* 후속 정렬](#7132-w15--child_profile-후속-정렬-2026-04-28-w1-후속) — 색상 swatch round → 사각, Save·추가 버튼 white → paper
+- [§7.132 W2 schedule + subscription + practice 도메인 정렬](#7132-w2--schedule--subscription--practice-도메인-정렬-2026-04-29) — paperAccent.alpha 0.05~0.5 → paperAccentSoft/solid, 0.5px → 1px, Colors.white → paper
 
 ---
 
@@ -5357,3 +5358,35 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: 색상 swatch 만 원형 유지 — CircleAvatar(사람)과 swatch(색상 선택)는 메타포가 다름. 인물 정체성 ≠ 색상 도구. swatch 도 사각화하는 것이 §7.132 일관성에 부합.
 
 **테스트**: `flutter analyze lib/features/parent_home` → No issues found!. W1 + W1.5 합계 24 파일 / 22건 정렬 완료.
+
+#### §7.132 W2 — schedule + subscription + practice 도메인 정렬 (2026-04-29)
+
+**전제**: §7.132 W1/W1.5 가 진입 표면(홈 + 자녀 프로필)을 정렬했으니, W2 는 사용 빈도 최상위 3개 도메인 — 스케줄(주간 그리드/요청/대안 제시), 수강권(제안/발급/취소/일정변경 채팅), 연습(메트로놈/녹음/리퍼토리) — 의 모든 상세 화면을 동일 규칙으로 일괄 정렬. 병렬 에이전트 3대 디스패치 후 직접 완료.
+
+**4 변환 규칙 (W1 동일)**:
+1. `BoxShape.circle` → 사각화 (CircleAvatar/BorderRadius.circular 면적·시각 정체성 보존 케이스 제외)
+2. `Colors.white` → `AppColors.paper` (foregroundColor / CircularProgressIndicator / 텍스트)
+3. `paperAccent.withValues(alpha: 0.05~0.2)` → `AppColors.paperAccentSoft` (15알파 배경 토큰)
+4. `paperAccent.withValues(alpha: 0.3~0.5)` → `AppColors.paperAccent` (border/divider/icon 강조 = 솔리드)
+5. `0.5px` border/divider → `1px` (HARD-GATE #5: 0.5px 라인 OVERFLOW 방지)
+6. canvas painter / 차트 그래픽 (waveform / fish bubble / cat painters) — Notebook 텍스트가 아닌 그래픽 컨텍스트, 변환 제외
+
+**적용 합계**: 3개 도메인 / 49 + 36 + 17 = ~102 파일 / paperAccent.alpha 76건 + Colors.white 12건 + 0.5px 4건 + BoxShape.circle 14건 정렬
+
+**도메인별 핵심 변경**:
+
+| 도메인 | 주요 파일 | 변경 패턴 |
+|---|---|---|
+| schedule | `weekly_schedule_screen`, `schedule_weekly_grid_view`, `timeline_lesson_block`, `unified_lesson_request_screen`, `suggest_alternative_screen`, `time_exception_screen`, `booking_reschedule_screen`, `booking_cancel_screen`, `request_completion_screen`, `all_lesson_requests_screen` (총 49 파일) | 그리드 셀 strokeAlignInside, 요청 챗 버블 paperAccentSoft, 대안 카드 1px border |
+| subscription | `proposal_card_widgets`, `subscription_card`, `subscription_chapter_lessons`, `subscription_detail_chat_list`, `subscription_issued_card`, `selectable_template_card`, `issue_form_*` (×6), `reschedule_bottom_sheet`, `cancel_lesson_bottom_sheet`, `schedule_change_event_bubble`, `proposal_settings_screen`, `subscription_status_colors`, `subscription_action_box` (총 18 파일) | 제안 카드 alpha 0.05/0.1 → paperAccentSoft, 보너스 배지 0.3 border → solid, 갱신필요 0.5 → solid, ChoiceChip selectedColor 0.15 → paperAccentSoft, 채팅 버블 isTeacher tint, divider 0.3 → solid, divider 0.5px → 1px |
+| practice | `metronome_*` (×4), `cat_beat_indicator`, `subdivision_picker`, `time_signature_picker`, `note_list_item`, `practice_streak_card`, `recording_comparison_sheet`, `recording_player_sheet`, `repertoire_timeline_card`, `bpm_controls` 등 (총 36 파일) | 메트로놈 비트 인디케이터 paperAccentSoft 틴트, 녹음 비교 시트 1px border, 리퍼토리 타임라인 카드 round → 사각 (캔버스 painter 영역은 그래픽 컨텍스트로 보존) |
+
+**Lore-directive**: paperAccent.alpha 0.05~0.2 = 단일 토큰 paperAccentSoft 로 통일 — 알파 그라디언트 5단계는 시각 노이즈, 단일 톤이 § 7.132 의 "1-point accent" 원칙과 일치.
+
+**Lore-directive**: 0.3~0.5 alpha 의 border/divider/icon 강조 = 솔리드 paperAccent — 강조 의도가 명시된 자리는 알파 흐림이 의미 손실. divider 0.3 흐림은 "선택됨" 신호를 약화시킴.
+
+**Lore-rejected**: 도메인별 별도 토큰 (subscriptionAccent / scheduleAccent / practiceAccent) — Notebook × Score 는 단일 잉크 팔레트(paper + ink + paperAccent + paperOk + paperHighlight) 가 강령. 도메인 분리는 페이지의 "공책" 메타포 위반.
+
+**Lore-rejected**: 캔버스 painter 의 white 도 paper 로 일괄 — 차트/그래픽은 검정 배경 + 흰색 데이터 라인이 가독성 표준 (waveform / fish bubble / cat painters). Notebook 텍스트 규칙과 그래픽 캔버스 규칙은 분리.
+
+**검증**: `flutter analyze lib/features/subscription lib/features/schedule lib/features/practice` → No issues found! (14.0s). 비즈니스 로직 무변경, 시각 토큰 정렬만. W1 + W1.5 + W2 누적 ~126 파일 / ~120건 정렬 완료.

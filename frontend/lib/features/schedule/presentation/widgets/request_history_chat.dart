@@ -182,7 +182,7 @@ class RequestHistoryChat extends StatelessWidget {
                     // Color by role (not viewer): teacher=primary, student=secondary
                     color:
                         event.actorType == ProposerRole.teacher
-                            ? AppColors.paperAccent.withValues(alpha: 0.08)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
                   ),
                   child: _buildBubbleContent(

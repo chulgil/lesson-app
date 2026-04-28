@@ -296,10 +296,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                     height: 22,
                     decoration:
                         isToday
-                            ? const BoxDecoration(
-                              color: AppColors.paperAccent,
-                              shape: BoxShape.circle,
-                            )
+                            ? const BoxDecoration(color: AppColors.paperAccent)
                             : null,
                     child: Center(
                       child: Text(
@@ -309,7 +306,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                               isToday ? FontWeight.bold : FontWeight.normal,
                           color:
                               isToday
-                                  ? Colors.white
+                                  ? AppColors.paper
                                   : AppColors.inkSecondary,
                         ),
                       ),
@@ -372,9 +369,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
       // Unavailable / past
       return Container(
         margin: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          color: AppColors.scheduleMutedBackground,
-        ),
+        decoration: BoxDecoration(color: AppColors.scheduleMutedBackground),
       );
     }
 
@@ -384,15 +379,13 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         onTap: () => _onSlotTapped(dayIndex, hour),
         child: Container(
           margin: const EdgeInsets.all(1),
-          decoration: BoxDecoration(
-            color: _priorityColor(priority),
-          ),
+          decoration: BoxDecoration(color: _priorityColor(priority)),
           child: Center(
             child: Text(
               _priorityLabel(priority),
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.paper,
               ),
             ),
           ),
@@ -406,11 +399,8 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
       child: Container(
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.08),
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.2),
-            width: 0.5,
-          ),
+          color: AppColors.paperAccentSoft,
+          border: Border.all(color: AppColors.inkQuaternary, width: 1),
         ),
       ),
     );

@@ -53,12 +53,13 @@ class _SubscriptionChapterLessonsState
           const SizedBox(height: AppSpacing.space3),
           usageHistoryAsync.when(
             data: (usages) => _buildSessionList(usages),
-            loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.space4),
-                child: CircularProgressIndicator(),
-              ),
-            ),
+            loading:
+                () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
             error: (_, __) => _buildEmptyState(),
           ),
         ],
@@ -74,14 +75,11 @@ class _SubscriptionChapterLessonsState
     final remaining = widget.subscription.remainingLessons ?? 0;
     final total = widget.subscription.totalLessonsForDisplay ?? 0;
     final used = widget.subscription.usedLessons;
-    final statusColor =
-        SubscriptionStatusColors.getColor(widget.subscription);
+    final statusColor = SubscriptionStatusColors.getColor(widget.subscription);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.08),
-      ),
+      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.08)),
       child: Column(
         children: [
           Row(
@@ -104,7 +102,6 @@ class _SubscriptionChapterLessonsState
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            
             child: LinearProgressIndicator(
               value: total > 0 ? used / total : 0,
               minHeight: 8,
@@ -122,17 +119,15 @@ class _SubscriptionChapterLessonsState
   // ═══════════════════════════════════════════════════════════════
 
   Widget _buildGuideMessage() {
-    final isPackage =
-        widget.subscription.type == SubscriptionType.package;
-    final message = isPackage
-        ? AppStrings.packageGuideMessage
-        : AppStrings.monthlyGuideMessage;
+    final isPackage = widget.subscription.type == SubscriptionType.package;
+    final message =
+        isPackage
+            ? AppStrings.packageGuideMessage
+            : AppStrings.monthlyGuideMessage;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.06),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.06)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -159,8 +154,7 @@ class _SubscriptionChapterLessonsState
     final total = widget.subscription.totalLessonsForDisplay ?? 0;
     if (total == 0) return _buildEmptyState();
 
-    final isPackage =
-        widget.subscription.type == SubscriptionType.package;
+    final isPackage = widget.subscription.type == SubscriptionType.package;
     final completedUsages =
         usages.where((u) => u.usageType == UsageType.normal).toList();
     final completedCount = completedUsages.length;
@@ -174,8 +168,9 @@ class _SubscriptionChapterLessonsState
     );
 
     // Determine the "current" session index (first non-completed)
-    final currentIndex =
-        sessions.indexWhere((s) => s.status != _SessionStatus.completed);
+    final currentIndex = sessions.indexWhere(
+      (s) => s.status != _SessionStatus.completed,
+    );
     final effectiveCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
 
     // Auto-expand current session on first build
@@ -199,8 +194,7 @@ class _SubscriptionChapterLessonsState
         for (final session in windowSessions)
           _buildSessionTile(
             session: session,
-            isLast: session == windowSessions.last &&
-                remainingSessions.isEmpty,
+            isLast: session == windowSessions.last && remainingSessions.isEmpty,
           ),
 
         // Collapsed remaining sessions
@@ -229,39 +223,45 @@ class _SubscriptionChapterLessonsState
     // Completed sessions
     for (int i = 0; i < completedCount; i++) {
       final usage = completedUsages[i];
-      sessions.add(_SessionModel(
-        sessionNumber: i + 1,
-        status: _SessionStatus.completed,
-        dateTime: usage.usedAt,
-        teacherName: usage.teacherName,
-        usage: usage,
-      ));
+      sessions.add(
+        _SessionModel(
+          sessionNumber: i + 1,
+          status: _SessionStatus.completed,
+          dateTime: usage.usedAt,
+          teacherName: usage.teacherName,
+          usage: usage,
+        ),
+      );
     }
 
     if (isPackage) {
       // Package: next session = "예약 필요"
       if (completedCount < total) {
-        sessions.add(_SessionModel(
-          sessionNumber: completedCount + 1,
-          status: _SessionStatus.bookingRequired,
-        ));
+        sessions.add(
+          _SessionModel(
+            sessionNumber: completedCount + 1,
+            status: _SessionStatus.bookingRequired,
+          ),
+        );
       }
       // Remaining package sessions (no date, just placeholders)
       for (int i = completedCount + 1; i < total; i++) {
-        sessions.add(_SessionModel(
-          sessionNumber: i + 1,
-          status: _SessionStatus.pending,
-        ));
+        sessions.add(
+          _SessionModel(sessionNumber: i + 1, status: _SessionStatus.pending),
+        );
       }
     } else {
       // Monthly: all remaining sessions are scheduled
       for (int i = completedCount; i < total; i++) {
-        sessions.add(_SessionModel(
-          sessionNumber: i + 1,
-          status: i == completedCount
-              ? _SessionStatus.scheduled
-              : _SessionStatus.upcoming,
-        ));
+        sessions.add(
+          _SessionModel(
+            sessionNumber: i + 1,
+            status:
+                i == completedCount
+                    ? _SessionStatus.scheduled
+                    : _SessionStatus.upcoming,
+          ),
+        );
       }
     }
 
@@ -294,8 +294,7 @@ class _SubscriptionChapterLessonsState
     required List<_SessionModel> sessions,
     required List<_SessionModel> windowSessions,
   }) {
-    final windowNumbers =
-        windowSessions.map((s) => s.sessionNumber).toSet();
+    final windowNumbers = windowSessions.map((s) => s.sessionNumber).toSet();
     return sessions
         .where((s) => !windowNumbers.contains(s.sessionNumber))
         .toList();
@@ -331,7 +330,8 @@ class _SubscriptionChapterLessonsState
   }) {
     final icon = _iconForStatus(session.status);
     final iconColor = _iconColorForStatus(session.status);
-    final isCurrent = session.status == _SessionStatus.scheduled ||
+    final isCurrent =
+        session.status == _SessionStatus.scheduled ||
         session.status == _SessionStatus.bookingRequired;
 
     return GestureDetector(
@@ -372,14 +372,13 @@ class _SubscriptionChapterLessonsState
                 horizontal: AppSpacing.space3,
                 vertical: isCurrent ? AppSpacing.space2 : 4,
               ),
-              decoration: isCurrent
-                  ? BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.06),
-                      border: Border.all(
-                        color: AppColors.paperAccent.withValues(alpha: 0.2),
-                      ),
-                    )
-                  : null,
+              decoration:
+                  isCurrent
+                      ? BoxDecoration(
+                        color: AppColors.paperAccentSoft,
+                        border: Border.all(color: AppColors.paperAccent),
+                      )
+                      : null,
               child: Row(
                 children: [
                   Expanded(
@@ -430,10 +429,7 @@ class _SubscriptionChapterLessonsState
     required bool isLast,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 36,
-        bottom: AppSpacing.space3,
-      ),
+      padding: const EdgeInsets.only(left: 36, bottom: AppSpacing.space3),
       child: Consumer(
         builder: (context, ref, _) {
           final eventsAsync = ref.watch(
@@ -450,14 +446,15 @@ class _SubscriptionChapterLessonsState
               }
               return _buildEventBubbles(events);
             },
-            loading: () => const Padding(
-              padding: EdgeInsets.all(AppSpacing.space2),
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
+            loading:
+                () => const Padding(
+                  padding: EdgeInsets.all(AppSpacing.space2),
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
             error: (_, __) => _buildEmptyEventArea(),
           );
         },
@@ -471,14 +468,10 @@ class _SubscriptionChapterLessonsState
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Text(
         AppStrings.noChangeHistory,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkTertiary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }
@@ -486,42 +479,46 @@ class _SubscriptionChapterLessonsState
   /// Render events as chat bubbles: student left, teacher right.
   Widget _buildEventBubbles(List<dynamic> events) {
     return Column(
-      children: events.map<Widget>((event) {
-        // Chat bubble rendering — follows RequestHistoryChat pattern.
-        // actorType determines alignment: student=left, teacher=right.
-        final isTeacher = event.actorType?.name == 'teacher';
+      children:
+          events.map<Widget>((event) {
+            // Chat bubble rendering — follows RequestHistoryChat pattern.
+            // actorType determines alignment: student=left, teacher=right.
+            final isTeacher = event.actorType?.name == 'teacher';
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-          child: Align(
-            alignment:
-                isTeacher ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 240),
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: isTeacher
-                    ? AppColors.paperAccent.withValues(alpha: 0.08)
-                    : AppColors.paperDark,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(AppSpacing.radiusLarge),
-                  topRight: const Radius.circular(AppSpacing.radiusLarge),
-                  bottomLeft: Radius.circular(
-                      isTeacher ? AppSpacing.radiusLarge : 4),
-                  bottomRight: Radius.circular(
-                      isTeacher ? 4 : AppSpacing.radiusLarge),
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: Align(
+                alignment:
+                    isTeacher ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 240),
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color:
+                        isTeacher
+                            ? AppColors.paperAccentSoft
+                            : AppColors.paperDark,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(AppSpacing.radiusLarge),
+                      topRight: const Radius.circular(AppSpacing.radiusLarge),
+                      bottomLeft: Radius.circular(
+                        isTeacher ? AppSpacing.radiusLarge : 4,
+                      ),
+                      bottomRight: Radius.circular(
+                        isTeacher ? 4 : AppSpacing.radiusLarge,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    event.message ?? event.chatDisplayMessage ?? '',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.ink,
+                    ),
+                  ),
                 ),
               ),
-              child: Text(
-                event.message ?? event.chatDisplayMessage ?? '',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.ink,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
     );
   }
 
@@ -540,11 +537,14 @@ class _SubscriptionChapterLessonsState
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
         child: Row(
           children: [
-            const SizedBox(width: 24, child: Icon(
-              Icons.more_horiz,
-              size: 20,
-              color: AppColors.inkTertiary,
-            )),
+            const SizedBox(
+              width: 24,
+              child: Icon(
+                Icons.more_horiz,
+                size: 20,
+                color: AppColors.inkTertiary,
+              ),
+            ),
             const SizedBox(width: AppSpacing.space3),
             Text(
               '${AppStrings.moreSessionsLabel(first, last)} (${AppStrings.showMore})',
@@ -569,11 +569,7 @@ class _SubscriptionChapterLessonsState
         padding: const EdgeInsets.all(AppSpacing.space6),
         child: Column(
           children: [
-            Icon(
-              Icons.music_note,
-              size: 40,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.music_note, size: 40, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space2),
             Text(
               AppStrings.noLessonRecords,
@@ -594,9 +590,10 @@ class _SubscriptionChapterLessonsState
   String _titleForSession(_SessionModel session) {
     switch (session.status) {
       case _SessionStatus.completed:
-        final dateLabel = session.dateTime != null
-            ? formatDateMDWithDay(session.dateTime!)
-            : '';
+        final dateLabel =
+            session.dateTime != null
+                ? formatDateMDWithDay(session.dateTime!)
+                : '';
         return AppStrings.sessionCompleted(session.sessionNumber, dateLabel);
       case _SessionStatus.scheduled:
         return AppStrings.sessionScheduled(session.sessionNumber);
@@ -652,13 +649,7 @@ class _SubscriptionChapterLessonsState
 // Internal Models
 // ═══════════════════════════════════════════════════════════════
 
-enum _SessionStatus {
-  completed,
-  scheduled,
-  upcoming,
-  bookingRequired,
-  pending,
-}
+enum _SessionStatus { completed, scheduled, upcoming, bookingRequired, pending }
 
 class _SessionModel {
   final int sessionNumber;

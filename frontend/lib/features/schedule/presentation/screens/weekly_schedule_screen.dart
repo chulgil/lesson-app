@@ -170,7 +170,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: BoxDecoration(color: AppColors.paper),
               child: Row(
                 children: [
                   Icon(
@@ -257,7 +257,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
