@@ -5,7 +5,6 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 
@@ -70,9 +69,10 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           // Bubble content
           Flexible(
             child: Column(
-              crossAxisAlignment: isMyMessage
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isMyMessage
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
               children: [
                 // Actor name (only for opponent bubbles)
                 if (!isMyMessage)
@@ -94,16 +94,19 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 260),
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: isMyMessage
-                        ? AppColors.paperAccent.withValues(alpha: 0.08)
-                        : AppColors.paperDark,
+                    color:
+                        isMyMessage
+                            ? AppColors.paperAccent.withValues(alpha: 0.08)
+                            : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
                       topRight: const Radius.circular(AppSpacing.radiusLarge),
                       bottomLeft: Radius.circular(
-                          isMyMessage ? AppSpacing.radiusLarge : 4),
+                        isMyMessage ? AppSpacing.radiusLarge : 4,
+                      ),
                       bottomRight: Radius.circular(
-                          isMyMessage ? 4 : AppSpacing.radiusLarge),
+                        isMyMessage ? 4 : AppSpacing.radiusLarge,
+                      ),
                     ),
                   ),
                   child: _buildBubbleContent(),
@@ -125,9 +128,8 @@ class ScheduleChangeEventBubble extends StatelessWidget {
 
   /// Whether this event's actor matches the viewer role.
   bool _isMyMessage() {
-    final actorRole = event.actorType == ProposerRole.teacher
-        ? 'teacher'
-        : 'student';
+    final actorRole =
+        event.actorType == ProposerRole.teacher ? 'teacher' : 'student';
     return actorRole == viewerRole;
   }
 
@@ -143,8 +145,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   Widget _buildBubbleContent() {
     return switch (event.eventType) {
       RequestEventType.scheduleChangeProposed ||
-      RequestEventType.scheduleChangeCountered =>
-        _buildProposedContent(),
+      RequestEventType.scheduleChangeCountered => _buildProposedContent(),
       RequestEventType.scheduleChangeAccepted => _buildAcceptedContent(),
       RequestEventType.scheduleChangeRejected => _buildRejectedContent(),
       // scheduleChanged is used as "requested" in this context
@@ -203,21 +204,19 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   Widget _buildProposedContent() {
     final isCounter =
         event.eventType == RequestEventType.scheduleChangeCountered;
-    final isBulk =
-        event.scheduleChangeType == ScheduleChangeType.bulkChange;
+    final isBulk = event.scheduleChangeType == ScheduleChangeType.bulkChange;
 
     // Header text
     final String headerText;
     if (isCounter) {
       headerText = AppStrings.counterProposed;
-    } else if (isBulk &&
-        bulkFromSession != null &&
-        bulkToSession != null) {
-      headerText =
-          AppStrings.bulkChangeProposed(bulkFromSession!, bulkToSession!);
+    } else if (isBulk && bulkFromSession != null && bulkToSession != null) {
+      headerText = AppStrings.bulkChangeProposed(
+        bulkFromSession!,
+        bulkToSession!,
+      );
     } else {
-      headerText =
-          AppStrings.sessionChangeProposed(event.sessionNumber ?? 0);
+      headerText = AppStrings.sessionChangeProposed(event.sessionNumber ?? 0);
     }
 
     return Column(
@@ -349,10 +348,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border.all(
-          color: AppColors.inkQuaternary,
-          width: 0.5,
-        ),
+        border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,16 +364,18 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: i == 0
-                        ? AppColors.paperAccent.withValues(alpha: 0.12)
-                        : AppColors.scheduleMutedBackground,
+                    color:
+                        i == 0
+                            ? AppColors.paperAccent.withValues(alpha: 0.12)
+                            : AppColors.scheduleMutedBackground,
                   ),
                   child: Text(
                     AppStrings.slotPriority(i + 1),
                     style: AppTypography.caption.copyWith(
-                      color: i == 0
-                          ? AppColors.paperAccent
-                          : AppColors.inkSecondary,
+                      color:
+                          i == 0
+                              ? AppColors.paperAccent
+                              : AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -402,18 +400,14 @@ class ScheduleChangeEventBubble extends StatelessWidget {
 
   /// Render bulk change slot card: "매주 [day] [time]".
   Widget _buildBulkSlotCard() {
-    final dayLabel =
-        LessonScheduleChange.dayOfWeekLabel(event.proposedDayOfWeek!);
+    final dayLabel = dayOfWeekLabel(event.proposedDayOfWeek!);
     final time = event.proposedTime!;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border.all(
-          color: AppColors.inkQuaternary,
-          width: 0.5,
-        ),
+        border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
       ),
       child: Text(
         AppStrings.fixedScheduleLabel('$dayLabel $time'),
@@ -442,9 +436,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   Widget _buildTimestamp(DateTime time) {
     return Text(
       formatTimeAMPM(time),
-      style: AppTypography.caption.copyWith(
-        color: AppColors.inkTertiary,
-      ),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
     );
   }
 }

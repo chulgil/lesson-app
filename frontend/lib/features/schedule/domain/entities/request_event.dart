@@ -2,10 +2,43 @@ import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import 'lesson_schedule_change.dart';
 import 'unified_lesson_request.dart';
 
 part 'request_event.g.dart';
+
+/// 스케줄 변경 유형 (1회성 vs 일괄).
+///
+/// 원래 LessonScheduleChange 엔티티에 있었으나 RequestEvent SSOT 정렬을 위해
+/// 이쪽으로 이동 (Phase 2, 2026-04-28). LessonScheduleChange 엔티티 자체는
+/// 미사용 dead code 로 제거됨. typeId는 90 → 132 로 재할당:
+/// (1) typeId 90은 teacher_student_relation 과 충돌이었음 (둘 다 미등록 상태)
+/// (2) RequestEvent 시리즈(130/131) 옆 132 가 도메인 응집성 측면 일관됨.
+@HiveType(typeId: 132)
+enum ScheduleChangeType {
+  @HiveField(0)
+  singleLesson, // 1회성 변경 (이번 주만)
+
+  @HiveField(1)
+  bulkChange; // 일괄 변경 (앞으로 모든 레슨)
+
+  String get label {
+    switch (this) {
+      case ScheduleChangeType.singleLesson:
+        return '이번 주만';
+      case ScheduleChangeType.bulkChange:
+        return '앞으로 모두';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case ScheduleChangeType.singleLesson:
+        return '이번 주 레슨만 시간을 변경합니다';
+      case ScheduleChangeType.bulkChange:
+        return '앞으로 모든 레슨 시간을 변경합니다';
+    }
+  }
+}
 
 /// Type of event in a lesson request lifecycle (chat history).
 @HiveType(typeId: 130)
@@ -154,11 +187,11 @@ enum RequestEventType {
   }
 
   bool get isTerminal => [
-        RequestEventType.cancel,
-        RequestEventType.expire,
-        RequestEventType.subscriptionCompleted,
-        RequestEventType.reject,
-      ].contains(this);
+    RequestEventType.cancel,
+    RequestEventType.expire,
+    RequestEventType.subscriptionCompleted,
+    RequestEventType.reject,
+  ].contains(this);
 }
 
 /// A single event in a lesson request's history.

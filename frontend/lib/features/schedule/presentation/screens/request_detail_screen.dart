@@ -13,7 +13,6 @@ import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
-import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
@@ -355,9 +354,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         final student = studentAsync.valueOrNull;
 
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.paper,
-          ),
+          decoration: const BoxDecoration(color: AppColors.paper),
           padding: EdgeInsets.fromLTRB(
             0,
             AppSpacing.space3,

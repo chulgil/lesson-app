@@ -313,7 +313,7 @@ booked -> available (취소)
 
 ### 3.4 정기 레슨 시간 변경 (Rescheduling)
 
-정기 레슨의 시간을 변경하는 플로우. `LessonScheduleChange` 엔티티로 관리.
+정기 레슨의 시간을 변경하는 플로우. `RequestEvent` (chat history) 로 관리.
 
 **변경 유형:**
 
@@ -322,22 +322,23 @@ booked -> available (취소)
 | 1회성 변경 | `singleLesson` | 이번 주만 시간 변경 |
 | 일괄 변경 | `bulkChange` | 앞으로 모든 레슨 시간 변경 |
 
-**변경 요청 상태:**
+**변경 요청 상태** (Phase 2 이후 — `RequestEventType` 으로 통합, 2026-04-28):
 
-| 상태 | `ScheduleChangeStatus` | 설명 |
-|------|----------------------|------|
-| 대기 중 | `pending` | 요청 접수 |
-| 승인됨 | `approved` | 변경 확정 |
-| 거절됨 | `rejected` | 변경 불가 |
-| 대안 제시 | `alternativeProposed` | 선생님이 대안 시간 제시 |
-| 취소됨 | `cancelled` | 요청 취소 |
+| 상태 | `RequestEventType` | 설명 |
+|------|---------------------|------|
+| 대기 중 | `scheduleChangeProposed` | 요청 접수 |
+| 승인됨 | `scheduleChangeAccepted` | 변경 확정 |
+| 거절됨 | `scheduleChangeRejected` | 변경 불가 |
+| 대안 제시 | `scheduleChangeCountered` | 선생님이 대안 시간 제시 |
+| 취소됨 | `cancel` | 요청 취소 |
 
-**변경 요청 속성:**
-- `previousDayOfWeek` / `previousTime`: 기존 스케줄
-- `newDayOfWeek` / `newTime`: 새 스케줄
-- `effectiveFrom`: 적용 시작일
-- `requestedBy`: 요청자 (student 또는 teacher)
-- `alternativeTimes`: 대안 시간 목록 (대안 제시 시)
+**변경 요청 속성** (`RequestEvent`):
+- `scheduleChangeType`: 변경 유형 (singleLesson / bulkChange)
+- `proposedDayOfWeek` / `proposedTime`: 제안된 새 스케줄 (bulkChange 시)
+- `suggestedSlots`: 제안 시간 목록 (singleLesson / 대안 제시 시)
+- `actorId` + `actorType`: 요청자
+- `createdAt`: 요청 시각
+- `subscriptionId` + `sessionNumber`: 어떤 수강권의 몇 번째 회차인지
 
 ### 3.5 동시성 처리
 
@@ -1046,9 +1047,9 @@ ScheduleTab에서 토글로 전환하는 3가지 뷰 모드:
 | 87 | MakeupLesson |
 | 88 | NoShowPolicy (enum, 독립 정책) |
 | 89 | NoShowRecord |
-| 90 | ScheduleChangeType (enum) |
-| 91 | ScheduleChangeStatus (enum) |
-| 92 | LessonScheduleChange |
+| 90 | ~~ScheduleChangeType (enum)~~ → 132로 이전 (Phase 2, 2026-04-28) |
+| 91 | ~~ScheduleChangeStatus (enum)~~ → 제거 (dead, 2026-04-28) |
+| 92 | ~~LessonScheduleChange~~ → 제거 (dead, 2026-04-28) |
 | 98 | PreferredStartTiming (enum) |
 | 99 | LessonRequestStatus (enum) |
 | 100 | ScheduleCardType (enum) / LessonRequest (충돌 주의) |
@@ -1184,26 +1185,21 @@ enum GroupClassType {
 
 > 코드 위치: `features/schedule/domain/entities/group_class.dart`
 
-### 10.9 ScheduleChangeType (2개 값) / ScheduleChangeStatus (5개 값)
+### 10.9 ScheduleChangeType (2개 값)
 
 ```dart
-@HiveType(typeId: 90)
+@HiveType(typeId: 132)
 enum ScheduleChangeType {
   singleLesson,   // 1회성 변경 (이번 주만)
   bulkChange,      // 일괄 변경 (앞으로 모든 레슨)
 }
-
-@HiveType(typeId: 91)
-enum ScheduleChangeStatus {
-  pending,                // 대기 중
-  approved,               // 승인됨
-  rejected,               // 거절됨
-  alternativeProposed,    // 대안 제시됨
-  cancelled,              // 취소됨
-}
 ```
 
-> 코드 위치: `features/schedule/domain/entities/lesson_schedule_change.dart`
+> 코드 위치: `features/schedule/domain/entities/request_event.dart` (Phase 2, 2026-04-28)
+>
+> - `ScheduleChangeStatus` (구 typeId 91) — 협상 상태가 `RequestEventType` 으로 통합되어 제거됨
+> - `LessonScheduleChange` 엔티티 (구 typeId 92) — `RequestEvent` 가 chat history 로 대체하여 제거됨
+> - `dayOfWeekLabel(int)` 헬퍼 — `core/utils/date_format_utils.dart` 로 이동
 
 ### 10.10 NoShowPolicy (4개 값)
 
@@ -1298,7 +1294,7 @@ enum ScheduleCardStatus {
 | GroupClassBooking | `features/schedule/domain/entities/group_class_booking.dart` |
 | MakeupLesson | `features/schedule/domain/entities/makeup_lesson.dart` |
 | NoShowPolicy / NoShowRecord | `features/schedule/domain/entities/no_show_policy.dart` |
-| LessonScheduleChange | `features/schedule/domain/entities/lesson_schedule_change.dart` |
+| ~~LessonScheduleChange~~ | ~~`features/schedule/domain/entities/lesson_schedule_change.dart`~~ → 제거 (Phase 2, 2026-04-28). `RequestEvent` 가 대체. |
 | LessonRequest | `features/schedule/domain/entities/lesson_request.dart` |
 | ScheduleConfirmationCard | `features/schedule/domain/entities/schedule_confirmation_card.dart` |
 | TimeSlot | `features/schedule/domain/entities/time_slot.dart` |
@@ -1433,7 +1429,7 @@ enum ScheduleCardStatus {
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
-| LessonScheduleChange 엔티티 | 완료 | `domain/entities/lesson_schedule_change.dart` |
+| ~~LessonScheduleChange 엔티티~~ | 제거 (Phase 2, 2026-04-28) | `RequestEvent` 가 chat history 로 대체. `ScheduleChangeType` 만 `request_event.dart` 로 이전 |
 | MakeupLesson 엔티티 | 완료 | `domain/entities/makeup_lesson.dart` |
 | NoShowPolicy / NoShowRecord 엔티티 | 완료 | `domain/entities/no_show_policy.dart` |
 

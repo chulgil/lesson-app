@@ -5,8 +5,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/chapter_guide_box.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
-import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import 'proposal_chat_card.dart';
@@ -345,7 +345,7 @@ class RequestHistoryChat extends StatelessWidget {
             event.proposedTime != null) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '${LessonScheduleChange.dayOfWeekLabel(event.proposedDayOfWeek!)} ${event.proposedTime}',
+            '${dayOfWeekLabel(event.proposedDayOfWeek!)} ${event.proposedTime}',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,

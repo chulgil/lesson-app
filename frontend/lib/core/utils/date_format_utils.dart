@@ -56,6 +56,14 @@ String formatWeekdayShort(DateTime date) {
   return dayNames[date.weekday];
 }
 
+/// Format day-of-week index (0=월, 6=일) as full Korean label (e.g., '월요일')
+/// Returns empty string for out-of-range values.
+String dayOfWeekLabel(int day) {
+  const days = ['월', '화', '수', '목', '금', '토', '일'];
+  if (day < 0 || day > 6) return '';
+  return '${days[day]}요일';
+}
+
 /// Format date as M/d (e.g., 4/5)
 String formatDateMD(DateTime date) {
   return '${date.month}/${date.day}';

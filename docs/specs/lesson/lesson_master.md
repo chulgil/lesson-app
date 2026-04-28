@@ -1102,8 +1102,8 @@ enum LessonType {
 | NoShowRecord | `features/schedule/domain/entities/no_show_policy.dart` |
 | MakeupLesson | `features/schedule/domain/entities/makeup_lesson.dart` |
 | MakeupStatus / MakeupReason | `features/schedule/domain/entities/makeup_lesson.dart` |
-| LessonScheduleChange | `features/schedule/domain/entities/lesson_schedule_change.dart` |
-| ScheduleChangeType / Status | `features/schedule/domain/entities/lesson_schedule_change.dart` |
+| ~~LessonScheduleChange~~ | ~~`lesson_schedule_change.dart`~~ → 제거 (Phase 2, 2026-04-28). `RequestEvent` 가 chat history 로 대체. |
+| ScheduleChangeType | `features/schedule/domain/entities/request_event.dart` (구 `lesson_schedule_change.dart`, Phase 2 이동) |
 | GroupClass | `features/schedule/domain/entities/group_class.dart` |
 | GroupClassSchedule | `features/schedule/domain/entities/group_class_schedule.dart` |
 | GroupClassBooking | `features/schedule/domain/entities/group_class_booking.dart` |
@@ -1191,7 +1191,7 @@ frontend/lib/features/schedule/
 │   ├── group_class.dart / group_class_schedule.dart / group_class_booking.dart
 │   ├── makeup_lesson.dart
 │   ├── no_show_policy.dart
-│   ├── lesson_schedule_change.dart
+│   ├── request_event.dart  # ScheduleChangeType 포함 (Phase 2 통합)
 │   ├── lesson_request.dart
 │   └── schedule_confirmation_card.dart
 ├── domain/repositories/
@@ -1247,7 +1247,7 @@ frontend/lib/features/schedule/
 | **3자 관계 (학원)** | 설계 완료 | 10% | LessonClass 엔티티 설계만 |
 | **앱 전환 플로우** | 부분 구현 | 70% | "결제 완료로 발급" 옵션 보완 필요 |
 | **이전 선생님 재연결** | 부분 구현 | 40% | 기본 플로우 구현, 알림/스케줄 복원 작업 중 |
-| **정기 시간 일괄 변경** | 설계 완료 | 20% | LessonScheduleChange 엔티티 존재 |
+| **정기 시간 일괄 변경** | 설계 완료 | 20% | `RequestEvent` (chat history) 로 통합. Phase 2, 2026-04-28. |
 | **스케줄 확인 카드** | 설계 완료 | 50% | ScheduleConfirmationCard 엔티티 172줄 완전 구현 (3-옵션 제안, 재등록/신규 분기, `formattedOptions`/`getOption(index)` 포함). UI 노출·라우팅 검증 필요 |
 | **FCM 푸시 알림** | 부분 구현 | 40% | 인프라 완성 (`firebase_messaging:15.2.4` 의존성, `main.dart` 백그라운드 핸들러 초기화, `FcmService.initialize()` 완성, foregroundMessage 스트림). 화면 통합·알림 UI 미구현 |
 | **백엔드 API** | 개발 중 | 20% | FastAPI 기본 구조 |

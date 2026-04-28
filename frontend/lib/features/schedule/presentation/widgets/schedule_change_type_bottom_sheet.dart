@@ -6,7 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../domain/entities/lesson_schedule_change.dart';
+import '../../domain/entities/request_event.dart';
 
 /// Shows a bottom sheet to choose between single lesson or bulk schedule change.
 /// Returns [ScheduleChangeType] or null if cancelled.
@@ -18,8 +18,7 @@ Future<ScheduleChangeType?> showScheduleChangeTypeBottomSheet(
     isScrollControlled: true,
     backgroundColor: AppColors.paperDark,
     barrierColor: AppColors.ink.withValues(alpha: 0.3),
-    shape: const RoundedRectangleBorder(
-    ),
+    shape: const RoundedRectangleBorder(),
     builder: (context) => const _ScheduleChangeTypeBottomSheet(),
   );
 }

@@ -79,6 +79,45 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
           typeId == other.typeId;
 }
 
+class ScheduleChangeTypeAdapter extends TypeAdapter<ScheduleChangeType> {
+  @override
+  final int typeId = 132;
+
+  @override
+  ScheduleChangeType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ScheduleChangeType.singleLesson;
+      case 1:
+        return ScheduleChangeType.bulkChange;
+      default:
+        return ScheduleChangeType.singleLesson;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ScheduleChangeType obj) {
+    switch (obj) {
+      case ScheduleChangeType.singleLesson:
+        writer.writeByte(0);
+        break;
+      case ScheduleChangeType.bulkChange:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ScheduleChangeTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
   @override
   final int typeId = 130;

@@ -7,7 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../schedule/domain/entities/lesson_schedule_change.dart';
+import '../../../schedule/domain/entities/request_event.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Result from the reschedule bottom sheet.

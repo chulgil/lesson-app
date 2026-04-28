@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../domain/entities/lesson_schedule_change.dart';
+import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../screens/suggest_alternative_screen.dart';
 
@@ -81,9 +81,7 @@ class _ScheduleChangeResponseBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -137,8 +135,7 @@ class _ScheduleChangeResponseBottomSheetState
                           AppSpacing.buttonHeightSmall,
                         ),
                         side: const BorderSide(color: AppColors.inkQuaternary),
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         AppStrings.scheduleChangeReject,
@@ -158,8 +155,7 @@ class _ScheduleChangeResponseBottomSheetState
                           AppSpacing.buttonHeightSmall,
                         ),
                         side: const BorderSide(color: AppColors.paperAccent),
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         AppStrings.scheduleChangeCounter,
@@ -179,8 +175,7 @@ class _ScheduleChangeResponseBottomSheetState
                           AppSpacing.buttonHeightSmall,
                         ),
                         backgroundColor: AppColors.paperAccent,
-                        shape: RoundedRectangleBorder(
-                        ),
+                        shape: RoundedRectangleBorder(),
                       ),
                       child: Text(
                         AppStrings.scheduleChangeAccept,

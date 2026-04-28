@@ -9,7 +9,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
-import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';

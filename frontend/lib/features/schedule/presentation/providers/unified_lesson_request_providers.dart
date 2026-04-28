@@ -3,7 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
 import '../../data/repositories/remote_unified_lesson_request_repository.dart';
-import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
@@ -12,38 +11,36 @@ part 'unified_lesson_request_providers.g.dart';
 
 /// Student name lookup — Mock only (Remote: fetch from API).
 /// Returns student name by studentId.
-final studentNameMapProvider = Provider<Map<String, String>>((ref) => {
-      'student_1': '김민준',
-      'student_2': '이서현',
-      'student_3': '박지호',
-      'student_4': '최수아',
-      'student_5': '정하은',
-    });
+final studentNameMapProvider = Provider<Map<String, String>>(
+  (ref) => {
+    'student_1': '김민준',
+    'student_2': '이서현',
+    'student_3': '박지호',
+    'student_4': '최수아',
+    'student_5': '정하은',
+  },
+);
 
 /// Teacher name lookup — Mock only (Remote: fetch from API).
 /// Returns teacher name by teacherId.
-final teacherNameMapProvider = Provider<Map<String, String>>((ref) => {
-      'teacher_1': '김선아',
-      'teacher_2': '박지영',
-      'teacher_3': '이현우',
-    });
+final teacherNameMapProvider = Provider<Map<String, String>>(
+  (ref) => {'teacher_1': '김선아', 'teacher_2': '박지영', 'teacher_3': '이현우'},
+);
 
 /// Academy name lookup — Mock only.
-final academyNameMapProvider = Provider<Map<String, String>>((ref) => {
-      'academy_1': '서울음악학원',
-      'academy_2': '강남아트스쿨',
-    });
+final academyNameMapProvider = Provider<Map<String, String>>(
+  (ref) => {'academy_1': '서울음악학원', 'academy_2': '강남아트스쿨'},
+);
 
 /// Repository provider — switches between Mock and Remote.
 final unifiedLessonRequestRepositoryProvider =
     Provider<UnifiedLessonRequestRepository>(
-  (ref) => createRepository<UnifiedLessonRequestRepository>(
-    ref: ref,
-    mock: () => MockUnifiedLessonRequestRepository(),
-    remote: (apiClient) =>
-        RemoteUnifiedLessonRequestRepository(apiClient),
-  ),
-);
+      (ref) => createRepository<UnifiedLessonRequestRepository>(
+        ref: ref,
+        mock: () => MockUnifiedLessonRequestRepository(),
+        remote: (apiClient) => RemoteUnifiedLessonRequestRepository(apiClient),
+      ),
+    );
 
 /// Get all unified lesson requests for a teacher
 @riverpod
@@ -119,18 +116,20 @@ Future<List<UnifiedLessonRequest>> todayRequests(
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
 
-  final filtered = all.where((r) {
-    if (r.status.isActive) return true;
-    if (r.status == UnifiedRequestStatus.completed && r.confirmedAt != null) {
-      final confirmedDate = DateTime(
-        r.confirmedAt!.year,
-        r.confirmedAt!.month,
-        r.confirmedAt!.day,
-      );
-      return confirmedDate == today;
-    }
-    return false;
-  }).toList();
+  final filtered =
+      all.where((r) {
+        if (r.status.isActive) return true;
+        if (r.status == UnifiedRequestStatus.completed &&
+            r.confirmedAt != null) {
+          final confirmedDate = DateTime(
+            r.confirmedAt!.year,
+            r.confirmedAt!.month,
+            r.confirmedAt!.day,
+          );
+          return confirmedDate == today;
+        }
+        return false;
+      }).toList();
 
   // Sort: pending first, then by createdAt desc
   filtered.sort((a, b) {
@@ -160,18 +159,20 @@ Future<List<UnifiedLessonRequest>> studentTodayRequests(
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
 
-  final filtered = all.where((r) {
-    if (r.status.isActive) return true;
-    if (r.status == UnifiedRequestStatus.completed && r.confirmedAt != null) {
-      final confirmedDate = DateTime(
-        r.confirmedAt!.year,
-        r.confirmedAt!.month,
-        r.confirmedAt!.day,
-      );
-      return confirmedDate == today;
-    }
-    return false;
-  }).toList();
+  final filtered =
+      all.where((r) {
+        if (r.status.isActive) return true;
+        if (r.status == UnifiedRequestStatus.completed &&
+            r.confirmedAt != null) {
+          final confirmedDate = DateTime(
+            r.confirmedAt!.year,
+            r.confirmedAt!.month,
+            r.confirmedAt!.day,
+          );
+          return confirmedDate == today;
+        }
+        return false;
+      }).toList();
 
   filtered.sort((a, b) {
     if (a.status == UnifiedRequestStatus.pending &&
@@ -205,26 +206,34 @@ class UnifiedLessonRequestActions {
     final result = await _repository.create(request);
 
     // Create initial request event
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: result.id,
-      actorType: ProposerRole.student,
-      actorId: request.studentId,
-      eventType: RequestEventType.initialRequest,
-      suggestedSlots: request.preferredSlots
-          .map((ps) => TimeSlotOption(
-                id: 'slot_${ps.priority}',
-                dayOfWeek: ps.dayOfWeek ?? 0,
-                startTime: ps.startTime,
-                endTime: ps.endTime,
-              ))
-          .toList(),
-      message: request.message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: result.id,
+        actorType: ProposerRole.student,
+        actorId: request.studentId,
+        eventType: RequestEventType.initialRequest,
+        suggestedSlots:
+            request.preferredSlots
+                .map(
+                  (ps) => TimeSlotOption(
+                    id: 'slot_${ps.priority}',
+                    dayOfWeek: ps.dayOfWeek ?? 0,
+                    startTime: ps.startTime,
+                    endTime: ps.endTime,
+                  ),
+                )
+                .toList(),
+        message: request.message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
-    _invalidateProviders(request.teacherId, request.studentId,
-        requestId: result.id);
+    _invalidateProviders(
+      request.teacherId,
+      request.studentId,
+      requestId: result.id,
+    );
     return result;
   }
 
@@ -239,16 +248,18 @@ class UnifiedLessonRequestActions {
   }) async {
     final result = await _repository.approve(requestId);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.approve,
-      selectedSlotIndex: selectedSlotIndex,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: selectedSlotIndex,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -264,16 +275,18 @@ class UnifiedLessonRequestActions {
   }) async {
     final result = await _repository.approve(requestId);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.acceptAlternative,
-      selectedSlotIndex: selectedSlotIndex,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.student,
+        actorId: studentId,
+        eventType: RequestEventType.acceptAlternative,
+        selectedSlotIndex: selectedSlotIndex,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -301,15 +314,17 @@ class UnifiedLessonRequestActions {
 
     final result = await _repository.withdrawApproval(requestId);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorRole == ProposerRole.teacher ? teacherId : studentId,
-      eventType: RequestEventType.withdrawApproval,
-      selectedSlotIndex: prevSlotIndex,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorRole == ProposerRole.teacher ? teacherId : studentId,
+        eventType: RequestEventType.withdrawApproval,
+        selectedSlotIndex: prevSlotIndex,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -324,15 +339,17 @@ class UnifiedLessonRequestActions {
   }) async {
     final result = await _repository.reject(requestId, reason: reason);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.reject,
-      message: reason,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.reject,
+        message: reason,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -409,14 +426,16 @@ class UnifiedLessonRequestActions {
     );
     final result = await _repository.update(updated);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.completed,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.completed,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -445,15 +464,17 @@ class UnifiedLessonRequestActions {
     );
     final result = await _repository.update(updated);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorType,
-      actorId: actorId,
-      eventType: RequestEventType.cancel,
-      message: reason,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorType,
+        actorId: actorId,
+        eventType: RequestEventType.cancel,
+        message: reason,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
@@ -504,15 +525,17 @@ class UnifiedLessonRequestActions {
       await _repository.update(updated);
     }
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.proposalSent,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.proposalSent,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -535,19 +558,22 @@ class UnifiedLessonRequestActions {
     }
 
     // Include selected template in event message for traceability
-    final eventMessage = selectedTemplateId != null
-        ? (message ?? '수강권을 수락했습니다 (템플릿: $selectedTemplateId)')
-        : message;
+    final eventMessage =
+        selectedTemplateId != null
+            ? (message ?? '수강권을 수락했습니다 (템플릿: $selectedTemplateId)')
+            : message;
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.proposalAccepted,
-      message: eventMessage,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.student,
+        actorId: studentId,
+        eventType: RequestEventType.proposalAccepted,
+        message: eventMessage,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -561,21 +587,21 @@ class UnifiedLessonRequestActions {
   }) async {
     final request = await _repository.getById(requestId);
     if (request != null) {
-      final updated = request.copyWith(
-        status: UnifiedRequestStatus.rejected,
-      );
+      final updated = request.copyWith(status: UnifiedRequestStatus.rejected);
       await _repository.update(updated);
     }
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.reject,
-      message: reason,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.student,
+        actorId: studentId,
+        eventType: RequestEventType.reject,
+        message: reason,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -596,15 +622,17 @@ class UnifiedLessonRequestActions {
       await _repository.update(updated);
     }
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.paymentNotified,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.student,
+        actorId: studentId,
+        eventType: RequestEventType.paymentNotified,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -626,17 +654,19 @@ class UnifiedLessonRequestActions {
       await _repository.update(updated);
     }
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.subscriptionIssued,
-      message: message ?? (paymentConfirmed
-          ? '수강권이 발행되었습니다'
-          : '수강권이 발행되었습니다 (후불)'),
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.subscriptionIssued,
+        message:
+            message ??
+            (paymentConfirmed ? '수강권이 발행되었습니다' : '수강권이 발행되었습니다 (후불)'),
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -654,21 +684,21 @@ class UnifiedLessonRequestActions {
     final request = await _repository.getById(requestId);
     if (request != null &&
         request.status == UnifiedRequestStatus.subscriptionIssued) {
-      final updated = request.copyWith(
-        status: UnifiedRequestStatus.inProgress,
-      );
+      final updated = request.copyWith(status: UnifiedRequestStatus.inProgress);
       await _repository.update(updated);
     }
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.lessonCompleted,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.lessonCompleted,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -682,15 +712,17 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.lessonCancelled,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.lessonCancelled,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -704,15 +736,17 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChanged,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChanged,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -724,15 +758,17 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.lessonNoteAdded,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.lessonNoteAdded,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -752,14 +788,16 @@ class UnifiedLessonRequestActions {
     );
     await _repository.update(updated);
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.subscriptionCompleted,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: ProposerRole.teacher,
+        actorId: teacherId,
+        eventType: RequestEventType.subscriptionCompleted,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -779,19 +817,21 @@ class UnifiedLessonRequestActions {
     String? proposedTime,
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChangeProposed,
-      scheduleChangeType: changeType,
-      suggestedSlots: suggestedSlots,
-      proposedDayOfWeek: proposedDayOfWeek,
-      proposedTime: proposedTime,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChangeProposed,
+        scheduleChangeType: changeType,
+        suggestedSlots: suggestedSlots,
+        proposedDayOfWeek: proposedDayOfWeek,
+        proposedTime: proposedTime,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -806,27 +846,31 @@ class UnifiedLessonRequestActions {
     int? selectedSlotIndex,
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChangeAccepted,
-      selectedSlotIndex: selectedSlotIndex,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChangeAccepted,
+        selectedSlotIndex: selectedSlotIndex,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     // Record final scheduleChanged event for timeline summary
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch + 1}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChanged,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch + 1}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChanged,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -840,15 +884,17 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChangeRejected,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChangeRejected,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -866,19 +912,21 @@ class UnifiedLessonRequestActions {
     String? proposedTime,
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.scheduleChangeCountered,
-      scheduleChangeType: changeType,
-      suggestedSlots: suggestedSlots,
-      proposedDayOfWeek: proposedDayOfWeek,
-      proposedTime: proposedTime,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.scheduleChangeCountered,
+        scheduleChangeType: changeType,
+        suggestedSlots: suggestedSlots,
+        proposedDayOfWeek: proposedDayOfWeek,
+        proposedTime: proposedTime,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
@@ -892,15 +940,17 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? message,
   }) async {
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: actorRole,
-      actorId: actorId,
-      eventType: RequestEventType.subscriptionRenewed,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
+    await _repository.addEvent(
+      RequestEvent(
+        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+        requestId: requestId,
+        actorType: actorRole,
+        actorId: actorId,
+        eventType: RequestEventType.subscriptionRenewed,
+        message: message,
+        createdAt: DateTime.now(),
+      ),
+    );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }

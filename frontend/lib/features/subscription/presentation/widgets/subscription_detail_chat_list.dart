@@ -9,7 +9,6 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
-import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 
 /// Scrollable chat-style list showing per-session schedule change events.
@@ -311,14 +310,10 @@ class _SessionSection extends ConsumerWidget {
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Text(
         AppStrings.noChangeHistory,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkTertiary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }
@@ -373,9 +368,7 @@ class _SessionSection extends ConsumerWidget {
     if (!isScheduleChange) {
       return Text(
         event.message ?? event.chatDisplayMessage,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.ink,
-        ),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
       );
     }
 
@@ -422,9 +415,7 @@ class _SessionSection extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             event.message!,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
           ),
         ],
       ],

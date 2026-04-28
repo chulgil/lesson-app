@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
@@ -13,12 +12,13 @@ import '../../domain/repositories/subscription_repository.dart';
 part 'subscription_providers.g.dart';
 
 /// Repository provider for Subscription - switches between Mock and Remote.
-final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) =>
-    createRepository<SubscriptionRepository>(
-      ref: ref,
-      mock: () => MockSubscriptionRepository(),
-      remote: (api) => RemoteSubscriptionRepository(api),
-    ));
+final subscriptionRepositoryProvider = Provider<SubscriptionRepository>(
+  (ref) => createRepository<SubscriptionRepository>(
+    ref: ref,
+    mock: () => MockSubscriptionRepository(),
+    remote: (api) => RemoteSubscriptionRepository(api),
+  ),
+);
 
 /// Get all subscriptions for a student.
 @riverpod
@@ -337,10 +337,12 @@ void addSubscriptionSessionEvent(
   _subscriptionSessionEventStore.putIfAbsent(key, () => []).add(event);
 
   // Invalidate provider to trigger UI refresh
-  ref.invalidate(subscriptionSessionEventsProvider(
-    subscriptionId: subscriptionId,
-    sessionNumber: sessionNumber,
-  ));
+  ref.invalidate(
+    subscriptionSessionEventsProvider(
+      subscriptionId: subscriptionId,
+      sessionNumber: sessionNumber,
+    ),
+  );
 }
 
 /// Get events for a specific subscription session.
