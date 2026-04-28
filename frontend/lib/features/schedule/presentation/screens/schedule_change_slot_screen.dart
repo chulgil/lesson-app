@@ -103,7 +103,9 @@ class _ScheduleChangeSlotScreenState
             child: lessonsAsync.when(
               data: (lessons) => _buildGrid(lessons),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('$e')),
+              error:
+                  (_, __) =>
+                      const Center(child: Text(AppStrings.cannotLoadData)),
             ),
           ),
           // Suggested slots list
@@ -333,10 +335,13 @@ class _ScheduleChangeSlotScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // CurrentRequestBox 와 시각 align — bodySmall style + enabledBorder 명시
+            // (RequestDetailScreen 메시지 입력과 hint/내용 글자 계열 통일).
             TextField(
               controller: _messageController,
               maxLines: 2,
               maxLength: 200,
+              style: AppTypography.bodySmall,
               decoration: InputDecoration(
                 hintText:
                     params.isBulkChange
@@ -348,7 +353,13 @@ class _ScheduleChangeSlotScreenState
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
-                contentPadding: const EdgeInsets.all(AppSpacing.space3),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2,
+                ),
                 counterText: '',
               ),
             ),

@@ -1,79 +1,144 @@
-# §7.127 Gaegu 손글씨 4계층 SSOT 정착 — 시스템 자동 뱃지 hand 해제
+# 추천 액션 순서 P0~P2 — 통합 plan
 
 > 작성일: 2026-04-28
-> 모드: `/plan` → `/auto` 10x Vision 모드 (사용자: "3번으로 진행 병렬처리 가능하면 병렬로 진행")
-> 사용자 결정: Phase 1~5 완전 적용 + 신규 advisory 훅 + Phase 6 별건 분리
+> 모드: `/plan --eng` + adaptive-quality **ultra** (스펙 정렬 + 마이그레이션 + 다중 화면 영향)
+> 사용자 결정: 추천 순서대로 진행 (P0→P1→P2)
 
-## 배경
+## 요구사항 재정의
 
-사용자 점검: "현재 디자인컨셉 notebook x score 가 되어있는데 일부만 폰트 필기체가 적용되어있는데 클래식 전공 선생님의 노트필기에 익숙해져있어 해당 디자인 컨셉의 폰트의 경우 필기체 적용 범위를 다시 검증해주세요. UX전문가 관점과 선생님관점에서".
+5개 우선순위 작업을 단계화해 진행:
 
-§7.107~§7.108 에서 시스템 자동 뱃지("오늘", "D-N", "미결제", "필수", "진행 중") 에 `handEmphasis` 적용. 그러나 클래식 노트북 메타포에서 자필은 **사람의 인격적 메시지** — 시스템 자동 데이터에 자필을 입히면 "가짜 자필" → 메타포 신뢰 훼손.
+| 우선순위 | 작업 | 핵심 변경 |
+|---|---|---|
+| **P0-1** | 스케쥴변경에 챕터 모델 적용 | `ScheduleChangeSlotScreen` 을 `RequestDetailScreen` 패턴(Masthead+ProgressBar+ChapterSummary+RequestHistoryChat+CurrentRequestBox) 으로 재구성 |
+| **P0-2** | ScheduleChangeType/Status dead enum 제거 | `RequestEvent.scheduleChangeType` SSOT 정착, 미사용 잔재 정리 |
+| **P1-1** | 스펙 동기화 — 가이드 2색, 확정카드, travel_time | `chat_guide_message_spec` ↔ 코드 매트릭스 정합 + travel_time §7 4 갭 케이스 패치 |
+| **P1-2** | 레슨신청 세부 수정 | AppBar 통일, Phase 2 액션박스 3경로 카드, 가이드 색상 분기 정합성 |
+| **P2** | i18n AppStrings 마이그레이션 | Phase 5-1h(booking_reschedule) → 5-1i → 5-2 lessons → 5-3 subscription |
 
-## UX 분석 — 4계층 작성 주체
+## 핵심 발견 (탐색 결과)
 
-| Tier | 주체 | 종류 | 스타일 |
-|------|-----|------|--------|
-| Tier 1 | 사람 | 자필 본문 (≥1 줄) | `hand` |
-| Tier 2 | 사람 | 짧은 자필 강조 / 완료 체크 | `hand` / `handOk` |
-| Tier 3 | 시스템 | 안내문·온보딩 톤 (논쟁) | `hand` 또는 Pretendard |
-| Tier 4 | 시스템 | 자동 인디케이터·메타 라벨 | `indicatorLabel` (Pretendard italic) |
+- ✅ **공통 위젯 이미 존재**: `core/widgets/chapter_guide_box.dart`, `core/widgets/chapter_summary.dart`, `features/schedule/presentation/widgets/request_history_chat.dart` — 새 위젯 추출 불필요
+- ✅ **RequestEvent SSOT 이미 통합**: `RequestEvent.scheduleChangeType` 필드 존재 — dead enum 제거가 핵심
+- ✅ **spec 이미 작성됨**: `chat_guide_message_spec.md`, `schedule_confirmation_card_spec.md` — 코드 정합만
+- ❌ **travel_time §7 갭 4 케이스**: 부분 차단 / 반차 vacation / 차단경계 incoming travel / 차단직후 outgoing travel — 코드 미구현
 
-**의사결정 트리**: "이 텍스트의 작성 주체는 누구인가?" → 사람이면 자필, 시스템이면 인쇄체.
+## 아키텍처
 
-## Phase 1: README §1.1.1 4계층 SSOT 명시 ✅
+```
+P0-1 (재구성)  →  P0-2 (정리)  →  P1-1 (스펙+travel)  →  P1-2 (UI세부)  →  P2 (i18n)
+                                                                        ↑
+                                                            (Phase 5-1h 부터 이어서)
+```
 
-`docs/specs/design/notebook/README.md` 에 §1.1.1 절 신설:
-- 작성 주체별 4 Tier 표
-- Tier 4 회피 신호 (5종 키워드 패턴)
-- Tier 3 결정 가이드
-- 구현 토큰 매핑
+## P0-1 Phase 분해
 
-## Phase 2: 신규 토큰 `indicatorLabel` 도입 + Tier 4 위반 7지점 정정 ✅
+### Phase A — 분석 & 매핑 표
+- `ScheduleChangeSlotScreen` 현재 구조 라인별 매핑
+- `RequestDetailScreen` 의 챕터 패턴 (1410줄) 분해
+- 두 화면 공통 차이점 → 재구성 디프 plan
 
-`NotebookTypography.indicatorLabel` 신규 (Pretendard italic 11/700 paperAccent letterSpacing 0.8).
+### Phase B — 재구성 적용
+- AppBar → Masthead
+- Body 를 `CustomScrollView` 또는 `ListView` 로 chapterSummary + history + requestBox 순서로 재구성
+- 기존 AlternativeTimeGrid 흐름 보존 (제안 슬롯 선택 로직)
 
-7개 화면 `handEmphasis` → `indicatorLabel`:
-- `schedule_tab.dart` "오늘"
-- `student_lessons_tab.dart` "오늘"
-- `student_practice_tab.dart` "오늘"
-- `month_group_header.dart` "진행 중"
-- `parent_dashboard_tab.dart` "D-N" (`copyWith(color: paperOk)`) + "미결제"
-- `assignment_item.dart` "필수"
+### Phase C — Smoke Test + 회귀
+- `test/features/schedule/screens/schedule_change_slot_layout_test.dart` 추가 (BoxConstraints 크래시 방지)
+- `flutter analyze` 0 / `flutter test` 통과
+- 실기 확인 (학생 경로)
 
-## Phase 3: 레퍼토리 곡 메모 Tier 1 보완 ✅
+## P0-2 Phase 분해
 
-`repertoire_management_widgets.dart` `piece.notes` → `NotebookTypography.hand` (선생님 자필 곡 메모 의도).
+### Phase A — Dead Code grep
+- `ScheduleChangeStatus` 호출처 0 확인
+- `ScheduleChange` 구 엔티티 / `lib/models/` 잔재 확인
+- 의도적 예약 enum 은 `// ignore: unused-enum + 사유` 표기
 
-## Phase 4: handOk 활성화 — 검토 후 보류
+### Phase B — 제거
+- import / definition / mock 정리
+- HiveType 제거 시 마이그레이션 plan (사용자 데이터 영향 검증)
 
-handOk 토큰은 보존. 진정한 Tier 2 (선생님 자필 ✓) 사용처 현재 없음. "저장됨" 등은 시스템 자동 상태 → Tier 4. 자필 ✓ 마킹 UI 도입 시점에 활성화.
+### Phase C — 검증
+- analyze + test, code-review
 
-## Phase 5: Advisory 훅 신설 ✅
+## P1-1 Phase 분해
 
-`.claude/hooks/check-handwriting-tier.sh`:
-- Tier 4 키워드 (오늘/내일/D-N/미결제/필수/진행 중/대기/완료) 와 자필 스타일 (`hand*`/`Gaegu`) 동일 윈도우 ±10 라인 동시 출현 감지
-- stderr 경고 (exit 0 advisory)
-- `// ignore: handwriting-tier` 옵트아웃
-- `settings.json` 등록 + 자가 검증 (1 위반 케이스 감지, 7 정정 파일 false-positive 0)
+### Phase A — 스펙↔코드 정합
+- chat_guide_message_spec 11 상태 매트릭스 ↔ `_getPhaseGuide()` 일치
+- schedule_confirmation_card_spec 3타입 ↔ `schedule_confirmation_card_widget` 일치
 
-## Phase 6: Tier 3 안내문 톤 통일 — 별건 분리
+### Phase B — travel_time §7 4 케이스 패치
+- `_computeSlotsForDate`: `containsDate` → `containsDateTimeRange`
+- `_findConflictingSlot`: travelTime 포함
+- TimeException UI 부분 차단 시간 입력
+- unit test 4 케이스
 
-§1.1.1 Tier 3 결정 가이드를 SSOT 로 두고, 시간대 인사·온보딩·빈 상태 안내문 전수 점검은 §7.128 별건 후보로 보존. 일괄 인쇄체 전환은 "선생님 톤" 인격적 메시지 의도 손상 → Lore-rejected.
+### Phase C — 검증
 
-## 평가 결과
+## P1-2 Phase 분해
 
-| 기준 | 점수 | 근거 |
-|------|------|------|
-| 완성도 | 10/10 | Phase 1·2·3·5 완전 적용, Phase 4·6 의식적 보류·분리 |
-| 견고성 | 9/10 | flutter analyze 0, 신규 훅 자가 검증 (violation 1, false-positive 0) |
-| 일관성 | 9/10 | indicatorLabel 7지점 모두 동일 스타일 + copyWith 의미별 색만 변형 |
-| 간결성 | 9/10 | 신규 토큰 1, 신규 훅 1, README 1절 신설, 라인 변경 최소 |
-| **가중 평균** | **9.5** | **PASS** |
+### Phase A — AppBar 통일
+- `LessonRequestsScreen` / `RequestDetailScreen` / `SuggestAlternativeScreen` AppBar 패턴 매핑 → Masthead 정착
+
+### Phase B — Phase 2 3경로 카드
+- `current_request_box.dart::_buildTeacherPhase2 / _buildStudentPhase2` 의 3 경로 카드 시각 일관성
+
+### Phase C — 가이드 색상 2색 분기
+- `_getPhaseGuide()` 의 ChapterGuideVariant action/wait 두 값만 사용 확인 (5색 회피)
+
+## P2 진행 상황
+
+- 5-1a~5-1g 완료 (commits: df846fab, 1a290003, 1accb9d6, b1580850, 5f4d5c2a, b0c96b58, 37090589)
+- 5-1h booking_reschedule_screen 진입 예정 (~22 사이트)
+- 5-1i schedule_tab.dart + 작은 파일들
+- 5-2 lessons 도메인
+- 5-3 subscription 도메인
+
+## 평가 기준 (Rubric, 합격선 7.5)
+
+| 기준 | 가중 | 목표 |
+|---|---|---|
+| 완성도 | 40% | 8/10 — P0~P1 spec 갭 없음 |
+| 견고성 | 30% | 7/10 — 회귀 없음, smoke test |
+| 일관성 | 20% | 8/10 — 도메인 린터 통과, 공통 위젯 재사용 |
+| 간결성 | 10% | 7/10 — 800줄/50줄 룰 |
+
+## 리스크
+
+| 등급 | 리스크 | 완화 |
+|---|---|---|
+| HIGH | ScheduleChangeSlotScreen 재구성으로 학생 경로 깨짐 | smoke test + 실기 확인 |
+| HIGH | ScheduleChangeStatus 제거 시 Hive 마이그레이션 | grep 0 확인 후 제거, mock 검증 |
+| MEDIUM | travel_time 패치가 기존 슬롯 생성 회귀 | unit test 4 케이스 + 회귀 케이스 1 |
+| LOW | i18n 회귀 | Phase 5-1a~g 패턴 그대로 |
 
 ## 다음 단계
 
-| 작업 | 커맨드 |
-|------|--------|
-| 커밋·푸시·문서 동기화 | `/commit-push-pr` (이 작업의 마지막 단계) |
-| §7.128 Tier 3 안내문 별건 점검 | 향후 별 phase 로 분리 |
+| 작업 | 순서 |
+|---|---|
+| **즉시** P0-1 Phase A — 매핑 표 작성 | 진입 |
+| P0-1 Phase B — 재구성 + commit | 후속 |
+| P0-1 Phase C — smoke test + 회귀 | 후속 |
+| P0-2 진행 | P0-1 완료 후 |
+| P1, P2 | 순서대로 |
+
+> **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
+
+---
+
+## 이전 계획
+
+# 백엔드 API 구현 점검 (Audit Plan)
+
+> 작성일: 2026-04-28
+> 모드: `/plan --eng`
+> 사용자 결정: yes (전체 4 도메인 audit 진행)
+
+요구사항·범위·Phase 0~2 백엔드 audit 본문은 `docs/specs/backend/audit/2026-04-28/` 폴더와 git history (commit `60f48cef` 이전) 참조.
+
+---
+
+## 더 이전 계획
+
+§7.127 Gaegu 손글씨 4계층 SSOT 정착 — 시스템 자동 뱃지 hand 해제 (Phase 1·2·3·5 완전 적용, Phase 4·6 보류·분리, 가중 평균 9.5 PASS). 본문은 git history 참조.
