@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -55,16 +56,20 @@ class _RegisterRegularLessonScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('정규레슨 등록')),
+      appBar: AppBar(title: const Text(AppStrings.regularLessonTitle)),
       body: settingsAsync.when(
         data:
             (settings) => availabilityAsync.when(
               data: (slots) => _buildContent(settings, slots),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('시간 정보를 불러올 수 없습니다')),
+              error:
+                  (_, __) =>
+                      const Center(child: Text(AppStrings.timeInfoLoadError)),
             ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('설정 정보를 불러올 수 없습니다')),
+        error:
+            (_, __) =>
+                const Center(child: Text(AppStrings.settingsInfoLoadError)),
       ),
     );
   }
@@ -91,7 +96,10 @@ class _RegisterRegularLessonScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Schedule type
-          const RegularLessonSectionTitle('레슨 유형', romanIndex: 0),
+          const RegularLessonSectionTitle(
+            AppStrings.lessonTypeLabel,
+            romanIndex: 0,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ScheduleTypeSelector(
             selectedType: _scheduleType,
@@ -111,10 +119,15 @@ class _RegisterRegularLessonScreenState
           // Fixed time slot selection
           if (_scheduleType == ScheduleType.fixed) ...[
             // Lesson duration selection
-            const RegularLessonSectionTitle('레슨 시간', romanIndex: 1),
+            const RegularLessonSectionTitle(
+              AppStrings.lessonDurationLabel,
+              romanIndex: 1,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '선생님 기본 설정: ${LessonDurations.format(settings.defaultLessonDuration)}',
+              AppStrings.teacherDefaultDuration(
+                LessonDurations.format(settings.defaultLessonDuration),
+              ),
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -135,10 +148,13 @@ class _RegisterRegularLessonScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Day selection
-            const RegularLessonSectionTitle('요일 선택', romanIndex: 2),
+            const RegularLessonSectionTitle(
+              AppStrings.daySelectLabel,
+              romanIndex: 2,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '주 $_lessonsPerWeek회 레슨 - $_lessonsPerWeek개 요일을 선택하세요',
+              AppStrings.daySelectHint(_lessonsPerWeek),
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -169,7 +185,10 @@ class _RegisterRegularLessonScreenState
 
             // Time selection for each selected day
             if (_selectedDays.isNotEmpty) ...[
-              const RegularLessonSectionTitle('시간 선택', romanIndex: 3),
+              const RegularLessonSectionTitle(
+                AppStrings.timeSelectLabel,
+                romanIndex: 3,
+              ),
               const SizedBox(height: AppSpacing.space3),
               ..._selectedDays.map(
                 (day) => RegularLessonTimeSelector(
@@ -190,7 +209,10 @@ class _RegisterRegularLessonScreenState
           ],
 
           // Lessons per week
-          const RegularLessonSectionTitle('레슨 횟수', romanIndex: 4),
+          const RegularLessonSectionTitle(
+            AppStrings.lessonCountLabel,
+            romanIndex: 4,
+          ),
           const SizedBox(height: AppSpacing.space3),
           LessonsPerWeekSelector(
             lessonsPerWeek: _lessonsPerWeek,
@@ -211,7 +233,7 @@ class _RegisterRegularLessonScreenState
           // 정책 footnote = 객관적 정보 → Tier 3 Pretendard bodyMedium
           // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
-            '* 5주차가 있는 달은 기본 휴강이에요. 추가 레슨은 1회 레슨으로 신청!',
+            AppStrings.fifthWeekFootnote,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -220,7 +242,10 @@ class _RegisterRegularLessonScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Monthly fee
-          const RegularLessonSectionTitle('월 수강료', romanIndex: 5),
+          const RegularLessonSectionTitle(
+            AppStrings.monthlyFeeLabel,
+            romanIndex: 5,
+          ),
           const SizedBox(height: AppSpacing.space3),
           RegularLessonFeeSelector(
             monthlyFee: _monthlyFee,
@@ -230,7 +255,10 @@ class _RegisterRegularLessonScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Start date
-          const RegularLessonSectionTitle('시작일', romanIndex: 6),
+          const RegularLessonSectionTitle(
+            AppStrings.startDateLabel,
+            romanIndex: 6,
+          ),
           const SizedBox(height: AppSpacing.space3),
           RegularLessonStartDateSelector(
             startDate: _startDate,
@@ -282,7 +310,7 @@ class _RegisterRegularLessonScreenState
       if (_selectedDays.length != _lessonsPerWeek) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$_lessonsPerWeek개의 요일을 선택해주세요'),
+            content: Text(AppStrings.selectDaysCountHint(_lessonsPerWeek)),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -291,7 +319,7 @@ class _RegisterRegularLessonScreenState
       if (_selectedTimesPerDay.length != _lessonsPerWeek) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('각 요일의 레슨 시간을 선택해주세요'),
+            content: Text(AppStrings.selectTimeForEachDay),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -329,14 +357,14 @@ class _RegisterRegularLessonScreenState
             teacherId: widget.teacherId,
             teacherName: widget.teacherName,
             studentId: widget.studentId ?? 'new_student',
-            studentName: widget.studentName ?? '신규 학생',
+            studentName: widget.studentName ?? AppStrings.newStudentDefault,
             registration: registration,
           );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('정규레슨이 등록되었습니다'),
+            content: Text(AppStrings.regularLessonRegistered),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -346,7 +374,7 @@ class _RegisterRegularLessonScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('등록 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.registrationErrorRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );

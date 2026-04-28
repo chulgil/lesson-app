@@ -1650,4 +1650,56 @@ class AppStrings {
 
   /// 특별 일정 관리 (버튼)
   static const manageSpecialSchedules = '특별 일정 관리';
+
+  // ── Register Regular Lesson (정규레슨 등록) ──────────────────────
+
+  /// 정규레슨 등록 (AppBar)
+  static const regularLessonTitle = '정규레슨 등록';
+
+  /// 시간 정보를 불러올 수 없습니다 (에러)
+  static const timeInfoLoadError = '시간 정보를 불러올 수 없습니다';
+
+  /// 설정 정보를 불러올 수 없습니다 (에러)
+  static const settingsInfoLoadError = '설정 정보를 불러올 수 없습니다';
+
+  /// 레슨 유형 (섹션 0 제목)
+  static const lessonTypeLabel = '레슨 유형';
+
+  /// 선생님 기본 설정: $formatted (안내)
+  static String teacherDefaultDuration(String formatted) =>
+      '선생님 기본 설정: $formatted';
+
+  /// 요일 선택 (섹션 2 제목)
+  static const daySelectLabel = '요일 선택';
+
+  /// 주 $n회 레슨 - $n개 요일을 선택하세요 (안내)
+  static String daySelectHint(int lessonsPerWeek) =>
+      '주 $lessonsPerWeek회 레슨 - $lessonsPerWeek개 요일을 선택하세요';
+
+  /// 시간 선택 (섹션 3 제목)
+  static const timeSelectLabel = '시간 선택';
+
+  /// 레슨 횟수 (섹션 4 제목)
+  static const lessonCountLabel = '레슨 횟수';
+
+  /// 5주차 휴강 정책 (footnote)
+  static const fifthWeekFootnote = '* 5주차가 있는 달은 기본 휴강이에요. 추가 레슨은 1회 레슨으로 신청!';
+
+  /// 월 수강료 (섹션 5 제목)
+  static const monthlyFeeLabel = '월 수강료';
+
+  /// $n개의 요일을 선택해주세요 (검증 메시지)
+  static String selectDaysCountHint(int count) => '$count개의 요일을 선택해주세요';
+
+  /// 각 요일의 레슨 시간을 선택해주세요 (검증 메시지)
+  static const selectTimeForEachDay = '각 요일의 레슨 시간을 선택해주세요';
+
+  /// 신규 학생 (기본값)
+  static const newStudentDefault = '신규 학생';
+
+  /// 정규레슨이 등록되었습니다 (성공 토스트)
+  static const regularLessonRegistered = '정규레슨이 등록되었습니다';
+
+  /// 등록 중 오류가 발생했습니다. 다시 시도해주세요. (실패 토스트)
+  static const registrationErrorRetry = '등록 중 오류가 발생했습니다. 다시 시도해주세요.';
 }
