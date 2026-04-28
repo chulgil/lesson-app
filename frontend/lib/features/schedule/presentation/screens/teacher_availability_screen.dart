@@ -43,7 +43,7 @@ class _TeacherAvailabilityScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('레슨 운영 시간 설정')),
+      appBar: AppBar(title: const Text(AppStrings.teacherAvailabilityTitle)),
       body: availabilityAsync.when(
         data: (availability) => _buildBody(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -59,7 +59,7 @@ class _TeacherAvailabilityScreenState
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
-                    '데이터를 불러올 수 없습니다',
+                    AppStrings.cannotLoadData,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -96,9 +96,9 @@ class _TeacherAvailabilityScreenState
           // Section 1: Weekly lesson times
           _buildSectionHeader(
             romanIndex: 0,
-            title: '주간 레슨 시간',
-            subtitle: '레슨하는 요일과 시간을 설정하세요',
-            helpText: '설정한 시간이 스케줄과 학생 예약 화면에 반영됩니다',
+            title: AppStrings.weeklyLessonTimes,
+            subtitle: AppStrings.weeklyLessonTimesSubtitle,
+            helpText: AppStrings.weeklyLessonTimesHelp,
           ),
           const SizedBox(height: AppSpacing.space3),
           _buildWeeklySchedule(avail),
@@ -106,7 +106,11 @@ class _TeacherAvailabilityScreenState
           const SizedBox(height: AppSpacing.space8),
 
           // Section 2: Lesson settings
-          _buildSectionHeader(romanIndex: 1, title: '레슨 기본 설정', subtitle: null),
+          _buildSectionHeader(
+            romanIndex: 1,
+            title: AppStrings.lessonBasicSettings,
+            subtitle: null,
+          ),
           const SizedBox(height: AppSpacing.space3),
           _buildLessonSettings(avail),
 
@@ -115,8 +119,8 @@ class _TeacherAvailabilityScreenState
           // Section 3: Preview
           _buildSectionHeader(
             romanIndex: 2,
-            title: '이번 주 예상 스케줄',
-            subtitle: '설정한 시간 기반 미리보기',
+            title: AppStrings.weeklyPreview,
+            subtitle: AppStrings.weeklyPreviewSubtitle,
           ),
           const SizedBox(height: AppSpacing.space3),
           _buildWeeklyPreview(avail),
@@ -126,8 +130,8 @@ class _TeacherAvailabilityScreenState
           // Section 4: Special schedules
           _buildSectionHeader(
             romanIndex: 3,
-            title: '특별 일정',
-            subtitle: '휴가, 공휴일, 추가 오픈 등을 관리합니다',
+            title: AppStrings.specialSchedules,
+            subtitle: AppStrings.specialSchedulesSubtitle,
           ),
           const SizedBox(height: AppSpacing.space3),
           _buildExceptions(avail),
@@ -263,7 +267,7 @@ class _TeacherAvailabilityScreenState
                   children: schedules.map((s) => _buildTimeChip(s)).toList(),
                 )
                 : Text(
-                  '쉬는날',
+                  AppStrings.dayOff,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                     fontStyle: FontStyle.italic,
@@ -333,31 +337,32 @@ class _TeacherAvailabilityScreenState
           children: [
             _buildSettingRow(
               icon: Icons.timer_outlined,
-              label: '레슨 길이',
-              value: '${avail.slotDurationMinutes}분',
-              help: '학생이 예약 시 이 길이로 예약됩니다',
+              label: AppStrings.lessonLengthLabel,
+              value: AppStrings.durationMinutesValue(avail.slotDurationMinutes),
+              help: AppStrings.lessonLengthHelp,
             ),
             const Divider(height: 24),
             _buildSettingRow(
               icon: Icons.coffee_outlined,
-              label: '쉬는 시간',
-              value: '${avail.breakTimeBetweenLessons}분',
-              help: '연속 레슨 사이에 자동으로 쉬는 시간이 추가됩니다',
+              label: AppStrings.breakTimeLabel,
+              value: AppStrings.durationMinutesValue(
+                avail.breakTimeBetweenLessons,
+              ),
+              help: AppStrings.breakTimeHelp,
             ),
             const Divider(height: 24),
             _buildSettingRow(
               icon: Icons.schedule,
-              label: '시작 간격',
-              value: '${avail.slotStartInterval}분',
-              help:
-                  '${avail.slotStartInterval}분이면 10:00, 10:${avail.slotStartInterval == 30 ? '30, 11:00' : '00 → 11:00'} 시작 가능',
+              label: AppStrings.startIntervalLabel,
+              value: AppStrings.durationMinutesValue(avail.slotStartInterval),
+              help: AppStrings.startIntervalHelp(avail.slotStartInterval),
             ),
             const SizedBox(height: AppSpacing.space2),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  '탭하여 변경',
+                  AppStrings.tapToChange,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -557,7 +562,7 @@ class _TeacherAvailabilityScreenState
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  '설정된 특별 일정이 없습니다',
+                  AppStrings.noSpecialSchedules,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -578,14 +583,13 @@ class _TeacherAvailabilityScreenState
                   ),
                 ),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('특별 일정 관리'),
+            label: const Text(AppStrings.manageSpecialSchedules),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
               side: BorderSide(
                 color: AppColors.paperAccent.withValues(alpha: 0.3),
               ),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
           ),
         ),
@@ -717,9 +721,13 @@ class _TeacherAvailabilityScreenState
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('스케줄 삭제'),
+            title: const Text(AppStrings.deleteScheduleTitle),
             content: Text(
-              '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
+              AppStrings.deleteScheduleConfirm(
+                dayName: schedule.dayName,
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+              ),
             ),
             actions: [
               TextButton(

@@ -1594,4 +1594,60 @@ class AppStrings {
 
   /// 추가 (제출 버튼)
   static const addAction = '추가';
+
+  // ── Teacher Availability (레슨 운영 시간 설정) ──────────────────
+
+  /// 레슨 운영 시간 설정 (AppBar)
+  static const teacherAvailabilityTitle = '레슨 운영 시간 설정';
+
+  /// 주간 레슨 시간 (섹션 1 제목)
+  static const weeklyLessonTimes = '주간 레슨 시간';
+
+  /// 섹션 1 부제
+  static const weeklyLessonTimesSubtitle = '레슨하는 요일과 시간을 설정하세요';
+
+  /// 섹션 1 도움말
+  static const weeklyLessonTimesHelp = '설정한 시간이 스케줄과 학생 예약 화면에 반영됩니다';
+
+  /// 레슨 기본 설정 (섹션 2 제목)
+  static const lessonBasicSettings = '레슨 기본 설정';
+
+  /// 이번 주 예상 스케줄 (섹션 3 제목)
+  static const weeklyPreview = '이번 주 예상 스케줄';
+
+  /// 섹션 3 부제
+  static const weeklyPreviewSubtitle = '설정한 시간 기반 미리보기';
+
+  /// 특별 일정 (섹션 4 제목)
+  static const specialSchedules = '특별 일정';
+
+  /// 섹션 4 부제
+  static const specialSchedulesSubtitle = '휴가, 공휴일, 추가 오픈 등을 관리합니다';
+
+  /// 쉬는날 (요일 행 빈 상태)
+  static const dayOff = '쉬는날';
+
+  /// 레슨 길이 (라벨)
+  static const lessonLengthLabel = '레슨 길이';
+
+  /// 레슨 길이 도움말
+  static const lessonLengthHelp = '학생이 예약 시 이 길이로 예약됩니다';
+
+  /// 쉬는 시간 도움말
+  static const breakTimeHelp = '연속 레슨 사이에 자동으로 쉬는 시간이 추가됩니다';
+
+  /// 시작 간격 동적 예시 (interval 30 또는 60)
+  static String startIntervalHelp(int intervalMinutes) {
+    final tail = intervalMinutes == 30 ? '30, 11:00' : '00 → 11:00';
+    return '$intervalMinutes분이면 10:00, 10:$tail 시작 가능';
+  }
+
+  /// 탭하여 변경 (설정 카드 안내)
+  static const tapToChange = '탭하여 변경';
+
+  /// 설정된 특별 일정이 없습니다 (빈 상태)
+  static const noSpecialSchedules = '설정된 특별 일정이 없습니다';
+
+  /// 특별 일정 관리 (버튼)
+  static const manageSpecialSchedules = '특별 일정 관리';
 }
