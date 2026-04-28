@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -66,7 +68,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('예약 취소')),
+      appBar: AppBar(title: const Text(AppStrings.bookingCancelTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -112,7 +114,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '취소할 예약',
+            AppStrings.bookingToBeCancelled,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -175,7 +177,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 const Icon(Icons.block, color: AppColors.paperAccent, size: 20),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
-                  '취소 불가',
+                  AppStrings.bookingCancelImpossible,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
@@ -185,14 +187,14 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '변경/취소 횟수를 모두 사용하셨습니다 (${widget.totalReschedules}/${widget.totalReschedules}회 사용)',
+              AppStrings.rescheduleQuotaExhausted(widget.totalReschedules),
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.paperAccent,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '취소가 필요하시면 선생님께 직접 문의해주세요.',
+              AppStrings.bookingCancelContactTeacher,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -223,7 +225,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
-                  '마지막 취소 기회',
+                  AppStrings.bookingCancelLastChance,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
@@ -233,11 +235,14 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '현재 ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
+              AppStrings.rescheduleUsageStatus(
+                widget.totalReschedules - widget.remainingReschedules,
+                widget.totalReschedules,
+              ),
               style: AppTypography.bodyMedium,
             ),
             Text(
-              '취소 후 ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막!)',
+              AppStrings.rescheduleAfterCancelLast(widget.totalReschedules),
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
@@ -245,7 +250,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '이후 더 이상 변경/취소가 불가합니다.',
+              AppStrings.rescheduleNoMoreAfter,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -257,9 +262,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.ink, size: 20),
@@ -269,14 +272,17 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '변경/취소: ${widget.remainingReschedules}/${widget.totalReschedules}회 남음',
+                  AppStrings.rescheduleRemaining(
+                    widget.remainingReschedules,
+                    widget.totalReschedules,
+                  ),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '취소 시 1회 차감됩니다.',
+                  AppStrings.bookingCancelDeductNotice,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -292,9 +298,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   Widget _buildTeacherCancelInfo() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-      ),
+      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.ink, size: 20),
@@ -304,14 +308,14 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '선생님 취소',
+                  AppStrings.teacherCancelLabel,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '학생의 변경 횟수는 차감되지 않습니다.',
+                  AppStrings.teacherCancelNoStudentDeduct,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -329,7 +333,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '취소 사유 (선택)',
+          AppStrings.cancelReasonOptionalLabel,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -337,7 +341,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
           controller: _reasonController,
           maxLines: 3,
           decoration: InputDecoration(
-            hintText: '취소 사유를 입력해주세요',
+            hintText: AppStrings.cancelReasonInputHint,
             hintStyle: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -372,8 +376,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
             ),
             child:
                 _isLoading
@@ -386,7 +389,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                       ),
                     )
                     : Text(
-                      '예약 취소하기',
+                      AppStrings.bookingCancelAction,
                       style: AppTypography.bodyLarge.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -404,12 +407,11 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              shape: RoundedRectangleBorder(
-              ),
+              shape: RoundedRectangleBorder(),
               side: const BorderSide(color: AppColors.inkQuaternary),
             ),
             child: Text(
-              '돌아가기',
+              AppStrings.goBack,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -432,7 +434,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               TextButton(
                 onPressed: _contactTeacher,
                 child: Text(
-                  '선생님에게 문의하기',
+                  AppStrings.contactTeacher,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
@@ -453,34 +455,39 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         context: context,
         builder:
             (context) => AlertDialog(
-              title: const Text('마지막 취소 기회입니다'),
+              title: const Text(AppStrings.bookingCancelLastChanceDialogTitle),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
+                    AppStrings.rescheduleUsageStatusWithColon(
+                      widget.totalReschedules - widget.remainingReschedules,
+                      widget.totalReschedules,
+                    ),
                     style: AppTypography.bodyMedium,
                   ),
                   Text(
-                    '취소 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
+                    AppStrings.rescheduleAfterCancelMarker(
+                      widget.totalReschedules,
+                    ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  const Text('이후 더 이상 변경/취소가 불가합니다.'),
+                  const Text(AppStrings.rescheduleNoMoreAfter),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('돌아가기'),
+                  child: const Text(AppStrings.goBack),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('취소하기'),
+                  child: const Text(AppStrings.cancelRequestAction),
                 ),
               ],
             ),
@@ -512,7 +519,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('예약이 취소되었습니다'),
+            content: Text(AppStrings.bookingCancelled),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -522,7 +529,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('예약 취소에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.bookingCancelFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -537,9 +544,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   void _contactTeacher() {
     final teacherId = widget.teacherId;
     if (teacherId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.teacherInfoNotFound)),
+      );
       return;
     }
 
@@ -547,9 +554,9 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     final phone = profileAsync.valueOrNull?.verification.phoneNumber;
 
     if (phone == null || phone.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('선생님 연락처가 등록되지 않았습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.teacherContactNotRegistered)),
+      );
       return;
     }
 
@@ -559,8 +566,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   void _showContactBottomSheet(String phone) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-      ),
+      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Padding(
@@ -572,7 +578,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                   // Notebook × Score: 모달 시트 상단 제목 블록은 Playfair
                   // appBarTitle 로 통일 (§7.27). teacherName 동적 substring 허용.
                   Text(
-                    '${widget.teacherName} 연락처',
+                    AppStrings.teacherContactTitle(widget.teacherName),
                     style: NotebookTypography.appBarTitle,
                   ),
                   const SizedBox(height: AppSpacing.space2),
@@ -597,7 +603,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                             }
                           },
                           icon: const Icon(Icons.phone, size: 18),
-                          label: const Text('전화하기'),
+                          label: const Text(AppStrings.callAction),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.paperAccent,
                             side: const BorderSide(
@@ -622,7 +628,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                             }
                           },
                           icon: const Icon(Icons.message, size: 18),
-                          label: const Text('문자 보내기'),
+                          label: const Text(AppStrings.smsAction),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.ink,
                             side: const BorderSide(color: AppColors.ink),
@@ -643,7 +649,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                         _copyToClipboard(phone);
                       },
                       icon: const Icon(Icons.copy, size: 16),
-                      label: const Text('번호 복사'),
+                      label: const Text(AppStrings.copyNumber),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.inkSecondary,
                       ),
@@ -661,7 +667,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('연락처가 복사되었습니다'),
+          content: Text(AppStrings.contactCopied),
           backgroundColor: AppColors.paperOk,
         ),
       );
@@ -669,8 +675,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   }
 
   String _formatBookingDate() {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekday = weekdays[widget.bookingDate.weekday - 1];
+    final weekday = dayOfWeekLabel(widget.bookingDate.weekday);
     final hour = widget.startTime.hour.toString().padLeft(2, '0');
     final minute = widget.startTime.minute.toString().padLeft(2, '0');
     return '${widget.bookingDate.month}/${widget.bookingDate.day}($weekday) $hour:$minute';

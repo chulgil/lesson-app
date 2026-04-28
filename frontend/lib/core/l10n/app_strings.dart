@@ -1263,4 +1263,101 @@ class AppStrings {
     );
     return '$teacherName 선생님: 수강료 $formatted원 입금을 부탁드려요';
   }
+
+  // ── Booking Cancel (예약 취소 화면) ─────────────────────────
+  /// 예약 취소 (AppBar)
+  static const bookingCancelTitle = '예약 취소';
+
+  /// 취소할 예약 (카드 라벨)
+  static const bookingToBeCancelled = '취소할 예약';
+
+  /// 취소 불가 (배지)
+  static const bookingCancelImpossible = '취소 불가';
+
+  /// 변경/취소 횟수 모두 사용 안내
+  static String rescheduleQuotaExhausted(int total) =>
+      '변경/취소 횟수를 모두 사용하셨습니다 ($total/$total회 사용)';
+
+  /// 선생님 직접 문의 안내
+  static const bookingCancelContactTeacher = '취소가 필요하시면 선생님께 직접 문의해주세요.';
+
+  /// 마지막 취소 기회 (배지)
+  static const bookingCancelLastChance = '마지막 취소 기회';
+
+  /// 현재 N/M회 사용
+  static String rescheduleUsageStatus(int used, int total) =>
+      '현재 $used/$total회 사용';
+
+  /// 현재: N/M회 사용 (다이얼로그 콜론 형식)
+  static String rescheduleUsageStatusWithColon(int used, int total) =>
+      '현재: $used/$total회 사용';
+
+  /// 취소 후 N/N회 (마지막!)
+  static String rescheduleAfterCancelLast(int total) =>
+      '취소 후 $total/$total회 (마지막!)';
+
+  /// 변경/취소 불가 안내
+  static const rescheduleNoMoreAfter = '이후 더 이상 변경/취소가 불가합니다.';
+
+  /// 변경/취소 N/M회 남음
+  static String rescheduleRemaining(int remain, int total) =>
+      '변경/취소: $remain/$total회 남음';
+
+  /// 취소 시 1회 차감 안내
+  static const bookingCancelDeductNotice = '취소 시 1회 차감됩니다.';
+
+  /// 선생님 취소 (배지)
+  static const teacherCancelLabel = '선생님 취소';
+
+  /// 학생 차감 없음 안내
+  static const teacherCancelNoStudentDeduct = '학생의 변경 횟수는 차감되지 않습니다.';
+
+  /// 취소 사유 (선택) 라벨
+  static const cancelReasonOptionalLabel = '취소 사유 (선택)';
+
+  /// 취소 사유 입력 힌트
+  static const cancelReasonInputHint = '취소 사유를 입력해주세요';
+
+  /// 예약 취소하기 (CTA 버튼)
+  static const bookingCancelAction = '예약 취소하기';
+
+  /// 돌아가기 (보조 버튼)
+  static const goBack = '돌아가기';
+
+  /// 선생님에게 문의하기
+  static const contactTeacher = '선생님에게 문의하기';
+
+  /// 마지막 취소 기회입니다 (다이얼로그 제목)
+  static const bookingCancelLastChanceDialogTitle = '마지막 취소 기회입니다';
+
+  /// 취소 후: N/N회 (마지막)
+  static String rescheduleAfterCancelMarker(int total) =>
+      '취소 후: $total/$total회 (마지막)';
+
+  /// 예약이 취소되었습니다 (스낵바)
+  static const bookingCancelled = '예약이 취소되었습니다';
+
+  /// 예약 취소 실패 (스낵바)
+  static const bookingCancelFailed = '예약 취소에 실패했습니다. 다시 시도해주세요.';
+
+  /// 선생님 정보를 찾을 수 없습니다
+  static const teacherInfoNotFound = '선생님 정보를 찾을 수 없습니다';
+
+  /// 선생님 연락처 미등록
+  static const teacherContactNotRegistered = '선생님 연락처가 등록되지 않았습니다';
+
+  /// $teacherName 연락처 (바텀시트 제목)
+  static String teacherContactTitle(String teacherName) => '$teacherName 연락처';
+
+  /// 전화하기
+  static const callAction = '전화하기';
+
+  /// 문자 보내기
+  static const smsAction = '문자 보내기';
+
+  /// 번호 복사
+  static const copyNumber = '번호 복사';
+
+  /// 연락처 복사 완료 (스낵바)
+  static const contactCopied = '연락처가 복사되었습니다';
 }
