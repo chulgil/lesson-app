@@ -254,9 +254,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
   ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08)
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08)),
       child: Column(
         children: [
           Icon(icon, size: 20, color: color),
@@ -285,9 +283,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         Container(
           width: 4,
           height: 16,
-          decoration: BoxDecoration(
-            color: color
-          ),
+          decoration: BoxDecoration(color: color),
         ),
         const SizedBox(width: AppSpacing.space2),
         // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
@@ -358,10 +354,12 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      // §7.130: 선생님 작성 과제 제목 → Tier 1 Gaegu hand.
                       if (status.mostUrgentItem != null && !isCompleted)
                         Text(
                           status.mostUrgentItem!.title,
-                          style: AppTypography.caption.copyWith(
+                          style: NotebookTypography.hand.copyWith(
+                            fontSize: 12,
                             color: AppColors.inkTertiary,
                           ),
                           maxLines: 1,

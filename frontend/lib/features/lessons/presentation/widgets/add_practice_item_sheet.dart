@@ -154,9 +154,11 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
+              // §7.130: 선생님 작성 연습 설명 → Tier 1 Gaegu hand.
               TextField(
                 controller: _descriptionController,
                 maxLines: 5,
+                style: NotebookTypography.hand.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(
                   hintText: '예: 메트로놈 60으로 정확하게!',
                   border: OutlineInputBorder(),
@@ -241,8 +243,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
+          // §7.130: 선생님 입력 레퍼토리 이름 → Tier 1 Gaegu hand.
           TextField(
             controller: _newRepertoireNameController,
+            style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
               hintText: '예: 스즈키 5권',
               border: OutlineInputBorder(),
@@ -257,8 +261,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
+        // §7.130: 선생님 입력 곡명 → Tier 1 Gaegu hand.
         TextField(
           controller: _pieceNameController,
+          style: NotebookTypography.hand.copyWith(color: AppColors.ink),
           decoration: InputDecoration(
             hintText: '예: 라폴리아',
             border: OutlineInputBorder(),

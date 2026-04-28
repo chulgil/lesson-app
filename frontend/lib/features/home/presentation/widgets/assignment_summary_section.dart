@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../providers/assignment_summary_provider.dart';
 
@@ -151,10 +152,12 @@ class AssignmentSummarySection extends ConsumerWidget {
                         color: AppColors.ink,
                       ),
                     ),
+                    // §7.130: 선생님 작성 과제 제목 → Tier 1 Gaegu hand.
                     if (status.mostUrgentItem != null)
                       Text(
                         status.mostUrgentItem!.title,
-                        style: AppTypography.caption.copyWith(
+                        style: NotebookTypography.hand.copyWith(
+                          fontSize: 12,
                           color: AppColors.inkTertiary,
                         ),
                         maxLines: 1,

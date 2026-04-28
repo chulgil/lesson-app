@@ -125,8 +125,10 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
+              // §7.130: 선생님 작성 과제 제목 → Tier 1 Gaegu hand.
               TextField(
                 controller: _titleController,
+                style: NotebookTypography.hand.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(border: OutlineInputBorder()),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -139,9 +141,11 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
+              // §7.130: 선생님 작성 과제 설명 → Tier 1 Gaegu hand.
               TextField(
                 controller: _descriptionController,
                 maxLines: 2,
+                style: NotebookTypography.hand.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(border: OutlineInputBorder()),
               ),
               const SizedBox(height: AppSpacing.space4),

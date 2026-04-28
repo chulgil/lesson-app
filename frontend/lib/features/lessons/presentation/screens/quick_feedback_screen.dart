@@ -414,6 +414,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             controller: _feedbackController,
             maxLines: 6,
             onChanged: (_) => setState(() => _hasChanges = true),
+            // §7.130: 선생님 자필 피드백 → Tier 1 Gaegu hand.
+            style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
               hintText: '레슨 피드백을 작성하세요...',
               hintStyle: AppTypography.bodyMedium.copyWith(
@@ -508,7 +510,13 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                   ),
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
-                    child: Text(entry.value, style: AppTypography.bodyMedium),
+                    // §7.130: 선생님 입력 keypoint → Tier 1 Gaegu hand.
+                    child: Text(
+                      entry.value,
+                      style: NotebookTypography.hand.copyWith(
+                        color: AppColors.ink,
+                      ),
+                    ),
                   ),
                   IconButton(
                     onPressed: () {
@@ -554,6 +562,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         controller: _tipController,
         maxLines: 3,
         onChanged: (_) => setState(() => _hasChanges = true),
+        // §7.130: 선생님 자필 연습팁 → Tier 1 Gaegu hand.
+        style: NotebookTypography.hand.copyWith(color: AppColors.ink),
         decoration: InputDecoration(
           hintText: '연습할 때 주의할 점을 적어주세요...',
           hintStyle: AppTypography.bodyMedium.copyWith(
@@ -642,6 +652,8 @@ class _KeyPointInputState extends State<_KeyPointInput> {
           child: TextField(
             controller: _controller,
             onSubmitted: (_) => _submit(),
+            // §7.130: 선생님 keypoint 입력 → Tier 1 Gaegu hand.
+            style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
               hintText: '포인트 추가...',
               hintStyle: AppTypography.bodySmall.copyWith(

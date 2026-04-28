@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_crud_provider.dart';
@@ -254,6 +255,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                   child: TextField(
                     controller: _feedbackController,
                     maxLines: 5,
+                    // §7.130: 선생님 자필 공통 피드백 → Tier 1 Gaegu hand.
+                    style: NotebookTypography.hand.copyWith(
+                      color: AppColors.ink,
+                    ),
                     decoration: InputDecoration(
                       hintText: '모든 선택 학생에게 전달할 피드백을 작성하세요...',
                       hintStyle: AppTypography.bodyMedium.copyWith(
@@ -298,6 +303,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                       child: TextField(
                         controller: _perStudentControllers[lesson.id],
                         maxLines: 2,
+                        // §7.130: 선생님 자필 개별 코멘트 → Tier 1 Gaegu hand.
+                        style: NotebookTypography.hand.copyWith(
+                          color: AppColors.ink,
+                        ),
                         decoration: InputDecoration(
                           labelText: NameUtils.givenName(lesson.studentName),
                           hintText: '추가 코멘트...',
@@ -418,7 +427,14 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                         ],
                       ),
                       const SizedBox(height: AppSpacing.space3),
-                      Text(fullFeedback, style: AppTypography.bodySmall),
+                      // §7.130: 미리보기 = 선생님 자필 피드백 → Tier 1 Gaegu hand.
+                      Text(
+                        fullFeedback,
+                        style: NotebookTypography.hand.copyWith(
+                          fontSize: 13,
+                          color: AppColors.ink,
+                        ),
+                      ),
                     ],
                   ),
                 ),

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
@@ -223,9 +224,10 @@ class PracticeItemsSection extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // §7.130: 선생님 작성 과제 제목 → Tier 1 Gaegu hand.
                       Text(
                         item.title,
-                        style: AppTypography.bodyMedium.copyWith(
+                        style: NotebookTypography.hand.copyWith(
                           fontWeight: FontWeight.w600,
                           color:
                               item.isCompleted
@@ -236,9 +238,11 @@ class PracticeItemsSection extends ConsumerWidget {
                       if (item.description != null &&
                           item.description!.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.space1),
+                        // §7.130: 선생님 작성 과제 설명 → Tier 1 Gaegu hand.
                         Text(
                           item.description!,
-                          style: AppTypography.bodySmall.copyWith(
+                          style: NotebookTypography.hand.copyWith(
+                            fontSize: 13,
                             color:
                                 item.isCompleted
                                     ? AppColors.inkTertiary

@@ -5172,3 +5172,58 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `flutter analyze` 0 issues (변경 4 파일 scope), README §1.1.1 매트릭스 Tier 1 예시 + Tier 4 회피 신호 한정 정제.
 
 ---
+
+#### §7.130 — 액션 입력/표시 Tier 1 hand 정렬 확장 (2026-04-28 §7.129 후속)
+
+**전제**: §7.129 직후 사용자 검수 — 레슨피드백·연습팁이 lesson_notes_widgets 에서는 hand 가 됐지만 `quick_feedback_screen.dart`(개별 레슨 피드백 작성), `bulk_feedback_screen.dart`(다수 학생 일괄 피드백), `practice_items_section.dart`(과제 카드 표시), `edit/add_practice_item_sheet.dart`(과제 작성/수정), `parent_assignments_tab.dart`(학부모 과제), 홈 `assignment_summary_section.dart` + `assignment_dashboard_screen.dart`(최우선 과제 표시)에서 여전히 산세리프. §7.129 의 "자유 서술 입력 = hand" 룰이 "lessons" 도메인 외부로 전파되지 않음 — Tier 매트릭스 정의는 정확하나 **검수 범위가 lesson_note 한 줄에 국한**.
+
+**사용자 룰 정련**:
+1. "선생님과 학생이 한 액션 성 성격의 경우 손글씨로 되어야 합니다."
+2. "시스템이 고정및 알려주는 경우만 다른 폰트여야합니다."
+
+이전 4-tier 분류는 자유 서술 vs 식별자 정도였으나, 사용자가 더 단순한 이항 룰 제시 — **사람이 한 행동(action) 산출물 = hand, 시스템이 정의/통보(label, count, status, identifier) = sans-serif**. §7.129 룰의 상위 추상화이며 결정 트리 단순화.
+
+**적용 13개 위치 / 8개 파일**:
+
+| 파일 | 위치 | 종류 |
+|---|---|---|
+| `quick_feedback_screen.dart` | 피드백 TextField (`:413`) | 입력 |
+| `quick_feedback_screen.dart` | keypoint Text (`:511`) | 표시 |
+| `quick_feedback_screen.dart` | tip TextField (`:553`) | 입력 |
+| `quick_feedback_screen.dart` | keypoint 추가 TextField (`:642`) | 입력 |
+| `bulk_feedback_screen.dart` | 공통 피드백 TextField (`:254`) | 입력 |
+| `bulk_feedback_screen.dart` | 개별 코멘트 TextField (`:298`) | 입력 |
+| `bulk_feedback_screen.dart` | 미리보기 fullFeedback Text (`:421`) | 표시 |
+| `practice_items_section.dart` | item.title Text (`:226`) | 표시 |
+| `practice_items_section.dart` | item.description Text (`:239`) | 표시 |
+| `edit_practice_item_sheet.dart` | 제목 TextField (`:128`) | 입력 |
+| `edit_practice_item_sheet.dart` | 설명 TextField (`:142`) | 입력 |
+| `add_practice_item_sheet.dart` | 설명 TextField (`:157`) | 입력 |
+| `add_practice_item_sheet.dart` | 새 레퍼토리 이름 TextField (`:244`) | 입력 |
+| `add_practice_item_sheet.dart` | 곡명 TextField (`:260`) | 입력 |
+| `parent_assignments_tab.dart` | 과제 title Text (`:293`) | 표시 |
+| `parent_assignments_tab.dart` | 과제 description Text (`:312`) | 표시 |
+| `assignment_summary_section.dart` | mostUrgentItem.title Text (`:154`) | 표시 |
+| `assignment_dashboard_screen.dart` | mostUrgentItem.title Text (`:361`) | 표시 |
+
+신규 import 3건: `bulk_feedback_screen`, `practice_items_section`, `assignment_summary_section` 에 `notebook_typography.dart` 추가.
+
+**의도적 제외**:
+- 마디/줄 시작·끝 숫자 입력 (`add_practice_item_sheet:537/567`) — 정수 식별자, hand 적용 시 가짜 자필 재발
+- presetChip 라벨 (`AppTypography.caption`) — 시스템 제공 빠른 선택지, 사용자 액션 아님
+- 학생 이름·진행률 카운트(`completed/total`) — 시스템 산출 데이터
+- 카드 진행률 라벨 ("이번 주 연습", "완료율") — 시스템 고정 라벨
+
+**Lore-directive**: 액션 vs 시스템 이항 룰이 §7.129 의 4-tier 매트릭스보다 우선. 새 화면 추가 시 "이 텍스트는 사람이 만들었나, 시스템이 만들었나" 한 질문으로 결정.
+
+**Lore-directive**: 표시(Text) 와 입력(TextField input style)은 동일 Tier — §7.129 결정 유지하되 lesson_notes_widgets 외 모든 도메인에 전파.
+
+**Lore-rejected**: 표시는 hand, 입력만 산세리프 — 입력 → 저장 → 표시 사이클에서 폰트 점프 발생, §7.129 에서 이미 거절한 결정.
+
+**Lore-rejected**: 곡명 (`pieceNameController`) 은 고유명사라 산세리프 — 곡명은 선생님이 **직접 적은 메모**(서지 정보 아닌 사용자 표기)이므로 사람의 행동 산출물. 학생/연락처와 다름.
+
+**Lore-rejected**: practice item.description 의 폰트 사이즈 14(bodyMedium 동급) 유지 — Tier 1 hand body 사이즈 16 은 카드 좁은 폭에서 줄바꿈 폭증. fontSize 13 으로 명시 override(notebook §1.1.1 의 history 변형 응용).
+
+**테스트**: `flutter analyze` 0 issues (8 파일 scope). 적용 후 quick_feedback_screen·bulk_feedback_screen·과제 카드·과제 대시보드의 사용자 액션 텍스트가 일관되게 Gaegu hand 톤.
+
+---

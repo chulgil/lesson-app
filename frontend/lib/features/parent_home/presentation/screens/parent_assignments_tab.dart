@@ -288,11 +288,11 @@ class _AssignmentCard extends StatelessWidget {
                         : null,
               ),
               const SizedBox(width: AppSpacing.space3),
-              // Title
+              // §7.130: 선생님 작성 과제 제목 → Tier 1 Gaegu hand.
               Expanded(
                 child: Text(
                   title,
-                  style: AppTypography.bodyMedium.copyWith(
+                  style: NotebookTypography.hand.copyWith(
                     fontWeight: FontWeight.w600,
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
                     color: isCompleted ? AppColors.inkTertiary : AppColors.ink,
@@ -309,9 +309,11 @@ class _AssignmentCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // §7.130: 선생님 작성 과제 설명 → Tier 1 Gaegu hand.
                 Text(
                   description,
-                  style: AppTypography.bodySmall.copyWith(
+                  style: NotebookTypography.hand.copyWith(
+                    fontSize: 13,
                     color: AppColors.inkSecondary,
                   ),
                 ),
