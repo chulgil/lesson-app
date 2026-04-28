@@ -657,6 +657,7 @@ class ParentDashboardTab extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
+              // §7.132: round → 사각 day cell (Notebook 메타포).
               Container(
                 width: 36,
                 height: 36,
@@ -669,7 +670,6 @@ class ParentDashboardTab extends ConsumerWidget {
                           : isPast
                           ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
-                  shape: BoxShape.circle,
                   border:
                       isToday
                           ? Border.all(color: AppColors.paperAccent, width: 2)

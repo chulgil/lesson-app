@@ -349,6 +349,7 @@ class _StudentProfileEditScreenState
                   )
                   : null,
         ),
+        // §7.132: round → 사각 카메라 뱃지.
         Positioned(
           right: 0,
           bottom: 0,
@@ -356,10 +357,7 @@ class _StudentProfileEditScreenState
             onTap: () => _onTapProfileImage(),
             child: Container(
               padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: AppColors.ink,
-                shape: BoxShape.circle,
-              ),
+              decoration: const BoxDecoration(color: AppColors.ink),
               child: const Icon(
                 Icons.camera_alt,
                 size: 16,

@@ -34,11 +34,12 @@ class AddChildOption extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // §7.132: round → 사각 아이콘 컨테이너 + 1px ink 스트로크.
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: AppColors.paper,
+                border: Border.all(color: iconColor, width: 1),
               ),
               child: Icon(icon, color: iconColor, size: 24),
             ),
@@ -63,10 +64,7 @@ class AddChildOption extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.inkTertiary,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

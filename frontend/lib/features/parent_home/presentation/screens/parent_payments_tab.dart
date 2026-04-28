@@ -278,13 +278,14 @@ class _ChildSummaryHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
         children: [
+          // §7.132: CircleAvatar 유지. white → paper.
           CircleAvatar(
             radius: 22,
             backgroundColor: profile.profileColor,
             child: Text(
               profile.initial,
               style: AppTypography.bodyLarge.copyWith(
-                color: Colors.white,
+                color: AppColors.paper,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -452,11 +453,12 @@ class _ChildSelectorSheet extends ConsumerWidget {
                     itemBuilder: (_, i) {
                       final p = profiles[i];
                       return ListTile(
+                        // §7.132: CircleAvatar 유지. white → paper.
                         leading: CircleAvatar(
                           backgroundColor: p.profileColor,
                           child: Text(
                             p.initial,
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: AppColors.paper),
                           ),
                         ),
                         title: Text(p.name),

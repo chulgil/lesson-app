@@ -164,15 +164,13 @@ class StudentProfileTab extends ConsumerWidget {
                     ),
                   ),
                 ),
+                // §7.132: round → 사각 카메라 뱃지.
                 Positioned(
                   right: 0,
                   bottom: 0,
                   child: Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: AppColors.paper,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: const BoxDecoration(color: AppColors.paper),
                     child: const Icon(
                       Icons.camera_alt,
                       size: 16,
@@ -490,9 +488,10 @@ class StudentProfileTab extends ConsumerWidget {
         onPressed: () => _showLogoutDialog(context),
         icon: Icon(Icons.logout, color: AppColors.paperAccent),
         label: Text('로그아웃', style: TextStyle(color: AppColors.paperAccent)),
+        // §7.132: paperAccent.alpha border → solid paperAccent.
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-          side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
+          side: const BorderSide(color: AppColors.paperAccent),
         ),
       ),
     );

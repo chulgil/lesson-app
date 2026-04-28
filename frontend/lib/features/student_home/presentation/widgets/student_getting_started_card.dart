@@ -147,6 +147,7 @@ class _StepItem extends StatelessWidget {
         child: Row(
           children: [
             // Step number or check
+            // §7.132: round → 사각 step 인디케이터 (Notebook 번호 메타포).
             Container(
               width: 28,
               height: 28,
@@ -157,7 +158,6 @@ class _StepItem extends StatelessWidget {
                         : isEnabled
                         ? AppColors.ink
                         : AppColors.inkTertiary,
-                shape: BoxShape.circle,
               ),
               child: Center(
                 child:

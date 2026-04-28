@@ -68,13 +68,14 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
         ),
 
         // Summary
+        // §7.132: paperAccent.alpha → paperAccentSoft.
         Container(
           margin: const EdgeInsets.symmetric(
             horizontal: AppSpacing.screenPadding,
           ),
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.1),
+            color: AppColors.paperAccentSoft,
             borderRadius: BorderRadius.zero,
           ),
           child: Row(

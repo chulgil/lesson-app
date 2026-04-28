@@ -109,12 +109,11 @@ class ParentAssignmentsTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Notebook × Score: accent 배너 섹션 제목은 Playfair sectionTitle
-              // 로 통일. white copyWith 유지 (§7.17).
+              // §7.132: accent 배너 텍스트 white → paper.
               Text(
                 '이번 주 과제',
                 style: NotebookTypography.sectionTitle.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                 ),
               ),
               Container(
@@ -129,7 +128,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
                 child: Text(
                   '71% 완료',
                   style: AppTypography.bodySmall.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -143,7 +142,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: 0.71,
               backgroundColor: AppColors.paper.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.paper),
               minHeight: 8,
             ),
           ),
@@ -151,7 +150,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _ProgressStat(label: '전체', value: '7', color: Colors.white),
+              _ProgressStat(label: '전체', value: '7', color: AppColors.paper),
               _ProgressStat(
                 label: '완료',
                 value: '5',
@@ -270,13 +269,12 @@ class _AssignmentCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              // Checkbox
+              // §7.132: round → 사각 체크박스. white → paper.
               Container(
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
                   color: isCompleted ? AppColors.paperOk : AppColors.paperDark,
-                  shape: BoxShape.circle,
                   border:
                       isCompleted
                           ? null
@@ -284,7 +282,11 @@ class _AssignmentCard extends StatelessWidget {
                 ),
                 child:
                     isCompleted
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.paper,
+                        )
                         : null,
               ),
               const SizedBox(width: AppSpacing.space3),

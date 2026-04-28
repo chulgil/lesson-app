@@ -20,6 +20,7 @@ class ProfileHeader extends ConsumerWidget {
           // Profile avatar
           Stack(
             children: [
+              // §7.132: 프로필 아바타는 CircleAvatar 유지 (사람 = 원형 관습).
               CircleAvatar(
                 radius: 40,
                 backgroundColor: AppColors.paperAccent,
@@ -28,10 +29,11 @@ class ProfileHeader extends ConsumerWidget {
                       ? userProfile.userName.characters.first
                       : '학',
                   style: AppTypography.headingLarge.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
               ),
+              // §7.132: 카메라 뱃지 round → 사각. white → paper.
               Positioned(
                 right: 0,
                 bottom: 0,
@@ -39,13 +41,12 @@ class ProfileHeader extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space1),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: AppColors.paper, width: 2),
                   ),
                   child: const Icon(
                     Icons.camera_alt,
                     size: 14,
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
               ),
@@ -68,13 +69,14 @@ class ProfileHeader extends ConsumerWidget {
                       style: AppTypography.headingLarge,
                     ),
                     const SizedBox(width: AppSpacing.space2),
+                    // §7.132: paperAccent.alpha → paperAccentSoft (cream 톤 정렬).
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.2),
+                        color: AppColors.paperAccentSoft,
                         borderRadius: BorderRadius.zero,
                       ),
                       child: Text(

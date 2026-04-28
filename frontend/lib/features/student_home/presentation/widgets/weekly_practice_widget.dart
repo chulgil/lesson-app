@@ -245,23 +245,19 @@ class _PracticeItemTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () => _toggleComplete(ref),
+      // §7.132: 0.5px border → 1px ThinRule 정렬. priority dot/checkbox round → 사각.
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
-          ),
+          border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
         ),
         child: Row(
           children: [
-            // Priority dot
+            // Priority dot (사각 priority mark)
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: item.priority.color,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: item.priority.color),
             ),
             const SizedBox(width: AppSpacing.space2),
 
@@ -274,7 +270,6 @@ class _PracticeItemTile extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color:
                       item.isCompleted ? AppColors.paperOk : Colors.transparent,
-                  shape: BoxShape.circle,
                   border: Border.all(
                     color:
                         item.isCompleted

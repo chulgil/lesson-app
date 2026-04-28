@@ -89,11 +89,12 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
               ),
               child: Row(
                 children: [
+                  // §7.132: round → 사각 아이콘 컨테이너 (Notebook 메타포).
+                  // bannerColor 는 동적이므로 alpha 변형 유지 (paperAccent 외 팔레트).
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.space2),
                     decoration: BoxDecoration(
                       color: bannerColor.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
                     ),
                     child: Icon(
                       hasRenewalProposal

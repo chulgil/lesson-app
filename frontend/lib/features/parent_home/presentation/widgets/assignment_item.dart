@@ -26,12 +26,12 @@ class AssignmentItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
       child: Row(
         children: [
+          // §7.132: round → 사각 체크박스 (Notebook 메타포).
           Container(
             width: 24,
             height: 24,
             decoration: BoxDecoration(
               color: isCompleted ? AppColors.paperOk : AppColors.paperDark,
-              shape: BoxShape.circle,
               border:
                   isCompleted
                       ? null
@@ -39,7 +39,7 @@ class AssignmentItem extends StatelessWidget {
             ),
             child:
                 isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    ? const Icon(Icons.check, size: 16, color: AppColors.paper)
                     : null,
           ),
           const SizedBox(width: AppSpacing.space3),

@@ -43,13 +43,14 @@ class ChildCard extends ConsumerWidget {
               Row(
                 children: [
                   // Avatar
+                  // §7.132: CircleAvatar 유지 (사람 = 원형 관습). white → paper.
                   CircleAvatar(
                     radius: 24,
                     backgroundColor: AppColors.paperAccent,
                     child: Text(
                       student.name.isNotEmpty ? student.name[0] : 'S',
                       style: AppTypography.headingMedium.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     ),
                   ),
@@ -70,15 +71,14 @@ class ChildCard extends ConsumerWidget {
                             ),
                             if (relation.isPrimaryGuardian) ...[
                               const SizedBox(width: AppSpacing.space2),
+                              // §7.132: paperAccent.alpha → paperAccentSoft.
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.paperAccent.withValues(
-                                    alpha: 0.1,
-                                  ),
+                                  color: AppColors.paperAccentSoft,
                                   borderRadius: BorderRadius.zero,
                                 ),
                                 child: Text(
@@ -105,6 +105,7 @@ class ChildCard extends ConsumerWidget {
                   ),
 
                   // Billing badge
+                  // §7.132: paperAccent.alpha → paperAccentSoft.
                   if (relation.isBillingTarget) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -112,7 +113,7 @@ class ChildCard extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                        color: AppColors.paperAccentSoft,
                         borderRadius: BorderRadius.zero,
                       ),
                       child: Row(
@@ -188,12 +189,15 @@ class ChildCard extends ConsumerWidget {
           (_, __) => Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              // §7.132: paperAccent.alpha → paperAccentSoft.
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Text(
               '정보를 불러올 수 없습니다',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
     );
@@ -219,9 +223,7 @@ class ChildCard extends ConsumerWidget {
           ),
           Text(
             label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),

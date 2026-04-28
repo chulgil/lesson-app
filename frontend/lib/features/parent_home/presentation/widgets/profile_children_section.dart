@@ -128,13 +128,14 @@ class ProfileChildrenSection extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
           children: [
+            // §7.132: CircleAvatar 유지 (사람 = 원형 관습). white → paper.
             CircleAvatar(
               radius: 16,
               backgroundColor: profile.profileColor,
               child: Text(
                 profile.initial,
                 style: AppTypography.bodySmall.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -194,9 +195,7 @@ class ProfileChildrenSection extends ConsumerWidget {
   void _showAddChildDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => SafeArea(
             child: Padding(

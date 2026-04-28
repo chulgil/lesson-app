@@ -178,6 +178,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                                 .read(practiceReminderProvider.notifier)
                                 .toggleDay(index)
                             : null,
+                    // §7.132: round → 사각 day-of-week 셀 (Notebook 메타포).
                     child: Container(
                       width: 40,
                       height: 40,
@@ -186,7 +187,6 @@ class PracticeReminderSheet extends ConsumerWidget {
                             isSelected && settings.isEnabled
                                 ? AppColors.paperAccent
                                 : AppColors.paperDark,
-                        shape: BoxShape.circle,
                         border: Border.all(
                           color:
                               isSelected && settings.isEnabled

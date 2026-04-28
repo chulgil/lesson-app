@@ -177,29 +177,24 @@ class UnconnectedChildDashboard extends ConsumerWidget {
   }
 
   Widget _buildTeacherConnectionBanner(BuildContext context) {
+    // §7.132: paperAccent.alpha 변형(gradient·border) → paperAccentSoft + paperAccent solid border.
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.paperAccent.withValues(alpha: 0.1),
-            AppColors.paperAccent.withValues(alpha: 0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.paperAccentSoft,
         borderRadius: BorderRadius.zero,
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              // §7.132: paperAccent.alpha → paperAccentSoft.
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space2),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                   borderRadius: BorderRadius.zero,
                 ),
                 child: const Icon(
@@ -256,9 +251,10 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   onPressed: () => _enterInviteCode(context),
                   icon: const Icon(Icons.qr_code, size: 18),
                   label: const Text('초대코드 입력'),
+                  // §7.132: foregroundColor white → paper.
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
                     ),
@@ -356,7 +352,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     color:
                         isToday
-                            ? Colors.white
+                            ? AppColors.paper
                             : hasPractice
                             ? AppColors.paperOk
                             : AppColors.inkSecondary,

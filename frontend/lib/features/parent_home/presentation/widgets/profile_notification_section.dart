@@ -170,13 +170,14 @@ class ProfileNotificationSection extends ConsumerWidget {
                     Text(label, style: AppTypography.bodyLarge),
                     if (isRequired) ...[
                       const SizedBox(width: AppSpacing.space1),
+                      // §7.132: paperAccent.alpha → paperAccentSoft.
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
                           vertical: 1,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.paperAccent.withValues(alpha: 0.1),
+                          color: AppColors.paperAccentSoft,
                           borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
@@ -259,9 +260,7 @@ class ProfileNotificationSection extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.85,

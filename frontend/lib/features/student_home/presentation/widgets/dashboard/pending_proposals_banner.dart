@@ -49,12 +49,10 @@ class PendingProposalsBanner extends ConsumerWidget {
             ),
             child: Row(
               children: [
+                // §7.132: round → 사각 아이콘 컨테이너 (Notebook 메타포).
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
-                  decoration: const BoxDecoration(
-                    color: AppColors.paperDark,
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(color: AppColors.paperDark),
                   child: const Icon(
                     Icons.card_giftcard,
                     color: AppColors.paperAccent,

@@ -302,16 +302,16 @@ class ParentLessonsTab extends ConsumerWidget {
                               ),
                               child: Row(
                                 children: [
+                                  // §7.132: round → 사각 play 버튼. white → paper.
                                   Container(
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
                                       color: AppColors.paperAccent,
-                                      shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
                                       Icons.play_arrow,
-                                      color: Colors.white,
+                                      color: AppColors.paper,
                                     ),
                                   ),
                                   const SizedBox(width: AppSpacing.space3),

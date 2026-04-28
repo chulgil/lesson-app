@@ -72,6 +72,7 @@
 - [§7.125 주간 헤더↔그리드 가로 정렬](#7125--주간-헤더그리드-가로-정렬-2026-04-27-같은-날-후속)
 - [§7.126 좌측 공간 축소 + 모든 모드 헤더 동일 사이즈](#7126--좌측-공간-축소--모든-모드-헤더-동일-사이즈-2026-04-27-같은-날-후속)
 - [§7.131 알림 모듈 Notebook × Score 정렬](#7131--알림-모듈-notebook--score-정렬-2026-04-28-사용자-점검) — 이모지 → outlined Icon, alpha 변형 → ink 톤 분리, round → 사각
+- [§7.132 student_home + parent_home Notebook × Score 정렬 W1](#7132--student_home--parent_home-notebook--score-정렬-w1-2026-04-28) — round → 사각 (CircleAvatar 사람 메타포만 유지), Colors.white → AppColors.paper, paperAccent.alpha → paperAccentSoft
 
 ---
 
@@ -5278,3 +5279,61 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: 날짜 헤더에 `bodySmall` 유지 + ThinRule 만 추가 — `sectionLabel`(uppercase + letterSpacing 1.5)이 §7.17 통일 패턴. 한글 "오늘"/"어제" 도 letterSpacing 으로 위계 표시 가능.
 
 **테스트**: `flutter analyze` 0 issues (전체 frontend scope). 알림 모듈에 단위 테스트 부재이므로 시각 정렬 위주 — entity 변경 없음, 비즈니스 로직 무변경.
+
+#### §7.132 — student_home + parent_home Notebook × Score 정렬 W1 (2026-04-28)
+
+**전제**: §7.131 알림 모듈 정렬을 두 홈 도메인(parent_home / student_home)으로 횡전개. `Colors.white` 하드코딩, `BoxShape.circle` 비-아바타 컨테이너, `paperAccent.withValues(alpha: ...)` 변형이 W1 grep audit 에서 23 파일 / ~50 hits 검출. child_profile* 3 파일은 W1.5 로 이연.
+
+**적용 원칙 (§7.131 패턴 횡전개)**:
+1. **사람 = 원형 관습 보존** — `CircleAvatar` 는 유지 (학부모/학생 정체성 표현). 인물 텍스트 색상만 `Colors.white → AppColors.paper`.
+2. **비-아바타 round → 사각** — 체크박스, 뱃지, 아이콘 컨테이너, day-cell, step indicator, 카메라 뱃지, play 버튼, dot 마커. Notebook 메타포(잉크 마크) 정렬.
+3. **`Colors.white → AppColors.paper`** — accent 배너 위 텍스트, foregroundColor, 테두리, 체크마크. cream 톤 유지.
+4. **`paperAccent.withValues(alpha: 0.1/0.2) → paperAccentSoft`** — 1-point accent 원칙 (ux-rules #14). 0.3/0.5 border 는 solid `paperAccent` 또는 `inkQuaternary`.
+5. **`width: 0.5` border → 1px** — ux-rules #5 OVERFLOW 회피.
+6. **동적 `bannerColor.withValues(alpha:)` 는 예외** — 파라미터화된 색이라 paperAccent 직접 매핑 불가, alpha 변형 유지 + shape 만 사각화.
+
+**적용 18건 / 13개 파일 (W1 scope)**:
+
+| 파일 | 위치 | 변경 |
+|---|---|---|
+| `parent_home/widgets/assignment_item.dart` | `:30-43` | round → 사각 체크박스, `Colors.white → AppColors.paper` 체크마크 |
+| `parent_home/widgets/parent_notification_badge.dart` | `:26-47` | 둥근 뱃지 → 사각 잉크 마크, `paperAccent` 배경 + `paper` 1px 테두리 |
+| `parent_home/widgets/add_child_option.dart` | `:37-44` | round → 사각 아이콘 컨테이너 + 1px ink stroke |
+| `parent_home/widgets/profile_header.dart` | `:21-52, 71-87` | CircleAvatar 유지(사람 = 원형), 카메라 뱃지 round → 사각, `Colors.white → AppColors.paper` × 3, paperAccent.alpha → paperAccentSoft |
+| `parent_home/widgets/child_card.dart` | `:46-56, 71-82, 109-117, 188-194` | CircleAvatar 유지 + paper 텍스트, paperAccent.alpha × 3 → paperAccentSoft |
+| `parent_home/widgets/profile_children_section.dart` | `:131-141` | CircleAvatar 유지, `Colors.white → AppColors.paper` |
+| `parent_home/widgets/profile_notification_section.dart` | `:172-181` | paperAccent.alpha → paperAccentSoft (필수 뱃지) |
+| `parent_home/widgets/notification_settings_sheet.dart` | `:71-79` | paperAccent.alpha → paperAccentSoft (Summary 카드) |
+| `parent_home/screens/parent_dashboard_tab.dart` | `:660-677` | 36x36 day cell round → 사각 (practice streak) |
+| `parent_home/screens/parent_assignments_tab.dart` | `:114-119, 129-135, 146, 154, 274-289` | 배너 텍스트 white × 4 → paper, 체크박스 round → 사각 + paper 체크마크 |
+| `parent_home/screens/parent_lessons_tab.dart` | `:305-316` | 40x40 play 버튼 round → 사각, `Colors.white → AppColors.paper` |
+| `parent_home/screens/parent_payments_tab.dart` | `:280-291, 455-462` | CircleAvatar 유지(사람 = 원형) × 2, `Colors.white → AppColors.paper` |
+| `parent_home/screens/unconnected_child_dashboard.dart` | `:179-210, 254-261, 326-358` | gradient alpha → paperAccentSoft solid + paperAccent border, foregroundColor white → paper, day cell white → paper |
+| `student_home/widgets/dashboard/subscription_renewal_banner.dart` | `:92-105` | round → 사각 아이콘 컨테이너 (bannerColor.alpha 는 동적이므로 유지) |
+| `student_home/widgets/dashboard/pending_proposals_banner.dart` | `:52-63` | round → 사각 아이콘 컨테이너 |
+| `student_home/widgets/student_getting_started_card.dart` | `:150-161` | 28x28 step 인디케이터 round → 사각 |
+| `student_home/widgets/practice_reminder_sheet.dart` | `:181-196` | 40x40 day-of-week 셀 round → 사각 |
+| `student_home/widgets/weekly_practice_widget.dart` | `:248-285` | 0.5px → 1px ThinRule, priority dot + 체크박스 round → 사각 |
+| `student_home/screens/student_lessons_tab.dart` | `:354-365` | empty state 아이콘 컨테이너 round → 사각 |
+| `student_home/screens/student_profile_tab.dart` | `:167-182, 487-494` | 카메라 뱃지 round → 사각, paperAccent.alpha 0.5 border → solid paperAccent |
+| `student_home/screens/student_profile_edit_screen.dart` | `:352-370` | 카메라 뱃지 round → 사각 |
+
+**의도적 제외 (W1.5 이연)**:
+- `parent_home/screens/child_profile_form_screen.dart` (`:202, 215, 412, 424, 430`) — 자녀 프로필 폼 전체. 본 W1 은 dashboard 표면 위주, 폼은 별도 phase.
+- `parent_home/screens/child_profiles_screen.dart` (`:98, 224`) — 자녀 프로필 목록. W1.5 와 함께 처리.
+- `student_home` 의 `learning_record_group.dart`, `student_lesson_card.dart` 등 — 본 W1 grep 에서 위반 미검출, 회귀 시 W2 에서 처리.
+- 동적 `bannerColor.withValues(alpha:)` (subscription_renewal_banner) — 파라미터화 색상, paperAccent 매핑 불가.
+
+**Lore-directive**: 비-아바타 컨테이너의 `BoxShape.circle` 은 §7.131 / §7.132 에서 일괄 사각화. 인물 정체성을 표현하는 `CircleAvatar` 만 보존(사람 = 원형 관습). 새 위젯 추가 시 `BoxShape.circle` 사용은 인물 표현일 때만 허용.
+
+**Lore-directive**: accent 배너 위 텍스트는 `Colors.white` 가 아닌 `AppColors.paper` 사용 (cream 톤 유지). foregroundColor / valueColor / 체크마크 / 인물 이니셜 모두 동일 규칙.
+
+**Lore-directive**: `paperAccent.withValues(alpha: 0.1/0.2)` 는 `paperAccentSoft` 토큰으로 일원화. alpha 변형은 ux-rules #14 (1-point accent) 위반.
+
+**Lore-rejected**: 모든 CircleAvatar 도 사각화 — 학부모/학생/자녀 정체성을 표현하는 인물 아바타는 디자인 시스템과 무관한 사회적 관습(사람 사진 = 원형). 사각화는 정체성 인식 저해.
+
+**Lore-rejected**: 동적 `bannerColor.withValues(alpha: 0.1)` 도 paperAccentSoft 매핑 — bannerColor 가 paperAccent 외 팔레트(paperWarning 등) 일 수 있어 단일 토큰 매핑 불가. shape 만 사각화로 부분 정렬.
+
+**Lore-rejected**: child_profile* 까지 W1 에 포함 — 폼 위젯은 별도 디자인 컨텍스트(입력 영역). dashboard 표면(W1)과 분리하여 W1.5 에서 일관 처리.
+
+**테스트**: `flutter analyze lib/features/parent_home lib/features/student_home` → No issues found! (parent_notification_badge.dart 의 unused AppSpacing import 제거 후). 비즈니스 로직 무변경, 시각 토큰 정렬만.

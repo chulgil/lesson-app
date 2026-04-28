@@ -351,12 +351,10 @@ class StudentLessonsTab extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // §7.132: round → 사각 empty state 아이콘 컨테이너.
             Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
               child: Icon(
                 Icons.event_available,
                 size: 48,
