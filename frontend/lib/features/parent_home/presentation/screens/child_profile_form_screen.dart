@@ -192,6 +192,7 @@ class _ChildProfileFormScreenState
                   _profileColors.map((color) {
                     final isSelected =
                         _selectedColor.toARGB32() == color.toARGB32();
+                    // §7.132 W1.5: 색상 선택 swatch round → 사각 (Notebook 메타포). white → paper.
                     return GestureDetector(
                       onTap: () => setState(() => _selectedColor = color),
                       child: Container(
@@ -199,20 +200,16 @@ class _ChildProfileFormScreenState
                         height: 44,
                         decoration: BoxDecoration(
                           color: color,
-                          shape: BoxShape.circle,
                           border:
                               isSelected
-                                  ? Border.all(
-                                    color: AppColors.ink,
-                                    width: 3,
-                                  )
+                                  ? Border.all(color: AppColors.ink, width: 3)
                                   : null,
                         ),
                         child:
                             isSelected
                                 ? const Icon(
                                   Icons.check,
-                                  color: Colors.white,
+                                  color: AppColors.paper,
                                   size: 20,
                                 )
                                 : null,
@@ -405,11 +402,12 @@ class _ChildProfileFormScreenState
             SizedBox(
               width: double.infinity,
               height: 52,
+              // §7.132 W1.5: white × 3 → paper.
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.paper,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,
                   ),
@@ -421,13 +419,13 @@ class _ChildProfileFormScreenState
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         )
                         : Text(
                           isEditing ? '저장' : '자녀 추가',
                           style: AppTypography.button.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         ),
               ),
@@ -471,7 +469,9 @@ class _ChildProfileFormScreenState
                   Navigator.pop(context);
                   await _deleteProfile();
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],

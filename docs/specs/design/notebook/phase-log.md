@@ -73,6 +73,7 @@
 - [§7.126 좌측 공간 축소 + 모든 모드 헤더 동일 사이즈](#7126--좌측-공간-축소--모든-모드-헤더-동일-사이즈-2026-04-27-같은-날-후속)
 - [§7.131 알림 모듈 Notebook × Score 정렬](#7131--알림-모듈-notebook--score-정렬-2026-04-28-사용자-점검) — 이모지 → outlined Icon, alpha 변형 → ink 톤 분리, round → 사각
 - [§7.132 student_home + parent_home Notebook × Score 정렬 W1](#7132--student_home--parent_home-notebook--score-정렬-w1-2026-04-28) — round → 사각 (CircleAvatar 사람 메타포만 유지), Colors.white → AppColors.paper, paperAccent.alpha → paperAccentSoft
+- [§7.132 W1.5 child_profile* 후속 정렬](#7132-w15--child_profile-후속-정렬-2026-04-28-w1-후속) — 색상 swatch round → 사각, Save·추가 버튼 white → paper
 
 ---
 
@@ -5337,3 +5338,22 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: child_profile* 까지 W1 에 포함 — 폼 위젯은 별도 디자인 컨텍스트(입력 영역). dashboard 표면(W1)과 분리하여 W1.5 에서 일관 처리.
 
 **테스트**: `flutter analyze lib/features/parent_home lib/features/student_home` → No issues found! (parent_notification_badge.dart 의 unused AppSpacing import 제거 후). 비즈니스 로직 무변경, 시각 토큰 정렬만.
+
+#### §7.132 W1.5 — child_profile* 후속 정렬 (2026-04-28 W1 후속)
+
+**전제**: §7.132 W1 의 의도적 제외(`child_profile_form_screen`, `child_profiles_screen`)를 동일 규칙으로 마무리. W1 은 dashboard 표면, W1.5 는 자녀 프로필 입력/목록 영역.
+
+**적용 4건 / 2개 파일**:
+
+| 파일 | 위치 | 변경 |
+|---|---|---|
+| `child_profile_form_screen.dart` | `:195-220` | 색상 선택 swatch round → 사각 + 체크마크 white → paper |
+| `child_profile_form_screen.dart` | `:402-431` | Save 버튼 foregroundColor·CircularProgressIndicator·button text white × 3 → paper |
+| `child_profiles_screen.dart` | `:92-104` | "자녀 추가하기" 버튼 foregroundColor white → paper |
+| `child_profiles_screen.dart` | `:218-228` | CircleAvatar 유지(사람 = 원형) + 이니셜 white → paper |
+
+**Lore-directive**: 색상 선택 swatch 도 사각화 — Notebook × Score 의 사각 메타포 일관성 우선. 색상 선택기는 통상 원형이지만, 시스템 내 위젯 위계 통일이 사회적 관습보다 우선(swatch 는 인물 표현이 아님).
+
+**Lore-rejected**: 색상 swatch 만 원형 유지 — CircleAvatar(사람)과 swatch(색상 선택)는 메타포가 다름. 인물 정체성 ≠ 색상 도구. swatch 도 사각화하는 것이 §7.132 일관성에 부합.
+
+**테스트**: `flutter analyze lib/features/parent_home` → No issues found!. W1 + W1.5 합계 24 파일 / 22건 정렬 완료.

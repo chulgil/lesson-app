@@ -89,13 +89,14 @@ class ChildProfilesScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space6),
+            // §7.132 W1.5: foregroundColor white → paper.
             ElevatedButton.icon(
               onPressed: () => _navigateToAddChild(context),
               icon: const Icon(Icons.add),
               label: const Text('자녀 추가하기'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.paper,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space6,
                   vertical: AppSpacing.space3,
@@ -214,14 +215,14 @@ class _ChildProfileCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
             children: [
-              // Profile avatar
+              // §7.132 W1.5: CircleAvatar 유지(사람 = 원형 관습). white → paper.
               CircleAvatar(
                 radius: 28,
                 backgroundColor: profile.profileColor,
                 child: Text(
                   profile.initial,
                   style: AppTypography.headingMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
               ),
