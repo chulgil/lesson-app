@@ -97,7 +97,8 @@ class TeacherAvailability extends HiveObject {
 
   /// Effective slot duration including break time
   /// Used for determining next available slot start time
-  int get effectiveSlotDuration => slotDurationMinutes + breakTimeBetweenLessons;
+  int get effectiveSlotDuration =>
+      slotDurationMinutes + breakTimeBetweenLessons;
 
   TeacherAvailability copyWith({
     String? id,
@@ -122,7 +123,8 @@ class TeacherAvailability extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       slotStartInterval: slotStartInterval ?? this.slotStartInterval,
-      breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
+      breakTimeBetweenLessons:
+          breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
       minBookingHours: minBookingHours ?? this.minBookingHours,
     );
   }
@@ -296,9 +298,47 @@ class TimeException extends HiveObject {
   /// Check if a date falls within this exception
   bool containsDate(DateTime date) {
     final dateOnly = DateTime(date.year, date.month, date.day);
-    final startOnly =
-        DateTime(startDate.year, startDate.month, startDate.day);
+    final startOnly = DateTime(startDate.year, startDate.month, startDate.day);
     final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
     return !dateOnly.isBefore(startOnly) && !dateOnly.isAfter(endOnly);
+  }
+
+  /// Check if a slot's effective time range overlaps with this exception's
+  /// blocked time on [date]. Used by `_computeSlotsForDate` to decide
+  /// whether a generated slot must be excluded.
+  ///
+  /// - When [startTime]/[endTime] are both null → whole-day block
+  ///   (backward compatible with prior `containsDate` behavior).
+  /// - When [startTime]/[endTime] are set → block only that time window.
+  ///   Slot range `[slotEffectiveStartMinutes, slotEffectiveEndMinutes]`
+  ///   must NOT overlap the blocked window.
+  ///
+  /// Boundary: touching (slot.end == block.start, or slot.start == block.end)
+  /// is treated as NO overlap so adjacent slots are usable.
+  bool containsDateTimeRange(
+    DateTime date,
+    int slotEffectiveStartMinutes,
+    int slotEffectiveEndMinutes,
+  ) {
+    if (!containsDate(date)) return false;
+    if (startTime == null || endTime == null) {
+      return true; // whole-day block
+    }
+    final blockStart = _parseHHmm(startTime!);
+    final blockEnd = _parseHHmm(endTime!);
+    if (blockStart == null || blockEnd == null) {
+      return true; // malformed → fall back to whole-day for safety
+    }
+    return slotEffectiveStartMinutes < blockEnd &&
+        slotEffectiveEndMinutes > blockStart;
+  }
+
+  static int? _parseHHmm(String value) {
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null) return null;
+    return h * 60 + m;
   }
 }

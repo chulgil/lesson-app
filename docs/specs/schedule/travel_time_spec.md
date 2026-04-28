@@ -180,11 +180,18 @@ for (final exception in availability.exceptions) {
 
 `TimeException` (`teacher_availability.dart:229`) 에 `startTime` / `endTime` 필드는 이미 존재하나 `additionalSlot` 용도로만 쓰이는 중. 동일 필드를 `holiday`/`vacation` 부분 차단에 재활용 가능.
 
-### 7.4 향후 패치 단계 제안
+### 7.4 패치 단계 진행
 
-| Phase | 작업 |
-|-------|------|
-| 3.3 | (현재) 갭 식별 + 스펙 명시 |
-| 미정 | `_computeSlotsForDate` 의 차단 로직을 시간 단위로 확장. `containsDate` → `containsDateTimeRange` |
-| 미정 | TimeException UI 가 부분 차단 시간 입력 받도록 |
-| 미정 | 회귀 테스트: 위 4 케이스에 대한 unit test |
+| Phase | 작업 | 상태 |
+|-------|------|------|
+| 3.3 | 갭 식별 + 스펙 명시 | ✅ 완료 (2026-04-28) |
+| 3.4 | `_computeSlotsForDate` 의 차단 로직을 시간 단위로 확장. `TimeException.containsDateTimeRange(date, slotEffectiveStart, slotEffectiveEnd)` 추가, 부분 차단 슬롯만 제외 (whole-day 역호환 유지) | ✅ 완료 (2026-04-28) |
+| 3.4 | 회귀 테스트: 위 4 케이스 + 역호환 unit test (`test/features/schedule/availability_time_exception_test.dart`) | ✅ 완료 (2026-04-28, 5/5 PASS) |
+| 미정 | TimeException UI 가 부분 차단 시간 입력 받도록 (현재 entity HiveField 4/5 만 존재, 입력 화면 미반영) | 🟡 후속 phase |
+
+### 7.5 적용된 차단 규칙 (3.4 패치 결과)
+
+- `TimeException.startTime`/`endTime` 둘 다 null → 기존대로 하루 전체 차단 (역호환).
+- 둘 다 set → 슬롯의 `effectiveRange = [slotStart - incomingTravelTime, slotEnd]` 가 차단 윈도우와 겹치는 경우만 제외.
+  - 경계 접합(`slot.end == block.start` 또는 `slot.effectiveStart == block.end`)은 **non-overlap** 으로 처리하여 인접 슬롯 사용 가능.
+- `incomingTravelTime` 은 `currentStudentId` 가 주어지면 `_studentTravelTimes[studentId]` 에서 조회 (기존 `_findConflictingSlot` 과 동일 소스).

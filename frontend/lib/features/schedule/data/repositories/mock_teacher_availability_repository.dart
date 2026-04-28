@@ -114,8 +114,14 @@ class MockTeacherAvailabilityRepository
     );
 
     // teacher_3 ~ teacher_8: teacher_1과 동일한 스케줄 공유 (간단 설정)
-    for (final tid in ['teacher_3', 'teacher_4', 'teacher_5',
-                        'teacher_6', 'teacher_7', 'teacher_8']) {
+    for (final tid in [
+      'teacher_3',
+      'teacher_4',
+      'teacher_5',
+      'teacher_6',
+      'teacher_7',
+      'teacher_8',
+    ]) {
       _availabilities[tid] = TeacherAvailability(
         id: _uuid.v4(),
         teacherId: tid,
@@ -163,8 +169,8 @@ class MockTeacherAvailabilityRepository
 
     // Mock student travel times (from ClassMembership)
     _studentTravelTimes['student_1'] = 20; // 홍길동 - 학생 집 방문 (20분)
-    _studentTravelTimes['student_2'] = 0;  // 학원 (이동 없음)
-    _studentTravelTimes['student_3'] = 0;  // 박민지 - 학원 (이동 없음)
+    _studentTravelTimes['student_2'] = 0; // 학원 (이동 없음)
+    _studentTravelTimes['student_3'] = 0; // 박민지 - 학원 (이동 없음)
     _studentTravelTimes['student_4'] = 30; // 먼 거리 (30분)
 
     // Add pre-booked slots
@@ -284,9 +290,10 @@ class MockTeacherAvailabilityRepository
       throw Exception('Availability not found for teacher: $teacherId');
     }
 
-    final schedules = current.weeklySchedules.map((s) {
-      return s.id == schedule.id ? schedule : s;
-    }).toList();
+    final schedules =
+        current.weeklySchedules.map((s) {
+          return s.id == schedule.id ? schedule : s;
+        }).toList();
 
     final updated = current.copyWith(
       weeklySchedules: schedules,
@@ -355,9 +362,10 @@ class MockTeacherAvailabilityRepository
       throw Exception('Availability not found for teacher: $teacherId');
     }
 
-    final exceptions = current.exceptions.map((e) {
-      return e.id == exception.id ? exception : e;
-    }).toList();
+    final exceptions =
+        current.exceptions.map((e) {
+          return e.id == exception.id ? exception : e;
+        }).toList();
 
     final updated = current.copyWith(
       exceptions: exceptions,
@@ -492,16 +500,21 @@ class MockTeacherAvailabilityRepository
     final history = _lessonHistory[studentId] ?? [];
     if (history.isEmpty) return [];
 
-    return allSlots.where((slot) {
-      if (slot.status != AvailabilitySlotStatus.available) return false;
+    return allSlots
+        .where((slot) {
+          if (slot.status != AvailabilitySlotStatus.available) return false;
 
-      // Check if this slot matches student's usual time
-      return history.any((h) =>
-          slot.date.weekday == h.dayOfWeek &&
-          slot.startTime.hour == h.hour &&
-          slot.startTime.minute == h.minute &&
-          h.count >= 2);
-    }).map((slot) => slot.copyWith(isRecommended: true)).toList();
+          // Check if this slot matches student's usual time
+          return history.any(
+            (h) =>
+                slot.date.weekday == h.dayOfWeek &&
+                slot.startTime.hour == h.hour &&
+                slot.startTime.minute == h.minute &&
+                h.count >= 2,
+          );
+        })
+        .map((slot) => slot.copyWith(isRecommended: true))
+        .toList();
   }
 
   List<AvailabilitySlot> _computeSlotsForDate(
@@ -511,7 +524,8 @@ class MockTeacherAvailabilityRepository
   }) {
     final now = DateTime.now();
     final dateOnly = DateTime(date.year, date.month, date.day);
-    final isToday = dateOnly.year == now.year &&
+    final isToday =
+        dateOnly.year == now.year &&
         dateOnly.month == now.month &&
         dateOnly.day == now.day;
 
@@ -520,12 +534,27 @@ class MockTeacherAvailabilityRepository
       return [];
     }
 
-    // Check for exceptions (holidays, vacations)
-    for (final exception in availability.exceptions) {
-      if (exception.type != ExceptionType.additionalSlot &&
-          exception.containsDate(date)) {
-        return []; // Day is blocked
-      }
+    // Pre-filter applicable blocking exceptions for this date.
+    // Per-slot check happens inside the slot generation loop so that
+    // partial-day blocks (holiday/vacation with startTime/endTime) only
+    // remove overlapping slots rather than the entire day.
+    // See docs/specs/schedule/travel_time_spec.md §7.2.
+    final blockingExceptions =
+        availability.exceptions
+            .where(
+              (e) =>
+                  e.type != ExceptionType.additionalSlot &&
+                  e.containsDate(date),
+            )
+            .toList();
+
+    // Optimization: if any blocking exception spans the whole day
+    // (startTime/endTime both null), the day is fully blocked.
+    final hasWholeDayBlock = blockingExceptions.any(
+      (e) => e.startTime == null || e.endTime == null,
+    );
+    if (hasWholeDayBlock) {
+      return [];
     }
 
     // Find applicable weekly schedule
@@ -577,12 +606,31 @@ class MockTeacherAvailabilityRepository
           }
         }
 
+        final breakTime = availability.breakTimeBetweenLessons;
+        final incomingTravelTime =
+            currentStudentId != null
+                ? (_studentTravelTimes[currentStudentId] ?? 0)
+                : 0;
+
+        // Per-slot exception check: a partial-day block (holiday/vacation
+        // with startTime/endTime) excludes any slot whose effective range
+        // [start - incomingTravelTime, end] overlaps the blocked window.
+        final slotEffectiveStart = currentMinutes - incomingTravelTime;
+        final slotEffectiveEnd = currentMinutes + lessonDuration;
+        final isBlockedByException = blockingExceptions.any(
+          (e) => e.containsDateTimeRange(
+            date,
+            slotEffectiveStart,
+            slotEffectiveEnd,
+          ),
+        );
+        if (isBlockedByException) {
+          currentMinutes += startInterval;
+          continue;
+        }
+
         // Check if this slot conflicts with any booked slot
         // Include breakTime + travelTime buffer around booked slots
-        final breakTime = availability.breakTimeBetweenLessons;
-        final incomingTravelTime = currentStudentId != null
-            ? (_studentTravelTimes[currentStudentId] ?? 0)
-            : 0;
         final conflictingSlot = _findConflictingSlot(
           availability.teacherId,
           date,
@@ -617,20 +665,23 @@ class MockTeacherAvailabilityRepository
             _isRecommendedSlot(currentStudentId, date, startTime);
 
         // Use simple date format (yyyy-MM-dd) to avoid parsing issues with ISO 8601
-        final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-        slots.add(AvailabilitySlot(
-          id: '${availability.teacherId}_${dateStr}_$slotHour:$slotMinute',
-          teacherId: availability.teacherId,
-          date: date,
-          startTime: startTime,
-          endTime: endTime,
-          durationMinutes: lessonDuration,
-          status: status,
-          bookedByStudentId: bookedById,
-          bookedByStudentName: bookedByName,
-          lessonId: lessonId,
-          isRecommended: isRecommended,
-        ));
+        final dateStr =
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        slots.add(
+          AvailabilitySlot(
+            id: '${availability.teacherId}_${dateStr}_$slotHour:$slotMinute',
+            teacherId: availability.teacherId,
+            date: date,
+            startTime: startTime,
+            endTime: endTime,
+            durationMinutes: lessonDuration,
+            status: status,
+            bookedByStudentId: bookedById,
+            bookedByStudentName: bookedByName,
+            lessonId: lessonId,
+            isRecommended: isRecommended,
+          ),
+        );
 
         // Move to next slot start time (30min or 60min interval)
         currentMinutes += startInterval;
@@ -662,7 +713,8 @@ class MockTeacherAvailabilityRepository
         continue;
       }
 
-      final bookedStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
+      final bookedStartMinutes =
+          slot.startTime.hour * 60 + slot.startTime.minute;
       final bookedEndMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
 
       // Each slot's occupied range includes travel BEFORE the lesson
@@ -689,11 +741,13 @@ class MockTeacherAvailabilityRepository
     final history = _lessonHistory[studentId];
     if (history == null) return false;
 
-    return history.any((h) =>
-        date.weekday == h.dayOfWeek &&
-        time.hour == h.hour &&
-        time.minute == h.minute &&
-        h.count >= 2);
+    return history.any(
+      (h) =>
+          date.weekday == h.dayOfWeek &&
+          time.hour == h.hour &&
+          time.minute == h.minute &&
+          h.count >= 2,
+    );
   }
 
   // ============================================================
@@ -766,10 +820,7 @@ class MockTeacherAvailabilityRepository
       teacherId: teacherId,
       date: date,
       startTime: TimeOfDay(hour: hour, minute: minute),
-      endTime: TimeOfDay(
-        hour: endMinutes ~/ 60,
-        minute: endMinutes % 60,
-      ),
+      endTime: TimeOfDay(hour: endMinutes ~/ 60, minute: endMinutes % 60),
       durationMinutes: availability.slotDurationMinutes,
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: studentId,
@@ -819,10 +870,13 @@ class MockTeacherAvailabilityRepository
 
     if (isAvailable) {
       // Remove any exception for this date/time
-      final exceptionsToRemove = availability.exceptions.where((e) =>
-          e.containsDate(date) &&
-          e.startTime != null &&
-          e.startTime == '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}');
+      final exceptionsToRemove = availability.exceptions.where(
+        (e) =>
+            e.containsDate(date) &&
+            e.startTime != null &&
+            e.startTime ==
+                '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+      );
 
       if (exceptionsToRemove.isNotEmpty) {
         for (final e in exceptionsToRemove) {

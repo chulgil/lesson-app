@@ -60,17 +60,20 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 
 ## P1-1 Phase 분해
 
-### Phase A — 스펙↔코드 정합
-- chat_guide_message_spec 11 상태 매트릭스 ↔ `_getPhaseGuide()` 일치
+### Phase A — 스펙↔코드 정합 ✅ 완료 (commit 0ed0d3c7)
+- chat_guide_message_spec 12 상태 ↔ `_getPhaseGuide()` 일치
 - schedule_confirmation_card_spec 3타입 ↔ `schedule_confirmation_card_widget` 일치
 
-### Phase B — travel_time §7 4 케이스 패치
-- `_computeSlotsForDate`: `containsDate` → `containsDateTimeRange`
-- `_findConflictingSlot`: travelTime 포함
-- TimeException UI 부분 차단 시간 입력
-- unit test 4 케이스
+### Phase B — travel_time §7 4 케이스 패치 ✅ 완료 (2026-04-28)
+- `TimeException.containsDateTimeRange(date, slotStart, slotEnd)` 추가
+- `_computeSlotsForDate`: 부분 차단 슬롯만 제외 (whole-day 역호환 유지)
+- 회귀 테스트 5건 (4 케이스 + 역호환), 5/5 PASS, schedule scope 237/237 통과
+- TimeException UI 부분 차단 시간 입력 → 별도 phase 로 분리 (entity 만 준비)
 
-### Phase C — 검증
+### Phase C — 검증 ✅ 완료
+- `flutter analyze lib/features/schedule/ test/features/schedule/` 0 issues
+- `flutter test test/features/schedule/` 237/237 PASS
+- 스펙 동기화: `travel_time_spec.md` §7.4/7.5 갱신
 
 ## P1-2 Phase 분해
 
@@ -111,13 +114,14 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 
 ## 다음 단계
 
-| 작업 | 순서 |
+| 작업 | 상태 |
 |---|---|
-| **즉시** P0-1 Phase A — 매핑 표 작성 | 진입 |
-| P0-1 Phase B — 재구성 + commit | 후속 |
-| P0-1 Phase C — smoke test + 회귀 | 후속 |
-| P0-2 진행 | P0-1 완료 후 |
-| P1, P2 | 순서대로 |
+| P0-1 / P0-2 / P1-1 Phase A·B·C | ✅ 완료 (2026-04-28) |
+| **다음** P1-2 Phase A — AppBar 통일 (LessonRequestsScreen / RequestDetailScreen / SuggestAlternativeScreen Masthead) | 진입 |
+| P1-2 Phase B — Phase 2 3경로 카드 일관성 | 후속 |
+| P1-2 Phase C — 가이드 색상 2색 분기 검증 | 후속 |
+| P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
+| P2 5-1h booking_reschedule_screen i18n | P1-2 완료 후 |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
 
