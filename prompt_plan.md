@@ -48,19 +48,15 @@ P0-1 (재구성)  →  P0-2 (정리)  →  P1-1 (스펙+travel)  →  P1-2 (UI�
 - `flutter analyze` 0 / `flutter test` 통과
 - 실기 확인 (학생 경로)
 
-## P0-2 Phase 분해
+## P0-2 — 완료 (2026-04-28 검증)
 
-### Phase A — Dead Code grep
-- `ScheduleChangeStatus` 호출처 0 확인
-- `ScheduleChange` 구 엔티티 / `lib/models/` 잔재 확인
-- 의도적 예약 enum 은 `// ignore: unused-enum + 사유` 표기
+phase_a_mapping.md 분석 + 추가 grep 결과:
 
-### Phase B — 제거
-- import / definition / mock 정리
-- HiveType 제거 시 마이그레이션 plan (사용자 데이터 영향 검증)
+- frontend: `ScheduleChangeStatus` 호출처 0건 (이미 제거됨)
+- frontend: `ScheduleChangeType` 은 `RequestEvent.scheduleChangeType` SSOT 로 정착 (request_event.dart §16-41)
+- backend: `ScheduleChangeStatus` 는 `RegularLessonScheduleChange.status` 컬럼에서 active 사용 — dead 아님 (schedule_ext.py §46-50, §181-184)
 
-### Phase C — 검증
-- analyze + test, code-review
+코드 작업 불필요. P0-2 close.
 
 ## P1-1 Phase 분해
 
