@@ -17,8 +17,8 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
+import '../widgets/schedule_change_slot_bottom_sheet.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
-import 'schedule_change_slot_screen.dart';
 import '../../../subscription/presentation/providers/subscription_template_providers.dart';
 import '../widgets/current_request_box.dart';
 import '../widgets/request_profile_card.dart';
@@ -947,22 +947,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final changeType = await showScheduleChangeTypeBottomSheet(context);
     if (changeType == null || !context.mounted) return;
 
-    // Both single and bulk use the same ScheduleChangeSlotScreen
-    final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
-      MaterialPageRoute(
-        builder:
-            (_) => ScheduleChangeSlotScreen(
-              params: ScheduleChangeSlotParams(
-                teacherId: request.teacherId,
-                studentId: request.studentId,
-                durationMinutes: 60, // TODO: get from subscription
-                currentScheduleLabel:
-                    request.preferredSlots.isNotEmpty
-                        ? request.preferredSlots.first.displayLabel
-                        : '-',
-                isBulkChange: changeType == ScheduleChangeType.bulkChange,
-              ),
-            ),
+    // Both single and bulk use the same ScheduleChangeSlotBottomSheet.
+    // P0-1 Phase B(b) — 부모가 BottomSheet 흐름이므로 sheet 로 통일.
+    if (!context.mounted) return;
+    final result = await showScheduleChangeSlotBottomSheet(
+      context,
+      params: ScheduleChangeSlotParams(
+        teacherId: request.teacherId,
+        studentId: request.studentId,
+        durationMinutes: 60, // TODO: get from subscription
+        currentScheduleLabel:
+            request.preferredSlots.isNotEmpty
+                ? request.preferredSlots.first.displayLabel
+                : '-',
+        isBulkChange: changeType == ScheduleChangeType.bulkChange,
       ),
     );
     if (result == null || !context.mounted) return;

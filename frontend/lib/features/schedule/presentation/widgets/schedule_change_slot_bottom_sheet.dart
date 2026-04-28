@@ -6,16 +6,18 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_guide_box.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../providers/week_lessons_provider.dart';
-import '../widgets/alternative_time_grid.dart';
+import 'alternative_time_grid.dart';
 
-/// Result from the schedule change slot selection screen.
+/// Result from the schedule change slot selection bottom sheet.
 typedef ScheduleChangeSlotResult = ({String message, List<TimeSlot> slots});
 
-/// Parameters for navigating to this screen.
+/// Parameters for showing the schedule change slot bottom sheet.
 class ScheduleChangeSlotParams {
   final String teacherId;
   final String studentId;
@@ -35,22 +37,38 @@ class ScheduleChangeSlotParams {
   });
 }
 
-/// Screen for selecting alternative time slots for a single lesson change.
+/// Shows the schedule change slot selection bottom sheet.
+///
+/// 부모 흐름이 `showScheduleChangeTypeBottomSheet` (BottomSheet) 으로 시작하므로
+/// 본 화면도 BottomSheet 로 통일해 흐름 단절을 제거 (P0-1 Phase B(b)).
+Future<ScheduleChangeSlotResult?> showScheduleChangeSlotBottomSheet(
+  BuildContext context, {
+  required ScheduleChangeSlotParams params,
+}) {
+  return showModalBottomSheet<ScheduleChangeSlotResult>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _ScheduleChangeSlotBottomSheet(params: params),
+  );
+}
+
+/// Bottom sheet for selecting alternative time slots.
 ///
 /// Reuses [AlternativeTimeGrid] from the decline/counter-propose flow.
 /// Shows teacher's weekly schedule and allows selecting up to 3 slots.
-class ScheduleChangeSlotScreen extends ConsumerStatefulWidget {
+class _ScheduleChangeSlotBottomSheet extends ConsumerStatefulWidget {
   final ScheduleChangeSlotParams params;
 
-  const ScheduleChangeSlotScreen({super.key, required this.params});
+  const _ScheduleChangeSlotBottomSheet({required this.params});
 
   @override
-  ConsumerState<ScheduleChangeSlotScreen> createState() =>
-      _ScheduleChangeSlotScreenState();
+  ConsumerState<_ScheduleChangeSlotBottomSheet> createState() =>
+      _ScheduleChangeSlotBottomSheetState();
 }
 
-class _ScheduleChangeSlotScreenState
-    extends ConsumerState<ScheduleChangeSlotScreen> {
+class _ScheduleChangeSlotBottomSheetState
+    extends ConsumerState<_ScheduleChangeSlotBottomSheet> {
   late DateTime _weekStart;
   final List<TimeSlot> _suggestedSlots = [];
   final _messageController = TextEditingController();
@@ -78,40 +96,72 @@ class _ScheduleChangeSlotScreenState
         teacherId: params.teacherId,
       )),
     );
+    final mq = MediaQuery.of(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: Text(
-          params.isBulkChange
-              ? AppStrings.scheduleChangeRegularTitle
-              : AppStrings.scheduleChangeSlotTitle,
+    return Container(
+      // proposal_bottom_sheet 패턴 — maxHeight 으로 sheet 상한 고정.
+      // FractionallySizedBox 금지 (scrim 삼킴) — Container constraints 사용.
+      constraints: BoxConstraints(maxHeight: mq.size.height * 0.92),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
+      padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            const Padding(
+              padding: EdgeInsets.only(top: AppSpacing.space3),
+              child: Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            // Header — 바텀시트 제목 (§7.27 Playfair sectionTitle).
+            _buildHeader(context),
+            // Chapter guide — 단계 안내 (request_history_chat 와 시그니처 통일)
+            _buildChapterGuide(),
+            // Current schedule info
+            _buildCurrentScheduleInfo(),
+            // Bulk change info banner
+            if (params.isBulkChange) _buildBulkChangeInfo(),
+            // Week navigation
+            _buildWeekNavigation(),
+            // Grid — Flexible 로 남은 공간 (sheet 상한 안에서 grid 내부 스크롤 보존)
+            Flexible(
+              child: lessonsAsync.when(
+                data: (lessons) => _buildGrid(lessons),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error:
+                    (_, __) =>
+                        const Center(child: Text(AppStrings.cannotLoadData)),
+              ),
+            ),
+            // Suggested slots list
+            if (_suggestedSlots.isNotEmpty) _buildSuggestedSlotsList(),
+            // Message + Submit
+            _buildBottomSection(),
+          ],
         ),
       ),
-      body: Column(
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Row(
         children: [
-          // Chapter guide — 단계 안내 (request_history_chat 와 시그니처 통일)
-          _buildChapterGuide(),
-          // Current schedule info
-          _buildCurrentScheduleInfo(),
-          // Bulk change info banner
-          if (params.isBulkChange) _buildBulkChangeInfo(),
-          // Week navigation
-          _buildWeekNavigation(),
-          // Grid
-          Expanded(
-            child: lessonsAsync.when(
-              data: (lessons) => _buildGrid(lessons),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (_, __) =>
-                      const Center(child: Text(AppStrings.cannotLoadData)),
-            ),
+          Text(
+            params.isBulkChange
+                ? AppStrings.scheduleChangeRegularTitle
+                : AppStrings.scheduleChangeSlotTitle,
+            style: NotebookTypography.sectionTitle,
           ),
-          // Suggested slots list
-          if (_suggestedSlots.isNotEmpty) _buildSuggestedSlotsList(),
-          // Message + Submit
-          _buildBottomSection(),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.close),
+            iconSize: 20,
+          ),
         ],
       ),
     );
@@ -318,10 +368,10 @@ class _ScheduleChangeSlotScreenState
 
   Widget _buildBottomSection() {
     return Container(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: AppSpacing.screenPadding,
         right: AppSpacing.screenPadding,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.space3,
+        bottom: AppSpacing.space3,
         top: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
@@ -330,49 +380,46 @@ class _ScheduleChangeSlotScreenState
           top: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
         ),
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // CurrentRequestBox 와 시각 align — bodySmall style + enabledBorder 명시
-            // (RequestDetailScreen 메시지 입력과 hint/내용 글자 계열 통일).
-            TextField(
-              controller: _messageController,
-              maxLines: 2,
-              maxLength: 200,
-              style: AppTypography.bodySmall,
-              decoration: InputDecoration(
-                hintText:
-                    params.isBulkChange
-                        ? AppStrings.scheduleChangeBulkDesc
-                        : AppStrings.scheduleChangeSingleDesc,
-                hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                counterText: '',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // CurrentRequestBox 와 시각 align — bodySmall style + enabledBorder 명시
+          // (RequestDetailScreen 메시지 입력과 hint/내용 글자 계열 통일).
+          TextField(
+            controller: _messageController,
+            maxLines: 2,
+            maxLength: 200,
+            style: AppTypography.bodySmall,
+            decoration: InputDecoration(
+              hintText:
+                  params.isBulkChange
+                      ? AppStrings.scheduleChangeBulkDesc
+                      : AppStrings.scheduleChangeSingleDesc,
+              hintStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkTertiary,
               ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _suggestedSlots.isEmpty ? null : _submit,
-                child: Text(AppStrings.scheduleChangePropose),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              counterText: '',
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _suggestedSlots.isEmpty ? null : _submit,
+              child: Text(AppStrings.scheduleChangePropose),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -114,7 +114,6 @@ class AppRoutes {
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
   static const requestCompletion = '/schedule/request-completion';
   static const requestDetail = '/schedule/request/:id';
-  static const scheduleChangeSlots = '/schedule/change-slots';
   static const regularScheduleChange = '/schedule/change-regular';
 
   // Subscription routes

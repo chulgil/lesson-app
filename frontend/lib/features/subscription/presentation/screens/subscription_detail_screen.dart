@@ -11,7 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../schedule/presentation/screens/schedule_change_slot_screen.dart';
+import '../../../schedule/presentation/widgets/schedule_change_slot_bottom_sheet.dart';
 import '../../../schedule/presentation/widgets/schedule_change_type_bottom_sheet.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
@@ -372,27 +372,22 @@ class _SubscriptionDetailBodyState
 
   /// Schedule change — same flow as RequestDetailScreen._handleScheduleChange:
   /// 1. showScheduleChangeTypeBottomSheet → type selection
-  /// 2. ScheduleChangeSlotScreen (single & bulk share same UI)
+  /// 2. showScheduleChangeSlotBottomSheet (single & bulk share same UI)
   void _handleScheduleChange(BuildContext context) async {
     // Step 1: Choose change type
     final changeType = await showScheduleChangeTypeBottomSheet(context);
     if (changeType == null || !context.mounted) return;
 
-    // Both single and bulk use the same ScheduleChangeSlotScreen
-    final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
-      MaterialPageRoute(
-        builder:
-            (_) => ScheduleChangeSlotScreen(
-              params: ScheduleChangeSlotParams(
-                teacherId: subscription.membershipId, // TODO: resolve teacherId
-                studentId: subscription.studentId,
-                durationMinutes: 60,
-                currentScheduleLabel: AppStrings.sessionNumberLabel(
-                  _selectedSession,
-                ),
-                isBulkChange: changeType == ScheduleChangeType.bulkChange,
-              ),
-            ),
+    // Both single and bulk use the same ScheduleChangeSlotBottomSheet.
+    // P0-1 Phase B(b) — 부모가 BottomSheet 흐름이므로 sheet 로 통일.
+    final result = await showScheduleChangeSlotBottomSheet(
+      context,
+      params: ScheduleChangeSlotParams(
+        teacherId: subscription.membershipId, // TODO: resolve teacherId
+        studentId: subscription.studentId,
+        durationMinutes: 60,
+        currentScheduleLabel: AppStrings.sessionNumberLabel(_selectedSession),
+        isBulkChange: changeType == ScheduleChangeType.bulkChange,
       ),
     );
     if (result == null || !context.mounted) return;
