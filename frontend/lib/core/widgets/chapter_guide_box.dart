@@ -4,18 +4,18 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
-/// Chapter-stage guide variant — prepared for Phase 3 color split.
+/// Chapter-stage guide variant — Phase 3 색상 2색 원칙 (chat_guide_message_spec.md §27).
 ///
-/// Phase 1 (현재): 모두 [neutral] 로 사용 — 기존 동작 보존.
-/// Phase 3: [action] / [wait] 분기 도입 (chat_guide_message_spec.md §25).
+/// 2색 원칙: action(내 차례) = paperAccent / wait(대기·종료) = ink grey.
+/// neutral 은 wait 의 별칭으로 보존 — 호출자가 명시적 분기 못하는 자리에서 default.
 enum ChapterGuideVariant {
-  /// 사용자(뷰어)가 행동해야 하는 상태 — primary 강조 (Phase 3).
+  /// 사용자(뷰어)가 행동해야 하는 상태 — paperAccent 강조.
   action,
 
-  /// 상대방의 행동을 기다리는 상태 — grey 약화 (Phase 3).
+  /// 상대방의 행동을 기다리는 또는 종료된 상태 — ink grey 약화.
   wait,
 
-  /// 기본 — 모든 챕터 단계의 기본 회색조. Phase 1 디폴트.
+  /// 기본 — wait 와 동일 색상. variant 미지정 시 default.
   neutral,
 }
 
@@ -91,14 +91,21 @@ class ChapterGuideBox extends StatelessWidget {
   static _GuideColors _resolveColors(ChapterGuideVariant variant) {
     switch (variant) {
       case ChapterGuideVariant.action:
+        return _GuideColors(
+          background: AppColors.paperAccentSoft,
+          icon: AppColors.paperAccent,
+          chipBackground: AppColors.paperAccent,
+          chipText: AppColors.paper,
+          bodyText: AppColors.ink,
+        );
       case ChapterGuideVariant.wait:
       case ChapterGuideVariant.neutral:
         return _GuideColors(
           background: AppColors.ink.withValues(alpha: 0.06),
-          icon: AppColors.ink,
+          icon: AppColors.inkTertiary,
           chipBackground: AppColors.ink.withValues(alpha: 0.12),
-          chipText: AppColors.ink,
-          bodyText: AppColors.inkSecondary,
+          chipText: AppColors.inkSecondary,
+          bodyText: AppColors.inkTertiary,
         );
     }
   }

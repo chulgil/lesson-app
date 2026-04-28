@@ -127,6 +127,8 @@ class _ScheduleChangeSlotScreenState
             params.isBulkChange
                 ? AppStrings.scheduleChangeSlotGuideBulk
                 : AppStrings.scheduleChangeSlotGuideSingle,
+        // 사용자가 슬롯을 직접 선택하는 화면 — action variant.
+        variant: ChapterGuideVariant.action,
       ),
     );
   }

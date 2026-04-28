@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/core/widgets/chapter_guide_box.dart';
 
@@ -76,5 +77,59 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(ChapterGuideBox), findsNWidgets(2));
+  });
+
+  testWidgets('action variant 는 paperAccent 칩 배경, wait 는 ink alpha 회색', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        const ChapterGuideBox(
+          title: 'ACT',
+          situation: 'a',
+          variant: ChapterGuideVariant.action,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final actionChip =
+        tester
+                .widget<Container>(
+                  find
+                      .ancestor(
+                        of: find.text('ACT'),
+                        matching: find.byType(Container),
+                      )
+                      .first,
+                )
+                .decoration
+            as BoxDecoration;
+    expect(actionChip.color, AppColors.paperAccent);
+
+    await tester.pumpWidget(
+      wrap(
+        const ChapterGuideBox(
+          title: 'WAIT',
+          situation: 'w',
+          variant: ChapterGuideVariant.wait,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final waitChip =
+        tester
+                .widget<Container>(
+                  find
+                      .ancestor(
+                        of: find.text('WAIT'),
+                        matching: find.byType(Container),
+                      )
+                      .first,
+                )
+                .decoration
+            as BoxDecoration;
+    expect(waitChip.color, AppColors.ink.withValues(alpha: 0.12));
   });
 }

@@ -1,6 +1,6 @@
 # 스케줄 확인 카드 (Schedule Confirmation Card)
 
-> 마지막 업데이트: 2026-03-02
+> 마지막 업데이트: 2026-04-28
 
 ## 개요
 
@@ -55,8 +55,9 @@
 
 ## 현재 상태
 
-- 카드 타입 분기 로직: 구현 완료
-- 대시보드 표시: **비활성** (설계 재검토 필요 시 재활성화)
+- 카드 타입 분기 로직: **구현 완료** (`issue_subscription_actions.dart::_detectScheduleCardType`)
+- 대시보드 표시: **활성** (`student_dashboard_tab.dart::_StudentEventsGroup` → `_ScheduleConfirmationSection`)
+- 진입점: 수강권 발급 직후 자동 카드 생성 → 학생 대시보드 이벤트 그룹에 노출
 
 ## 변경 이력
 
@@ -64,3 +65,4 @@
 |------|------|
 | 2026-03-02 | 카드 타입 분기 로직 구현 (afterTrial/reEnrollment/additionalInstrument) |
 | 2026-03-02 | 대시보드에서 카드 표시 비활성화 (하드코딩 afterTrial 문제 해결 전까지) |
+| 2026-04-28 | Phase 3.2 spec ↔ 코드 일치 점검 — 분기 로직 정상 동작, 대시보드 재활성 상태 spec 반영 |

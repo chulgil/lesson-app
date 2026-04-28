@@ -377,7 +377,11 @@ class RequestHistoryChat extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-      child: ChapterGuideBox(title: guide.title, situation: guide.situation),
+      child: ChapterGuideBox(
+        title: guide.title,
+        situation: guide.situation,
+        variant: guide.variant,
+      ),
     );
   }
 
@@ -506,72 +510,139 @@ class RequestHistoryChat extends StatelessWidget {
     final title =
         isTeacher ? request!.teacherActionLabel : request!.studentActionLabel;
 
+    // 색상 매핑 (chat_guide_message_spec.md §27 2색 원칙):
+    //   action = 뷰어 차례 (CTA 존재) → paperAccent
+    //   wait   = 상대 차례·종결 → ink grey
     return switch (request!.status) {
       UnifiedRequestStatus.pending =>
         isTeacher
             ? _PhaseGuide(
               title: title,
               situation: '희망 시간을 확인하고 수락 또는 다른 시간을 제안해주세요',
+              variant: ChapterGuideVariant.action,
             )
-            : _PhaseGuide(title: title, situation: '선생님의 응답을 기다리고 있습니다'),
+            : _PhaseGuide(
+              title: title,
+              situation: '선생님의 응답을 기다리고 있습니다',
+              variant: ChapterGuideVariant.wait,
+            ),
 
-      UnifiedRequestStatus.approved || UnifiedRequestStatus.negotiating =>
-        isTeacher
-            ? _PhaseGuide(title: title, situation: '시간을 수락하거나 다른 시간을 역제안해주세요')
-            : _PhaseGuide(title: title, situation: '제안된 시간을 확인하고 수락해주세요'),
+      UnifiedRequestStatus.approved ||
+      UnifiedRequestStatus.negotiating => _PhaseGuide(
+        title: title,
+        situation:
+            isTeacher ? '시간을 수락하거나 다른 시간을 역제안해주세요' : '제안된 시간을 확인하고 수락해주세요',
+        variant: ChapterGuideVariant.action,
+      ),
 
       UnifiedRequestStatus.timeConfirmed =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '수강권 종류와 결제 방법을 선택해 발급해주세요')
-            : _PhaseGuide(title: title, situation: '선생님이 수강권 안내를 보내면 알림을 드립니다'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '수강권 종류와 결제 방법을 선택해 발급해주세요',
+              variant: ChapterGuideVariant.action,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '선생님이 수강권 안내를 보내면 알림을 드립니다',
+              variant: ChapterGuideVariant.wait,
+            ),
 
       UnifiedRequestStatus.proposalSent =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '학생이 수락하면 알림을 드립니다')
-            : _PhaseGuide(title: title, situation: '수강권 안내를 확인하고 수락 또는 거절해주세요'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '학생이 수락하면 알림을 드립니다',
+              variant: ChapterGuideVariant.wait,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '수강권 안내를 확인하고 수락 또는 거절해주세요',
+              variant: ChapterGuideVariant.action,
+            ),
 
       UnifiedRequestStatus.proposalAccepted =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '학생이 입금하면 알림을 드립니다')
-            : _PhaseGuide(title: title, situation: '결제를 완료해주세요'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '학생이 입금하면 알림을 드립니다',
+              variant: ChapterGuideVariant.wait,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '결제를 완료해주세요',
+              variant: ChapterGuideVariant.action,
+            ),
 
       UnifiedRequestStatus.paymentNotified =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '입금을 확인하고 수강권을 발급해주세요')
-            : _PhaseGuide(title: title, situation: '선생님이 확인하면 수강권이 발급됩니다'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '입금을 확인하고 수강권을 발급해주세요',
+              variant: ChapterGuideVariant.action,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '선생님이 확인하면 수강권이 발급됩니다',
+              variant: ChapterGuideVariant.wait,
+            ),
 
       UnifiedRequestStatus.subscriptionIssued => _PhaseGuide(
         title: title,
         situation: '레슨을 시작할 준비가 완료되었습니다',
+        variant: ChapterGuideVariant.wait,
       ),
 
       UnifiedRequestStatus.inProgress =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '레슨 후 출석 처리와 기록을 남겨주세요')
-            : _PhaseGuide(title: title, situation: '레슨 일정에 맞춰 참석해주세요'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '레슨 후 출석 처리와 기록을 남겨주세요',
+              variant: ChapterGuideVariant.action,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '레슨 일정에 맞춰 참석해주세요',
+              variant: ChapterGuideVariant.wait,
+            ),
 
       UnifiedRequestStatus.completed => _PhaseGuide(
         title: title,
         situation: '모든 레슨 수강이 완료되었습니다',
+        variant: ChapterGuideVariant.wait,
       ),
 
       UnifiedRequestStatus.rejected =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '이 레슨 요청을 거절했습니다')
+            ? _PhaseGuide(
+              title: title,
+              situation: '이 레슨 요청을 거절했습니다',
+              variant: ChapterGuideVariant.wait,
+            )
             : _PhaseGuide(
               title: title,
               situation: '다른 선생님이나 시간을 변경해 다시 신청할 수 있습니다',
+              variant: ChapterGuideVariant.wait,
             ),
 
       UnifiedRequestStatus.cancelled => _PhaseGuide(
         title: title,
         situation: '이 레슨 요청이 취소되었습니다',
+        variant: ChapterGuideVariant.wait,
       ),
 
       UnifiedRequestStatus.expired =>
         isTeacher
-            ? _PhaseGuide(title: title, situation: '응답 기간이 지나 자동 종료되었습니다')
-            : _PhaseGuide(title: title, situation: '다시 신청하시면 선생님에게 알림이 전송됩니다'),
+            ? _PhaseGuide(
+              title: title,
+              situation: '응답 기간이 지나 자동 종료되었습니다',
+              variant: ChapterGuideVariant.wait,
+            )
+            : _PhaseGuide(
+              title: title,
+              situation: '다시 신청하시면 선생님에게 알림이 전송됩니다',
+              variant: ChapterGuideVariant.wait,
+            ),
     };
   }
 }
@@ -581,6 +652,11 @@ class RequestHistoryChat extends StatelessWidget {
 class _PhaseGuide {
   final String title;
   final String situation;
+  final ChapterGuideVariant variant;
 
-  const _PhaseGuide({required this.title, required this.situation});
+  const _PhaseGuide({
+    required this.title,
+    required this.situation,
+    this.variant = ChapterGuideVariant.neutral,
+  });
 }

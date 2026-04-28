@@ -1,6 +1,6 @@
 # 챗 화면 상태별 가이드 메시지 스펙
 
-> 마지막 업데이트: 2026-04-04
+> 마지막 업데이트: 2026-04-28
 
 ## 설계 원칙
 
@@ -24,7 +24,9 @@
 - 상단 가이드와 하단 액션은 **같은 내용을 반복하지 않음**
 - 채팅 말풍선은 과거 이벤트 사실만 표시
 - 과거 챕터 펼칠 때 가이드 숨김 (`showGuide: false`)
-- 색상: action(내 차례)=primary, wait(대기/종료)=grey (2색 원칙)
+- 색상: action(내 차례)=`paperAccent` 강조, wait(대기/종료)=`ink` alpha 회색 (2색 원칙)
+  - **구현**: `ChapterGuideVariant.action` / `wait` (`core/widgets/chapter_guide_box.dart`)
+  - **매핑 규칙**: 매트릭스의 "하단 액션" 열에 `-` 인 행 → wait, 그 외 → action
 
 ## 선생님 시점 전체 매트릭스
 

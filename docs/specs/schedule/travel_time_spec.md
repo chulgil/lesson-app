@@ -147,3 +147,44 @@ effectiveBuffer = max(breakTimeBetweenLessons, travelTime);
 | LocationProvider | ✅ | 장소 조회 그대로 사용 |
 | breakTimeBetweenLessons | ✅ | max(breakTime, travelTime) 계산 |
 | _findConflictingSlot | ✅ | breakTimeMinutes 파라미터 확장 |
+
+---
+
+## 7. TimeException × travel_time 충돌 케이스 (Phase 3.3 갭 분석)
+
+> 2026-04-28 조사 결과. **현재 미지원** 케이스를 명시. 코드 패치는 별도 Phase.
+
+### 7.1 현재 동작 (`mock_teacher_availability_repository.dart::_computeSlotsForDate` line 524-529)
+
+```dart
+for (final exception in availability.exceptions) {
+  if (exception.type != ExceptionType.additionalSlot &&
+      exception.containsDate(date)) {
+    return []; // Day is blocked
+  }
+}
+```
+
+→ `holiday` / `vacation` 이 해당 날짜 포함 시 **하루 전체** 차단으로만 처리.
+
+### 7.2 식별된 갭
+
+| # | 케이스 | 현재 동작 | 기대 동작 |
+|---|--------|----------|----------|
+| 1 | 부분 차단 (holiday `startTime`/`endTime` 활용) | `containsDate()` 만 보고 하루 전체 차단 | 해당 시간대만 차단, 나머지 슬롯 정상 |
+| 2 | 반차 vacation (오후만 휴무) | 하루 전체 차단 | 오전 슬롯은 유지 |
+| 3 | TimeException 경계 × incoming travelTime | 미검사 | 차단 시간대 직전 슬롯이 travel_time 만큼 차단 영역으로 침범 시 차단 |
+| 4 | 차단 시간대 직후 outgoing 슬롯 × 다음 학생 travelTime | 미검사 | 차단 종료 + travel_time 이후로 슬롯 시작 가능 |
+
+### 7.3 엔티티 현황
+
+`TimeException` (`teacher_availability.dart:229`) 에 `startTime` / `endTime` 필드는 이미 존재하나 `additionalSlot` 용도로만 쓰이는 중. 동일 필드를 `holiday`/`vacation` 부분 차단에 재활용 가능.
+
+### 7.4 향후 패치 단계 제안
+
+| Phase | 작업 |
+|-------|------|
+| 3.3 | (현재) 갭 식별 + 스펙 명시 |
+| 미정 | `_computeSlotsForDate` 의 차단 로직을 시간 단위로 확장. `containsDate` → `containsDateTimeRange` |
+| 미정 | TimeException UI 가 부분 차단 시간 입력 받도록 |
+| 미정 | 회귀 테스트: 위 4 케이스에 대한 unit test |
