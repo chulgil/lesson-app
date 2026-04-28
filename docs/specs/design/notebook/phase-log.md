@@ -71,6 +71,7 @@
 - [§7.124 주간 그리드 구분선 종이 톤 정렬](#7124--주간-그리드-구분선-종이-톤-정렬-2026-04-27-같은-날-후속)
 - [§7.125 주간 헤더↔그리드 가로 정렬](#7125--주간-헤더그리드-가로-정렬-2026-04-27-같은-날-후속)
 - [§7.126 좌측 공간 축소 + 모든 모드 헤더 동일 사이즈](#7126--좌측-공간-축소--모든-모드-헤더-동일-사이즈-2026-04-27-같은-날-후속)
+- [§7.131 알림 모듈 Notebook × Score 정렬](#7131--알림-모듈-notebook--score-정렬-2026-04-28-사용자-점검) — 이모지 → outlined Icon, alpha 변형 → ink 톤 분리, round → 사각
 
 ---
 
@@ -5227,3 +5228,53 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `flutter analyze` 0 issues (8 파일 scope). 적용 후 quick_feedback_screen·bulk_feedback_screen·과제 카드·과제 대시보드의 사용자 액션 텍스트가 일관되게 Gaegu hand 톤.
 
 ---
+
+#### §7.131 — 알림 모듈 Notebook × Score 정렬 (2026-04-28 사용자 점검)
+
+**전제**: 사용자 검수 — 알림 페이지의 Notebook × Score 컨셉 반영도 재확인 요청. 점검 결과 3개 파일에서 10건 위반 발견:
+1. **이모지 24+ 종 (CRITICAL)** — `🎻📅📝🎯🔥💰⚠️⏰👋📊⭐🔗✅❌🔄⏳📆🎫💬⌛🚫📣🏆🎉` 컬러 이모지가 `notification_item._getIcon()` 에 분산. Notebook × Score 의 모노톤 잉크 원칙과 정면 충돌, 시스템 컬러팔레트 무시.
+2. **`Colors.white` 하드코딩 (CRITICAL)** — `notification_item:32` 배경, `notification_bell_icon:64,69` 뱃지 테두리/텍스트. ux-rules #6 위반 (`AppColors`만 사용).
+3. **0.5px BoxDecoration 라인 (CRITICAL)** — `notification_item:34` `BorderSide(width: 0.5)` — ux-rules #5 OVERFLOW 위반, 별도 ThinRule 분리 필요.
+4. **AppBar 매스트헤드 분리 부재 (HIGH)** — `notification_list_screen:27-43` 기본 Material AppBar, 종이 메타포 단절.
+5. **날짜 그룹 헤더 sans-serif (HIGH)** — `notification_list_screen:84-99` `AppTypography.bodySmall` — 섹션 헤더 §7.17 패턴(uppercase + ThinRule) 누락.
+6. **40x40 paperAccent alpha 4단계 (HIGH)** — `_getIconBackgroundColor()` `0.05/0.1/0.2` — 1-point accent 원칙 위반, ink/paperAccent 모노톤 분리 필요.
+7. **`AppTypography.caption` 시간 표시 (HIGH)** — Pretendard caption — 시스템 메타이므로 `metaMono`(IBM Plex Mono) 가 정렬.
+8. **8x8 round dot 미읽음 (MEDIUM)** — `BoxShape.circle` — Notebook × Score 의 사각/잉크 마크 원칙 위반.
+9. **actionLabel 테두리 부재 + alpha fill (MEDIUM)** — paperAccent 0.1 채움만, 잉크 stroke 없음 → "종이 위 도장" 위계 약함.
+10. **둥근 뱃지 + Colors.white 테두리 (MEDIUM)** — `notification_bell_icon._buildBadge()` 둥근 BoxDecoration.
+
+**사용자 룰 적용 (§7.130 binary)**: 알림 title/body 는 **시스템 생성 메시지** → sans-serif 유지. 이번 정렬은 시각 프리미티브(색·형·라인·폰트)에 한정, 텍스트 폰트는 변경하지 않음.
+
+**적용 10건 / 3개 파일**:
+
+| 파일 | 위치 | 변경 |
+|---|---|---|
+| `notification_item.dart` | `:138-241` | 이모지 24+종 → Material outlined Icon 32종 |
+| `notification_item.dart` | `:32` | `Colors.white` → `AppColors.paper` |
+| `notification_item.dart` | `:33-35` | 0.5px Border → 별도 ThinRule (Column 하단) |
+| `notification_item.dart` | `:64-69` | `AppTypography.caption` → `NotebookTypography.metaMono` (10pt, inkTertiary) |
+| `notification_item.dart` | `:88-103` | actionLabel: paper bg + 1px ink stroke + uppercase `sectionLabel` |
+| `notification_item.dart` | `:110-119` | 8x8 round dot → 6x6 사각 paperAccent 마크 |
+| `notification_item.dart` | `:127-135, 244-255` | 36x36 paper bg + 1px stroke + Material Icon (priority별 ink/paperAccent/inkTertiary 3단) |
+| `notification_list_screen.dart` | `:31-46` | AppBar 하단 ThinRule(ink) + "모두 읽음" `sectionLabel` 톤 |
+| `notification_list_screen.dart` | `:86-104` | 날짜 헤더 → `NotebookSectionHeader(label: dateLabel)` |
+| `notification_bell_icon.dart` | `:56-75` | 둥근 뱃지 → 사각 `AppColors.paper` 테두리 + `AppColors.paper` 텍스트 |
+
+신규 import 3건: `notification_item` 에 `notebook_typography`+`thin_rule`, `notification_list_screen` 에 `notebook_typography`+`section_header`+`thin_rule`.
+
+**의도적 제외**:
+- 알림 title/body 본문 폰트 — §7.130 binary rule: 시스템 생성 메시지는 sans-serif 유지. 향후 `lessonNoteShared` 처럼 본문에 선생님 자필이 직접 임베드되는 경우는 후속 phase 에서 entity 단위 검토.
+- `actionLabel` 한글 그대로 (toUpperCase 후에도 한글은 변형 없음) — 한글 환경에서는 sectionLabel letterSpacing 만으로 위계 표시.
+- `EmptyStateWidget` (`:142-148`) — 공통 위젯이라 도메인 분리, §7.131 scope 외.
+
+**Lore-directive**: 알림 타입 → Material outlined Icon 매핑(32종)을 Notebook × Score 의 "모노톤 잉크" 원칙으로 고정. 새 NotificationType 추가 시 컬러 이모지 금지 — outlined 한 글자 식별자만.
+
+**Lore-directive**: 우선순위 변형은 `alpha 변형`이 아닌 `ink 톤 분리`로 표현 (paperAccent ↔ ink ↔ inkTertiary). alpha 변형은 1-point accent 원칙(ux-rules #14)에 모순.
+
+**Lore-rejected**: 이모지를 그대로 두고 채도만 낮춤 — 이모지는 OS 폰트 의존 컬러 글리프, 모노톤 강제 불가. Material Icon 으로 교체가 유일한 정렬 방법.
+
+**Lore-rejected**: AppBar 를 `NotebookMasthead("LESSONAZA · NOTICE", date meta)` 로 전환 — 다른 탭 AppBar 와 위계 불일치 발생, AppBar 하단 ThinRule 추가가 최소 침습. 매스트헤드 적용은 향후 알림 전용 첫 화면 디자인 phase 에서 재검토.
+
+**Lore-rejected**: 날짜 헤더에 `bodySmall` 유지 + ThinRule 만 추가 — `sectionLabel`(uppercase + letterSpacing 1.5)이 §7.17 통일 패턴. 한글 "오늘"/"어제" 도 letterSpacing 으로 위계 표시 가능.
+
+**테스트**: `flutter analyze` 0 issues (전체 frontend scope). 알림 모듈에 단위 테스트 부재이므로 시각 정렬 위주 — entity 변경 없음, 비즈니스 로직 무변경.

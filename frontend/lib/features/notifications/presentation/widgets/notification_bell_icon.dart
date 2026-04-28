@@ -53,20 +53,21 @@ class NotificationBellIcon extends ConsumerWidget {
     );
   }
 
+  /// §7.131: 둥근 뱃지 → 사각 잉크 마크. paperAccent 배경 + paper 테두리(1px).
   Widget _buildBadge(int count) {
     final displayCount = count > 99 ? '99+' : count.toString();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      constraints: const BoxConstraints(minWidth: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      constraints: const BoxConstraints(minWidth: 14),
       decoration: BoxDecoration(
         color: AppColors.paperAccent,
-        border: Border.all(color: Colors.white, width: 1.5),
+        border: Border.all(color: AppColors.paper, width: 1),
       ),
       child: Text(
         displayCount,
         style: AppTypography.captionSmall.copyWith(
-          color: Colors.white,
+          color: AppColors.paper,
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.center,

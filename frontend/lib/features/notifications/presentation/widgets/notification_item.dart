@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/notification.dart';
 
-/// 개별 알림 항목 위젯
+/// 개별 알림 항목 — Notebook × Score.
 ///
-/// 재사용 가능한 단일 알림 표시 컴포넌트:
-/// - 읽지 않은 알림 강조 (배경색)
-/// - 아이콘 + 제목 + 본문 + 시간
-/// - 액션 버튼 (있는 경우)
+/// §7.130 binary rule: 알림 title/body 는 시스템 생성 메시지이므로 sans-serif 유지.
+/// 시각 정렬:
+/// - 색상 ink/paper/paperAccent 3색 (이모지·alpha 변형 제거)
+/// - 1px ThinRule 구분선 (0.5px BoxDecoration 금지)
+/// - 사각형 인디케이터 + 모노톤 Material Icon
+/// - 시간은 IBM Plex Mono (metaMono)
 class NotificationItem extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback? onTap;
@@ -21,145 +25,164 @@ class NotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isUnread = !notification.isRead;
 
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color:
-              isUnread
-                  ? AppColors.paperAccent.withValues(alpha: 0.05)
-                  : Colors.white,
-          border: const Border(
-            bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon
-            _buildIcon(),
-            const SizedBox(width: AppSpacing.space3),
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            color:
+                isUnread
+                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                    : AppColors.paper,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon (square + ink stroke + paper bg)
+                _buildIcon(),
+                const SizedBox(width: AppSpacing.space3),
 
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title row with time
-                  Row(
+                // Content
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          notification.title,
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight:
-                                isUnread ? FontWeight.w600 : FontWeight.normal,
-                            color: AppColors.ink,
+                      // Title row with time
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              notification.title,
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight:
+                                    isUnread
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                color: AppColors.ink,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: AppSpacing.space2),
+                          // §7.131: 시간 → IBM Plex Mono (시스템 메타)
+                          Text(
+                            _formatTime(notification.createdAt),
+                            style: NotebookTypography.metaMono.copyWith(
+                              fontSize: 10,
+                              color: AppColors.inkTertiary,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: AppSpacing.space2),
+
+                      const SizedBox(height: AppSpacing.space1),
+
+                      // Body
                       Text(
-                        _formatTime(notification.createdAt),
-                        style: AppTypography.caption.copyWith(
+                        notification.body,
+                        style: AppTypography.bodySmall.copyWith(
                           color: AppColors.inkSecondary,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
+
+                      // Action label (uppercase eyebrow on paper)
+                      if (notification.actionLabel != null) ...[
+                        const SizedBox(height: AppSpacing.space2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.space3,
+                            vertical: AppSpacing.space1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper,
+                            border: Border.all(color: AppColors.ink, width: 1),
+                          ),
+                          child: Text(
+                            notification.actionLabel!.toUpperCase(),
+                            style: NotebookTypography.sectionLabel.copyWith(
+                              color: AppColors.ink,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
-
-                  const SizedBox(height: AppSpacing.space1),
-
-                  // Body
-                  Text(
-                    notification.body,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  // Action button (if present)
-                  if (notification.actionLabel != null) ...[
-                    const SizedBox(height: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space3,
-                        vertical: AppSpacing.space1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
-                      ),
-                      child: Text(
-                        notification.actionLabel!,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.paperAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            // Unread indicator
-            if (isUnread) ...[
-              const SizedBox(width: AppSpacing.space2),
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.paperAccent,
-                  shape: BoxShape.circle,
                 ),
-              ),
-            ],
-          ],
+
+                // Unread indicator — 사각 잉크 마크 (round dot 금지)
+                if (isUnread) ...[
+                  const SizedBox(width: AppSpacing.space2),
+                  Container(width: 6, height: 6, color: AppColors.paperAccent),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+        // §7.131: 0.5px BoxDecoration → 1px ThinRule (separate component)
+        const ThinRule(),
+      ],
     );
   }
 
   Widget _buildIcon() {
     return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(color: _getIconBackgroundColor()),
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: Border.all(color: _getIconStrokeColor(), width: 1),
+      ),
       child: Center(
-        child: Text(_getIcon(), style: const TextStyle(fontSize: 20)),
+        child: Icon(_getIcon(), size: 18, color: _getIconStrokeColor()),
       ),
     );
   }
 
-  String _getIcon() {
+  /// §7.131: 우선순위는 ink 톤 차이로만 표현 (alpha 변형 금지).
+  Color _getIconStrokeColor() {
+    switch (notification.priority) {
+      case NotificationPriority.urgent:
+      case NotificationPriority.high:
+        return AppColors.paperAccent;
+      case NotificationPriority.normal:
+        return AppColors.ink;
+      case NotificationPriority.low:
+        return AppColors.inkTertiary;
+    }
+  }
+
+  /// §7.131: 이모지 → Material outlined Icon (모노톤).
+  IconData _getIcon() {
     switch (notification.type) {
       // Lesson
       case NotificationType.lessonBooked:
       case NotificationType.lessonReminder:
       case NotificationType.lessonStarting:
-        return '🎻';
+        return Icons.event_note_outlined;
       case NotificationType.lessonCancelled:
+        return Icons.event_busy_outlined;
       case NotificationType.lessonRescheduled:
-        return '📅';
+        return Icons.update_outlined;
       case NotificationType.lessonCompleted:
+        return Icons.check_circle_outline;
       case NotificationType.lessonNoteShared:
-        return '📝';
+        return Icons.note_alt_outlined;
 
       // Practice
       case NotificationType.practiceReminder:
       case NotificationType.practiceAssigned:
-        return '🎯';
+        return Icons.assignment_outlined;
       case NotificationType.streakWarning:
+        return Icons.warning_amber_outlined;
       case NotificationType.streakMilestone:
-        return '🔥';
+        return Icons.local_fire_department_outlined;
       case NotificationType.weeklyGoalAchieved:
-        return '🏆';
+        return Icons.emoji_events_outlined;
       case NotificationType.recordingFeedbackReceived:
-        return '📝';
+        return Icons.rate_review_outlined;
 
       // Payment
       case NotificationType.paymentRequested:
@@ -167,90 +190,77 @@ class NotificationItem extends StatelessWidget {
       case NotificationType.paymentReceived:
       case NotificationType.paymentConfirmed:
       case NotificationType.lessonsRunningLow:
-        return '💰';
+        return Icons.receipt_long_outlined;
 
-      // No-show
+      // No-show / cancellation
       case NotificationType.noshowWarning:
       case NotificationType.noshowConfirmed:
       case NotificationType.teacherNoshow:
-        return '⚠️';
+        return Icons.report_outlined;
       case NotificationType.compensationApplied:
       case NotificationType.cancellationDeadline:
-        return '⏰';
+        return Icons.access_time_outlined;
 
       // Management
       case NotificationType.newStudentRegistered:
       case NotificationType.trialBookingRequest:
-        return '👋';
+        return Icons.person_add_outlined;
       case NotificationType.studentPracticeReport:
-        return '📊';
+        return Icons.bar_chart_outlined;
       case NotificationType.reviewReceived:
-        return '⭐';
+        return Icons.star_border_outlined;
 
       // Connection
       case NotificationType.connectionRequestReceived:
-        return '🔗';
+        return Icons.link_outlined;
       case NotificationType.connectionRequestAccepted:
       case NotificationType.connectionEstablished:
-        return '✅';
+        return Icons.handshake_outlined;
       case NotificationType.connectionRequestRejected:
       case NotificationType.connectionDisconnected:
-        return '❌';
+        return Icons.link_off_outlined;
 
       // Makeup
       case NotificationType.makeupLessonCreated:
-        return '🔄';
+        return Icons.replay_outlined;
       case NotificationType.makeupLessonExpiring:
       case NotificationType.makeupLessonExpired:
-        return '⏳';
+        return Icons.hourglass_bottom_outlined;
 
       // Schedule change
       case NotificationType.scheduleChangeRequested:
       case NotificationType.scheduleChangeApproved:
       case NotificationType.scheduleChangeRejected:
       case NotificationType.scheduleChangeAlternative:
-        return '📆';
+        return Icons.swap_horiz_outlined;
 
       // Subscription proposal
       case NotificationType.proposalReceived:
       case NotificationType.proposalAccepted:
-        return '🎫';
+        return Icons.confirmation_number_outlined;
       case NotificationType.proposalReminder24h:
       case NotificationType.proposalReminder48h:
-        return '💬';
+        return Icons.notifications_active_outlined;
       case NotificationType.proposalReminder72h:
-        return '⏰';
+        return Icons.alarm_outlined;
       case NotificationType.proposalExpired:
-        return '⌛';
+        return Icons.hourglass_disabled_outlined;
 
       // Subscription expiry
       case NotificationType.subscriptionExpiringSoon:
-        return '⏳';
+        return Icons.timer_outlined;
       case NotificationType.subscriptionExpired:
-        return '🚫';
+        return Icons.block_outlined;
 
       // Reschedule allowance
       case NotificationType.rescheduleAllowanceUsed:
-        return '🔄';
+        return Icons.history_outlined;
       case NotificationType.rescheduleAllowanceDepleted:
-        return '⚠️';
+        return Icons.error_outline;
 
       // Bulk teacher actions (§7.119)
       case NotificationType.generalAnnouncement:
-        return '📣';
-    }
-  }
-
-  Color _getIconBackgroundColor() {
-    switch (notification.priority) {
-      case NotificationPriority.urgent:
-        return AppColors.paperAccent.withValues(alpha: 0.1);
-      case NotificationPriority.high:
-        return AppColors.paperAccent.withValues(alpha: 0.2);
-      case NotificationPriority.normal:
-        return AppColors.paperAccent.withValues(alpha: 0.1);
-      case NotificationPriority.low:
-        return AppColors.inkSecondary.withValues(alpha: 0.1);
+        return Icons.campaign_outlined;
     }
   }
 

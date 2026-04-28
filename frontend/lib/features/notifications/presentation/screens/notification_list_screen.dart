@@ -5,7 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/notification.dart';
 import '../providers/notification_providers.dart';
 import '../widgets/notification_item.dart';
@@ -24,18 +27,26 @@ class NotificationListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(userNotificationsProvider);
 
+    // §7.131: AppBar 는 전역 테마(Playfair appBarTitle)를 따르고,
+    // 하단에 1px ThinRule 을 두어 매스트헤드 메타포 유지.
     return Scaffold(
       appBar: AppBar(
         title: const Text('알림'),
         backgroundColor: AppColors.paperDark,
         elevation: 0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: ThinRule(color: AppColors.ink),
+        ),
         actions: [
           TextButton(
             onPressed: () => _markAllAsRead(ref),
+            // §7.131: 액션 라벨도 시스템 메타이므로 sectionLabel(uppercase) 톤.
             child: Text(
               '모두 읽음',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.paperAccent,
+              style: NotebookTypography.sectionLabel.copyWith(
+                color: AppColors.ink,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -43,7 +54,9 @@ class NotificationListScreen extends ConsumerWidget {
       ),
       backgroundColor: AppColors.paperDark,
       body: notificationsAsync.when(
-        data: (notifications) => _buildNotificationList(context, ref, notifications),
+        data:
+            (notifications) =>
+                _buildNotificationList(context, ref, notifications),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _buildErrorState(context, error),
       ),
@@ -78,10 +91,10 @@ class NotificationListScreen extends ConsumerWidget {
     String dateLabel,
     List<AppNotification> notifications,
   ) {
+    // §7.131: 날짜 그룹 헤더 → NotebookSectionHeader (uppercase + ThinRule).
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Date header
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.space4,
@@ -89,24 +102,21 @@ class NotificationListScreen extends ConsumerWidget {
             AppSpacing.space4,
             AppSpacing.space2,
           ),
-          child: Text(
-            dateLabel,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+          child: NotebookSectionHeader(label: dateLabel),
+        ),
+        ...notifications.map(
+          (notification) => NotificationItem(
+            notification: notification,
+            onTap: () => _handleNotificationTap(context, ref, notification),
           ),
         ),
-        // Notification items
-        ...notifications.map((notification) => NotificationItem(
-              notification: notification,
-              onTap: () => _handleNotificationTap(context, ref, notification),
-            )),
       ],
     );
   }
 
-  Map<String, List<AppNotification>> _groupByDate(List<AppNotification> notifications) {
+  Map<String, List<AppNotification>> _groupByDate(
+    List<AppNotification> notifications,
+  ) {
     final Map<String, List<AppNotification>> grouped = {};
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
