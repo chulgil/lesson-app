@@ -1454,4 +1454,42 @@ class AppStrings {
 
   /// 대기가 취소되었습니다
   static const waitlistCancelled = '대기가 취소되었습니다';
+
+  // ── Group Class Attendance (출석 체크) ─────────────────────
+  /// 출석 체크 (AppBar 제목)
+  static const attendanceCheck = '출석 체크';
+
+  /// 출석 (헤더 카운트 캡션)
+  static const attendedLabel = '출석';
+
+  /// 미참석자만 탭하세요 (도움말)
+  static const attendanceHint = '미참석자만 탭하세요';
+
+  /// 예약된 학생이 없습니다 (빈 상태)
+  static const noBookedStudents = '예약된 학생이 없습니다';
+
+  /// 로딩중... (로딩 상태)
+  static const loadingText = '로딩중...';
+
+  /// 알 수 없음 (이름 폴백)
+  static const unknownName = '알 수 없음';
+
+  /// 미참석 (학생 상태 라벨)
+  static const absentLabel = '미참석';
+
+  /// 수업 종료 (버튼/다이얼로그 제목)
+  static const finishClass = '수업 종료';
+
+  /// 출석이 저장되었습니다 (스낵바)
+  static const attendanceSaved = '출석이 저장되었습니다';
+
+  /// 출석 N명 / 미참석 N명 (다이얼로그 본문)
+  static String attendanceSummary(int attended, int absent) =>
+      '출석: $attended명\n미참석: $absent명';
+
+  /// 수업 종료 확인 (다이얼로그 본문)
+  static const finishClassConfirm = '수업을 종료하시겠습니까?\n출석한 학생의 수강권이 차감됩니다.';
+
+  /// 수업이 종료되었습니다 (스낵바)
+  static const classFinished = '수업이 종료되었습니다';
 }

@@ -51,7 +51,7 @@ class _GroupClassAttendanceScreenState
     return Scaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
-        title: const Text('출석 체크'),
+        title: const Text(AppStrings.attendanceCheck),
         actions: [
           if (_hasChanges)
             TextButton(
@@ -79,7 +79,9 @@ class _GroupClassAttendanceScreenState
           Expanded(
             child: bookingsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+              error:
+                  (_, __) =>
+                      Center(child: Text('${AppStrings.errorOccurred}.')),
               data: (bookings) {
                 // Filter only confirmed bookings
                 final confirmedBookings =
@@ -172,7 +174,7 @@ class _GroupClassAttendanceScreenState
                 ),
               ),
               Text(
-                '출석',
+                AppStrings.attendedLabel,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -198,7 +200,7 @@ class _GroupClassAttendanceScreenState
           // 인터랙션 힌트 = 시스템 가이드 → Tier 3 Pretendard bodyMedium
           // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
-            '미참석자만 탭하세요',
+            AppStrings.attendanceHint,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -216,7 +218,7 @@ class _GroupClassAttendanceScreenState
           Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '예약된 학생이 없습니다',
+            AppStrings.noBookedStudents,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -245,11 +247,11 @@ class _GroupClassAttendanceScreenState
       loading:
           () => const ListTile(
             leading: CircularProgressIndicator(),
-            title: Text('로딩중...'),
+            title: Text(AppStrings.loadingText),
           ),
-      error: (e, _) => ListTile(title: const Text('오류가 발생했습니다.')),
+      error: (e, _) => ListTile(title: Text('${AppStrings.errorOccurred}.')),
       data: (student) {
-        final studentName = student?.name ?? '알 수 없음';
+        final studentName = student?.name ?? AppStrings.unknownName;
 
         return InkWell(
           onTap: () => _toggleAttendance(booking.id),
@@ -312,7 +314,7 @@ class _GroupClassAttendanceScreenState
                       ),
                       if (!isAttended)
                         Text(
-                          '미참석',
+                          AppStrings.absentLabel,
                           style: AppTypography.caption.copyWith(
                             color: AppColors.paperAccent,
                           ),
@@ -371,7 +373,7 @@ class _GroupClassAttendanceScreenState
                       color: Colors.white,
                     ),
                   )
-                  : const Text('수업 종료'),
+                  : const Text(AppStrings.finishClass),
         ),
       ),
     );
@@ -403,7 +405,7 @@ class _GroupClassAttendanceScreenState
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('출석이 저장되었습니다'),
+            content: Text(AppStrings.attendanceSaved),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -412,7 +414,7 @@ class _GroupClassAttendanceScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -432,19 +434,21 @@ class _GroupClassAttendanceScreenState
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('수업 종료'),
+            title: const Text(AppStrings.finishClass),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '출석: ${_getAttendedCount()}명\n'
-                  '미참석: ${_attendanceState.length - _getAttendedCount()}명',
+                  AppStrings.attendanceSummary(
+                    _getAttendedCount(),
+                    _attendanceState.length - _getAttendedCount(),
+                  ),
                   style: AppTypography.bodyMedium,
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '수업을 종료하시겠습니까?\n출석한 학생의 수강권이 차감됩니다.',
+                  AppStrings.finishClassConfirm,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -458,7 +462,7 @@ class _GroupClassAttendanceScreenState
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('수업 종료'),
+                child: const Text(AppStrings.finishClass),
               ),
             ],
           ),
@@ -490,7 +494,7 @@ class _GroupClassAttendanceScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('수업이 종료되었습니다'),
+            content: Text(AppStrings.classFinished),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -500,7 +504,7 @@ class _GroupClassAttendanceScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
