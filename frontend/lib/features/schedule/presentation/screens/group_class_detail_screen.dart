@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -55,7 +56,7 @@ class _GroupClassDetailScreenState
       appBar: AppBar(
         titleSpacing: 0,
         title: Text(
-          '${widget.groupClass.name} (그룹)',
+          AppStrings.groupClassTitle(widget.groupClass.name),
           style: NotebookTypography.appBarTitle,
         ),
       ),
@@ -77,12 +78,12 @@ class _GroupClassDetailScreenState
             // Capacity status
             confirmedCountAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Text('오류가 발생했습니다.'),
+              error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
               data: (confirmedCount) {
                 return waitlistCountAsync.when(
                   loading:
                       () => const Center(child: CircularProgressIndicator()),
-                  error: (_, __) => const Text('오류가 발생했습니다.'),
+                  error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
                   data: (waitlistCount) {
                     return _buildCapacityStatus(confirmedCount, waitlistCount);
                   },
@@ -95,7 +96,7 @@ class _GroupClassDetailScreenState
             // Current booking status or action buttons
             bookingAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Text('오류가 발생했습니다.'),
+              error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
               data: (booking) {
                 if (booking != null) {
                   return _buildCurrentBookingStatus(booking);
@@ -177,8 +178,8 @@ class _GroupClassDetailScreenState
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
-                  ? '정규 클래스'
-                  : '드롭인 클래스',
+                  ? AppStrings.groupClassRegular
+                  : AppStrings.groupClassDropin,
               style: AppTypography.caption.copyWith(
                 color:
                     widget.groupClass.type == GroupClassType.regular
@@ -204,26 +205,28 @@ class _GroupClassDetailScreenState
         children: [
           _buildInfoRow(
             icon: Icons.calendar_today,
-            label: '날짜',
+            label: AppStrings.infoLabelDate,
             value: widget.schedule.dateText,
           ),
           const Divider(height: 24),
           _buildInfoRow(
             icon: Icons.access_time,
-            label: '시간',
+            label: AppStrings.infoLabelTime,
             value: widget.schedule.timeText,
           ),
           const Divider(height: 24),
           _buildInfoRow(
             icon: Icons.timer_outlined,
-            label: '수업 시간',
-            value: '${widget.groupClass.durationMinutes}분',
+            label: AppStrings.infoLabelDuration,
+            value: AppStrings.durationMinutesValue(
+              widget.groupClass.durationMinutes,
+            ),
           ),
           if (widget.groupClass.pricePerSession != null) ...[
             const Divider(height: 24),
             _buildInfoRow(
               icon: Icons.payments_outlined,
-              label: '수강료',
+              label: AppStrings.infoLabelTuition,
               value: _formatPrice(widget.groupClass.pricePerSession!),
             ),
           ],
@@ -301,10 +304,10 @@ class _GroupClassDetailScreenState
               const SizedBox(width: AppSpacing.space2),
               Text(
                 isFull
-                    ? '만석'
+                    ? AppStrings.capacityFull
                     : isAlmostFull
-                    ? '마감임박'
-                    : '예약가능',
+                    ? AppStrings.capacityAlmostFull
+                    : AppStrings.capacityAvailable,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w700,
                   color:
@@ -322,7 +325,10 @@ class _GroupClassDetailScreenState
 
           // Capacity numbers
           Text(
-            '$confirmedCount / ${widget.schedule.maxCapacity}명',
+            AppStrings.capacityCount(
+              confirmedCount,
+              widget.schedule.maxCapacity,
+            ),
             style: AppTypography.headingLarge.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -332,7 +338,7 @@ class _GroupClassDetailScreenState
           if (isFull && waitlistCount > 0) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '대기자 현황: $waitlistCount명',
+              AppStrings.waitlistStatus(waitlistCount),
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -384,7 +390,7 @@ class _GroupClassDetailScreenState
           if (isWaitlist) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '취소 발생 시 순서대로 예약됩니다',
+              AppStrings.waitlistAutoRebook,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -409,7 +415,11 @@ class _GroupClassDetailScreenState
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                      : Text(isWaitlist ? '대기 취소' : '예약 취소'),
+                      : Text(
+                        isWaitlist
+                            ? AppStrings.waitlistCancelTitle
+                            : AppStrings.bookingCancelTitle,
+                      ),
             ),
           ),
         ],
@@ -430,7 +440,7 @@ class _GroupClassDetailScreenState
             const Icon(Icons.block, size: 48, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '예약이 마감되었습니다',
+              AppStrings.bookingClosed,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -462,14 +472,16 @@ class _GroupClassDetailScreenState
                         color: Colors.white,
                       ),
                     )
-                    : Text(isFull ? '대기자로 등록하기' : '예약하기'),
+                    : Text(
+                      isFull ? AppStrings.joinWaitlist : AppStrings.bookAction,
+                    ),
           ),
         ),
 
         if (isFull) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            'ℹ️ 취소 발생 시 순서대로 예약됩니다',
+            AppStrings.waitlistAutoRebookInfo,
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -490,7 +502,10 @@ class _GroupClassDetailScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Notebook × Score: 섹션 제목은 Playfair sectionTitle 통일 (§7.87).
-          Text('클래스 소개', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.classDescription,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             widget.groupClass.description!,
@@ -515,14 +530,22 @@ class _GroupClassDetailScreenState
               const Icon(Icons.info_outline, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space1),
               // Notebook × Score: 섹션 제목은 Playfair sectionTitle 통일 (§7.87).
-              Text('예약 안내', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.bookingPolicy,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '• 예약 마감: 수업 ${widget.groupClass.bookingDeadlineMinutes ~/ 60}시간 전\n'
-            '• 취소 마감: 수업 ${widget.groupClass.cancelDeadlineMinutes ~/ 60}시간 전\n'
-            '• 미참석 시: ${widget.groupClass.noShowPolicy == NoShowPolicy.deduct ? '수강권 차감' : '수강권 미차감'}',
+            AppStrings.bookingPolicyText(
+              bookingDeadlineHours:
+                  widget.groupClass.bookingDeadlineMinutes ~/ 60,
+              cancelDeadlineHours:
+                  widget.groupClass.cancelDeadlineMinutes ~/ 60,
+              deductOnNoShow:
+                  widget.groupClass.noShowPolicy == NoShowPolicy.deduct,
+            ),
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -571,8 +594,8 @@ class _GroupClassDetailScreenState
           SnackBar(
             content: Text(
               isWaitlist
-                  ? '대기 ${booking.waitlistPosition}번으로 등록되었습니다'
-                  : '예약이 완료되었습니다',
+                  ? AppStrings.waitlistRegistered(booking.waitlistPosition!)
+                  : AppStrings.bookingCompleted,
             ),
             backgroundColor:
                 isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
@@ -583,7 +606,7 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -602,21 +625,27 @@ class _GroupClassDetailScreenState
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text(booking.isOnWaitlist ? '대기 취소' : '예약 취소'),
+            title: Text(
+              booking.isOnWaitlist
+                  ? AppStrings.waitlistCancelTitle
+                  : AppStrings.bookingCancelTitle,
+            ),
             content: Text(
-              booking.isOnWaitlist ? '대기를 취소하시겠습니까?' : '예약을 취소하시겠습니까?',
+              booking.isOnWaitlist
+                  ? AppStrings.cancelWaitlistConfirm
+                  : AppStrings.cancelBookingConfirm,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('아니오'),
+                child: Text(AppStrings.no),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                 ),
-                child: const Text('취소하기'),
+                child: Text(AppStrings.cancelRequestAction),
               ),
             ],
           ),
@@ -635,7 +664,11 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(booking.isOnWaitlist ? '대기가 취소되었습니다' : '예약이 취소되었습니다'),
+            content: Text(
+              booking.isOnWaitlist
+                  ? AppStrings.waitlistCancelled
+                  : AppStrings.bookingCancelled,
+            ),
           ),
         );
       }
@@ -643,7 +676,7 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );

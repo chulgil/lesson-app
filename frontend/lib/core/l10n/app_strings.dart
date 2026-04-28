@@ -1360,4 +1360,98 @@ class AppStrings {
 
   /// 연락처 복사 완료 (스낵바)
   static const contactCopied = '연락처가 복사되었습니다';
+
+  // ── Group Class (그룹 클래스 상세) ─────────────────────────
+  /// $name (그룹) — AppBar 제목
+  static String groupClassTitle(String name) => '$name (그룹)';
+
+  /// 정규 클래스 (배지)
+  static const groupClassRegular = '정규 클래스';
+
+  /// 드롭인 클래스 (배지)
+  static const groupClassDropin = '드롭인 클래스';
+
+  /// 오류가 발생했습니다. 다시 시도해주세요.
+  static const errorTryAgain = '오류가 발생했습니다. 다시 시도해주세요.';
+
+  /// 날짜 (라벨)
+  static const infoLabelDate = '날짜';
+
+  /// 시간 (라벨)
+  static const infoLabelTime = '시간';
+
+  /// 수업 시간 (라벨)
+  static const infoLabelDuration = '수업 시간';
+
+  /// $n분 (수업 시간 값)
+  static String durationMinutesValue(int n) => '$n분';
+
+  /// 수강료 (라벨)
+  static const infoLabelTuition = '수강료';
+
+  /// 만석
+  static const capacityFull = '만석';
+
+  /// 마감임박
+  static const capacityAlmostFull = '마감임박';
+
+  /// 예약가능
+  static const capacityAvailable = '예약가능';
+
+  /// $confirmed / $max명 (정원 표시)
+  static String capacityCount(int confirmed, int max) => '$confirmed / $max명';
+
+  /// 대기자 현황: $count명
+  static String waitlistStatus(int count) => '대기자 현황: $count명';
+
+  /// 취소 발생 시 순서대로 예약됩니다
+  static const waitlistAutoRebook = '취소 발생 시 순서대로 예약됩니다';
+
+  /// ℹ️ 취소 발생 시 순서대로 예약됩니다
+  static const waitlistAutoRebookInfo = 'ℹ️ 취소 발생 시 순서대로 예약됩니다';
+
+  /// 대기 취소 (다이얼로그/버튼)
+  static const waitlistCancelTitle = '대기 취소';
+
+  /// 예약이 마감되었습니다
+  static const bookingClosed = '예약이 마감되었습니다';
+
+  /// 대기자로 등록하기
+  static const joinWaitlist = '대기자로 등록하기';
+
+  /// 예약하기
+  static const bookAction = '예약하기';
+
+  /// 클래스 소개 (섹션 제목)
+  static const classDescription = '클래스 소개';
+
+  /// 예약 안내 (섹션 제목)
+  static const bookingPolicy = '예약 안내';
+
+  /// 예약/취소 마감 + 미참석 정책 본문
+  static String bookingPolicyText({
+    required int bookingDeadlineHours,
+    required int cancelDeadlineHours,
+    required bool deductOnNoShow,
+  }) {
+    final noShow = deductOnNoShow ? '수강권 차감' : '수강권 미차감';
+    return '• 예약 마감: 수업 $bookingDeadlineHours시간 전\n'
+        '• 취소 마감: 수업 $cancelDeadlineHours시간 전\n'
+        '• 미참석 시: $noShow';
+  }
+
+  /// 대기 N번으로 등록되었습니다
+  static String waitlistRegistered(int position) => '대기 $position번으로 등록되었습니다';
+
+  /// 예약이 완료되었습니다
+  static const bookingCompleted = '예약이 완료되었습니다';
+
+  /// 대기를 취소하시겠습니까?
+  static const cancelWaitlistConfirm = '대기를 취소하시겠습니까?';
+
+  /// 예약을 취소하시겠습니까?
+  static const cancelBookingConfirm = '예약을 취소하시겠습니까?';
+
+  /// 대기가 취소되었습니다
+  static const waitlistCancelled = '대기가 취소되었습니다';
 }
