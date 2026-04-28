@@ -292,9 +292,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (sheetContext) => Consumer(
             builder: (context, sheetRef, _) {
@@ -611,10 +609,11 @@ class ParentDashboardTab extends ConsumerWidget {
             color: AppColors.paperDark,
             borderRadius: BorderRadius.zero,
           ),
-          // Notebook × Score: "D-N" = 임박 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
+          // "D-N" = 시스템 자동 임박 인디케이터 → Tier 4 Pretendard italic
+          // (README §1.1 4계층, §7.127 Gaegu 회피). paperOk 유지.
           child: Text(
             'D-1',
-            style: NotebookTypography.handEmphasis.copyWith(
+            style: NotebookTypography.indicatorLabel.copyWith(
               color: AppColors.paperOk,
             ),
           ),
@@ -775,8 +774,12 @@ class ParentDashboardTab extends ConsumerWidget {
                       color: AppColors.paperAccentSoft,
                       borderRadius: BorderRadius.zero,
                     ),
-                    // Notebook × Score: "미결제" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
-                    child: Text('미결제', style: NotebookTypography.handEmphasis),
+                    // "미결제" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
+                    // italic (README §1.1 4계층, §7.127 Gaegu 회피).
+                    child: Text(
+                      '미결제',
+                      style: NotebookTypography.indicatorLabel,
+                    ),
                   ),
                 ],
               ),

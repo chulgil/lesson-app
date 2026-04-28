@@ -5037,3 +5037,51 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **테스트**: `flutter analyze` 0 issues, schedule 테스트 230/230 통과. 좌측 공간 52px → 16px (36px 회수).
 
 ---
+
+#### §7.127 — Gaegu 손글씨 4계층 SSOT 정착 + 시스템 자동 뱃지 hand 해제 (2026-04-28)
+
+**전제**: 사용자 점검: "현재 디자인컨셉 notebook x score 가 되어있는데 일부만 폰트 필기체가 적용되어있는데 클래식 전공 선생님의 노트필기에 익숙해져있어 해당 디자인 컨셉의 폰트의 경우 필기체 적용 범위를 다시 검증해주세요. UX전문가 관점과 선생님관점에서". §7.107~§7.108 에서 시스템 자동 뱃지("오늘", "D-N", "미결제", "필수", "진행 중") 에 `handEmphasis` 를 적용했으나, 클래식 노트북 메타포에서 자필은 **사람의 인격적 메시지**여야 하며 시스템 자동 생성 데이터에 자필을 입히면 "가짜 자필" → 메타포 신뢰 훼손.
+
+**진단** (전수)
+
+| Tier | 작성 주체 | 적용 일관성 | 위반 |
+|---|---|---|---|
+| Tier 1 (자필 본문) | 사람 | ✓ 선생님 피드백·연습 팁·메모 자필 | 1건: 레퍼토리 곡 메모(`piece.notes`) 자필 누락 — Pretendard 본문 |
+| Tier 2 (자필 강조) | 사람 | ✓ "✓ 보잉 좋음" handOk 토큰 정의 | 0건 (현재 진정 Tier 2 사용처 없음, 토큰 보존) |
+| Tier 3 (안내문) | 시스템 | △ 선생님 톤 의도 → hand 사용 | 일부 안내문 hand vs 본문 혼재 (Phase 6 후속) |
+| Tier 4 (자동 인디케이터) | 시스템 | ✗ "오늘"/"D-N"/"미결제"/"필수"/"진행 중" 5종 → handEmphasis 적용 | 7개 화면 전수 위반 |
+
+**결정**
+
+1. **§1.1 #4 정의 재정렬** — "Gaegu = 사람이 작성한 자필 본문/완료 마크"로 명확화. 시스템 자동 데이터는 자필 금지.
+2. **§1.1.1 4계층 의사결정 트리 SSOT 신설** — README 에 작성 주체 → Tier 매핑 + 회피 신호 + 결정 가이드 + 구현 토큰 매핑 명시.
+3. **신규 토큰 `NotebookTypography.indicatorLabel`** (Pretendard italic 11/700, paperAccent, letterSpacing 0.8) — Tier 4 시스템 인디케이터 전용. `copyWith(color: ...)` 으로 의미별 변형(paperOk = D-1 임박 등).
+4. **Tier 4 위반 7지점 정정** — handEmphasis → indicatorLabel:
+   - `schedule_tab.dart` "오늘" 뱃지
+   - `student_lessons_tab.dart` "오늘"
+   - `student_practice_tab.dart` "오늘"
+   - `month_group_header.dart` "진행 중"
+   - `parent_dashboard_tab.dart` "D-N" (`copyWith(color: paperOk)`) + "미결제"
+   - `assignment_item.dart` "필수"
+5. **Tier 1 보완 1지점** — `repertoire_management_widgets.dart` `piece.notes` 디스플레이 → `NotebookTypography.hand` (자필 곡 메모 의도 반영).
+6. **Advisory 훅 신설** — `.claude/hooks/check-handwriting-tier.sh` 가 Tier 4 키워드(오늘/내일/D-[0-9]+/미결제/필수/진행 중/대기/완료) 와 hand·handEmphasis·handOk·Gaegu 조합을 감지해 stderr 경고 (exit 0 advisory).
+
+**Why indicatorLabel = Pretendard italic 11/700 letterSpacing 0.8**: 인쇄체이지만 시스템 메타라는 시각 신호 필요. italic 으로 메타 성격, letterSpacing 0.8 로 small caps 느낌, w700 로 시인성. paperAccent 가 기본 — 강조 의미 자동 자동 인디케이터는 현재 진행/긴급. `copyWith(color: paperOk)` 으로 D-1 임박, 완료 등 의미별 색 변형.
+
+**Why §7.107~§7.108 결정 reverse**: 당시 "수첩 위 필기" 메타포의 시각 풍부함을 우선했으나, 클래식 전공 선생님 점검에서 "이건 손글씨 영역이 아닌데 자필이 있다" 는 메타포 위반 신호 도출. 사람 자필 ≠ 시스템 데이터 — 두 매체 혼합이 메타포 본질이고, 시스템에 자필을 입히면 두 매체가 단일 매체로 붕괴.
+
+**Lore-directive**: Gaegu 손글씨는 **사람이 작성한 자필**에만 적용 (Tier 1·2). 시스템 자동 생성 데이터는 인쇄체(Tier 4 `indicatorLabel`).
+
+**Lore-directive**: §1.1.1 4계층 의사결정 트리 = SSOT. 신규 텍스트 추가 시 "작성 주체는 누구인가" 질문이 첫 번째 분기.
+
+**Lore-directive**: §7.107~§7.108 의 시스템 뱃지 `handEmphasis` 적용 결정 reverse. 동일 시각 의도(메타 강조)는 `indicatorLabel` 토큰으로 달성.
+
+**Lore-rejected**: 모든 시스템 뱃지를 `Pretendard regular` 평기본 — 메타 강조성 손실, "오늘" 같은 시간성 정보가 일반 텍스트로 묻힘.
+
+**Lore-rejected**: 시스템 뱃지 `handEmphasis` 유지 (§7.107~§7.108) — 클래식 노트북 메타포에서 시스템 자동 데이터에 자필 적용 = 가짜 자필, 메타포 신뢰 훼손. 사용자 직접 정정.
+
+**Lore-rejected**: Tier 3 안내문(시간대 인사·온보딩) 까지 일괄 인쇄체 전환 — "선생님 톤" 의 인격적 메시지 의도 손상. Phase 6 별건 검토로 분리.
+
+**테스트**: `flutter analyze` 0 issues, 시그니처 훅 + 신규 handwriting-tier 훅 cross-check.
+
+---

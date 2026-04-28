@@ -668,7 +668,9 @@ void showPieceDetails({
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space2),
-                      Text(piece.notes!, style: AppTypography.bodyMedium),
+                      // 곡 메모 = 선생님 자필 노트 → Tier 1 Gaegu hand
+                      // (README §1.1 4계층, §7.127 Gaegu 누락 보완).
+                      Text(piece.notes!, style: NotebookTypography.hand),
                     ],
 
                     const SizedBox(height: AppSpacing.space6),

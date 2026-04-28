@@ -307,8 +307,9 @@ class ScheduleTab extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
               ),
-              // "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
-              child: Text('오늘', style: NotebookTypography.handEmphasis),
+              // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
+              // (README §1.1 4계층, §7.127 Gaegu 회피).
+              child: Text('오늘', style: NotebookTypography.indicatorLabel),
             ),
           ],
           const Spacer(),

@@ -144,10 +144,11 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           decoration: BoxDecoration(
                             color: AppColors.paperAccentSoft,
                           ),
-                          // Notebook × Score: "오늘" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).,
+                          // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
+                          // italic (README §1.1 4계층, §7.127 Gaegu 회피).
                           child: Text(
                             '오늘',
-                            style: NotebookTypography.handEmphasis,
+                            style: NotebookTypography.indicatorLabel,
                           ),
                         ),
                       ],

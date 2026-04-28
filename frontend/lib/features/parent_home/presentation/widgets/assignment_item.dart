@@ -75,8 +75,9 @@ class AssignmentItem extends StatelessWidget {
                 color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
-              // Notebook × Score: "필수" = 긴급도 마지널리아 → Gaegu handEmphasis (§1.1 #4 · §7.108).
-              child: Text('필수', style: NotebookTypography.handEmphasis),
+              // "필수" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard italic
+              // (README §1.1 4계층, §7.127 Gaegu 회피).
+              child: Text('필수', style: NotebookTypography.indicatorLabel),
             ),
         ],
       ),

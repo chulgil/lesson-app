@@ -155,6 +155,21 @@ class NotebookTypography {
     color: AppColors.paperOk,
   );
 
+  /// 시스템 자동 인디케이터 — Pretendard italic small caps.
+  ///
+  /// 사용 대상: 앱이 자동 생성한 메타 라벨 — "오늘", "D-N", "미결제", "필수",
+  /// "진행 중" 등. README §1.1 Tier 4 (사람 자필 아님) → Gaegu 회피.
+  ///
+  /// 색상 override: paperOk 등 의미별 변형은 `copyWith(color: ...)` 사용.
+  static TextStyle get indicatorLabel => const TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w700,
+    fontStyle: FontStyle.italic,
+    color: AppColors.paperAccent,
+    letterSpacing: 0.8,
+    height: 1.2,
+  );
+
   /// 템포 표기 — "♩ = 92".
   static TextStyle get tempoMono => GoogleFonts.ibmPlexMono(
     fontSize: 9,

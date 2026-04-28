@@ -33,9 +33,7 @@ class MonthGroupHeader extends StatelessWidget {
               Container(
                 width: 3,
                 height: 20,
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent,
-                  ),
+                decoration: BoxDecoration(color: AppColors.paperAccent),
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -53,9 +51,10 @@ class MonthGroupHeader extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.15),
-                    ),
-                  // Notebook × Score: "진행 중" = 시스템 마지널리아 → Gaegu handEmphasis (§1.1 #4).
-                  child: Text('진행 중', style: NotebookTypography.handEmphasis),
+                  ),
+                  // "진행 중" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
+                  // (README §1.1 4계층, §7.127 Gaegu 회피).
+                  child: Text('진행 중', style: NotebookTypography.indicatorLabel),
                 ),
               ],
             ],
