@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/chapter_guide_box.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
@@ -60,14 +61,13 @@ class RequestHistoryChat extends StatelessWidget {
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     // Detect withdraw+re-approve(same slot) pairs to hide redundant withdraws
-    final (hiddenWithdrawIds, messageOnlyApproveIds) =
-        _findSameSlotPairs(chronological);
+    final (hiddenWithdrawIds, messageOnlyApproveIds) = _findSameSlotPairs(
+      chronological,
+    );
 
     return ListView.builder(
       shrinkWrap: shrinkWrap,
-      physics: shrinkWrap
-          ? const NeverScrollableScrollPhysics()
-          : null,
+      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space4,
@@ -91,7 +91,10 @@ class RequestHistoryChat extends StatelessWidget {
         final isMessageOnly = messageOnlyApproveIds.contains(event.id);
         Widget? dateSeparator;
         if (eventIndex == 0 ||
-            !_isSameDay(chronological[eventIndex - 1].createdAt, event.createdAt)) {
+            !_isSameDay(
+              chronological[eventIndex - 1].createdAt,
+              event.createdAt,
+            )) {
           dateSeparator = _buildDateSeparator(event.createdAt);
         }
 
@@ -111,9 +114,10 @@ class RequestHistoryChat extends StatelessWidget {
     bool isMyMessage, {
     bool isMessageOnly = false,
   }) {
-    final actorName = event.actorType == ProposerRole.student
-        ? studentName
-        : AppStrings.teacher;
+    final actorName =
+        event.actorType == ProposerRole.student
+            ? studentName
+            : AppStrings.teacher;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -127,22 +131,24 @@ class RequestHistoryChat extends StatelessWidget {
             GestureDetector(
               onTap: onOpponentAvatarTap,
               child: CircleAvatar(
-              radius: AppSpacing.avatarSmall / 2,
-              backgroundColor: AppColors.scheduleMutedBackground,
-              backgroundImage: studentProfileUrl != null &&
-                      event.actorType == ProposerRole.student
-                  ? NetworkImage(studentProfileUrl!)
-                  : null,
-              child: studentProfileUrl == null ||
-                      event.actorType == ProposerRole.teacher
-                  ? Text(
-                      actorName.isNotEmpty ? actorName[0] : '?',
-                      style: AppTypography.bodySmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.inkSecondary,
-                      ),
-                    )
-                  : null,
+                radius: AppSpacing.avatarSmall / 2,
+                backgroundColor: AppColors.scheduleMutedBackground,
+                backgroundImage:
+                    studentProfileUrl != null &&
+                            event.actorType == ProposerRole.student
+                        ? NetworkImage(studentProfileUrl!)
+                        : null,
+                child:
+                    studentProfileUrl == null ||
+                            event.actorType == ProposerRole.teacher
+                        ? Text(
+                          actorName.isNotEmpty ? actorName[0] : '?',
+                          style: AppTypography.bodySmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.inkSecondary,
+                          ),
+                        )
+                        : null,
               ),
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -151,9 +157,10 @@ class RequestHistoryChat extends StatelessWidget {
           // Bubble content
           Flexible(
             child: Column(
-              crossAxisAlignment: isMyMessage
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isMyMessage
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
               children: [
                 if (!isMyMessage)
                   Padding(
@@ -173,11 +180,15 @@ class RequestHistoryChat extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     // Color by role (not viewer): teacher=primary, student=secondary
-                    color: event.actorType == ProposerRole.teacher
-                        ? AppColors.paperAccent.withValues(alpha: 0.08)
-                        : AppColors.paperDark,
+                    color:
+                        event.actorType == ProposerRole.teacher
+                            ? AppColors.paperAccent.withValues(alpha: 0.08)
+                            : AppColors.paperDark,
                   ),
-                  child: _buildBubbleContent(event, isMessageOnly: isMessageOnly),
+                  child: _buildBubbleContent(
+                    event,
+                    isMessageOnly: isMessageOnly,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 _buildTimestamp(event.createdAt),
@@ -206,25 +217,24 @@ class RequestHistoryChat extends StatelessWidget {
         ..sort((a, b) => a.priority.compareTo(b.priority));
       labels = sorted.map((ps) => ps.displayLabel).toList();
     } else if (event.suggestedSlots.isNotEmpty) {
-      labels = event.suggestedSlots
-          .take(3)
-          .map((s) => s.displayLabel)
-          .toList();
+      labels = event.suggestedSlots.take(3).map((s) => s.displayLabel).toList();
     } else {
       return [];
     }
 
     return [
       const SizedBox(height: AppSpacing.space2),
-      ...labels.asMap().entries.map((entry) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.space1 / 2),
-            child: Text(
-              '${entry.key + 1}순위 ${entry.value}',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
+      ...labels.asMap().entries.map(
+        (entry) => Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space1 / 2),
+          child: Text(
+            '${entry.key + 1}순위 ${entry.value}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
             ),
-          )),
+          ),
+        ),
+      ),
     ];
   }
 
@@ -264,10 +274,7 @@ class RequestHistoryChat extends StatelessWidget {
   }
 
   /// Bubble inner content: status text + optional slots + optional message
-  Widget _buildBubbleContent(
-    RequestEvent event, {
-    bool isMessageOnly = false,
-  }) {
+  Widget _buildBubbleContent(RequestEvent event, {bool isMessageOnly = false}) {
     // For approve/acceptAlternative/scheduleChangeAccepted: resolve the confirmed slot
     final isAcceptEvent =
         event.eventType == RequestEventType.approve ||
@@ -294,7 +301,8 @@ class RequestHistoryChat extends StatelessWidget {
 
     // Proposal card for proposalSent events
     final isProposalEvent =
-        event.eventType == RequestEventType.proposalSent && proposalTemplates.isNotEmpty;
+        event.eventType == RequestEventType.proposalSent &&
+        proposalTemplates.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,9 +330,7 @@ class RequestHistoryChat extends StatelessWidget {
             confirmedSlotLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
-              decoration: isWithdrawEvent
-                  ? TextDecoration.lineThrough
-                  : null,
+              decoration: isWithdrawEvent ? TextDecoration.lineThrough : null,
             ),
           ),
         ],
@@ -348,7 +354,9 @@ class RequestHistoryChat extends StatelessWidget {
         ],
 
         // User message (skip for proposal events — template info replaces it)
-        if (event.message != null && event.message!.isNotEmpty && !isProposalEvent) ...[
+        if (event.message != null &&
+            event.message!.isNotEmpty &&
+            !isProposalEvent) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
             event.message!,
@@ -362,61 +370,14 @@ class RequestHistoryChat extends StatelessWidget {
   }
 
   /// Status-specific guide at the top of chat history.
-  /// Shows [title] chip + [situation] text in a single info box.
+  /// Delegates rendering to shared [ChapterGuideBox] (core/widgets/).
   Widget _buildSystemGuide() {
     final guide = _getPhaseGuide();
     if (guide == null) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space3),
-        decoration: BoxDecoration(
-          color: AppColors.ink.withValues(alpha: 0.06),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.lightbulb_outline,
-                size: 18, color: AppColors.ink),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title chip — matches list actionLabel
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.ink.withValues(alpha: 0.12),
-                      borderRadius:
-                          BorderRadius.zero,
-                    ),
-                    child: Text(
-                      guide.title,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.ink,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space1),
-                  // Situation — one line guide
-                  Text(
-                    guide.situation,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: ChapterGuideBox(title: guide.title, situation: guide.situation),
     );
   }
 
@@ -431,8 +392,7 @@ class RequestHistoryChat extends StatelessWidget {
         children: [
           const Expanded(child: Divider(color: AppColors.inkQuaternary)),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
             child: Text(
               '${date.month}월 ${date.day}일 $dayLabel요일',
               style: AppTypography.caption.copyWith(
@@ -456,9 +416,7 @@ class RequestHistoryChat extends StatelessWidget {
 
     return Text(
       '$period $displayHour:$minuteStr',
-      style: AppTypography.caption.copyWith(
-        color: AppColors.inkTertiary,
-      ),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
     );
   }
 
@@ -471,7 +429,7 @@ class RequestHistoryChat extends StatelessWidget {
   /// 3. Either has null selectedSlotIndex → treat as same slot (fallback)
   ///    (null usually means the index wasn't recorded, not that it changed)
   (Set<String> hiddenWithdraws, Set<String> messageOnlyApproves)
-      _findSameSlotPairs(List<RequestEvent> sorted) {
+  _findSameSlotPairs(List<RequestEvent> sorted) {
     final hiddenWithdraws = <String>{};
     final messageOnlyApproves = <String>{};
 
@@ -545,75 +503,75 @@ class RequestHistoryChat extends StatelessWidget {
   _PhaseGuide? _getPhaseGuide() {
     if (request == null) return null;
     final isTeacher = viewerId == request!.teacherId;
-    final title = isTeacher
-        ? request!.teacherActionLabel
-        : request!.studentActionLabel;
-
+    final title =
+        isTeacher ? request!.teacherActionLabel : request!.studentActionLabel;
 
     return switch (request!.status) {
-      UnifiedRequestStatus.pending => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '희망 시간을 확인하고 수락 또는 다른 시간을 제안해주세요')
-          : _PhaseGuide(title: title,
-              situation: '선생님의 응답을 기다리고 있습니다'),
+      UnifiedRequestStatus.pending =>
+        isTeacher
+            ? _PhaseGuide(
+              title: title,
+              situation: '희망 시간을 확인하고 수락 또는 다른 시간을 제안해주세요',
+            )
+            : _PhaseGuide(title: title, situation: '선생님의 응답을 기다리고 있습니다'),
 
-      UnifiedRequestStatus.approved ||
-      UnifiedRequestStatus.negotiating => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '시간을 수락하거나 다른 시간을 역제안해주세요')
-          : _PhaseGuide(title: title,
-              situation: '제안된 시간을 확인하고 수락해주세요'),
+      UnifiedRequestStatus.approved || UnifiedRequestStatus.negotiating =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '시간을 수락하거나 다른 시간을 역제안해주세요')
+            : _PhaseGuide(title: title, situation: '제안된 시간을 확인하고 수락해주세요'),
 
-      UnifiedRequestStatus.timeConfirmed => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '수강권 종류와 결제 방법을 선택해 발급해주세요')
-          : _PhaseGuide(title: title,
-              situation: '선생님이 수강권 안내를 보내면 알림을 드립니다'),
+      UnifiedRequestStatus.timeConfirmed =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '수강권 종류와 결제 방법을 선택해 발급해주세요')
+            : _PhaseGuide(title: title, situation: '선생님이 수강권 안내를 보내면 알림을 드립니다'),
 
-      UnifiedRequestStatus.proposalSent => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '학생이 수락하면 알림을 드립니다')
-          : _PhaseGuide(title: title,
-              situation: '수강권 안내를 확인하고 수락 또는 거절해주세요'),
+      UnifiedRequestStatus.proposalSent =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '학생이 수락하면 알림을 드립니다')
+            : _PhaseGuide(title: title, situation: '수강권 안내를 확인하고 수락 또는 거절해주세요'),
 
-      UnifiedRequestStatus.proposalAccepted => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '학생이 입금하면 알림을 드립니다')
-          : _PhaseGuide(title: title,
-              situation: '결제를 완료해주세요'),
+      UnifiedRequestStatus.proposalAccepted =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '학생이 입금하면 알림을 드립니다')
+            : _PhaseGuide(title: title, situation: '결제를 완료해주세요'),
 
-      UnifiedRequestStatus.paymentNotified => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '입금을 확인하고 수강권을 발급해주세요')
-          : _PhaseGuide(title: title,
-              situation: '선생님이 확인하면 수강권이 발급됩니다'),
+      UnifiedRequestStatus.paymentNotified =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '입금을 확인하고 수강권을 발급해주세요')
+            : _PhaseGuide(title: title, situation: '선생님이 확인하면 수강권이 발급됩니다'),
 
-      UnifiedRequestStatus.subscriptionIssued => _PhaseGuide(title: title,
-              situation: '레슨을 시작할 준비가 완료되었습니다'),
+      UnifiedRequestStatus.subscriptionIssued => _PhaseGuide(
+        title: title,
+        situation: '레슨을 시작할 준비가 완료되었습니다',
+      ),
 
-      UnifiedRequestStatus.inProgress => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '레슨 후 출석 처리와 기록을 남겨주세요')
-          : _PhaseGuide(title: title,
-              situation: '레슨 일정에 맞춰 참석해주세요'),
+      UnifiedRequestStatus.inProgress =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '레슨 후 출석 처리와 기록을 남겨주세요')
+            : _PhaseGuide(title: title, situation: '레슨 일정에 맞춰 참석해주세요'),
 
-      UnifiedRequestStatus.completed => _PhaseGuide(title: title,
-              situation: '모든 레슨 수강이 완료되었습니다'),
+      UnifiedRequestStatus.completed => _PhaseGuide(
+        title: title,
+        situation: '모든 레슨 수강이 완료되었습니다',
+      ),
 
-      UnifiedRequestStatus.rejected => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '이 레슨 요청을 거절했습니다')
-          : _PhaseGuide(title: title,
-              situation: '다른 선생님이나 시간을 변경해 다시 신청할 수 있습니다'),
+      UnifiedRequestStatus.rejected =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '이 레슨 요청을 거절했습니다')
+            : _PhaseGuide(
+              title: title,
+              situation: '다른 선생님이나 시간을 변경해 다시 신청할 수 있습니다',
+            ),
 
-      UnifiedRequestStatus.cancelled => _PhaseGuide(title: title,
-              situation: '이 레슨 요청이 취소되었습니다'),
+      UnifiedRequestStatus.cancelled => _PhaseGuide(
+        title: title,
+        situation: '이 레슨 요청이 취소되었습니다',
+      ),
 
-      UnifiedRequestStatus.expired => isTeacher
-          ? _PhaseGuide(title: title,
-              situation: '응답 기간이 지나 자동 종료되었습니다')
-          : _PhaseGuide(title: title,
-              situation: '다시 신청하시면 선생님에게 알림이 전송됩니다'),
+      UnifiedRequestStatus.expired =>
+        isTeacher
+            ? _PhaseGuide(title: title, situation: '응답 기간이 지나 자동 종료되었습니다')
+            : _PhaseGuide(title: title, situation: '다시 신청하시면 선생님에게 알림이 전송됩니다'),
     };
   }
 }
@@ -626,4 +584,3 @@ class _PhaseGuide {
 
   const _PhaseGuide({required this.title, required this.situation});
 }
-

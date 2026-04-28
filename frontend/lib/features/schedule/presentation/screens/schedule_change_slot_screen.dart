@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/chapter_guide_box.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
@@ -89,6 +90,8 @@ class _ScheduleChangeSlotScreenState
       ),
       body: Column(
         children: [
+          // Chapter guide — 단계 안내 (request_history_chat 와 시그니처 통일)
+          _buildChapterGuide(),
           // Current schedule info
           _buildCurrentScheduleInfo(),
           // Bulk change info banner
@@ -108,6 +111,22 @@ class _ScheduleChangeSlotScreenState
           // Message + Submit
           _buildBottomSection(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildChapterGuide() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      child: ChapterGuideBox(
+        title: AppStrings.scheduleChangeSlotGuideTitle,
+        situation:
+            params.isBulkChange
+                ? AppStrings.scheduleChangeSlotGuideBulk
+                : AppStrings.scheduleChangeSlotGuideSingle,
       ),
     );
   }

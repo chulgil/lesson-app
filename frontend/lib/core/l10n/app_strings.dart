@@ -499,6 +499,13 @@ class AppStrings {
   static const scheduleChangeInProgress = '시간 변경 진행 중';
   static const scheduleChangeRequestArrived = '시간 변경 요청이 도착했습니다';
 
+  // ── Schedule Change Slot Screen — Chapter guide ─────────────────
+  static const scheduleChangeSlotGuideTitle = '시간 변경 제안';
+  static const scheduleChangeSlotGuideSingle =
+      '변경할 회차의 대안 시간을 최대 3개까지 선택해 학생에게 제안해주세요';
+  static const scheduleChangeSlotGuideBulk =
+      '앞으로 매주 적용될 새 정규 시간을 최대 3개까지 선택해 학생에게 제안해주세요';
+
   // Profile card
   static const studentMessage = '학생 메시지';
   static const scheduleChangeAccept = '수락';
