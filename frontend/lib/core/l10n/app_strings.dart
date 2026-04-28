@@ -1492,4 +1492,55 @@ class AppStrings {
 
   /// 수업이 종료되었습니다 (스낵바)
   static const classFinished = '수업이 종료되었습니다';
+
+  // ── Weekly Schedule (주간 스케줄 설정) ─────────────────────
+  /// 주간 스케줄 설정 (AppBar)
+  static const weeklyScheduleSetting = '주간 스케줄 설정';
+
+  /// 스케줄 추가 (FAB)
+  static const addSchedule = '스케줄 추가';
+
+  /// 주간 스케줄 (섹션 제목)
+  static const weeklyScheduleSection = '주간 스케줄';
+
+  /// 레슨 시간 설정 (카드 헤더)
+  static const lessonTimeSettings = '레슨 시간 설정';
+
+  /// 레슨 시간 (라벨)
+  static const lessonDurationLabel = '레슨 시간';
+
+  /// 시작 간격 (라벨)
+  static const startIntervalLabel = '시작 간격';
+
+  /// 쉬는 시간 (라벨)
+  static const breakTimeLabel = '쉬는 시간';
+
+  /// 예약 가능 시간 예시 (intervalMinutes=30 또는 60)
+  static String availableSlotsExample(int intervalMinutes) {
+    final extra = intervalMinutes == 30 ? '10:30, ' : '';
+    final tail = intervalMinutes == 30 ? ', 11:30' : '';
+    return '예약 가능 시간: 10:00, ${extra}11:00$tail...';
+  }
+
+  /// 탭하여 시간 추가 (빈 요일 셀)
+  static const tapToAddTime = '탭하여 시간 추가';
+
+  /// 설정된 스케줄이 없습니다
+  static const noScheduleSet = '설정된 스케줄이 없습니다';
+
+  /// 아래 버튼을 눌러 레슨 가능 시간을 추가하세요
+  static const addScheduleHint = '아래 버튼을 눌러 레슨 가능 시간을 추가하세요';
+
+  /// 데이터를 불러올 수 없습니다 (에러 상태)
+  static const cannotLoadData = '데이터를 불러올 수 없습니다';
+
+  /// 스케줄 삭제 (다이얼로그 제목)
+  static const deleteScheduleTitle = '스케줄 삭제';
+
+  /// $dayName요일 $start - $end 스케줄을 삭제하시겠습니까?
+  static String deleteScheduleConfirm({
+    required String dayName,
+    required String startTime,
+    required String endTime,
+  }) => '$dayName요일 $startTime - $endTime 스케줄을 삭제하시겠습니까?';
 }

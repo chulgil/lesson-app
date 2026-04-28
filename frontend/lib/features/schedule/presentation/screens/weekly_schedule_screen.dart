@@ -29,7 +29,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('주간 스케줄 설정')),
+      appBar: AppBar(title: const Text(AppStrings.weeklyScheduleSetting)),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -38,7 +38,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddScheduleDialog(),
         icon: const Icon(Icons.add),
-        label: const Text('스케줄 추가'),
+        label: const Text(AppStrings.addSchedule),
       ),
     );
   }
@@ -77,7 +77,10 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
 
           // Weekly overview
           // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-          Text('주간 스케줄', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.weeklyScheduleSection,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
 
           // Days grid
@@ -116,7 +119,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 Icon(Icons.settings, size: 20, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
-                  '레슨 시간 설정',
+                  AppStrings.lessonTimeSettings,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.paperAccent,
@@ -138,22 +141,22 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 Expanded(
                   child: _buildSettingItem(
                     icon: Icons.timer_outlined,
-                    label: '레슨 시간',
-                    value: '$lessonDuration분',
+                    label: AppStrings.lessonDurationLabel,
+                    value: AppStrings.durationMinutesValue(lessonDuration),
                   ),
                 ),
                 Expanded(
                   child: _buildSettingItem(
                     icon: Icons.schedule,
-                    label: '시작 간격',
-                    value: '$startInterval분',
+                    label: AppStrings.startIntervalLabel,
+                    value: AppStrings.durationMinutesValue(startInterval),
                   ),
                 ),
                 Expanded(
                   child: _buildSettingItem(
                     icon: Icons.coffee_outlined,
-                    label: '쉬는 시간',
-                    value: '$breakTime분',
+                    label: AppStrings.breakTimeLabel,
+                    value: AppStrings.durationMinutesValue(breakTime),
                   ),
                 ),
               ],
@@ -178,7 +181,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '예약 가능 시간: 10:00, ${startInterval == 30 ? '10:30, ' : ''}11:00${startInterval == 30 ? ', 11:30' : ''}...',
+                      AppStrings.availableSlotsExample(startInterval),
                       style: AppTypography.caption.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -292,7 +295,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                   children: schedules.map((s) => _buildTimeChip(s)).toList(),
                 )
                 : Text(
-                  '탭하여 시간 추가',
+                  AppStrings.tapToAddTime,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                     fontStyle: FontStyle.italic,
@@ -362,7 +365,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             const SizedBox(height: AppSpacing.space4),
             // Notebook × Score: 빈 상태 타이틀은 Playfair sectionTitle (§7.87).
             Text(
-              '설정된 스케줄이 없습니다',
+              AppStrings.noScheduleSet,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -371,7 +374,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
             // (README §1.1.1 결정 가이드, §7.128 자필 회피).
             Text(
-              '아래 버튼을 눌러 레슨 가능 시간을 추가하세요',
+              AppStrings.addScheduleHint,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -396,7 +399,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '데이터를 불러올 수 없습니다',
+            AppStrings.cannotLoadData,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -459,9 +462,13 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('스케줄 삭제'),
+            title: const Text(AppStrings.deleteScheduleTitle),
             content: Text(
-              '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
+              AppStrings.deleteScheduleConfirm(
+                dayName: schedule.dayName,
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+              ),
             ),
             actions: [
               TextButton(
