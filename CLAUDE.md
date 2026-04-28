@@ -1,6 +1,6 @@
 # CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-03-29
+> 마지막 업데이트: 2026-04-28
 
 음악 레슨/연습 관리 앱 — Flutter 3.29.0, Riverpod, Go Router, Hive | Clean Architecture + Feature-based
 
@@ -57,3 +57,15 @@ flutter analyze                                              # 분석
 | `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
 | `scenario-testing.md` | 백엔드 시나리오 테스트 규칙 |
 | `seed-data.md` | 백엔드 시드 데이터 자동 감지/실행 규칙 |
+
+## 검증 에이전트 (`.claude/agents/`)
+
+Oracle Problem (같은 AI 가 코드+테스트 작성 시 정확도 ~6%) 완화를 위해 별개 컨텍스트로 격리 호출.
+
+| 에이전트 | 역할 | 사용 시점 |
+|------|------|----------|
+| `architect.md` | 아키텍처 설계 검토 | 새 기능 / 구조 변경 |
+| `market-researcher.md` | 시장 조사 | 신규 기능 기획 |
+| `test-critic.md` | 테스트가 spec 을 검증하는지 vs 구현 복사인지 판별 | 테스트 작성 후 |
+| `security-reviewer.md` | Flutter 보안 12-항목 (시크릿/Hive/딥링크/플랫폼 채널) | 보안/결제/인증 변경 |
+| `codex-reviewer.md` | OpenAI Codex 외부 모델 교차 검증 | ultra 모드 (보안/결제/마이그레이션) |
