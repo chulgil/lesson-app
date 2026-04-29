@@ -25,7 +25,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     final studentNames = ref.watch(studentNameMapProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('출석 현황')),
+      appBar: AppBar(title: const Text(AppStrings.attendanceTitle)),
       body: overviewAsync.when(
         data: (overview) => _buildContent(context, overview, studentNames),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -42,7 +42,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     if (overview.totalCountable == 0) {
       return Center(
         child: Text(
-          '출석 데이터가 없습니다',
+          AppStrings.noAttendanceData,
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -184,9 +184,9 @@ class TeacherAttendanceScreen extends ConsumerWidget {
 
   Widget _buildAbsenceRow(AbsenceRecord ar, String name) {
     final statusLabel = switch (ar.status) {
-      LessonStatus.studentAbsent => '결석',
-      LessonStatus.noShow => '노쇼',
-      LessonStatus.cancelledByStudentLate => '당일 취소',
+      LessonStatus.studentAbsent => AppStrings.statusAbsent,
+      LessonStatus.noShow => AppStrings.statusNoShow,
+      LessonStatus.cancelledByStudentLate => AppStrings.statusSameDayCancel,
       _ => '',
     };
 
