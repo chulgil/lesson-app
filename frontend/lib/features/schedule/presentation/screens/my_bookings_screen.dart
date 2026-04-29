@@ -55,7 +55,7 @@ class MyBookingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('내 레슨 예약')),
+      appBar: AppBar(title: const Text(AppStrings.myBookingsTitle)),
       body: SafeArea(
         child: Column(
           children: [
@@ -92,7 +92,7 @@ class MyBookingsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: AppSpacing.space3),
                           Text(
-                            '데이터를 불러올 수 없습니다',
+                            AppStrings.cannotLoadData,
                             style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.inkSecondary,
                             ),
@@ -152,7 +152,10 @@ class MyBookingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
-                      '변경/취소: $remainingReschedules/$totalReschedules회',
+                      AppStrings.rescheduleUsageInline(
+                        remainingReschedules,
+                        totalReschedules,
+                      ),
                       style: AppTypography.bodySmall.copyWith(
                         color:
                             canReschedule
@@ -177,8 +180,8 @@ class MyBookingsScreen extends ConsumerWidget {
   Widget _buildEmptyState() {
     return const EmptyStateWidget(
       icon: Icons.event_available,
-      title: '예약된 레슨이 없습니다',
-      subtitle: '새로운 레슨을 예약해보세요',
+      title: AppStrings.noBookings,
+      subtitle: AppStrings.bookNewLesson,
     );
   }
 
@@ -259,7 +262,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 ),
                 if (isPast)
                   Text(
-                    '완료',
+                    AppStrings.statusCompleted,
                     style: NotebookTypography.sectionLabel.copyWith(
                       color: AppColors.paperOk,
                     ),
@@ -278,7 +281,7 @@ class MyBookingsScreen extends ConsumerWidget {
                               ? () => _navigateToReschedule(context, booking)
                               : null,
                       icon: const Icon(Icons.swap_horiz, size: 18),
-                      label: const Text('변경'),
+                      label: const Text(AppStrings.rescheduleShort),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,
                         side: BorderSide(
@@ -321,7 +324,7 @@ class MyBookingsScreen extends ConsumerWidget {
               if (!canReschedule) ...[
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  '변경/취소 횟수를 모두 사용했습니다',
+                  AppStrings.rescheduleQuotaUsedUp,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),
