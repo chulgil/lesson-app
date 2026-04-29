@@ -96,6 +96,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-1a~5-1g 완료 (commits: df846fab, 1a290003, 1accb9d6, b1580850, 5f4d5c2a, b0c96b58, 37090589)
 - 5-1h booking_reschedule_screen 완료 (2026-04-29) — 17 신규 키 + 4 재사용 (cancel, cannotLoadData, rescheduleUsageStatusWithColon, rescheduleNoMoreAfter), 20 사이트, schedule scope 237/237 PASS
 - 5-1i schedule_tab + lesson_requests + request_detail 완료 (2026-04-29) — 10 신규 키 + 7 재사용 (retry, lessonComplete, statusCompleted, actionLessonCancel, cancel, goBack, errorOccurred), 20 사이트, schedule scope 237/237 PASS
+- 5-1j request_completion + unified_lesson_request + my_bookings 완료 (2026-04-29) — 30 신규 키 + 7 재사용 (requestCompleteTitle, lessonTypeLabel, instrumentFallback, teacher, durationMinutesValue, cannotLoadData, statusCompleted, cancel), 30 사이트, schedule scope 237/237 PASS
 - 5-2 lessons 도메인
 - 5-3 subscription 도메인
 
@@ -124,8 +125,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P0-1 / P0-2 / P1-1 / P1-2 Phase A·B·C | ✅ 완료 (2026-04-29) |
 | P2 5-1h booking_reschedule_screen i18n (20 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-1i schedule_tab + lesson_requests + request_detail i18n (20 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-1j request_completion_screen + unified_lesson_request_screen + my_bookings_screen | 진입 |
-| P2 5-2 lessons 도메인 / 5-3 subscription 도메인 | 후속 |
+| P2 5-1j request_completion + unified_lesson_request + my_bookings i18n (30 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-2 lessons 도메인 / 5-3 subscription 도메인 | 진입 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
