@@ -252,7 +252,7 @@ class _RepertoireDetailScreenState
                 );
               },
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('추가'),
+              label: const Text(AppStrings.add),
             ),
           ],
         ),

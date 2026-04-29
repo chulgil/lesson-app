@@ -365,7 +365,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                     Navigator.pop(ctx);
                   }
                 },
-                child: const Text('추가'),
+                child: const Text(AppStrings.add),
               ),
             ],
           ),

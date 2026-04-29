@@ -102,6 +102,9 @@ class AppStrings {
   /// 저장 버튼
   static const save = '저장';
 
+  /// 추가 버튼 (신규 항목 생성)
+  static const add = '추가';
+
   /// 다시 시도 버튼 (에러 재시도)
   static const retry = '다시 시도';
 
@@ -1764,4 +1767,38 @@ class AppStrings {
 
   /// 등록 중 오류가 발생했습니다. 다시 시도해주세요. (실패 토스트)
   static const registrationErrorRetry = '등록 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  // ── Schedule Tab (스케줄 탭) ──────────────────────────────
+  /// 레슨 추가 (IconButton tooltip)
+  static const addLessonTooltip = '레슨 추가';
+
+  /// 스케줄 (Programme Title)
+  static const scheduleTabTitle = '스케줄';
+
+  /// 오늘 (today indicator badge)
+  static const todayLabel = '오늘';
+
+  /// $n개 레슨 (count display)
+  static String lessonCountWithUnit(int count) => '$count개 레슨';
+
+  /// 예정된 레슨이 없습니다 (empty state)
+  static const noUpcomingLessons = '예정된 레슨이 없습니다';
+
+  /// 레슨 정보를 불러오는데 실패했습니다 (error state)
+  static const lessonLoadFailed = '레슨 정보를 불러오는데 실패했습니다';
+
+  /// $name 레슨을 완료 처리하시겠습니까? (confirm dialog message)
+  static String confirmLessonCompletion(String studentName) =>
+      '$studentName 레슨을 완료 처리하시겠습니까?';
+
+  /// $name 레슨을 취소하시겠습니까? (confirm dialog message)
+  static String confirmLessonCancellation(String studentName) =>
+      '$studentName 레슨을 취소하시겠습니까?';
+
+  /// $name 레슨이 $action되었습니다 (snackbar after swipe action)
+  static String lessonActionCompleted(String studentName, String action) =>
+      '$studentName 레슨이 $action되었습니다';
+
+  /// 수강권 상세 화면은 준비 중입니다 (TODO placeholder)
+  static const subscriptionDetailComingSoon = '수강권 상세 화면은 준비 중입니다';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -226,7 +227,7 @@ class ScheduleTab extends ConsumerWidget {
             trailing: IconButton(
               onPressed: () => _navigateToAddLesson(context, ref),
               icon: const Icon(Icons.add),
-              tooltip: '레슨 추가',
+              tooltip: AppStrings.addLessonTooltip,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               style: IconButton.styleFrom(
@@ -246,7 +247,10 @@ class ScheduleTab extends ConsumerWidget {
                   style: NotebookTypography.mastheadLabel,
                 ),
                 const SizedBox(height: 4),
-                Text('스케줄', style: NotebookTypography.masthead),
+                Text(
+                  AppStrings.scheduleTabTitle,
+                  style: NotebookTypography.masthead,
+                ),
                 const SizedBox(height: AppSpacing.space3),
                 const ThinRule(),
               ],
@@ -309,7 +313,10 @@ class ScheduleTab extends ConsumerWidget {
               ),
               // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
               // (README §1.1 4계층, §7.127 Gaegu 회피).
-              child: Text('오늘', style: NotebookTypography.indicatorLabel),
+              child: Text(
+                AppStrings.todayLabel,
+                style: NotebookTypography.indicatorLabel,
+              ),
             ),
           ],
           const Spacer(),
@@ -458,9 +465,9 @@ class _SwipeableLessonCard extends ConsumerWidget {
           return await _showConfirmDialog(
             context,
             ref,
-            title: '레슨 완료',
-            message: '${lesson.studentName} 레슨을 완료 처리하시겠습니까?',
-            confirmLabel: '완료',
+            title: AppStrings.lessonComplete,
+            message: AppStrings.confirmLessonCompletion(lesson.studentName),
+            confirmLabel: AppStrings.statusCompleted,
             confirmColor: AppColors.paperOk,
             onConfirm: () async {
               final updated = lesson.copyWith(status: LessonStatus.completed);
@@ -473,9 +480,9 @@ class _SwipeableLessonCard extends ConsumerWidget {
           return await _showConfirmDialog(
             context,
             ref,
-            title: '레슨 취소',
-            message: '${lesson.studentName} 레슨을 취소하시겠습니까?',
-            confirmLabel: '취소',
+            title: AppStrings.actionLessonCancel,
+            message: AppStrings.confirmLessonCancellation(lesson.studentName),
+            confirmLabel: AppStrings.cancel,
             confirmColor: AppColors.paperAccent,
             onConfirm: () async {
               await ref
@@ -496,7 +503,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
             Icon(Icons.check_circle, color: AppColors.paper),
             SizedBox(width: AppSpacing.space2),
             Text(
-              '완료',
+              AppStrings.statusCompleted,
               style: TextStyle(
                 color: AppColors.paper,
                 fontWeight: FontWeight.w600,
@@ -513,7 +520,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: const [
             Text(
-              '취소',
+              AppStrings.cancel,
               style: TextStyle(
                 color: AppColors.paper,
                 fontWeight: FontWeight.w600,
@@ -546,7 +553,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('돌아가기'),
+                child: const Text(AppStrings.goBack),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
@@ -562,7 +569,12 @@ class _SwipeableLessonCard extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${lesson.studentName} 레슨이 $confirmLabel되었습니다'),
+            content: Text(
+              AppStrings.lessonActionCompleted(
+                lesson.studentName,
+                confirmLabel,
+              ),
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );

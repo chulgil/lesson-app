@@ -719,7 +719,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                     Navigator.pop(context);
                     widget.onSave(_currentDuration);
                   },
-          child: const Text('추가'),
+          child: const Text(AppStrings.add),
         ),
       ],
     );

@@ -252,7 +252,7 @@ class _InstrumentManagementScreenState
             const SizedBox(width: AppSpacing.space2),
             FilledButton(
               onPressed: _addCustomInstrument,
-              child: const Text('추가'),
+              child: const Text(AppStrings.add),
             ),
           ],
         ),

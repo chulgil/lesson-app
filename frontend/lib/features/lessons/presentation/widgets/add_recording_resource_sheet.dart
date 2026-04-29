@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -158,7 +159,7 @@ class _AddRecordingResourceSheetState
                             color: AppColors.paper,
                           ),
                         )
-                        : const Text('추가'),
+                        : const Text(AppStrings.add),
               ),
             ),
           ],

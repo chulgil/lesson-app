@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/notebook_typography.dart';
@@ -110,7 +111,7 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
                       widget.onSubmit(content);
                     }
                   },
-                  child: const Text('추가'),
+                  child: const Text(AppStrings.add),
                 ),
               ),
 

@@ -691,7 +691,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _consentChecked ? _submit : null,
-                child: const Text('추가'),
+                child: const Text(AppStrings.add),
               ),
             ),
           ],

@@ -419,7 +419,7 @@ class _TipTemplateManagementScreenState
                         );
                       }
                     },
-                    child: const Text('추가'),
+                    child: const Text(AppStrings.add),
                   ),
                 ],
               );
