@@ -113,7 +113,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isRecordMode ? '레슨 기록' : '레슨 추가'),
+        title: Text(
+          _isRecordMode
+              ? AppStrings.lessonRecordTitle
+              : AppStrings.lessonAddTitle,
+        ),
         leading: IconButton(
           onPressed:
               () => showLessonExitConfirmation(
@@ -138,7 +142,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Student selection
-              const LessonFormSectionTitle('학생 선택'),
+              const LessonFormSectionTitle(AppStrings.bulkFeedbackStepStudent),
               const SizedBox(height: AppSpacing.space3),
 
               // Quick select chips for recent students
@@ -155,7 +159,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Date and time selection
-              const LessonFormSectionTitle('일시'),
+              const LessonFormSectionTitle(AppStrings.dateTimeLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonDateTimeSection(
                 selectedDate: _selectedDate,
@@ -167,7 +171,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson duration
-              const LessonFormSectionTitle('레슨 시간'),
+              const LessonFormSectionTitle(AppStrings.lessonDurationLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonDurationSelector(
                 selectedDuration: _lessonDuration,
@@ -179,7 +183,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson location (selected from teacher's registered locations)
-              const LessonFormSectionTitle('레슨 장소'),
+              const LessonFormSectionTitle(AppStrings.lessonLocationLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonLocationSection(
                 teacherId: 'teacher_1',
@@ -223,7 +227,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson content
-              const LessonFormSectionTitle('레슨 내용'),
+              const LessonFormSectionTitle(AppStrings.lessonContentLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonContentFields(
                 pieceController: _pieceController,
@@ -256,10 +260,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   onPressed: _saveLesson,
                   child: Text(
                     _isRecurring
-                        ? '정기 레슨 예약하기'
+                        ? AppStrings.reserveRecurringLessonButton
                         : _isRecordMode
-                        ? '레슨 기록하기'
-                        : '레슨 추가하기',
+                        ? AppStrings.recordLessonButton
+                        : AppStrings.addLessonButton,
                   ),
                 ),
               ),
@@ -422,7 +426,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.',
+                    AppStrings.noActiveSubscriptionBanner,
                     style: AppTypography.caption.copyWith(color: AppColors.ink),
                   ),
                 ),
@@ -447,14 +451,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               children: [
                 Icon(Icons.history, color: AppColors.paperAccent, size: 24),
                 const SizedBox(width: AppSpacing.space2),
-                const Text('과거 레슨 기록'),
+                const Text(AppStrings.pastLessonRecordTitle),
               ],
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('선택한 시간은 이미 지난 시간입니다.'),
+                const Text(AppStrings.pastTimeMessage),
                 const SizedBox(height: AppSpacing.space3),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
@@ -463,7 +467,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '레슨 기록 시:',
+                        AppStrings.recordLessonChecklistHeader,
                         style: AppTypography.caption.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.ink,
@@ -471,7 +475,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                       ),
                       const SizedBox(height: AppSpacing.space1),
                       Text(
-                        '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
+                        AppStrings.recordLessonChecklistItems,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.ink,
                         ),
@@ -488,7 +492,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('레슨 기록'),
+                child: const Text(AppStrings.lessonRecordTitle),
               ),
             ],
           ),
@@ -544,10 +548,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('시간 충돌'),
-            content: Text(
-              '해당 시간에 기존 레슨이 있습니다:\n$conflictInfo\n\n그래도 계속 진행하시겠습니까?',
-            ),
+            title: const Text(AppStrings.timeConflictTitle),
+            content: Text(AppStrings.conflictDialogContent(conflictInfo)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -555,7 +557,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('계속'),
+                child: const Text(AppStrings.continueAction),
               ),
             ],
           ),
@@ -567,7 +569,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('학생을 선택해주세요'),
+          content: Text(AppStrings.selectStudentValidation),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -577,7 +579,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     if (_isRecurring && _recurringDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('반복 요일을 선택해주세요'),
+          content: Text(AppStrings.selectRecurringDaysValidation),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -598,7 +600,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
     if (_isRecurring && _recurringDays.isNotEmpty) {
       // Check conflicts for each recurring day (int: 0=Mon...6=Sun)
-      const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+      const dayNames = AppStrings.dayNamesShort;
       final conflictDays = <String>[];
       for (final dayIndex in _recurringDays) {
         final weekday =
@@ -616,7 +618,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         if (conflict != null) {
           final dayLabel =
               dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
-          conflictDays.add('$dayLabel요일 ($conflict)');
+          conflictDays.add(AppStrings.recurringConflictDay(dayLabel, conflict));
         }
       }
       if (conflictDays.isNotEmpty) {
@@ -662,7 +664,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       studentId: _selectedStudent!.id,
       studentName: _selectedStudent!.name,
       teacherName:
-          ref.read(teacherExtendedProfileProvider).valueOrNull?.name ?? '선생님',
+          ref.read(teacherExtendedProfileProvider).valueOrNull?.name ??
+          AppStrings.teacher,
       instrument: _selectedStudent!.instrument,
       date: _selectedDate,
       startTime: formatLessonTime(_selectedTime),
@@ -717,7 +720,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${_selectedStudent!.name} 학생의 정기 레슨 $createdCount개가 생성되었습니다 (4주간)',
+              AppStrings.recurringLessonsCreated(
+                _selectedStudent!.name,
+                createdCount,
+              ),
             ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperOk,
@@ -739,8 +745,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
         final message =
             isPastLesson
-                ? '${_selectedStudent!.name} 학생의 레슨이 기록되었습니다'
-                : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다';
+                ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
+                : AppStrings.lessonAddedFor(_selectedStudent!.name);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -757,7 +763,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('레슨 추가에 실패했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.addLessonFailed),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),
@@ -782,7 +788,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         usedAt: lesson.date,
         teacherName: lesson.teacherName,
         instrument: lesson.instrument,
-        note: '레슨 기록 (사후 등록)',
+        note: AppStrings.lessonRecordPostNote,
         createdAt: DateTime.now(),
         usageType: UsageType.normal,
         deducted: true,
@@ -832,12 +838,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('반복 레슨 시간 충돌'),
+            title: const Text(AppStrings.recurringConflictTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('다음 요일에 기존 레슨과 시간이 겹칩니다:'),
+                const Text(AppStrings.recurringConflictHeader),
                 const SizedBox(height: AppSpacing.space2),
                 ...conflictDays.map(
                   (d) => Padding(
@@ -849,7 +855,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
-                const Text('그래도 계속 진행하시겠습니까?'),
+                const Text(AppStrings.continueProgressQuestion),
               ],
             ),
             actions: [
@@ -859,7 +865,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('계속'),
+                child: const Text(AppStrings.continueAction),
               ),
             ],
           ),

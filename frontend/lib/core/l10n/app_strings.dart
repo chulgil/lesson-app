@@ -2287,4 +2287,83 @@ class AppStrings {
 
   /// 연습이 추가되었습니다 (practice item added success)
   static const practiceItemAdded = '연습이 추가되었습니다';
+
+  // ── Add Lesson Screen (레슨 추가/기록 화면 30차) ─
+
+  /// 레슨 기록 (add lesson screen title — past mode)
+  static const lessonRecordTitle = '레슨 기록';
+
+  /// 레슨 추가 (add lesson screen title — future mode)
+  static const lessonAddTitle = '레슨 추가';
+
+  /// 레슨 장소 (lesson location section title)
+  static const lessonLocationLabel = '레슨 장소';
+
+  /// 정기 레슨 예약하기 (recurring lesson submit button)
+  static const reserveRecurringLessonButton = '정기 레슨 예약하기';
+
+  /// 레슨 기록하기 (record lesson submit button)
+  static const recordLessonButton = '레슨 기록하기';
+
+  /// 레슨 추가하기 (add lesson submit button)
+  static const addLessonButton = '레슨 추가하기';
+
+  /// 이 학생은 현재 유효한 수강권이 없습니다... (no active subscription banner)
+  static const noActiveSubscriptionBanner =
+      '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.';
+
+  /// 과거 레슨 기록 (past lesson record dialog title)
+  static const pastLessonRecordTitle = '과거 레슨 기록';
+
+  /// 선택한 시간은 이미 지난 시간입니다. (past time message)
+  static const pastTimeMessage = '선택한 시간은 이미 지난 시간입니다.';
+
+  /// 레슨 기록 시: (record lesson checklist header)
+  static const recordLessonChecklistHeader = '레슨 기록 시:';
+
+  /// • "완료" 상태로 저장됩니다... (record lesson checklist items)
+  static const recordLessonChecklistItems =
+      '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다';
+
+  /// 해당 시간에 기존 레슨이 있습니다:\n{info}\n\n그래도 계속 진행하시겠습니까? (conflict dialog content)
+  static String conflictDialogContent(String info) =>
+      '해당 시간에 기존 레슨이 있습니다:\n$info\n\n그래도 계속 진행하시겠습니까?';
+
+  /// 학생을 선택해주세요 (validation: select student)
+  static const selectStudentValidation = '학생을 선택해주세요';
+
+  /// 반복 요일을 선택해주세요 (validation: select recurring days)
+  static const selectRecurringDaysValidation = '반복 요일을 선택해주세요';
+
+  /// {dayLabel}요일 ({conflict}) (recurring conflict day template)
+  static String recurringConflictDay(String dayLabel, String conflict) =>
+      '$dayLabel요일 ($conflict)';
+
+  /// 월/화/수/목/금/토/일 (Korean day-of-week short names, Mon=0)
+  static const dayNamesShort = ['월', '화', '수', '목', '금', '토', '일'];
+
+  /// {name} 학생의 정기 레슨 {count}개가 생성되었습니다 (4주간) (recurring created success)
+  static String recurringLessonsCreated(String name, int count) =>
+      '$name 학생의 정기 레슨 $count개가 생성되었습니다 (4주간)';
+
+  /// {name} 학생의 레슨이 기록되었습니다 (lesson recorded success)
+  static String lessonRecordedFor(String name) => '$name 학생의 레슨이 기록되었습니다';
+
+  /// {name} 학생의 레슨이 추가되었습니다 (lesson added success)
+  static String lessonAddedFor(String name) => '$name 학생의 레슨이 추가되었습니다';
+
+  /// 레슨 추가에 실패했습니다. 다시 시도해주세요. (add lesson failed)
+  static const addLessonFailed = '레슨 추가에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레슨 기록 (사후 등록) (subscription usage note for past lesson)
+  static const lessonRecordPostNote = '레슨 기록 (사후 등록)';
+
+  /// 반복 레슨 시간 충돌 (recurring conflict dialog title)
+  static const recurringConflictTitle = '반복 레슨 시간 충돌';
+
+  /// 다음 요일에 기존 레슨과 시간이 겹칩니다: (recurring conflict header)
+  static const recurringConflictHeader = '다음 요일에 기존 레슨과 시간이 겹칩니다:';
+
+  /// 그래도 계속 진행하시겠습니까? (continue progress question)
+  static const continueProgressQuestion = '그래도 계속 진행하시겠습니까?';
 }
