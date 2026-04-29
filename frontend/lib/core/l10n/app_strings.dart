@@ -3236,4 +3236,54 @@ class AppStrings {
 
   /// 학생 선택 (FifthWeekPolicy.optional)
   static const fifthWeekOptional = '학생 선택';
+
+  // -- Location & Travel Selector (위치/이동시간 선택 5-3b-4) --
+
+  /// 학생 집 (LocationType.studentHome chip label)
+  static const locationStudentHomeLabel = '학생 집';
+
+  /// 외부 스튜디오 (LocationType.externalPlace chip label)
+  static const locationExternalPlaceLabel = '외부 스튜디오';
+
+  /// 선생님 집 (LocationType.teacherStudio chip label)
+  static const locationTeacherHomeLabel = '선생님 집';
+
+  /// 온라인 (LocationType.online chip label)
+  static const locationOnlineLabel = '온라인';
+
+  /// 이 학생의 기본 레슨 장소를 선택하세요 (lesson location section description)
+  static const lessonLocationDescription = '이 학생의 기본 레슨 장소를 선택하세요';
+
+  /// 학원 주소 (자동) (academy auto address)
+  static const locationAcademyAddressAuto = '학원 주소 (자동)';
+
+  /// 선생님 스튜디오 (자동) (teacher studio auto address)
+  static const locationTeacherStudioAddressAuto = '선생님 스튜디오 (자동)';
+
+  /// 이동시간 없음 (online — no travel)
+  static const locationOnlineNoTravel = '이동시간 없음';
+
+  /// 학생 주소 미등록 (student home address empty warning)
+  static const locationStudentAddressEmpty = '학생 주소 미등록';
+
+  /// 주소 불러오는 중... (address loading)
+  static const locationAddressLoading = '주소 불러오는 중...';
+
+  /// 주소 조회 실패 (address fetch failed)
+  static const locationAddressFetchFailed = '주소 조회 실패';
+
+  /// 외부 장소 주소 (external place address input label)
+  static const locationExternalAddressLabel = '외부 장소 주소';
+
+  /// 예: 강남 OO 스튜디오 (external place address input hint)
+  static const locationExternalAddressHint = '예: 강남 OO 스튜디오';
+
+  /// 이동시간 (travel time section title)
+  static const travelTimeLabel = '이동시간';
+
+  /// 없음 (travel time dropdown 0 label)
+  static const travelTimeNone = '없음';
+
+  /// 스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다 (travel time helper)
+  static const travelTimeDescription = '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다';
 }

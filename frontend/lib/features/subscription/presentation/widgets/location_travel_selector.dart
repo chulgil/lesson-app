@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -25,27 +26,27 @@ const _locationOptions = [
   _LocationOption(
     type: LocationType.studentHome,
     icon: Icons.home,
-    label: '학생 집',
+    label: AppStrings.locationStudentHomeLabel,
   ),
   _LocationOption(
     type: LocationType.academyRoom,
     icon: Icons.school,
-    label: '학원',
+    label: AppStrings.academy,
   ),
   _LocationOption(
     type: LocationType.externalPlace,
     icon: Icons.music_note,
-    label: '외부 스튜디오',
+    label: AppStrings.locationExternalPlaceLabel,
   ),
   _LocationOption(
     type: LocationType.teacherStudio,
     icon: Icons.person,
-    label: '선생님 집',
+    label: AppStrings.locationTeacherHomeLabel,
   ),
   _LocationOption(
     type: LocationType.online,
     icon: Icons.videocam,
-    label: '온라인',
+    label: AppStrings.locationOnlineLabel,
   ),
 ];
 
@@ -146,10 +147,13 @@ class _LocationTravelSelectorState
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('레슨 장소', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.lessonLocationLabel,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '이 학생의 기본 레슨 장소를 선택하세요',
+          AppStrings.lessonLocationDescription,
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -213,13 +217,22 @@ class _LocationTravelSelectorState
       case LocationType.studentHome:
         return _buildStudentHomeAddress();
       case LocationType.academyRoom:
-        return _buildReadOnlyAddress(icon: Icons.school, text: '학원 주소 (자동)');
+        return _buildReadOnlyAddress(
+          icon: Icons.school,
+          text: AppStrings.locationAcademyAddressAuto,
+        );
       case LocationType.externalPlace:
         return _buildExternalAddressField();
       case LocationType.teacherStudio:
-        return _buildReadOnlyAddress(icon: Icons.person, text: '선생님 스튜디오 (자동)');
+        return _buildReadOnlyAddress(
+          icon: Icons.person,
+          text: AppStrings.locationTeacherStudioAddressAuto,
+        );
       case LocationType.online:
-        return _buildReadOnlyAddress(icon: Icons.videocam, text: '이동시간 없음');
+        return _buildReadOnlyAddress(
+          icon: Icons.videocam,
+          text: AppStrings.locationOnlineNoTravel,
+        );
     }
   }
 
@@ -232,18 +245,21 @@ class _LocationTravelSelectorState
         if (address == null || address.isEmpty) {
           return _buildReadOnlyAddress(
             icon: Icons.home,
-            text: '학생 주소 미등록',
+            text: AppStrings.locationStudentAddressEmpty,
             isWarning: true,
           );
         }
         return _buildReadOnlyAddress(icon: Icons.home, text: address);
       },
       loading:
-          () => _buildReadOnlyAddress(icon: Icons.home, text: '주소 불러오는 중...'),
+          () => _buildReadOnlyAddress(
+            icon: Icons.home,
+            text: AppStrings.locationAddressLoading,
+          ),
       error:
           (_, __) => _buildReadOnlyAddress(
             icon: Icons.home,
-            text: '주소 조회 실패',
+            text: AppStrings.locationAddressFetchFailed,
             isWarning: true,
           ),
     );
@@ -288,8 +304,8 @@ class _LocationTravelSelectorState
     return TextFormField(
       controller: _externalAddressController,
       decoration: InputDecoration(
-        labelText: '외부 장소 주소',
-        hintText: '예: 강남 OO 스튜디오',
+        labelText: AppStrings.locationExternalAddressLabel,
+        hintText: AppStrings.locationExternalAddressHint,
         prefixIcon: const Icon(Icons.music_note, size: AppSpacing.iconSM),
         border: OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
@@ -317,7 +333,10 @@ class _LocationTravelSelectorState
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('이동시간', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.travelTimeLabel,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space2),
         DropdownButtonFormField<int>(
           initialValue:
@@ -327,7 +346,9 @@ class _LocationTravelSelectorState
                 return DropdownMenuItem<int>(
                   value: minutes,
                   child: Text(
-                    minutes == 0 ? '없음' : '$minutes분',
+                    minutes == 0
+                        ? AppStrings.travelTimeNone
+                        : AppStrings.durationMinutesValue(minutes),
                     style: AppTypography.bodyMedium,
                   ),
                 );
@@ -356,7 +377,7 @@ class _LocationTravelSelectorState
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다',
+          AppStrings.travelTimeDescription,
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
