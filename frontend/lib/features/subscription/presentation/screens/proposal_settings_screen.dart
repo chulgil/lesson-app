@@ -60,13 +60,18 @@ class _ProposalSettingsScreenState
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('자동 제안 설정')),
+        appBar: AppBar(
+          title: const Text(AppStrings.proposalSettingsAppBarTitle),
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('자동 제안 설정'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.proposalSettingsAppBarTitle),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -127,14 +132,14 @@ class _ProposalSettingsScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '체험 후 자동 제안',
+                      AppStrings.proposalSettingsAutoToggleTitle,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space1),
                     Text(
-                      '체험레슨 완료 시 수강권을 자동으로 제안합니다',
+                      AppStrings.proposalSettingsAutoToggleSubtitle,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -170,7 +175,7 @@ class _ProposalSettingsScreenState
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '체험 후 즉시 제안하여 전환율을 높이세요',
+                      AppStrings.proposalSettingsAutoToggleHint,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.ink,
                       ),
@@ -194,18 +199,18 @@ class _ProposalSettingsScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '제안할 수강권',
+          AppStrings.proposalSettingsTemplateSectionTitle,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '선택하지 않으면 모든 활성 수강권이 제안됩니다',
+          AppStrings.proposalSettingsTemplateSectionHint,
           style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
         templatesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const Text('오류가 발생했습니다.'),
+          error: (_, __) => Text('${AppStrings.errorOccurred}.'),
           data: (templates) {
             if (templates.isEmpty) {
               return Container(
@@ -223,7 +228,7 @@ class _ProposalSettingsScreenState
                     ),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
-                      '수강권 템플릿이 없습니다',
+                      AppStrings.proposalSettingsTemplateEmpty,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -339,7 +344,10 @@ class _ProposalSettingsScreenState
                                       ],
                                     ),
                                     Text(
-                                      '${template.totalLessons}회 · ${template.formattedPrice}',
+                                      AppStrings.proposalSettingsTemplateInfoFormat(
+                                        template.totalLessons,
+                                        template.formattedPrice,
+                                      ),
                                       style: AppTypography.caption.copyWith(
                                         color: AppColors.inkSecondary,
                                       ),
@@ -369,7 +377,7 @@ class _ProposalSettingsScreenState
                                               : AppColors.paperDark,
                                     ),
                                     child: Text(
-                                      isRecommended ? '추천' : '추천',
+                                      AppStrings.templateRecommendedBadge,
                                       style: AppTypography.captionSmall
                                           .copyWith(
                                             color:
@@ -400,7 +408,7 @@ class _ProposalSettingsScreenState
         Row(
           children: [
             Text(
-              '골든타임 할인',
+              AppStrings.proposalSettingsGoldenTimeTitle,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -410,7 +418,7 @@ class _ProposalSettingsScreenState
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Text(
-                '전환율 UP',
+                AppStrings.proposalSettingsConversionUpBadge,
                 style: AppTypography.captionSmall.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
@@ -421,7 +429,7 @@ class _ProposalSettingsScreenState
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다',
+          AppStrings.proposalSettingsGoldenTimeHint,
           style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -436,7 +444,10 @@ class _ProposalSettingsScreenState
               // Discount percentage
               Row(
                 children: [
-                  Text('할인율', style: AppTypography.bodyMedium),
+                  Text(
+                    AppStrings.proposalSettingsDiscountPercentLabel,
+                    style: AppTypography.bodyMedium,
+                  ),
                   const Spacer(),
                   SizedBox(
                     width: 80,
@@ -469,7 +480,10 @@ class _ProposalSettingsScreenState
               // Validity hours
               Row(
                 children: [
-                  Text('유효 시간', style: AppTypography.bodyMedium),
+                  Text(
+                    AppStrings.proposalSettingsValidityHoursLabel,
+                    style: AppTypography.bodyMedium,
+                  ),
                   const Spacer(),
                   SizedBox(
                     width: 100,
@@ -486,7 +500,9 @@ class _ProposalSettingsScreenState
                           [12, 24, 48, 72].map((v) {
                             return DropdownMenuItem(
                               value: v,
-                              child: Text('$v시간'),
+                              child: Text(
+                                AppStrings.proposalSettingsHoursFormat(v),
+                              ),
                             );
                           }).toList(),
                       onChanged: (value) {
@@ -513,7 +529,10 @@ class _ProposalSettingsScreenState
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
-                          '체험 후 $_discountHours시간 이내 결제 시 $_discountPercent% 할인',
+                          AppStrings.proposalSettingsGoldenTimeSummaryFormat(
+                            _discountHours,
+                            _discountPercent,
+                          ),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.paperAccent,
                           ),
@@ -535,12 +554,12 @@ class _ProposalSettingsScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '자동 리마인더',
+          AppStrings.proposalSettingsAutoReminderTitle,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '제안 후 응답이 없으면 자동으로 알림을 보냅니다',
+          AppStrings.proposalSettingsAutoReminderHint,
           style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -556,9 +575,12 @@ class _ProposalSettingsScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('자동 리마인더', style: AppTypography.bodyMedium),
                     Text(
-                      '24시간, 48시간, 72시간 후 알림',
+                      AppStrings.proposalSettingsAutoReminderTitle,
+                      style: AppTypography.bodyMedium,
+                    ),
+                    Text(
+                      AppStrings.proposalSettingsAutoReminderSchedule,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -625,7 +647,7 @@ class _ProposalSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('설정이 저장되었습니다'),
+            content: Text(AppStrings.proposalSettingsSavedSnackbar),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -635,7 +657,7 @@ class _ProposalSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('저장 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.proposalSettingsSaveFailedSnackbar),
             backgroundColor: AppColors.paperAccent,
           ),
         );
