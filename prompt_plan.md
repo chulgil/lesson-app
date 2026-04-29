@@ -44,16 +44,19 @@
 - [x] backend_spec.md 갱신 1건 등록 (#251)
 - [x] prompt_plan.md 본 plan 저장
 
-### Phase 2 — 결정 게이트 큐잉 (이슈 본문 메모, 결정 대기)
+### Phase 2 — 결정 게이트 ✅ 완료 (2026-04-29, 권장 4건 모두 채택)
 
-| 게이트 | 위치 | 옵션 |
+| 게이트 | 결정 | 이슈 코멘트 |
 |---|---|---|
-| Plan B §6.1 | BookingStatus.noShow 처리 | 제거 vs 유지 |
-| Plan B §6.2 | BookingStatus.rejected 처리 | 제거 vs 유지 |
-| Plan C §7.1 | Cron 인프라 | APScheduler in-process vs docker cron |
-| Plan C §7.4 | 만료 알림 수신자 범위 | 학생만 vs 학생+학부모+선생님 |
+| Plan B §6.1 BookingStatus.noShow | **A** 제거 → cancelled + NoShowRecord 영속 | #238 |
+| Plan B §6.2 BookingStatus.rejected | **A** 제거 → cancelled + decline_reason 컬럼 | #238 |
+| Plan B 후속 NoShowPolicy 통합 | 4값 단일 enum | #239 |
+| Plan C §7.1 Cron 인프라 | **A** APScheduler in-process + PG advisory lock + dedup table | #240 |
+| Plan C §7.2 subscription_settings 스키마 | X 4 컬럼 (Boring) | #240 |
+| Plan C §7.3 renewal_alert_days 처리 | 6개월 grace 보존 | #240 |
+| Plan C §7.4 만료 알림 수신자 | 학생 + 학부모 (notify_parent flag, 선생님 dashboard 뱃지) | #240 |
 
-이슈 본문에 "결정 대기" 섹션으로 명시. 사용자가 답하면 해당 phase 진입.
+차단 해제: alembic `0007_align_booking_status` + `0008_unify_no_show_policy` 진입 가능, `app/core/scheduler.py` + `subscription_expiry_service.py` 진입 가능.
 
 ### Phase 3 — Plan A Phase 1 진입 (RequestEvent 모델 + alembic) ✅ 완료 (2026-04-29)
 
