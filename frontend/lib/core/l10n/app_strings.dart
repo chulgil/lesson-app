@@ -4242,9 +4242,4 @@ class AppStrings {
   static const notificationPushPreparingNotice =
       '푸시 알림은 준비 중입니다.\n'
       '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.';
-
-  // ── Subscription Glue (5-3b-23 detail tooltip + provider fallback) ───
-
-  /// 적용 정책 (subscription_detail_screen AppBar 아이콘 tooltip)
-  static const subscriptionPolicyTooltip = '적용 정책';
 }
