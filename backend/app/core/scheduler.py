@@ -12,7 +12,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from collections.abc import Awaitable, Callable
-from typing import Protocol
+from typing import Any, Protocol
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore[import-untyped]
 from apscheduler.triggers.cron import CronTrigger  # type: ignore[import-untyped]
@@ -73,7 +73,7 @@ def get_scheduler() -> AsyncIOScheduler:
 
 
 def register_daily_kst_job(
-    func: Callable[[], Awaitable[None]],
+    func: Callable[[], Awaitable[Any]],
     *,
     job_id: str,
     hour: int,
