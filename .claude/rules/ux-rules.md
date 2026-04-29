@@ -82,7 +82,13 @@ grep -rn -B 3 -A 5 "FilledButton\|ElevatedButton\|OutlinedButton" --include="*.d
 
 ## 레이아웃 크래시 방지 (HARD-GATE)
 
-- **탭/화면 레벨 위젯은 widget smoke test 필수** — `CustomScrollView` + `Sliver*` + 트레일링 버튼 같은 복합 레이아웃은 `flutter analyze` 가 BoxConstraints 크래시를 잡지 못함. tab/screen 추가 시 `test/features/<domain>/<name>_layout_test.dart` 에 최소 1개 `testWidgets` (`pumpWidget` + `pumpAndSettle` + `tester.takeException() isNull`) 필수 (2026-04-24 수강관리 탭 재발)
+- **모든 top-level 위젯은 widget smoke test 필수** — `Screen|Page|Tab|Widget|Stamp|Card|Bar|Sheet|Dialog|Masthead|Header|Section|View` 접미사를 가진 클래스를 신규 추가/변경할 때, `flutter analyze` 가 `RenderBox`/`RenderMetaData`/`BoxConstraints` 류 런타임 크래시를 잡지 못한다. 따라서 다음을 필수 작성:
+  - 위치: `test/.../<snake_name>_test.dart` (또는 `_layout_test.dart`/`_smoke_test.dart`/`_widget_test.dart`)
+  - 최소: `testWidgets` 1개 — `pumpWidget(MaterialApp(home: ...))` + `pumpAndSettle()` + `expect(tester.takeException(), isNull)`
+  - 권장: Row/Column/Expanded 등 좁은 제약 컨텍스트에서 렌더 회귀 케이스 1건
+  - 의도적 예외: 클래스 정의 위 줄 `// ignore: widget-smoke-test` 주석 + 사유 필수
+  - 자동 감지: `.claude/hooks/check-widget-smoke-test.sh` 가 신규 위젯 도입 시 누락 경고
+  - 사례: 2026-04-24 수강관리 탭 BoxConstraints 재발 / 2026-04-29 §7.133 LikeStamp `RenderMetaData` 회귀
 - **컴팩트 버튼 배치 규칙** — 트레일링/인라인 FilledButton/ElevatedButton/OutlinedButton 은 반드시 `styleFrom(minimumSize: Size(0, AppSpacing.buttonHeight))` override. 테마가 `Size(∞, h)` 인데 Row/Align/Wrap 은 loose 폭을 주기 때문 → [tech-patterns.md](tech-patterns.md#flutter-레이아웃) 참조
 
 ## 상세 화면 일관성 규칙 (HARD-GATE)
