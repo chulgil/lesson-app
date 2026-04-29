@@ -4147,4 +4147,104 @@ class AppStrings {
 
   /// 완료율 (요약 섹션 라벨)
   static const completionRateLabel = '완료율';
+
+  // ── Notification Settings Screen (5-3b-23) ──
+
+  /// 알림 설정 (AppBar)
+  static const notificationSettingsAppBarTitle = '알림 설정';
+
+  /// 전체 알림 (master 섹션 헤더)
+  static const notificationSettingsMasterSection = '전체 알림';
+
+  /// 알림 받기 (master toggle title)
+  static const notificationToggleAllTitle = '알림 받기';
+
+  /// 모든 알림을 켜거나 끕니다 (master toggle subtitle)
+  static const notificationToggleAllSubtitle = '모든 알림을 켜거나 끕니다';
+
+  /// 레슨 알림 (섹션 헤더)
+  static const notificationSettingsLessonSection = '레슨 알림';
+
+  /// 레슨 시작 알림 (toggle title)
+  static const notificationLessonStartTitle = '레슨 시작 알림';
+
+  /// 레슨 30분 전 알림 (toggle subtitle)
+  static const notificationLessonStartSubtitle = '레슨 30분 전 알림';
+
+  /// 레슨 변경 알림 (toggle title)
+  static const notificationLessonChangeTitle = '레슨 변경 알림';
+
+  /// 레슨 시간/일정 변경 시 (toggle subtitle)
+  static const notificationLessonChangeSubtitle = '레슨 시간/일정 변경 시';
+
+  /// 수강권 알림 (섹션 헤더)
+  static const notificationSettingsSubscriptionSection = '수강권 알림';
+
+  /// 수강권 제안 알림 (toggle title)
+  static const notificationSubscriptionProposalTitle = '수강권 제안 알림';
+
+  /// 선생님이 수강권을 제안할 때 (toggle subtitle)
+  static const notificationSubscriptionProposalSubtitle = '선생님이 수강권을 제안할 때';
+
+  /// 수강권 만료 알림 (toggle title)
+  static const notificationSubscriptionExpiryTitle = '수강권 만료 알림';
+
+  /// 수강권 만료 7일 전 알림 (toggle subtitle)
+  static const notificationSubscriptionExpirySubtitle = '수강권 만료 7일 전 알림';
+
+  /// 연습 알림 (섹션 헤더)
+  static const notificationSettingsPracticeSection = '연습 알림';
+
+  /// 연습 리마인더 (toggle title)
+  static const notificationPracticeReminderTitle = '연습 리마인더';
+
+  /// 매일 설정한 시간에 알림 (toggle subtitle)
+  static const notificationPracticeReminderSubtitle = '매일 설정한 시간에 알림';
+
+  /// 선생님이 피드백을 남길 때 (toggle subtitle — 제목은 teacherFeedbackHeader 재사용)
+  static const notificationTeacherFeedbackSubtitle = '선생님이 피드백을 남길 때';
+
+  /// 수강권 만료 자동 알림 (선생님) (선생님 전용 섹션 헤더)
+  static const notificationSettingsExpiryAutoSectionTeacher =
+      '수강권 만료 자동 알림 (선생님)';
+
+  /// 만료 자동 알림 (master toggle title)
+  static const notificationExpiryAutoMasterTitle = '만료 자동 알림';
+
+  /// 활성 수강권의 만료 시점에 자동으로 알림 (master toggle subtitle)
+  static const notificationExpiryAutoMasterSubtitle = '활성 수강권의 만료 시점에 자동으로 알림';
+
+  /// D-14 (14일 전) — D-N prefix 는 ASCII (다국어 무관 universal)
+  static const notificationExpiryD14Title = 'D-14 (14일 전)';
+
+  /// 여유 있게 재등록 제안 시점
+  static const notificationExpiryD14Subtitle = '여유 있게 재등록 제안 시점';
+
+  /// D-7 (7일 전)
+  static const notificationExpiryD7Title = 'D-7 (7일 전)';
+
+  /// 재등록 유도 주차 알림
+  static const notificationExpiryD7Subtitle = '재등록 유도 주차 알림';
+
+  /// D-1 (하루 전)
+  static const notificationExpiryD1Title = 'D-1 (하루 전)';
+
+  /// 만료 임박 최종 알림
+  static const notificationExpiryD1Subtitle = '만료 임박 최종 알림';
+
+  /// D-0 (당일)
+  static const notificationExpiryD0Title = 'D-0 (당일)';
+
+  /// 만료 당일 보관 이동 알림
+  static const notificationExpiryD0Subtitle = '만료 당일 보관 이동 알림';
+
+  /// 푸시 알림 준비 안내 (info 배너 — \n 포함)
+  static const notificationPushPreparingNotice =
+      '푸시 알림은 준비 중입니다.\n'
+      '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.';
+
+  // ── Subscription Glue (5-3b-23 detail tooltip + provider fallback) ───
+
+  /// 적용 정책 (subscription_detail_screen AppBar 아이콘 tooltip)
+  static const subscriptionPolicyTooltip = '적용 정책';
 }
