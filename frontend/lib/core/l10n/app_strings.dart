@@ -2288,6 +2288,9 @@ class AppStrings {
   /// 연습이 추가되었습니다 (practice item added success)
   static const practiceItemAdded = '연습이 추가되었습니다';
 
+  /// {n}개 섹션 (repertoire section count caption)
+  static String repertoireSectionCount(int n) => '$n개 섹션';
+
   // ── Add Lesson Screen (레슨 추가/기록 화면 30차) ─
 
   /// 레슨 기록 (add lesson screen title — past mode)

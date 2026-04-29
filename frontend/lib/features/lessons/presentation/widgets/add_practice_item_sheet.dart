@@ -362,7 +362,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                           ),
                           if (repertoire.sections.isNotEmpty)
                             Text(
-                              '${repertoire.sections.length}개 섹션',
+                              AppStrings.repertoireSectionCount(
+                                repertoire.sections.length,
+                              ),
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.inkSecondary,
                               ),
