@@ -105,7 +105,11 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.lessonClassId != null ? '클래스 정책 설정' : '레슨 정책 설정'),
+        title: Text(
+          widget.lessonClassId != null
+              ? AppStrings.policyClassAppBarTitle
+              : AppStrings.policyLessonAppBarTitle,
+        ),
         centerTitle: true,
       ),
       body:
@@ -151,38 +155,45 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('변경/취소 정책', Icons.event_busy),
+          _buildSectionHeader(
+            AppStrings.policyChangeCancelHeader,
+            Icons.event_busy,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // 최소 취소 시간
           ChipInputField(
-            title: '최소 취소 시간',
+            title: AppStrings.policyMinCancelHoursTitle,
             options: const [2, 4, 24],
             currentValue: _minCancelHours,
             onChanged: (value) => setState(() => _minCancelHours = value),
             controller: _cancelHoursController,
-            suffix: '시간 전',
-            labelFormatter: (v) => '$v시간',
+            suffix: AppStrings.policyHoursBeforeSuffix,
+            labelFormatter: (v) => AppStrings.policyHoursFormat(v),
           ),
 
           const SizedBox(height: AppSpacing.space4),
 
           // 월 변경 횟수
           ChipInputField(
-            title: '월 변경 횟수',
+            title: AppStrings.policyMonthlyChangesTitle,
             options: const [1, 2, 99],
             currentValue: _maxChangesPerMonth,
             onChanged: (value) => setState(() => _maxChangesPerMonth = value),
             controller: _changesController,
-            suffix: '회',
-            labelFormatter: (v) => v >= 99 ? '무제한' : '$v회',
+            suffix: AppStrings.lessonsUnit,
+            labelFormatter:
+                (v) =>
+                    v >= 99
+                        ? AppStrings.policyUnlimited
+                        : AppStrings.policyTimesFormat(v),
           ),
 
           const SizedBox(height: AppSpacing.space4),
 
           // 당일 취소 허용
           _buildToggleRow(
-            '당일 취소 허용',
+            AppStrings.policyAllowSameDayCancelToggle,
             _allowSameDayCancel,
             (value) => setState(() => _allowSameDayCancel = value),
           ),
@@ -201,12 +212,12 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('노쇼 정책', Icons.person_off),
+          _buildSectionHeader(AppStrings.policyNoShowHeader, Icons.person_off),
           const SizedBox(height: AppSpacing.space4),
 
           // 노쇼 시 횟수 차감
           _buildToggleRow(
-            '노쇼 시 횟수 차감',
+            AppStrings.policyNoShowDeduct,
             _deductLessonOnNoShow,
             (value) => setState(() => _deductLessonOnNoShow = value),
           ),
@@ -215,12 +226,12 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
 
           // 지각 허용 시간
           ChipInputField(
-            title: '지각 허용 시간',
+            title: AppStrings.policyGracePeriodTitle,
             options: const [10, 15, 30],
             currentValue: _gracePeriodMinutes,
             onChanged: (value) => setState(() => _gracePeriodMinutes = value),
             controller: _graceController,
-            suffix: '분',
+            suffix: AppStrings.minuteLabel,
           ),
         ],
       ),
@@ -237,12 +248,15 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('이월 정책 (월정액)', Icons.swap_horiz),
+          _buildSectionHeader(
+            AppStrings.policyCarryoverHeader,
+            Icons.swap_horiz,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // 이월 허용
           _buildToggleRow(
-            '미사용 수업 이월 허용',
+            AppStrings.policyAllowCarryoverToggle,
             _allowCarryover,
             (value) => setState(() => _allowCarryover = value),
           ),
@@ -252,26 +266,26 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
 
             // 최대 이월 횟수
             ChipInputField(
-              title: '최대 이월 횟수',
+              title: AppStrings.policyMaxCarryoverTitle,
               options: const [1, 2, 3],
               currentValue: _maxCarryoverLessons,
               onChanged:
                   (value) => setState(() => _maxCarryoverLessons = value),
               controller: _carryoverCountController,
-              suffix: '회',
+              suffix: AppStrings.lessonsUnit,
             ),
 
             const SizedBox(height: AppSpacing.space4),
 
             // 이월 유효 기간
             ChipInputField(
-              title: '이월 유효 기간',
+              title: AppStrings.policyCarryoverPeriodTitle,
               options: const [1, 2, 3],
               currentValue: _carryoverPeriodMonths,
               onChanged:
                   (value) => setState(() => _carryoverPeriodMonths = value),
               controller: _carryoverMonthsController,
-              suffix: '개월',
+              suffix: AppStrings.policyMonthsSuffix,
             ),
           ],
         ],
@@ -310,27 +324,42 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
           // Notebook × Score: 강조된 요약 섹션 제목도 Playfair sectionTitle 로 통일,
           // paperAccent 색상만 copyWith 로 유지 (§7.17 패턴, color override 변형).
           Text(
-            '📋 정책 요약',
+            AppStrings.policySummaryHeader,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
           _buildSummaryItem(
-            '취소',
-            _allowSameDayCancel ? '당일 취소 가능' : '$_minCancelHours시간 전까지',
+            AppStrings.policyCancelLabel,
+            _allowSameDayCancel
+                ? AppStrings.policyCancelSameDay
+                : AppStrings.policyHoursBeforeFormat(_minCancelHours),
           ),
           _buildSummaryItem(
-            '변경',
-            _maxChangesPerMonth >= 99 ? '무제한' : '월 $_maxChangesPerMonth회',
+            AppStrings.policyChangeLabel,
+            _maxChangesPerMonth >= 99
+                ? AppStrings.policyUnlimited
+                : AppStrings.policyMonthlyChangesFormat(_maxChangesPerMonth),
           ),
-          _buildSummaryItem('노쇼', _deductLessonOnNoShow ? '횟수 차감' : '횟수 유지'),
-          _buildSummaryItem('지각', '$_gracePeriodMinutes분까지 허용'),
           _buildSummaryItem(
-            '이월',
+            AppStrings.policyNoShowLabel,
+            _deductLessonOnNoShow
+                ? AppStrings.policyDeductCount
+                : AppStrings.policyKeepCount,
+          ),
+          _buildSummaryItem(
+            AppStrings.policyLatenessLabel,
+            AppStrings.policyLatenessFormat(_gracePeriodMinutes),
+          ),
+          _buildSummaryItem(
+            AppStrings.policyCarryoverLabel,
             _allowCarryover
-                ? '최대 $_maxCarryoverLessons회 ($_carryoverPeriodMonths개월 내)'
-                : '불가',
+                ? AppStrings.policyCarryoverFormat(
+                  _maxCarryoverLessons,
+                  _carryoverPeriodMonths,
+                )
+                : AppStrings.policyNotAllowed,
           ),
         ],
       ),
@@ -368,21 +397,21 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('관련 설정', Icons.settings),
+        _buildSectionHeader(AppStrings.policyRelatedHeader, Icons.settings),
         const SizedBox(height: AppSpacing.space3),
         _buildRelatedSettingItem(
           icon: Icons.schedule,
-          label: '레슨 시간 설정',
+          label: AppStrings.lessonTimeSettings,
           onTap: () => context.push(AppRoutes.lessonTimeSettings),
         ),
         _buildRelatedSettingItem(
           icon: Icons.payments_outlined,
-          label: '수강료 관리',
+          label: AppStrings.policyTuitionManagement,
           onTap: () => context.push(AppRoutes.paymentManagement),
         ),
         _buildRelatedSettingItem(
           icon: Icons.library_books_outlined,
-          label: '템플릿 관리',
+          label: AppStrings.policyTemplateManagement,
           onTap: () => context.push(AppRoutes.tipTemplateManagement),
         ),
       ],
@@ -449,7 +478,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('정책이 저장되었습니다'),
+            content: Text(AppStrings.policySavedSnackbar),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -458,8 +487,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('저장 실패. 다시 시도해주세요.'),
+          const SnackBar(
+            content: Text(AppStrings.proposalSettingsSaveFailedSnackbar),
             backgroundColor: AppColors.paperAccent,
           ),
         );
