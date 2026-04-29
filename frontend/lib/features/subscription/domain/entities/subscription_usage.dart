@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'subscription_usage.g.dart';
 
 /// Usage type for subscription deduction
@@ -21,13 +23,13 @@ enum UsageType {
   String get label {
     switch (this) {
       case UsageType.normal:
-        return '정상 수업';
+        return AppStrings.usageTypeNormal;
       case UsageType.lateCancellation:
-        return '당일 취소';
+        return AppStrings.usageTypeLateCancellation;
       case UsageType.studentAbsent:
-        return '학생 결석';
+        return AppStrings.usageTypeStudentAbsent;
       case UsageType.rescheduled:
-        return '변경 수업';
+        return AppStrings.usageTypeRescheduled;
     }
   }
 
@@ -169,7 +171,7 @@ class SubscriptionUsage extends HiveObject {
       usedAt: usedAt,
       teacherName: teacherName,
       instrument: instrument,
-      note: note ?? '당일 취소 (24시간 이내)',
+      note: note ?? AppStrings.usageNoteLateCancellation,
       createdAt: DateTime.now(),
       usageType: UsageType.lateCancellation,
       deducted: true,
@@ -193,7 +195,7 @@ class SubscriptionUsage extends HiveObject {
       usedAt: usedAt,
       teacherName: teacherName,
       instrument: instrument,
-      note: note ?? '학생 결석',
+      note: note ?? AppStrings.usageTypeStudentAbsent,
       createdAt: DateTime.now(),
       usageType: UsageType.studentAbsent,
       deducted: true,

@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'subscription_settings.g.dart';
 
 /// Discount type for bulk purchase.
@@ -136,10 +138,9 @@ class SubscriptionSettings extends HiveObject {
     if (discountPolicies.isEmpty) return null;
 
     // Sort by minLessons descending to get the best applicable policy
-    final applicable = discountPolicies
-        .where((p) => lessonCount >= p.minLessons)
-        .toList()
-      ..sort((a, b) => b.minLessons.compareTo(a.minLessons));
+    final applicable =
+        discountPolicies.where((p) => lessonCount >= p.minLessons).toList()
+          ..sort((a, b) => b.minLessons.compareTo(a.minLessons));
 
     return applicable.isNotEmpty ? applicable.first : null;
   }
@@ -211,14 +212,14 @@ class SubscriptionSettings extends HiveObject {
           minLessons: 10,
           type: DiscountType.bonusLessons,
           value: 1,
-          description: '대량 구매 보너스',
+          description: AppStrings.bulkPurchaseBonus,
         ),
         // Default: 16+ lessons = 2 bonus
         PackageDiscountPolicy(
           minLessons: 16,
           type: DiscountType.bonusLessons,
           value: 2,
-          description: '대량 구매 보너스',
+          description: AppStrings.bulkPurchaseBonus,
         ),
       ],
       createdAt: DateTime.now(),

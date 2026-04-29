@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'subscription_template.g.dart';
 
 /// Owner type for subscription template.
@@ -149,15 +151,16 @@ class SubscriptionTemplate extends HiveObject {
   }
 
   /// Display label (e.g., "8회권 (50분)")
-  String get displayLabel => '$name ($lessonDurationMinutes분)';
+  String get displayLabel =>
+      '$name (${AppStrings.durationMinutesValue(lessonDurationMinutes)})';
 
   /// Owner type display label
   String get ownerTypeLabel {
     switch (ownerType) {
       case SubscriptionTemplateOwnerType.teacher:
-        return '개인';
+        return AppStrings.individual;
       case SubscriptionTemplateOwnerType.academy:
-        return '학원';
+        return AppStrings.academy;
     }
   }
 

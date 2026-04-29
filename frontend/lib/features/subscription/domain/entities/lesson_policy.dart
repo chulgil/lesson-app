@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'lesson_policy.g.dart';
 
 /// Lesson policy settings for teachers/academies.
@@ -176,36 +178,39 @@ class LessonPolicy extends HiveObject {
   /// 취소 정책 요약 텍스트
   String get cancelPolicySummary {
     if (allowSameDayCancel) {
-      return '당일 취소 가능';
+      return AppStrings.policyCancelSameDay;
     }
-    return '$minCancelHours시간 전까지 취소 가능';
+    return AppStrings.policyCancelMinHours(minCancelHours);
   }
 
   /// 변경 정책 요약 텍스트
   String get changePolicySummary {
     if (maxChangesPerMonth == 0) {
-      return '변경 불가';
+      return AppStrings.policyChangeNone;
     }
     if (maxChangesPerMonth >= 99) {
-      return '무제한 변경 가능';
+      return AppStrings.policyChangeUnlimited;
     }
-    return '월 $maxChangesPerMonth회 변경 가능';
+    return AppStrings.policyChangeMonthly(maxChangesPerMonth);
   }
 
   /// 노쇼 정책 요약 텍스트
   String get noShowPolicySummary {
     if (deductLessonOnNoShow) {
-      return '노쇼 시 횟수 차감';
+      return AppStrings.policyNoShowDeduct;
     }
-    return '노쇼 시 횟수 유지';
+    return AppStrings.policyNoShowKeep;
   }
 
   /// 이월 정책 요약 텍스트
   String get carryoverPolicySummary {
     if (!allowCarryover) {
-      return '이월 불가';
+      return AppStrings.policyCarryoverNone;
     }
-    return '최대 $maxCarryoverLessons회 이월 ($carryoverPeriodMonths개월 내)';
+    return AppStrings.policyCarryoverMax(
+      maxCarryoverLessons,
+      carryoverPeriodMonths,
+    );
   }
 
   factory LessonPolicy.fromJson(Map<String, dynamic> json) =>

@@ -3213,6 +3213,7 @@ class AppStrings {
   static String detailBonusReasonInline(String reason) => ' ($reason)';
 
   /// N만원
+  // ignore: unnecessary_brace_in_string_interps
   static String amountManwon(String value) => '${value}만원';
 
   /// N원

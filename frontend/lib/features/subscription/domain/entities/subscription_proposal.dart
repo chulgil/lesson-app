@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'subscription_proposal.g.dart';
 
 /// Who initiated the renewal proposal.
@@ -62,9 +64,9 @@ extension ProposalPaymentStatusExtension on ProposalPaymentStatus {
   String get label {
     switch (this) {
       case ProposalPaymentStatus.pending:
-        return '결제 대기';
+        return AppStrings.proposalPaymentStatusPending;
       case ProposalPaymentStatus.completed:
-        return '결제 완료';
+        return AppStrings.proposalPaymentStatusCompleted;
     }
   }
 
@@ -72,9 +74,9 @@ extension ProposalPaymentStatusExtension on ProposalPaymentStatus {
   String get description {
     switch (this) {
       case ProposalPaymentStatus.pending:
-        return '입금 확인 필요';
+        return AppStrings.proposalPaymentDescPending;
       case ProposalPaymentStatus.completed:
-        return '이미 결제됨';
+        return AppStrings.proposalPaymentDescCompleted;
     }
   }
 
@@ -88,17 +90,17 @@ extension ProposalStatusExtension on ProposalStatus {
   String get label {
     switch (this) {
       case ProposalStatus.pending:
-        return '제안됨';
+        return AppStrings.proposalStatusPending;
       case ProposalStatus.paymentNotified:
-        return '입금 알림';
+        return AppStrings.proposalStatusPaymentNotified;
       case ProposalStatus.confirmed:
-        return '발급 완료';
+        return AppStrings.proposalStatusConfirmed;
       case ProposalStatus.rejected:
-        return '스킵됨';
+        return AppStrings.proposalStatusRejected;
       case ProposalStatus.expired:
-        return '만료됨';
+        return AppStrings.expired;
       case ProposalStatus.cancelled:
-        return '취소됨';
+        return AppStrings.proposalStatusCancelled;
     }
   }
 
@@ -134,9 +136,9 @@ extension ProposalTypeExtension on ProposalType {
   String get label {
     switch (this) {
       case ProposalType.proposal:
-        return '제안';
+        return AppStrings.proposalTypeProposal;
       case ProposalType.directIssue:
-        return '즉시 발급';
+        return AppStrings.proposalTypeDirectIssue;
     }
   }
 
@@ -318,8 +320,7 @@ class SubscriptionProposal extends HiveObject {
   bool get isExpired => DateTime.now().isAfter(expiresAt);
 
   /// Whether the proposal can be confirmed (payment notified and not expired)
-  bool get canConfirm =>
-      status == ProposalStatus.paymentNotified && !isExpired;
+  bool get canConfirm => status == ProposalStatus.paymentNotified && !isExpired;
 
   /// Whether the proposal is still active (can transition to another state)
   bool get isActive => status.isActive && !isExpired;
@@ -354,7 +355,8 @@ class SubscriptionProposal extends HiveObject {
   /// For multi-choice: uses selectedTemplateId (must be set by student).
   /// For single: uses templateId.
   String get effectiveTemplateId =>
-      selectedTemplateId ?? (templateIds.isNotEmpty ? templateIds.first : templateId);
+      selectedTemplateId ??
+      (templateIds.isNotEmpty ? templateIds.first : templateId);
 
   /// The recommended template ID (for display with ⭐).
   /// Returns recommendedTemplateId if set, otherwise first template.
@@ -372,28 +374,28 @@ class SubscriptionProposal extends HiveObject {
   String get timeSinceCreated {
     final diff = DateTime.now().difference(createdAt);
     if (diff.inDays > 0) {
-      return '${diff.inDays}일 전';
+      return AppStrings.timeAgoDays(diff.inDays);
     } else if (diff.inHours > 0) {
-      return '${diff.inHours}시간 전';
+      return AppStrings.timeAgoHours(diff.inHours);
     } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes}분 전';
+      return AppStrings.timeAgoMinutes(diff.inMinutes);
     }
-    return '방금 전';
+    return AppStrings.timeAgoJustNow;
   }
 
   /// Formatted expiration time
   String get formattedExpiration {
     final diff = expiresAt.difference(DateTime.now());
     if (diff.isNegative) {
-      return '만료됨';
+      return AppStrings.expired;
     } else if (diff.inDays > 0) {
-      return '${diff.inDays}일 후 만료';
+      return AppStrings.expiresInDays(diff.inDays);
     } else if (diff.inHours > 0) {
-      return '${diff.inHours}시간 후 만료';
+      return AppStrings.expiresInHours(diff.inHours);
     } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes}분 후 만료';
+      return AppStrings.expiresInMinutes(diff.inMinutes);
     }
-    return '곧 만료';
+    return AppStrings.expiresVerySoon;
   }
 
   /// Whether payment confirmation should be skipped (app transition case)
@@ -453,7 +455,8 @@ class SubscriptionProposal extends HiveObject {
       discountAmount: discountAmount ?? this.discountAmount,
       discountReason: discountReason ?? this.discountReason,
       templateIds: templateIds ?? this.templateIds,
-      recommendedTemplateId: recommendedTemplateId ?? this.recommendedTemplateId,
+      recommendedTemplateId:
+          recommendedTemplateId ?? this.recommendedTemplateId,
       selectedTemplateId: selectedTemplateId ?? this.selectedTemplateId,
       isAutoProposal: isAutoProposal ?? this.isAutoProposal,
       paymentStatus: paymentStatus ?? this.paymentStatus,
@@ -461,7 +464,8 @@ class SubscriptionProposal extends HiveObject {
       lessonRequestId: lessonRequestId ?? this.lessonRequestId,
       proposalType: proposalType ?? this.proposalType,
       isRenewal: isRenewal ?? this.isRenewal,
-      previousSubscriptionId: previousSubscriptionId ?? this.previousSubscriptionId,
+      previousSubscriptionId:
+          previousSubscriptionId ?? this.previousSubscriptionId,
       renewalInitiator: renewalInitiator ?? this.renewalInitiator,
     );
   }

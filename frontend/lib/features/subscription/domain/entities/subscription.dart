@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'subscription.g.dart';
 
 /// Subscription type.
@@ -76,13 +78,13 @@ enum SubscriptionPaymentMethod {
   String get label {
     switch (this) {
       case SubscriptionPaymentMethod.cash:
-        return '현금';
+        return AppStrings.paymentMethodCash;
       case SubscriptionPaymentMethod.bankTransfer:
-        return '계좌이체';
+        return AppStrings.paymentMethodBankTransfer;
       case SubscriptionPaymentMethod.card:
-        return '카드';
+        return AppStrings.paymentMethodCard;
       case SubscriptionPaymentMethod.other:
-        return '기타';
+        return AppStrings.paymentMethodOther;
     }
   }
 }
@@ -261,8 +263,7 @@ class Subscription extends HiveObject {
   bool get hasBonus => bonusCount > 0;
 
   /// 🆕 Remaining reschedule count.
-  int get remainingReschedule =>
-      totalRescheduleAllowance - usedRescheduleCount;
+  int get remainingReschedule => totalRescheduleAllowance - usedRescheduleCount;
 
   /// 🆕 Check if student can reschedule (has remaining allowance).
   bool get canReschedule => remainingReschedule > 0;
@@ -271,11 +272,13 @@ class Subscription extends HiveObject {
   bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
 
   /// Payment status label for display.
-  String get paymentStatusLabel => paymentConfirmed ? '결제완료' : '미결제';
+  String get paymentStatusLabel =>
+      paymentConfirmed
+          ? AppStrings.paymentStatusPaid
+          : AppStrings.paymentStatusUnpaid;
 
   /// Days until expiration.
-  int? get daysUntilExpiration =>
-      endDate?.difference(DateTime.now()).inDays;
+  int? get daysUntilExpiration => endDate?.difference(DateTime.now()).inDays;
 
   /// Check if all lessons are used (depleted).
   /// Different from expired - depleted is a positive outcome (goal achieved).
@@ -328,11 +331,13 @@ class Subscription extends HiveObject {
   String get typeLabel {
     switch (type) {
       case SubscriptionType.trial:
-        return '체험';
+        return AppStrings.subscriptionTypeTrial;
       case SubscriptionType.monthly:
-        return lessonsPerMonth != null ? '월정액 ($lessonsPerMonth회)' : '월정액';
+        return lessonsPerMonth != null
+            ? AppStrings.subscriptionTypeMonthlyWithCount(lessonsPerMonth!)
+            : AppStrings.subscriptionTypeMonthly;
       case SubscriptionType.package:
-        return '${totalLessons ?? 0}회권';
+        return AppStrings.subscriptionTypePackageWithCount(totalLessons ?? 0);
     }
   }
 
@@ -340,20 +345,22 @@ class Subscription extends HiveObject {
   String get statusLabel {
     switch (status) {
       case SubscriptionStatus.active:
-        return '이용중';
+        return AppStrings.subscriptionStatusActive;
       case SubscriptionStatus.expiringSoon:
-        return '만료 임박';
+        return AppStrings.subscriptionStatusExpiringSoon;
       case SubscriptionStatus.expired:
-        return '만료됨';
+        return AppStrings.subscriptionStatusExpired;
       case SubscriptionStatus.paused:
-        return '일시정지';
+        return AppStrings.subscriptionStatusPaused;
     }
   }
 
   /// Summary text for display (hybrid: count + days).
   String get summaryText {
     if (type == SubscriptionType.trial) {
-      return usedLessons > 0 ? '체험 완료' : '체험중';
+      return usedLessons > 0
+          ? AppStrings.trialCompleted
+          : AppStrings.trialOngoing;
     }
 
     final remaining = remainingLessons;
@@ -362,32 +369,33 @@ class Subscription extends HiveObject {
 
     // Depleted: show "N회 모두 사용" (positive framing)
     if (isDepleted && total != null) {
-      return '$total회 모두 사용';
+      return AppStrings.subscriptionAllUsed(total);
     }
 
     // Expired by date with unused lessons: show remaining with "만료됨"
     if (isExpired && remaining != null && remaining > 0) {
-      return '$remaining회 미사용 (만료됨)';
+      return AppStrings.subscriptionUnusedExpired(remaining);
     }
 
     // Build hybrid display: "2/4회 남음 (D-15)"
-    final countPart = (remaining != null && total != null)
-        ? '$remaining/$total회 남음'
-        : '';
+    final countPart =
+        (remaining != null && total != null)
+            ? AppStrings.subscriptionRemainingOf(remaining, total)
+            : '';
 
     String daysPart = '';
     if (status == SubscriptionStatus.paused) {
-      daysPart = '일시정지';
+      daysPart = AppStrings.subscriptionStatusPaused;
     } else if (isExpired) {
-      daysPart = '만료됨';
+      daysPart = AppStrings.subscriptionStatusExpired;
     } else if (days != null && days > 0) {
-      daysPart = 'D-$days';
+      daysPart = AppStrings.daysUntilExpirationFormat(days);
     } else if (days != null && days <= 0) {
-      daysPart = '만료됨';
+      daysPart = AppStrings.subscriptionStatusExpired;
     }
 
     if (countPart.isNotEmpty && daysPart.isNotEmpty) {
-      return '$countPart ($daysPart)';
+      return AppStrings.subscriptionSummaryWithDays(countPart, daysPart);
     }
     return countPart.isNotEmpty ? countPart : daysPart;
   }
@@ -395,29 +403,31 @@ class Subscription extends HiveObject {
   /// Bonus display text (e.g., "🎁 보너스 +1회 (5주차)").
   String? get bonusText {
     if (bonusCount <= 0) return null;
-    final reason = bonusReason ?? '보너스';
-    return '🎁 +$bonusCount회 ($reason)';
+    final reason = bonusReason ?? AppStrings.bonusDefault;
+    return AppStrings.bonusText(bonusCount, reason);
   }
 
   /// Detailed breakdown text for display.
   String get detailText {
     if (type == SubscriptionType.trial) {
-      return amount > 0 ? '체험 레슨 (${_formatAmount(amount)})' : '무료 체험 레슨';
+      return amount > 0
+          ? AppStrings.trialLessonWithAmount(_formatAmount(amount))
+          : AppStrings.freeTrialLesson;
     }
 
     final base = baseLessons;
     final buffer = StringBuffer();
 
     if (type == SubscriptionType.monthly) {
-      buffer.write('기본: ${base ?? 0}회');
+      buffer.write(AppStrings.detailBaseLessons(base ?? 0));
     } else {
-      buffer.write('${base ?? 0}회권 중 $usedLessons회 사용');
+      buffer.write(AppStrings.detailPackageUsage(base ?? 0, usedLessons));
     }
 
     if (bonusCount > 0) {
-      buffer.write('\n보너스: +$bonusCount회');
+      buffer.write(AppStrings.detailBonusLine(bonusCount));
       if (bonusReason != null) {
-        buffer.write(' ($bonusReason)');
+        buffer.write(AppStrings.detailBonusReasonInline(bonusReason!));
       }
     }
 
@@ -427,9 +437,9 @@ class Subscription extends HiveObject {
   /// Format amount in Korean won.
   String _formatAmount(int amount) {
     if (amount >= 10000) {
-      return '${(amount / 10000).toStringAsFixed(0)}만원';
+      return AppStrings.amountManwon((amount / 10000).toStringAsFixed(0));
     }
-    return '$amount원';
+    return AppStrings.amountWon(amount);
   }
 
   /// Billing type display label in Korean.
@@ -437,9 +447,11 @@ class Subscription extends HiveObject {
     if (billingType == null) return null;
     switch (billingType!) {
       case BillingType.perPackage:
-        return '회차 결제';
+        return AppStrings.billingTypePerPackage;
       case BillingType.monthly:
-        return billingDay != null ? '월정액 (매월 $billingDay일)' : '월정액';
+        return billingDay != null
+            ? AppStrings.billingTypeMonthlyWithDay(billingDay!)
+            : AppStrings.subscriptionTypeMonthly;
     }
   }
 
@@ -448,13 +460,13 @@ class Subscription extends HiveObject {
     if (fifthWeekPolicy == null) return null;
     switch (fifthWeekPolicy!) {
       case FifthWeekPolicy.skip:
-        return '휴강';
+        return AppStrings.fifthWeekSkip;
       case FifthWeekPolicy.bonus:
-        return '보너스 지급';
+        return AppStrings.fifthWeekBonus;
       case FifthWeekPolicy.deduct:
-        return '기존에서 차감';
+        return AppStrings.fifthWeekDeduct;
       case FifthWeekPolicy.optional:
-        return '학생 선택';
+        return AppStrings.fifthWeekOptional;
     }
   }
 
