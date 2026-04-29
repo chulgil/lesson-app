@@ -90,7 +90,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Icon(Icons.event_busy, size: 64, color: AppColors.inkTertiary),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '레슨을 찾을 수 없습니다',
+              AppStrings.lessonNotFound,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -128,7 +128,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '데이터를 불러오는데 실패했습니다',
+              AppStrings.loadDataFailed,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -210,18 +210,23 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         icon: const Icon(Icons.arrow_back),
       ),
       title: Text(
-        '${lesson.studentName} (레슨)',
+        AppStrings.lessonDetailAppBarTitle(lesson.studentName),
         style: NotebookTypography.appBarTitle,
       ),
       actions: [
         IconButton(
           onPressed: () {
             final date = formatDateYMD(lesson.date);
-            final text =
-                '${lesson.studentName} ${lesson.instrument} 레슨\n$date ${lesson.startTime} (${lesson.duration}분)';
+            final text = AppStrings.lessonShareText(
+              studentName: lesson.studentName,
+              instrument: lesson.instrument,
+              date: date,
+              startTime: lesson.startTime,
+              duration: lesson.duration,
+            );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('공유 텍스트가 복사되었습니다: $text'),
+                content: Text(AppStrings.shareTextCopied(text)),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -237,7 +242,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   child: Text(AppStrings.modify),
                 ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
-                  const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
+                  const PopupMenuItem(
+                    value: 'complete',
+                    child: Text(AppStrings.markComplete),
+                  ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
                   const PopupMenuItem(
                     value: 'cancel',
@@ -246,7 +254,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 PopupMenuItem(
                   value: 'delete',
                   child: Text(
-                    '삭제',
+                    AppStrings.delete,
                     style: TextStyle(color: AppColors.paperAccent),
                   ),
                 ),
@@ -267,15 +275,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               .read(lessonsNotifierProvider.notifier)
               .cancelLesson(lesson.id);
           if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('레슨이 취소되었습니다')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text(AppStrings.lessonCancelled)),
+            );
           }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
+                content: const Text(AppStrings.lessonCancelFailed),
                 backgroundColor: AppColors.paperAccent,
               ),
             );
@@ -287,8 +295,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         context: context,
         builder:
             (context) => AlertDialog(
-              title: const Text('레슨 완료'),
-              content: const Text('이 레슨을 완료 처리하시겠습니까?'),
+              title: const Text(AppStrings.lessonCompleteTitle),
+              content: const Text(AppStrings.lessonCompleteConfirm),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -296,7 +304,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('완료'),
+                  child: const Text(AppStrings.completeAction),
                 ),
               ],
             ),
@@ -308,9 +316,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               .read(lessonsNotifierProvider.notifier)
               .updateLesson(updatedLesson);
           if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('레슨이 완료 처리되었습니다')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text(AppStrings.lessonCompletedSnack)),
+            );
           }
 
           // Auto-propose regular lessons if student has no active subscription
@@ -321,7 +329,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('레슨 완료 처리에 실패했습니다. 다시 시도해주세요.'),
+                content: const Text(AppStrings.lessonCompleteFailed),
                 backgroundColor: AppColors.paperAccent,
               ),
             );
@@ -337,15 +345,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               .deleteLesson(lesson.id);
           if (mounted) {
             context.pop();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('레슨이 삭제되었습니다')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text(AppStrings.lessonDeleted)),
+            );
           }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
+                content: const Text(AppStrings.lessonDeleteFailed),
                 backgroundColor: AppColors.paperAccent,
               ),
             );
@@ -363,7 +371,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        tabs: const [Tab(text: '레슨 노트'), Tab(text: '과제')],
+        tabs: const [
+          Tab(text: AppStrings.lessonNotesTab),
+          Tab(text: AppStrings.assignmentsTab),
+        ],
         labelColor: AppColors.paperAccent,
         unselectedLabelColor: AppColors.inkSecondary,
         indicatorColor: AppColors.paperAccent,
@@ -388,9 +399,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
-                border: Border.all(
-                  color: AppColors.paperAccent,
-                ),
+                border: Border.all(color: AppColors.paperAccent),
               ),
               child: Row(
                 children: [
@@ -398,7 +407,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '레슨이 완료되었습니다. 피드백을 작성해주세요!',
+                      AppStrings.lessonNeedsFeedbackPrompt,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
@@ -421,14 +430,20 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Teacher notes section
           if (widget.isTeacher) ...[
-            LessonDetailSectionHeader(title: '레슨 피드백', icon: Icons.edit_note),
+            LessonDetailSectionHeader(
+              title: AppStrings.lessonFeedbackHeader,
+              icon: Icons.edit_note,
+            ),
             const SizedBox(height: AppSpacing.space3),
             LessonNoteEditor(
               initialText: lesson.feedback,
               onChanged: (text) => _saveFeedbackDebounced(lesson, text),
             ),
           ] else ...[
-            LessonDetailSectionHeader(title: '선생님 피드백', icon: Icons.school),
+            LessonDetailSectionHeader(
+              title: AppStrings.teacherFeedbackHeader,
+              icon: Icons.school,
+            ),
             const SizedBox(height: AppSpacing.space3),
             TeacherFeedbackCard(lesson: lesson),
           ],
@@ -448,7 +463,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Key points
           LessonDetailSectionHeader(
-            title: '주요 포인트',
+            title: AppStrings.keyPointsSection,
             icon: Icons.lightbulb_outline,
             showAddButton: widget.isTeacher,
             onAdd: () => _showAddKeyPointDialog(lesson),
@@ -466,7 +481,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Practice tips
           LessonDetailSectionHeader(
-            title: '연습 팁',
+            title: AppStrings.practiceTipsSection,
             icon: Icons.tips_and_updates_outlined,
             showAddButton: widget.isTeacher,
             onAdd: () => _showAddPracticeTipDialog(lesson),
@@ -543,14 +558,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  AppColors.paperAccentSoft,
-                  AppColors.paperAccentSoft,
-                ],
+                colors: [AppColors.paperAccentSoft, AppColors.paperAccentSoft],
               ),
-              border: Border.all(
-                color: AppColors.paperAccent,
-              ),
+              border: Border.all(color: AppColors.paperAccent),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,7 +575,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
-                        '정규 레슨을 제안해보세요',
+                        AppStrings.regularLessonProposalTitle,
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
@@ -585,7 +595,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  '수강권을 발급하면 정기 레슨을 시작할 수 있습니다.',
+                  AppStrings.regularLessonProposalDescription,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -600,7 +610,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       );
                     },
                     icon: const Icon(Icons.card_membership, size: 18),
-                    label: const Text('수강권 발급하기'),
+                    label: const Text(AppStrings.issueSubscriptionButton),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       padding: const EdgeInsets.symmetric(
@@ -637,7 +647,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       backgroundColor: Colors.transparent,
       builder:
           (context) => AddTipBottomSheet(
-            title: '주요 포인트 추가',
+            title: AppStrings.addKeyPointTitle,
             instrument: lesson.instrument,
             initialCategory: TipCategory.technique,
             onSubmit: (content) => _addKeyPoint(lesson, content),
@@ -652,7 +662,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       backgroundColor: Colors.transparent,
       builder:
           (context) => AddTipBottomSheet(
-            title: '연습 팁 추가',
+            title: AppStrings.addPracticeTipTitle,
             instrument: lesson.instrument,
             initialCategory: TipCategory.practice,
             onSubmit: (content) => _setPracticeTip(lesson, content),
@@ -687,13 +697,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('주요 포인트가 추가되었습니다')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.keyPointAdded)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('주요 포인트 추가에 실패했습니다.'),
+            content: const Text(AppStrings.addKeyPointFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -718,7 +728,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('주요 포인트 삭제에 실패했습니다.'),
+            content: const Text(AppStrings.removeKeyPointFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -743,7 +753,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('피드백 저장에 실패했습니다.'),
+              content: const Text(AppStrings.feedbackSaveFailedShort),
               backgroundColor: AppColors.paperAccent,
             ),
           );
@@ -764,7 +774,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('메모 저장에 실패했습니다.'),
+            content: const Text(AppStrings.memoSaveFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -781,9 +791,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         .updateLesson(updatedLesson);
 
     if (mounted && content != null && content.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('연습 팁이 저장되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceTipSaved)),
+      );
     }
   }
 }

@@ -2366,4 +2366,101 @@ class AppStrings {
 
   /// 그래도 계속 진행하시겠습니까? (continue progress question)
   static const continueProgressQuestion = '그래도 계속 진행하시겠습니까?';
+
+  // ── Lesson Detail Screen (레슨 상세화면 30차) ─
+
+  /// {studentName} (레슨) (lesson detail app bar title template)
+  static String lessonDetailAppBarTitle(String studentName) =>
+      '$studentName (레슨)';
+
+  /// {studentName} {instrument} 레슨\n{date} {startTime} ({duration}분) (share text template)
+  static String lessonShareText({
+    required String studentName,
+    required String instrument,
+    required String date,
+    required String startTime,
+    required int duration,
+  }) => '$studentName $instrument 레슨\n$date $startTime ($duration분)';
+
+  /// 공유 텍스트가 복사되었습니다: {text} (share text copied)
+  static String shareTextCopied(String text) => '공유 텍스트가 복사되었습니다: $text';
+
+  /// 완료 처리 (mark complete menu item)
+  static const markComplete = '완료 처리';
+
+  /// 레슨이 취소되었습니다 (lesson cancelled snack)
+  static const lessonCancelled = '레슨이 취소되었습니다';
+
+  /// 레슨 취소에 실패했습니다. 다시 시도해주세요. (lesson cancel failed)
+  static const lessonCancelFailed = '레슨 취소에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레슨 완료 (lesson complete dialog title)
+  static const lessonCompleteTitle = '레슨 완료';
+
+  /// 이 레슨을 완료 처리하시겠습니까? (lesson complete confirm)
+  static const lessonCompleteConfirm = '이 레슨을 완료 처리하시겠습니까?';
+
+  /// 완료 (complete action button)
+  static const completeAction = '완료';
+
+  /// 레슨이 완료 처리되었습니다 (lesson completed snack)
+  static const lessonCompletedSnack = '레슨이 완료 처리되었습니다';
+
+  /// 레슨 완료 처리에 실패했습니다. 다시 시도해주세요. (lesson complete failed)
+  static const lessonCompleteFailed = '레슨 완료 처리에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레슨이 삭제되었습니다 (lesson deleted snack)
+  static const lessonDeleted = '레슨이 삭제되었습니다';
+
+  /// 레슨 삭제에 실패했습니다. 다시 시도해주세요. (lesson delete failed)
+  static const lessonDeleteFailed = '레슨 삭제에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레슨 노트 (lesson notes tab title)
+  static const lessonNotesTab = '레슨 노트';
+
+  /// 과제 (assignments tab title)
+  static const assignmentsTab = '과제';
+
+  /// 레슨이 완료되었습니다. 피드백을 작성해주세요! (lesson needs feedback prompt)
+  static const lessonNeedsFeedbackPrompt = '레슨이 완료되었습니다. 피드백을 작성해주세요!';
+
+  /// 레슨 피드백 (lesson feedback section title — teacher view)
+  static const lessonFeedbackHeader = '레슨 피드백';
+
+  /// 선생님 피드백 (teacher feedback section title — student view)
+  static const teacherFeedbackHeader = '선생님 피드백';
+
+  /// 정규 레슨을 제안해보세요 (regular lesson proposal banner title)
+  static const regularLessonProposalTitle = '정규 레슨을 제안해보세요';
+
+  /// 수강권을 발급하면 정기 레슨을 시작할 수 있습니다. (regular lesson proposal description)
+  static const regularLessonProposalDescription =
+      '수강권을 발급하면 정기 레슨을 시작할 수 있습니다.';
+
+  /// 수강권 발급하기 (issue subscription button)
+  static const issueSubscriptionButton = '수강권 발급하기';
+
+  /// 주요 포인트 추가 (add key point sheet title)
+  static const addKeyPointTitle = '주요 포인트 추가';
+
+  /// 연습 팁 추가 (add practice tip sheet title)
+  static const addPracticeTipTitle = '연습 팁 추가';
+
+  /// 주요 포인트가 추가되었습니다 (key point added snack)
+  static const keyPointAdded = '주요 포인트가 추가되었습니다';
+
+  /// 주요 포인트 추가에 실패했습니다. (add key point failed)
+  static const addKeyPointFailed = '주요 포인트 추가에 실패했습니다.';
+
+  /// 주요 포인트 삭제에 실패했습니다. (remove key point failed)
+  static const removeKeyPointFailed = '주요 포인트 삭제에 실패했습니다.';
+
+  /// 피드백 저장에 실패했습니다. (feedback save failed)
+  static const feedbackSaveFailedShort = '피드백 저장에 실패했습니다.';
+
+  /// 메모 저장에 실패했습니다. (memo save failed)
+  static const memoSaveFailed = '메모 저장에 실패했습니다.';
+
+  /// 연습 팁이 저장되었습니다 (practice tip saved snack)
+  static const practiceTipSaved = '연습 팁이 저장되었습니다';
 }
