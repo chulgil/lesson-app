@@ -3828,4 +3828,56 @@ class AppStrings {
 
   /// 다음에 다시 안내해 드릴게요 (거절 SnackBar)
   static const renewalDeclineSnackbar = '다음에 다시 안내해 드릴게요';
+
+  // ── Proposal Detail Screen (수강권 제안 상세 5-3b-17) ─────────
+
+  /// 수강권을 선택하세요 (multi-choice 단계 제목)
+  static const proposalDetailSelectTemplate = '수강권을 선택하세요';
+
+  /// 수강권을 선택해주세요 (하단 액션바 안내)
+  static const proposalDetailSelectTemplateRequired = '수강권을 선택해주세요';
+
+  /// 자동 발송 (auto proposal 배지)
+  static const proposalDetailAutoSentBadge = '자동 발송';
+
+  /// 선생님이 보낸 제안 (헤더 subtitle)
+  static const proposalDetailFromTeacherSubtitle = '선생님이 보낸 제안';
+
+  /// 추천 (recommended template 배지)
+  static const proposalDetailRecommendedBadge = '추천';
+
+  /// 입금 완료했어요 (학생 입금 알림 CTA)
+  static const proposalDetailPaymentDoneAction = '입금 완료했어요';
+
+  /// 이번엔 스킵할게요 (학생 거절 CTA)
+  static const proposalDetailSkipAction = '이번엔 스킵할게요';
+
+  /// 이번 제안을 스킵했습니다 (거절 SnackBar)
+  static const proposalDetailSkippedSnackbar = '이번 제안을 스킵했습니다';
+
+  /// 선생님 정보를 찾을 수 없습니다 (teacher profile null)
+  static const teacherProfileNotFound = '선생님 정보를 찾을 수 없습니다';
+
+  /// 선생님 연락처 정보가 없습니다 (teacher phone null)
+  static const teacherContactNotAvailable = '선생님 연락처 정보가 없습니다';
+
+  /// 선생님 정보를 불러오는 중... (teacher profile loading)
+  static const teacherProfileLoading = '선생님 정보를 불러오는 중...';
+
+  /// 선생님 정보를 불러올 수 없습니다 (teacher profile load error)
+  static const teacherProfileLoadError = '선생님 정보를 불러올 수 없습니다';
+
+  /// $name 선생님께 연락하기 (contact sheet title)
+  static String teacherContactSheetTitleFormat(String name) =>
+      '$name 선생님께 연락하기';
+
+  /// 전화하기 (call action)
+  static const callTeacherAction = '전화하기';
+
+  /// 문자 보내기 (sms action)
+  static const messageTeacherAction = '문자 보내기';
+
+  /// 전화번호가 복사되었습니다: $phoneNumber (clipboard SnackBar)
+  static String phoneNumberCopiedFormat(String phoneNumber) =>
+      '전화번호가 복사되었습니다: $phoneNumber';
 }
