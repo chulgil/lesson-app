@@ -1340,6 +1340,68 @@ class AppStrings {
   /// 예약 취소 실패 (스낵바)
   static const bookingCancelFailed = '예약 취소에 실패했습니다. 다시 시도해주세요.';
 
+  // ── Booking Reschedule (예약 변경 화면) ─────────────────────────
+  /// 예약 변경 (AppBar)
+  static const bookingRescheduleTitle = '예약 변경';
+
+  /// 현재 예약 (카드 라벨)
+  static const currentBookingLabel = '현재 예약';
+
+  /// 변경 불가 (X/Y회 사용완료) — 배지
+  static String bookingRescheduleQuotaUsed(int used, int total) =>
+      '변경 불가 ($used/$total회 사용완료)';
+
+  /// 마지막 변경 기회! (X/Y회 남음) — 배지
+  static String rescheduleLastChanceWithCount(int remaining, int total) =>
+      '마지막 변경 기회! ($remaining/$total회 남음)';
+
+  /// 변경 가능: X/Y회 — 배지
+  static String bookingRescheduleAvailable(int remaining, int total) =>
+      '변경 가능: $remaining/$total회';
+
+  /// 새로운 시간 선택 (섹션 라벨)
+  static const selectNewTimeLabel = '새로운 시간 선택';
+
+  /// 예약 가능한 시간이 없습니다 (빈 상태)
+  static const noAvailableBookingTime = '예약 가능한 시간이 없습니다';
+
+  /// 변경 후: $date $time (프리뷰 카드)
+  static String afterChangeDateTime(String date, String time) =>
+      '변경 후: $date $time';
+
+  /// 예약 변경하기 (CTA 버튼)
+  static const bookingRescheduleAction = '예약 변경하기';
+
+  /// 마지막 변경 기회입니다 (다이얼로그 제목)
+  static const bookingRescheduleLastChanceDialogTitle = '마지막 변경 기회입니다';
+
+  /// 변경 후: N/N회 (마지막) — 다이얼로그 본문
+  static String rescheduleAfterChangeMarker(int total) =>
+      '변경 후: $total/$total회 (마지막)';
+
+  /// 변경하기 (다이얼로그 확인 액션)
+  static const changeAction = '변경하기';
+
+  /// 예약이 $date $time 로 변경되었습니다 (스낵바)
+  static String bookingRescheduledTo(String date, String time) =>
+      '예약이 $date $time로 변경되었습니다';
+
+  /// 예약 변경 실패 (스낵바)
+  static const bookingRescheduleFailed = '예약 변경에 실패했습니다. 다시 시도해주세요.';
+
+  /// 변경권 모두 사용 (알림 제목)
+  static const rescheduleCreditsAllUsedTitle = '변경권을 모두 사용했습니다';
+
+  /// 변경권 모두 사용 (알림 본문)
+  static const rescheduleCreditsAllUsedBody =
+      '더 이상 레슨 일정을 직접 변경할 수 없습니다. 변경이 필요한 경우 선생님에게 문의해주세요.';
+
+  /// 변경권 1회 남음 (알림 제목)
+  static const rescheduleCreditLastOneTitle = '변경권 1회 남음';
+
+  /// 변경권 1회 남음 (알림 본문)
+  static const rescheduleCreditLastOneBody = '변경권이 1회 남았습니다. 신중하게 사용해주세요.';
+
   /// 선생님 정보를 찾을 수 없습니다
   static const teacherInfoNotFound = '선생님 정보를 찾을 수 없습니다';
 

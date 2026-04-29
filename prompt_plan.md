@@ -94,7 +94,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 ## P2 진행 상황
 
 - 5-1a~5-1g 완료 (commits: df846fab, 1a290003, 1accb9d6, b1580850, 5f4d5c2a, b0c96b58, 37090589)
-- 5-1h booking_reschedule_screen 진입 예정 (~22 사이트)
+- 5-1h booking_reschedule_screen 완료 (2026-04-29) — 17 신규 키 + 4 재사용 (cancel, cannotLoadData, rescheduleUsageStatusWithColon, rescheduleNoMoreAfter), 20 사이트, schedule scope 237/237 PASS
 - 5-1i schedule_tab.dart + 작은 파일들
 - 5-2 lessons 도메인
 - 5-3 subscription 도메인
@@ -122,8 +122,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | 작업 | 상태 |
 |---|---|
 | P0-1 / P0-2 / P1-1 / P1-2 Phase A·B·C | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-1h booking_reschedule_screen i18n (~22 사이트) | 진입 |
-| P2 5-1i schedule_tab.dart + 작은 파일들 | 후속 |
+| P2 5-1h booking_reschedule_screen i18n (20 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-1i schedule_tab.dart + 작은 파일들 | 진입 |
 | P2 5-2 lessons 도메인 / 5-3 subscription 도메인 | 후속 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 

@@ -75,7 +75,7 @@ class _BookingRescheduleScreenState
 
     return Scaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('예약 변경')),
+      appBar: AppBar(title: const Text(AppStrings.bookingRescheduleTitle)),
       body: SafeArea(
         child: Column(
           children: [
@@ -104,7 +104,7 @@ class _BookingRescheduleScreenState
                 error:
                     (error, _) => Center(
                       child: Text(
-                        '데이터를 불러올 수 없습니다',
+                        AppStrings.cannotLoadData,
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.inkSecondary,
                         ),
@@ -133,7 +133,7 @@ class _BookingRescheduleScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '현재 예약',
+            AppStrings.currentBookingLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -183,7 +183,10 @@ class _BookingRescheduleScreenState
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
-                '변경 불가 (${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용완료)',
+                AppStrings.bookingRescheduleQuotaUsed(
+                  widget.totalReschedules - widget.remainingReschedules,
+                  widget.totalReschedules,
+                ),
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
@@ -217,8 +220,14 @@ class _BookingRescheduleScreenState
           const SizedBox(width: AppSpacing.space2),
           Text(
             isLastChance
-                ? '마지막 변경 기회! (${widget.remainingReschedules}/${widget.totalReschedules}회 남음)'
-                : '변경 가능: ${widget.remainingReschedules}/${widget.totalReschedules}회',
+                ? AppStrings.rescheduleLastChanceWithCount(
+                  widget.remainingReschedules,
+                  widget.totalReschedules,
+                )
+                : AppStrings.bookingRescheduleAvailable(
+                  widget.remainingReschedules,
+                  widget.totalReschedules,
+                ),
             style: AppTypography.bodyMedium.copyWith(
               color: isLastChance ? AppColors.paperAccent : AppColors.ink,
               fontWeight: FontWeight.w600,
@@ -246,7 +255,7 @@ class _BookingRescheduleScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '새로운 시간 선택',
+            AppStrings.selectNewTimeLabel,
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -335,7 +344,7 @@ class _BookingRescheduleScreenState
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
-                  '예약 가능한 시간이 없습니다',
+                  AppStrings.noAvailableBookingTime,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -410,7 +419,10 @@ class _BookingRescheduleScreenState
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '변경 후: ${_selectedSlot!.formattedDate} ${_selectedSlot!.formattedStartTime}',
+                    AppStrings.afterChangeDateTime(
+                      _selectedSlot!.formattedDate,
+                      _selectedSlot!.formattedStartTime,
+                    ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
@@ -450,7 +462,7 @@ class _BookingRescheduleScreenState
                         ),
                       )
                       : Text(
-                        '예약 변경하기',
+                        AppStrings.bookingRescheduleAction,
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.paper,
                           fontWeight: FontWeight.w600,
@@ -470,24 +482,31 @@ class _BookingRescheduleScreenState
         context: context,
         builder:
             (context) => AlertDialog(
-              title: const Text('마지막 변경 기회입니다'),
+              title: const Text(
+                AppStrings.bookingRescheduleLastChanceDialogTitle,
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
+                    AppStrings.rescheduleUsageStatusWithColon(
+                      widget.totalReschedules - widget.remainingReschedules,
+                      widget.totalReschedules,
+                    ),
                     style: AppTypography.bodyMedium,
                   ),
                   Text(
-                    '변경 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
+                    AppStrings.rescheduleAfterChangeMarker(
+                      widget.totalReschedules,
+                    ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  const Text('이후 더 이상 변경/취소가 불가합니다.'),
+                  const Text(AppStrings.rescheduleNoMoreAfter),
                 ],
               ),
               actions: [
@@ -497,7 +516,7 @@ class _BookingRescheduleScreenState
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('변경하기'),
+                  child: const Text(AppStrings.changeAction),
                 ),
               ],
             ),
@@ -546,7 +565,10 @@ class _BookingRescheduleScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '예약이 ${_selectedSlot!.formattedDate} ${_selectedSlot!.formattedStartTime}로 변경되었습니다',
+              AppStrings.bookingRescheduledTo(
+                _selectedSlot!.formattedDate,
+                _selectedSlot!.formattedStartTime,
+              ),
             ),
             backgroundColor: AppColors.paperOk,
           ),
@@ -557,7 +579,7 @@ class _BookingRescheduleScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('예약 변경에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.bookingRescheduleFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -588,8 +610,8 @@ class _BookingRescheduleScreenState
         userId: widget.studentId,
         type: NotificationType.rescheduleAllowanceDepleted,
         priority: NotificationPriority.high,
-        title: '변경권을 모두 사용했습니다',
-        body: '더 이상 레슨 일정을 직접 변경할 수 없습니다. 변경이 필요한 경우 선생님에게 문의해주세요.',
+        title: AppStrings.rescheduleCreditsAllUsedTitle,
+        body: AppStrings.rescheduleCreditsAllUsedBody,
         createdAt: DateTime.now(),
         data: {
           'subscriptionId': widget.subscriptionId,
@@ -604,8 +626,8 @@ class _BookingRescheduleScreenState
         userId: widget.studentId,
         type: NotificationType.rescheduleAllowanceUsed,
         priority: NotificationPriority.normal,
-        title: '변경권 1회 남음',
-        body: '변경권이 1회 남았습니다. 신중하게 사용해주세요.',
+        title: AppStrings.rescheduleCreditLastOneTitle,
+        body: AppStrings.rescheduleCreditLastOneBody,
         createdAt: DateTime.now(),
         data: {
           'subscriptionId': widget.subscriptionId,
