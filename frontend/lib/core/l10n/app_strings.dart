@@ -2065,4 +2065,59 @@ class AppStrings {
 
   /// 전송 실패. 다시 시도해주세요. (failure snackbar)
   static const sendFailedRetry = '전송 실패. 다시 시도해주세요.';
+
+  // ── Lesson Notes Widgets (레슨 노트/피드백/연습 팁/녹음 위젯) ─────────
+  /// 레슨 피드백 에디터 hint
+  static const feedbackEditorHint = '레슨 피드백을 작성하세요...';
+
+  /// 저장 중 상태 표시
+  static const savingLabel = '저장 중...';
+
+  /// 저장 완료 상태 표시
+  static const savedLabel = '저장됨';
+
+  /// 피드백 카드 빈 상태
+  static const feedbackEmpty = '아직 피드백이 없습니다';
+
+  /// 작성 일자 ($date)
+  static String feedbackWrittenAt(String date) => '작성: $date';
+
+  /// 주요 포인트 빈 상태 (선생님)
+  static const keyPointsEmptyTeacher = '+ 버튼을 눌러 주요 포인트를 추가하세요';
+
+  /// 주요 포인트 빈 상태 (학생)
+  static const keyPointsEmptyStudent = '주요 포인트가 없습니다';
+
+  /// 연습 팁 빈 상태 (선생님)
+  static const practiceTipsEmptyTeacher = '+ 버튼을 눌러 연습 팁을 추가하세요';
+
+  /// 연습 팁 빈 상태 (학생)
+  static const practiceTipsEmptyStudent = '연습 팁이 없습니다';
+
+  /// 녹음 진행 중 라벨
+  static const recordingInProgress = '녹음 중';
+
+  /// 녹음 파일 빈 상태
+  static const recordingsEmpty = '녹음 파일이 없습니다';
+
+  /// 레슨 취소 확인 다이얼로그 메시지
+  static const cancelLessonConfirm = '이 레슨을 취소하시겠습니까?';
+
+  /// 레슨 삭제 다이얼로그 제목
+  static const deleteLessonTitle = '레슨 삭제';
+
+  /// 레슨 삭제 확인 다이얼로그 메시지 (녹음/노트 동반 삭제 경고 포함)
+  static const deleteLessonConfirm = '이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.';
+
+  /// 연습 팁 수정 다이얼로그 제목
+  static const editPracticeTipTitle = '연습 팁 수정';
+
+  /// 연습 팁 입력 hint
+  static const editPracticeTipHint = '연습 팁을 입력하세요';
+
+  /// 학생 메모 카드 제목
+  static const studentMemoTitle = '내 메모';
+
+  /// 학생 메모 입력 hint
+  static const studentMemoHint = '오늘 배운 것, 어려웠던 점 등을 메모하세요...';
 }
