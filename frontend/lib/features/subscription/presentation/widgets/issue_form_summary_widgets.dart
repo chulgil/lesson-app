@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -74,7 +75,10 @@ class AppliedPolicySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final allowance = rescheduleAllowance ?? policy.maxChangesPerMonth;
     final deadline = rescheduleDeadlineHours ?? policy.minCancelHours;
-    final changeLine = '$deadline시간 전까지 · 월 $allowance회';
+    final changeLine = AppStrings.issueFormSummaryPolicyChangeLine(
+      deadline,
+      allowance,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.space3),
@@ -88,7 +92,7 @@ class AppliedPolicySection extends StatelessWidget {
               Icon(Icons.rule_rounded, size: 16, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                '적용 정책',
+                AppStrings.policyAppliedTitle,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.paperAccent,
@@ -97,9 +101,18 @@ class AppliedPolicySection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
-          _PolicyLine(label: '변경/취소', value: changeLine),
-          _PolicyLine(label: '노쇼', value: policy.noShowPolicySummary),
-          _PolicyLine(label: '이월', value: policy.carryoverPolicySummary),
+          _PolicyLine(
+            label: AppStrings.policyChangeCancelLabel,
+            value: changeLine,
+          ),
+          _PolicyLine(
+            label: AppStrings.policyNoShowLabel,
+            value: policy.noShowPolicySummary,
+          ),
+          _PolicyLine(
+            label: AppStrings.policyCarryoverLabel,
+            value: policy.carryoverPolicySummary,
+          ),
         ],
       ),
     );
@@ -197,59 +210,77 @@ class SubscriptionSummaryCard extends StatelessWidget {
           // Notebook × Score: 요약 카드 섹션 제목은 Playfair sectionTitle
           // 로 통일 (§7.17). paperAccent 틴트 유지.
           Text(
-            '발급 요약',
+            AppStrings.issueFormSummaryTitle,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          SummaryRow(label: '유형', value: lessonsDisplay),
+          SummaryRow(
+            label: AppStrings.issueFormSummaryTypeLabel,
+            value: lessonsDisplay,
+          ),
 
           // Amount with discount
           if (discountPercent > 0 && originalAmount > 0) ...[
             SummaryRow(
-              label: '정가',
+              label: AppStrings.issueFormAmountSectionTitle,
               value: formatWonWithComma(originalAmount),
               strikethrough: true,
             ),
             SummaryRow(
-              label: '할인',
-              value:
-                  '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
+              label: AppStrings.issueFormDiscountTitle,
+              value: AppStrings.issueFormSummaryDiscountValue(
+                formatWonWithComma(originalAmount - finalAmount),
+                discountPercent,
+              ),
               valueColor: AppColors.paperAccent,
             ),
             SummaryRow(
-              label: '결제금액',
+              label: AppStrings.issueFormSummaryFinalAmountLabel,
               value: formatWonWithComma(finalAmount),
               isBold: true,
             ),
           ] else ...[
-            SummaryRow(label: '금액', value: formatWonWithComma(originalAmount)),
+            SummaryRow(
+              label: AppStrings.issueFormSummaryAmountLabel,
+              value: formatWonWithComma(originalAmount),
+            ),
           ],
 
           // Bonus
           if (bonusLessons > 0)
             SummaryRow(
-              label: '보너스',
-              value:
-                  '+$bonusLessons회${effectiveBonusReason != null ? ' ($effectiveBonusReason)' : ''}',
+              label: AppStrings.issueFormBonusTitle,
+              value: AppStrings.issueFormSummaryBonusValue(
+                bonusLessons,
+                effectiveBonusReason,
+              ),
               valueColor: AppColors.paperAccent,
             ),
 
           // Payment status
           SummaryRow(
-            label: '결제',
+            label: AppStrings.issueFormSummaryPaymentLabel,
             value:
                 isPaymentConfirmed
-                    ? '${selectedPaymentMethod.label} (확인됨)'
-                    : '미결제 (후불)',
+                    ? AppStrings.issueFormSummaryPaymentConfirmed(
+                      selectedPaymentMethod.label,
+                    )
+                    : AppStrings.issueFormSummaryUnpaidLabel,
             valueColor: isPaymentConfirmed ? null : AppColors.paperAccent,
           ),
 
           if (startDate != null)
-            SummaryRow(label: '시작일', value: formatDateYMDKorean(startDate!)),
+            SummaryRow(
+              label: AppStrings.issueFormStartDateSectionTitle,
+              value: formatDateYMDKorean(startDate!),
+            ),
           if (endDate != null)
-            SummaryRow(label: '만료일', value: formatDateYMDKorean(endDate)),
+            SummaryRow(
+              label: AppStrings.issueFormSummaryEndDateLabel,
+              value: formatDateYMDKorean(endDate),
+            ),
 
           if (effectivePolicy != null)
             AppliedPolicySection(
@@ -280,13 +311,20 @@ class SubscriptionSummaryCard extends StatelessWidget {
 
   String _buildLessonsDisplay() {
     if (selectedType == SubscriptionType.trial) {
-      return '체험 (1회)';
+      return AppStrings.issueFormSummaryLessonsTrial;
     } else if (selectedType == SubscriptionType.package) {
       return bonusLessons > 0
-          ? '회차제 ($totalLessons + $bonusLessons회, $validityDays일)'
-          : '회차제 ($totalLessons회, $validityDays일)';
+          ? AppStrings.issueFormSummaryLessonsPackageWithBonus(
+            totalLessons,
+            bonusLessons,
+            validityDays,
+          )
+          : AppStrings.issueFormSummaryLessonsPackage(
+            totalLessons,
+            validityDays,
+          );
     } else {
-      return '월정액 ($monthsCount개월)';
+      return AppStrings.issueFormSummaryLessonsMonthly(monthsCount);
     }
   }
 }
@@ -314,7 +352,7 @@ class BatchInfoBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$studentCount명의 학생에게 동일한 수강권을 발급합니다',
+                  AppStrings.issueFormBatchBannerTitle(studentCount),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w600,
@@ -322,7 +360,7 @@ class BatchInfoBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '각 학생에게 개별 수강권이 생성됩니다',
+                  AppStrings.issueFormBatchBannerBody,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.ink.withValues(alpha: 0.8),
                   ),
@@ -388,43 +426,51 @@ class BatchSummaryCard extends StatelessWidget {
           // Notebook × Score: 요약 카드 섹션 제목은 Playfair sectionTitle
           // 로 통일 (§7.17). paperAccent 틴트 유지.
           Text(
-            '배치 발급 요약',
+            AppStrings.issueFormSummaryBatchTitle,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          SummaryRow(label: '발급 대상', value: '$studentCount명'),
-          SummaryRow(label: '유형', value: lessonsDisplay),
+          SummaryRow(
+            label: AppStrings.issueFormBatchTargetLabel,
+            value: AppStrings.issueFormBatchStudentCount(studentCount),
+          ),
+          SummaryRow(
+            label: AppStrings.issueFormSummaryTypeLabel,
+            value: lessonsDisplay,
+          ),
 
           // Amount with discount
           if (discountPercent > 0 && originalAmount > 0) ...[
             SummaryRow(
-              label: '정가',
+              label: AppStrings.issueFormAmountSectionTitle,
               value: formatWonWithComma(originalAmount),
               strikethrough: true,
             ),
             SummaryRow(
-              label: '할인',
-              value:
-                  '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
+              label: AppStrings.issueFormDiscountTitle,
+              value: AppStrings.issueFormSummaryDiscountValue(
+                formatWonWithComma(originalAmount - finalAmount),
+                discountPercent,
+              ),
               valueColor: AppColors.paperAccent,
             ),
             SummaryRow(
-              label: '개인당 금액',
+              label: AppStrings.issueFormBatchPerPersonLabel,
               value: formatWonWithComma(finalAmount),
               isBold: true,
             ),
           ] else ...[
             SummaryRow(
-              label: '개인당 금액',
+              label: AppStrings.issueFormBatchPerPersonLabel,
               value: formatWonWithComma(originalAmount),
             ),
           ],
 
           // Total amount
           SummaryRow(
-            label: '총 예상 금액',
+            label: AppStrings.issueFormBatchTotalLabel,
             value: formatWonWithComma(finalAmount * studentCount),
             isBold: true,
             valueColor: AppColors.paperAccent,
@@ -433,16 +479,24 @@ class BatchSummaryCard extends StatelessWidget {
           // Bonus
           if (bonusLessons > 0)
             SummaryRow(
-              label: '보너스',
-              value:
-                  '+$bonusLessons회${effectiveBonusReason != null ? ' ($effectiveBonusReason)' : ''}',
+              label: AppStrings.issueFormBonusTitle,
+              value: AppStrings.issueFormSummaryBonusValue(
+                bonusLessons,
+                effectiveBonusReason,
+              ),
               valueColor: AppColors.paperAccent,
             ),
 
           if (startDate != null)
-            SummaryRow(label: '시작일', value: formatDateYMDKorean(startDate!)),
+            SummaryRow(
+              label: AppStrings.issueFormStartDateSectionTitle,
+              value: formatDateYMDKorean(startDate!),
+            ),
           if (endDate != null)
-            SummaryRow(label: '만료일', value: formatDateYMDKorean(endDate)),
+            SummaryRow(
+              label: AppStrings.issueFormSummaryEndDateLabel,
+              value: formatDateYMDKorean(endDate),
+            ),
 
           if (effectivePolicy != null)
             AppliedPolicySection(
@@ -473,13 +527,20 @@ class BatchSummaryCard extends StatelessWidget {
 
   String _buildLessonsDisplay() {
     if (selectedType == SubscriptionType.trial) {
-      return '체험 (1회)';
+      return AppStrings.issueFormSummaryLessonsTrial;
     } else if (selectedType == SubscriptionType.package) {
       return bonusLessons > 0
-          ? '회차제 ($totalLessons + $bonusLessons회, $validityDays일)'
-          : '회차제 ($totalLessons회, $validityDays일)';
+          ? AppStrings.issueFormSummaryLessonsPackageWithBonus(
+            totalLessons,
+            bonusLessons,
+            validityDays,
+          )
+          : AppStrings.issueFormSummaryLessonsPackage(
+            totalLessons,
+            validityDays,
+          );
     } else {
-      return '월정액 ($monthsCount개월)';
+      return AppStrings.issueFormSummaryLessonsMonthly(monthsCount);
     }
   }
 }
