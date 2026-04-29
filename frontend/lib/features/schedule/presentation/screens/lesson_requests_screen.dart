@@ -74,7 +74,7 @@ class LessonRequestsScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space4),
                   ElevatedButton(
                     onPressed: () => context.pop(),
-                    child: const Text('돌아가기'),
+                    child: const Text(AppStrings.goBack),
                   ),
                 ],
               ),
