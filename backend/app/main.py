@@ -1,7 +1,7 @@
 """FastAPI application entry point."""
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +17,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Startup: import all models to register with Base.metadata
     import app.models  # noqa: F401
 
+    # Plan C Phase 6a — start APScheduler. Disabled when TESTING flag is set
+    # so pytest doesn't spawn a background event loop.
+    from app.core.config import settings as _settings
+    from app.core.scheduler import shutdown_scheduler, start_scheduler
+
+    scheduler_enabled = not getattr(_settings, "TESTING", False)
+    if scheduler_enabled:
+        start_scheduler()
+
     yield
+
+    if scheduler_enabled:
+        shutdown_scheduler()
     # Shutdown: dispose engine connection pool
     from app.core.database import engine
 

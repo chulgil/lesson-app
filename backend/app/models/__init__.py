@@ -64,6 +64,7 @@ from app.models.subscription import (  # noqa: F401
     SubscriptionTemplate,
     SubscriptionUsage,
 )
+from app.models.subscription_expiry import SubscriptionExpiryDispatchLog  # noqa: F401
 from app.models.teacher import (  # noqa: F401
     Teacher,
     TeacherCareer,

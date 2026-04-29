@@ -1,7 +1,11 @@
 """Shared test fixtures for the lesson-app backend test suite."""
 
 import asyncio
+import os
 from collections.abc import AsyncGenerator
+
+# Plan C Phase 6a — must run before app.main import so APScheduler stays off.
+os.environ.setdefault("TESTING", "1")
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -148,9 +152,7 @@ async def teacher(
 
 
 @pytest.fixture
-async def student(
-    client: AsyncClient, student_auth_headers: dict, create_test_user
-) -> "StudentActions":
+async def student(client: AsyncClient, student_auth_headers: dict, create_test_user) -> "StudentActions":
     """Pre-seeded student with scenario helper methods.
 
     Usage:
@@ -160,7 +162,9 @@ async def student(
     from tests.scenarios.helpers import StudentActions
 
     await create_test_user(
-        user_id="test-student-id", role="student",
-        name="Test Student", email="student@test.com",
+        user_id="test-student-id",
+        role="student",
+        name="Test Student",
+        email="student@test.com",
     )
     return StudentActions(client, student_auth_headers)

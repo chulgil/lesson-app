@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     # Environment
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
+    # Plan C Phase 6a — disable APScheduler in pytest (env: TESTING=1) to keep
+    # ASGI lifespan deterministic and avoid leaking background event loops.
+    TESTING: bool = False
 
     # OpenAI (for AI lesson notes)
     OPENAI_API_KEY: str = ""

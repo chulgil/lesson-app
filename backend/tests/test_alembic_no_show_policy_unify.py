@@ -23,11 +23,20 @@ def test_unify_no_show_policy_chained_to_align_booking_status() -> None:
     assert rev.down_revision == "align_booking_status"
 
 
-def test_unify_no_show_policy_is_head() -> None:
-    """0010 가 단일 head."""
+def test_unify_no_show_policy_descendants_chain() -> None:
+    """0010 위에 후속 revision 이 있어도 단일 chain (no branching)."""
     script = _script()
     heads = list(script.get_heads())
-    assert heads == ["unify_no_show_policy"], f"expected single head, got {heads}"
+    assert len(heads) == 1, f"expected single head, got {heads}"
+    # 0010 까지 거꾸로 따라갈 수 있어야 함 (chain 정합)
+    head = script.get_revision(heads[0])
+    chain = {head.revision}
+    cursor = head
+    while cursor.down_revision:
+        down = cursor.down_revision if isinstance(cursor.down_revision, str) else cursor.down_revision[0]
+        cursor = script.get_revision(down)
+        chain.add(cursor.revision)
+    assert "unify_no_show_policy" in chain
 
 
 def test_unify_no_show_policy_data_migration_present() -> None:
