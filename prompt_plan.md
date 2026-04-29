@@ -318,7 +318,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-14 student_proposal_accept_screen 13 사이트 (2026-04-29) — AppBar(수강권 선택) + 에러 상태 + 제안 null 빈 상태 + 선생님 fallback + 헤더(name 포매터·subtitle) + 거절 버튼 + 결제 안내 divider + 결제 캡션 + 복사 버튼 + 수락 SnackBar + 에러 재시도 SnackBar 2건 + 거절 SnackBar + 클립보드 SnackBar. 신규 키 8개 (studentProposalAcceptAppBarTitle, proposalNotFoundEmpty, teacherWithName 포매터, proposalSubmittedSubtitle, proposalDeclineNextTime, paymentDepositInstruction, subscriptionSelectedSnackbar, proposalRejectedNextTimeSnackbar) + 재사용 6건 (teacher, errorOccurred, errorTryAgain × 2, eventPaymentRequested, proposalPaymentCopyLabel, proposalPaymentAccountCopied). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `456b381a` (키, 외부 5-3b-13 keys 번들 포함) + `1e38b2d6` (마이그레이션). **주의**: 외부 세션이 동일 시각에 5-3b-13 진행 중 — staged 키가 working tree 에 있어 본 키 커밋에 함께 번들됨, 본 plan 에서는 5-3b-14 로 재매핑. 잔여 ~8 파일은 5-3b-15 이후.
 - 5-3b-15 proposal_create_screen 22 사이트 (2026-04-29) — 기본 파라미터(teacherName=teacher) + AppBar(수강권 제안) + error fallback 2건 + 학생 0건 빈 상태(title/body) + 템플릿 0건 빈 상태(title/body/CTA) + 3-step header (학생 선택 + 수강권 선택 max formatter + 메시지 선택) + student dropdown hint + template info banner(단일/복수) + recommended 안내 + 복수 선택 카운터 formatter + 메시지 입력 hint + 송신 버튼(단/복수 formatter) + 즉시 발급 버튼 + 즉시 발급 help + templateName fallback(수강권) + 송신 SnackBar(단/복수 formatter) + 실패 SnackBar. 신규 키 19개 (proposalCreate AppBarTitle/NoStudents{Title,Body}/NoTemplates{Title,Body}/TemplateButton/StepStudent/StepTemplateMaxFormat/MessageOptional/StudentSelectHint/TemplateInfoBanner/RecommendedHint/MultiSelectInfoFormat/MessageHint/ImmediateIssueHelp/SentMessage/MultiTemplateSendFormat/MultiSentMessageFormat/FailMessage) + 재사용 5건 (proposalSend, proposalTypeDirectIssue, subscription, teacher, errorOccurred × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `53c5ec1e` (키) + `344cdb91` (마이그레이션). **주의**: 외부 세션이 5-3b-12 / 13 / 14 점유 — 본 plan 에서는 5-3b-15 로 재매핑. 잔여 ~7 파일은 5-3b-16 이후.
 - 5-3b-15a proposal_create_screen 잔여 2 사이트 패치 (2026-04-29) — 5cac8ad3 클로즈 후 grep 재검증으로 누락 발견: 추천 지정 SnackBar(`'${template.name}을 추천으로 지정했습니다'`) + 선택 카운터 라벨(`'$len/$max개 선택'`). 신규 키 2개 (proposalCreateRecommendedDesignatedFormat 포매터, proposalCreateSelectedCountFormat 포매터). 키+마이그레이션 단일 커밋 `3d9db2df` (2 사이트 follow-up 단위라 surgical). 한글 grep 결과는 doc 주석만 잔존. **교훈**: "한글 grep clean" 클로즈 후에도 교차 grep 필수.
-- 5-3b 잔여 subscription 화면·repository·mock (~7 파일)
+- 5-3b-16 renewal_detail_screen 14 사이트 (2026-04-29) — AppBar(수강권 갱신 제안) + 에러/null 폴백 + 선생님 폴백 + 갱신 헤더(name 포매터) + 템플릿 선택 프롬프트 + 추천 배지 + "지난번과 동일" 힌트 + 입금 알림 SnackBar + 오류 SnackBar × 2 + 수강권 선택 CTA + 나중에 할게요 CTA + 거절 SnackBar. 신규 키 7개 (renewalProposalAppBarTitle, renewalSelectTemplatePrompt, renewalProposedByFormat 포매터, renewalSameAsPreviousHint, renewalSelectButton, renewalDeclineLater, renewalDeclineSnackbar) + 재사용 7건 (errorOccurred, proposalNotFoundEmpty, teacher, templateRecommendedBadge, paymentReminderSent, errorTryAgain × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `6d098429` (키) + `4f8038a8` (마이그레이션). **주의**: 외부 세션이 동시 5-3b-17(proposal_detail_screen) 진행 중 — staged 5-3b-17 키를 잠시 제거 후 본 키 커밋, 즉시 복원하여 외부 세션 작업 보존. 잔여 ~6 파일은 5-3b-17 이후.
+- 5-3b 잔여 subscription 화면·repository·mock (~6 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -371,7 +372,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-13 issue_subscription_screen i18n (10 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-14 student_proposal_accept_screen i18n (13 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-15 proposal_create_screen i18n (22 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-16 subscription 화면·repository (~7 파일 분할) | 대기 |
+| P2 5-3b-16 renewal_detail_screen i18n (14 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-17 subscription 화면·repository (~6 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
