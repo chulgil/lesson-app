@@ -244,7 +244,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-10 issue_subscription_actions 10 사이트 (2026-04-29) — 단건 발급 검증 3건 (membership/startDate/bonusReason) + 단건 발급 성공 snackbar + 단건 발급 실패 snackbar (2회) + discountReason 합성 (단건+일괄 2회) + 일괄 발급 결과 snackbar 2건 (전체 성공/부분 성공) + 선생님 fallback 2건 (registerRegularLesson extra + scheduleConfirmationCard). 신규 키 8개 (chooseLessonValidation/chooseStartDateValidation/chooseBonusReasonValidation, discountPercentReason 포매터, subscriptionIssueSuccess/subscriptionIssueFailRetry, batchSubscriptionIssueSuccess/batchSubscriptionIssuePartial 포매터) + 재사용 1건 (teacher × 2). 신규 키는 8aed2089(parallel sweep)에 이미 추가됨. subscription 63/63 PASS, flutter analyze — No issues. 커밋 `6033fd29` (마이그레이션). 잔여 ~12 파일은 5-3b-11 이후.
 - 5-3b-11 proposal_confirm_screen 12 사이트 (2026-04-29) — 기본 파라미터(teacherName) + AppBar(paymentConfirm) + 빈 상태(title/body) + 학생 fallback(loading/error/null) + 입금 알림 포매터 + 템플릿 fallback(error/null) + 템플릿 summary 포매터(회수·시간·유효기간) + 액션 버튼(입금 미확인/입금 확인 → 수강권 발급) + 발급 SnackBar(성공/실패) + 입금 미확인 다이얼로그(제목·본문·메시지 보내기) + 발송 SnackBar + 상대 시간(분/시간/일 전 → timeAgoMinutes/Hours/Days). 신규 키 0건 (8aed2089 parallel sweep 에서 선반영) + 재사용 12건. subscription 63/63 PASS, flutter analyze — No issues. 커밋 `2fd01a64` (마이그레이션). **주의**: 커밋 메시지의 `5-3b-10` 라벨은 6033fd29 와 충돌 — 본 plan 에서는 5-3b-11 로 등록. 잔여 ~11 파일은 5-3b-12 이후.
 - 5-3b-12 subscription_list_screen 10 사이트 (2026-04-29) — AppBar 타이틀 + _createPlaceholderMembership instrument + 수강권 0건 빈 상태(title/body 인터폴레이션) + 멤버십 0건 빈 상태(title/body/CTA) + 에러 상태 + lessonClass 로딩/에러 className fallback 2건. 신규 키 7개 (subscriptionListAppBarTitle, noSubscriptionsRegisteredTitle, noSubscriptionsRegisteredBody 포매터, noLessonsRegisteredTitle, noLessonsRegisteredBody, teacherSearchButton, lessonClassErrorFallback) + 재사용 3건 (instrumentFallback, errorOccurred, individualLesson). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `b5910c66` (키) + `07dcc311` (마이그레이션). 잔여 ~10 파일은 5-3b-13 이후.
-- 5-3b 잔여 subscription 화면·repository·mock (~10 파일)
+- 5-3b-13 issue_subscription_screen 10 사이트 (2026-04-29) — 보너스 reason 비교('기타') + AppBar(단건/일괄 분기, 일괄 composite) + 변경/취소 가능 횟수 섹션(제목·설명) + 정책 안내 2건(matches/override composite) + ChoiceChip 라벨(불가/N회) + 하단 발급 버튼(단건/일괄 분기, 일괄 composite) + _PolicyBadge 라벨(기본/조정됨). 신규 키 9개 (batchSubscriptionAppBarTitle/batchIssueButtonLabel 포매터, rescheduleAllowanceTitle/Description/MatchesPolicy/OverridePolicy/None, policyBadgeDefault/Custom) + 재사용 4건 (issueFormBonusReasonOther, proposalTitle × 2, usageCountShort). 신규 키는 456b381a(parallel sweep)에 이미 추가됨. subscription 63/63 PASS, flutter analyze — No issues. 커밋 `105d6195` (마이그레이션). 잔여 ~9 파일은 5-3b-14 이후.
+- 5-3b 잔여 subscription 화면·repository·mock (~9 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -294,7 +295,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-10 issue_subscription_actions i18n (10 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-11 proposal_confirm_screen i18n (12 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-12 subscription_list_screen i18n (10 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-13 subscription 화면·repository (~10 파일 분할) | 대기 |
+| P2 5-3b-13 issue_subscription_screen i18n (10 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-14 subscription 화면·repository (~9 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
