@@ -3650,4 +3650,28 @@ class AppStrings {
 
   /// 확인 요청 메시지를 보냈습니다 (Inquiry 전송 후 snackbar)
   static const inquiryMessageSent = '확인 요청 메시지를 보냈습니다';
+
+  // -- Subscription List Screen (학생 수강권 목록 5-3b-12) --
+
+  /// 내 수강권 (AppBar 타이틀)
+  static const subscriptionListAppBarTitle = '내 수강권';
+
+  /// 등록된 수강권이 없습니다 (수강권 0건 빈 상태 타이틀)
+  static const noSubscriptionsRegisteredTitle = '등록된 수강권이 없습니다';
+
+  /// $count개의 레슨에 등록되어 있습니다.\n선생님에게 수강권 발급을 요청하세요. (수강권 0건 본문)
+  static String noSubscriptionsRegisteredBody(int count) =>
+      '$count개의 레슨에 등록되어 있습니다.\n선생님에게 수강권 발급을 요청하세요.';
+
+  /// 등록된 레슨이 없습니다 (멤버십 0건 빈 상태 타이틀)
+  static const noLessonsRegisteredTitle = '등록된 레슨이 없습니다';
+
+  /// 선생님에게 초대를 요청하거나\n체험 레슨을 신청하세요. (멤버십 0건 본문)
+  static const noLessonsRegisteredBody = '선생님에게 초대를 요청하거나\n체험 레슨을 신청하세요.';
+
+  /// 선생님 찾기 (멤버십 0건 CTA 버튼)
+  static const teacherSearchButton = '선생님 찾기';
+
+  /// 레슨 (lessonClass 로딩 실패 시 className fallback)
+  static const lessonClassErrorFallback = '레슨';
 }
