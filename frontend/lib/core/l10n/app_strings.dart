@@ -3805,4 +3805,27 @@ class AppStrings {
   /// $selected/$max개 선택 (선택 카운터 포매터)
   static String proposalCreateSelectedCountFormat(int selected, int max) =>
       '$selected/$max개 선택';
+
+  // -- Renewal Detail Screen (수강권 갱신 제안 5-3b-16) --
+
+  /// 수강권 갱신 제안 (AppBar 타이틀)
+  static const renewalProposalAppBarTitle = '수강권 갱신 제안';
+
+  /// 수강권을 선택하세요 (템플릿 선택 헤더 — 갱신 컨텍스트)
+  static const renewalSelectTemplatePrompt = '수강권을 선택하세요';
+
+  /// $name이 수강권 갱신을 제안했어요 (헤더 포매터)
+  static String renewalProposedByFormat(String name) => '$name이 수강권 갱신을 제안했어요';
+
+  /// 지난번과 동일한 수강권입니다 ("Same as before" 힌트)
+  static const renewalSameAsPreviousHint = '지난번과 동일한 수강권입니다';
+
+  /// 수강권 선택하기 (Primary CTA)
+  static const renewalSelectButton = '수강권 선택하기';
+
+  /// 나중에 할게요 (Decline 버튼)
+  static const renewalDeclineLater = '나중에 할게요';
+
+  /// 다음에 다시 안내해 드릴게요 (거절 SnackBar)
+  static const renewalDeclineSnackbar = '다음에 다시 안내해 드릴게요';
 }
