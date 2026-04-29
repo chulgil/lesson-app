@@ -3009,6 +3009,84 @@ class AppStrings {
   /// 사유를 직접 입력해주세요 (custom 사유 hint)
   static const issueFormBonusReasonCustomHint = '사유를 직접 입력해주세요';
 
+  // -- Issue Form Summary Widgets (수강권 발급 요약 카드 5-3b-6) --
+
+  /// 발급 요약 (요약 카드 제목)
+  static const issueFormSummaryTitle = '발급 요약';
+
+  /// 배치 발급 요약 (배치 요약 카드 제목)
+  static const issueFormSummaryBatchTitle = '배치 발급 요약';
+
+  /// 유형 (요약 행 라벨)
+  static const issueFormSummaryTypeLabel = '유형';
+
+  /// 결제금액 (요약 행 라벨)
+  static const issueFormSummaryFinalAmountLabel = '결제금액';
+
+  /// 금액 (요약 행 라벨)
+  static const issueFormSummaryAmountLabel = '금액';
+
+  /// 결제 (요약 행 라벨)
+  static const issueFormSummaryPaymentLabel = '결제';
+
+  /// 만료일 (요약 행 라벨)
+  static const issueFormSummaryEndDateLabel = '만료일';
+
+  /// 미결제 (후불) (결제 미확인 시 표기)
+  static const issueFormSummaryUnpaidLabel = '미결제 (후불)';
+
+  /// $method (확인됨) (결제 확인 시 표기)
+  static String issueFormSummaryPaymentConfirmed(String method) =>
+      '$method (확인됨)';
+
+  /// -$amount ($percent%) (할인 요약 표기)
+  static String issueFormSummaryDiscountValue(String amount, int percent) =>
+      '-$amount ($percent%)';
+
+  /// +$bonus회 ($reason) 또는 +$bonus회 (보너스 요약 표기)
+  static String issueFormSummaryBonusValue(int bonus, String? reason) =>
+      reason != null ? '+$bonus회 ($reason)' : '+$bonus회';
+
+  /// $deadline시간 전까지 · 월 $allowance회 (정책 변경/취소 요약)
+  static String issueFormSummaryPolicyChangeLine(int deadline, int allowance) =>
+      '$deadline시간 전까지 · 월 $allowance회';
+
+  /// 체험 (1회) (수강권 유형 표시)
+  static const issueFormSummaryLessonsTrial = '체험 (1회)';
+
+  /// 회차제 ($total + $bonus회, $days일) (보너스 포함 패키지 표시)
+  static String issueFormSummaryLessonsPackageWithBonus(
+    int total,
+    int bonus,
+    int days,
+  ) => '회차제 ($total + $bonus회, $days일)';
+
+  /// 회차제 ($total회, $days일) (패키지 표시)
+  static String issueFormSummaryLessonsPackage(int total, int days) =>
+      '회차제 ($total회, $days일)';
+
+  /// 월정액 ($months개월) (월정액 표시)
+  static String issueFormSummaryLessonsMonthly(int months) => '월정액 ($months개월)';
+
+  /// $count명의 학생에게 동일한 수강권을 발급합니다 (배치 배너 제목)
+  static String issueFormBatchBannerTitle(int count) =>
+      '$count명의 학생에게 동일한 수강권을 발급합니다';
+
+  /// 각 학생에게 개별 수강권이 생성됩니다 (배치 배너 본문)
+  static const issueFormBatchBannerBody = '각 학생에게 개별 수강권이 생성됩니다';
+
+  /// 발급 대상 (배치 요약 라벨)
+  static const issueFormBatchTargetLabel = '발급 대상';
+
+  /// $count명 (배치 학생 수 표기)
+  static String issueFormBatchStudentCount(int count) => '$count명';
+
+  /// 개인당 금액 (배치 요약 라벨)
+  static const issueFormBatchPerPersonLabel = '개인당 금액';
+
+  /// 총 예상 금액 (배치 요약 라벨)
+  static const issueFormBatchTotalLabel = '총 예상 금액';
+
   // ─── Subscription entities (P2 5-3b-2) ───────────────────────
 
   // LessonPolicy summaries
@@ -3286,4 +3364,18 @@ class AppStrings {
 
   /// 스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다 (travel time helper)
   static const travelTimeDescription = '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다';
+
+  // -- Expiring Subscriptions Screen (수강권 임박 화면 5-3b-6) --
+
+  /// N명의 학생 (subtitle: count of students with expiring subscriptions)
+  static String studentsCountSubtitle(int n) => '$n명의 학생';
+
+  /// 학생 #ID (fallback when student name is unknown)
+  static String studentNameFallback(String idShort) => '학생 $idShort';
+
+  /// 확인이 필요한 수강권이 없습니다 (empty state title)
+  static const expiringEmptyTitle = '확인이 필요한 수강권이 없습니다';
+
+  /// 모든 학생의 수강권이 정상입니다 (empty state body)
+  static const expiringEmptyBody = '모든 학생의 수강권이 정상입니다';
 }
