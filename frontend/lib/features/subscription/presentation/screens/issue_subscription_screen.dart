@@ -137,7 +137,7 @@ class _IssueSubscriptionScreenState
   @override
   String? get effectiveBonusReason {
     if (_bonusLessons == 0) return null;
-    if (_bonusReason == '기타') {
+    if (_bonusReason == AppStrings.issueFormBonusReasonOther) {
       return _customBonusReason.isNotEmpty ? _customBonusReason : null;
     }
     return _bonusReason;
@@ -204,8 +204,10 @@ class _IssueSubscriptionScreenState
       appBar: AppBar(
         title: Text(
           widget.isBatchMode
-              ? '수강권 발급 (${widget.studentIds.length}명)'
-              : '수강권 발급',
+              ? AppStrings.batchSubscriptionAppBarTitle(
+                widget.studentIds.length,
+              )
+              : AppStrings.proposalTitle,
         ),
         centerTitle: true,
       ),
@@ -539,7 +541,10 @@ class _IssueSubscriptionScreenState
           children: [
             // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
             // 로 통일 (§7.17).
-            Text('변경/취소 가능 횟수', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.rescheduleAllowanceTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
             if (policy != null) ...[
               const SizedBox(width: AppSpacing.space2),
               _PolicyBadge(isDefault: matchesPolicy),
@@ -548,7 +553,7 @@ class _IssueSubscriptionScreenState
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.',
+          AppStrings.rescheduleAllowanceDescription,
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -557,8 +562,13 @@ class _IssueSubscriptionScreenState
           const SizedBox(height: AppSpacing.space1),
           Text(
             matchesPolicy
-                ? '선생님 기본 정책: ${policy.changePolicySummary} (이 수강권에서 개별 조정 가능)'
-                : '선생님 기본 정책 ${policy.changePolicySummary} → 이 수강권만 $_rescheduleAllowance회로 재설정',
+                ? AppStrings.rescheduleAllowanceMatchesPolicy(
+                  policy.changePolicySummary,
+                )
+                : AppStrings.rescheduleAllowanceOverridePolicy(
+                  policy.changePolicySummary,
+                  _rescheduleAllowance,
+                ),
             style: AppTypography.bodySmall.copyWith(
               color:
                   matchesPolicy ? AppColors.paperAccent : AppColors.inkTertiary,
@@ -573,7 +583,11 @@ class _IssueSubscriptionScreenState
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.space2),
                 child: ChoiceChip(
-                  label: Text(count == 0 ? '불가' : '$count회'),
+                  label: Text(
+                    count == 0
+                        ? AppStrings.rescheduleAllowanceNone
+                        : AppStrings.usageCountShort(count),
+                  ),
                   selected: _rescheduleAllowance == count,
                   onSelected:
                       (_) => setState(() => _rescheduleAllowance = count),
@@ -704,8 +718,8 @@ class _IssueSubscriptionScreenState
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           child: Text(
             widget.isBatchMode
-                ? '${widget.studentIds.length}명에게 수강권 발급'
-                : '수강권 발급',
+                ? AppStrings.batchIssueButtonLabel(widget.studentIds.length)
+                : AppStrings.proposalTitle,
           ),
         ),
       ),
@@ -765,7 +779,9 @@ class _PolicyBadge extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
-        isDefault ? '기본 정책' : '개별 조정됨',
+        isDefault
+            ? AppStrings.policyBadgeDefault
+            : AppStrings.policyBadgeCustom,
         style: AppTypography.caption.copyWith(
           color: color,
           fontWeight: FontWeight.w600,
