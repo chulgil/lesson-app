@@ -108,6 +108,12 @@ class AppStrings {
   /// 다시 시도 버튼 (에러 재시도)
   static const retry = '다시 시도';
 
+  /// 좋아요 OFF 라벨 (선생님 토글 버튼, 미평가 상태)
+  static const practiceLikeOff = '좋아요';
+
+  /// 좋아요 ON 라벨 (도장 찍힘, 선생님 평가 완료 상태)
+  static const practiceLikeOn = '좋음';
+
   /// 취소 버튼
   static const cancel = '취소';
 
@@ -1801,4 +1807,114 @@ class AppStrings {
 
   /// 수강권 상세 화면은 준비 중입니다 (TODO placeholder)
   static const subscriptionDetailComingSoon = '수강권 상세 화면은 준비 중입니다';
+
+  // ── Request Completion (신청 완료 화면) ─────────────────
+  /// 신청 완료 (AppBar)
+  static const requestSubmittedTitle = '신청 완료';
+
+  /// $teacherName 선생님에게 요청을 보냈습니다 (success header subtitle)
+  static String requestSentToTeacherWithName(String teacherName) =>
+      '$teacherName 선생님에게 요청을 보냈습니다';
+
+  /// 진행 단계 가이드 (section title)
+  static const progressStepGuide = '진행 단계 가이드';
+
+  /// 선생님에게 요청이 전송되었습니다 (step 1 desc)
+  static const stepRequestSentDesc = '선생님에게 요청이 전송되었습니다';
+
+  /// 선생님이 시간 확인 (step 2 title)
+  static const stepTeacherChecking = '선생님이 시간 확인';
+
+  /// 희망 시간을 검토 중입니다 (step 2 desc)
+  static const stepTeacherCheckingDesc = '희망 시간을 검토 중입니다';
+
+  /// 시간 확정 후 입금 (step 3 title)
+  static const stepPaymentAfterConfirm = '시간 확정 후 입금';
+
+  /// 확정된 시간에 맞춰 입금합니다 (step 3 desc)
+  static const stepPaymentAfterConfirmDesc = '확정된 시간에 맞춰 입금합니다';
+
+  /// 선생님이 수강권 발급 (step 4 title)
+  static const stepSubscriptionIssued = '선생님이 수강권 발급';
+
+  /// 수강권이 발급되면 알림을 보내드립니다 (step 4 desc)
+  static const stepSubscriptionIssuedDesc = '수강권이 발급되면 알림을 보내드립니다';
+
+  /// 레슨 시작! (step 5 title)
+  static const stepLessonStart = '레슨 시작!';
+
+  /// 첫 레슨을 즐겨보세요 (step 5 desc)
+  static const stepLessonStartDesc = '첫 레슨을 즐겨보세요';
+
+  /// 신청 정보 요약 (section title)
+  static const requestInfoSummary = '신청 정보 요약';
+
+  /// 희망시간 (summary row label)
+  static const preferredTimeLabel = '희망시간';
+
+  /// $n순위 (priority rank)
+  static String priorityRank(int n) => '$n순위';
+
+  /// (미선택) (empty slot placeholder)
+  static const notSelectedParen = '(미선택)';
+
+  /// 메인으로 가기 (home button)
+  static const goToMain = '메인으로 가기';
+
+  // ── Unified Lesson Request (통합 레슨 신청) ─────────────
+  /// 재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다 (returning student banner)
+  static const returningStudentBanner = '재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다';
+
+  /// 레슨 목표 (section title)
+  static const lessonGoalLabel = '레슨 목표';
+
+  /// 경험 수준 (section title)
+  static const experienceLevelLabel = '경험 수준';
+
+  /// 희망 레슨 시간 (section title)
+  static const preferredLessonTimeLabel = '희망 레슨 시간';
+
+  /// 메시지 (section title)
+  static const messageLabel = '메시지';
+
+  /// (선택) (optional indicator)
+  static const optionalParen = '(선택)';
+
+  /// 선생님께 전달할 메시지를 입력하세요 (text field hint)
+  static const messageHintToTeacher = '선생님께 전달할 메시지를 입력하세요';
+
+  /// 참고 레슨비 (price section label)
+  static const referencePriceLabel = '참고 레슨비';
+
+  /// $price원 / 회 (price per session)
+  static String pricePerSession(String price) => '$price원 / 회';
+
+  /// 악기를 선택해주세요 (validation error)
+  static const validationSelectInstrument = '악기를 선택해주세요';
+
+  /// 희망 레슨 시간을 1개 이상 선택해주세요 (validation error)
+  static const validationSelectPreferredTime = '희망 레슨 시간을 1개 이상 선택해주세요';
+
+  /// 신청 전송에 실패했습니다. 다시 시도해주세요. (submit error)
+  static const requestSubmitFailedRetry = '신청 전송에 실패했습니다. 다시 시도해주세요.';
+
+  // ── My Bookings (내 레슨 예약) ─────────────────────────
+  /// 내 레슨 예약 (AppBar)
+  static const myBookingsTitle = '내 레슨 예약';
+
+  /// 변경/취소: $remaining/$total회 (subscription header inline)
+  static String rescheduleUsageInline(int remaining, int total) =>
+      '변경/취소: $remaining/$total회';
+
+  /// 예약된 레슨이 없습니다 (empty title)
+  static const noBookings = '예약된 레슨이 없습니다';
+
+  /// 새로운 레슨을 예약해보세요 (empty subtitle)
+  static const bookNewLesson = '새로운 레슨을 예약해보세요';
+
+  /// 변경 (reschedule short button)
+  static const rescheduleShort = '변경';
+
+  /// 변경/취소 횟수를 모두 사용했습니다 (limit reached note)
+  static const rescheduleQuotaUsedUp = '변경/취소 횟수를 모두 사용했습니다';
 }

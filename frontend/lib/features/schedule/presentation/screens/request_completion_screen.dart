@@ -40,12 +40,24 @@ class RequestCompletionScreen extends StatelessWidget {
   static const _steps = [
     _StepData(
       title: AppStrings.requestCompleteTitle,
-      description: '선생님에게 요청이 전송되었습니다',
+      description: AppStrings.stepRequestSentDesc,
     ),
-    _StepData(title: '선생님이 시간 확인', description: '희망 시간을 검토 중입니다'),
-    _StepData(title: '시간 확정 후 입금', description: '확정된 시간에 맞춰 입금합니다'),
-    _StepData(title: '선생님이 수강권 발급', description: '수강권이 발급되면 알림을 보내드립니다'),
-    _StepData(title: '레슨 시작!', description: '첫 레슨을 즐겨보세요'),
+    _StepData(
+      title: AppStrings.stepTeacherChecking,
+      description: AppStrings.stepTeacherCheckingDesc,
+    ),
+    _StepData(
+      title: AppStrings.stepPaymentAfterConfirm,
+      description: AppStrings.stepPaymentAfterConfirmDesc,
+    ),
+    _StepData(
+      title: AppStrings.stepSubscriptionIssued,
+      description: AppStrings.stepSubscriptionIssuedDesc,
+    ),
+    _StepData(
+      title: AppStrings.stepLessonStart,
+      description: AppStrings.stepLessonStartDesc,
+    ),
   ];
 
   @override
@@ -53,7 +65,7 @@ class RequestCompletionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
-        title: const Text('신청 완료'),
+        title: const Text(AppStrings.requestSubmittedTitle),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -92,7 +104,7 @@ class RequestCompletionScreen extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
-          '${params.teacherName} 선생님에게 요청을 보냈습니다',
+          AppStrings.requestSentToTeacherWithName(params.teacherName),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -119,7 +131,7 @@ class RequestCompletionScreen extends StatelessWidget {
         children: [
           // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
           Text(
-            '진행 단계 가이드',
+            AppStrings.progressStepGuide,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.ink,
             ),
@@ -252,19 +264,22 @@ class RequestCompletionScreen extends StatelessWidget {
         children: [
           // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
           Text(
-            '신청 정보 요약',
+            AppStrings.requestInfoSummary,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          _buildSummaryRow('선생님', params.teacherName),
-          _buildSummaryRow('악기', params.instrument),
-          _buildSummaryRow('유형', params.lessonType.label),
-          _buildSummaryRow('레슨시간', '${params.duration}분'),
+          _buildSummaryRow(AppStrings.teacher, params.teacherName),
+          _buildSummaryRow(AppStrings.instrumentFallback, params.instrument),
+          _buildSummaryRow(AppStrings.typeLabel, params.lessonType.label),
+          _buildSummaryRow(
+            AppStrings.lessonDurationLabel,
+            AppStrings.durationMinutesValue(params.duration),
+          ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '희망시간',
+            AppStrings.preferredTimeLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -279,7 +294,7 @@ class RequestCompletionScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    '${slot.priority}순위',
+                    AppStrings.priorityRank(slot.priority),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
@@ -302,7 +317,9 @@ class RequestCompletionScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    '${params.preferredSlots.length + i + 1}순위',
+                    AppStrings.priorityRank(
+                      params.preferredSlots.length + i + 1,
+                    ),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.scheduleMutedAccent,
                       fontWeight: FontWeight.w600,
@@ -310,7 +327,7 @@ class RequestCompletionScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '(미선택)',
+                    AppStrings.notSelectedParen,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.scheduleMutedAccent,
                     ),
@@ -365,7 +382,7 @@ class RequestCompletionScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(),
         ),
-        child: const Text('메인으로 가기'),
+        child: const Text(AppStrings.goToMain),
       ),
     );
   }
