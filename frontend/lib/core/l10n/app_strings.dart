@@ -2162,4 +2162,61 @@ class AppStrings {
 
   /// 레슨 수정에 실패했습니다. 다시 시도해주세요. (edit failure)
   static const editLessonFailedRetry = '레슨 수정에 실패했습니다. 다시 시도해주세요.';
+
+  // ── Quick Feedback (빠른 피드백 화면 30차) ─
+
+  /// 피드백 (quick feedback screen title)
+  static const feedbackTitle = '피드백';
+
+  /// 레슨을 찾을 수 없습니다 (lesson not found body)
+  static const lessonNotFound = '레슨을 찾을 수 없습니다';
+
+  /// {name} 피드백 (app bar title with student name)
+  static String studentFeedbackTitle(String name) => '$name 피드백';
+
+  /// 레슨 피드백 (section header)
+  static const lessonFeedbackSection = '레슨 피드백';
+
+  /// 주요 포인트 (section header)
+  static const keyPointsSection = '주요 포인트';
+
+  /// 연습 팁 (section header)
+  static const practiceTipsSection = '연습 팁';
+
+  /// 저장하기 (save action button)
+  static const saveAction = '저장하기';
+
+  /// {date} {time} 레슨 (lesson header line 1)
+  static String lessonAtDateTime(String date, String time) => '$date $time 레슨';
+
+  /// {instrument} · {duration}분 (lesson header line 2)
+  static String instrumentDurationSubtitle(String instrument, int duration) =>
+      '$instrument · $duration분';
+
+  /// 프리셋 추가 (preset add dialog title)
+  static const presetAddTitle = '프리셋 추가';
+
+  /// 피드백 문구 입력 (preset text hint)
+  static const presetTextHint = '피드백 문구 입력';
+
+  /// 숨기기 (preset hide action)
+  static const presetHide = '숨기기';
+
+  /// 기본 프리셋은 숨김 처리됩니다 (default preset hide description)
+  static const presetHideDescription = '기본 프리셋은 숨김 처리됩니다';
+
+  /// 이 프리셋을 삭제합니다 (preset delete description)
+  static const presetDeleteDescription = '이 프리셋을 삭제합니다';
+
+  /// 연습할 때 주의할 점을 적어주세요... (practice tips field hint)
+  static const practiceTipsHint = '연습할 때 주의할 점을 적어주세요...';
+
+  /// ✅ 피드백이 저장되었습니다 (feedback saved snackbar)
+  static const feedbackSavedSnack = '✅ 피드백이 저장되었습니다';
+
+  /// 피드백 저장 실패 (feedback save error snackbar)
+  static const feedbackSaveFailed = '피드백 저장 실패';
+
+  /// 포인트 추가... (key point input hint)
+  static const keyPointAddHint = '포인트 추가...';
 }
