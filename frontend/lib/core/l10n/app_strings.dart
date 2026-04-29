@@ -3797,4 +3797,12 @@ class AppStrings {
 
   /// 제안 실패. 다시 시도해주세요. (제안 실패 SnackBar)
   static const proposalCreateFailMessage = '제안 실패. 다시 시도해주세요.';
+
+  /// $name을 추천으로 지정했습니다 (추천 지정 SnackBar 포매터)
+  static String proposalCreateRecommendedDesignatedFormat(String name) =>
+      '$name을 추천으로 지정했습니다';
+
+  /// $selected/$max개 선택 (선택 카운터 포매터)
+  static String proposalCreateSelectedCountFormat(int selected, int max) =>
+      '$selected/$max개 선택';
 }

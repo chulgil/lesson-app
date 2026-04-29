@@ -326,7 +326,11 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${template.name}을 추천으로 지정했습니다'),
+                            content: Text(
+                              AppStrings.proposalCreateRecommendedDesignatedFormat(
+                                template.name,
+                              ),
+                            ),
                             duration: const Duration(seconds: 1),
                             backgroundColor: AppColors.paperAccent,
                           ),
@@ -349,7 +353,10 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.space1),
             child: Text(
-              '${_selectedTemplateIds.length}/$kMaxTemplateSelections개 선택',
+              AppStrings.proposalCreateSelectedCountFormat(
+                _selectedTemplateIds.length,
+                kMaxTemplateSelections,
+              ),
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkSecondary,
               ),
