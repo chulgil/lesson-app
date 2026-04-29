@@ -238,7 +238,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-5 location_travel_selector 18 사이트 (2026-04-29) — 위치 5종 chip label + 주소 5종(읽기/입력/로딩/실패) + 이동시간 4종 키 신설. 신규 키 16개 (`locationStudentHomeLabel` 등) + 재사용 3건 (`academy`, `lessonLocationLabel`, `durationMinutesValue`). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `2d628cca`. 잔여 ~17 파일은 5-3b-6 이후.
 - 5-3b-6 issue_form_summary_widgets 22 사이트 (2026-04-29) — SubscriptionSummaryCard + BatchSummaryCard + BatchInfoBanner + AppliedPolicySection. 신규 키 17개 (issueFormSummaryTitle/BatchTitle, TypeLabel, FinalAmountLabel, AmountLabel, PaymentLabel, EndDateLabel, UnpaidLabel, PaymentConfirmed/DiscountValue/BonusValue/PolicyChangeLine 포매터, LessonsTrial/Package/PackageWithBonus/Monthly, BatchBannerTitle/Body, BatchTargetLabel, BatchStudentCount, BatchPerPersonLabel, BatchTotalLabel) + 재사용 8건 (policyApplied/ChangeCancel/NoShow/Carryover, issueFormAmountSection/Discount/Bonus/StartDate). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `5382bb70` (키) + `98873d88` (마이그레이션).
 - 5-3b-6+ expiring_subscriptions_screen 7 사이트 (2026-04-29) — AppBar 3 사이트(loading/error/data) + 학생 수 부제 + 에러 메시지 + 학생 이름 fallback + 빈 상태(title/body) + 발급 버튼. 신규 키 4개(studentsCountSubtitle, studentNameFallback, expiringEmptyTitle, expiringEmptyBody)는 5382bb70 에 이미 존재. 재사용 3건 (subscriptionViewAction, errorTryAgain, issueSubscriptionButton). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `b71e4b53`. 잔여 ~16 파일은 5-3b-7 이후.
-- 5-3b 잔여 subscription 발급폼/제안 화면·서비스·repository (~16 파일)
+- 5-3b-7 proposal_card_widgets 26 사이트 (2026-04-29) — ProposalStatusBanner 5 + ProposalHeaderCard 1 + ProposalDetailsCard 4 + ProposalMessageCard 1 + ProposalDiscountCard 4 + _formatPrice 3 + ProposalPaymentInfoCard 6 + _PaymentInfoRow 2 + ProposalWaitingCard 3. 신규 키 26개 (proposalBanner 5종, proposalHeaderSubtitle, proposalDetailsLessons/Duration/Validity, proposalMessageCardLabel, proposalDiscountReason/Final, proposalPriceManwon/ManRemainder/Won, proposalPaymentBank/Info/AccountNumber/Holder/Change/Copied/Copy 7종, proposalWaitingTitle/Body/ContactCta) + 재사용 5건 (issueFormSummaryAmountLabel, durationMinutesValue, issueFormValidityTitle, issueFormAmountSectionTitle, issueFormDiscountTitle). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `f22c1675` (키) + `cd586ed5` (마이그레이션). 잔여 ~15 파일은 5-3b-8 이후.
+- 5-3b 잔여 subscription 발급폼/제안 화면·서비스·repository (~15 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -282,7 +283,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-5 location_travel_selector i18n (18 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-6 issue_form_summary_widgets i18n (22 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-6+ expiring_subscriptions_screen i18n (7 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-7 subscription 화면·서비스·repository (~16 파일 분할) | 대기 |
+| P2 5-3b-7 proposal_card_widgets i18n (26 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-8 subscription 화면·서비스·repository (~15 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
