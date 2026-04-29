@@ -23,7 +23,7 @@ class ProposalConfirmScreen extends ConsumerStatefulWidget {
   const ProposalConfirmScreen({
     super.key,
     required this.teacherId,
-    this.teacherName = '선생님', // 🆕 Default value
+    this.teacherName = AppStrings.teacher, // 🆕 Default value
   });
 
   @override
@@ -41,10 +41,13 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('입금 확인'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.paymentConfirm),
+        centerTitle: true,
+      ),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
         data: (proposals) {
           if (proposals.isEmpty) {
             return _buildEmptyState();
@@ -74,14 +77,14 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '입금 확인 대기 중인 제안이 없습니다',
+            AppStrings.proposalConfirmEmptyTitle,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '학생이 입금 완료를 알리면 여기에 표시됩니다',
+            AppStrings.proposalConfirmEmptyBody,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -121,10 +124,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
               // Student name
               Expanded(
                 child: studentAsync.when(
-                  loading: () => const Text('로딩중...'),
-                  error: (e, st) => const Text('학생 정보 오류'),
+                  loading: () => const Text(AppStrings.loadingText),
+                  error: (e, st) => const Text(AppStrings.studentInfoError),
                   data: (student) {
-                    if (student == null) return const Text('알 수 없는 학생');
+                    if (student == null) {
+                      return const Text(AppStrings.unknownStudent);
+                    }
                     return Row(
                       children: [
                         CircleAvatar(
@@ -149,7 +154,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                                 ),
                               ),
                               Text(
-                                '입금 알림: ${_formatDateTime(proposal.paymentNotifiedAt)}',
+                                AppStrings.proposalPaymentNotificationFormat(
+                                  _formatDateTime(proposal.paymentNotifiedAt),
+                                ),
                                 style: AppTypography.caption.copyWith(
                                   color: AppColors.inkTertiary,
                                 ),
@@ -170,9 +177,11 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           // Template info
           templateAsync.when(
             loading: () => const LinearProgressIndicator(),
-            error: (_, __) => const Text('오류가 발생했습니다.'),
+            error: (_, __) => Text('${AppStrings.errorOccurred}.'),
             data: (template) {
-              if (template == null) return const Text('템플릿을 찾을 수 없습니다');
+              if (template == null) {
+                return const Text(AppStrings.templateNotFound);
+              }
               return _buildTemplateInfo(template, proposal);
             },
           ),
@@ -219,7 +228,11 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '${template.totalLessons}회 · ${template.lessonDurationMinutes}분 · ${template.formattedValidity}',
+                  AppStrings.proposalTemplateSummaryFormat(
+                    template.totalLessons,
+                    template.lessonDurationMinutes,
+                    template.formattedValidity,
+                  ),
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -268,7 +281,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
-            child: const Text('입금 미확인'),
+            child: const Text(AppStrings.paymentUnverifiedAction),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -288,7 +301,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                    : const Text('입금 확인 → 수강권 발급'),
+                    : const Text(AppStrings.paymentVerifyToIssueButton),
           ),
         ),
       ],
@@ -345,7 +358,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('수강권이 발급되었습니다'),
+            content: Text(AppStrings.subscriptionIssuedMessage),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -357,7 +370,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -376,8 +389,8 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('입금 미확인'),
-            content: const Text('입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까?'),
+            title: const Text(AppStrings.paymentUnverifiedAction),
+            content: const Text(AppStrings.paymentInquiryDialogBody),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -385,7 +398,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('메시지 보내기'),
+                child: const Text(AppStrings.sendMessage),
               ),
             ],
           ),
@@ -393,9 +406,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
 
     if (result == true && mounted) {
       // TODO: Send inquiry message notification
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('확인 요청 메시지를 보냈습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.inquiryMessageSent)),
+      );
     }
   }
 
@@ -405,11 +418,11 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}분 전';
+      return AppStrings.timeAgoMinutes(diff.inMinutes);
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}시간 전';
+      return AppStrings.timeAgoHours(diff.inHours);
     } else {
-      return '${diff.inDays}일 전';
+      return AppStrings.timeAgoDays(diff.inDays);
     }
   }
 
