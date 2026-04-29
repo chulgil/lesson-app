@@ -81,7 +81,10 @@ class EditLessonStudentCard extends StatelessWidget {
             ),
           ),
           if (onViewProfile != null)
-            TextButton(onPressed: onViewProfile, child: const Text('프로필 보기')),
+            TextButton(
+              onPressed: onViewProfile,
+              child: const Text(AppStrings.viewProfileAction),
+            ),
         ],
       ),
     );
@@ -108,14 +111,12 @@ class LessonActionButtons extends StatelessWidget {
             onPressed: onCancel,
             icon: Icon(Icons.event_busy, color: AppColors.paperAccent),
             label: Text(
-              '레슨 취소',
+              AppStrings.actionLessonCancel,
               style: TextStyle(color: AppColors.paperAccent),
             ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(
-                color: AppColors.paperAccent,
-              ),
+              side: BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),
@@ -125,14 +126,12 @@ class LessonActionButtons extends StatelessWidget {
             onPressed: onDelete,
             icon: Icon(Icons.delete_outline, color: AppColors.paperAccent),
             label: Text(
-              '레슨 삭제',
+              AppStrings.deleteLessonTitle,
               style: TextStyle(color: AppColors.paperAccent),
             ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(
-                color: AppColors.paperAccent,
-              ),
+              side: BorderSide(color: AppColors.paperAccent),
             ),
           ),
         ),
@@ -153,12 +152,12 @@ void showCancelLessonDialog({
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('레슨 취소'),
+          title: const Text(AppStrings.actionLessonCancel),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('이 레슨을 취소하시겠습니까?'),
+              const Text(AppStrings.cancelLessonConfirm),
               const SizedBox(height: AppSpacing.space4),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
@@ -167,7 +166,7 @@ void showCancelLessonDialog({
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$studentName 학생',
+                      AppStrings.studentNameSuffix(studentName),
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -183,7 +182,7 @@ void showCancelLessonDialog({
               ),
               const SizedBox(height: AppSpacing.space4),
               Text(
-                '학생에게 레슨 취소 알림이 전송됩니다.',
+                AppStrings.cancelLessonNotificationNotice,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -193,7 +192,7 @@ void showCancelLessonDialog({
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('닫기'),
+              child: const Text(AppStrings.closeAction),
             ),
             TextButton(
               onPressed: () {
@@ -203,7 +202,7 @@ void showCancelLessonDialog({
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.paperAccent,
               ),
-              child: const Text('레슨 취소'),
+              child: const Text(AppStrings.actionLessonCancel),
             ),
           ],
         ),
@@ -219,11 +218,8 @@ void showDeleteLessonDialog({
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('레슨 삭제'),
-          content: const Text(
-            '이 레슨을 삭제하시겠습니까?\n\n'
-            '삭제된 레슨은 복구할 수 없습니다.',
-          ),
+          title: const Text(AppStrings.deleteLessonTitle),
+          content: const Text(AppStrings.deleteLessonNoRestoreConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -259,12 +255,12 @@ void showEditLessonExitConfirmation({
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('변경사항 취소'),
-          content: const Text('변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?'),
+          title: const Text(AppStrings.cancelChangesTitle),
+          content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('계속 수정'),
+              child: const Text(AppStrings.continueEditing),
             ),
             TextButton(
               onPressed: () {
@@ -274,7 +270,7 @@ void showEditLessonExitConfirmation({
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.paperAccent,
               ),
-              child: const Text('나가기'),
+              child: const Text(AppStrings.exitAction),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -125,9 +126,9 @@ class _ResourceChip extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('링크를 열 수 없습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.cannotOpenLink)),
+        );
       }
     }
   }
@@ -158,7 +159,7 @@ class ResourceAttachmentEditor extends ConsumerWidget {
             Icon(Icons.attach_file, size: 16, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space1),
             Text(
-              '학습 자료 (${resourceIds.length})',
+              AppStrings.learningResourceCount(resourceIds.length),
               style: AppTypography.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -278,7 +279,7 @@ class _AddResourceButton extends ConsumerWidget {
     return OutlinedButton.icon(
       onPressed: () => _showAddOptions(context, ref),
       icon: const Icon(Icons.add, size: 18),
-      label: const Text('자료 첨부'),
+      label: const Text(AppStrings.attachResource),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 40),
         foregroundColor: AppColors.inkSecondary,
@@ -305,14 +306,17 @@ class _AddResourceButton extends ConsumerWidget {
                   ),
                   // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
                   // 패턴. Playfair appBarTitle 로 통일.
-                  Text('학습 자료 추가', style: NotebookTypography.appBarTitle),
+                  Text(
+                    AppStrings.addLearningResourceTitle,
+                    style: NotebookTypography.appBarTitle,
+                  ),
                   const SizedBox(height: AppSpacing.space4),
 
                   // From library
                   _buildOption(
                     ctx,
                     icon: Icons.folder_outlined,
-                    label: '라이브러리에서 선택',
+                    label: AppStrings.selectFromLibrary,
                     onTap: () {
                       Navigator.pop(ctx);
                       _showLibraryPicker(context, ref);
@@ -323,7 +327,7 @@ class _AddResourceButton extends ConsumerWidget {
                   _buildOption(
                     ctx,
                     icon: Icons.play_circle_outline,
-                    label: '유튜브 링크 추가',
+                    label: AppStrings.addYoutubeLink,
                     color: AppColors.youtubeRed,
                     onTap: () {
                       Navigator.pop(ctx);
@@ -391,7 +395,7 @@ class _AddResourceButton extends ConsumerWidget {
                           // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
                           // 패턴. Playfair appBarTitle 로 통일.
                           Text(
-                            '내 학습 자료',
+                            AppStrings.myLearningResources,
                             style: NotebookTypography.appBarTitle,
                           ),
                         ],
@@ -404,7 +408,7 @@ class _AddResourceButton extends ConsumerWidget {
                           if (resources.isEmpty) {
                             return Center(
                               child: Text(
-                                '등록된 자료가 없습니다',
+                                AppStrings.noResourcesRegistered,
                                 style: AppTypography.bodyMedium.copyWith(
                                   color: AppColors.inkSecondary,
                                 ),
@@ -453,7 +457,7 @@ class _AddResourceButton extends ConsumerWidget {
                         error:
                             (_, __) => Center(
                               child: Text(
-                                '자료를 불러올 수 없습니다',
+                                AppStrings.resourceLoadFailed,
                                 style: AppTypography.bodyMedium.copyWith(
                                   color: AppColors.paperAccent,
                                 ),

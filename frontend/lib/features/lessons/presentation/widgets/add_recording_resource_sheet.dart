@@ -59,7 +59,10 @@ class _AddRecordingResourceSheetState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('시범 연주 녹음 추가', style: NotebookTypography.appBarTitle),
+                Text(
+                  AppStrings.addRecordingResourceTitle,
+                  style: NotebookTypography.appBarTitle,
+                ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -98,7 +101,7 @@ class _AddRecordingResourceSheetState
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
-                      _selectedFileName ?? '탭하여 오디오 파일 선택',
+                      _selectedFileName ?? AppStrings.tapToSelectAudioFile,
                       style: AppTypography.bodyMedium.copyWith(
                         color:
                             _selectedFilePath != null
@@ -109,7 +112,7 @@ class _AddRecordingResourceSheetState
                     ),
                     if (_selectedFilePath == null)
                       Text(
-                        'm4a, mp3, wav 지원',
+                        AppStrings.audioFileSupportedFormats,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.inkTertiary,
                         ),
@@ -124,8 +127,8 @@ class _AddRecordingResourceSheetState
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                labelText: '제목',
-                hintText: '예: 바흐 미뉴에트 G장조 시범연주',
+                labelText: AppStrings.titleLabel,
+                hintText: AppStrings.recordingTitleHint,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -135,8 +138,8 @@ class _AddRecordingResourceSheetState
             TextField(
               controller: _memoController,
               decoration: const InputDecoration(
-                labelText: '메모 (학생에게 표시)',
-                hintText: '연습 포인트를 적어주세요',
+                labelText: AppStrings.memoStudentVisibleLabel,
+                hintText: AppStrings.practicePointHint,
                 border: OutlineInputBorder(),
               ),
               maxLines: 2,
@@ -193,9 +196,9 @@ class _AddRecordingResourceSheetState
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('파일을 선택할 수 없습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.cannotSelectFile)),
+        );
       }
     }
   }
@@ -224,9 +227,9 @@ class _AddRecordingResourceSheetState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음 추가에 실패했습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.recordingAddFailed)),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

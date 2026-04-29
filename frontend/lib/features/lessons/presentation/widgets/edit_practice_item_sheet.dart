@@ -79,12 +79,15 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               Row(
                 children: [
                   // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-                  Text('연습 수정', style: NotebookTypography.sectionTitle),
+                  Text(
+                    AppStrings.editPracticeItemTitle,
+                    style: NotebookTypography.sectionTitle,
+                  ),
                   const Spacer(),
                   TextButton(
                     onPressed: _isSubmitting ? null : _delete,
                     child: Text(
-                      '삭제',
+                      AppStrings.delete,
                       style: TextStyle(color: AppColors.paperAccent),
                     ),
                   ),
@@ -105,7 +108,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
-                          '학생이 이미 연습한 과제입니다',
+                          AppStrings.practiceItemAlreadyDoneWarning,
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.ink,
                           ),
@@ -119,7 +122,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
               // Title
               Text(
-                '제목',
+                AppStrings.titleLabel,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -135,7 +138,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
               // Description
               Text(
-                '설명 (선택)',
+                AppStrings.descriptionOptional,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -183,9 +186,9 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   Future<void> _submit() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('제목을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.enterTitleValidation)),
+      );
       return;
     }
 
@@ -207,15 +210,15 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('연습이 수정되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.practiceItemUpdated)),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
       }
     } finally {
       if (mounted) {
@@ -229,8 +232,8 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('연습 삭제'),
-            content: const Text('이 연습을 삭제하시겠습니까?'),
+            title: const Text(AppStrings.deletePracticeItemTitle),
+            content: const Text(AppStrings.deletePracticeItemConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -255,15 +258,15 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('연습이 삭제되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.practiceItemDeleted)),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
       }
     } finally {
       if (mounted) {

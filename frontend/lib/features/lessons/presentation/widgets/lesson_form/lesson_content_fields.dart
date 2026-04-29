@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 
@@ -22,8 +23,8 @@ class LessonContentFields extends StatelessWidget {
         TextFormField(
           controller: pieceController,
           decoration: InputDecoration(
-            labelText: '레슨 곡',
-            hintText: '레슨할 곡이나 내용을 입력하세요',
+            labelText: AppStrings.lessonSongLabel,
+            hintText: AppStrings.lessonContentHint,
             prefixIcon: const Icon(Icons.music_note),
             border: const OutlineInputBorder(),
             filled: true,
@@ -37,8 +38,8 @@ class LessonContentFields extends StatelessWidget {
         TextFormField(
           controller: notesController,
           decoration: InputDecoration(
-            labelText: '메모',
-            hintText: '레슨 시 참고할 내용을 입력하세요',
+            labelText: AppStrings.memoLabel,
+            hintText: AppStrings.lessonNoteHint,
             prefixIcon: const Icon(Icons.note_alt_outlined),
             border: const OutlineInputBorder(),
             filled: true,

@@ -80,7 +80,7 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
                       );
                     },
                     icon: const Icon(Icons.library_books_outlined, size: 18),
-                    label: const Text('템플릿에서'),
+                    label: const Text(AppStrings.fromTemplate),
                   ),
                 ],
               ),
@@ -93,7 +93,7 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
                 maxLines: 4,
                 autofocus: true,
                 decoration: const InputDecoration(
-                  hintText: '직접 입력하세요...',
+                  hintText: AppStrings.manualInputHint,
                   border: OutlineInputBorder(),
                 ),
               ),

@@ -71,12 +71,15 @@ class _TipTemplateBottomSheetState
                 child: Row(
                   children: [
                     // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-                    Text('템플릿 선택', style: NotebookTypography.sectionTitle),
+                    Text(
+                      AppStrings.templatePickerTitle,
+                      style: NotebookTypography.sectionTitle,
+                    ),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: () => _showAddTemplateDialog(context),
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('새 템플릿'),
+                      label: const Text(AppStrings.newTemplateButton),
                     ),
                   ],
                 ),
@@ -90,7 +93,7 @@ class _TipTemplateBottomSheetState
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: '템플릿 검색...',
+                    hintText: AppStrings.templateSearchHint,
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon:
                         _searchQuery.isNotEmpty
@@ -123,7 +126,7 @@ class _TipTemplateBottomSheetState
                     horizontal: AppSpacing.screenPadding,
                   ),
                   children: [
-                    _buildCategoryChip(null, '전체'),
+                    _buildCategoryChip(null, AppStrings.all),
                     ...TipCategory.values.map(
                       (cat) => _buildCategoryChip(cat, cat.label),
                     ),
@@ -189,7 +192,7 @@ class _TipTemplateBottomSheetState
                   Icon(Icons.star, size: 18, color: AppColors.paperAccent),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '자주 사용',
+                    AppStrings.frequentlyUsed,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
@@ -248,9 +251,7 @@ class _TipTemplateBottomSheetState
                       horizontal: 6,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccentSoft,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       template.category.label,
                       style: AppTypography.caption.copyWith(
@@ -261,7 +262,7 @@ class _TipTemplateBottomSheetState
                   ),
                   const Spacer(),
                   Text(
-                    '${template.usageCount}회',
+                    AppStrings.usageCountShort(template.usageCount),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkTertiary,
                     ),
@@ -312,7 +313,7 @@ class _TipTemplateBottomSheetState
                 Icon(Icons.search_off, size: 48, color: AppColors.inkTertiary),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '검색 결과가 없습니다',
+                  AppStrings.searchNoResults,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -347,7 +348,7 @@ class _TipTemplateBottomSheetState
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '템플릿을 불러오는데 실패했습니다',
+                  AppStrings.templateLoadFailed,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -379,9 +380,7 @@ class _TipTemplateBottomSheetState
                       horizontal: 8,
                       vertical: 4,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccentSoft,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       template.category.label,
                       style: AppTypography.caption.copyWith(
@@ -423,7 +422,7 @@ class _TipTemplateBottomSheetState
               if (template.usageCount > 0) ...[
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  '${template.usageCount}회 사용됨',
+                  AppStrings.usageCountUsed(template.usageCount),
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -446,7 +445,7 @@ class _TipTemplateBottomSheetState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('템플릿 사용 기록에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.templateUsageRecordFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -469,7 +468,7 @@ class _TipTemplateBottomSheetState
           (context) => StatefulBuilder(
             builder: (context, setDialogState) {
               return AlertDialog(
-                title: const Text('새 템플릿 추가'),
+                title: const Text(AppStrings.addNewTemplateTitle),
                 content: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -479,13 +478,13 @@ class _TipTemplateBottomSheetState
                         controller: contentController,
                         maxLines: 3,
                         decoration: const InputDecoration(
-                          hintText: '템플릿 내용을 입력하세요',
+                          hintText: AppStrings.templateContentHint,
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space4),
                       Text(
-                        '카테고리',
+                        AppStrings.categoryLabel,
                         style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -533,7 +532,9 @@ class _TipTemplateBottomSheetState
                       if (context.mounted) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('템플릿이 추가되었습니다')),
+                          const SnackBar(
+                            content: Text(AppStrings.templateAdded),
+                          ),
                         );
                       }
                     },

@@ -58,7 +58,10 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('외부 링크 추가', style: NotebookTypography.appBarTitle),
+                Text(
+                  AppStrings.addExternalLinkTitle,
+                  style: NotebookTypography.appBarTitle,
+                ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -71,8 +74,8 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             TextField(
               controller: _urlController,
               decoration: InputDecoration(
-                labelText: 'URL',
-                hintText: 'https://...',
+                labelText: AppStrings.urlLabel,
+                hintText: AppStrings.externalLinkUrlHint,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(
                   Icons.link,
@@ -95,8 +98,8 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                labelText: '제목',
-                hintText: '예: 바이올린 활잡기 영상',
+                labelText: AppStrings.titleLabel,
+                hintText: AppStrings.externalLinkTitleHint,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -106,8 +109,8 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             TextField(
               controller: _memoController,
               decoration: const InputDecoration(
-                labelText: '메모 (학생에게 표시)',
-                hintText: '참고할 내용을 적어주세요',
+                labelText: AppStrings.memoStudentVisibleLabel,
+                hintText: AppStrings.referenceContentHint,
                 border: OutlineInputBorder(),
               ),
               maxLines: 2,
@@ -117,9 +120,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             // Hint
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Row(
                 children: [
                   const Icon(
@@ -130,7 +131,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '악보, 강의 영상, 참고 자료 등 모든 URL을 추가할 수 있습니다',
+                      AppStrings.externalLinkInfoHint,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.paperAccent,
                       ),
@@ -199,9 +200,9 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('링크 추가에 실패했습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.externalLinkAddFailed)),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

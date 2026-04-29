@@ -53,7 +53,7 @@ class PracticeItemsSection extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
-                    '데이터를 불러오는데 실패했습니다',
+                    AppStrings.loadDataFailed,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -119,7 +119,9 @@ class PracticeItemsSection extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            isTeacher ? '이번 주 연습 과제를 추가해보세요' : '아직 연습 과제가 없습니다',
+            isTeacher
+                ? AppStrings.practiceItemEmptyTeacher
+                : AppStrings.practiceItemEmptyStudent,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -130,7 +132,7 @@ class PracticeItemsSection extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () => _showAddItemDialog(context, ref),
               icon: const Icon(Icons.add),
-              label: const Text('연습 추가'),
+              label: const Text(AppStrings.addPracticeItemTitle),
             ),
           ],
         ],
@@ -178,13 +180,13 @@ class PracticeItemsSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '이번 주 연습',
+                  AppStrings.weeklyPracticeLabel,
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '$completed / $total 완료',
+                  AppStrings.practiceCompletionFraction(completed, total),
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -265,7 +267,7 @@ class PracticeItemsSection extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.space2),
                     child: Text(
-                      '${item.practiceCount}회',
+                      AppStrings.practiceCountTimes(item.practiceCount),
                       style: AppTypography.caption.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.inkSecondary,
@@ -318,7 +320,7 @@ class PracticeItemsSection extends ConsumerWidget {
     return OutlinedButton.icon(
       onPressed: () => _showAddItemDialog(context, ref),
       icon: const Icon(Icons.add),
-      label: const Text('연습 추가'),
+      label: const Text(AppStrings.addPracticeItemTitle),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 48),
       ),

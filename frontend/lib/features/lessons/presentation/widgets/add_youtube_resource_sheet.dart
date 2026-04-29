@@ -132,16 +132,19 @@ class _AddYoutubeResourceSheetState
               ),
 
               // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-              Text('유튜브 영상 추가', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.addYoutubeResourceTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space4),
 
               // URL input
-              _buildLabel('URL'),
+              _buildLabel(AppStrings.urlLabel),
               TextField(
                 controller: _urlController,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
-                  hintText: 'https://youtube.com/watch?v=...',
+                  hintText: AppStrings.youtubeUrlHint,
                   prefixIcon: const Icon(Icons.link, size: 20),
                   border: const OutlineInputBorder(),
                 ),
@@ -187,7 +190,7 @@ class _AddYoutubeResourceSheetState
                             ),
                             const SizedBox(width: AppSpacing.space2),
                             Text(
-                              'URL 확인됨',
+                              AppStrings.urlConfirmed,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.paperOk,
                                 fontWeight: FontWeight.w600,
@@ -203,11 +206,11 @@ class _AddYoutubeResourceSheetState
               ],
 
               // Title
-              _buildLabel('제목'),
+              _buildLabel(AppStrings.titleLabel),
               TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  hintText: '예: 힐러리 한 - 바흐 파르티타',
+                  hintText: AppStrings.youtubeTitleHint,
                   border: const OutlineInputBorder(),
                 ),
               ),
@@ -217,7 +220,7 @@ class _AddYoutubeResourceSheetState
               Row(
                 children: [
                   Text(
-                    '재생 구간',
+                    AppStrings.playSectionLabel,
                     style: AppTypography.bodySmall.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -239,7 +242,7 @@ class _AddYoutubeResourceSheetState
                     // Start time
                     Expanded(
                       child: _buildTimeInput(
-                        label: '시작',
+                        label: AppStrings.rangeStart,
                         minController: _startMinController,
                         secController: _startSecController,
                       ),
@@ -253,7 +256,7 @@ class _AddYoutubeResourceSheetState
                     // End time
                     Expanded(
                       child: _buildTimeInput(
-                        label: '종료 (선택)',
+                        label: AppStrings.timeEndOptionalLabel,
                         minController: _endMinController,
                         secController: _endSecController,
                       ),
@@ -265,12 +268,12 @@ class _AddYoutubeResourceSheetState
 
               // Memo
               const SizedBox(height: AppSpacing.space2),
-              _buildLabel('메모 (학생에게 표시)'),
+              _buildLabel(AppStrings.memoStudentVisibleLabel),
               TextField(
                 controller: _memoController,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  hintText: '예: 1:32~2:05 구간의 보잉 방향 전환을 관찰하세요',
+                  hintText: AppStrings.youtubeMemoHint,
                   border: const OutlineInputBorder(),
                 ),
               ),
@@ -332,7 +335,7 @@ class _AddYoutubeResourceSheetState
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: '분',
+                    hintText: AppStrings.minuteLabel,
                     hintStyle: AppTypography.caption.copyWith(
                       color: AppColors.inkTertiary,
                     ),
@@ -360,7 +363,7 @@ class _AddYoutubeResourceSheetState
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: '초',
+                    hintText: AppStrings.secondLabel,
                     hintStyle: AppTypography.caption.copyWith(
                       color: AppColors.inkTertiary,
                     ),
@@ -385,23 +388,23 @@ class _AddYoutubeResourceSheetState
     final title = _titleController.text.trim();
 
     if (url.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('유튜브 URL을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.enterYoutubeUrlValidation)),
+      );
       return;
     }
 
     if (_parsedVideoId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('올바른 유튜브 URL을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.invalidYoutubeUrlValidation)),
+      );
       return;
     }
 
     if (title.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('제목을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.enterTitleValidation)),
+      );
       return;
     }
 
@@ -435,15 +438,15 @@ class _AddYoutubeResourceSheetState
       if (mounted) {
         widget.onResourceCreated?.call(resource);
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('유튜브 영상이 추가되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.youtubeResourceAdded)),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
       }
     } finally {
       if (mounted) {

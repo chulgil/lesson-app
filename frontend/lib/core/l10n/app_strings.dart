@@ -2466,4 +2466,408 @@ class AppStrings {
 
   /// 연습 팁이 저장되었습니다 (practice tip saved snack)
   static const practiceTipSaved = '연습 팁이 저장되었습니다';
+
+  // ── Lesson Resource Widgets (레슨 자료 위젯 30차 5-2c-5) ─
+
+  // -- Edit Practice Item Sheet --
+
+  /// 연습 수정 (edit practice item sheet title)
+  static const editPracticeItemTitle = '연습 수정';
+
+  /// 학생이 이미 연습한 과제입니다 (already-completed practice warning)
+  static const practiceItemAlreadyDoneWarning = '학생이 이미 연습한 과제입니다';
+
+  /// 제목 (title input label)
+  static const titleLabel = '제목';
+
+  /// 제목을 입력해주세요 (title required validation)
+  static const enterTitleValidation = '제목을 입력해주세요';
+
+  /// 연습이 수정되었습니다 (practice item updated snack)
+  static const practiceItemUpdated = '연습이 수정되었습니다';
+
+  /// 연습 삭제 (delete practice item dialog title)
+  static const deletePracticeItemTitle = '연습 삭제';
+
+  /// 이 연습을 삭제하시겠습니까? (delete practice item confirm)
+  static const deletePracticeItemConfirm = '이 연습을 삭제하시겠습니까?';
+
+  /// 연습이 삭제되었습니다 (practice item deleted snack)
+  static const practiceItemDeleted = '연습이 삭제되었습니다';
+
+  // -- Add YouTube Resource Sheet --
+
+  /// 유튜브 영상 추가 (add youtube resource sheet title)
+  static const addYoutubeResourceTitle = '유튜브 영상 추가';
+
+  /// URL (URL label)
+  static const urlLabel = 'URL';
+
+  /// https://youtube.com/watch?v=... (youtube url hint)
+  static const youtubeUrlHint = 'https://youtube.com/watch?v=...';
+
+  /// URL 확인됨 (url confirmed badge)
+  static const urlConfirmed = 'URL 확인됨';
+
+  /// 예: 힐러리 한 - 바흐 파르티타 (youtube title hint)
+  static const youtubeTitleHint = '예: 힐러리 한 - 바흐 파르티타';
+
+  /// 재생 구간 (play section label)
+  static const playSectionLabel = '재생 구간';
+
+  /// 종료 (선택) (time end optional label)
+  static const timeEndOptionalLabel = '종료 (선택)';
+
+  /// 메모 (학생에게 표시) (memo student-visible label)
+  static const memoStudentVisibleLabel = '메모 (학생에게 표시)';
+
+  /// 예: 1:32~2:05 구간의 보잉 방향 전환을 관찰하세요 (youtube memo hint)
+  static const youtubeMemoHint = '예: 1:32~2:05 구간의 보잉 방향 전환을 관찰하세요';
+
+  /// 분 (minute hint)
+  static const minuteLabel = '분';
+
+  /// 초 (second hint)
+  static const secondLabel = '초';
+
+  /// 유튜브 URL을 입력해주세요 (enter youtube url validation)
+  static const enterYoutubeUrlValidation = '유튜브 URL을 입력해주세요';
+
+  /// 올바른 유튜브 URL을 입력해주세요 (invalid youtube url validation)
+  static const invalidYoutubeUrlValidation = '올바른 유튜브 URL을 입력해주세요';
+
+  /// 유튜브 영상이 추가되었습니다 (youtube resource added snack)
+  static const youtubeResourceAdded = '유튜브 영상이 추가되었습니다';
+
+  // -- Add Recording Resource Sheet --
+
+  /// 시범 연주 녹음 추가 (add recording resource sheet title)
+  static const addRecordingResourceTitle = '시범 연주 녹음 추가';
+
+  /// 탭하여 오디오 파일 선택 (tap to select audio file)
+  static const tapToSelectAudioFile = '탭하여 오디오 파일 선택';
+
+  /// m4a, mp3, wav 지원 (audio file supported formats)
+  static const audioFileSupportedFormats = 'm4a, mp3, wav 지원';
+
+  /// 예: 바흐 미뉴에트 G장조 시범연주 (recording title hint)
+  static const recordingTitleHint = '예: 바흐 미뉴에트 G장조 시범연주';
+
+  /// 연습 포인트를 적어주세요 (practice point hint)
+  static const practicePointHint = '연습 포인트를 적어주세요';
+
+  /// 파일을 선택할 수 없습니다 (cannot select file snack)
+  static const cannotSelectFile = '파일을 선택할 수 없습니다';
+
+  /// 녹음 추가에 실패했습니다 (recording add failed snack)
+  static const recordingAddFailed = '녹음 추가에 실패했습니다';
+
+  // -- Add External Link Sheet --
+
+  /// 외부 링크 추가 (add external link sheet title)
+  static const addExternalLinkTitle = '외부 링크 추가';
+
+  /// https://... (generic url hint)
+  static const externalLinkUrlHint = 'https://...';
+
+  /// 예: 바이올린 활잡기 영상 (external link title hint)
+  static const externalLinkTitleHint = '예: 바이올린 활잡기 영상';
+
+  /// 참고할 내용을 적어주세요 (reference content hint)
+  static const referenceContentHint = '참고할 내용을 적어주세요';
+
+  /// 악보, 강의 영상, 참고 자료 등 모든 URL을 추가할 수 있습니다 (external link info hint)
+  static const externalLinkInfoHint = '악보, 강의 영상, 참고 자료 등 모든 URL을 추가할 수 있습니다';
+
+  /// 링크 추가에 실패했습니다 (external link add failed snack)
+  static const externalLinkAddFailed = '링크 추가에 실패했습니다';
+
+  // -- Practice Items Section --
+
+  /// 이번 주 연습 과제를 추가해보세요 (teacher empty state)
+  static const practiceItemEmptyTeacher = '이번 주 연습 과제를 추가해보세요';
+
+  /// 아직 연습 과제가 없습니다 (student empty state)
+  static const practiceItemEmptyStudent = '아직 연습 과제가 없습니다';
+
+  /// 이번 주 연습 (weekly practice summary label)
+  static const weeklyPracticeLabel = '이번 주 연습';
+
+  /// {completed} / {total} 완료 (practice completion fraction)
+  static String practiceCompletionFraction(int completed, int total) =>
+      '$completed / $total 완료';
+
+  /// {n}회 (practice count times)
+  static String practiceCountTimes(int n) => '$n회';
+
+  // -- Resource Attachment Section --
+
+  /// 자료 첨부 (attach resource button)
+  static const attachResource = '자료 첨부';
+
+  /// 학습 자료 추가 (add learning resource sheet title)
+  static const addLearningResourceTitle = '학습 자료 추가';
+
+  /// 라이브러리에서 선택 (select from library option)
+  static const selectFromLibrary = '라이브러리에서 선택';
+
+  /// 유튜브 링크 추가 (add youtube link option)
+  static const addYoutubeLink = '유튜브 링크 추가';
+
+  /// 내 학습 자료 (my learning resources sheet title)
+  static const myLearningResources = '내 학습 자료';
+
+  /// 등록된 자료가 없습니다 (no resources registered)
+  static const noResourcesRegistered = '등록된 자료가 없습니다';
+
+  /// 자료를 불러올 수 없습니다 (resource load failed)
+  static const resourceLoadFailed = '자료를 불러올 수 없습니다';
+
+  /// 링크를 열 수 없습니다 (url launcher error)
+  static const cannotOpenLink = '링크를 열 수 없습니다';
+
+  /// 학습 자료 (N) — 첨부된 자료 개수 라벨
+  static String learningResourceCount(int count) => '학습 자료 ($count)';
+
+  // ── Lesson Form / Edit Dialogs (레슨 작성/편집 30차 5-2c-5) ─────
+
+  /// 작성 취소 (lesson form exit confirm title)
+  static const cancelWritingTitle = '작성 취소';
+
+  /// 입력한 내용이 저장되지 않습니다 — 정말 나가시겠습니까?
+  static const exitWithoutSavingConfirm = '입력한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?';
+
+  /// 계속 작성 (continue writing action)
+  static const continueWriting = '계속 작성';
+
+  /// 나가기 (exit action)
+  static const exitAction = '나가기';
+
+  /// 변경사항 취소 (cancel changes confirm title)
+  static const cancelChangesTitle = '변경사항 취소';
+
+  /// 변경한 내용이 저장되지 않습니다 — 정말 나가시겠습니까?
+  static const exitChangesWithoutSavingConfirm =
+      '변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?';
+
+  /// 계속 수정 (continue editing action)
+  static const continueEditing = '계속 수정';
+
+  /// 프로필 보기 (view profile action)
+  static const viewProfileAction = '프로필 보기';
+
+  /// 닫기 (close action)
+  static const closeAction = '닫기';
+
+  /// 레슨 곡 (lesson content field label)
+  static const lessonSongLabel = '레슨 곡';
+
+  /// 레슨할 곡이나 내용을 입력하세요 (lesson content hint)
+  static const lessonContentHint = '레슨할 곡이나 내용을 입력하세요';
+
+  /// 메모 (memo field label)
+  static const memoLabel = '메모';
+
+  /// 레슨 시 참고할 내용을 입력하세요 (lesson note hint)
+  static const lessonNoteHint = '레슨 시 참고할 내용을 입력하세요';
+
+  // -- Tip Template Bottom Sheet (팁 템플릿 바텀시트) --
+
+  /// 템플릿 선택 (template picker title)
+  static const templatePickerTitle = '템플릿 선택';
+
+  /// 새 템플릿 (new template button)
+  static const newTemplateButton = '새 템플릿';
+
+  /// 템플릿 검색... (template search hint)
+  static const templateSearchHint = '템플릿 검색...';
+
+  /// 템플릿 사용 기록에 실패했습니다. 다시 시도해주세요.
+  static const templateUsageRecordFailed = '템플릿 사용 기록에 실패했습니다. 다시 시도해주세요.';
+
+  /// 새 템플릿 추가 (add new template title)
+  static const addNewTemplateTitle = '새 템플릿 추가';
+
+  /// 템플릿 내용을 입력하세요 (template content hint)
+  static const templateContentHint = '템플릿 내용을 입력하세요';
+
+  /// 템플릿이 추가되었습니다 (template added snackbar)
+  static const templateAdded = '템플릿이 추가되었습니다';
+
+  /// 템플릿에서 (from template button)
+  static const fromTemplate = '템플릿에서';
+
+  /// 직접 입력하세요... (manual input hint)
+  static const manualInputHint = '직접 입력하세요...';
+
+  /// {name} 학생 (student suffix label in dialogs)
+  static String studentNameSuffix(String name) => '$name 학생';
+
+  /// 학생에게 레슨 취소 알림이 전송됩니다.
+  static const cancelLessonNotificationNotice = '학생에게 레슨 취소 알림이 전송됩니다.';
+
+  /// 이 레슨을 삭제하시겠습니까?\n\n삭제된 레슨은 복구할 수 없습니다.
+  static const deleteLessonNoRestoreConfirm =
+      '이 레슨을 삭제하시겠습니까?\n\n삭제된 레슨은 복구할 수 없습니다.';
+
+  /// 자주 사용 (frequently used templates section header)
+  static const frequentlyUsed = '자주 사용';
+
+  /// 카테고리 (category label)
+  static const categoryLabel = '카테고리';
+
+  /// 템플릿을 불러오는데 실패했습니다 (template list load error)
+  static const templateLoadFailed = '템플릿을 불러오는데 실패했습니다';
+
+  /// {N}회 (template usage count short label)
+  static String usageCountShort(int count) => '$count회';
+
+  /// {N}회 사용됨 (template usage count long label)
+  static String usageCountUsed(int count) => '$count회 사용됨';
+
+  // ── Subscription Domain (수강권 도메인 30차 5-3a) ─────────────────
+
+  // -- Expiry Monitor (수강권 만료 알림) --
+
+  /// 수강권 만료 임박 (D-day 알림 제목)
+  static String subscriptionExpiringTitle(int daysLeft) =>
+      '수강권이 $daysLeft일 후 만료됩니다';
+
+  /// 수강권 만료 임박 본문 (남은 횟수 안내 + CTA)
+  static String subscriptionExpiringBody(int remaining) =>
+      '남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
+
+  /// 수강권 확인 (액션 라벨)
+  static const subscriptionViewAction = '수강권 확인';
+
+  /// 수강권 횟수 모두 소진 (low lessons 알림 제목)
+  static const subscriptionLessonsExhaustedTitle = '수강권 횟수를 모두 사용했습니다';
+
+  /// 수강권 1회 남음 (low lessons 알림 제목)
+  static const subscriptionLastLessonTitle = '수강권이 마지막 1회 남았습니다';
+
+  /// 갱신 요청 안내 본문 (low lessons / expired 공용)
+  static const subscriptionRenewalRequestBody = '갱신 요청을 보내 레슨을 이어가세요';
+
+  /// 갱신 요청 (액션 라벨)
+  static const subscriptionRenewalAction = '갱신 요청';
+
+  /// 수강권 만료 (이미 만료된 알림 제목)
+  static const subscriptionExpiredTitle = '수강권이 만료되었습니다';
+
+  // -- Proposal Reminder (제안 리마인더 알림) --
+
+  /// 24h 리마인더 제목
+  static const proposalReminder24hTitle = '수강권 제안이 기다리고 있어요';
+
+  /// 24h 리마인더 본문
+  static const proposalReminder24hBody = '선생님의 수강권 제안을 확인해보세요.';
+
+  /// 48h 리마인더 제목
+  static const proposalReminder48hTitle = '수강권 제안 확인이 필요해요';
+
+  /// 48h 리마인더 본문
+  static const proposalReminder48hBody = '선생님의 수강권 제안을 아직 확인하지 않으셨어요.';
+
+  /// 72h 리마인더 제목 (할인 종료 경고)
+  static const proposalReminder72hTitleDiscount = '⏰ 특별 할인이 곧 종료됩니다!';
+
+  /// 72h 리마인더 제목 (일반)
+  static const proposalReminder72hTitleNoDiscount = '수강권 제안 마지막 알림';
+
+  /// 72h 리마인더 본문 (할인 종료 경고)
+  static const proposalReminder72hBodyDiscount = '할인 혜택이 곧 종료됩니다. 지금 확인하세요!';
+
+  /// 72h 리마인더 본문 (일반)
+  static const proposalReminder72hBodyNoDiscount = '선생님의 수강권 제안을 확인해주세요.';
+
+  /// 제안 확인하기 (액션 라벨)
+  static const proposalReminderAction = '제안 확인하기';
+
+  // -- Skip Reason Dialog (제안 스킵 다이얼로그) --
+
+  /// 이번엔 스킵 (다이얼로그 제목)
+  static const skipProposalTitle = '이번엔 스킵';
+
+  /// 스킵 확인 본문
+  static const skipProposalContent = '이번 제안을 스킵하시겠습니까?\n나중에 다시 제안받을 수 있어요.';
+
+  /// 사유 (선택) (입력 필드 라벨)
+  static const skipReasonLabel = '사유 (선택)';
+
+  /// 선생님께 전달할 메시지 (입력 필드 힌트)
+  static const skipReasonHint = '선생님께 전달할 메시지';
+
+  /// 스킵하기 (확인 버튼)
+  static const skipProposalAction = '스킵하기';
+
+  // -- Template Choice Card (수강권 템플릿 카드) --
+
+  /// 추천 (배지)
+  static const templateRecommendedBadge = '추천';
+
+  /// 가격 · 유효 N일 (가격 + 유효기간 한 줄)
+  static String templatePriceValidity({
+    required String price,
+    required int days,
+  }) => '$price  ·  유효 $days일';
+
+  /// 주 1회 기준 약 N개월 (사용 기간 추정)
+  static String templateMonthlyEstimate(String monthsLabel) =>
+      '주 1회 기준 약 $monthsLabel개월';
+
+  /// 회당 가격 (단가 라벨)
+  static String templateUnitPriceLabel(String price) => '회당 $price';
+
+  /// 선택하기 (수락 버튼)
+  static const templateChooseButton = '선택하기';
+
+  // -- Subscription Policy Sheet (적용 정책 바텀시트) --
+
+  /// 적용 정책 (시트 제목)
+  static const policyAppliedTitle = '적용 정책';
+
+  /// 변경 / 취소 (정책 항목 라벨)
+  static const policyChangeCancelLabel = '변경 / 취소';
+
+  /// 노쇼 (정책 항목 라벨)
+  static const policyNoShowLabel = '노쇼';
+
+  /// 이월 (정책 항목 라벨)
+  static const policyCarryoverLabel = '이월';
+
+  /// 변경/취소 정책 요약 (마감시간/월 한도/잔여)
+  static String policyChangeSummary({
+    required int deadlineHours,
+    required int totalAllowance,
+    required int remaining,
+  }) => '$deadlineHours시간 전까지 · 월 $totalAllowance회 (남은 $remaining회)';
+
+  /// 정책 적용 시점 안내 푸터
+  static const policyAppliedFooter =
+      '수강권 발급 시점의 정책이 적용됩니다. 선생님이 이후 정책을 변경해도 이 수강권에는 영향을 주지 않습니다.';
+
+  // -- Issue Form Type Options (수강권 발급 폼 타입 옵션) --
+
+  /// 회차 (패키지 회차 입력 라벨)
+  static const issueFormLessonsTitle = '회차';
+
+  /// 회 (회차 단위)
+  static const issueFormLessonsSuffix = '회';
+
+  /// 유효기간 (유효기간 입력 라벨)
+  static const issueFormValidityTitle = '유효기간';
+
+  /// 일 (유효기간 단위)
+  static const issueFormValiditySuffix = '일';
+
+  /// 기간 선택 (월정기 옵션 섹션 제목)
+  static const issueFormMonthlySectionTitle = '기간 선택';
+
+  /// N개월 (월정기 칩 라벨)
+  static String issueFormMonthsLabel(int months) => '$months개월';
+
+  /// 체험 레슨 안내
+  static const issueFormTrialNotice =
+      '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.';
 }
