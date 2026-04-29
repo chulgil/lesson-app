@@ -65,15 +65,35 @@
 | flutter analyze | ✅ 0 issues |
 | 훅 동작 (post-migration) | ✅ 0건 경고 (마이그레이션 완료 확인) |
 
-## Phase 3+ (추후 분할 — 도메인별)
+## Phase 3 — 시그니처 영역 잔재 감사 (완료, 마이그레이션 0건)
 
-시그니처 영역 점진 마이그레이션. 도메인별 PR 분리. 각 PR 5-15 파일 단위.
+**감사 일자**: 2026-04-29
+**범위**: §9.4 정의 5개 시그니처 패턴 전수 스캔
 
-### Phase 3 후보 (시그니처 영역 잔존 Icons.* 스캔 결과)
+| 패턴 | 잔재 | 결과 |
+|------|------|------|
+| `core/widgets/notebook/**.dart` | 0건 (notebook_glyph.dart 자체 docstring 제외) | ✅ |
+| `core/widgets/empty_state_widget.dart` | 0건 | ✅ |
+| `**/widgets/*_stamp.dart` | 0건 (Phase 2 like_stamp 마이그레이션 후) | ✅ |
+| `**/widgets/*_masthead.dart` | 0건 | ✅ |
+| `**/widgets/*empty_state*.dart` | 0건 | ✅ |
 
-> Phase 2 종료 시점 스캔 — `notebook_glyph.dart` 자체 제외, navigation/utility 후보 식별.
+**결론**: 시그니처 영역 `Icons.*` 잔재 = **0건**. §9.7 로드맵 "최종 — 시그니처 영역 Icons.* 잔재 0건" 조기 달성. 정책 게이트(check-notebook-icon.sh)가 회귀 방지.
 
-확정 후보 도메인: practice 스탬프 / lesson 마스트헤드 / empty-state 위젯 / parent 손글씨 영역 (구체 파일은 Phase 3 진입 시 grep 으로 확정).
+### 별도 결정 게이트 (사용자 확인 필요)
+
+다음은 §9 정책상 강제 대상이 **아니나** 사용자 우려 영역과 인접하므로 별도 결정 필요:
+
+1. **시그니처 영역 외부 emoji 30+ 건** (`🎵` `⭐` 등) — schedule/auth/practice/profile/subscription 도메인
+   - 현재 정책: §9.8 NotebookGlyph 상수 추가만 금지, 일반 영역 사용은 미강제
+   - 결정 필요: 노트북×스코어 적용 화면(홈, 프로필, 학생카드 등) 의 emoji 도 시그니처로 간주할지
+   - 후속 작업 시: 도메인별 grep → 시그니처 vs 일반 분류 → 마이그레이션 PR
+
+2. **시그니처 패턴 확장** (예: `*_card.dart`, `*_section.dart` 중 노트북×스코어 적용 카드)
+   - 현재 정책: 강제하지 않음 (A2 선택적 강제)
+   - 결정 필요: 훅 적용 범위 확장 여부
+
+이 2 항목은 본 Phase 3 종결 후 별도 plan/이슈로 분기.
 
 ## 평가 결과 (Phase 1 자체 채점)
 
