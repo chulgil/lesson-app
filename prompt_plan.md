@@ -199,7 +199,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-1h booking_reschedule_screen 완료 (2026-04-29) — 17 신규 키 + 4 재사용 (cancel, cannotLoadData, rescheduleUsageStatusWithColon, rescheduleNoMoreAfter), 20 사이트, schedule scope 237/237 PASS
 - 5-1i schedule_tab + lesson_requests + request_detail 완료 (2026-04-29) — 10 신규 키 + 7 재사용 (retry, lessonComplete, statusCompleted, actionLessonCancel, cancel, goBack, errorOccurred), 20 사이트, schedule scope 237/237 PASS
 - 5-1j request_completion + unified_lesson_request + my_bookings 완료 (2026-04-29) — 30 신규 키 + 7 재사용 (requestCompleteTitle, lessonTypeLabel, instrumentFallback, teacher, durationMinutesValue, cannotLoadData, statusCompleted, cancel), 30 사이트, schedule scope 237/237 PASS
-- 5-2 lessons 도메인
+- 5-2a teacher_attendance + lesson_note_history + quick_feedback_student_list 완료 (2026-04-29) — 19 신규 키 + 2 재사용 (errorOccurred, statusCompleted), 18 사이트, lessons 46/46 + schedule 237/237 PASS
+- 5-2b/c 나머지 lessons 큰 파일들 (lesson_detail, add/edit/quick_feedback/bulk_feedback ~112 사이트)
 - 5-3 subscription 도메인
 
 ## 평가 기준 (Rubric, 합격선 7.5)
@@ -228,7 +229,9 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-1h booking_reschedule_screen i18n (20 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-1i schedule_tab + lesson_requests + request_detail i18n (20 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-1j request_completion + unified_lesson_request + my_bookings i18n (30 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-2 lessons 도메인 / 5-3 subscription 도메인 | 진입 |
+| P2 5-2a teacher_attendance + lesson_note_history + quick_feedback_student_list i18n (18 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-2b/c lessons 큰 파일 (lesson_detail / add_lesson / edit_lesson / quick_feedback / bulk_feedback ~112 사이트) | 대기 |
+| P2 5-3 subscription 도메인 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
