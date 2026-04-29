@@ -35,7 +35,10 @@ class SubscriptionListScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('내 수강권'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.subscriptionListAppBarTitle),
+        centerTitle: true,
+      ),
       body: membershipsAsync.when(
         data: (memberships) {
           if (memberships.isEmpty) {
@@ -281,7 +284,7 @@ class SubscriptionListScreen extends ConsumerWidget {
       id: id,
       lessonClassId: '',
       studentId: '',
-      instrument: '악기',
+      instrument: AppStrings.instrumentFallback,
       status: MembershipStatus.active,
       createdAt: DateTime.now(),
       monthlyFee: 0,
@@ -305,14 +308,14 @@ class SubscriptionListScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
           Text(
-            '등록된 수강권이 없습니다',
+            AppStrings.noSubscriptionsRegisteredTitle,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '${memberships.length}개의 레슨에 등록되어 있습니다.\n선생님에게 수강권 발급을 요청하세요.',
+            AppStrings.noSubscriptionsRegisteredBody(memberships.length),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -334,14 +337,14 @@ class SubscriptionListScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space4),
             // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
-              '등록된 레슨이 없습니다',
+              AppStrings.noLessonsRegisteredTitle,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '선생님에게 초대를 요청하거나\n체험 레슨을 신청하세요.',
+              AppStrings.noLessonsRegisteredBody,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -351,7 +354,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () => context.push(AppRoutes.teacherSearch),
               icon: const Icon(Icons.search),
-              label: const Text('선생님 찾기'),
+              label: const Text(AppStrings.teacherSearchButton),
             ),
           ],
         ),
@@ -369,7 +372,10 @@ class SubscriptionListScreen extends ConsumerWidget {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space3),
             // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text('오류가 발생했습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.errorOccurred,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               error,
@@ -409,7 +415,7 @@ class _SubscriptionCardWithClass extends StatelessWidget {
       data:
           (lessonClass) => SubscriptionTicketCard(
             subscription: subscription,
-            className: lessonClass?.name ?? '개인레슨',
+            className: lessonClass?.name ?? AppStrings.individualLesson,
             instrument: membership.instrument,
             onTap: onTap,
           ),
@@ -423,7 +429,7 @@ class _SubscriptionCardWithClass extends StatelessWidget {
       error:
           (_, __) => SubscriptionTicketCard(
             subscription: subscription,
-            className: '레슨',
+            className: AppStrings.lessonClassErrorFallback,
             instrument: membership.instrument,
             onTap: onTap,
           ),
