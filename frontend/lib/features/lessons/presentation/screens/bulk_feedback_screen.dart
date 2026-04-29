@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -60,7 +61,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
       body: lessonsAsync.when(
         data: (lessons) => _buildStep(lessons),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
       ),
     );
   }
@@ -68,13 +69,13 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
   String get _stepTitle {
     switch (_currentStep) {
       case 0:
-        return '학생 선택';
+        return AppStrings.bulkFeedbackStepStudent;
       case 1:
-        return '피드백 작성';
+        return AppStrings.bulkFeedbackStepWrite;
       case 2:
-        return '미리보기';
+        return AppStrings.bulkFeedbackStepPreview;
       default:
-        return '일괄 피드백';
+        return AppStrings.bulkFeedbackTitle;
     }
   }
 
@@ -127,7 +128,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
-                  '완료된 레슨 학생이 자동 선택됩니다. 변경하려면 탭하세요.',
+                  AppStrings.bulkFeedbackInfoBanner,
                   style: AppTypography.caption.copyWith(color: AppColors.ink),
                 ),
               ),
@@ -141,7 +142,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
               todayLessons.isEmpty
                   ? Center(
                     child: Text(
-                      '오늘 레슨이 없습니다',
+                      AppStrings.noTodayLessons,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -187,8 +188,13 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            '${lesson.startTime} (${isCompleted ? "완료" : "예정"})'
-                            '${hasFeedback ? " · 피드백 있음" : ""}',
+                            AppStrings.bulkLessonTileSubtitle(
+                              lesson.startTime,
+                              isCompleted
+                                  ? AppStrings.statusCompleted
+                                  : AppStrings.statusUpcoming,
+                              hasFeedback,
+                            ),
                             style: AppTypography.bodySmall.copyWith(
                               color: AppColors.inkSecondary,
                             ),
@@ -208,7 +214,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
 
         // Next button
         _buildBottomButton(
-          label: '다음 (${_selectedLessonIds.length}명)',
+          label: AppStrings.bulkFeedbackNextWithCount(
+            _selectedLessonIds.length,
+          ),
           enabled: _selectedLessonIds.isNotEmpty,
           onPressed: () => setState(() => _currentStep = 1),
         ),
@@ -232,7 +240,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
               children: [
                 // Common feedback
                 Text(
-                  '공통 피드백',
+                  AppStrings.bulkFeedbackCommonHeader,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -260,7 +268,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                       color: AppColors.ink,
                     ),
                     decoration: InputDecoration(
-                      hintText: '모든 선택 학생에게 전달할 피드백을 작성하세요...',
+                      hintText: AppStrings.bulkFeedbackHint,
                       hintStyle: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkTertiary,
                       ),
@@ -274,14 +282,14 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
 
                 // Per-student comments (optional)
                 Text(
-                  '개별 코멘트 (선택)',
+                  AppStrings.bulkFeedbackPerStudentHeader,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '각 학생에게 추가할 개별 메시지',
+                  AppStrings.bulkFeedbackPerStudentDesc,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -309,7 +317,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                         ),
                         decoration: InputDecoration(
                           labelText: NameUtils.givenName(lesson.studentName),
-                          hintText: '추가 코멘트...',
+                          hintText: AppStrings.additionalCommentHint,
                           hintStyle: AppTypography.bodySmall.copyWith(
                             color: AppColors.inkTertiary,
                           ),
@@ -328,7 +336,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         ),
 
         _buildBottomButton(
-          label: '미리보기',
+          label: AppStrings.bulkFeedbackStepPreview,
           enabled: _feedbackController.text.trim().isNotEmpty,
           onPressed: () => setState(() => _currentStep = 2),
         ),
@@ -353,9 +361,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
               ),
             ),
             backgroundColor: AppColors.paperAccentSoft,
-            side: BorderSide(
-              color: AppColors.paperAccentSoft,
-            ),
+            side: BorderSide(color: AppColors.paperAccentSoft),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () {
@@ -444,7 +450,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         ),
 
         _buildBottomButton(
-          label: _isSending ? '전송 중...' : '${selectedLessons.length}명에게 전송',
+          label:
+              _isSending
+                  ? AppStrings.sendingInProgress
+                  : AppStrings.bulkFeedbackSendButton(selectedLessons.length),
           enabled: !_isSending,
           onPressed: () => _sendBulkFeedback(selectedLessons),
         ),
@@ -493,7 +502,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${selectedLessons.length}명에게 피드백을 전송했습니다'),
+            content: Text(
+              AppStrings.bulkFeedbackSentMessage(selectedLessons.length),
+            ),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -503,7 +514,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('전송 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.sendFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
