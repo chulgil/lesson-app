@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -28,16 +29,16 @@ class DiscountSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ChipInputField(
-          title: '할인',
+          title: AppStrings.issueFormDiscountTitle,
           isOptional: true,
           options: const [0, 5, 10, 20],
           currentValue: discountPercent,
           onChanged: onChanged,
           controller: controller,
-          suffix: '%',
+          suffix: AppStrings.issueFormPercentSuffix,
           maxValue: 100,
           selectedColor: AppColors.paperAccent,
-          zeroLabel: '없음',
+          zeroLabel: AppStrings.issueFormZeroLabel,
         ),
         if (discountPercent > 0 && originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
@@ -82,15 +83,15 @@ class BonusSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ChipInputField(
-          title: '보너스',
+          title: AppStrings.issueFormBonusTitle,
           isOptional: true,
           options: const [0, 1, 2, 3],
           currentValue: bonusLessons,
           onChanged: onBonusLessonsChanged,
           controller: bonusController,
-          suffix: '회',
-          zeroLabel: '없음',
-          labelFormatter: (value) => value == 0 ? '없음' : '+$value회',
+          suffix: AppStrings.issueFormLessonsSuffix,
+          zeroLabel: AppStrings.issueFormZeroLabel,
+          labelFormatter: AppStrings.issueFormBonusFormatter,
         ),
         if (bonusLessons > 0) ...[
           const SizedBox(height: AppSpacing.space3),
@@ -98,19 +99,19 @@ class BonusSection extends StatelessWidget {
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
             children: [
-              _buildBonusReasonChip('대량 구매'),
-              _buildBonusReasonChip('5주차'),
-              _buildBonusReasonChip('추천'),
-              _buildBonusReasonChip('재등록'),
-              _buildBonusReasonChip('기타'),
+              _buildBonusReasonChip(AppStrings.issueFormBonusReasonBulk),
+              _buildBonusReasonChip(AppStrings.issueFormBonusReasonFifthWeek),
+              _buildBonusReasonChip(AppStrings.issueFormBonusReasonReferral),
+              _buildBonusReasonChip(AppStrings.issueFormBonusReasonRenewal),
+              _buildBonusReasonChip(AppStrings.issueFormBonusReasonOther),
             ],
           ),
-          if (bonusReason == '기타') ...[
+          if (bonusReason == AppStrings.issueFormBonusReasonOther) ...[
             const SizedBox(height: AppSpacing.space3),
             TextFormField(
               controller: customBonusReasonController,
               decoration: InputDecoration(
-                hintText: '사유를 직접 입력해주세요',
+                hintText: AppStrings.issueFormBonusReasonCustomHint,
                 filled: true,
                 fillColor: AppColors.paper,
                 border: OutlineInputBorder(

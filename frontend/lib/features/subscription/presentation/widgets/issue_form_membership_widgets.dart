@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -31,7 +32,10 @@ class MembershipSelectorWidget extends ConsumerWidget {
         children: [
           // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
           // 로 통일 (§7.17).
-          Text('레슨 선택', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.issueFormMembershipSectionTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...memberships.map((membership) {
             final isSelected = selectedMembershipId == membership.id;
@@ -69,13 +73,18 @@ class MembershipSelectorWidget extends ConsumerWidget {
                             lessonClassAsync.when(
                               data:
                                   (lessonClass) => Text(
-                                    lessonClass?.name ?? '개인레슨',
+                                    lessonClass?.name ??
+                                        AppStrings
+                                            .issueFormMembershipDefaultName,
                                     style: AppTypography.bodyMedium.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                               loading: () => const Text('...'),
-                              error: (_, __) => const Text('레슨'),
+                              error:
+                                  (_, __) => const Text(
+                                    AppStrings.issueFormMembershipFallback,
+                                  ),
                             ),
                             Text(
                               membership.instrument,
@@ -162,16 +171,19 @@ class MembershipInfoCard extends ConsumerWidget {
                 lessonClassAsync.when(
                   data:
                       (lessonClass) => Text(
-                        lessonClass?.name ?? '개인레슨',
+                        lessonClass?.name ??
+                            AppStrings.issueFormMembershipDefaultName,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                   loading: () => const Text('...'),
-                  error: (_, __) => const Text('개인레슨'),
+                  error:
+                      (_, __) =>
+                          const Text(AppStrings.issueFormMembershipDefaultName),
                 ),
                 Text(
-                  '${membership.instrument} · ${membership.level ?? '레벨 미설정'}',
+                  '${membership.instrument} · ${membership.level ?? AppStrings.issueFormMembershipNoLevel}',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -201,14 +213,14 @@ class NoMembershipState extends StatelessWidget {
             const SizedBox(height: AppSpacing.space4),
             // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
             Text(
-              '등록된 레슨이 없습니다',
+              AppStrings.issueFormNoMembershipTitle,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '학생을 레슨에 먼저 등록해주세요.',
+              AppStrings.issueFormNoMembershipBody,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -238,7 +250,10 @@ class SubscriptionErrorState extends StatelessWidget {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space3),
             // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text('오류가 발생했습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.issueFormErrorTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               error,

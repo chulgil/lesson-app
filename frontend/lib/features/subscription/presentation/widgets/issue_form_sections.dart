@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -27,21 +28,28 @@ class SubscriptionTypeSelector extends StatelessWidget {
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('수강권 유형', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.issueFormTypeSectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
-            _buildTypeChip(SubscriptionType.trial, '체험', Icons.star_outline),
+            _buildTypeChip(
+              SubscriptionType.trial,
+              AppStrings.issueFormTypeTrialLabel,
+              Icons.star_outline,
+            ),
             const SizedBox(width: AppSpacing.space2),
             _buildTypeChip(
               SubscriptionType.package,
-              '회차제',
+              AppStrings.issueFormTypePackageLabel,
               Icons.confirmation_number_outlined,
             ),
             const SizedBox(width: AppSpacing.space2),
             _buildTypeChip(
               SubscriptionType.monthly,
-              '월정액',
+              AppStrings.issueFormTypeMonthlyLabel,
               Icons.calendar_month,
             ),
           ],
@@ -98,14 +106,13 @@ class SubscriptionTypeSelector extends StatelessWidget {
 
     switch (selectedType) {
       case SubscriptionType.trial:
-        description =
-            '1회 체험 레슨으로, 학생과 선생님의 적합성을 확인합니다. 무료 또는 할인 금액으로 설정할 수 있습니다.';
+        description = AppStrings.issueFormTypeTrialDescription;
         icon = Icons.lightbulb_outline;
       case SubscriptionType.package:
-        description = '정해진 횟수만큼 레슨을 진행합니다. 매 레슨마다 유연하게 스케줄을 조율할 수 있습니다.';
+        description = AppStrings.issueFormTypePackageDescription;
         icon = Icons.swap_horiz;
       case SubscriptionType.monthly:
-        description = '월 단위 정기 수강권입니다. 고정된 요일·시간에 레슨이 자동 배정되어 스케줄 관리가 편리합니다.';
+        description = AppStrings.issueFormTypeMonthlyDescription;
         icon = Icons.event_repeat;
     }
 
@@ -154,13 +161,16 @@ class PaymentStatusSection extends StatelessWidget {
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('결제 방식', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.issueFormPaymentSectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
             Expanded(
               child: _PaymentStatusChip(
-                label: '선불',
+                label: AppStrings.issueFormPaymentPrepaidLabel,
                 icon: Icons.payment,
                 isSelected: isPaymentConfirmed,
                 onTap: () => onPaymentConfirmedChanged(true),
@@ -169,7 +179,7 @@ class PaymentStatusSection extends StatelessWidget {
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: _PaymentStatusChip(
-                label: '후불',
+                label: AppStrings.issueFormPaymentPostpaidLabel,
                 icon: Icons.schedule,
                 isSelected: !isPaymentConfirmed,
                 onTap: () => onPaymentConfirmedChanged(false),
@@ -232,7 +242,7 @@ class PaymentStatusSection extends StatelessWidget {
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '후불 수강권은 미수금으로 표시됩니다. 입금 확인 후 결제완료 처리할 수 있습니다.',
+                    AppStrings.issueFormPaymentPostpaidNotice,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paperAccent,
                     ),
@@ -332,7 +342,10 @@ class AmountInputSection extends StatelessWidget {
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('정가', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.issueFormAmountSectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
 
         // Amount preset chips
@@ -345,7 +358,7 @@ class AmountInputSection extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.space2),
                     child: ChoiceChip(
-                      label: Text('${amount ~/ 10000}만원'),
+                      label: Text(AppStrings.issueFormAmountChipLabel(amount)),
                       selected: isSelected,
                       onSelected: (selected) {
                         if (selected) {
@@ -385,8 +398,8 @@ class AmountInputSection extends StatelessWidget {
             ThousandsSeparatorFormatter(),
           ],
           decoration: InputDecoration(
-            hintText: '직접 입력',
-            suffixText: '원',
+            hintText: AppStrings.issueFormAmountHint,
+            suffixText: AppStrings.issueFormAmountSuffix,
             filled: true,
             fillColor: AppColors.paper,
             border: OutlineInputBorder(
@@ -402,7 +415,7 @@ class AmountInputSection extends StatelessWidget {
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '금액을 입력해주세요';
+              return AppStrings.issueFormAmountValidation;
             }
             return null;
           },
@@ -410,7 +423,9 @@ class AmountInputSection extends StatelessWidget {
         if (selectedType == SubscriptionType.package && originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '회당 ${formatWonWithComma((originalAmount / totalLessons).round())}',
+            AppStrings.issueFormPerLessonAmount(
+              formatWonWithComma((originalAmount / totalLessons).round()),
+            ),
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -439,7 +454,10 @@ class StartDatePickerField extends StatelessWidget {
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('시작일', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.issueFormStartDateSectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         GestureDetector(
           onTap: () async {
@@ -464,7 +482,9 @@ class StartDatePickerField extends StatelessWidget {
                 Icon(Icons.calendar_today, color: AppColors.inkSecondary),
                 const SizedBox(width: AppSpacing.space3),
                 Text(
-                  startDate != null ? formatDateYMDKorean(startDate!) : '날짜 선택',
+                  startDate != null
+                      ? formatDateYMDKorean(startDate!)
+                      : AppStrings.issueFormStartDateHint,
                   style: AppTypography.bodyMedium,
                 ),
                 const Spacer(),
