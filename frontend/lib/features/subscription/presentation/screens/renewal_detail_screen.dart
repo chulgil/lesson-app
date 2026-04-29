@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,17 +43,24 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Text('수강권 갱신 제안', style: NotebookTypography.appBarTitle),
+        title: Text(
+          AppStrings.renewalProposalAppBarTitle,
+          style: NotebookTypography.appBarTitle,
+        ),
       ),
       body:
           _isProcessing
               ? const Center(child: CircularProgressIndicator())
               : proposalAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                error:
+                    (_, __) =>
+                        Center(child: Text('${AppStrings.errorOccurred}.')),
                 data: (proposal) {
                   if (proposal == null) {
-                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                    return const Center(
+                      child: Text(AppStrings.proposalNotFoundEmpty),
+                    );
                   }
                   return _buildContent(proposal);
                 },
@@ -73,7 +81,8 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       teacherFullProfileProvider(proposal.teacherId),
     );
     final teacherName =
-        teacherAsync.whenOrNull(data: (profile) => profile?.name) ?? '선생님';
+        teacherAsync.whenOrNull(data: (profile) => profile?.name) ??
+        AppStrings.teacher;
 
     _selectedTemplateId ??=
         proposal.selectedTemplateId ?? proposal.effectiveRecommendedTemplateId;
@@ -95,7 +104,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
           // Template selection or details
           if (proposal.isMultiChoice && proposal.canRespond) ...[
             Text(
-              '수강권을 선택하세요',
+              AppStrings.renewalSelectTemplatePrompt,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -177,7 +186,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$teacherName이 수강권 갱신을 제안했어요',
+                  AppStrings.renewalProposedByFormat(teacherName),
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -303,7 +312,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                             color: AppColors.paperAccentSoft,
                           ),
                           child: Text(
-                            '추천',
+                            AppStrings.templateRecommendedBadge,
                             style: AppTypography.captionSmall.copyWith(
                               color: AppColors.paperAccent,
                             ),
@@ -364,7 +373,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
           Icon(Icons.lightbulb_outline, size: 16, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Text(
-            '지난번과 동일한 수강권입니다',
+            AppStrings.renewalSameAsPreviousHint,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.ink,
               fontWeight: FontWeight.w500,
@@ -447,7 +456,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                         : const Icon(Icons.payment),
-                label: const Text('수강권 선택하기'),
+                label: const Text(AppStrings.renewalSelectButton),
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -456,7 +465,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               onPressed:
                   _isProcessing ? null : () => _showRejectDialog(proposal),
               child: Text(
-                '나중에 할게요',
+                AppStrings.renewalDeclineLater,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -483,7 +492,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('입금 알림을 보냈습니다'),
+            content: Text(AppStrings.paymentReminderSent),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -493,7 +502,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -525,16 +534,16 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       await notifier.reject(proposal.id, reason);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('다음에 다시 안내해 드릴게요')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.renewalDeclineSnackbar)),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
