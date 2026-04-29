@@ -3732,4 +3732,69 @@ class AppStrings {
 
   /// 다음에 다시 제안 받을 수 있어요 (거절 SnackBar)
   static const proposalRejectedNextTimeSnackbar = '다음에 다시 제안 받을 수 있어요';
+
+  // -- Proposal Create Screen (수강권 제안 생성 5-3b-15) --
+
+  /// 수강권 제안 (생성 AppBar 타이틀)
+  static const proposalCreateAppBarTitle = '수강권 제안';
+
+  /// 등록된 학생이 없습니다 (학생 0건 빈 상태 타이틀)
+  static const proposalCreateNoStudentsTitle = '등록된 학생이 없습니다';
+
+  /// 학생을 먼저 추가해주세요 (학생 0건 빈 상태 본문)
+  static const proposalCreateNoStudentsBody = '학생을 먼저 추가해주세요';
+
+  /// 수강권 템플릿이 없습니다 (템플릿 0건 빈 상태 타이틀)
+  static const proposalCreateNoTemplatesTitle = '수강권 템플릿이 없습니다';
+
+  /// 먼저 수강권 템플릿을 생성해주세요 (템플릿 0건 본문)
+  static const proposalCreateNoTemplatesBody = '먼저 수강권 템플릿을 생성해주세요';
+
+  /// 템플릿 만들기 (템플릿 0건 CTA)
+  static const proposalCreateTemplateButton = '템플릿 만들기';
+
+  /// 학생 선택 (Step 1 헤더)
+  static const proposalCreateStepStudent = '학생 선택';
+
+  /// 수강권 선택 (최대 $max개) (Step 2 헤더 포매터)
+  static String proposalCreateStepTemplateMaxFormat(int max) =>
+      '수강권 선택 (최대 $max개)';
+
+  /// 메시지 (선택) (Step 3 섹션 타이틀)
+  static const proposalCreateMessageOptional = '메시지 (선택)';
+
+  /// 학생을 선택하세요 (학생 드롭다운 hint)
+  static const proposalCreateStudentSelectHint = '학생을 선택하세요';
+
+  /// 수강권을 선택하세요. 복수 선택 시 학생이 하나를 선택합니다. (템플릿 단계 안내 배너)
+  static const proposalCreateTemplateInfoBanner =
+      '수강권을 선택하세요. 복수 선택 시 학생이 하나를 선택합니다.';
+
+  /// 추천 지정: 카드를 길게 누르세요. (추천 카드 안내)
+  static const proposalCreateRecommendedHint = '추천 지정: 카드를 길게 누르세요.';
+
+  /// $count개 선택됨 — 학생이 하나를 선택합니다.  (복수 선택 안내)
+  static String proposalCreateMultiSelectInfoFormat(int count) =>
+      '$count개 선택됨 — 학생이 하나를 선택합니다. ';
+
+  /// 학생에게 전달할 메시지를 입력하세요 (메시지 입력 hint)
+  static const proposalCreateMessageHint = '학생에게 전달할 메시지를 입력하세요';
+
+  /// 즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다 (즉시 발급 안내)
+  static const proposalCreateImmediateIssueHelp =
+      '즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다';
+
+  /// 수강권 제안을 보냈습니다 (제안 발송 성공 SnackBar)
+  static const proposalCreateSentMessage = '수강권 제안을 보냈습니다';
+
+  /// $count개 수강권 제안 보내기 (복수 템플릿 송신 버튼)
+  static String proposalCreateMultiTemplateSendFormat(int count) =>
+      '$count개 수강권 제안 보내기';
+
+  /// $count개 수강권 제안을 보냈습니다 (복수 템플릿 송신 SnackBar)
+  static String proposalCreateMultiSentMessageFormat(int count) =>
+      '$count개 수강권 제안을 보냈습니다';
+
+  /// 제안 실패. 다시 시도해주세요. (제안 실패 SnackBar)
+  static const proposalCreateFailMessage = '제안 실패. 다시 시도해주세요.';
 }
