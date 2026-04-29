@@ -3501,4 +3501,50 @@ class AppStrings {
 
   /// 수강권이 활성화되어 있습니다 (message — active)
   static const subscriptionMessageActive = '수강권이 활성화되어 있습니다';
+
+  // -- Subscription Card (수강권 카드 5-3b-8) --
+
+  /// 남음: $remain/$total회 (subscription_card.dart 진행바 라벨)
+  static String subscriptionRemainingPrefix(int remain, int total) =>
+      '남음: $remain/$total회';
+
+  /// (기본 $base + 보너스 $bonus) (subscription_card.dart 보너스 분해 표기)
+  static String subscriptionBonusBreakdown(int base, int bonus) =>
+      '(기본 $base + 보너스 $bonus)';
+
+  /// 📋 상세 (subscription_card.dart 상세 섹션 헤더)
+  static const subscriptionDetailHeader = '📋 상세';
+
+  /// • 기본 (subscription_card.dart 상세 행 라벨)
+  static const subscriptionDetailRowBase = '• 기본';
+
+  /// • 보너스
+  static const subscriptionDetailRowBonus = '• 보너스';
+
+  /// • 사용
+  static const subscriptionDetailRowUsed = '• 사용';
+
+  /// • 잔여
+  static const subscriptionDetailRowRemaining = '• 잔여';
+
+  /// • 변경
+  static const subscriptionDetailRowChanges = '• 변경';
+
+  /// • 유효기간
+  static const subscriptionDetailRowExpiry = '• 유효기간';
+
+  /// • 결제
+  static const subscriptionDetailRowPayment = '• 결제';
+
+  /// • 5주차
+  static const subscriptionDetailRowFifthWeek = '• 5주차';
+
+  /// 보너스 (보너스 reason 기본값 fallback)
+  static const subscriptionBonusReasonFallback = '보너스';
+
+  /// ⚠️ 미사용분 소멸 (이월 불가) (월정액 카드 경고)
+  static const subscriptionMonthlyCarryoverWarning = '⚠️ 미사용분 소멸 (이월 불가)';
+
+  /// 유효기간 내 자유롭게 사용 (회차권 카드 안내)
+  static const subscriptionPackageFreeUseInfo = '유효기간 내 자유롭게 사용';
 }
