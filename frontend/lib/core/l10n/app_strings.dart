@@ -714,6 +714,39 @@ class AppStrings {
   static const optionalNote = '추가 메모를 입력하세요 (선택)';
   static String lessonsNeedConfirmation(int count) => '미확인 레슨 $count건';
 
+  /// 이 레슨이 진행되었나요? (LessonConfirmationDialog 본문 질문)
+  static const lessonConductedQuestion = '이 레슨이 진행되었나요?';
+
+  /// 나중에 (LessonConfirmationDialog 취소 버튼)
+  static const later = '나중에';
+
+  /// 메모 (선택) (TextField 라벨)
+  static const memoOptional = '메모 (선택)';
+
+  /// 추가 메모를 입력하세요 (TextField hint, "(선택)" 미포함)
+  static const memoHint = '추가 메모를 입력하세요';
+
+  /// 횟수 1회 차감 (LessonNonCompletionReason.description, "레슨" prefix 미포함)
+  static const lessonDeductOnce = '횟수 1회 차감';
+
+  /// 다른 날짜로 변경 (횟수 유지) (LessonNonCompletionReason.description)
+  static const lessonRescheduleNoCount = '다른 날짜로 변경 (횟수 유지)';
+
+  /// 무단 결석 (LessonNonCompletionReason.noShow label)
+  static const lessonNoShow = '무단 결석';
+
+  /// 학생 사정으로 불참 (LessonNonCompletionReason.studentAbsent label)
+  static const lessonStudentAbsentReason = '학생 사정으로 불참';
+
+  /// 당일 취소 (24시간 이내) (LessonNonCompletionReason.cancelledByStudentLate label)
+  static const lessonCancelledByStudentLateReason = '당일 취소 (24시간 이내)';
+
+  /// 선생님 사정으로 취소 (LessonNonCompletionReason.teacherCancelled label)
+  static const lessonTeacherCancelledReason = '선생님 사정으로 취소';
+
+  /// 상호 합의로 취소 (LessonNonCompletionReason.mutualCancelled label)
+  static const lessonMutualCancelledReason = '상호 합의로 취소';
+
   // ── Day of Week ────────────────────────────────────────
 
   static const mon = '월';
