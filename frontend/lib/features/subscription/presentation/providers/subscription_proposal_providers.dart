@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_subscription_proposal_repository.dart';
 import '../../data/repositories/remote_subscription_proposal_repository.dart';
@@ -18,12 +19,13 @@ part 'subscription_proposal_providers.g.dart';
 
 /// Proposal repository provider - switches between Mock and Remote.
 final subscriptionProposalRepositoryProvider =
-    Provider<SubscriptionProposalRepository>((ref) =>
-        createRepository<SubscriptionProposalRepository>(
-          ref: ref,
-          mock: () => MockSubscriptionProposalRepository(),
-          remote: (api) => RemoteSubscriptionProposalRepository(api),
-        ));
+    Provider<SubscriptionProposalRepository>(
+      (ref) => createRepository<SubscriptionProposalRepository>(
+        ref: ref,
+        mock: () => MockSubscriptionProposalRepository(),
+        remote: (api) => RemoteSubscriptionProposalRepository(api),
+      ),
+    );
 
 // ============================================================
 // Teacher Proposals
@@ -230,7 +232,7 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
             studentId: studentId,
             teacherName: teacherName,
             proposalId: created.id,
-            templateName: templateName ?? '수강권',
+            templateName: templateName ?? AppStrings.subscription,
             isMultiChoice: isMultiChoice,
           );
         } catch (e) {
@@ -279,7 +281,7 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
             teacherId: updated.teacherId,
             studentName: studentName,
             proposalId: proposalId,
-            templateName: templateName ?? '수강권',
+            templateName: templateName ?? AppStrings.subscription,
           );
         } catch (e) {
           debugPrint('[ProposalNotifier] Failed to send notification: $e');
@@ -324,7 +326,7 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
           await notificationService.sendProposalAcceptedNotification(
             studentId: updated.studentId,
             teacherName: teacherName,
-            templateName: templateName ?? '수강권',
+            templateName: templateName ?? AppStrings.subscription,
             totalLessons: totalLessons ?? 0,
           );
         } catch (e) {

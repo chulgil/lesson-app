@@ -269,7 +269,7 @@ class _SubscriptionDetailBodyState
             actions: [
               IconButton(
                 icon: const Icon(Icons.rule_rounded),
-                tooltip: '적용 정책',
+                tooltip: AppStrings.policyAppliedTitle,
                 onPressed:
                     () => SubscriptionPolicySheet.show(
                       context,
