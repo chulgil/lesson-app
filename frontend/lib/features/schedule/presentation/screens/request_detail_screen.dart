@@ -86,11 +86,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     icon: Icons.check_circle,
   );
 
-  void _showError([String message = '오류가 발생했습니다']) => _showEventMessage(
-    message,
-    color: AppColors.paperAccent,
-    icon: Icons.error_outline,
-  );
+  void _showError([String message = AppStrings.errorOccurred]) =>
+      _showEventMessage(
+        message,
+        color: AppColors.paperAccent,
+        icon: Icons.error_outline,
+      );
 
   void _showInfo(String message) => _showEventMessage(
     message,
@@ -1123,7 +1124,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
   ) {
     // TODO: Navigate to subscription detail screen
-    _showInfo('수강권 상세 화면은 준비 중입니다');
+    _showInfo(AppStrings.subscriptionDetailComingSoon);
   }
 
   Future<void> _handleRenewal(
