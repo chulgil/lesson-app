@@ -31,18 +31,18 @@ class _SkipReasonDialogState extends State<SkipReasonDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('이번엔 스킵'),
+      title: const Text(AppStrings.skipProposalTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('이번 제안을 스킵하시겠습니까?\n나중에 다시 제안받을 수 있어요.'),
+          const Text(AppStrings.skipProposalContent),
           const SizedBox(height: AppSpacing.space4),
           TextField(
             controller: _controller,
             decoration: const InputDecoration(
-              labelText: '사유 (선택)',
-              hintText: '선생님께 전달할 메시지',
+              labelText: AppStrings.skipReasonLabel,
+              hintText: AppStrings.skipReasonHint,
               border: OutlineInputBorder(),
             ),
             maxLines: 2,
@@ -56,7 +56,7 @@ class _SkipReasonDialogState extends State<SkipReasonDialog> {
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, _controller.text),
-          child: const Text('스킵하기'),
+          child: const Text(AppStrings.skipProposalAction),
         ),
       ],
     );

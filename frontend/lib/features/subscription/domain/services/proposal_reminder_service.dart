@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/domain/services/notification_scheduler_service.dart';
 import '../entities/subscription_proposal.dart';
@@ -16,7 +17,9 @@ part 'proposal_reminder_service.g.dart';
 /// - 48h reminder: Follow-up reminder
 /// - 72h reminder: Golden time ending warning (if applicable)
 @riverpod
-ProposalReminderService proposalReminderService(ProposalReminderServiceRef ref) {
+ProposalReminderService proposalReminderService(
+  ProposalReminderServiceRef ref,
+) {
   return ProposalReminderService(ref);
 }
 
@@ -32,8 +35,12 @@ class ProposalReminderService {
   /// - 24h reminder
   /// - 48h reminder
   /// - 72h reminder (with golden time warning if applicable)
-  Future<void> scheduleRemindersForProposal(SubscriptionProposal proposal) async {
-    debugPrint('[ProposalReminderService] Scheduling reminders for proposal: ${proposal.id}');
+  Future<void> scheduleRemindersForProposal(
+    SubscriptionProposal proposal,
+  ) async {
+    debugPrint(
+      '[ProposalReminderService] Scheduling reminders for proposal: ${proposal.id}',
+    );
 
     final now = DateTime.now();
     final schedulerService = _ref.read(notificationSchedulerServiceProvider);
@@ -46,8 +53,8 @@ class ProposalReminderService {
       proposal: proposal,
       type: NotificationType.proposalReminder24h,
       scheduledAt: now.add(const Duration(hours: 24)),
-      title: '수강권 제안이 기다리고 있어요',
-      body: '선생님의 수강권 제안을 확인해보세요.',
+      title: AppStrings.proposalReminder24hTitle,
+      body: AppStrings.proposalReminder24hBody,
     );
     await schedulerService.scheduleNotification(reminder24h);
 
@@ -56,8 +63,8 @@ class ProposalReminderService {
       proposal: proposal,
       type: NotificationType.proposalReminder48h,
       scheduledAt: now.add(const Duration(hours: 48)),
-      title: '수강권 제안 확인이 필요해요',
-      body: '선생님의 수강권 제안을 아직 확인하지 않으셨어요.',
+      title: AppStrings.proposalReminder48hTitle,
+      body: AppStrings.proposalReminder48hBody,
     );
     await schedulerService.scheduleNotification(reminder48h);
 
@@ -66,14 +73,20 @@ class ProposalReminderService {
       proposal: proposal,
       type: NotificationType.proposalReminder72h,
       scheduledAt: now.add(const Duration(hours: 72)),
-      title: hasDiscount ? '⏰ 특별 할인이 곧 종료됩니다!' : '수강권 제안 마지막 알림',
-      body: hasDiscount
-          ? '할인 혜택이 곧 종료됩니다. 지금 확인하세요!'
-          : '선생님의 수강권 제안을 확인해주세요.',
+      title:
+          hasDiscount
+              ? AppStrings.proposalReminder72hTitleDiscount
+              : AppStrings.proposalReminder72hTitleNoDiscount,
+      body:
+          hasDiscount
+              ? AppStrings.proposalReminder72hBodyDiscount
+              : AppStrings.proposalReminder72hBodyNoDiscount,
     );
     await schedulerService.scheduleNotification(reminder72h);
 
-    debugPrint('[ProposalReminderService] Scheduled 3 reminders for proposal: ${proposal.id}');
+    debugPrint(
+      '[ProposalReminderService] Scheduled 3 reminders for proposal: ${proposal.id}',
+    );
   }
 
   /// Cancel all pending reminders for a proposal.
@@ -83,14 +96,18 @@ class ProposalReminderService {
   /// - Proposal is cancelled
   /// - Proposal expires
   Future<void> cancelRemindersForProposal(String proposalId) async {
-    debugPrint('[ProposalReminderService] Cancelling reminders for proposal: $proposalId');
+    debugPrint(
+      '[ProposalReminderService] Cancelling reminders for proposal: $proposalId',
+    );
 
     final schedulerService = _ref.read(notificationSchedulerServiceProvider);
 
     // Cancel all reminder types for this proposal
     await schedulerService.cancelNotificationsByProposalId(proposalId);
 
-    debugPrint('[ProposalReminderService] Cancelled all reminders for proposal: $proposalId');
+    debugPrint(
+      '[ProposalReminderService] Cancelled all reminders for proposal: $proposalId',
+    );
   }
 
   /// Check if proposal is still pending before sending reminder.
@@ -110,10 +127,14 @@ class ProposalReminderService {
       // Only send reminder if proposal is still pending
       final shouldSend = proposal.status == ProposalStatus.pending;
 
-      debugPrint('[ProposalReminderService] Should send reminder for $proposalId: $shouldSend (status: ${proposal.status})');
+      debugPrint(
+        '[ProposalReminderService] Should send reminder for $proposalId: $shouldSend (status: ${proposal.status})',
+      );
       return shouldSend;
     } catch (e) {
-      debugPrint('[ProposalReminderService] Error checking proposal status: $e');
+      debugPrint(
+        '[ProposalReminderService] Error checking proposal status: $e',
+      );
       return false;
     }
   }
@@ -141,7 +162,7 @@ class ProposalReminderService {
       createdAt: DateTime.now(),
       scheduledAt: scheduledAt,
       actionUrl: '/proposals/${proposal.id}',
-      actionLabel: '제안 확인하기',
+      actionLabel: AppStrings.proposalReminderAction,
     );
   }
 }

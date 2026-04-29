@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -85,7 +86,11 @@ class SubscriptionPolicySheet extends ConsumerWidget {
     final remaining = subscription.remainingReschedule;
     final total = subscription.totalRescheduleAllowance;
     final deadline = subscription.rescheduleDeadlineHours;
-    final changeLine = '$deadline시간 전까지 · 월 $total회 (남은 $remaining회)';
+    final changeLine = AppStrings.policyChangeSummary(
+      deadlineHours: deadline,
+      totalAllowance: total,
+      remaining: remaining,
+    );
     final remainingColor =
         remaining <= 0
             ? AppColors.paperAccent
@@ -102,7 +107,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
             const SizedBox(width: AppSpacing.space2),
             // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
             Text(
-              '적용 정책',
+              AppStrings.policyAppliedTitle,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.paperAccent,
               ),
@@ -111,17 +116,23 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space4),
         _PolicyItem(
-          label: '변경 / 취소',
+          label: AppStrings.policyChangeCancelLabel,
           value: changeLine,
           valueColor: remainingColor,
         ),
         if (policy != null) ...[
-          _PolicyItem(label: '노쇼', value: policy.noShowPolicySummary),
-          _PolicyItem(label: '이월', value: policy.carryoverPolicySummary),
+          _PolicyItem(
+            label: AppStrings.policyNoShowLabel,
+            value: policy.noShowPolicySummary,
+          ),
+          _PolicyItem(
+            label: AppStrings.policyCarryoverLabel,
+            value: policy.carryoverPolicySummary,
+          ),
         ],
         const SizedBox(height: AppSpacing.space3),
         Text(
-          '수강권 발급 시점의 정책이 적용됩니다. 선생님이 이후 정책을 변경해도 이 수강권에는 영향을 주지 않습니다.',
+          AppStrings.policyAppliedFooter,
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
@@ -151,9 +162,7 @@ class _SheetFrame extends StatelessWidget {
             child: Container(
               width: 36,
               height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.inkQuaternary,
-              ),
+              decoration: BoxDecoration(color: AppColors.inkQuaternary),
             ),
           ),
           Flexible(

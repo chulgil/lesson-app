@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../entities/subscription.dart';
 import '../entities/subscription_proposal.dart';
@@ -33,9 +34,7 @@ class SubscriptionExpiryMonitor {
       final expiringSoon = await _ref.read(
         expiringSoonSubscriptionsProvider.future,
       );
-      final expired = await _ref.read(
-        expiredSubscriptionsProvider.future,
-      );
+      final expired = await _ref.read(expiredSubscriptionsProvider.future);
 
       // Generate alerts for expiring soon subscriptions
       for (final sub in expiringSoon) {
@@ -60,7 +59,9 @@ class SubscriptionExpiryMonitor {
         alerts.add(_createExpiredAlert(sub));
       }
     } catch (e) {
-      debugPrint('[SubscriptionExpiryMonitor] Error checking subscriptions: $e');
+      debugPrint(
+        '[SubscriptionExpiryMonitor] Error checking subscriptions: $e',
+      );
     }
 
     return alerts;
@@ -71,15 +72,16 @@ class SubscriptionExpiryMonitor {
       id: 'sub_expiring_${sub.id}_d$daysLeft',
       userId: sub.studentId,
       type: NotificationType.subscriptionExpiringSoon,
-      priority: daysLeft <= 1
-          ? NotificationPriority.urgent
-          : NotificationPriority.high,
-      title: '수강권이 $daysLeft일 후 만료됩니다',
-      body: '남은 횟수 ${sub.remainingLessons ?? 0}회 · 갱신 요청을 보내보세요',
+      priority:
+          daysLeft <= 1
+              ? NotificationPriority.urgent
+              : NotificationPriority.high,
+      title: AppStrings.subscriptionExpiringTitle(daysLeft),
+      body: AppStrings.subscriptionExpiringBody(sub.remainingLessons ?? 0),
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: '수강권 확인',
+      actionLabel: AppStrings.subscriptionViewAction,
       data: {
         'subscriptionId': sub.id,
         'daysLeft': daysLeft,
@@ -94,12 +96,15 @@ class SubscriptionExpiryMonitor {
       userId: sub.studentId,
       type: NotificationType.lessonsRunningLow,
       priority: NotificationPriority.high,
-      title: remaining == 0 ? '수강권 횟수를 모두 사용했습니다' : '수강권이 마지막 1회 남았습니다',
-      body: '갱신 요청을 보내 레슨을 이어가세요',
+      title:
+          remaining == 0
+              ? AppStrings.subscriptionLessonsExhaustedTitle
+              : AppStrings.subscriptionLastLessonTitle,
+      body: AppStrings.subscriptionRenewalRequestBody,
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: '갱신 요청',
+      actionLabel: AppStrings.subscriptionRenewalAction,
       data: {
         'subscriptionId': sub.id,
         'remainingLessons': remaining,
@@ -132,16 +137,13 @@ class SubscriptionExpiryMonitor {
       userId: sub.studentId,
       type: NotificationType.subscriptionExpired,
       priority: NotificationPriority.high,
-      title: '수강권이 만료되었습니다',
-      body: '갱신 요청을 보내 레슨을 이어가세요',
+      title: AppStrings.subscriptionExpiredTitle,
+      body: AppStrings.subscriptionRenewalRequestBody,
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: '갱신 요청',
-      data: {
-        'subscriptionId': sub.id,
-        'studentId': sub.studentId,
-      },
+      actionLabel: AppStrings.subscriptionRenewalAction,
+      data: {'subscriptionId': sub.id, 'studentId': sub.studentId},
     );
   }
 }

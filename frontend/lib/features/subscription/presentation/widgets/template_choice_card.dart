@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -54,7 +55,7 @@ class TemplateChoiceCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(color: AppColors.paperAccent),
                   child: Text(
-                    '추천',
+                    AppStrings.templateRecommendedBadge,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paper,
                       fontWeight: FontWeight.w600,
@@ -76,7 +77,10 @@ class TemplateChoiceCard extends StatelessWidget {
 
           // Price and validity
           Text(
-            '${formatWonWithComma(template.price)}  ·  유효 ${template.validityDays}일',
+            AppStrings.templatePriceValidity(
+              price: formatWonWithComma(template.price),
+              days: template.validityDays,
+            ),
             style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           ),
 
@@ -84,7 +88,7 @@ class TemplateChoiceCard extends StatelessWidget {
 
           // Duration estimate
           Text(
-            '주 1회 기준 약 $monthsLabel개월',
+            AppStrings.templateMonthlyEstimate(monthsLabel),
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -94,7 +98,7 @@ class TemplateChoiceCard extends StatelessWidget {
           if (template.totalLessons > 1) ...[
             const SizedBox(height: AppSpacing.space1),
             Text(
-              '회당 ${formatWonWithComma(unitPrice)}',
+              AppStrings.templateUnitPriceLabel(formatWonWithComma(unitPrice)),
               style: AppTypography.bodySmall.copyWith(
                 color:
                     isRecommended
@@ -125,7 +129,10 @@ class TemplateChoiceCard extends StatelessWidget {
                   shape: const RoundedRectangleBorder(),
                   elevation: 0,
                 ),
-                child: Text('선택하기', style: AppTypography.buttonSmall),
+                child: Text(
+                  AppStrings.templateChooseButton,
+                  style: AppTypography.buttonSmall,
+                ),
               ),
             ),
           ),
