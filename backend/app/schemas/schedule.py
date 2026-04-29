@@ -1,14 +1,13 @@
 """Schedule and booking schemas."""
 
-
 import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-
 # ---------------------------------------------------------------------------
 # Availability
 # ---------------------------------------------------------------------------
+
 
 class TimeSlotSchema(BaseModel):
     """A single time slot within a day."""
@@ -65,10 +64,12 @@ class AvailabilityCreate(BaseModel):
                 day = ws.get("day_of_week", ws.get("dayOfWeek", 0))
                 start = ws.get("start_time", ws.get("startTime", "09:00"))
                 end = ws.get("end_time", ws.get("endTime", "18:00"))
-                converted.append(DayAvailability(
-                    day_of_week=day,
-                    time_slots=[TimeSlotSchema(start_time=start, end_time=end)],
-                ))
+                converted.append(
+                    DayAvailability(
+                        day_of_week=day,
+                        time_slots=[TimeSlotSchema(start_time=start, end_time=end)],
+                    )
+                )
             self.availabilities = converted
         return self
 
@@ -76,6 +77,7 @@ class AvailabilityCreate(BaseModel):
 # ---------------------------------------------------------------------------
 # Schedule slots (read-only, computed)
 # ---------------------------------------------------------------------------
+
 
 class SlotStatus(BaseModel):
     """A single bookable slot."""
@@ -97,6 +99,7 @@ class SlotsResponse(BaseModel):
 # Weekly schedule (availability + bookings merged)
 # ---------------------------------------------------------------------------
 
+
 class WeeklyScheduleResponse(BaseModel):
     """Combined weekly schedule for a teacher."""
 
@@ -109,6 +112,7 @@ class WeeklyScheduleResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Schedule exceptions
 # ---------------------------------------------------------------------------
+
 
 class ScheduleExceptionCreate(BaseModel):
     """Create a schedule exception.
@@ -171,6 +175,7 @@ class ScheduleExceptionResponse(BaseModel):
 # Bookings
 # ---------------------------------------------------------------------------
 
+
 class BookingResponse(BaseModel):
     """Lesson booking representation.
 
@@ -204,9 +209,7 @@ class BookingResponse(BaseModel):
         return self.scheduled_time
 
     def model_post_init(self, __context: object) -> None:
-        """Map status values for frontend compatibility."""
-        # Backend 'approved' = Frontend 'confirmed'
-        # Keep both values accepted
+        """Map status values for frontend compatibility — Plan B (#238): SSOT 'confirmed'."""
         pass
 
 

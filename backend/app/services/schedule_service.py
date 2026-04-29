@@ -47,10 +47,7 @@ class ScheduleService:
             slots_rows = await self.db.scalars(
                 select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
-            time_slots = [
-                TimeSlotSchema(start_time=s.start_time, end_time=s.end_time)
-                for s in slots_rows.all()
-            ]
+            time_slots = [TimeSlotSchema(start_time=s.start_time, end_time=s.end_time) for s in slots_rows.all()]
             day_list.append(DayAvailability(day_of_week=avail.day_of_week, time_slots=time_slots))
 
         return AvailabilityResponse(
@@ -58,9 +55,7 @@ class ScheduleService:
             availabilities=day_list,
         )
 
-    async def set_availability(
-        self, data: AvailabilityCreate, current_user: Any
-    ) -> AvailabilityResponse:
+    async def set_availability(self, data: AvailabilityCreate, current_user: Any) -> AvailabilityResponse:
         """Replace the teacher's weekly availability."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 
@@ -97,14 +92,12 @@ class ScheduleService:
         await self.db.flush()
         return await self.get_availability(current_user)
 
-    async def get_weekly_schedule(
-        self, current_user: Any, *, week_start: str | None = None
-    ) -> WeeklyScheduleResponse:
+    async def get_weekly_schedule(self, current_user: Any, *, week_start: str | None = None) -> WeeklyScheduleResponse:
         """Return the merged weekly schedule (availability + bookings)."""
-        from datetime import date as date_type, timedelta
+        from datetime import date as date_type
+        from datetime import timedelta
 
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
-        from app.schemas.schedule import SlotStatus
 
         ws = date_type.fromisoformat(week_start) if week_start else date_type.today()
         # Align to Monday
@@ -121,8 +114,7 @@ class ScheduleService:
                 select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
             avail_by_day[avail.day_of_week] = [
-                {"start_time": s.start_time, "end_time": s.end_time, "type": "available"}
-                for s in slots_rows.all()
+                {"start_time": s.start_time, "end_time": s.end_time, "type": "available"} for s in slots_rows.all()
             ]
 
         # Load bookings for this week
@@ -136,12 +128,14 @@ class ScheduleService:
         bookings_by_date: dict[str, list[dict]] = {}
         for b in bookings.all():
             date_str = b.scheduled_date.isoformat()
-            bookings_by_date.setdefault(date_str, []).append({
-                "start_time": b.scheduled_time,
-                "duration": b.duration,
-                "status": b.status.value if hasattr(b.status, "value") else b.status,
-                "type": "booking",
-            })
+            bookings_by_date.setdefault(date_str, []).append(
+                {
+                    "start_time": b.scheduled_time,
+                    "duration": b.duration,
+                    "status": b.status.value if hasattr(b.status, "value") else b.status,
+                    "type": "booking",
+                }
+            )
 
         # Build days dict
         days: dict[str, list] = {}
@@ -169,11 +163,9 @@ class ScheduleService:
         # Otherwise assume it's already a User.id
         return teacher_id
 
-    async def get_available_slots(
-        self, *, teacher_id: str, date: str, duration: int = 60
-    ) -> SlotsResponse:
+    async def get_available_slots(self, *, teacher_id: str, date: str, duration: int = 60) -> SlotsResponse:
         """Compute available booking slots for a date."""
-        from datetime import date as date_type, timedelta
+        from datetime import date as date_type
 
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
         from app.schemas.schedule import SlotStatus
@@ -204,7 +196,7 @@ class ScheduleService:
             select(LessonBooking).where(
                 LessonBooking.teacher_id == user_id,
                 LessonBooking.scheduled_date == d,
-                LessonBooking.status.in_(["pending", "approved"]),
+                LessonBooking.status.in_(["pending", "confirmed"]),
             )
         )
         booked_times = {b.scheduled_time for b in bookings.all()}
@@ -226,11 +218,13 @@ class ScheduleService:
                 slot_end_time = f"{slot_end_minutes // 60:02d}:{slot_end_minutes % 60:02d}"
 
                 is_booked = slot_time in booked_times
-                slots.append(SlotStatus(
-                    start_time=slot_time,
-                    end_time=slot_end_time,
-                    status="booked" if is_booked else "available",
-                ))
+                slots.append(
+                    SlotStatus(
+                        start_time=slot_time,
+                        end_time=slot_end_time,
+                        status="booked" if is_booked else "available",
+                    )
+                )
                 current += 30  # 30-minute interval
 
         return SlotsResponse(date=d, slots=slots)
@@ -239,14 +233,12 @@ class ScheduleService:
     # Schedule exceptions
     # ------------------------------------------------------------------
 
-    async def create_exception(
-        self, data: ScheduleExceptionCreate, current_user: Any
-    ) -> ScheduleExceptionResponse:
+    async def create_exception(self, data: ScheduleExceptionCreate, current_user: Any) -> ScheduleExceptionResponse:
         """Add a schedule exception."""
-        from app.models.schedule_ext import ScheduleException
-
         # Find teacher's first availability to link to (or use empty string)
         from app.models.schedule import TeacherAvailability
+        from app.models.schedule_ext import ScheduleException
+
         avail = await self.db.scalar(
             select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
         )
@@ -368,29 +360,25 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "approved"
+        booking.status = "confirmed"
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
-    async def reject_booking(
-        self, booking_id: str, reason: str | None, current_user: Any
-    ) -> BookingResponse:
-        """Reject a pending booking."""
+    async def reject_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
+        """Reject a pending booking — Plan B (#238): rejected 제거, cancelled + decline_reason 사유."""
         from app.models.schedule import LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "rejected"
+        booking.status = "cancelled"
         booking.reason = reason
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
-    async def cancel_booking(
-        self, booking_id: str, reason: str | None, current_user: Any
-    ) -> BookingResponse:
+    async def cancel_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
         """Cancel a booking."""
         from app.models.schedule import LessonBooking
 
@@ -403,9 +391,7 @@ class ScheduleService:
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
-    async def change_booking(
-        self, booking_id: str, data: BookingChangeRequest, current_user: Any
-    ) -> BookingResponse:
+    async def change_booking(self, booking_id: str, data: BookingChangeRequest, current_user: Any) -> BookingResponse:
         """Request a change to booking date/time."""
         from app.models.schedule import LessonBooking
 
@@ -432,9 +418,7 @@ class ScheduleService:
         )
         return [BookingResponse.model_validate(b) for b in result.all()]
 
-    async def create_makeup_booking(
-        self, data: MakeupBookingCreate, current_user: Any
-    ) -> BookingResponse:
+    async def create_makeup_booking(self, data: MakeupBookingCreate, current_user: Any) -> BookingResponse:
         """Create a makeup lesson booking."""
         from app.models.schedule import LessonBooking
 
@@ -444,7 +428,7 @@ class ScheduleService:
             lesson_type="makeup",
             scheduled_date=data.scheduled_date,
             scheduled_time=data.scheduled_time,
-            status="approved",
+            status="confirmed",
             notes=data.reason,
         )
         self.db.add(booking)

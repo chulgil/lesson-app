@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -15,13 +15,25 @@ class BookingLessonType(str, enum.Enum):
 
 
 class BookingStatus(str, enum.Enum):
+    """spec §10.2 7값 SSOT (#238, 결정 2026-04-29 옵션 A 채택).
+
+    제거 (rename / 분리):
+    - approved → confirmed (rename)
+    - rejected → cancelled + decline_reason 컬럼 (사유 분리)
+    - noShow → cancelled + NoShowRecord 테이블 (이력 분리)
+
+    추가:
+    - unavailable: 강사 불가 슬롯 (휴무 마킹)
+    - expired: 마감 시점까지 confirm 미도달
+    """
+
     pending = "pending"
-    approved = "approved"
-    rejected = "rejected"
-    cancelled = "cancelled"
-    completed = "completed"
-    noShow = "noShow"
+    confirmed = "confirmed"
     changeRequested = "changeRequested"
+    completed = "completed"
+    cancelled = "cancelled"
+    unavailable = "unavailable"
+    expired = "expired"
 
 
 class RequestTiming(str, enum.Enum):
@@ -82,9 +94,7 @@ class TeacherAvailability(UUIDMixin, TimestampMixin, Base):
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     day_of_week: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    __table_args__ = (
-        Index("uk_avail_teacher_day", "teacher_id", "day_of_week", unique=True),
-    )
+    __table_args__ = (Index("uk_avail_teacher_day", "teacher_id", "day_of_week", unique=True),)
 
 
 class AvailabilityTimeSlot(UUIDMixin, Base):
@@ -97,9 +107,7 @@ class AvailabilityTimeSlot(UUIDMixin, Base):
     end_time: Mapped[str] = mapped_column(String(5), nullable=False)
     is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (
-        Index("idx_slot_availability", "availability_id"),
-    )
+    __table_args__ = (Index("idx_slot_availability", "availability_id"),)
 
 
 class LessonBooking(UUIDMixin, TimestampMixin, Base):
@@ -158,7 +166,9 @@ class LessonRequest(UUIDMixin, Base):
 
     # Legacy fields (kept for backward compatibility)
     preferred_timing: Mapped[str | None] = mapped_column(
-        String(30), nullable=True, default="afterConsultation",
+        String(30),
+        nullable=True,
+        default="afterConsultation",
     )
     keep_previous_schedule: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     previous_lesson_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -218,6 +228,4 @@ class GroupClass(UUIDMixin, TimestampMixin, Base):
     price_per_session: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (
-        Index("idx_group_teacher", "teacher_id"),
-    )
+    __table_args__ = (Index("idx_group_teacher", "teacher_id"),)

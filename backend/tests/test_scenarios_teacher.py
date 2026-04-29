@@ -7,16 +7,13 @@ calling multiple APIs sequentially and verifying data consistency across calls.
 import pytest
 from httpx import AsyncClient
 
-
 # ===========================================================================
 # Scenario 1: 온보딩 → 학생 등록 → 첫 레슨 → 피드백
 # ===========================================================================
 
 
 @pytest.mark.asyncio
-async def test_scenario_onboarding_to_first_lesson(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_onboarding_to_first_lesson(client: AsyncClient, auth_headers, create_test_user):
     """Teacher onboards, registers a student, creates a lesson, writes feedback."""
     # Step 1: Teacher logs in (user already exists from auth)
     await create_test_user(user_id="test-user-id", role="teacher")
@@ -103,9 +100,7 @@ async def test_scenario_onboarding_to_first_lesson(
 
 
 @pytest.mark.asyncio
-async def test_scenario_subscription_lifecycle(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers, create_test_user):
     """Teacher creates a template, issues subscription, deducts lessons until expiring."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -202,8 +197,10 @@ async def test_scenario_invite_connect_booking(
     """Teacher invites → student connects → books trial → teacher approves."""
     await create_test_user(user_id="test-user-id", role="teacher", name="박선생")
     await create_test_user(
-        user_id="test-student-id", role="student",
-        email="student@test.com", name="최학생",
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="최학생",
     )
 
     # Step 1: Teacher creates invite
@@ -271,7 +268,7 @@ async def test_scenario_invite_connect_booking(
         headers=auth_headers,
     )
     assert approve.status_code == 200
-    assert approve.json()["status"] == "approved"
+    assert approve.json()["status"] == "confirmed"
 
 
 # ===========================================================================
@@ -280,9 +277,7 @@ async def test_scenario_invite_connect_booking(
 
 
 @pytest.mark.asyncio
-async def test_scenario_group_class_full_lifecycle(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_group_class_full_lifecycle(client: AsyncClient, auth_headers, create_test_user):
     """Full group class lifecycle: schedule, fill, waitlist, cancel, promote, attend."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -359,9 +354,7 @@ async def test_scenario_group_class_full_lifecycle(
 
 
 @pytest.mark.asyncio
-async def test_scenario_practice_management(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_practice_management(client: AsyncClient, auth_headers, create_test_user):
     """Teacher assigns practice, student records, stats + gamification update."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -470,8 +463,10 @@ async def test_scenario_dashboard_and_content(
     """Teacher opens dashboard, manages feedback presets, adds resources, checks reviews."""
     await create_test_user(user_id="test-user-id", role="teacher", name="김선생")
     await create_test_user(
-        user_id="test-student-id", role="student",
-        email="student@test.com", name="학생A",
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="학생A",
     )
 
     # Step 1: Teacher dashboard
@@ -576,9 +571,7 @@ async def test_scenario_dashboard_and_content(
 
 
 @pytest.mark.asyncio
-async def test_scenario_settings_full_configuration(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_settings_full_configuration(client: AsyncClient, auth_headers, create_test_user):
     """Teacher configures all settings in order during initial setup."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -650,8 +643,10 @@ async def test_scenario_proposal_to_subscription(
     """Teacher proposes subscription → student accepts → subscription issued."""
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
-        user_id="test-student-id", role="student",
-        email="student@test.com", name="학생",
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="학생",
     )
 
     # Step 1: Create template
@@ -722,9 +717,7 @@ async def test_scenario_proposal_to_subscription(
 
 
 @pytest.mark.asyncio
-async def test_scenario_no_show_and_makeup(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_no_show_and_makeup(client: AsyncClient, auth_headers, create_test_user):
     """Student no-shows → teacher records → creates makeup booking."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -797,9 +790,7 @@ async def test_scenario_no_show_and_makeup(
 
 
 @pytest.mark.asyncio
-async def test_scenario_multi_student_day(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_scenario_multi_student_day(client: AsyncClient, auth_headers, create_test_user):
     """Teacher manages multiple lessons on the same day."""
     await create_test_user(user_id="test-user-id", role="teacher")
 

@@ -21,40 +21,37 @@ import pytest
 from tests.scenarios.assertions import assert_status, assert_total
 from tests.scenarios.helpers import StudentActions, TeacherActions
 
-
 # ─────────────────────────────────────────────────────────────────────────
 # 1. Availability → slot query → booking → approve
 # ─────────────────────────────────────────────────────────────────────────
 
 
 @pytest.mark.asyncio
-async def test_availability_to_booking_approval(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_availability_to_booking_approval(teacher: TeacherActions, student: StudentActions):
     """
     Teacher sets availability → Student queries slots → books → Teacher approves.
     선생님 가용시간 설정 → 학생 슬롯 조회 → 부킹 → 선생님 승인.
     """
     # ── Phase 1: Teacher sets weekly availability (Mon, Wed) ──
-    await teacher.set_availability([
-        {
-            "day_of_week": 0,
-            "time_slots": [{"start_time": "14:00", "end_time": "20:00"}],
-        },
-        {
-            "day_of_week": 2,
-            "time_slots": [{"start_time": "14:00", "end_time": "20:00"}],
-        },
-    ])
+    await teacher.set_availability(
+        [
+            {
+                "day_of_week": 0,
+                "time_slots": [{"start_time": "14:00", "end_time": "20:00"}],
+            },
+            {
+                "day_of_week": 2,
+                "time_slots": [{"start_time": "14:00", "end_time": "20:00"}],
+            },
+        ]
+    )
 
     avail = await teacher.get_availability()
     assert len(avail["availabilities"]) == 2
 
     # ── Phase 2: Student queries available slots ──────────────
     # 2026-04-01 is a Wednesday (day_of_week=2)
-    slots = await student.get_available_slots(
-        "test-user-id", "2026-04-01", duration=60
-    )
+    slots = await student.get_available_slots("test-user-id", "2026-04-01", duration=60)
     assert "slots" in slots
 
     # ── Phase 3: Student books a slot ─────────────────────────
@@ -71,7 +68,7 @@ async def test_availability_to_booking_approval(
 
     # ── Phase 4: Teacher approves ─────────────────────────────
     result = await teacher.approve_booking(booking_id)
-    assert_status(result, "approved")
+    assert_status(result, "confirmed")
 
     # ── Phase 5: Teacher checks weekly schedule ───────────────
     weekly = await teacher.get_weekly_schedule(week_start="2026-03-30")
@@ -84,9 +81,7 @@ async def test_availability_to_booking_approval(
 
 
 @pytest.mark.asyncio
-async def test_booking_rejection_and_rebook(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_booking_rejection_and_rebook(teacher: TeacherActions, student: StudentActions):
     """
     Student books → Teacher rejects with reason → Student rebooks different day → approved.
     학생 부킹 → 선생님 거절(사유) → 학생 다른 날 부킹 → 승인.
@@ -101,10 +96,8 @@ async def test_booking_rejection_and_rebook(
     )
 
     # ── Phase 2: Teacher rejects with reason ──────────────────
-    rejected = await teacher.reject_booking(
-        booking_id1, reason="월요일은 이미 예약이 꽉 찼어요"
-    )
-    assert_status(rejected, "rejected")
+    rejected = await teacher.reject_booking(booking_id1, reason="월요일은 이미 예약이 꽉 찼어요")
+    assert_status(rejected, "cancelled")
 
     # ── Phase 3: Student rebooks on Wednesday ─────────────────
     booking_id2 = await student.create_booking(
@@ -117,7 +110,7 @@ async def test_booking_rejection_and_rebook(
 
     # ── Phase 4: Teacher approves the new booking ─────────────
     approved = await teacher.approve_booking(booking_id2)
-    assert_status(approved, "approved")
+    assert_status(approved, "confirmed")
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -126,9 +119,7 @@ async def test_booking_rejection_and_rebook(
 
 
 @pytest.mark.asyncio
-async def test_booking_cancel_and_makeup(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_booking_cancel_and_makeup(teacher: TeacherActions, student: StudentActions):
     """
     Student books → Teacher approves → Student cancels → Teacher creates makeup.
     학생 부킹 → 선생님 승인 → 학생 취소 → 선생님 보강 생성.
@@ -144,9 +135,7 @@ async def test_booking_cancel_and_makeup(
     await teacher.approve_booking(booking_id)
 
     # ── Phase 2: Student cancels ──────────────────────────────
-    cancelled = await student.cancel_booking(
-        booking_id, reason="갑자기 일정이 생겼어요"
-    )
+    cancelled = await student.cancel_booking(booking_id, reason="갑자기 일정이 생겼어요")
     assert_status(cancelled, "cancelled")
 
     # ── Phase 3: Teacher creates makeup for a student ─────────
@@ -172,17 +161,17 @@ async def test_schedule_exception_holiday(teacher: TeacherActions):
     선생님 가용시간 설정 → 특정일 휴무 등록 → 확인.
     """
     # ── Phase 1: Set availability ─────────────────────────────
-    await teacher.set_availability([
-        {
-            "day_of_week": 2,
-            "time_slots": [{"start_time": "10:00", "end_time": "18:00"}],
-        },
-    ])
+    await teacher.set_availability(
+        [
+            {
+                "day_of_week": 2,
+                "time_slots": [{"start_time": "10:00", "end_time": "18:00"}],
+            },
+        ]
+    )
 
     # ── Phase 2: Add holiday exception ────────────────────────
-    exception = await teacher.create_schedule_exception(
-        "2026-04-09", exception_type="holiday", reason="개인 휴무"
-    )
+    exception = await teacher.create_schedule_exception("2026-04-09", exception_type="holiday", reason="개인 휴무")
     assert exception["start_date"] == "2026-04-09"
     assert exception["type"] == "holiday"
 
@@ -196,9 +185,7 @@ async def test_schedule_exception_holiday(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_booking_change_request(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_booking_change_request(teacher: TeacherActions, student: StudentActions):
     """
     Student books → Teacher approves → Student requests time change.
     학생 부킹 → 선생님 승인 → 학생 일정 변경 요청.

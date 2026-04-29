@@ -13,7 +13,6 @@ from tests.scenarios.assertions import (
 )
 from tests.scenarios.helpers import StudentActions, TeacherActions
 
-
 # ===========================================================================
 # Scenario A: 신규 선생님 온보딩 (프레임워크 버전)
 # ===========================================================================
@@ -79,9 +78,7 @@ async def test_fw_invite_connect_book(teacher: TeacherActions, student: StudentA
     invite = await teacher.create_invite(is_single_use=True)
     code = invite["invite_code"]
 
-    req_id = await student.send_connection_request(
-        "test-user-id", method="inviteCode", invite_code=code
-    )
+    req_id = await student.send_connection_request("test-user-id", method="inviteCode", invite_code=code)
 
     pending = await teacher.list_pending_requests()
     assert_total(pending, 1)
@@ -92,7 +89,7 @@ async def test_fw_invite_connect_book(teacher: TeacherActions, student: StudentA
 
     booking_id = await student.book_trial("test-user-id", instrument="violin")
     result = await teacher.approve_booking(booking_id)
-    assert_status(result, "approved")
+    assert_status(result, "confirmed")
 
 
 # ===========================================================================
@@ -247,9 +244,7 @@ async def test_fw_multi_student_day(teacher: TeacherActions):
 
     lessons = []
     for sid, time in zip(students, ["10:00", "11:30", "14:00"]):
-        lessons.append(
-            await teacher.create_lesson(sid, date="2026-03-20", start_time=time)
-        )
+        lessons.append(await teacher.create_lesson(sid, date="2026-03-20", start_time=time))
 
     # Complete first two
     await teacher.complete_lesson(lessons[0])
@@ -267,9 +262,7 @@ async def test_fw_multi_student_day(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_subscription_renewal_after_expiry(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_subscription_renewal_after_expiry(teacher: TeacherActions, student: StudentActions):
     """수강권 4회 모두 사용 → 만료 확인 → 선생님 재제안 → 학생 수락 → 새 수강권."""
     # Step 1: 학생 + 첫 수강권 발급 (4회)
     sid = await teacher.create_student("재등록학생", instrument="violin")
@@ -291,9 +284,7 @@ async def test_fw_subscription_renewal_after_expiry(
 
     # Step 4: 선생님이 재등록 제안 (새 템플릿)
     tmpl_id = await teacher.create_template("재등록 8회", lessons_count=8, amount=300000)
-    proposal_id = await teacher.send_proposal(
-        sid, tmpl_id, message="수강권이 만료되었습니다. 재등록을 추천합니다!"
-    )
+    proposal_id = await teacher.send_proposal(sid, tmpl_id, message="수강권이 만료되었습니다. 재등록을 추천합니다!")
 
     # Step 5: 학생이 수락
     result = await student.accept_proposal(proposal_id, tmpl_id)
@@ -323,9 +314,7 @@ async def test_fw_subscription_renewal_after_expiry(
 
 
 @pytest.mark.asyncio
-async def test_fw_unified_lesson_request_approve(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_unified_lesson_request_approve(teacher: TeacherActions, student: StudentActions):
     """Student submits unified lesson request → Teacher approves."""
     # Step 1: 학생이 통합 레슨 신청 (체험, 바이올린, 초급)
     request_id = await student.create_lesson_request(
@@ -370,9 +359,7 @@ async def test_fw_unified_lesson_request_approve(
 
 
 @pytest.mark.asyncio
-async def test_fw_unified_lesson_request_reject(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_unified_lesson_request_reject(teacher: TeacherActions, student: StudentActions):
     """Student submits unified lesson request → Teacher rejects with reason."""
     # Step 1: 학생이 정규 레슨 신청
     request_id = await student.create_lesson_request(
@@ -387,9 +374,7 @@ async def test_fw_unified_lesson_request_reject(
     )
 
     # Step 2: 선생님이 거절 (사유 포함)
-    rejected = await teacher.reject_lesson_request(
-        request_id, reason="스케줄이 꽉 차서 다음에 신청해주세요"
-    )
+    rejected = await teacher.reject_lesson_request(request_id, reason="스케줄이 꽉 차서 다음에 신청해주세요")
     assert_status(rejected, "rejected")
     assert rejected["decline_reason"] == "스케줄이 꽉 차서 다음에 신청해주세요"
 
@@ -405,9 +390,7 @@ async def test_fw_unified_lesson_request_reject(
 
 
 @pytest.mark.asyncio
-async def test_fw_unified_lesson_request_returning_student(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_unified_lesson_request_returning_student(teacher: TeacherActions, student: StudentActions):
     """Returning student sends request with previous lesson info prefilled."""
     # Step 1: 복귀 학생이 이전 정보 포함하여 신청
     request_id = await student.create_lesson_request(
@@ -439,9 +422,7 @@ async def test_fw_unified_lesson_request_returning_student(
 
 
 @pytest.mark.asyncio
-async def test_fw_time_negotiation_accept_alternative(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_negotiation_accept_alternative(teacher: TeacherActions, student: StudentActions):
     """Teacher proposes 3 alternatives → Student accepts one → timeConfirmed."""
     # Step 1: 학생이 레슨 신청
     request_id = await student.create_lesson_request(
@@ -461,17 +442,13 @@ async def test_fw_time_negotiation_accept_alternative(
         {"day_of_week": 3, "start_time": "14:00", "end_time": "15:00"},
         {"day_of_week": 5, "start_time": "10:00", "end_time": "11:00"},
     ]
-    result = await teacher.propose_alternatives(
-        request_id, alternatives, message="화요일 2시는 다른 레슨이 있어요"
-    )
+    result = await teacher.propose_alternatives(request_id, alternatives, message="화요일 2시는 다른 레슨이 있어요")
     assert_status(result, "negotiating")
     assert result["current_round"] == 1
     assert len(result["time_proposals"]) == 1
 
     # Step 3: 학생이 두 번째 대안(목요일 2시) 수락
-    confirmed = await student.accept_alternative(
-        request_id, 1, message="목요일 2시로 할게요!"
-    )
+    confirmed = await student.accept_alternative(request_id, 1, message="목요일 2시로 할게요!")
     assert_status(confirmed, "timeConfirmed")
     assert confirmed["preferred_day"] == 3  # Thursday
     assert confirmed["preferred_time"] == "14:00"
@@ -484,9 +461,7 @@ async def test_fw_time_negotiation_accept_alternative(
 
 
 @pytest.mark.asyncio
-async def test_fw_time_negotiation_counter_propose_then_approve(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_negotiation_counter_propose_then_approve(teacher: TeacherActions, student: StudentActions):
     """Teacher proposes alternatives → Student counter-proposes → Teacher approves."""
     # Step 1: 학생이 레슨 신청
     request_id = await student.create_lesson_request(
@@ -503,16 +478,12 @@ async def test_fw_time_negotiation_counter_propose_then_approve(
     alternatives = [
         {"day_of_week": 2, "start_time": "14:00", "end_time": "15:00"},
     ]
-    result = await teacher.propose_alternatives(
-        request_id, alternatives, message="월요일은 어려워요"
-    )
+    result = await teacher.propose_alternatives(request_id, alternatives, message="월요일은 어려워요")
     assert_status(result, "negotiating")
 
     # Step 3: 학생이 역제안
     counter_slot = {"day_of_week": 4, "start_time": "16:00", "end_time": "17:00"}
-    countered = await student.counter_propose(
-        request_id, counter_slot, message="금요일 4시는 어떨까요?"
-    )
+    countered = await student.counter_propose(request_id, counter_slot, message="금요일 4시는 어떨까요?")
     assert_status(countered, "negotiating")
     assert len(countered["time_proposals"]) == 2
 
@@ -527,9 +498,7 @@ async def test_fw_time_negotiation_counter_propose_then_approve(
 
 
 @pytest.mark.asyncio
-async def test_fw_time_negotiation_two_rounds(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_negotiation_two_rounds(teacher: TeacherActions, student: StudentActions):
     """Round 1: propose → counter. Round 2: propose → accept."""
     request_id = await student.create_lesson_request(
         "test-user-id",
@@ -576,9 +545,7 @@ async def test_fw_time_negotiation_two_rounds(
 
 
 @pytest.mark.asyncio
-async def test_fw_time_negotiation_expire_after_three_rounds(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_negotiation_expire_after_three_rounds(teacher: TeacherActions, student: StudentActions):
     """3 rounds of negotiation without agreement → request expires."""
     request_id = await student.create_lesson_request(
         "test-user-id",
@@ -630,9 +597,7 @@ async def test_fw_time_negotiation_expire_after_three_rounds(
 
 
 @pytest.mark.asyncio
-async def test_fw_time_negotiation_no_propose_after_expire(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_negotiation_no_propose_after_expire(teacher: TeacherActions, student: StudentActions):
     """After expiration, teacher cannot propose alternatives."""
     request_id = await student.create_lesson_request(
         "test-user-id",
@@ -678,9 +643,7 @@ async def test_fw_time_negotiation_no_propose_after_expire(
 
 
 @pytest.mark.asyncio
-async def test_fw_price_table_auto_match(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_price_table_auto_match(teacher: TeacherActions, student: StudentActions):
     """Teacher sets price table → Student request auto-matches suggested price."""
     # Step 1: 선생님이 가격표 설정
     await teacher.update_settings(
@@ -751,9 +714,7 @@ async def test_fw_trial_lesson_free_setting(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_time_confirmed_to_subscription_proposal(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_fw_time_confirmed_to_subscription_proposal(teacher: TeacherActions, student: StudentActions):
     """Time confirmed → Teacher sends subscription proposal → Student accepts."""
     # Step 1: 학생 등록 + 수강권 템플릿 생성
     sid = await teacher.create_student("협상학생", instrument="violin")
@@ -779,14 +740,10 @@ async def test_fw_time_confirmed_to_subscription_proposal(
     assert_status(confirmed, "timeConfirmed")
 
     # Step 4: 선생님이 수강권 제안 발송 (lesson_request_id 연결)
-    proposal_id = await teacher.send_proposal(
-        sid, tmpl_id, lesson_request_id=request_id
-    )
+    proposal_id = await teacher.send_proposal(sid, tmpl_id, lesson_request_id=request_id)
 
     # Step 5: 레슨 요청 상태를 proposalSent로 업데이트
-    updated = await teacher.update_lesson_request_status(
-        request_id, "proposalSent", proposal_id=proposal_id
-    )
+    updated = await teacher.update_lesson_request_status(request_id, "proposalSent", proposal_id=proposal_id)
     assert_status(updated, "proposalSent")
 
     # Step 6: 학생이 수강권 수락
@@ -830,9 +787,7 @@ async def test_fw_multiple_bank_accounts(teacher: TeacherActions):
             "created_at": "2026-03-27T00:00:00Z",
         },
     ]
-    result = await teacher.update_teacher_profile(
-        teacher_id, bank_accounts=accounts
-    )
+    result = await teacher.update_teacher_profile(teacher_id, bank_accounts=accounts)
     assert len(result["bank_accounts"]) == 2
 
     # Step 2: 영속성 확인
@@ -846,15 +801,11 @@ async def test_fw_multiple_bank_accounts(teacher: TeacherActions):
     # Step 3: 디폴트 변경 (신한은행을 기본으로)
     accounts[0]["is_default"] = False
     accounts[1]["is_default"] = True
-    result = await teacher.update_teacher_profile(
-        teacher_id, bank_accounts=accounts
-    )
+    result = await teacher.update_teacher_profile(teacher_id, bank_accounts=accounts)
     assert result["bank_accounts"][1]["is_default"] is True
 
     # Step 4: 계좌 1개 삭제 (국민은행)
     updated_accounts = [accounts[1]]
-    result = await teacher.update_teacher_profile(
-        teacher_id, bank_accounts=updated_accounts
-    )
+    result = await teacher.update_teacher_profile(teacher_id, bank_accounts=updated_accounts)
     assert len(result["bank_accounts"]) == 1
     assert result["bank_accounts"][0]["bank_name"] == "신한은행"
