@@ -53,13 +53,13 @@ class LevelUpDialog extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.paperAccent,
-                    AppColors.paperAccent.withValues(alpha: 0.7),
+                    AppColors.paperAccent,
                   ],
                 ),
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.paperAccent.withValues(alpha: 0.4),
+                    color: AppColors.paperAccent,
                     blurRadius: 20,
                     spreadRadius: 4,
                   ),
@@ -69,7 +69,7 @@ class LevelUpDialog extends StatelessWidget {
               child: Text(
                 'Lv.$newLevel',
                 style: AppTypography.headingMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -94,7 +94,7 @@ class LevelUpDialog extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Text(

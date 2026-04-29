@@ -362,7 +362,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                   }
                 });
               },
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+              selectedColor: AppColors.paperAccentSoft,
               checkmarkColor: AppColors.paperAccent,
               labelStyle: AppTypography.bodyMedium.copyWith(
                 color: isSelected ? AppColors.paperAccent : AppColors.ink,
@@ -399,7 +399,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           icon: const Icon(Icons.add, size: 20),
           style: IconButton.styleFrom(
             backgroundColor: AppColors.paperAccent,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.paper,
             minimumSize: const Size(44, 44),
           ),
         ),

@@ -75,6 +75,7 @@
 - [§7.132 student_home + parent_home Notebook × Score 정렬 W1](#7132--student_home--parent_home-notebook--score-정렬-w1-2026-04-28) — round → 사각 (CircleAvatar 사람 메타포만 유지), Colors.white → AppColors.paper, paperAccent.alpha → paperAccentSoft
 - [§7.132 W1.5 child_profile* 후속 정렬](#7132-w15--child_profile-후속-정렬-2026-04-28-w1-후속) — 색상 swatch round → 사각, Save·추가 버튼 white → paper
 - [§7.132 W2 schedule + subscription + practice 도메인 정렬](#7132-w2--schedule--subscription--practice-도메인-정렬-2026-04-29) — paperAccent.alpha 0.05~0.5 → paperAccentSoft/solid, 0.5px → 1px, Colors.white → paper
+- [§7.132 W3 lessons·profile·students·invite·auth·search·onboarding·gamification 잔여 13 도메인 정렬](#7132-w3--lessons-profile-students-invite-auth-search-onboarding-gamification-잔여-13-도메인-정렬-2026-04-29-같은-날-후속) — paperAccent.alpha 잔재 0건, BoxShape.circle 30건 사각화 (CircleAvatar/painter 예외 보존), Colors.white → AppColors.paper
 
 ---
 
@@ -5390,3 +5391,48 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: 캔버스 painter 의 white 도 paper 로 일괄 — 차트/그래픽은 검정 배경 + 흰색 데이터 라인이 가독성 표준 (waveform / fish bubble / cat painters). Notebook 텍스트 규칙과 그래픽 캔버스 규칙은 분리.
 
 **검증**: `flutter analyze lib/features/subscription lib/features/schedule lib/features/practice` → No issues found! (14.0s). 비즈니스 로직 무변경, 시각 토큰 정렬만. W1 + W1.5 + W2 누적 ~126 파일 / ~120건 정렬 완료.
+
+#### §7.132 W3 — lessons·profile·students·invite·auth·search·onboarding·gamification 잔여 13 도메인 정렬 (2026-04-29 같은 날 후속)
+
+**전제**: W1/W1.5/W2 가 진입표면(홈/자녀/스케줄/수강권/연습) 5 도메인을 정렬. W3 는 잔여 13 도메인 일괄 정렬 — lessons, profile, students, invite, auth, search, onboarding, gamification, settings, follow, analytics, home, notifications, parent_home — Notebook × Score 시그니처 4 변환 규칙(W2 동일) 일괄 적용.
+
+**4 변환 규칙 (W1/W2 동일)**:
+1. `BoxShape.circle` → `BorderRadius.circular(AppSpacing.radiusSmall)` (사각화) — CircleAvatar/사람 정체성/canvas painter 예외 보존
+2. `Colors.white` → `AppColors.paper` — canvas painter (analytics/practice waveform·tuner) 예외 보존
+3. `paperAccent.withValues(alpha: 0.05~0.2)` → `AppColors.paperAccentSoft`
+4. `paperAccent.withValues(alpha: 0.3~0.5)` → `AppColors.paperAccent` (솔리드)
+5. `0.5px` → `1px` (HARD-GATE #5)
+
+**적용 합계**: 13 도메인 / 92 파일 / +348 -336 / paperAccent.alpha 잔재 0건 (2-pass sed batch), BoxShape.circle 30건 사각화, Colors.white 95건 → AppColors.paper, 0.5px 1건 → 1px.
+
+**도메인별 변경 분포**:
+
+| 도메인 | 파일 수 | 핵심 패턴 |
+|---|---|---|
+| lessons | 21 | add_practice_item_sheet 0.5px → 1px, attendance_stats 인라인 BoxDecoration round → 사각, lesson_recurring_section 요일 picker 사각화, ai_notes_result_sheet 인디케이터 사각화 |
+| profile | 20 | extended_profile_widgets / outstanding_payments / certificate_edit / payment_card / lesson_time_settings → Colors.white → AppColors.paper |
+| students | 12 | schedule_section 요일 picker 사각화 (CircleAvatar 학생 아바타 + §7.50 edit badge 보존), students_tab 알림 dot 사각화 + const 제거, student_practice_section 연습 인디케이터 사각화 |
+| invite | 7 | invite_confirm 4 아이콘 컨테이너 + pending_requests/code_input/invite_history/my_connections 빈 상태 아이콘 round → 사각, foregroundColor / backgroundColor / fillColor → AppColors.paper |
+| auth | 7 | parent_invite_code_screen Colors.white → paper (login_bottom_sheets §7.113·§7.114 / role_select_screen §7.113 BoxShape.circle 의례 모먼트 보존) |
+| search | 5 | teacher_detail / academy_detail appbar back arrow + title + foregroundColor → AppColors.paper, teacher_detail 인디케이터 사각화 + const 제거, teacher_search_filter_sheet → AppColors.paper |
+| onboarding | 5 | tutorial / student_tutorial / phone_verification / student_profile_setup / profile_setup → 페이지 인디케이터·스텝 인디케이터·아이콘 컨테이너 사각화 (profile_setup 100×100 아바타 + 32×32 edit badge §7.50 패턴 보존) |
+| gamification | 5 | badge_award_sheet / level_up_dialog / gamification_header / badge_collection_screen / challenges_card → Colors.white → paper, BoxShape.circle 사각화 |
+| settings | 3 | backup_widgets / all_recordings_screen / orphan_recordings_screen → Colors.white → paper |
+| follow / analytics / home / notifications | 4 | analytics/practice_ranking_list rank 배지 사각화, home/schedule_change_request_section dot 사각화 (analytics/monthly_trend_chart canvas painter 보존) |
+
+**보존 예외 (5 카테고리)**:
+- §7.113·§7.114: auth/login_bottom_sheets 이모지 가족 + auth/role_select_screen 웰컴 아이콘 (의례 모먼트)
+- §7.50: students/student_profile_section + onboarding/profile_setup_screen edit badge (Vermillion 카메라 배지가 원형 아바타에 부착되는 SSOT 패턴)
+- 사람 정체성: students/student_detail_screen 학생 아바타 64×64 + onboarding/profile_setup_screen 100×100 프로필 이미지 (CircleAvatar 동일 의미)
+- canvas painter: practice/tuner/tuner_fish_indicator 3 bubble shape + tuner_cat_painters + waveform painters + analytics/monthly_trend_chart + practice/weekly_trend_chart (그래픽 컨텍스트, 차트/계기 가독성 표준)
+- 코멘트 보존: scan_invite_screen / parent_dashboard_tab / metronome/time_signature_picker 의 "Material Colors.white70 → paper alpha" 마이그레이션 코멘트 (히스토리 기록)
+
+**Lore-directive**: BoxShape.circle 변환 시 default radius = `AppSpacing.radiusSmall` (4) — Notebook 의 미니멀 모서리. 큰 컨테이너(48px+)도 동일 토큰으로 통일 — 라디우스 다양성은 Score 의 정렬감 위반.
+
+**Lore-directive**: const BoxDecoration 의 round → BorderRadius.circular 변환 시 const 제거 필수 — `BorderRadius.circular(AppSpacing.radiusSmall)` 는 const constructor 가 아님 (Dart 제약). teacher_detail / students_tab 2건 const_with_non_const 에러 발생 후 const 제거로 해결.
+
+**Lore-rejected**: BoxShape.circle 잔재를 `BorderRadius.circular(size/2)` 로 모사 (예: 8/2 = 4) — 컨테이너 크기 변경 시 라운드 비례가 깨짐. 토큰 단일 = 시각 일관성.
+
+**Lore-rejected**: foregroundColor: Colors.white 를 paperAccent 의 contrast 자동 계산으로 분기 — 일괄 paper 토큰이 SSOT. 분기 로직은 사용자가 토큰 추적 불가능하게 만듦 (§7.132 1-point accent 원칙 위반).
+
+**검증**: `flutter analyze` (전체) → No issues found! (15.0s). 비즈니스 로직 무변경. W1 + W1.5 + W2 + W3 누적 ~218 파일 / ~250건 정렬 — Notebook × Score 4 변환 규칙이 모든 features/ 도메인에 동질화 완료.

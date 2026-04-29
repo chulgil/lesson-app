@@ -29,7 +29,7 @@ class PaymentCard extends StatelessWidget {
         border: Border.all(
           color:
               isOverdue
-                  ? AppColors.paperAccent.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent
                   : AppColors.inkQuaternary,
         ),
         boxShadow: [
@@ -79,7 +79,7 @@ class PaymentCard extends StatelessWidget {
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
             style: AppTypography.bodyLarge.copyWith(
-              color: Colors.white,
+              color: AppColors.paper,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -151,7 +151,7 @@ class PaymentCard extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
+          color: AppColors.paperAccentSoft,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

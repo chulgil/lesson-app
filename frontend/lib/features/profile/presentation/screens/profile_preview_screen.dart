@@ -109,7 +109,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                           alpha: 0.08,
                         ),
                         side: BorderSide(
-                          color: AppColors.paperAccent.withValues(alpha: 0.2),
+                          color: AppColors.paperAccentSoft,
                         ),
                         shape: const RoundedRectangleBorder(),
                       );
@@ -237,7 +237,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                         ? Text(
                           initial,
                           style: AppTypography.displayLarge.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         )
                         : null,
@@ -245,7 +245,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space4),
               Text(
                 profile.name,
-                style: AppTypography.headingLarge.copyWith(color: Colors.white),
+                style: AppTypography.headingLarge.copyWith(color: AppColors.paper),
               ),
               if (profile.instruments.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space2),

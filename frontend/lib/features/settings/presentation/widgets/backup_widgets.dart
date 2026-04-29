@@ -39,7 +39,7 @@ class StatusCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                 ),
                 child: const Icon(
                   Icons.storage,
@@ -212,7 +212,7 @@ class ErrorCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft,
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Row(
         children: [
@@ -432,7 +432,7 @@ class ActionButton extends StatelessWidget {
                   color:
                       isDisabled
                           ? AppColors.inkQuaternary.withValues(alpha: 0.2)
-                          : AppColors.paperAccent.withValues(alpha: 0.1),
+                          : AppColors.paperAccentSoft,
                 ),
                 child: Icon(
                   icon,
@@ -584,7 +584,7 @@ class BackupItem extends ConsumerWidget {
         leading: Container(
           padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.1),
+            color: AppColors.paperAccentSoft,
           ),
           child: const Icon(Icons.archive, color: AppColors.paperAccent),
         ),
@@ -788,8 +788,8 @@ class OrphanRecordingsButton extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color:
                           hasOrphans
-                              ? AppColors.paperAccent.withValues(alpha: 0.1)
-                              : AppColors.paperAccent.withValues(alpha: 0.1),
+                              ? AppColors.paperAccentSoft
+                              : AppColors.paperAccentSoft,
                     ),
                     child: Icon(
                       hasOrphans ? Icons.link_off : Icons.link,
@@ -836,7 +836,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       child: Text(
                         '$count',
                         style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                           fontWeight: FontWeight.w700,
                         ),
                       ),

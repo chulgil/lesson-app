@@ -38,7 +38,7 @@ class LessonRecordingCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                 ),
                 child: Icon(Icons.audio_file, color: AppColors.paperAccent),
               ),

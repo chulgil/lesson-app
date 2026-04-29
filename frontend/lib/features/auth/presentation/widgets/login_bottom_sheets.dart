@@ -88,7 +88,7 @@ void showParentLoginSheet(BuildContext context) {
                   label: 'Apple로 계속하기',
                   description: '신규 가입 → 초대코드 입력',
                   backgroundColor: AppColors.appleBackground,
-                  textColor: Colors.white,
+                  textColor: AppColors.paper,
                   onPressed: () {
                     Navigator.pop(sheetContext);
                     context.go(AppRoutes.parentInviteCode);

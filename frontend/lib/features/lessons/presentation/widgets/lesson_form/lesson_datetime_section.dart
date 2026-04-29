@@ -48,8 +48,8 @@ class LessonDateTimeSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color:
                             isPast
-                                ? AppColors.paperAccent.withValues(alpha: 0.1)
-                                : AppColors.paperAccent.withValues(alpha: 0.1),
+                                ? AppColors.paperAccentSoft
+                                : AppColors.paperAccentSoft,
                       ),
                       child: Icon(
                         isPast ? Icons.history : Icons.calendar_today,
@@ -98,7 +98,7 @@ class LessonDateTimeSection extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                        color: AppColors.paperAccentSoft,
                       ),
                       child: const Icon(
                         Icons.access_time,

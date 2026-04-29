@@ -92,7 +92,7 @@ class PracticeRankingList extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: rankColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             alignment: Alignment.center,
             child: Text(

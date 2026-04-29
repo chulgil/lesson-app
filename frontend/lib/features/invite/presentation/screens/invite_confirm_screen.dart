@@ -70,8 +70,8 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: AppColors.paperAccentSoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Icon(
               Icons.warning_amber_rounded,
@@ -121,7 +121,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             height: 100,
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Icon(Icons.link, size: 48, color: AppColors.paperOk),
           ),
@@ -154,7 +154,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.paper,
               borderRadius: BorderRadius.zero,
               border: Border.all(color: AppColors.inkQuaternary),
             ),
@@ -188,7 +188,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.paper,
               borderRadius: BorderRadius.zero,
               border: Border.all(color: AppColors.inkQuaternary),
             ),
@@ -240,7 +240,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               onPressed: _isLoading ? null : _sendRequest,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.paper,
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
                 ),
@@ -255,7 +255,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       )
                       : const Text('연결 요청 보내기'),
@@ -381,7 +381,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     color: AppColors.ink.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Icon(Icons.link, size: 48, color: AppColors.ink),
                 ),
@@ -413,7 +413,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                   ),
                   child: const Text(AppStrings.confirm),
                 ),
@@ -453,7 +453,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     color: AppColors.paperOk.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Icon(
                     Icons.check_circle,
@@ -548,7 +548,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.paperAccent,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.paper,
                         ),
                         child: const Text('레슨 예약'),
                       ),
@@ -582,7 +582,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.paperAccent,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.paper,
                         ),
                         child: const Text('학생 목록'),
                       ),
@@ -600,7 +600,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.paper,
                     ),
                     child: const Text(AppStrings.confirm),
                   ),

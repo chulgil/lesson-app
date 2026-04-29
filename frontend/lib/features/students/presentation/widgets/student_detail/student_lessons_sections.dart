@@ -88,7 +88,7 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1)
+                  color: AppColors.paperAccentSoft
                 ),
                 child: const Text('레슨 정보를 불러올 수 없습니다'),
               ),
@@ -178,7 +178,7 @@ class StudentRecentLessonsSection extends ConsumerWidget {
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1)
+                  color: AppColors.paperAccentSoft
                 ),
                 child: const Text('레슨 기록을 불러올 수 없습니다'),
               ),

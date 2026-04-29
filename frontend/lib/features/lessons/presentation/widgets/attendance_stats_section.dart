@@ -188,7 +188,7 @@ class AttendanceStatsSection extends ConsumerWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppSpacing.radiusSmall)),
         ),
         const SizedBox(width: AppSpacing.space2),
         Expanded(

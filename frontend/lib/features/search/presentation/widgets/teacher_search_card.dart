@@ -151,7 +151,7 @@ class TeacherSearchCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
+        color: AppColors.paperAccentSoft,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

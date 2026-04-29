@@ -37,7 +37,7 @@ class ChallengesCard extends ConsumerWidget {
         return Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.paper,
             borderRadius: BorderRadius.zero,
             border: Border.all(color: AppColors.inkQuaternary),
           ),
@@ -115,7 +115,7 @@ class _ChallengeItem extends StatelessWidget {
                   color:
                       challenge.period == ChallengePeriod.weekly
                           ? AppColors.ink.withValues(alpha: 0.1)
-                          : AppColors.paperAccent.withValues(alpha: 0.1),
+                          : AppColors.paperAccentSoft,
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Text(

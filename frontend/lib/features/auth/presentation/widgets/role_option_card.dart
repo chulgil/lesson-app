@@ -36,7 +36,7 @@ class RoleOptionCard extends StatelessWidget {
               height: 48,
               // Notebook × Score §7.113: 아이콘 bg 도 각진 (카드 내부 컨테이너 규칙).
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
               ),
               child: Icon(icon, color: AppColors.paperAccent),
             ),

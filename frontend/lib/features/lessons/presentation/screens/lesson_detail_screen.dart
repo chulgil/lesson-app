@@ -387,9 +387,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 border: Border.all(
-                  color: AppColors.paperAccent.withValues(alpha: 0.3),
+                  color: AppColors.paperAccent,
                 ),
               ),
               child: Row(
@@ -544,12 +544,12 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.paperAccent.withValues(alpha: 0.08),
-                  AppColors.paperAccent.withValues(alpha: 0.08),
+                  AppColors.paperAccentSoft,
+                  AppColors.paperAccentSoft,
                 ],
               ),
               border: Border.all(
-                color: AppColors.paperAccent.withValues(alpha: 0.3),
+                color: AppColors.paperAccent,
               ),
             ),
             child: Column(

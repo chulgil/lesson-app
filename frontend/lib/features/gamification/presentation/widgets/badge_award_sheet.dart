@@ -167,7 +167,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                       child: Text(
                         '\uC218\uC5EC\uD558\uAE30',
                         style: AppTypography.buttonSmall.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                     ),
@@ -199,7 +199,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
             borderRadius: BorderRadius.zero,
             color:
                 isSelected
-                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                    ? AppColors.paperAccentSoft
                     : null,
           ),
           child: Row(
@@ -211,9 +211,9 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 decoration: BoxDecoration(
                   color:
                       isSelected
-                          ? AppColors.paperAccent.withValues(alpha: 0.15)
+                          ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Icon(
                   badge.icon,

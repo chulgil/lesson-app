@@ -32,7 +32,7 @@ class FrequencyOption extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.paperAccent.withValues(alpha: 0.1)
+              ? AppColors.paperAccentSoft
               : AppColors.paperDark,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,

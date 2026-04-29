@@ -61,7 +61,7 @@ class _StudentInviteCodeScreenState
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: AppColors.paperAccent.withValues(alpha: 0.1),
+                          color: AppColors.paperAccentSoft,
                         ),
                         child: const Center(
                           child: Text('🎵', style: TextStyle(fontSize: 40)),

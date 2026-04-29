@@ -116,12 +116,14 @@ class _TeacherDetailContent extends ConsumerWidget {
           titleSpacing: 0,
           backgroundColor: AppColors.paperAccent,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: AppColors.paper),
             onPressed: () => context.pop(),
           ),
           title: Text(
             '${profile.name ?? '익명 선생님'} (선생님)',
-            style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
+            style: NotebookTypography.appBarTitle.copyWith(
+              color: AppColors.paper,
+            ),
           ),
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
@@ -129,10 +131,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.paperAccent,
-                    AppColors.paperAccent.withValues(alpha: 0.8),
-                  ],
+                  colors: [AppColors.paperAccent, AppColors.paperAccent],
                 ),
               ),
               child: SafeArea(
@@ -153,7 +152,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                 ? const Icon(
                                   Icons.person,
                                   size: 50,
-                                  color: Colors.white,
+                                  color: AppColors.paper,
                                 )
                                 : null,
                       ),
@@ -161,7 +160,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       Text(
                         profile.name ?? '익명 선생님',
                         style: AppTypography.headingMedium.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                       ),
                     ],
@@ -345,9 +344,11 @@ class _TeacherDetailContent extends ConsumerWidget {
                                     ),
                                     width: 6,
                                     height: 6,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       color: AppColors.paperAccent,
-                                      shape: BoxShape.circle,
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusSmall,
+                                      ),
                                     ),
                                   ),
                                   Expanded(
@@ -453,7 +454,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       label: const Text('레슨 신청'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.paper,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space3,
                         ),
@@ -549,7 +550,7 @@ class _TeacherDetailContent extends ConsumerWidget {
             label: const Text('다시 시작하기'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.paper,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: const RoundedRectangleBorder(),
             ),

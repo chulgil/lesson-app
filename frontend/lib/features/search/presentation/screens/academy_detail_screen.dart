@@ -104,12 +104,12 @@ class AcademyDetailScreen extends ConsumerWidget {
       titleSpacing: 0,
       backgroundColor: AppColors.paperAccent,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        icon: const Icon(Icons.arrow_back, color: AppColors.paper),
         onPressed: () => context.pop(),
       ),
       title: Text(
         '${academy.name} (학원)',
-        style: NotebookTypography.appBarTitle.copyWith(color: Colors.white),
+        style: NotebookTypography.appBarTitle.copyWith(color: AppColors.paper),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
@@ -119,7 +119,7 @@ class AcademyDetailScreen extends ConsumerWidget {
               end: Alignment.bottomCenter,
               colors: [
                 AppColors.paperAccent,
-                AppColors.paperAccent.withValues(alpha: 0.8),
+                AppColors.paperAccent,
               ],
             ),
           ),
@@ -136,14 +136,14 @@ class AcademyDetailScreen extends ConsumerWidget {
                     child: const Icon(
                       Icons.school,
                       size: 36,
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     academy.name,
                     style: AppTypography.headingMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   ),
                 ],
@@ -159,7 +159,7 @@ class AcademyDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -254,7 +254,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             vertical: 2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.1),
+            color: AppColors.paperAccentSoft,
           ),
           child: Text(
             '${academy.teacherCount}명',
@@ -344,7 +344,7 @@ class _AcademyTeacherCard extends StatelessWidget {
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -362,7 +362,7 @@ class _AcademyTeacherCard extends StatelessWidget {
               // Profile image
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccentSoft,
                 backgroundImage:
                     teacher.profileImage != null
                         ? NetworkImage(teacher.profileImage!)
@@ -415,7 +415,7 @@ class _AcademyTeacherCard extends StatelessWidget {
                 onPressed: onTrialTap,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.paper,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space3,
                     vertical: AppSpacing.space2,

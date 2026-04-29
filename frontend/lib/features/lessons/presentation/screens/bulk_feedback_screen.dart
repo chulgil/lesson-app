@@ -352,9 +352,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 color: AppColors.paperAccent,
               ),
             ),
-            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+            backgroundColor: AppColors.paperAccentSoft,
             side: BorderSide(
-              color: AppColors.paperAccent.withValues(alpha: 0.2),
+              color: AppColors.paperAccentSoft,
             ),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

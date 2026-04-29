@@ -182,7 +182,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.paper,
                         shape: RoundedRectangleBorder(),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
@@ -231,8 +231,8 @@ class _StudentTutorialPage extends StatelessWidget {
             width: 200,
             height: 200,
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: AppColors.paperAccentSoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Icon(data.icon, size: 80, color: AppColors.paperAccent),
           ),

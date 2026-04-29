@@ -160,7 +160,7 @@ class _ParentInviteCodeScreenState
                           onPressed: _isLoading ? null : _handleSubmitCode,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ink,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.paper,
                             shape: RoundedRectangleBorder(
                               
                             ),
@@ -173,7 +173,7 @@ class _ParentInviteCodeScreenState
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        AppColors.paper,
                                       ),
                                     ),
                                   )

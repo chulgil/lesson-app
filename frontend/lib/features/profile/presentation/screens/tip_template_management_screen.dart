@@ -168,7 +168,7 @@ class _TipTemplateManagementScreenState
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.space4),
         decoration: BoxDecoration(color: AppColors.paperAccent),
-        child: const Icon(Icons.delete, color: Colors.white),
+        child: const Icon(Icons.delete, color: AppColors.paper),
       ),
       confirmDismiss: (direction) async {
         return await _showDeleteConfirmation(template);
@@ -214,7 +214,7 @@ class _TipTemplateManagementScreenState
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                        color: AppColors.paperAccentSoft,
                       ),
                       child: Text(
                         template.category.label,
@@ -232,7 +232,7 @@ class _TipTemplateManagementScreenState
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.paperAccent.withValues(alpha: 0.1),
+                          color: AppColors.paperAccentSoft,
                         ),
                         child: Text(
                           template.instrument!,

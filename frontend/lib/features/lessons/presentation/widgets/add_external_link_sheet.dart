@@ -117,7 +117,7 @@ class _AddExternalLinkSheetState extends ConsumerState<AddExternalLinkSheet> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.08),
+                color: AppColors.paperAccentSoft,
               ),
               child: Row(
                 children: [

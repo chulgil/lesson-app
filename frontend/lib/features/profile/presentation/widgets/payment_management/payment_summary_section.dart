@@ -82,8 +82,8 @@ class _OverdueWarningBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Row(
         children: [

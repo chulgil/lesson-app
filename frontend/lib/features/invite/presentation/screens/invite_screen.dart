@@ -121,7 +121,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Row(
@@ -173,7 +173,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
         boxShadow: [
           BoxShadow(
@@ -192,7 +192,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             data: invite.qrCodeData,
             version: QrVersions.auto,
             size: 200,
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.paper,
             eyeStyle: QrEyeStyle(
               eyeShape: QrEyeShape.square,
               color: AppColors.paperAccent,
@@ -218,7 +218,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
@@ -273,7 +273,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             label: const Text('링크 공유하기'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.paper,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
@@ -358,7 +358,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           leading: Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.qr_code_scanner, color: AppColors.paperAccent),
@@ -391,7 +391,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             leading: Container(
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Icon(Icons.search, color: AppColors.paperAccent),

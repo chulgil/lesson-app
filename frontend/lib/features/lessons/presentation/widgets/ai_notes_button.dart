@@ -47,11 +47,11 @@ class AiNotesButton extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.paperAccent.withValues(alpha: 0.08),
-            AppColors.paperAccent.withValues(alpha: 0.03),
+            AppColors.paperAccentSoft,
+            AppColors.paperAccentSoft,
           ],
         ),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccentSoft),
       ),
       child: InkWell(
         onTap: () => _pickAndGenerate(context, ref),
@@ -60,7 +60,7 @@ class AiNotesButton extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.15),
+                color: AppColors.paperAccentSoft,
               ),
               child: const Icon(
                 Icons.auto_awesome,
@@ -106,8 +106,8 @@ class AiNotesButton extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccentSoft),
       ),
       child: Row(
         children: [
@@ -173,8 +173,8 @@ class AiNotesButton extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Row(
         children: [

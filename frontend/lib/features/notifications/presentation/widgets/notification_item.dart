@@ -33,7 +33,7 @@ class NotificationItem extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space4),
             color:
                 isUnread
-                    ? AppColors.paperAccent.withValues(alpha: 0.05)
+                    ? AppColors.paperAccentSoft
                     : AppColors.paper,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

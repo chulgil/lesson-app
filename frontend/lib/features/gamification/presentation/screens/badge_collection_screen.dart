@@ -85,8 +85,8 @@ class BadgeCollectionScreen extends ConsumerWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: AppColors.paperAccentSoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -189,7 +189,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                   badge.isEarned
                       ? rarityColor.withValues(alpha: 0.15)
                       : AppColors.paperDark,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             alignment: Alignment.center,
             child: Icon(

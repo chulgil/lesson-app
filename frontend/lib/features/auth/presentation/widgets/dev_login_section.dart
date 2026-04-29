@@ -35,7 +35,7 @@ class DevLoginSection extends StatelessWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
             ),
             child: Text(
               'DEV MODE — 테스트 계정 선택',
@@ -102,7 +102,7 @@ class DevLoginSection extends StatelessWidget {
           emoji: '🎵',
           name: '최유진',
           description: '체험 레슨 1개 (플루트)',
-          color: AppColors.paperAccent.withValues(alpha: 0.7),
+          color: AppColors.paperAccent,
           isLoading: isLoading,
           onTap:
               () => onDevLogin(

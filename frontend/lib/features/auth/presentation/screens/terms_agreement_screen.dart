@@ -164,7 +164,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
           border: Border.all(
             color:
                 _allChecked
-                    ? AppColors.paperAccent.withValues(alpha: 0.5)
+                    ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
           ),
         ),

@@ -101,9 +101,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   Future<void> _selectProfileImage() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => SafeArea(
             child: Padding(
@@ -162,9 +160,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => _InstrumentSelectorSheet(
             selectedInstruments: _selectedInstruments,
@@ -236,7 +232,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space3),
                         decoration: BoxDecoration(
-                          color: AppColors.paperAccent.withValues(alpha: 0.1),
+                          color: AppColors.paperAccentSoft,
                           borderRadius: BorderRadius.zero,
                         ),
                         child: Row(
@@ -273,7 +269,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   onPressed: _isLoading || !_isFormValid ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                     disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero,
@@ -286,7 +282,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : Text('다음', style: AppTypography.button),
@@ -374,11 +370,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.paper, width: 2),
                     ),
                     child: const Icon(
                       Icons.camera_alt,
-                      color: Colors.white,
+                      color: AppColors.paper,
                       size: 16,
                     ),
                   ),
@@ -414,9 +410,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
             hintText: '선생님 이름을 입력해주세요',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.inkQuaternary),
@@ -543,9 +537,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           decoration: InputDecoration(
             hintText: '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)',
             counterText: '',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.inkQuaternary),
@@ -587,17 +579,17 @@ class _ProgressStep extends StatelessWidget {
                   isActive || isCompleted
                       ? AppColors.paperAccent
                       : AppColors.inkQuaternary,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Center(
               child:
                   isCompleted
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      ? const Icon(Icons.check, size: 16, color: AppColors.paper)
                       : Text(
                         '$step',
                         style: AppTypography.bodySmall.copyWith(
                           color:
-                              isActive ? Colors.white : AppColors.inkTertiary,
+                              isActive ? AppColors.paper : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

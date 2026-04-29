@@ -399,9 +399,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.paperAccent,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                     ),
                   ),
@@ -891,14 +893,9 @@ class _StudentCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color:
             isSelected
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                ? AppColors.paperAccentSoft
                 : Theme.of(context).colorScheme.surface,
-        border:
-            isSelected
-                ? Border.all(
-                  color: AppColors.paperAccent.withValues(alpha: 0.3),
-                )
-                : null,
+        border: isSelected ? Border.all(color: AppColors.paperAccent) : null,
         boxShadow: [
           BoxShadow(
             color: AppColors.ink.withValues(alpha: 0.05),
@@ -958,7 +955,7 @@ class _StudentCard extends ConsumerWidget {
       // Avatar
       CircleAvatar(
         radius: 20,
-        backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+        backgroundColor: AppColors.paperAccentSoft,
         child: Text(
           swm.initial,
           style: AppTypography.bodyLarge.copyWith(
@@ -996,9 +993,7 @@ class _StudentCard extends ConsumerWidget {
                       horizontal: 5,
                       vertical: 1,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       '$subjectCount과목',
                       style: AppTypography.captionSmall.copyWith(
@@ -1068,10 +1063,8 @@ class _StudentCard extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: AppColors.paperAccent.withValues(alpha: 0.4),
-                  ),
+                  color: AppColors.paperAccentSoft,
+                  border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
                   '미수금',
@@ -1098,10 +1091,8 @@ class _StudentCard extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: AppColors.paperAccent.withValues(alpha: 0.4),
-                  ),
+                  color: AppColors.paperAccentSoft,
+                  border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
                   '갱신',

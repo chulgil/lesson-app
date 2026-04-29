@@ -123,10 +123,10 @@ class _DiagnosticCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: AppColors.paperAccent.withValues(alpha: 0.05),
+      color: AppColors.paperAccentSoft,
       shape: RoundedRectangleBorder(
         
-        side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        side: BorderSide(color: AppColors.paperAccentSoft),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -355,7 +355,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
@@ -411,7 +411,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                             Text(
                               '${widget.recording.bpm}bpm',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.paperAccent.withValues(alpha: 0.8),
+                                color: AppColors.paperAccent,
                               ),
                             ),
                           ],

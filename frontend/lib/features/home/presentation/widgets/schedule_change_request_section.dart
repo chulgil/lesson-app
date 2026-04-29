@@ -254,7 +254,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               color: AppColors.paperAccent,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               border: Border.all(color: AppColors.paper, width: 1.5),
             ),
           ),

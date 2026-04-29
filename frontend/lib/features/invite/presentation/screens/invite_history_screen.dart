@@ -71,8 +71,8 @@ class InviteHistoryScreen extends ConsumerWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: AppColors.paperAccentSoft,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(
                 Icons.history,
@@ -157,7 +157,7 @@ class InviteHistoryScreen extends ConsumerWidget {
             vertical: 2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.1),
+            color: AppColors.paperAccentSoft,
             borderRadius: BorderRadius.zero,
           ),
           child: Text(
@@ -241,7 +241,7 @@ class _InviteCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isInactive ? AppColors.paperDark : Colors.white,
+        color: isInactive ? AppColors.paperDark : AppColors.paper,
         borderRadius: BorderRadius.zero,
         border: Border.all(
           color:
@@ -356,7 +356,7 @@ class _InviteCard extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                   side: BorderSide(
-                    color: AppColors.paperAccent.withValues(alpha: 0.5),
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 child: const Text('초대 취소'),

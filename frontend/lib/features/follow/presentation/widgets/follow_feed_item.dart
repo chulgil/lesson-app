@@ -29,7 +29,7 @@ class FollowFeedItem extends StatelessWidget {
               // Author avatar placeholder
               CircleAvatar(
                 radius: 18,
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   post.authorName.isNotEmpty
                       ? post.authorName[0]

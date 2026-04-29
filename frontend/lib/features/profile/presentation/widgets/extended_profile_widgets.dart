@@ -60,7 +60,7 @@ class ProfileCompletionCard extends StatelessWidget {
                 child: Text(
                   levelLabel,
                   style: AppTypography.caption.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -73,7 +73,7 @@ class ProfileCompletionCard extends StatelessWidget {
               Text(
                 '$percentage%',
                 style: AppTypography.headingLarge.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontSize: 36,
                 ),
               ),
@@ -85,7 +85,7 @@ class ProfileCompletionCard extends StatelessWidget {
                     LinearProgressIndicator(
                       value: percentage / 100,
                       backgroundColor: AppColors.paper.withValues(alpha: 0.3),
-                      valueColor: const AlwaysStoppedAnimation(Colors.white),
+                      valueColor: const AlwaysStoppedAnimation(AppColors.paper),
                       minHeight: 8,
                       borderRadius: BorderRadius.zero,
                     ),
@@ -138,7 +138,7 @@ class ProfileInfoCard extends StatelessWidget {
           border: Border.all(
             color:
                 isEmpty
-                    ? AppColors.paperAccent.withValues(alpha: 0.3)
+                    ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
           ),
         ),
@@ -147,7 +147,7 @@ class ProfileInfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: AppColors.paperAccent, size: 24),
@@ -283,7 +283,7 @@ class CareerCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
+              color: AppColors.paperAccentSoft,
             ),
             child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
           ),

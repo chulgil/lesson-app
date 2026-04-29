@@ -307,7 +307,7 @@ class _PaymentManagementScreenState
                                   style: AppTypography.bodyMedium.copyWith(
                                     color:
                                         isSelected
-                                            ? Colors.white
+                                            ? AppColors.paper
                                             : isFuture
                                             ? AppColors.inkTertiary
                                             : AppColors.ink,

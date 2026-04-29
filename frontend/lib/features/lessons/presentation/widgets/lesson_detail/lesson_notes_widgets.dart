@@ -148,9 +148,9 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                     color: AppColors.paperAccent,
                   ),
                 ),
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+                backgroundColor: AppColors.paperAccentSoft,
                 side: BorderSide(
-                  color: AppColors.paperAccent.withValues(alpha: 0.2),
+                  color: AppColors.paperAccentSoft,
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space1,
@@ -354,7 +354,7 @@ class KeyPointsList extends StatelessWidget {
                     height: 6,
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -465,8 +465,8 @@ class RecordingStatusIndicator extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
       ),
       child: Row(
         children: [
@@ -475,7 +475,7 @@ class RecordingStatusIndicator extends StatelessWidget {
             height: 12,
             decoration: BoxDecoration(
               color: AppColors.paperAccent,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -677,9 +677,9 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.paperAccent.withValues(alpha: 0.05),
+            color: AppColors.paperAccentSoft,
             border: Border.all(
-              color: AppColors.paperAccent.withValues(alpha: 0.2),
+              color: AppColors.paperAccentSoft,
             ),
           ),
           child: Column(

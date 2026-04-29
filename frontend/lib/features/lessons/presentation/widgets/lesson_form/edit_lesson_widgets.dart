@@ -114,7 +114,7 @@ class LessonActionButtons extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(
-                color: AppColors.paperAccent.withValues(alpha: 0.5),
+                color: AppColors.paperAccent,
               ),
             ),
           ),
@@ -131,7 +131,7 @@ class LessonActionButtons extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(
-                color: AppColors.paperAccent.withValues(alpha: 0.5),
+                color: AppColors.paperAccent,
               ),
             ),
           ),

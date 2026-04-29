@@ -41,7 +41,7 @@ class _TeacherSearchFilterSheetState
       expand: false,
       builder:
           (context, scrollController) => Container(
-            decoration: const BoxDecoration(color: Colors.white),
+            decoration: const BoxDecoration(color: AppColors.paper),
             child: Column(
               children: [
                 // Handle
@@ -158,7 +158,7 @@ class _TeacherSearchFilterSheetState
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.ink.withValues(alpha: 0.1),
@@ -188,7 +188,7 @@ class _TeacherSearchFilterSheetState
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.paperAccent,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.paper,
                           shape: const RoundedRectangleBorder(),
                         ),
                         child: const Text('필터 적용'),
@@ -232,7 +232,7 @@ class _TeacherSearchFilterSheetState
                 }
                 onChanged(newList);
               },
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              selectedColor: AppColors.paperAccentSoft,
               checkmarkColor: AppColors.paperAccent,
             );
           }).toList(),
@@ -270,7 +270,7 @@ class _TeacherSearchFilterSheetState
                   );
                 });
               },
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              selectedColor: AppColors.paperAccentSoft,
               checkmarkColor: AppColors.paperAccent,
             );
           }).toList(),
@@ -294,7 +294,7 @@ class _TeacherSearchFilterSheetState
               _filter = _filter.copyWith(minExperience: options[index]);
             });
           },
-          selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+          selectedColor: AppColors.paperAccentSoft,
         );
       }),
     );

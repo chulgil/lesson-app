@@ -126,7 +126,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                               height: 6,
                               decoration: BoxDecoration(
                                 color: AppColors.paperAccent,
-                                shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                               ),
                             ),
                             const SizedBox(width: 10),

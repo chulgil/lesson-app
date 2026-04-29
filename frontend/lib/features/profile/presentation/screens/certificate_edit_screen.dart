@@ -443,7 +443,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 onPressed: _isLoading ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.paper,
                   shape: const RoundedRectangleBorder(),
                 ),
                 child:
@@ -453,7 +453,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         )
                         : Text(
@@ -510,7 +510,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ),
               child: Text(
                 '탭하여 변경',
-                style: AppTypography.caption.copyWith(color: Colors.white),
+                style: AppTypography.caption.copyWith(color: AppColors.paper),
               ),
             ),
           ),
@@ -546,7 +546,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ),
               child: Text(
                 '탭하여 변경',
-                style: AppTypography.caption.copyWith(color: Colors.white),
+                style: AppTypography.caption.copyWith(color: AppColors.paper),
               ),
             ),
           ),

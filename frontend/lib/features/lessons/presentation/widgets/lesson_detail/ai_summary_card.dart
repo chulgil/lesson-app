@@ -19,13 +19,13 @@ class AISummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.paperAccent.withValues(alpha: 0.05),
-            AppColors.paperAccent.withValues(alpha: 0.05),
+            AppColors.paperAccentSoft,
+            AppColors.paperAccentSoft,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.paperAccentSoft),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

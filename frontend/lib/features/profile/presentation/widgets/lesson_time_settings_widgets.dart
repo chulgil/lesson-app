@@ -92,7 +92,7 @@ class DurationOptionItem extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.delete_outline,
-                color: AppColors.paperAccent.withValues(alpha: 0.7),
+                color: AppColors.paperAccent,
                 size: 20,
               ),
               onPressed: onDelete,
@@ -532,8 +532,8 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
             decoration: BoxDecoration(
               color:
                   _isDuplicate
-                      ? AppColors.paperAccent.withValues(alpha: 0.1)
-                      : AppColors.paperAccent.withValues(alpha: 0.1),
+                      ? AppColors.paperAccentSoft
+                      : AppColors.paperAccentSoft,
             ),
             child: Column(
               children: [
@@ -582,10 +582,10 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                   alpha: 0.2,
                 ),
                 thumbColor: AppColors.paperAccent,
-                overlayColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                overlayColor: AppColors.paperAccentSoft,
                 valueIndicatorColor: AppColors.paperAccent,
                 valueIndicatorTextStyle: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.bold,
                 ),
               ),

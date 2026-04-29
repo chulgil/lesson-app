@@ -111,7 +111,7 @@ class ProfileCompletionCard extends StatelessWidget {
                 child: Text(
                   levelLabel,
                   style: AppTypography.caption.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -436,7 +436,7 @@ class BadgeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
+        color: AppColors.paperAccentSoft,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -475,7 +475,7 @@ void showProfilePreviewSheet({
           builder:
               (context, scrollController) => Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Column(

@@ -790,7 +790,7 @@ class _BookingSettingItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: AppColors.paperAccent, size: 20),

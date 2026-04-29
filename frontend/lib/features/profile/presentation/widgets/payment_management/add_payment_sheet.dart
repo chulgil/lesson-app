@@ -327,7 +327,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1),
+        color: AppColors.paperAccentSoft,
       ),
       child: Row(
         children: [

@@ -95,7 +95,7 @@ class _MethodCard extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isPrimary
-                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                ? AppColors.paperAccentSoft
                 : Theme.of(context).colorScheme.surface,
         border: Border.all(
           color: isPrimary ? AppColors.paperAccent : AppColors.inkQuaternary,
@@ -115,7 +115,7 @@ class _MethodCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isPrimary
-                            ? AppColors.paperAccent.withValues(alpha: 0.15)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
                   ),
                   child: Icon(

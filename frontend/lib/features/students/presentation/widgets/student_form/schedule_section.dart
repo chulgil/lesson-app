@@ -70,7 +70,7 @@ class ScheduleSection extends StatelessWidget {
                         isSelected
                             ? AppColors.paperAccent
                             : AppColors.paperDark,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Center(
                     child: Text(
@@ -231,8 +231,8 @@ class _DayTimeRow extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: AppColors.paperAccentSoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Center(
               child: Text(

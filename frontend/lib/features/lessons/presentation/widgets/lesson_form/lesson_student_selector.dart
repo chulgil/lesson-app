@@ -92,7 +92,7 @@ class LessonStudentSelector extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: AppColors.paperDark,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Icon(Icons.person_add, color: AppColors.inkTertiary),
                 ),

@@ -154,7 +154,7 @@ class _InstrumentManagementScreenState
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperAccentSoft,
           child: Icon(
             _getInstrumentIcon(instrument),
             color: AppColors.paperAccent,

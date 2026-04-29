@@ -182,7 +182,7 @@ class _QuickFeedbackStudentListState
           backgroundColor:
               isCompleted
                   ? AppColors.paperOk.withValues(alpha: 0.2)
-                  : AppColors.paperAccent.withValues(alpha: 0.1),
+                  : AppColors.paperAccentSoft,
           child: Icon(
             isCompleted ? Icons.check_circle : Icons.schedule,
             color: isCompleted ? AppColors.paperOk : AppColors.paperAccent,

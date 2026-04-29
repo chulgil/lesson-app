@@ -105,7 +105,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           gradient: LinearGradient(
             colors: [
               AppColors.paperAccent,
-              AppColors.paperAccent.withValues(alpha: 0.8),
+              AppColors.paperAccent,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -122,7 +122,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space2),
             Text(
               formatWonWithComma(totalAmount),
-              style: AppTypography.displayMedium.copyWith(color: Colors.white),
+              style: AppTypography.displayMedium.copyWith(color: AppColors.paper),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
@@ -162,7 +162,7 @@ class _UnpaidCard extends ConsumerWidget {
           border: Border.all(
             color:
                 daysOverdue > 0
-                    ? AppColors.paperAccent.withValues(alpha: 0.3)
+                    ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
           ),
           boxShadow: [
@@ -187,7 +187,7 @@ class _UnpaidCard extends ConsumerWidget {
                     child: Text(
                       studentName.isNotEmpty ? studentName[0] : '?',
                       style: AppTypography.bodyLarge.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -254,7 +254,7 @@ class _BankAccountCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
+                      color: AppColors.paperAccentSoft,
                       borderRadius: BorderRadius.zero,
                     ),
                     child: Text(
@@ -507,7 +507,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 border: Border.all(
                   color:
                       _consentChecked
-                          ? AppColors.paperAccent.withValues(alpha: 0.5)
+                          ? AppColors.paperAccent
                           : AppColors.inkQuaternary,
                 ),
               ),
@@ -546,7 +546,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
+                      color: AppColors.paperAccentSoft,
                     ),
                     child: Text(
                       '필수',

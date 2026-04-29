@@ -73,7 +73,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

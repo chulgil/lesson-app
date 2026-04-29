@@ -59,7 +59,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.paper,
         title: Text('$targetRole QR 스캔'),
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -157,7 +157,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
                 Text(
                   '$targetRole의 QR 코드를 스캔하세요',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -185,10 +185,10 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
                 context.pop();
                 context.push(AppRoutes.inviteCode);
               },
-              icon: const Icon(Icons.dialpad, color: Colors.white),
+              icon: const Icon(Icons.dialpad, color: AppColors.paper),
               label: Text(
                 '코드로 입력하기',
-                style: AppTypography.bodyMedium.copyWith(color: Colors.white),
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.paper),
               ),
             ),
           ),

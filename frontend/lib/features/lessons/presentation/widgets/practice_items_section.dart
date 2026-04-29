@@ -332,8 +332,8 @@ class PracticeItemsSection extends ConsumerWidget {
         decoration:
             item.hasLike
                 ? BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+                  color: AppColors.paperAccentSoft,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 )
                 : null,
         child: Text('👍', style: TextStyle(fontSize: item.hasLike ? 20 : 16)),

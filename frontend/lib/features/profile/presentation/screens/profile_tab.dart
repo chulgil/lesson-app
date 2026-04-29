@@ -386,7 +386,7 @@ class ProfileTab extends ConsumerWidget {
           label: const Text('내 프로필 미리보기'),
           style: OutlinedButton.styleFrom(
             side: BorderSide(
-              color: AppColors.paperAccent.withValues(alpha: 0.4),
+              color: AppColors.paperAccent,
             ),
             foregroundColor: AppColors.paperAccent,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
@@ -595,7 +595,7 @@ class ProfileTab extends ConsumerWidget {
         children: [
           Text(
             value,
-            style: AppTypography.headingMedium.copyWith(color: Colors.white),
+            style: AppTypography.headingMedium.copyWith(color: AppColors.paper),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(

@@ -51,13 +51,13 @@ class GamificationHeader extends ConsumerWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: AppColors.paper.withValues(alpha: 0.25),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     'Lv.${data.level}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -72,7 +72,7 @@ class GamificationHeader extends ConsumerWidget {
                       Text(
                         data.levelTitle,
                         style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white,
+                          color: AppColors.paper,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -104,13 +104,13 @@ class GamificationHeader extends ConsumerWidget {
                         const Icon(
                           Icons.emoji_events,
                           size: 14,
-                          color: Colors.white,
+                          color: AppColors.paper,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${data.earnedBadges.where((b) => b.isEarned).length}',
                           style: AppTypography.caption.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -132,7 +132,7 @@ class GamificationHeader extends ConsumerWidget {
                     minHeight: 6,
                     backgroundColor: AppColors.paper.withValues(alpha: 0.2),
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.white,
+                      AppColors.paper,
                     ),
                   ),
                 ),

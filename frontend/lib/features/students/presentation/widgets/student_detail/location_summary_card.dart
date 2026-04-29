@@ -125,7 +125,7 @@ class LocationSummaryCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.1)
+        color: AppColors.paperAccentSoft
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

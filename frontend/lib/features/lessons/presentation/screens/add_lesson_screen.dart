@@ -326,7 +326,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 student.name,
                 style: AppTypography.caption.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? Colors.white : null,
+                  color: isSelected ? AppColors.paper : null,
                 ),
               ),
               backgroundColor:

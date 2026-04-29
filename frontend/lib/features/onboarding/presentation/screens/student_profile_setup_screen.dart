@@ -188,7 +188,7 @@ class _StudentProfileSetupScreenState
                   onPressed: _isLoading || !_isFormValid ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                     disabledBackgroundColor: AppColors.inkQuaternary,
                     shape: const RoundedRectangleBorder(),
                   ),
@@ -199,7 +199,7 @@ class _StudentProfileSetupScreenState
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : Text('다음', style: AppTypography.button),
@@ -354,13 +354,13 @@ class _ProgressStep extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Center(
               child: Text(
                 '$step',
                 style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? Colors.white : AppColors.inkTertiary,
+                  color: isActive ? AppColors.paper : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -439,7 +439,7 @@ class _InstrumentSelectorSheet extends StatelessWidget {
                     selectedColor: AppColors.paperAccent.withValues(
                       alpha: 0.15,
                     ),
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.paper,
                     labelStyle: AppTypography.bodyMedium.copyWith(
                       color: isSelected ? AppColors.paperAccent : AppColors.ink,
                       fontWeight:

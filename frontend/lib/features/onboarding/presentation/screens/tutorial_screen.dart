@@ -172,7 +172,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.paper,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
                         ),
@@ -234,8 +234,8 @@ class _TutorialPage extends StatelessWidget {
             width: 200,
             height: 200,
             decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              color: AppColors.paperAccentSoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Icon(
               _getIconForStep(content.step),
@@ -330,16 +330,16 @@ class _ProgressStep extends StatelessWidget {
                 isActive || isCompleted
                     ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
             child:
                 isCompleted
-                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                    ? const Icon(Icons.check, size: 12, color: AppColors.paper)
                     : Text(
                       '$step',
                       style: AppTypography.caption.copyWith(
-                        color: isActive ? Colors.white : AppColors.inkTertiary,
+                        color: isActive ? AppColors.paper : AppColors.inkTertiary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

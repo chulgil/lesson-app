@@ -206,7 +206,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                         .read(teacherSearchSortStateProvider.notifier)
                         .updateSort(option);
                   },
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  selectedColor: AppColors.paperAccentSoft,
                   checkmarkColor: AppColors.paperAccent,
                 ),
               );

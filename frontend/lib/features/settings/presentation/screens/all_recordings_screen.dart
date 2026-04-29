@@ -236,10 +236,10 @@ class _RecordingsList extends StatelessWidget {
     final total = connectedCount + orphanedCount;
     return Card(
       elevation: 0,
-      color: AppColors.paperAccent.withValues(alpha: 0.05),
+      color: AppColors.paperAccentSoft,
       shape: RoundedRectangleBorder(
         
-        side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+        side: BorderSide(color: AppColors.paperAccentSoft),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -433,7 +433,7 @@ class _RecordingCard extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         border: Border.all(
           color: isOrphaned ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
@@ -470,7 +470,7 @@ class _RecordingCard extends ConsumerWidget {
                         Icon(
                           Icons.folder_outlined,
                           size: 12,
-                          color: AppColors.paperAccent.withValues(alpha: 0.7),
+                          color: AppColors.paperAccent,
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Expanded(
@@ -478,7 +478,7 @@ class _RecordingCard extends ConsumerWidget {
                             '${repertoire!.name} > ${section!.pieceName}',
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: AppColors.paperAccent.withValues(alpha: 0.9),
+                              color: AppColors.paperAccent,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -527,7 +527,7 @@ class _RecordingCard extends ConsumerWidget {
                         Text(
                           '${recording.bpm}bpm',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.paperAccent.withValues(alpha: 0.8),
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ],

@@ -73,8 +73,8 @@ class PendingRequestsScreen extends ConsumerWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: AppColors.paperAccentSoft,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(
                 Icons.inbox_outlined,
@@ -212,7 +212,7 @@ class _RequestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.paper,
         borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
@@ -231,7 +231,7 @@ class _RequestCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
                   requesterName.isNotEmpty ? requesterName[0] : '?',
                   style: AppTypography.headingSmall.copyWith(
@@ -316,7 +316,7 @@ class _RequestCard extends StatelessWidget {
                   onPressed: isProcessing ? null : onAccept,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space3,
                     ),
@@ -328,7 +328,7 @@ class _RequestCard extends StatelessWidget {
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text('수락'),

@@ -31,7 +31,7 @@ class StudentLessonCard extends StatelessWidget {
         border: Border.all(
           color:
               isUpcoming
-                  ? AppColors.paperAccent.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent
                   : AppColors.inkQuaternary,
         ),
       ),
@@ -52,7 +52,7 @@ class StudentLessonCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isUpcoming
-                          ? AppColors.paperAccent.withValues(alpha: 0.1)
+                          ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
                 ),
                 child: Column(

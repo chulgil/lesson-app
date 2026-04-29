@@ -313,9 +313,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                   color: AppColors.paperAccent,
                 ),
               ),
-              backgroundColor: AppColors.paperAccent.withValues(alpha: 0.08),
+              backgroundColor: AppColors.paperAccentSoft,
               side: BorderSide(
-                color: AppColors.paperAccent.withValues(alpha: 0.2),
+                color: AppColors.paperAccentSoft,
               ),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space1,
@@ -463,7 +463,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.paperAccent.withValues(alpha: 0.1),
+                      color: AppColors.paperAccentSoft,
                     ),
                     child: Text(
                       '$count',

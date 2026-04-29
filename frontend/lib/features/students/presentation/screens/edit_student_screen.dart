@@ -408,7 +408,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                         ),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: AppColors.paperAccent.withValues(alpha: 0.5),
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),

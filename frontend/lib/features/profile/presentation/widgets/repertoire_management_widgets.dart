@@ -221,7 +221,7 @@ class PieceCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.paperAccent.withValues(alpha: 0.1),
+                          color: AppColors.paperAccentSoft,
                         ),
                         child: Text(
                           piece.opus!,

@@ -236,7 +236,7 @@ class _PhoneVerificationScreenState
                             : (_codeSent ? _verifyCode : _sendCode),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.paper,
                       shape: RoundedRectangleBorder(),
                     ),
                     child:
@@ -246,7 +246,7 @@ class _PhoneVerificationScreenState
                               height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppColors.paper,
                               ),
                             )
                             : Text(
@@ -431,13 +431,13 @@ class _ProgressStep extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Center(
               child: Text(
                 '$step',
                 style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? Colors.white : AppColors.inkTertiary,
+                  color: isActive ? AppColors.paper : AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
                 ),
               ),

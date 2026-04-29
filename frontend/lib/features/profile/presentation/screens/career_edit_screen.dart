@@ -323,7 +323,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                 onPressed: _isLoading ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.paper,
                   shape: const RoundedRectangleBorder(),
                 ),
                 child:
@@ -333,7 +333,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         )
                         : Text(

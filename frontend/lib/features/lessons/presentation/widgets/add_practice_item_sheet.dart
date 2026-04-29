@@ -221,9 +221,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           error:
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Text(
                   '레퍼토리를 불러올 수 없습니다',
                   style: AppTypography.bodySmall.copyWith(
@@ -305,14 +303,11 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected
-                          ? AppColors.paperAccent.withValues(alpha: 0.1)
-                          : null,
+                  color: isSelected ? AppColors.paperAccentSoft : null,
                   border: Border(
                     bottom: BorderSide(
                       color: AppColors.inkQuaternary,
-                      width: 0.5,
+                      width: 1,
                     ),
                   ),
                 ),
@@ -322,7 +317,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                         border: Border.all(
                           color:
                               isSelected
@@ -386,9 +381,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color:
-                    _isCreatingNewRepertoire
-                        ? AppColors.paperAccent.withValues(alpha: 0.1)
-                        : null,
+                    _isCreatingNewRepertoire ? AppColors.paperAccentSoft : null,
               ),
               child: Row(
                 children: [
@@ -396,7 +389,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                       border: Border.all(
                         color:
                             _isCreatingNewRepertoire

@@ -88,8 +88,8 @@ class MyConnectionsScreen extends ConsumerWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: AppColors.paperAccentSoft,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(
                 Icons.people_outline,
@@ -302,7 +302,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space6),
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                  backgroundColor: AppColors.paperAccentSoft,
                   child: Text(
                     otherName[0],
                     style: AppTypography.headingLarge.copyWith(
@@ -452,7 +452,7 @@ class _HelpItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.paper,
           borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
@@ -462,7 +462,7 @@ class _HelpItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Icon(icon, color: AppColors.paperAccent, size: 20),
@@ -529,7 +529,7 @@ class _ConnectionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               isActive
-                  ? Colors.white
+                  ? AppColors.paper
                   : AppColors.inkTertiary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
@@ -541,7 +541,7 @@ class _ConnectionCard extends StatelessWidget {
               radius: 28,
               backgroundColor:
                   isActive
-                      ? AppColors.paperAccent.withValues(alpha: 0.1)
+                      ? AppColors.paperAccentSoft
                       : AppColors.inkTertiary.withValues(alpha: 0.1),
               backgroundImage:
                   profileImage != null ? NetworkImage(profileImage) : null,

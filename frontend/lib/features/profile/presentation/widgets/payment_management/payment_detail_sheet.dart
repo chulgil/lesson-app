@@ -49,7 +49,7 @@ class PaymentDetailSheet extends ConsumerWidget {
           backgroundColor: AppColors.paperAccentSoft,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
-            style: AppTypography.headingSmall.copyWith(color: Colors.white),
+            style: AppTypography.headingSmall.copyWith(color: AppColors.paper),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),

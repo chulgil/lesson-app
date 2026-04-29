@@ -117,7 +117,7 @@ class _LocationChip extends StatelessWidget {
       selected: isSelected,
       onSelected: (_) => onTap(),
       backgroundColor: AppColors.paper,
-      selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+      selectedColor: AppColors.paperAccentSoft,
       checkmarkColor: AppColors.paperAccent,
       side: BorderSide(
         color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,

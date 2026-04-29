@@ -36,7 +36,7 @@ class MonthlyTrendChart extends StatelessWidget {
             painter: _TrendChartPainter(
               data: trendData,
               lineColor: AppColors.paperAccent,
-              fillColor: AppColors.paperAccent.withValues(alpha: 0.1),
+              fillColor: AppColors.paperAccentSoft,
             ),
           ),
         ),

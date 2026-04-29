@@ -81,8 +81,8 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+                  color: AppColors.paperAccentSoft,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Icon(
                   Icons.dialpad,
@@ -161,7 +161,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                       _isCodeComplete && !_isLoading ? _submitCode : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.paper,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.space4,
                     ),
@@ -176,7 +176,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           )
                           : const Text(AppStrings.confirm),
@@ -222,7 +222,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
         decoration: InputDecoration(
           counterText: '',
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.paper,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.zero,
             borderSide: BorderSide(color: AppColors.inkQuaternary),

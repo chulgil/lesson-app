@@ -77,7 +77,7 @@ class StudentPracticeSection extends ConsumerWidget {
                                 isPracticed
                                     ? AppColors.paperOk.withValues(alpha: 0.15)
                                     : AppColors.paperDark,
-                            shape: BoxShape.circle,
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                             border:
                                 isPracticed
                                     ? Border.all(
@@ -109,7 +109,7 @@ class StudentPracticeSection extends ConsumerWidget {
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                 ),
                 child: const Text('연습 정보를 불러올 수 없습니다'),
               ),

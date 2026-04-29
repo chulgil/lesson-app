@@ -39,7 +39,7 @@ class LessonDurationSelector extends StatelessWidget {
             }
           },
           backgroundColor: AppColors.paper,
-          selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
+          selectedColor: AppColors.paperAccentSoft,
           checkmarkColor: AppColors.paperAccent,
           side: BorderSide(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
