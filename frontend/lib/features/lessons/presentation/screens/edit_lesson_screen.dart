@@ -97,14 +97,14 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('레슨 수정')),
+        appBar: AppBar(title: const Text(AppStrings.editLessonTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('레슨 수정'),
+        title: const Text(AppStrings.editLessonTitle),
         leading: IconButton(
           onPressed:
               () => showEditLessonExitConfirmation(
@@ -134,7 +134,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                       children: [
                         Icon(Icons.event_busy, color: AppColors.paperAccent),
                         const SizedBox(width: AppSpacing.space2),
-                        const Text('레슨 취소'),
+                        const Text(AppStrings.actionLessonCancel),
                       ],
                     ),
                   ),
@@ -148,7 +148,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
-                          '레슨 삭제',
+                          AppStrings.deleteLessonTitle,
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                       ],
@@ -159,7 +159,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           TextButton(
             onPressed: (_hasChanges && !_isSaving) ? _saveLesson : null,
             child: Text(
-              '저장',
+              AppStrings.save,
               style: TextStyle(
                 color:
                     (_hasChanges && !_isSaving) ? null : AppColors.inkTertiary,
@@ -177,7 +177,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Student info (read-only)
-              const LessonFormSectionTitle('학생'),
+              const LessonFormSectionTitle(AppStrings.student),
               const SizedBox(height: AppSpacing.space3),
               if (_selectedStudent != null)
                 EditLessonStudentCard(
@@ -195,7 +195,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Date and time selection
-              const LessonFormSectionTitle('일시'),
+              const LessonFormSectionTitle(AppStrings.dateTimeLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonDateTimeSection(
                 selectedDate: _selectedDate,
@@ -207,7 +207,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson duration
-              const LessonFormSectionTitle('레슨 시간'),
+              const LessonFormSectionTitle(AppStrings.lessonDurationLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonDurationSelector(
                 selectedDuration: _lessonDuration,
@@ -222,7 +222,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson content
-              const LessonFormSectionTitle('레슨 내용'),
+              const LessonFormSectionTitle(AppStrings.lessonContentLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonContentFields(
                 pieceController: _pieceController,
@@ -268,7 +268,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                               color: AppColors.paper,
                             ),
                           )
-                          : const Text('변경사항 저장'),
+                          : const Text(AppStrings.saveChangesButton),
                 ),
               ),
 
@@ -332,7 +332,11 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
+            content: Text(
+              AppStrings.lessonCancelledForStudent(
+                _selectedStudent?.name ?? '',
+              ),
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -343,7 +347,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.cancelLessonFailedRetry),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -361,7 +365,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('레슨이 삭제되었습니다'),
+            content: Text(AppStrings.lessonDeletedMessage),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -371,7 +375,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.deleteLessonFailedRetry),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -431,10 +435,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('시간 충돌'),
-            content: Text(
-              "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
-            ),
+            title: const Text(AppStrings.timeConflictTitle),
+            content: Text(AppStrings.timeConflictMessage(conflictStudentName)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -442,7 +444,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('계속'),
+                child: const Text(AppStrings.continueAction),
               ),
             ],
           ),
@@ -489,7 +491,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레슨 정보가 수정되었습니다'),
+            content: const Text(AppStrings.editLessonSuccess),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperOk,
           ),
@@ -500,7 +502,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레슨 수정에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.editLessonFailedRetry),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
