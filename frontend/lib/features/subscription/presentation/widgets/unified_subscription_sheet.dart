@@ -110,7 +110,7 @@ class _UnifiedSubscriptionSheetState
                   error:
                       (_, __) => Center(
                         child: Text(
-                          '오류가 발생했습니다.',
+                          AppStrings.errorOccurred,
                           style: AppTypography.bodyMedium.copyWith(
                             color: AppColors.inkSecondary,
                           ),
@@ -148,7 +148,10 @@ class _UnifiedSubscriptionSheetState
               ),
               const Spacer(),
               // Notebook × Score: 바텀시트 제목도 Playfair appBarTitle 로 통일.
-              Text('수강권 발급', style: NotebookTypography.appBarTitle),
+              Text(
+                AppStrings.unifiedSubscriptionAppBarTitle,
+                style: NotebookTypography.appBarTitle,
+              ),
               const Spacer(),
               const SizedBox(width: AppSpacing.iconMD),
             ],
@@ -171,7 +174,7 @@ class _UnifiedSubscriptionSheetState
           _buildStudentInfo(),
           const SizedBox(height: AppSpacing.space6),
         ],
-        _buildSectionLabel('템플릿 선택'),
+        _buildSectionLabel(AppStrings.unifiedSubscriptionTemplateSection),
         const SizedBox(height: AppSpacing.space3),
         _buildTemplateCards(templates),
         const SizedBox(height: AppSpacing.space4),
@@ -224,7 +227,7 @@ class _UnifiedSubscriptionSheetState
         padding: const EdgeInsets.all(AppSpacing.space6),
         alignment: Alignment.center,
         child: Text(
-          '등록된 템플릿이 없습니다',
+          AppStrings.unifiedSubscriptionNoTemplates,
           style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
       );
@@ -285,7 +288,9 @@ class _UnifiedSubscriptionSheetState
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${template.name}을 추천으로 지정했습니다'),
+        content: Text(
+          AppStrings.proposalCreateRecommendedDesignatedFormat(template.name),
+        ),
         duration: const Duration(seconds: 1),
         backgroundColor: AppColors.paperAccent,
       ),
@@ -312,7 +317,7 @@ class _UnifiedSubscriptionSheetState
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
-              '직접 입력',
+              AppStrings.unifiedSubscriptionDirectInputToggle,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
@@ -336,21 +341,23 @@ class _UnifiedSubscriptionSheetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildFormLabel('회차'),
+          _buildFormLabel(AppStrings.issueFormLessonsTitle),
           const SizedBox(height: AppSpacing.space2),
           _buildLessonCountChips(),
           const SizedBox(height: AppSpacing.space4),
-          _buildFormLabel('금액'),
+          _buildFormLabel(AppStrings.amountLabel),
           const SizedBox(height: AppSpacing.space2),
           _buildAmountInput(),
           const SizedBox(height: AppSpacing.space4),
-          _buildFormLabel('유효기간'),
+          _buildFormLabel(AppStrings.validityPeriod),
           const SizedBox(height: AppSpacing.space1),
           if (_customLessonCount != null)
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space2),
               child: Text(
-                '자동: $_autoValidityDays일',
+                AppStrings.unifiedSubscriptionAutoValidityFormat(
+                  _autoValidityDays,
+                ),
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkTertiary,
                 ),
@@ -379,7 +386,7 @@ class _UnifiedSubscriptionSheetState
         ..._lessonCountOptions.map((count) {
           final isSelected = _customLessonCount == count;
           return ChoiceChip(
-            label: Text('$count회'),
+            label: Text(AppStrings.unifiedSubscriptionLessonChipFormat(count)),
             selected: isSelected,
             onSelected: (selected) {
               setState(() {
@@ -401,7 +408,7 @@ class _UnifiedSubscriptionSheetState
           );
         }),
         ChoiceChip(
-          label: const Text('직접입력'),
+          label: const Text(AppStrings.unifiedSubscriptionDirectInputChip),
           selected:
               _customLessonCount != null &&
               !_lessonCountOptions.contains(_customLessonCount),
@@ -431,11 +438,11 @@ class _UnifiedSubscriptionSheetState
             vertical: AppSpacing.space2,
           ),
           border: InputBorder.none,
-          hintText: '금액을 입력하세요',
+          hintText: AppStrings.unifiedSubscriptionAmountHint,
           hintStyle: AppTypography.bodySmall.copyWith(
             color: AppColors.inkTertiary,
           ),
-          suffixText: '원',
+          suffixText: AppStrings.amountUnit,
           suffixStyle: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -454,7 +461,7 @@ class _UnifiedSubscriptionSheetState
             final isSelected =
                 (_customValidityDays ?? _autoValidityDays) == days;
             return ChoiceChip(
-              label: Text('$days일'),
+              label: Text(AppStrings.unifiedSubscriptionDaysChipFormat(days)),
               selected: isSelected,
               onSelected: (selected) {
                 setState(() {
@@ -521,7 +528,7 @@ class _UnifiedSubscriptionSheetState
                   shape: RoundedRectangleBorder(),
                 ),
                 child: Text(
-                  '바로 발급',
+                  AppStrings.unifiedSubscriptionDirectIssueButton,
                   style: AppTypography.buttonSmall.copyWith(
                     color:
                         canSubmit
@@ -557,8 +564,10 @@ class _UnifiedSubscriptionSheetState
                       )
                       : Text(
                         _selectedTemplateIds.length > 1
-                            ? '${_selectedTemplateIds.length}개 제안 보내기'
-                            : '제안 보내기',
+                            ? AppStrings.unifiedSubscriptionMultiSendFormat(
+                              _selectedTemplateIds.length,
+                            )
+                            : AppStrings.proposalSend,
                         style: AppTypography.buttonSmall.copyWith(
                           color: AppColors.paper,
                         ),
@@ -606,7 +615,8 @@ class _UnifiedSubscriptionSheetState
 
       final templateId = _selectedTemplateIds.first;
       final templateAsync = ref.read(subscriptionTemplateProvider(templateId));
-      final templateName = templateAsync.valueOrNull?.name ?? '수강권';
+      final templateName =
+          templateAsync.valueOrNull?.name ?? AppStrings.subscription;
 
       for (final studentId in widget.studentIds) {
         await notifier.createMultiChoiceProposal(
@@ -625,8 +635,10 @@ class _UnifiedSubscriptionSheetState
           SnackBar(
             content: Text(
               _selectedTemplateIds.length > 1
-                  ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
-                  : '수강권 제안을 보냈습니다',
+                  ? AppStrings.proposalCreateMultiSentMessageFormat(
+                    _selectedTemplateIds.length,
+                  )
+                  : AppStrings.proposalCreateSentMessage,
             ),
             backgroundColor: AppColors.paperOk,
           ),
@@ -636,7 +648,7 @@ class _UnifiedSubscriptionSheetState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('제안 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.proposalCreateFailMessage),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -657,15 +669,17 @@ class _UnifiedSubscriptionSheetState
       builder:
           (context) => AlertDialog(
             // Notebook × Score: 전역 dialogTheme(titleTextStyle=dialogTitle) 적용을 위해 style 오버라이드 제거.
-            title: const Text('회차 입력'),
+            title: const Text(
+              AppStrings.unifiedSubscriptionLessonCountDialogTitle,
+            ),
             content: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
               autofocus: true,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
-                hintText: '횟수를 입력하세요',
-                suffixText: '회',
+                hintText: AppStrings.unifiedSubscriptionLessonCountHint,
+                suffixText: AppStrings.lessonsUnit,
               ),
             ),
             actions: [
@@ -737,7 +751,7 @@ class _TemplateChip extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.space1),
               decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Text(
-                '추천',
+                AppStrings.templateRecommendedBadge,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
