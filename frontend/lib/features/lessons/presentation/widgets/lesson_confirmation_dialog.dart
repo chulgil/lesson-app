@@ -18,30 +18,30 @@ enum LessonNonCompletionReason {
   String get label {
     switch (this) {
       case LessonNonCompletionReason.noShow:
-        return '무단 결석';
+        return AppStrings.lessonNoShow;
       case LessonNonCompletionReason.studentAbsent:
-        return '학생 사정으로 불참';
+        return AppStrings.lessonStudentAbsentReason;
       case LessonNonCompletionReason.cancelledByStudentLate:
-        return '당일 취소 (24시간 이내)';
+        return AppStrings.lessonCancelledByStudentLateReason;
       case LessonNonCompletionReason.teacherCancelled:
-        return '선생님 사정으로 취소';
+        return AppStrings.lessonTeacherCancelledReason;
       case LessonNonCompletionReason.mutualCancelled:
-        return '상호 합의로 취소';
+        return AppStrings.lessonMutualCancelledReason;
     }
   }
 
   String get description {
     switch (this) {
       case LessonNonCompletionReason.noShow:
-        return '횟수 1회 차감';
+        return AppStrings.lessonDeductOnce;
       case LessonNonCompletionReason.studentAbsent:
-        return '횟수 1회 차감';
+        return AppStrings.lessonDeductOnce;
       case LessonNonCompletionReason.cancelledByStudentLate:
-        return '횟수 1회 차감';
+        return AppStrings.lessonDeductOnce;
       case LessonNonCompletionReason.teacherCancelled:
-        return '다른 날짜로 변경 (횟수 유지)';
+        return AppStrings.lessonRescheduleNoCount;
       case LessonNonCompletionReason.mutualCancelled:
-        return '다른 날짜로 변경 (횟수 유지)';
+        return AppStrings.lessonRescheduleNoCount;
     }
   }
 
@@ -180,7 +180,15 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
 
   Widget _buildInitialConfirmation() {
     final lesson = widget.lesson;
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    final weekdays = [
+      AppStrings.mon,
+      AppStrings.tue,
+      AppStrings.wed,
+      AppStrings.thu,
+      AppStrings.fri,
+      AppStrings.sat,
+      AppStrings.sun,
+    ];
     final weekday = weekdays[lesson.date.weekday - 1];
     final dateStr =
         '${lesson.date.month}/${lesson.date.day}($weekday) ${lesson.startTime}';
@@ -197,7 +205,10 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
               const Icon(Icons.fact_check, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score §7.27: 다이얼로그 제목 Playfair.
-              Text('레슨 확인', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.lessonConfirmation,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
 
@@ -229,7 +240,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           const SizedBox(height: AppSpacing.space4),
 
           Text(
-            '이 레슨이 진행되었나요?',
+            AppStrings.lessonConductedQuestion,
             style: AppTypography.bodyLarge,
             textAlign: TextAlign.center,
           ),
@@ -239,8 +250,8 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           // Completed button
           _buildOptionButton(
             icon: Icons.check_circle,
-            label: '레슨 완료',
-            description: '횟수 1회 차감',
+            label: AppStrings.lessonComplete,
+            description: AppStrings.lessonDeductOnce,
             color: AppColors.paperOk,
             onTap: () {
               Navigator.of(
@@ -254,8 +265,8 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           // Not completed button
           _buildOptionButton(
             icon: Icons.cancel,
-            label: '레슨 미진행',
-            description: '사유 선택 필요',
+            label: AppStrings.lessonNotCompleted,
+            description: AppStrings.selectReason,
             color: AppColors.paperAccent,
             onTap: () {
               setState(() {
@@ -270,7 +281,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              '나중에',
+              AppStrings.later,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -304,7 +315,10 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
               ),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score §7.27: 다이얼로그 서브 헤더 Playfair.
-              Text('레슨 미진행 사유', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.nonCompletionReason,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
 
@@ -331,7 +345,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
 
           // Note field
           Text(
-            '메모 (선택)',
+            AppStrings.memoOptional,
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -341,7 +355,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             controller: _noteController,
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: '추가 메모를 입력하세요',
+              hintText: AppStrings.memoHint,
               border: OutlineInputBorder(),
               contentPadding: const EdgeInsets.all(AppSpacing.space3),
             ),
