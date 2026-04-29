@@ -3674,4 +3674,62 @@ class AppStrings {
 
   /// 레슨 (lessonClass 로딩 실패 시 className fallback)
   static const lessonClassErrorFallback = '레슨';
+
+  // -- Issue Subscription Screen (수강권 발급 화면 5-3b-13) --
+
+  /// 수강권 발급 ($count명) (일괄 발급 AppBar 타이틀)
+  static String batchSubscriptionAppBarTitle(int count) => '수강권 발급 ($count명)';
+
+  /// $count명에게 수강권 발급 (일괄 발급 하단 버튼 라벨)
+  static String batchIssueButtonLabel(int count) => '$count명에게 수강권 발급';
+
+  /// 변경/취소 가능 횟수 (예약 변경 허용 횟수 섹션 제목)
+  static const rescheduleAllowanceTitle = '변경/취소 가능 횟수';
+
+  /// 학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가. (섹션 설명)
+  static const rescheduleAllowanceDescription =
+      '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.';
+
+  /// 선생님 기본 정책: $summary (이 수강권에서 개별 조정 가능) (정책 일치 안내)
+  static String rescheduleAllowanceMatchesPolicy(String summary) =>
+      '선생님 기본 정책: $summary (이 수강권에서 개별 조정 가능)';
+
+  /// 선생님 기본 정책 $summary → 이 수강권만 $count회로 재설정 (정책 override 안내)
+  static String rescheduleAllowanceOverridePolicy(String summary, int count) =>
+      '선생님 기본 정책 $summary → 이 수강권만 $count회로 재설정';
+
+  /// 불가 (변경/취소 0회 chip 라벨)
+  static const rescheduleAllowanceNone = '불가';
+
+  /// 기본 정책 (정책 매치 badge)
+  static const policyBadgeDefault = '기본 정책';
+
+  /// 개별 조정됨 (정책 override badge)
+  static const policyBadgeCustom = '개별 조정됨';
+
+  // -- Student Proposal Accept Screen (학생 제안 수락 5-3b-14) --
+
+  /// 수강권 선택 (학생 제안 수락 AppBar 타이틀)
+  static const studentProposalAcceptAppBarTitle = '수강권 선택';
+
+  /// 제안을 찾을 수 없습니다 (제안 null 빈 상태)
+  static const proposalNotFoundEmpty = '제안을 찾을 수 없습니다';
+
+  /// $name 선생님 (헤더 — 선생님 이름 + 호칭)
+  static String teacherWithName(String name) => '$name $teacher';
+
+  /// 수강권을 제안했어요 (헤더 부제)
+  static const proposalSubmittedSubtitle = '수강권을 제안했어요';
+
+  /// 다음에 할게요 (제안 거절 버튼)
+  static const proposalDeclineNextTime = '다음에 할게요';
+
+  /// 선택 후 위 계좌로 입금해 주세요 (결제 안내 캡션)
+  static const paymentDepositInstruction = '선택 후 위 계좌로 입금해 주세요';
+
+  /// 수강권을 선택했습니다 (수락 성공 SnackBar)
+  static const subscriptionSelectedSnackbar = '수강권을 선택했습니다';
+
+  /// 다음에 다시 제안 받을 수 있어요 (거절 SnackBar)
+  static const proposalRejectedNextTimeSnackbar = '다음에 다시 제안 받을 수 있어요';
 }
