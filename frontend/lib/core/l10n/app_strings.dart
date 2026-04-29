@@ -3880,4 +3880,25 @@ class AppStrings {
   /// 전화번호가 복사되었습니다: $phoneNumber (clipboard SnackBar)
   static String phoneNumberCopiedFormat(String phoneNumber) =>
       '전화번호가 복사되었습니다: $phoneNumber';
+
+  // -- Subscription History Section (수강 이력 위젯 5-3b-18) --
+
+  /// 수강 이력 (섹션 제목)
+  static const subscriptionHistoryTitle = '수강 이력';
+
+  /// 수강 기간 (stat row 라벨)
+  static const subscriptionPeriodLabel = '수강 기간';
+
+  /// 총 수강 (stat row 라벨)
+  static const subscriptionTotalLessonsLabel = '총 수강';
+
+  /// 출석률 (stat row 라벨 — section local)
+  static const subscriptionAttendanceRateLabel = '출석률';
+
+  /// $count회 완료 (총 수강 값 포매터)
+  static String subscriptionTotalUsedFormat(int count) => '$count회 완료';
+
+  /// $months개월 · $count회 완료 (수강 기간 + 총 수강 composite 포매터)
+  static String subscriptionMonthsAndUsedFormat(int months, int count) =>
+      '$months개월 · $count회 완료';
 }
