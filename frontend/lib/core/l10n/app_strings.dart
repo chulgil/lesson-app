@@ -1917,4 +1917,63 @@ class AppStrings {
 
   /// 변경/취소 횟수를 모두 사용했습니다 (limit reached note)
   static const rescheduleQuotaUsedUp = '변경/취소 횟수를 모두 사용했습니다';
+
+  // ── Lessons (레슨 도메인 화면 28차) ─────────────────────────
+  /// 출석 현황 (attendance screen AppBar)
+  static const attendanceTitle = '출석 현황';
+
+  /// 출석 데이터가 없습니다 (attendance empty state)
+  static const noAttendanceData = '출석 데이터가 없습니다';
+
+  /// 결석 (LessonStatus.studentAbsent label)
+  static const statusAbsent = '결석';
+
+  /// 노쇼 (LessonStatus.noShow label)
+  static const statusNoShow = '노쇼';
+
+  /// 당일 취소 (LessonStatus.cancelledByStudentLate label)
+  static const statusSameDayCancel = '당일 취소';
+
+  /// 레슨 노트 (lesson note history AppBar)
+  static const lessonNotesTitle = '레슨 노트';
+
+  /// 노트 검색... (search hint)
+  static const noteSearchHint = '노트 검색...';
+
+  /// 검색 결과가 없습니다 (search empty state)
+  static const searchNoResults = '검색 결과가 없습니다';
+
+  /// 레슨 노트가 없습니다 (notes empty state)
+  static const noLessonNotes = '레슨 노트가 없습니다';
+
+  /// $year년 $month월 (year-month group header)
+  static String yearMonthLabel(int year, int month) => '$year년 $month월';
+
+  /// 피드백 보내기 (quick feedback AppBar)
+  static const sendFeedbackTitle = '피드백 보내기';
+
+  /// 데이터를 불러오는데 실패했습니다 (load error)
+  static const loadDataFailed = '데이터를 불러오는데 실패했습니다';
+
+  /// 학생 검색... (student search hint)
+  static const studentSearchHint = '학생 검색...';
+
+  /// 오늘 레슨 (section header)
+  static const todayLessons = '오늘 레슨';
+
+  /// 최근 레슨 (section header)
+  static const recentLessons = '최근 레슨';
+
+  /// 예정 (lesson upcoming status)
+  static const statusUpcoming = '예정';
+
+  /// $startTime 레슨 ($statusLabel) (today lesson tile subtitle)
+  static String todayLessonSubtitle(String startTime, String statusLabel) =>
+      '$startTime 레슨 ($statusLabel)';
+
+  /// $month월 $day일 마지막 레슨 (recent lesson tile subtitle)
+  static String lastLessonOn(int month, int day) => '$month월 $day일 마지막 레슨';
+
+  /// 피드백을 보낼 레슨이 없습니다 (feedback empty state)
+  static const noLessonsForFeedback = '피드백을 보낼 레슨이 없습니다';
 }
