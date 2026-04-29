@@ -512,3 +512,151 @@ Text(
 5. **감사 시그니처 6대 필수 (§1.2)**: 정체성 4 (Playfair · 로마숫자 · Vermillion · Gaegu) + 구조 2 (NotebookMasthead · "Fine.") = 감사 점수 분모. **정체성 4 중 1 누락 = 점수 무관 BLOCK**. 구조 2 누락은 FLAG 단계.
 6. **메타 원칙 2종 (§1.3)**: 모든 화면은 (a) 각진 — `BorderRadius.zero` 기본, 3 예외(캐릭터·handle·변수표현식)에만 `BorderRadius.circular` 허용, (b) 평탄화 — 변별 채널은 헤더 OR 본문 둘 중 한 곳에서만. 두 원칙은 신규 화면 추가 시 시그니처와 동등 강제. 상세: §1.3.1 / §1.3.2.
 7. **각진 원칙 구현 출처 (§7.112 · §7.113 · §7.114 · §7.115 · §7.118)**: app_theme 테마 레이어 전체가 `BorderRadius.zero` (§7.118, 2026-04-24 포화). 바텀시트 상단도 각진 (10x Vision). `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.
+
+---
+
+## 9. 아이콘 정책 (2026-04-29 inception)
+
+> 노트북 × 스코어 메타포는 **손맛 + 잉크 + 종이** 의 평면 매체. Material/Cupertino 픽토그램 아이콘은 "디지털 UI 시스템" 의 시각 코드라 메타포와 충돌한다. 본 정책은 **시그니처 영역에 한해** ASCII/Unicode 글리프 사용을 강제한다.
+
+### 9.1 정책 강도 — A2 (선택적 강제)
+
+**시그니처 영역에서만 ASCII/Unicode 글리프 강제. 일반 navigation/utility 는 Material 허용.**
+
+| 영역 | 분류 | 정책 | 사유 |
+|------|------|------|------|
+| `core/widgets/notebook/` | 시그니처 프리미티브 | **ASCII 강제** | §1.2 시그니처 진원지 — 메타포 SSOT |
+| `*_stamp.dart` | 도장(스탬프) | **ASCII 강제** | "잉크 도장 찍힘" 메타포 |
+| `*_masthead.dart` | 매스트헤드 | **ASCII 강제** | §1.2 #5 구조 시그니처 |
+| `core/widgets/empty_state_widget.dart` 및 `*empty_state*.dart` | 빈 상태 | **ASCII 강제** | 손글씨 안내문 톤 (§1.1.1 Tier 3) |
+| 일반 navigation (`chevron_right`, `arrow_back`, `close`, `more_vert`, `search`) | 시스템 affordance | Material 허용 | 운영체제 컨벤션 우선 (사용성) |
+| 데이터 표시 아이콘 (`calendar_today`, `schedule`, `access_time`) | 정보 인디케이터 | Material 허용 | Tier 4 산세리프 영역과 정합 |
+| 대화/입력 affordance (`edit`, `camera_alt`, `delete`) | 사용자 액션 | Material 허용 | 시스템 컨벤션 |
+
+**핵심 결정 트리** (신규 아이콘 도입 시):
+
+```
+이 아이콘이 어느 영역에 들어가는가?
+  ├─ §6.7.1 시그니처 프리미티브 / 스탬프 / 매스트헤드 / 빈 상태?
+  │   └─ YES → NotebookGlyph 사용 (Material Icons.* 금지)
+  │
+  └─ NO (일반 화면 navigation/utility/데이터)
+      ├─ 시스템 affordance 인가? (chevron_right, arrow_back, close 등)
+      │   └─ YES → Material Icons.* 유지 (사용성 ↑)
+      └─ 손맛 표현이 필요한가? (음악 노트, 별, 좋아요 등)
+          └─ YES → NotebookGlyph 사용 권장
+```
+
+### 9.2 NotebookGlyph 위젯
+
+**파일**: `frontend/lib/core/widgets/notebook/notebook_glyph.dart`
+
+```dart
+NotebookGlyph(
+  NotebookGlyph.trebleClef,
+  size: 32,
+  color: AppColors.paperAccent,
+)
+```
+
+**파라미터**:
+
+| 이름 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `glyph` (positional) | `String` | — | 글리프 문자. `NotebookGlyph.<name>` 상수 권장 |
+| `size` | `double` | `16` | fontSize |
+| `color` | `Color?` | `AppColors.ink` | 글리프 색상 |
+| `fontFamily` | `String?` | null (serif fallback) | 폰트 패밀리 |
+| `semanticLabel` | `String?` | null (글리프 자체) | 스크린리더 라벨 |
+
+### 9.3 매핑표 — Material → NotebookGlyph
+
+상위 30+ Material 아이콘 ASCII/Unicode 대체. **시그니처 영역에서만 강제**.
+
+| 카테고리 | Material | NotebookGlyph | 글리프 |
+|----------|----------|---------------|--------|
+| **음악** | `music_note` | `note` | `♩` |
+| | (8분음표) | `eighthNote` | `♪` |
+| | — | `beamedNotes` | `♫` |
+| | — | `sixteenthNotes` | `♬` |
+| | (높은음자리표) | `trebleClef` | `𝄞` |
+| | (낮은음자리표) | `bassClef` | `𝄢` |
+| **체크** | `check` / `check_circle` | `check` | `✓` |
+| | `cancel` / `error` | `cross` | `✗` |
+| | `close` (시그니처 영역만) | `close` | `✕` |
+| **화살표** | `arrow_forward` | `arrowRight` | `→` |
+| | `arrow_back` (시그니처) | `arrowLeft` | `←` |
+| | `arrow_upward` | `arrowUp` | `↑` |
+| | `arrow_downward` | `arrowDown` | `↓` |
+| | `chevron_right` (시그니처) | `chevronRight` | `›` |
+| | `chevron_left` (시그니처) | `chevronLeft` | `‹` |
+| | (강조 진행) | `doubleChevronRight` | `»` |
+| **별** | `star` | `starFilled` | `★` |
+| | `star_border` | `starOutline` | `☆` |
+| **좋아요** | `favorite` / `thumb_up_alt` | `heartFilled` | `♥` |
+| | `favorite_border` / `thumb_up_alt_outlined` | `heartOutline` | `♡` |
+| **점·마커** | (불릿) | `bullet` | `•` |
+| | (메타 구분자) | `middleDot` | `·` |
+| | `radio_button_checked` | `dotFilled` | `●` |
+| | `radio_button_unchecked` | `dotOutline` | `○` |
+| **부호** | `add` (시그니처) | `plus` | `+` |
+| | `remove` (시그니처) | `minus` | `−` |
+| **편집** | `edit` (시그니처) | `pencil` | `✎` |
+| | `lightbulb_outline` | `sparkle` | `✦` |
+| **텍스트** | (스펙 인용) | `section` | `§` |
+| | (단락) | `paragraph` | `¶` |
+| | (참고) | `referenceMark` | `※` |
+
+> **주의 — 일반 영역에서는 Material 유지**: 위 표의 navigation/utility 매핑(`close`, `chevron_right`, `arrow_back`, `add`, `edit` 등)은 시그니처 영역에서만 강제다. 일반 화면에서는 사용성·접근성 표준 영향으로 Material 유지.
+
+### 9.4 시그니처 영역 정의 (강제 대상)
+
+다음 경로 패턴의 파일에서만 §9 정책이 강제된다:
+
+| 패턴 | 예시 |
+|------|------|
+| `core/widgets/notebook/**.dart` | `like_stamp.dart`, `notebook_masthead.dart`, `paper_scaffold.dart`, `staff_divider.dart`, `pencil_primitives.dart`, `thin_rule.dart`, `section_header.dart` |
+| `core/widgets/empty_state_widget.dart` | 공통 빈 상태 |
+| `**/widgets/*_stamp.dart` | 도메인별 도장 |
+| `**/widgets/*_masthead.dart` | 도메인별 매스트헤드 |
+| `**/widgets/*empty_state*.dart` | 도메인별 빈 상태 |
+
+### 9.5 예외 처리
+
+다음 3 종류는 정책 적용 제외:
+
+| 예외 | 사유 |
+|------|------|
+| `notebook_glyph.dart` 자체 | 정책 구현체 |
+| 폰트 fallback 미지원 글리프 | SMP plane (𝄞 U+1D11E) 등은 폰트 검증 후 제한적 사용 |
+| 의도적 Material 사용 (시그니처 영역) | `// ignore: notebook-icon` 주석 + 사유 기록 |
+
+**옵트아웃 예시**:
+
+```dart
+// ignore: notebook-icon — Material thumb_up 이 손맛 ♥ 보다 인지도 ↑
+const Icon(Icons.thumb_up_alt, size: 14)
+```
+
+### 9.6 검증
+
+| 시점 | 도구 | 동작 |
+|------|------|------|
+| 코드 편집 시 | `.claude/hooks/check-notebook-icon.sh` | 시그니처 영역 `Icons.*` 감지 → stderr 경고 (exit 0, 차단 X) |
+| 수동 grep | `grep -rn "Icons\." frontend/lib/core/widgets/notebook/` | 시그니처 영역 잔재 확인 |
+| 테스트 | `frontend/test/core/widgets/notebook/notebook_glyph_test.dart` | 위젯 smoke + 30개 글리프 검증 |
+
+### 9.7 마이그레이션 로드맵
+
+| Phase | 범위 | 상태 |
+|-------|------|------|
+| **Phase 1** (2026-04-29) | §9 정책 + NotebookGlyph 위젯 + smoke test + 훅 + 규칙 | **완료** |
+| Phase 2 (예정) | Pilot — `like_stamp.dart` 2건 NotebookGlyph 치환 + 시각 회귀 검증 | 대기 |
+| Phase 3+ (도메인별) | 시그니처 영역(매스트헤드/빈 상태/스탬프) 점진 마이그레이션 | 대기 |
+| 최종 | 시그니처 영역 `Icons.*` 잔재 0건 | 대기 |
+
+### 9.8 금지
+
+- 시그니처 영역에 신규 `Icons.*` 도입 (사유 없는 도입)
+- 일반 영역의 모든 `Icons.*` 강제 치환 (A2 정책 위반 — 시스템 affordance 컨벤션 침해)
+- NotebookGlyph 매핑 상수에 emoji 추가 (예: 🎵, 🎶) — emoji 는 OS 별 색상 렌더, 노트북 평면 잉크 메타포 위반

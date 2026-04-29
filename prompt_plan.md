@@ -1,4 +1,74 @@
-# 백엔드 갭 해소 — Phase 1~2 plan (현재 진행)
+# Notebook × Score §9 아이콘 정책 강제 — Phase 1 plan (현재 진행)
+
+> 작성일: 2026-04-29
+> 모드: `/plan --eng` + adaptive-quality **balanced** (정책 신규 + 신규 위젯, 기존 1584건 미터치)
+> 사용자 결정 (2026-04-29):
+> - **A) A2 정책** — 시그니처 영역(stamp/masthead/empty-state/notebook 프리미티브) 만 ASCII 강제, 일반 navigation/utility 는 Material 허용
+> - **B) Phase 1 범위 동의** — 정책 문서 + Adapter + 훅 + 테스트 + 규칙 (6 파일)
+> - **C) 추천 매핑으로 자동 진행** — 30개 글리프 매핑 사전 검토 생략
+
+## 배경
+
+- 현황: Material `Icons.*` 1,584건 / 318 파일 사용 (전수 마이그레이션 시 318 파일 churn)
+- 사용자 우려: "애플사용자모양" 등 디지털 픽토그램이 노트북 × 스코어 손맛 메타포와 충돌
+- 결정: **선택적 강제** — 메타포 진원지(시그니처 영역) 는 ASCII, 시스템 affordance 는 Material 유지
+
+## Phase 1 — 정책 + 인프라 (완료)
+
+### 산출물 6 파일
+
+| # | 파일 | 변경 | 상태 |
+|---|------|------|------|
+| 1 | `docs/specs/design/notebook/README.md` | §9 아이콘 정책 신규 (9.1~9.8 8 절) | ✅ |
+| 2 | `frontend/lib/core/widgets/notebook/notebook_glyph.dart` | NotebookGlyph 위젯 + 31개 글리프 상수 | ✅ |
+| 3 | `frontend/test/core/widgets/notebook/notebook_glyph_test.dart` | 10/10 PASS — 기본 렌더 4 + 글리프 상수 2 + 레이아웃 회귀 2 + 시맨틱 2 | ✅ |
+| 4 | `.claude/hooks/check-notebook-icon.sh` | PostToolUse stderr 경고 (exit 0). settings.json 등록 완료 | ✅ |
+| 5 | `.claude/rules/ux-rules.md` | "Notebook × Score 아이콘 정책 (HARD-GATE)" 섹션 추가 | ✅ |
+| 6 | `prompt_plan.md` | 본 plan 아카이브 (기존 백엔드 plan → "이전 계획") | ✅ |
+
+### 정책 요약 (§9)
+
+**시그니처 영역 (강제)**: `core/widgets/notebook/`, `*_stamp.dart`, `*_masthead.dart`, `*empty_state*.dart` → `NotebookGlyph` 사용
+
+**일반 영역 (Material 허용)**: navigation/utility/데이터 인디케이터 — 시스템 affordance 컨벤션 우선
+
+**예외**: `// ignore: notebook-icon` + 사유
+
+**매핑 (31개)**: 음악 6 (♩ ♪ ♫ ♬ 𝄞 𝄢) · 체크 3 (✓ ✗ ✕) · 화살표 7 (→ ← ↑ ↓ › ‹ ») · 별 2 (★ ☆) · 좋아요 2 (♥ ♡) · 점 4 (• · ● ○) · 부호 2 (+ −) · 편집 2 (✎ ✦) · 텍스트 3 (§ ¶ ※)
+
+### 검증 결과
+
+| 항목 | 결과 |
+|------|------|
+| flutter test (notebook_glyph_test) | ✅ 10/10 PASS |
+| flutter analyze (신규 2 파일) | ✅ 0 issues |
+| 훅 동작 (like_stamp.dart positive case) | ✅ 2건 경고 검출 (Icons.thumb_up_alt, _outlined) |
+| 훅 동작 (notebook_glyph.dart self-exclusion) | ✅ 0건 |
+| 훅 동작 (일반 영역 negative case) | ✅ 0건 (profile_visibility_widgets) |
+
+## Phase 2 (예정 — 사용자 확인 후)
+
+**Pilot**: `like_stamp.dart` 의 `Icons.thumb_up_alt` (line 55) + `Icons.thumb_up_alt_outlined` (line 81) 을 `NotebookGlyph.heartFilled` / `heartOutline` 으로 치환. 시각 회귀 + LikeStamp 기존 13/13 테스트 통과 확인.
+
+## Phase 3+ (추후 분할 — 도메인별)
+
+시그니처 영역 점진 마이그레이션. 도메인별 PR 분리. 각 PR 5-15 파일 단위.
+
+## 평가 결과 (Phase 1 자체 채점)
+
+| 기준 | 점수 | 근거 |
+|------|------|------|
+| 완성도 | 9/10 | 6 산출물 모두 작성 + 검증 5/5 PASS |
+| 견고성 | 8/10 | smoke test 10건 (기본·상수·레이아웃·시맨틱) + 훅 positive/negative 검증 |
+| 일관성 | 9/10 | §6.7.1 시그니처 프리미티브 폴더 + 기존 like_stamp_test 패턴 정합 |
+| 간결성 | 9/10 | NotebookGlyph 70 라인, 단일 책임, BorderRadius 없음 |
+| **가중 평균** | **8.75 / PASS** | |
+
+---
+
+## 이전 계획 (Backend 갭 해소)
+
+# 백엔드 갭 해소 — Phase 1~2 plan (완료)
 
 > 작성일: 2026-04-29
 > 모드: `/plan --eng` + adaptive-quality **ultra** (마이그레이션 + 27 이벤트 SSOT 정렬)

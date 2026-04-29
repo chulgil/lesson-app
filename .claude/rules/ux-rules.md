@@ -115,3 +115,31 @@ grep -rn "buttonHeightSmall" --include="*.dart" features/ | grep -i "bottom\|inp
 - **과거 챕터 펼침 시 가이드 숨김** — `showGuide: false` 전달 (#25)
 - **상태 라벨은 역할별** — 선생님: 행동 중심 (입금 대기), 학생: 상태 중심 (결제 필요) (#25)
 - **가이드 스펙**: `docs/specs/schedule/chat_guide_message_spec.md`
+
+## Notebook × Score 아이콘 정책 (HARD-GATE)
+
+> 스펙: `docs/specs/design/notebook/README.md` §9 (A2 — 선택적 강제)
+
+**시그니처 영역 (강제)**: `core/widgets/notebook/`, `*_stamp.dart`, `*_masthead.dart`, `*empty_state*.dart`
+- Material `Icons.*` 금지 → `NotebookGlyph` 사용 (`core/widgets/notebook/notebook_glyph.dart`)
+- 30개 글리프 상수 제공 (음악 ♩ 𝄞 / 체크 ✓ ✗ / 화살표 → ‹ › / 별 ★ ☆ / 좋아요 ♥ ♡ / 점 • · ● ○ 등)
+
+**일반 영역 (Material 허용)**: navigation/utility/데이터 인디케이터 — 시스템 affordance 컨벤션 우선
+
+**예외**: `// ignore: notebook-icon` 주석 + 사유 (시그니처 영역에서 의도적 Material 사용)
+
+**검증 grep**:
+
+```bash
+# 시그니처 영역 Icons.* 잔재 검출 (위반 후보)
+grep -rn "Icons\." frontend/lib/core/widgets/notebook/ --include="*.dart"
+grep -rn "Icons\." frontend/lib/core/widgets/empty_state_widget.dart
+grep -rn "Icons\." frontend/lib --include="*_stamp.dart"
+grep -rn "Icons\." frontend/lib --include="*_masthead.dart"
+grep -rn "Icons\." frontend/lib --include="*empty_state*.dart"
+
+# emoji 사용 검출 (정책 위반 — 평면 잉크 메타포 X)
+grep -rn "🎵\|🎶\|❤️\|⭐" frontend/lib --include="*.dart"
+```
+
+**자동 감지**: `.claude/hooks/check-notebook-icon.sh` PostToolUse 훅 (stderr 경고, exit 0)
