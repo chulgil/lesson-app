@@ -223,7 +223,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-2c-1 bulk_feedback_screen 완료 (2026-04-29) — 17 신규 키 + 3 재사용 (errorOccurred, statusCompleted, statusUpcoming), 17 사이트, lessons 46/46 + schedule 237/237 PASS
 - 5-2c-2 lesson_notes_widgets 완료 (2026-04-29) — 18 신규 키 + 7 재사용 (add, delete, modify, no, save, cancelRequestAction, actionLessonCancel), 28 사이트, lessons 46/46 PASS
 - 5-2c-3 edit_lesson_screen 완료 (2026-04-29) — 13 신규 키 + 5 재사용 (save, student, actionLessonCancel, deleteLessonTitle, lessonDurationLabel), 19 사이트, lessons 46/46 + schedule 237/237 PASS
-- 5-2c 나머지 lessons 큰 파일 (lesson_detail_screen, add_lesson, add_practice_item_sheet, quick_feedback ~88 사이트)
+- 5-2c-4 quick_feedback_screen 완료 (2026-04-29) — 18 신규 키 + 4 재사용 (add, delete, loadDataFailed, feedbackEditorHint), 22 사이트, lessons 46/46 + schedule 237/237 PASS
+- 5-2c 나머지 lessons 큰 파일 (lesson_detail_screen, add_lesson, add_practice_item_sheet ~97 사이트)
 - 5-3 subscription 도메인
 
 ## 평가 기준 (Rubric, 합격선 7.5)
@@ -257,7 +258,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-2c-1 bulk_feedback_screen i18n (17 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-2c-2 lesson_notes_widgets i18n (28 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-2c-3 edit_lesson_screen i18n (19 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-2c-4 lessons 잔여 (lesson_detail / add_lesson / add_practice_item / quick_feedback ~88 사이트) | 대기 |
+| P2 5-2c-4 quick_feedback_screen i18n (22 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-2c-5 lessons 잔여 (lesson_detail / add_lesson / add_practice_item ~97 사이트) | 대기 |
 | P2 5-3 subscription 도메인 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
