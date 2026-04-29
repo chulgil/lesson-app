@@ -24,11 +24,13 @@ def test_align_booking_status_revision_chained_to_request_events() -> None:
     assert rev.down_revision == "add_request_events"
 
 
-def test_align_booking_status_is_head() -> None:
-    """0009 가 단일 head 인지."""
+def test_align_booking_status_in_chain_to_head() -> None:
+    """0009 이 chain 안에 있고, head 까지 도달하는지 (후속 마이그레이션 추가에 안정)."""
     script = _script()
-    heads = list(script.get_heads())
-    assert heads == ["align_booking_status"], f"expected single head, got {heads}"
+    head = script.get_current_head()
+    assert head is not None
+    revs = [r.revision for r in script.walk_revisions(base="base", head=head)]
+    assert "align_booking_status" in revs
 
 
 def test_align_booking_status_adds_decline_reason() -> None:

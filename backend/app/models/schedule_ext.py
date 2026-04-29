@@ -31,11 +31,8 @@ class GroupScheduleStatus(str, enum.Enum):
     inProgress = "inProgress"
 
 
-class IndividualNoShowPolicy(str, enum.Enum):
-    deductCredit = "deductCredit"
-    halfCredit = "halfCredit"
-    noDeduction = "noDeduction"
-    reschedule = "reschedule"
+# #239 통합: schedule.NoShowPolicy 단일 SSOT — IndividualNoShowPolicy 는 alias 보존
+from app.models.schedule import NoShowPolicy as IndividualNoShowPolicy  # noqa: E402,F401
 
 
 class ScheduleChangeType(str, enum.Enum):

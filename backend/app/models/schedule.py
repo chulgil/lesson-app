@@ -82,8 +82,20 @@ class GroupClassType(str, enum.Enum):
 
 
 class NoShowPolicy(str, enum.Enum):
-    deduct = "deduct"
-    noDeduct = "noDeduct"
+    """spec 4값 SSOT (#239, 결정 2026-04-29 4값 단일 enum 채택).
+
+    레거시 통합:
+    - deduct → deductCredit (rename, 1회 차감)
+    - noDeduct → noDeduction (rename)
+    추가:
+    - halfCredit: 0.5회 차감
+    - reschedule: 차감 없이 보강 일정 강제
+    """
+
+    deductCredit = "deductCredit"
+    halfCredit = "halfCredit"
+    noDeduction = "noDeduction"
+    reschedule = "reschedule"
 
 
 class TeacherAvailability(UUIDMixin, TimestampMixin, Base):
@@ -219,7 +231,7 @@ class GroupClass(UUIDMixin, TimestampMixin, Base):
     no_show_policy: Mapped[NoShowPolicy] = mapped_column(
         Enum(NoShowPolicy, native_enum=True),
         nullable=False,
-        default=NoShowPolicy.deduct,
+        default=NoShowPolicy.deductCredit,
     )
     max_no_show_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     repeat_days: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
