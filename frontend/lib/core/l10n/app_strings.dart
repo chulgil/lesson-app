@@ -2009,4 +2009,60 @@ class AppStrings {
 
   /// 피드백을 보낼 레슨이 없습니다 (feedback empty state)
   static const noLessonsForFeedback = '피드백을 보낼 레슨이 없습니다';
+
+  // ── Bulk Feedback (일괄 피드백 화면 29차) ─────────────────────
+  /// 일괄 피드백 (default AppBar title)
+  static const bulkFeedbackTitle = '일괄 피드백';
+
+  /// 학생 선택 (step 1 title)
+  static const bulkFeedbackStepStudent = '학생 선택';
+
+  /// 피드백 작성 (step 2 title)
+  static const bulkFeedbackStepWrite = '피드백 작성';
+
+  /// 미리보기 (step 3 title + bottom button)
+  static const bulkFeedbackStepPreview = '미리보기';
+
+  /// 완료된 레슨 학생이 자동 선택됩니다. 변경하려면 탭하세요. (info banner)
+  static const bulkFeedbackInfoBanner = '완료된 레슨 학생이 자동 선택됩니다. 변경하려면 탭하세요.';
+
+  /// 오늘 레슨이 없습니다 (today empty state)
+  static const noTodayLessons = '오늘 레슨이 없습니다';
+
+  /// $startTime ($statusLabel) [· 피드백 있음] (lesson tile subtitle)
+  static String bulkLessonTileSubtitle(
+    String startTime,
+    String statusLabel,
+    bool hasFeedback,
+  ) => '$startTime ($statusLabel)${hasFeedback ? " · 피드백 있음" : ""}';
+
+  /// 다음 ($count명) (next button label)
+  static String bulkFeedbackNextWithCount(int count) => '다음 ($count명)';
+
+  /// 공통 피드백 (common feedback section header)
+  static const bulkFeedbackCommonHeader = '공통 피드백';
+
+  /// 모든 선택 학생에게 전달할 피드백을 작성하세요... (common feedback hint)
+  static const bulkFeedbackHint = '모든 선택 학생에게 전달할 피드백을 작성하세요...';
+
+  /// 개별 코멘트 (선택) (per-student section header)
+  static const bulkFeedbackPerStudentHeader = '개별 코멘트 (선택)';
+
+  /// 각 학생에게 추가할 개별 메시지 (per-student description)
+  static const bulkFeedbackPerStudentDesc = '각 학생에게 추가할 개별 메시지';
+
+  /// 추가 코멘트... (per-student textfield hint)
+  static const additionalCommentHint = '추가 코멘트...';
+
+  /// 전송 중... (sending in progress)
+  static const sendingInProgress = '전송 중...';
+
+  /// $count명에게 전송 (bulk send button)
+  static String bulkFeedbackSendButton(int count) => '$count명에게 전송';
+
+  /// $count명에게 피드백을 전송했습니다 (success snackbar)
+  static String bulkFeedbackSentMessage(int count) => '$count명에게 피드백을 전송했습니다';
+
+  /// 전송 실패. 다시 시도해주세요. (failure snackbar)
+  static const sendFailedRetry = '전송 실패. 다시 시도해주세요.';
 }
