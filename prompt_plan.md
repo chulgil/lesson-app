@@ -235,7 +235,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-2 subscription_chapter_lessons + selectable_template_card 4 사이트 (2026-04-29) — 신규 키 4개 (sessionBookingRequired, templateRecommendedBadgeStar, templateSummaryLine, templatePerLessonPrice). subscription 63/63 PASS.
 - 5-3b-3 issue_form 위젯 3파일 ~37 사이트 (2026-04-29) — issue_form_sections + issue_form_membership_widgets + issue_form_discount_bonus. 신규 키 ~37개 (TypeSection·PaymentSection·AmountSection·StartDate·Membership·Discount·Bonus). flutter analyze — No issues. 커밋 `59607f65` (키) + `4839fc38` (마이그레이션). 잔여 ~32 파일은 5-3b-4 이후.
 - 5-3b-4 subscription entities 6파일 ~58 사이트 (2026-04-29) — subscription + subscription_proposal + lesson_policy + subscription_usage + subscription_settings + subscription_template. 도메인 display getter 전수 AppStrings 경유 (결제수단/유형/상태/summary/detail/billing/fifthWeek/policy/usage 라벨 + 시간경과/만료 표시). 신규 키 ~55개 + 재사용 (individual, academy, expired, durationMinutesValue, subscriptionTypeMonthly). subscription 63/63 PASS. 커밋 `fba12be9`.
-- 5-3b 잔여 subscription 발급폼/제안 화면·서비스·repository (~26 파일)
+- 5-3b-5 location_travel_selector 18 사이트 (2026-04-29) — 위치 5종 chip label + 주소 5종(읽기/입력/로딩/실패) + 이동시간 4종 키 신설. 신규 키 16개 (`locationStudentHomeLabel` 등) + 재사용 3건 (`academy`, `lessonLocationLabel`, `durationMinutesValue`). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `2d628cca`. 잔여 ~17 파일은 5-3b-6 이후.
+- 5-3b 잔여 subscription 발급폼/제안 화면·서비스·repository (~17 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -276,7 +277,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-2 chapter_lessons + selectable_template_card i18n (4 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-3 issue_form 3위젯 i18n (~37 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-4 subscription entities 6파일 i18n (~58 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-5 subscription 화면·서비스·repository (~26 파일 분할) | 대기 |
+| P2 5-3b-5 location_travel_selector i18n (18 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-6 subscription 화면·서비스·repository (~17 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
