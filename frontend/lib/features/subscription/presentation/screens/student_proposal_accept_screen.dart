@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -37,16 +38,23 @@ class _StudentProposalAcceptScreenState
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('수강권 선택'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.studentProposalAcceptAppBarTitle),
+        centerTitle: true,
+      ),
       body:
           _isProcessing
               ? const Center(child: CircularProgressIndicator())
               : proposalAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                error:
+                    (_, __) =>
+                        const Center(child: Text(AppStrings.errorOccurred)),
                 data: (proposal) {
                   if (proposal == null) {
-                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                    return const Center(
+                      child: Text(AppStrings.proposalNotFoundEmpty),
+                    );
                   }
                   return _buildBody(proposal);
                 },
@@ -59,7 +67,8 @@ class _StudentProposalAcceptScreenState
       teacherFullProfileProvider(proposal.teacherId),
     );
     final teacherName =
-        teacherAsync.whenOrNull(data: (profile) => profile?.name) ?? '선생님';
+        teacherAsync.whenOrNull(data: (profile) => profile?.name) ??
+        AppStrings.teacher;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -87,12 +96,12 @@ class _StudentProposalAcceptScreenState
       children: [
         const SizedBox(height: AppSpacing.space4),
         Text(
-          '$teacherName 선생님',
+          AppStrings.teacherWithName(teacherName),
           style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '수강권을 제안했어요',
+          AppStrings.proposalSubmittedSubtitle,
           style: AppTypography.bodyLarge.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -163,7 +172,7 @@ class _StudentProposalAcceptScreenState
     return TextButton(
       onPressed: _isProcessing ? null : () => _handleReject(proposal),
       child: Text(
-        '다음에 할게요',
+        AppStrings.proposalDeclineNextTime,
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
       ),
     );
@@ -187,12 +196,12 @@ class _StudentProposalAcceptScreenState
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionDivider('결제 안내'),
+            _buildSectionDivider(AppStrings.eventPaymentRequested),
             const SizedBox(height: AppSpacing.space3),
             _buildAccountRow(accountText),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '선택 후 위 계좌로 입금해 주세요',
+              AppStrings.paymentDepositInstruction,
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -247,7 +256,7 @@ class _StudentProposalAcceptScreenState
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Text(
-                    '복사',
+                    AppStrings.proposalPaymentCopyLabel,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w500,
@@ -297,7 +306,7 @@ class _StudentProposalAcceptScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('수강권을 선택했습니다'),
+            content: Text(AppStrings.subscriptionSelectedSnackbar),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -307,7 +316,7 @@ class _StudentProposalAcceptScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -333,7 +342,7 @@ class _StudentProposalAcceptScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('다음에 다시 제안 받을 수 있어요'),
+            content: Text(AppStrings.proposalRejectedNextTimeSnackbar),
             backgroundColor: AppColors.ink,
           ),
         );
@@ -343,7 +352,7 @@ class _StudentProposalAcceptScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -362,7 +371,7 @@ class _StudentProposalAcceptScreenState
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('계좌번호가 복사되었습니다'),
+          content: Text(AppStrings.proposalPaymentAccountCopied),
           duration: Duration(seconds: 1),
         ),
       );
