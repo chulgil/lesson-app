@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -27,7 +28,7 @@ class ProposalCreateScreen extends ConsumerStatefulWidget {
   const ProposalCreateScreen({
     super.key,
     required this.teacherId,
-    this.teacherName = '선생님',
+    this.teacherName = AppStrings.teacher,
     this.preselectedStudentId,
   });
 
@@ -63,10 +64,13 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('수강권 제안'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.proposalCreateAppBarTitle),
+        centerTitle: true,
+      ),
       body: studentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
         data: (students) {
           if (students.isEmpty) {
             return _buildNoStudentsState();
@@ -74,7 +78,8 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
           return templatesAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+            error:
+                (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
             data: (templates) {
               if (templates.isEmpty) {
                 return _buildNoTemplatesState();
@@ -96,14 +101,14 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '등록된 학생이 없습니다',
+            AppStrings.proposalCreateNoStudentsTitle,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '학생을 먼저 추가해주세요',
+            AppStrings.proposalCreateNoStudentsBody,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -125,14 +130,14 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '수강권 템플릿이 없습니다',
+            AppStrings.proposalCreateNoTemplatesTitle,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '먼저 수강권 템플릿을 생성해주세요',
+            AppStrings.proposalCreateNoTemplatesBody,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -145,7 +150,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
               );
             },
             icon: const Icon(Icons.add),
-            label: const Text('템플릿 만들기'),
+            label: const Text(AppStrings.proposalCreateTemplateButton),
           ),
         ],
       ),
@@ -159,21 +164,26 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Step 1: Student Selection
-          _buildStepHeader('1', '학생 선택'),
+          _buildStepHeader('1', AppStrings.proposalCreateStepStudent),
           const SizedBox(height: AppSpacing.space2),
           _buildStudentSelector(students),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Step 2: Template Selection (Selectable Cards)
-          _buildStepHeader('2', '수강권 선택 (최대 $kMaxTemplateSelections개)'),
+          _buildStepHeader(
+            '2',
+            AppStrings.proposalCreateStepTemplateMaxFormat(
+              kMaxTemplateSelections,
+            ),
+          ),
           const SizedBox(height: AppSpacing.space2),
           _buildTemplateCards(templates),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Optional Message
-          _buildSectionTitle('메시지 (선택)'),
+          _buildSectionTitle(AppStrings.proposalCreateMessageOptional),
           const SizedBox(height: AppSpacing.space2),
           _buildMessageInput(),
 
@@ -240,7 +250,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
             vertical: AppSpacing.space3,
           ),
           border: InputBorder.none,
-          hintText: '학생을 선택하세요',
+          hintText: AppStrings.proposalCreateStudentSelectHint,
         ),
         isExpanded: true,
         items:
@@ -289,12 +299,14 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       children: [
         // Help text
         if (_selectedTemplateIds.isEmpty)
-          _buildInfoBanner('수강권을 선택하세요. 복수 선택 시 학생이 하나를 선택합니다.'),
+          _buildInfoBanner(AppStrings.proposalCreateTemplateInfoBanner),
 
         if (_selectedTemplateIds.length > 1)
           _buildInfoBanner(
-            '${_selectedTemplateIds.length}개 선택됨 — 학생이 하나를 선택합니다. '
-            '추천 지정: 카드를 길게 누르세요.',
+            AppStrings.proposalCreateMultiSelectInfoFormat(
+                  _selectedTemplateIds.length,
+                ) +
+                AppStrings.proposalCreateRecommendedHint,
           ),
 
         // Template cards
@@ -399,7 +411,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.all(AppSpacing.space4),
           border: InputBorder.none,
-          hintText: '학생에게 전달할 메시지를 입력하세요',
+          hintText: AppStrings.proposalCreateMessageHint,
         ),
       ),
     );
@@ -435,8 +447,10 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                     )
                     : Text(
                       _selectedTemplateIds.length > 1
-                          ? '${_selectedTemplateIds.length}개 수강권 제안 보내기'
-                          : '제안 보내기',
+                          ? AppStrings.proposalCreateMultiTemplateSendFormat(
+                            _selectedTemplateIds.length,
+                          )
+                          : AppStrings.proposalSend,
                     ),
           ),
         ),
@@ -461,12 +475,12 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                 ),
                 shape: RoundedRectangleBorder(),
               ),
-              child: const Text('즉시 발급'),
+              child: const Text(AppStrings.proposalTypeDirectIssue),
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다',
+            AppStrings.proposalCreateImmediateIssueHelp,
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
             textAlign: TextAlign.center,
           ),
@@ -499,7 +513,8 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
       final templateId = _selectedTemplateIds.first;
       final templateAsync = ref.read(subscriptionTemplateProvider(templateId));
-      final templateName = templateAsync.valueOrNull?.name ?? '수강권';
+      final templateName =
+          templateAsync.valueOrNull?.name ?? AppStrings.subscription;
 
       await notifier.createMultiChoiceProposal(
         teacherId: widget.teacherId,
@@ -518,8 +533,10 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           SnackBar(
             content: Text(
               _selectedTemplateIds.length > 1
-                  ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
-                  : '수강권 제안을 보냈습니다',
+                  ? AppStrings.proposalCreateMultiSentMessageFormat(
+                    _selectedTemplateIds.length,
+                  )
+                  : AppStrings.proposalCreateSentMessage,
             ),
             backgroundColor: AppColors.paperOk,
           ),
@@ -530,7 +547,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('제안 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.proposalCreateFailMessage),
             backgroundColor: AppColors.paperAccent,
           ),
         );
