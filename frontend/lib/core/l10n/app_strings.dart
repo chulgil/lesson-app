@@ -2886,4 +2886,353 @@ class AppStrings {
   /// 체험 레슨 안내
   static const issueFormTrialNotice =
       '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.';
+
+  // -- Issue Form Sections (수강권 발급 폼 섹션 5-3b-2a) --
+
+  /// 수강권 유형 (섹션 제목)
+  static const issueFormTypeSectionTitle = '수강권 유형';
+
+  /// 체험 (수강권 유형 칩 라벨)
+  static const issueFormTypeTrialLabel = '체험';
+
+  /// 회차제 (수강권 유형 칩 라벨)
+  static const issueFormTypePackageLabel = '회차제';
+
+  /// 월정액 (수강권 유형 칩 라벨)
+  static const issueFormTypeMonthlyLabel = '월정액';
+
+  /// 체험 수강권 설명
+  static const issueFormTypeTrialDescription =
+      '1회 체험 레슨으로, 학생과 선생님의 적합성을 확인합니다. 무료 또는 할인 금액으로 설정할 수 있습니다.';
+
+  /// 회차제 수강권 설명
+  static const issueFormTypePackageDescription =
+      '정해진 횟수만큼 레슨을 진행합니다. 매 레슨마다 유연하게 스케줄을 조율할 수 있습니다.';
+
+  /// 월정액 수강권 설명
+  static const issueFormTypeMonthlyDescription =
+      '월 단위 정기 수강권입니다. 고정된 요일·시간에 레슨이 자동 배정되어 스케줄 관리가 편리합니다.';
+
+  /// 결제 방식 (섹션 제목)
+  static const issueFormPaymentSectionTitle = '결제 방식';
+
+  /// 선불 (결제 칩 라벨)
+  static const issueFormPaymentPrepaidLabel = '선불';
+
+  /// 후불 (결제 칩 라벨)
+  static const issueFormPaymentPostpaidLabel = '후불';
+
+  /// 후불 수강권 안내
+  static const issueFormPaymentPostpaidNotice =
+      '후불 수강권은 미수금으로 표시됩니다. 입금 확인 후 결제완료 처리할 수 있습니다.';
+
+  /// 정가 (섹션 제목)
+  static const issueFormAmountSectionTitle = '정가';
+
+  /// N만원 (금액 프리셋 칩 라벨)
+  static String issueFormAmountChipLabel(int amount) => '${amount ~/ 10000}만원';
+
+  /// 직접 입력 (금액 입력 hint)
+  static const issueFormAmountHint = '직접 입력';
+
+  /// 원 (금액 단위)
+  static const issueFormAmountSuffix = '원';
+
+  /// 금액 입력 검증 메시지
+  static const issueFormAmountValidation = '금액을 입력해주세요';
+
+  /// 회당 N (회당 금액 라벨)
+  static String issueFormPerLessonAmount(String price) => '회당 $price';
+
+  /// 시작일 (섹션 제목)
+  static const issueFormStartDateSectionTitle = '시작일';
+
+  /// 날짜 선택 (시작일 placeholder)
+  static const issueFormStartDateHint = '날짜 선택';
+
+  // -- Issue Form Membership (멤버십 선택) --
+
+  /// 레슨 선택 (섹션 제목)
+  static const issueFormMembershipSectionTitle = '레슨 선택';
+
+  /// 개인레슨 (멤버십 기본 이름)
+  static const issueFormMembershipDefaultName = '개인레슨';
+
+  /// 레슨 (오류 시 fallback)
+  static const issueFormMembershipFallback = '레슨';
+
+  /// 레벨 미설정
+  static const issueFormMembershipNoLevel = '레벨 미설정';
+
+  /// 등록된 레슨이 없습니다 (빈 상태 제목)
+  static const issueFormNoMembershipTitle = '등록된 레슨이 없습니다';
+
+  /// 빈 상태 안내
+  static const issueFormNoMembershipBody = '학생을 레슨에 먼저 등록해주세요.';
+
+  /// 오류가 발생했습니다 (에러 상태 제목)
+  static const issueFormErrorTitle = '오류가 발생했습니다';
+
+  // -- Issue Form Discount/Bonus (할인·보너스) --
+
+  /// 할인 (섹션 제목)
+  static const issueFormDiscountTitle = '할인';
+
+  /// % (퍼센트 단위)
+  static const issueFormPercentSuffix = '%';
+
+  /// 없음 (zero 라벨)
+  static const issueFormZeroLabel = '없음';
+
+  /// 보너스 (섹션 제목)
+  static const issueFormBonusTitle = '보너스';
+
+  /// +N회 (보너스 라벨 포매터)
+  static String issueFormBonusFormatter(int value) =>
+      value == 0 ? '없음' : '+$value회';
+
+  /// 대량 구매 (보너스 사유)
+  static const issueFormBonusReasonBulk = '대량 구매';
+
+  /// 5주차 (보너스 사유)
+  static const issueFormBonusReasonFifthWeek = '5주차';
+
+  /// 추천 (보너스 사유)
+  static const issueFormBonusReasonReferral = '추천';
+
+  /// 재등록 (보너스 사유)
+  static const issueFormBonusReasonRenewal = '재등록';
+
+  /// 기타 (보너스 사유)
+  static const issueFormBonusReasonOther = '기타';
+
+  /// 사유를 직접 입력해주세요 (custom 사유 hint)
+  static const issueFormBonusReasonCustomHint = '사유를 직접 입력해주세요';
+
+  // ─── Subscription entities (P2 5-3b-2) ───────────────────────
+
+  // LessonPolicy summaries
+  /// 당일 취소 가능
+  static const policyCancelSameDay = '당일 취소 가능';
+
+  /// N시간 전까지 취소 가능
+  static String policyCancelMinHours(int hours) => '$hours시간 전까지 취소 가능';
+
+  /// 변경 불가
+  static const policyChangeNone = '변경 불가';
+
+  /// 무제한 변경 가능
+  static const policyChangeUnlimited = '무제한 변경 가능';
+
+  /// 월 N회 변경 가능
+  static String policyChangeMonthly(int max) => '월 $max회 변경 가능';
+
+  /// 노쇼 시 횟수 차감
+  static const policyNoShowDeduct = '노쇼 시 횟수 차감';
+
+  /// 노쇼 시 횟수 유지
+  static const policyNoShowKeep = '노쇼 시 횟수 유지';
+
+  /// 이월 불가
+  static const policyCarryoverNone = '이월 불가';
+
+  /// 최대 N회 이월 (M개월 내)
+  static String policyCarryoverMax(int max, int months) =>
+      '최대 $max회 이월 ($months개월 내)';
+
+  // SubscriptionUsage labels & default notes
+  /// 정상 수업
+  static const usageTypeNormal = '정상 수업';
+
+  /// 당일 취소
+  static const usageTypeLateCancellation = '당일 취소';
+
+  /// 학생 결석
+  static const usageTypeStudentAbsent = '학생 결석';
+
+  /// 변경 수업
+  static const usageTypeRescheduled = '변경 수업';
+
+  /// 당일 취소 (24시간 이내)
+  static const usageNoteLateCancellation = '당일 취소 (24시간 이내)';
+
+  // SubscriptionSettings 디폴트 description
+  /// 대량 구매 보너스
+  static const bulkPurchaseBonus = '대량 구매 보너스';
+
+  // ProposalPaymentStatus
+  /// 결제 대기
+  static const proposalPaymentStatusPending = '결제 대기';
+
+  /// 결제 완료
+  static const proposalPaymentStatusCompleted = '결제 완료';
+
+  /// 입금 확인 필요
+  static const proposalPaymentDescPending = '입금 확인 필요';
+
+  /// 이미 결제됨
+  static const proposalPaymentDescCompleted = '이미 결제됨';
+
+  // ProposalStatus
+  /// 제안됨
+  static const proposalStatusPending = '제안됨';
+
+  /// 입금 알림
+  static const proposalStatusPaymentNotified = '입금 알림';
+
+  /// 발급 완료
+  static const proposalStatusConfirmed = '발급 완료';
+
+  /// 스킵됨
+  static const proposalStatusRejected = '스킵됨';
+
+  /// 취소됨
+  static const proposalStatusCancelled = '취소됨';
+
+  // ProposalType
+  /// 제안 (action 라벨)
+  static const proposalTypeProposal = '제안';
+
+  /// 즉시 발급
+  static const proposalTypeDirectIssue = '즉시 발급';
+
+  // 시간 경과 / 만료 표시
+  /// N일 전
+  static String timeAgoDays(int days) => '$days일 전';
+
+  /// N시간 전
+  static String timeAgoHours(int hours) => '$hours시간 전';
+
+  /// N분 전
+  static String timeAgoMinutes(int minutes) => '$minutes분 전';
+
+  /// 방금 전
+  static const timeAgoJustNow = '방금 전';
+
+  /// N일 후 만료
+  static String expiresInDays(int days) => '$days일 후 만료';
+
+  /// N시간 후 만료
+  static String expiresInHours(int hours) => '$hours시간 후 만료';
+
+  /// N분 후 만료
+  static String expiresInMinutes(int minutes) => '$minutes분 후 만료';
+
+  /// 곧 만료
+  static const expiresVerySoon = '곧 만료';
+
+  // SubscriptionPaymentMethod
+  /// 현금
+  static const paymentMethodCash = '현금';
+
+  /// 계좌이체
+  static const paymentMethodBankTransfer = '계좌이체';
+
+  /// 카드
+  static const paymentMethodCard = '카드';
+
+  /// 기타 (결제 수단)
+  static const paymentMethodOther = '기타';
+
+  // Subscription payment status / type / status / summary
+  /// 결제완료
+  static const paymentStatusPaid = '결제완료';
+
+  /// 미결제
+  static const paymentStatusUnpaid = '미결제';
+
+  /// 체험 (수강권 유형)
+  static const subscriptionTypeTrial = '체험';
+
+  /// 월정액 (N회) — 형식
+  static String subscriptionTypeMonthlyWithCount(int count) => '월정액 ($count회)';
+
+  /// N회권 — 패키지 라벨
+  static String subscriptionTypePackageWithCount(int total) => '$total회권';
+
+  /// 이용중 (status)
+  static const subscriptionStatusActive = '이용중';
+
+  /// 만료 임박 (status)
+  static const subscriptionStatusExpiringSoon = '만료 임박';
+
+  /// 만료됨 (status)
+  static const subscriptionStatusExpired = '만료됨';
+
+  /// 일시정지 (status)
+  static const subscriptionStatusPaused = '일시정지';
+
+  /// 체험 완료
+  static const trialCompleted = '체험 완료';
+
+  /// 체험중
+  static const trialOngoing = '체험중';
+
+  /// N회 모두 사용 (depleted)
+  static String subscriptionAllUsed(int total) => '$total회 모두 사용';
+
+  /// N회 미사용 (만료됨)
+  static String subscriptionUnusedExpired(int remaining) =>
+      '$remaining회 미사용 (만료됨)';
+
+  /// remaining/total회 남음
+  static String subscriptionRemainingOf(int remaining, int total) =>
+      '$remaining/$total회 남음';
+
+  /// D-N
+  static String daysUntilExpirationFormat(int days) => 'D-$days';
+
+  /// summary 합성: "$count ($daysOrStatus)"
+  static String subscriptionSummaryWithDays(
+    String count,
+    String daysOrStatus,
+  ) => '$count ($daysOrStatus)';
+
+  /// 보너스 (디폴트 사유)
+  static const bonusDefault = '보너스';
+
+  /// 🎁 +N회 (사유) — bonusText
+  static String bonusText(int count, String reason) => '🎁 +$count회 ($reason)';
+
+  /// 체험 레슨 (금액)
+  static String trialLessonWithAmount(String amount) => '체험 레슨 ($amount)';
+
+  /// 무료 체험 레슨
+  static const freeTrialLesson = '무료 체험 레슨';
+
+  /// 기본: N회 (월정액 detail)
+  static String detailBaseLessons(int base) => '기본: $base회';
+
+  /// N회권 중 M회 사용 (package detail)
+  static String detailPackageUsage(int base, int used) => '$base회권 중 $used회 사용';
+
+  /// \n보너스: +N회 (detail 보너스 라인)
+  static String detailBonusLine(int count) => '\n보너스: +$count회';
+
+  /// (사유) — 보너스 사유 인라인 부착
+  static String detailBonusReasonInline(String reason) => ' ($reason)';
+
+  /// N만원
+  static String amountManwon(String value) => '${value}만원';
+
+  /// N원
+  static String amountWon(int amount) => '$amount원';
+
+  /// 회차 결제 (BillingType.perPackage)
+  static const billingTypePerPackage = '회차 결제';
+
+  /// 월정액 (매월 N일) — BillingType.monthly with day
+  static String billingTypeMonthlyWithDay(int day) => '월정액 (매월 $day일)';
+
+  /// 휴강 (FifthWeekPolicy.skip)
+  static const fifthWeekSkip = '휴강';
+
+  /// 보너스 지급 (FifthWeekPolicy.bonus)
+  static const fifthWeekBonus = '보너스 지급';
+
+  /// 기존에서 차감 (FifthWeekPolicy.deduct)
+  static const fifthWeekDeduct = '기존에서 차감';
+
+  /// 학생 선택 (FifthWeekPolicy.optional)
+  static const fifthWeekOptional = '학생 선택';
 }
