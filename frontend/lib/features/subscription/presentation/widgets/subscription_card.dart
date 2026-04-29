@@ -269,7 +269,10 @@ class SubscriptionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '남음: ${subscription.remainingLessons ?? 0}/$total회',
+              AppStrings.subscriptionRemainingPrefix(
+                subscription.remainingLessons ?? 0,
+                total,
+              ),
               style: AppTypography.caption.copyWith(
                 color: SubscriptionStatusColors.getSummaryTextColor(
                   subscription,
@@ -279,7 +282,10 @@ class SubscriptionCard extends StatelessWidget {
             ),
             if (subscription.hasBonus)
               Text(
-                '(기본 $base + 보너스 ${subscription.bonusCount})',
+                AppStrings.subscriptionBonusBreakdown(
+                  base,
+                  subscription.bonusCount,
+                ),
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkTertiary,
                 ),
@@ -300,7 +306,7 @@ class SubscriptionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '📋 상세',
+            AppStrings.subscriptionDetailHeader,
             style: AppTypography.caption.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.inkSecondary,
@@ -308,21 +314,31 @@ class SubscriptionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           // 기본 횟수
-          _buildDetailRow('• 기본', '${subscription.baseLessons ?? 0}회'),
+          _buildDetailRow(
+            AppStrings.subscriptionDetailRowBase,
+            AppStrings.usageCountShort(subscription.baseLessons ?? 0),
+          ),
           // 보너스 (있을 때만)
           if (subscription.hasBonus) ...[
             _buildDetailRow(
-              '• 보너스',
-              '+${subscription.bonusCount}회 (${subscription.bonusReason ?? "보너스"})',
+              AppStrings.subscriptionDetailRowBonus,
+              AppStrings.issueFormSummaryBonusValue(
+                subscription.bonusCount,
+                subscription.bonusReason ??
+                    AppStrings.subscriptionBonusReasonFallback,
+              ),
               valueColor: AppColors.paperAccent,
             ),
           ],
           // 사용 횟수
-          _buildDetailRow('• 사용', '${subscription.usedLessons}회'),
+          _buildDetailRow(
+            AppStrings.subscriptionDetailRowUsed,
+            AppStrings.usageCountShort(subscription.usedLessons),
+          ),
           // 남은 횟수
           _buildDetailRow(
-            '• 잔여',
-            '${subscription.remainingLessons ?? 0}회',
+            AppStrings.subscriptionDetailRowRemaining,
+            AppStrings.usageCountShort(subscription.remainingLessons ?? 0),
             valueColor:
                 subscription.isExpiringSoon
                     ? AppColors.paperAccent
@@ -331,7 +347,7 @@ class SubscriptionCard extends StatelessWidget {
           ),
           // 변경 횟수
           _buildDetailRow(
-            '• 변경',
+            AppStrings.subscriptionDetailRowChanges,
             AppStrings.rescheduleCount(
               subscription.remainingReschedule,
               subscription.totalRescheduleAllowance,
@@ -346,23 +362,32 @@ class SubscriptionCard extends StatelessWidget {
           // 유효기간
           if (subscription.endDate != null) ...[
             const SizedBox(height: AppSpacing.space1),
-            _buildDetailRow('• 유효기간', _formatDate(subscription.endDate!)),
+            _buildDetailRow(
+              AppStrings.subscriptionDetailRowExpiry,
+              _formatDate(subscription.endDate!),
+            ),
           ],
           // 결제 방식 (선생님/학원용)
           if (subscription.billingTypeLabel != null) ...[
-            _buildDetailRow('• 결제', subscription.billingTypeLabel!),
+            _buildDetailRow(
+              AppStrings.subscriptionDetailRowPayment,
+              subscription.billingTypeLabel!,
+            ),
           ],
           // 5주차 정책 (월정액만)
           if (subscription.type == SubscriptionType.monthly &&
               subscription.fifthWeekPolicyLabel != null) ...[
-            _buildDetailRow('• 5주차', subscription.fifthWeekPolicyLabel!),
+            _buildDetailRow(
+              AppStrings.subscriptionDetailRowFifthWeek,
+              subscription.fifthWeekPolicyLabel!,
+            ),
           ],
           // 월정액 이월 경고 (만료되지 않은 경우만)
           if (subscription.type == SubscriptionType.monthly &&
               subscription.status != SubscriptionStatus.expired) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '⚠️ 미사용분 소멸 (이월 불가)',
+              AppStrings.subscriptionMonthlyCarryoverWarning,
               style: AppTypography.caption.copyWith(
                 color: AppColors.paperAccent,
               ),
@@ -381,7 +406,7 @@ class SubscriptionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
-                  '유효기간 내 자유롭게 사용',
+                  AppStrings.subscriptionPackageFreeUseInfo,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                   ),
