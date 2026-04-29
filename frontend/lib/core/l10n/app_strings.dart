@@ -3901,4 +3901,73 @@ class AppStrings {
   /// $months개월 · $count회 완료 (수강 기간 + 총 수강 composite 포매터)
   static String subscriptionMonthsAndUsedFormat(int months, int count) =>
       '$months개월 · $count회 완료';
+
+  // ── Proposal Settings Screen (자동 제안 설정 5-3b-19) ─────────
+  // 외부 5-3b-18 (subscription_history_section) 점유로 5-3b-19 재매핑
+
+  /// 자동 제안 설정 (AppBar)
+  static const proposalSettingsAppBarTitle = '자동 제안 설정';
+
+  /// 체험 후 자동 제안 (메인 토글 타이틀)
+  static const proposalSettingsAutoToggleTitle = '체험 후 자동 제안';
+
+  /// 체험레슨 완료 시 수강권을 자동으로 제안합니다 (메인 토글 서브타이틀)
+  static const proposalSettingsAutoToggleSubtitle = '체험레슨 완료 시 수강권을 자동으로 제안합니다';
+
+  /// 체험 후 즉시 제안하여 전환율을 높이세요 (메인 토글 활성 시 힌트)
+  static const proposalSettingsAutoToggleHint = '체험 후 즉시 제안하여 전환율을 높이세요';
+
+  /// 제안할 수강권 (템플릿 선택 섹션 타이틀)
+  static const proposalSettingsTemplateSectionTitle = '제안할 수강권';
+
+  /// 선택하지 않으면 모든 활성 수강권이 제안됩니다 (템플릿 선택 섹션 힌트)
+  static const proposalSettingsTemplateSectionHint =
+      '선택하지 않으면 모든 활성 수강권이 제안됩니다';
+
+  /// 수강권 템플릿이 없습니다 (빈 상태)
+  static const proposalSettingsTemplateEmpty = '수강권 템플릿이 없습니다';
+
+  /// $lessons회 · $price (템플릿 항목 정보 포매터)
+  static String proposalSettingsTemplateInfoFormat(int lessons, String price) =>
+      '$lessons회 · $price';
+
+  /// 골든타임 할인 (섹션 타이틀)
+  static const proposalSettingsGoldenTimeTitle = '골든타임 할인';
+
+  /// 전환율 UP (배지)
+  static const proposalSettingsConversionUpBadge = '전환율 UP';
+
+  /// 체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다 (섹션 힌트)
+  static const proposalSettingsGoldenTimeHint =
+      '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다';
+
+  /// 할인율 (드롭다운 라벨)
+  static const proposalSettingsDiscountPercentLabel = '할인율';
+
+  /// 유효 시간 (드롭다운 라벨)
+  static const proposalSettingsValidityHoursLabel = '유효 시간';
+
+  /// $hours시간 (시간 드롭다운 항목 포매터)
+  static String proposalSettingsHoursFormat(int hours) => '$hours시간';
+
+  /// 체험 후 $hours시간 이내 결제 시 $percent% 할인 (요약 메시지 포매터)
+  static String proposalSettingsGoldenTimeSummaryFormat(
+    int hours,
+    int percent,
+  ) => '체험 후 $hours시간 이내 결제 시 $percent% 할인';
+
+  /// 자동 리마인더 (섹션 타이틀)
+  static const proposalSettingsAutoReminderTitle = '자동 리마인더';
+
+  /// 제안 후 응답이 없으면 자동으로 알림을 보냅니다 (섹션 힌트)
+  static const proposalSettingsAutoReminderHint = '제안 후 응답이 없으면 자동으로 알림을 보냅니다';
+
+  /// 24시간, 48시간, 72시간 후 알림 (스케줄 설명)
+  static const proposalSettingsAutoReminderSchedule = '24시간, 48시간, 72시간 후 알림';
+
+  /// 설정이 저장되었습니다 (저장 성공 SnackBar)
+  static const proposalSettingsSavedSnackbar = '설정이 저장되었습니다';
+
+  /// 저장 실패. 다시 시도해주세요. (저장 실패 SnackBar)
+  static const proposalSettingsSaveFailedSnackbar = '저장 실패. 다시 시도해주세요.';
 }

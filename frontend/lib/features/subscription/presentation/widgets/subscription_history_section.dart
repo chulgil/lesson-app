@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -48,7 +49,7 @@ class SubscriptionHistorySection extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '수강 이력',
+                    AppStrings.subscriptionHistoryTitle,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -56,13 +57,19 @@ class SubscriptionHistorySection extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.space3),
-              _buildStatRow('수강 기간', stats.periodText),
+              _buildStatRow(
+                AppStrings.subscriptionPeriodLabel,
+                stats.periodText,
+              ),
               const SizedBox(height: AppSpacing.space2),
-              _buildStatRow('총 수강', stats.totalText),
+              _buildStatRow(
+                AppStrings.subscriptionTotalLessonsLabel,
+                stats.totalText,
+              ),
               if (stats.attendanceRate > 0) ...[
                 const SizedBox(height: AppSpacing.space2),
                 _buildStatRow(
-                  '출석률',
+                  AppStrings.subscriptionAttendanceRateLabel,
                   '${stats.attendanceRate}%',
                 ),
               ],
@@ -85,9 +92,7 @@ class SubscriptionHistorySection extends ConsumerWidget {
         ),
         Text(
           value,
-          style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -95,54 +100,52 @@ class SubscriptionHistorySection extends ConsumerWidget {
 
   _HistoryStats _calculateStats(List<Subscription> subscriptions) {
     // Only count non-trial subscriptions
-    final regularSubs = subscriptions
-        .where((s) => s.type != SubscriptionType.trial)
-        .toList();
+    final regularSubs =
+        subscriptions.where((s) => s.type != SubscriptionType.trial).toList();
 
     if (regularSubs.isEmpty) {
-      return _HistoryStats(
-        periodText: '-',
-        totalText: '-',
-        attendanceRate: 0,
-      );
+      return _HistoryStats(periodText: '-', totalText: '-', attendanceRate: 0);
     }
 
     // Calculate period (filter out subs without dates)
     final datedSubs = regularSubs.where((s) => s.startDate != null).toList();
     if (datedSubs.isEmpty) {
-      final totalUsed = regularSubs.fold<int>(0, (sum, s) => sum + s.usedLessons);
+      final totalUsed = regularSubs.fold<int>(
+        0,
+        (sum, s) => sum + s.usedLessons,
+      );
       return _HistoryStats(
         periodText: '-',
-        totalText: '$totalUsed회 완료',
+        totalText: AppStrings.subscriptionTotalUsedFormat(totalUsed),
         attendanceRate: 0,
       );
     }
 
     final startDates = datedSubs.map((s) => s.startDate!).toList();
-    final endDates = datedSubs
-        .map((s) => s.endDate ?? s.startDate!)
-        .toList();
+    final endDates = datedSubs.map((s) => s.endDate ?? s.startDate!).toList();
 
     final earliest = startDates.reduce((a, b) => a.isBefore(b) ? a : b);
     final latest = endDates.reduce((a, b) => a.isAfter(b) ? a : b);
     final months = _monthsBetween(earliest, latest);
-    final periodText = '${earliest.year}.${earliest.month.toString().padLeft(2, '0')}'
+    final periodText =
+        '${earliest.year}.${earliest.month.toString().padLeft(2, '0')}'
         ' ~ ${latest.year}.${latest.month.toString().padLeft(2, '0')}';
 
     // Calculate total lessons
     final totalUsed = regularSubs.fold<int>(0, (sum, s) => sum + s.usedLessons);
-    final totalText = months > 0
-        ? '$months개월 · $totalUsed회 완료'
-        : '$totalUsed회 완료';
+    final totalText =
+        months > 0
+            ? AppStrings.subscriptionMonthsAndUsedFormat(months, totalUsed)
+            : AppStrings.subscriptionTotalUsedFormat(totalUsed);
 
     // Calculate attendance rate (used / total available)
     final totalAvailable = regularSubs.fold<int>(
       0,
-      (sum, s) => sum + (s.totalLessons ?? s.lessonsPerMonth ?? 0) + s.bonusCount,
+      (sum, s) =>
+          sum + (s.totalLessons ?? s.lessonsPerMonth ?? 0) + s.bonusCount,
     );
-    final attendanceRate = totalAvailable > 0
-        ? (totalUsed / totalAvailable * 100).round()
-        : 0;
+    final attendanceRate =
+        totalAvailable > 0 ? (totalUsed / totalAvailable * 100).round() : 0;
 
     return _HistoryStats(
       periodText: periodText,
