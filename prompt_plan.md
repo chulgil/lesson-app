@@ -361,7 +361,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-15a proposal_create_screen 잔여 2 사이트 패치 (2026-04-29) — 5cac8ad3 클로즈 후 grep 재검증으로 누락 발견: 추천 지정 SnackBar(`'${template.name}을 추천으로 지정했습니다'`) + 선택 카운터 라벨(`'$len/$max개 선택'`). 신규 키 2개 (proposalCreateRecommendedDesignatedFormat 포매터, proposalCreateSelectedCountFormat 포매터). 키+마이그레이션 단일 커밋 `3d9db2df` (2 사이트 follow-up 단위라 surgical). 한글 grep 결과는 doc 주석만 잔존. **교훈**: "한글 grep clean" 클로즈 후에도 교차 grep 필수.
 - 5-3b-16 renewal_detail_screen 14 사이트 (2026-04-29) — AppBar(수강권 갱신 제안) + 에러/null 폴백 + 선생님 폴백 + 갱신 헤더(name 포매터) + 템플릿 선택 프롬프트 + 추천 배지 + "지난번과 동일" 힌트 + 입금 알림 SnackBar + 오류 SnackBar × 2 + 수강권 선택 CTA + 나중에 할게요 CTA + 거절 SnackBar. 신규 키 7개 (renewalProposalAppBarTitle, renewalSelectTemplatePrompt, renewalProposedByFormat 포매터, renewalSameAsPreviousHint, renewalSelectButton, renewalDeclineLater, renewalDeclineSnackbar) + 재사용 7건 (errorOccurred, proposalNotFoundEmpty, teacher, templateRecommendedBadge, paymentReminderSent, errorTryAgain × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `6d098429` (키) + `4f8038a8` (마이그레이션). **주의**: 외부 세션이 동시 5-3b-17(proposal_detail_screen) 진행 중 — staged 5-3b-17 키를 잠시 제거 후 본 키 커밋, 즉시 복원하여 외부 세션 작업 보존. 잔여 ~6 파일은 5-3b-17 이후.
 - 5-3b-17 proposal_detail_screen 25 사이트 (2026-04-29) — AppBar(수강권 제안) + 에러/null 폴백 + 템플릿 null 폴백 + 다중 선택 헤더 + 헤더 타이틀(2회 재사용) + 자동 발송 배지 + from-teacher subtitle + 추천 배지 + 연락처 시트(title 포매터/call/message) + 프로필 not-found/contact-not-available + 프로필 loading/load-error + 전화번호 복사 SnackBar 포매터(2건) + 선택 필수 힌트 + 입금 완료 CTA + 스킵 CTA + 입금 알림 SnackBar + 오류 SnackBar × 2 + 스킵 SnackBar. 신규 키 17개 (proposalDetailSelectTemplate/SelectTemplateRequired/AutoSentBadge/FromTeacherSubtitle/RecommendedBadge/PaymentDoneAction/SkipAction/SkippedSnackbar, teacherProfileNotFound/ContactNotAvailable/Loading/LoadError, teacherContactSheetTitleFormat 포매터, callTeacherAction, messageTeacherAction, phoneNumberCopiedFormat 포매터) + 재사용 6건 (proposalCreateAppBarTitle × 2, errorOccurred × 2, proposalNotFoundEmpty, templateNotFound, paymentReminderSent, errorTryAgain × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `e12c813e` (키) + `308f1683` (마이그레이션). **주의**: 외부 세션이 5-3b-16(renewal_detail_screen) 점유 → 본 작업은 5-3b-17 로 재매핑. ⭐ emoji 인라인 보존 (다국어 무관). 잔여 ~5 파일은 5-3b-18 이후.
-- 5-3b 잔여 subscription 화면·repository·mock (~5 파일)
+- 5-3b-18 subscription_history_section 7 사이트 (2026-04-29) — 섹션 제목(수강 이력) + stat row 라벨 3건(수강 기간/총 수강/출석률) + 값 포매터 2건(N회 완료, M개월 · N회 완료) + import 추가. 신규 키 6개 (subscriptionHistoryTitle/PeriodLabel/TotalLessonsLabel/AttendanceRateLabel + subscriptionTotalUsedFormat 포매터 + subscriptionMonthsAndUsedFormat 포매터). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `074bdeca` (키) + `4f1e0106` (외부 세션이 5-3b-19 키와 함께 마이그레이션 동시 커밋). **주의**: 외부 세션이 5-3b-19 (proposal_settings_screen) 동시 진행 — Remove-Restore 패턴으로 staged 5-3b-19 키 분리 후 본 키 단독 커밋. 마이그레이션은 외부 세션이 자기 키 커밋 시 함께 포함(commit 4f1e0106). 잔여 ~4 파일은 5-3b-20 이후.
+- 5-3b 잔여 subscription 화면·repository·mock (~4 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -416,7 +417,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-15 proposal_create_screen i18n (22 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-16 renewal_detail_screen i18n (14 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-17 proposal_detail_screen i18n (25 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-18 subscription 화면·repository (~5 파일 분할) | 대기 |
+| P2 5-3b-18 subscription_history_section i18n (7 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-19+ subscription 화면·repository (~4 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
