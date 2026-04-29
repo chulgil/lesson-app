@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -56,12 +57,15 @@ class SubscriptionBadge extends StatelessWidget {
 
   String _getLabel() {
     if (subscription.type == SubscriptionType.package) {
-      return '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회';
+      return AppStrings.subscriptionPackageBadgeFormat(
+        subscription.remainingLessons ?? 0,
+        subscription.totalLessonsForDisplay ?? 0,
+      );
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
-      return days > 0 ? 'D-$days' : '만료';
+      return days > 0 ? 'D-$days' : AppStrings.statusExpired;
     } else {
-      return '체험';
+      return AppStrings.subscriptionTypeTrial;
     }
   }
 
@@ -161,13 +165,18 @@ class SubscriptionSummaryText extends StatelessWidget {
 
     String text;
     if (subscription.type == SubscriptionType.package) {
-      text =
-          '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회 남음';
+      text = AppStrings.subscriptionPackageRemainingFormat(
+        subscription.remainingLessons ?? 0,
+        subscription.totalLessonsForDisplay ?? 0,
+      );
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
-      text = days > 0 ? 'D-$days 남음' : '만료';
+      text =
+          days > 0
+              ? AppStrings.subscriptionDaysRemaining(days)
+              : AppStrings.statusExpired;
     } else {
-      text = '체험 중';
+      text = AppStrings.subscriptionTrialActive;
     }
 
     return Text(text, style: style ?? defaultStyle);

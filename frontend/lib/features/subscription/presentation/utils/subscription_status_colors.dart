@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -81,18 +82,18 @@ class SubscriptionStatusColors {
   /// Get the status label text.
   static String getLabel(Subscription subscription) {
     if (subscription.isDepleted) {
-      return '사용 완료';
+      return AppStrings.subscriptionStatusDepleted;
     }
     if (subscription.isExpired) {
-      return '만료됨';
+      return AppStrings.subscriptionStatusExpired;
     }
     if (subscription.isExpiringSoon) {
-      return '갱신 필요';
+      return AppStrings.subscriptionStatusRenewalNeeded;
     }
     if (subscription.status == SubscriptionStatus.paused) {
-      return '일시정지';
+      return AppStrings.subscriptionStatusPaused;
     }
-    return '이용중';
+    return AppStrings.subscriptionStatusActive;
   }
 
   /// Get the status icon.
@@ -115,18 +116,18 @@ class SubscriptionStatusColors {
   /// Get the status message.
   static String getMessage(Subscription subscription) {
     if (subscription.isDepleted) {
-      return '수강권을 모두 사용했습니다';
+      return AppStrings.subscriptionMessageDepleted;
     }
     if (subscription.isExpired) {
-      return '수강권 유효기간이 지났습니다';
+      return AppStrings.subscriptionMessageExpired;
     }
     if (subscription.isExpiringSoon) {
-      return '수강권 갱신이 필요합니다';
+      return AppStrings.subscriptionMessageRenewalNeeded;
     }
     if (subscription.status == SubscriptionStatus.paused) {
-      return '수강권이 일시정지 상태입니다';
+      return AppStrings.subscriptionMessagePaused;
     }
-    return '수강권이 활성화되어 있습니다';
+    return AppStrings.subscriptionMessageActive;
   }
 
   /// Get the border width.

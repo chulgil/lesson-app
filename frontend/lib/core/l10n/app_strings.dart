@@ -3087,6 +3087,92 @@ class AppStrings {
   /// 총 예상 금액 (배치 요약 라벨)
   static const issueFormBatchTotalLabel = '총 예상 금액';
 
+  // -- Proposal Card Widgets (제안 카드 5-3b-7) --
+
+  /// 입금 확인을 기다리고 있습니다 (paymentNotified 배너)
+  static const proposalBannerPaymentNotified = '입금 확인을 기다리고 있습니다';
+
+  /// 수강권이 발급되었습니다! (confirmed 배너)
+  static const proposalBannerConfirmed = '수강권이 발급되었습니다!';
+
+  /// 스킵한 제안입니다 (rejected 배너)
+  static const proposalBannerRejected = '스킵한 제안입니다';
+
+  /// 제안이 만료되었습니다 (expired 배너)
+  static const proposalBannerExpired = '제안이 만료되었습니다';
+
+  /// 선생님이 제안을 취소했습니다 (cancelled 배너)
+  static const proposalBannerCancelled = '선생님이 제안을 취소했습니다';
+
+  /// 선생님 제안 (헤더 카드 부제)
+  static const proposalHeaderSubtitle = '선생님 제안';
+
+  /// 횟수 (디테일 행 라벨)
+  static const proposalDetailsLessonsLabel = '횟수';
+
+  /// $count회 (횟수 값 포매터)
+  static String proposalDetailsLessonsValue(int count) => '$count회';
+
+  /// 레슨시간 (디테일 행 라벨)
+  static const proposalDetailsDurationLabel = '레슨시간';
+
+  /// 결제일로부터 $validity (유효기간 값 포매터)
+  static String proposalDetailsValidityValue(String validity) =>
+      '결제일로부터 $validity';
+
+  /// 선생님 메시지 (메시지 카드 라벨)
+  static const proposalMessageCardLabel = '선생님 메시지';
+
+  /// 할인 적용 (할인 카드 기본 사유)
+  static const proposalDiscountReasonDefault = '할인 적용';
+
+  /// 결제가 (할인 카드 최종 라벨)
+  static const proposalDiscountFinalLabel = '결제가';
+
+  /// $man만원 (가격 포매터: 만 단위 정확히)
+  static String proposalPriceManwon(int man) => '$man만원';
+
+  /// $man만 $remainder원 (가격 포매터: 만 + 나머지)
+  static String proposalPriceManRemainder(int man, int remainder) =>
+      '$man만 $remainder원';
+
+  /// $price원 (가격 포매터: 만 미만)
+  static String proposalPriceWon(int price) => '$price원';
+
+  /// 계좌 미등록 (입금 정보 카드 fallback)
+  static const proposalPaymentBankNotRegistered = '계좌 미등록';
+
+  /// 결제 정보 (입금 정보 카드 제목)
+  static const proposalPaymentInfoTitle = '결제 정보';
+
+  /// 은행 (입금 정보 행 라벨)
+  static const proposalPaymentBankLabel = '은행';
+
+  /// 계좌번호 (입금 정보 행 라벨)
+  static const proposalPaymentAccountNumberLabel = '계좌번호';
+
+  /// 예금주 (입금 정보 행 라벨)
+  static const proposalPaymentAccountHolderLabel = '예금주';
+
+  /// 계좌 변경 (입금 정보 다중 계좌 셀렉터)
+  static const proposalPaymentAccountChange = '계좌 변경';
+
+  /// 계좌번호가 복사되었습니다 (스낵바)
+  static const proposalPaymentAccountCopied = '계좌번호가 복사되었습니다';
+
+  /// 복사 (입금 정보 카피 버튼 라벨)
+  static const proposalPaymentCopyLabel = '복사';
+
+  /// 입금 확인 대기중 (대기 카드 제목)
+  static const proposalWaitingTitle = '입금 확인 대기중';
+
+  /// 대기 카드 본문 (멀티라인)
+  static const proposalWaitingBody =
+      '선생님이 입금을 확인하면 수강권이 발급됩니다.\n입금 확인까지 1~2일 정도 소요될 수 있습니다.';
+
+  /// 선생님께 문의하기 (대기 카드 CTA)
+  static const proposalWaitingContactCta = '선생님께 문의하기';
+
   // ─── Subscription entities (P2 5-3b-2) ───────────────────────
 
   // LessonPolicy summaries
@@ -3378,4 +3464,41 @@ class AppStrings {
 
   /// 모든 학생의 수강권이 정상입니다 (empty state body)
   static const expiringEmptyBody = '모든 학생의 수강권이 정상입니다';
+
+  // -- Subscription Display Layer (badge + status colors, P2 5-3b-7a) --
+
+  /// $remain/$total회 (badge format for package subscription)
+  static String subscriptionPackageBadgeFormat(int remain, int total) =>
+      '$remain/$total회';
+
+  /// $remain/$total회 남음 (summary text for package subscription)
+  static String subscriptionPackageRemainingFormat(int remain, int total) =>
+      '$remain/$total회 남음';
+
+  /// D-N 남음 (summary text for monthly subscription)
+  static String subscriptionDaysRemaining(int days) => 'D-$days 남음';
+
+  /// 체험 중 (summary text for trial subscription)
+  static const subscriptionTrialActive = '체험 중';
+
+  /// 사용 완료 (status — depleted, all lessons used)
+  static const subscriptionStatusDepleted = '사용 완료';
+
+  /// 갱신 필요 (status — expiring soon, renewal needed)
+  static const subscriptionStatusRenewalNeeded = '갱신 필요';
+
+  /// 수강권을 모두 사용했습니다 (message — depleted)
+  static const subscriptionMessageDepleted = '수강권을 모두 사용했습니다';
+
+  /// 수강권 유효기간이 지났습니다 (message — expired)
+  static const subscriptionMessageExpired = '수강권 유효기간이 지났습니다';
+
+  /// 수강권 갱신이 필요합니다 (message — renewal needed)
+  static const subscriptionMessageRenewalNeeded = '수강권 갱신이 필요합니다';
+
+  /// 수강권이 일시정지 상태입니다 (message — paused)
+  static const subscriptionMessagePaused = '수강권이 일시정지 상태입니다';
+
+  /// 수강권이 활성화되어 있습니다 (message — active)
+  static const subscriptionMessageActive = '수강권이 활성화되어 있습니다';
 }
