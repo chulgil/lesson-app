@@ -74,6 +74,22 @@
 - [x] `mypy app/models/request_event.py` → Success: no issues found
 - [x] Lore-directive 트레일러 포함 커밋 → **1b14e093**
 
+### Phase 5 — Plan B BookingStatus + NoShowPolicy ✅ 완료 (2026-04-29)
+
+- [x] **5a (#238)** BookingStatus 7값 SSOT 코드 정렬 (commit 85f5064e)
+  - approved → confirmed (rename), rejected/noShow 제거
+  - schedule_service callsites 정리, 192/192 GREEN
+- [x] **5b (#238)** alembic 0009_align_booking_status 데이터 마이그레이션 (commit 2f21951a)
+  - decline_reason 컬럼 신설, postgres ENUM 재생성, 196/196 GREEN
+- [x] **5c (#239)** NoShowPolicy 4값 단일 SSOT (commit b1daec9a)
+  - alembic 0010_unify_no_show_policy, IndividualNoShowPolicy → alias, 203/203 GREEN
+
+### Phase 6 — Plan C subscription expiry (#240) 🔄 진입 대기
+
+- [ ] **6a** APScheduler in-process + PG advisory lock + cron_dedup 테이블
+- [ ] **6b** subscription_expiry_service 만료 전이 로직 (active→expiring→expired)
+- [ ] **6c (P1, #246)** 만료 알림 발송 (FCM/email)
+
 ## 평가 기준 (Rubric, 합격선 7.5)
 
 | 기준 | 가중 | 목표 |
