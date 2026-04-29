@@ -232,7 +232,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-2c-6 레슨 위젯 잔여 11파일 (2026-04-29) — 5-2c 클로즈 후 누락 발견. 자료 첨부(YouTube/녹음/외부링크), 연습 과제, 레슨 폼/편집/취소 다이얼로그, 팁 템플릿 바텀시트 전수. 신규 키 ~50개 + 재사용 다수, lessons 46/46 PASS.
 - 5-3a subscription 알림/정책/템플릿 5파일 (2026-04-29) — expiry_monitor + proposal_reminder + skip_reason_dialog + subscription_policy_sheet + template_choice_card. 신규 키 ~25개, subscription 63/63 PASS. 잔여 ~38 파일은 5-3b 이후.
 - 5-3b-1 issue_form_type_options 7 사이트 (2026-04-29) — 5-3a 정의 키 (issueFormLessonsTitle/Suffix, issueFormValidityTitle/Suffix, issueFormMonthlySectionTitle, issueFormMonthsLabel, issueFormTrialNotice) 재사용, 신규 키 0건. subscription 63/63 PASS. 5-3a close 커밋(`bba9639e`)에 번들 포함.
-- 5-3b 잔여 subscription 발급폼/제안 위젯 (~37 파일)
+- 5-3b-2 subscription_chapter_lessons + selectable_template_card 4 사이트 (2026-04-29) — 신규 키 4개 (sessionBookingRequired, templateRecommendedBadgeStar, templateSummaryLine, templatePerLessonPrice). subscription 63/63 PASS.
+- 5-3b 잔여 subscription 발급폼/제안 위젯 (~35 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -270,7 +271,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-2c-6 레슨 위젯 잔여 11파일 (~80 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3a subscription 알림/정책/템플릿 5파일 | ✅ 완료 (2026-04-29) |
 | P2 5-3b-1 issue_form_type_options i18n (7 사이트, 키 재사용) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-2 subscription 발급폼/제안 위젯 잔여 (~37 파일 분할) | 대기 |
+| P2 5-3b-2 chapter_lessons + selectable_template_card i18n (4 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-3 subscription 발급폼/제안 위젯 잔여 (~35 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
