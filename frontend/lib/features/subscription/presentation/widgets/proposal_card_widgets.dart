@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -27,31 +28,31 @@ class ProposalStatusBanner extends StatelessWidget {
         backgroundColor = AppColors.ink.withValues(alpha: 0.1);
         textColor = AppColors.ink;
         icon = Icons.schedule;
-        message = '입금 확인을 기다리고 있습니다';
+        message = AppStrings.proposalBannerPaymentNotified;
         break;
       case ProposalStatus.confirmed:
         backgroundColor = AppColors.paperOk.withValues(alpha: 0.1);
         textColor = AppColors.paperOk;
         icon = Icons.check_circle;
-        message = '수강권이 발급되었습니다!';
+        message = AppStrings.proposalBannerConfirmed;
         break;
       case ProposalStatus.rejected:
         backgroundColor = AppColors.paperAccentSoft;
         textColor = AppColors.paperAccent;
         icon = Icons.cancel;
-        message = '스킵한 제안입니다';
+        message = AppStrings.proposalBannerRejected;
         break;
       case ProposalStatus.expired:
         backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
         textColor = AppColors.inkTertiary;
         icon = Icons.timer_off;
-        message = '제안이 만료되었습니다';
+        message = AppStrings.proposalBannerExpired;
         break;
       case ProposalStatus.cancelled:
         backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
         textColor = AppColors.inkTertiary;
         icon = Icons.block;
-        message = '선생님이 제안을 취소했습니다';
+        message = AppStrings.proposalBannerCancelled;
         break;
       default:
         return const SizedBox.shrink();
@@ -117,7 +118,7 @@ class ProposalHeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '선생님 제안',
+            AppStrings.proposalHeaderSubtitle,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -156,13 +157,25 @@ class ProposalDetailsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildDetailRow('금액', template.formattedPrice),
+          _buildDetailRow(
+            AppStrings.issueFormSummaryAmountLabel,
+            template.formattedPrice,
+          ),
           const Divider(height: 24),
-          _buildDetailRow('횟수', '${template.totalLessons}회'),
+          _buildDetailRow(
+            AppStrings.proposalDetailsLessonsLabel,
+            AppStrings.proposalDetailsLessonsValue(template.totalLessons),
+          ),
           const Divider(height: 24),
-          _buildDetailRow('레슨시간', '${template.lessonDurationMinutes}분'),
+          _buildDetailRow(
+            AppStrings.proposalDetailsDurationLabel,
+            AppStrings.durationMinutesValue(template.lessonDurationMinutes),
+          ),
           const Divider(height: 24),
-          _buildDetailRow('유효기간', '결제일로부터 ${template.formattedValidity}'),
+          _buildDetailRow(
+            AppStrings.issueFormValidityTitle,
+            AppStrings.proposalDetailsValidityValue(template.formattedValidity),
+          ),
         ],
       ),
     );
@@ -213,7 +226,7 @@ class ProposalMessageCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
-                '선생님 메시지',
+                AppStrings.proposalMessageCardLabel,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
@@ -263,7 +276,8 @@ class ProposalDiscountCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
-                proposal.discountReason ?? '할인 적용',
+                proposal.discountReason ??
+                    AppStrings.proposalDiscountReasonDefault,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
@@ -276,7 +290,7 @@ class ProposalDiscountCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '정가',
+                AppStrings.issueFormAmountSectionTitle,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -295,7 +309,7 @@ class ProposalDiscountCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '할인',
+                AppStrings.issueFormDiscountTitle,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -314,7 +328,7 @@ class ProposalDiscountCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '결제가',
+                AppStrings.proposalDiscountFinalLabel,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -338,11 +352,11 @@ class ProposalDiscountCard extends StatelessWidget {
       final man = price ~/ 10000;
       final remainder = price % 10000;
       if (remainder == 0) {
-        return '$man만원';
+        return AppStrings.proposalPriceManwon(man);
       }
-      return '$man만 $remainder원';
+      return AppStrings.proposalPriceManRemainder(man, remainder);
     }
-    return '$price원';
+    return AppStrings.proposalPriceWon(price);
   }
 }
 
@@ -375,7 +389,8 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
   @override
   Widget build(BuildContext context) {
     final account = _selectedAccount;
-    final bankName = account?.bankName ?? '계좌 미등록';
+    final bankName =
+        account?.bankName ?? AppStrings.proposalPaymentBankNotRegistered;
     final accountNumber = account?.accountNumber ?? '-';
     final accountHolder = account?.accountHolder ?? '-';
     final hasMultiple = widget.bankAccounts.length > 1;
@@ -398,7 +413,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
-                '결제 정보',
+                AppStrings.proposalPaymentInfoTitle,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -407,11 +422,21 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
-          _PaymentInfoRow(label: '은행', value: bankName),
+          _PaymentInfoRow(
+            label: AppStrings.proposalPaymentBankLabel,
+            value: bankName,
+          ),
           const SizedBox(height: AppSpacing.space2),
-          _PaymentInfoRow(label: '계좌번호', value: accountNumber, copyable: true),
+          _PaymentInfoRow(
+            label: AppStrings.proposalPaymentAccountNumberLabel,
+            value: accountNumber,
+            copyable: true,
+          ),
           const SizedBox(height: AppSpacing.space2),
-          _PaymentInfoRow(label: '예금주', value: accountHolder),
+          _PaymentInfoRow(
+            label: AppStrings.proposalPaymentAccountHolderLabel,
+            value: accountHolder,
+          ),
         ],
       ),
     );
@@ -453,7 +478,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '계좌 변경',
+              AppStrings.proposalPaymentAccountChange,
               style: AppTypography.caption.copyWith(
                 color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
@@ -505,7 +530,7 @@ class _PaymentInfoRow extends StatelessWidget {
                   Clipboard.setData(ClipboardData(text: value));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('계좌번호가 복사되었습니다'),
+                      content: Text(AppStrings.proposalPaymentAccountCopied),
                       duration: Duration(seconds: 1),
                     ),
                   );
@@ -517,7 +542,7 @@ class _PaymentInfoRow extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Text(
-                    '복사',
+                    AppStrings.proposalPaymentCopyLabel,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
@@ -553,14 +578,14 @@ class ProposalWaitingCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 대기 상태 헤드라인 3축 통과 (§7.89 변형) — Playfair 승격.
           Text(
-            '입금 확인 대기중',
+            AppStrings.proposalWaitingTitle,
             style: NotebookTypography.sectionTitle.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '선생님이 입금을 확인하면 수강권이 발급됩니다.\n입금 확인까지 1~2일 정도 소요될 수 있습니다.',
+            AppStrings.proposalWaitingBody,
             textAlign: TextAlign.center,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
@@ -570,7 +595,7 @@ class ProposalWaitingCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onContactTapped,
             icon: const Icon(Icons.chat_bubble_outline, size: 18),
-            label: const Text('선생님께 문의하기'),
+            label: const Text(AppStrings.proposalWaitingContactCta),
           ),
         ],
       ),
