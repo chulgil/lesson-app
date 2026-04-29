@@ -41,7 +41,7 @@ class LessonDetailSectionHeader extends StatelessWidget {
             icon: const Icon(Icons.add_circle_outline),
             iconSize: 22,
             color: AppColors.paperAccent,
-            tooltip: '추가',
+            tooltip: AppStrings.add,
             constraints: const BoxConstraints(),
             padding: EdgeInsets.zero,
           ),
@@ -149,9 +149,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                   ),
                 ),
                 backgroundColor: AppColors.paperAccentSoft,
-                side: BorderSide(
-                  color: AppColors.paperAccentSoft,
-                ),
+                side: BorderSide(color: AppColors.paperAccentSoft),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space1,
                 ),
@@ -177,7 +175,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
             // (README §1.1.1, §7.129 사용자 입력 정렬).
             style: NotebookTypography.hand,
             decoration: InputDecoration(
-              hintText: '레슨 피드백을 작성하세요...',
+              hintText: AppStrings.feedbackEditorHint,
               hintStyle: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -211,7 +209,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
-                              '저장 중...',
+                              AppStrings.savingLabel,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.inkTertiary,
                               ),
@@ -229,7 +227,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
-                              '저장됨',
+                              AppStrings.savedLabel,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.paperOk,
                               ),
@@ -263,7 +261,7 @@ class TeacherFeedbackCard extends StatelessWidget {
             Icon(Icons.chat_bubble_outline, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space3),
             Text(
-              '아직 피드백이 없습니다',
+              AppStrings.feedbackEmpty,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -290,7 +288,7 @@ class TeacherFeedbackCard extends StatelessWidget {
           if (lesson.updatedAt != null) ...[
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '작성: ${formatDateYMD(lesson.updatedAt!)}',
+              AppStrings.feedbackWrittenAt(formatDateYMD(lesson.updatedAt!)),
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -327,7 +325,9 @@ class KeyPointsList extends StatelessWidget {
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
-                isTeacher ? '+ 버튼을 눌러 주요 포인트를 추가하세요' : '주요 포인트가 없습니다',
+                isTeacher
+                    ? AppStrings.keyPointsEmptyTeacher
+                    : AppStrings.keyPointsEmptyStudent,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -354,7 +354,9 @@ class KeyPointsList extends StatelessWidget {
                     height: 6,
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -367,7 +369,7 @@ class KeyPointsList extends StatelessWidget {
                       color: AppColors.inkTertiary,
                       constraints: const BoxConstraints(),
                       padding: EdgeInsets.zero,
-                      tooltip: '삭제',
+                      tooltip: AppStrings.delete,
                     ),
                 ],
               ),
@@ -405,7 +407,9 @@ class PracticeTipsCard extends StatelessWidget {
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
-                isTeacher ? '+ 버튼을 눌러 연습 팁을 추가하세요' : '연습 팁이 없습니다',
+                isTeacher
+                    ? AppStrings.practiceTipsEmptyTeacher
+                    : AppStrings.practiceTipsEmptyStudent,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -439,7 +443,7 @@ class PracticeTipsCard extends StatelessWidget {
               color: AppColors.ink,
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,
-              tooltip: '수정',
+              tooltip: AppStrings.modify,
             ),
         ],
       ),
@@ -480,7 +484,7 @@ class RecordingStatusIndicator extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.space3),
           Text(
-            '녹음 중',
+            AppStrings.recordingInProgress,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
@@ -514,7 +518,7 @@ class RecordingsEmptyState extends StatelessWidget {
           Icon(Icons.mic_off, color: AppColors.inkTertiary),
           const SizedBox(width: AppSpacing.space3),
           Text(
-            '녹음 파일이 없습니다',
+            AppStrings.recordingsEmpty,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -531,16 +535,16 @@ Future<bool?> showCancelLessonConfirmation(BuildContext context) {
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('레슨 취소'),
-          content: const Text('이 레슨을 취소하시겠습니까?'),
+          title: const Text(AppStrings.actionLessonCancel),
+          content: const Text(AppStrings.cancelLessonConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('아니오'),
+              child: const Text(AppStrings.no),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('취소하기'),
+              child: const Text(AppStrings.cancelRequestAction),
             ),
           ],
         ),
@@ -553,8 +557,8 @@ Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('레슨 삭제'),
-          content: const Text('이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.'),
+          title: const Text(AppStrings.deleteLessonTitle),
+          content: const Text(AppStrings.deleteLessonConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -584,7 +588,7 @@ Future<String?> showEditPracticeTipDialog({
     context: context,
     builder:
         (context) => AlertDialog(
-          title: const Text('연습 팁 수정'),
+          title: const Text(AppStrings.editPracticeTipTitle),
           content: TextField(
             controller: controller,
             maxLines: 4,
@@ -592,7 +596,7 @@ Future<String?> showEditPracticeTipDialog({
             // (README §1.1.1, §7.129).
             style: NotebookTypography.hand,
             decoration: const InputDecoration(
-              hintText: '연습 팁을 입력하세요',
+              hintText: AppStrings.editPracticeTipHint,
               border: OutlineInputBorder(),
             ),
           ),
@@ -605,7 +609,7 @@ Future<String?> showEditPracticeTipDialog({
               TextButton(
                 onPressed: () => Navigator.pop(context, ''),
                 child: Text(
-                  '삭제',
+                  AppStrings.delete,
                   style: TextStyle(color: AppColors.paperAccent),
                 ),
               ),
@@ -670,7 +674,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LessonDetailSectionHeader(
-          title: '내 메모',
+          title: AppStrings.studentMemoTitle,
           icon: Icons.sticky_note_2_outlined,
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -678,9 +682,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperAccentSoft,
-            border: Border.all(
-              color: AppColors.paperAccentSoft,
-            ),
+            border: Border.all(color: AppColors.paperAccentSoft),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -690,7 +692,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                 onChanged: _onChanged,
                 maxLines: 4,
                 decoration: InputDecoration(
-                  hintText: '오늘 배운 것, 어려웠던 점 등을 메모하세요...',
+                  hintText: AppStrings.studentMemoHint,
                   hintStyle: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -705,7 +707,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
               const SizedBox(height: AppSpacing.space2),
               if (_status == _SaveStatus.saving)
                 Text(
-                  '저장 중...',
+                  AppStrings.savingLabel,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -717,7 +719,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                     Icon(Icons.check, size: 12, color: AppColors.paperOk),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
-                      '저장됨',
+                      AppStrings.savedLabel,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.paperOk,
                       ),
