@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -38,17 +39,24 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('수강권 제안'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppStrings.proposalCreateAppBarTitle),
+        centerTitle: true,
+      ),
       // 처리 중일 때는 provider 상태 변화로 인한 UI 깜빡임 방지
       body:
           _isProcessing
               ? const Center(child: CircularProgressIndicator())
               : proposalAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                error:
+                    (_, __) =>
+                        Center(child: Text('${AppStrings.errorOccurred}.')),
                 data: (proposal) {
                   if (proposal == null) {
-                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                    return const Center(
+                      child: Text(AppStrings.proposalNotFoundEmpty),
+                    );
                   }
 
                   return _buildContent(proposal);
@@ -79,10 +87,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+      error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
       data: (template) {
         if (template == null) {
-          return const Center(child: Text('템플릿을 찾을 수 없습니다'));
+          return const Center(child: Text(AppStrings.templateNotFound));
         }
 
         return SingleChildScrollView(
@@ -167,7 +175,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           // Template selection (only for pending)
           if (proposal.canRespond) ...[
             Text(
-              '수강권을 선택하세요',
+              AppStrings.proposalDetailSelectTemplate,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -238,7 +246,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 Row(
                   children: [
                     Text(
-                      '수강권 제안',
+                      AppStrings.proposalCreateAppBarTitle,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -254,7 +262,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           color: AppColors.ink.withValues(alpha: 0.1),
                         ),
                         child: Text(
-                          '자동 발송',
+                          AppStrings.proposalDetailAutoSentBadge,
                           style: AppTypography.caption.copyWith(
                             color: AppColors.ink,
                             fontWeight: FontWeight.w500,
@@ -279,7 +287,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   )
                 else if (!proposal.isAutoProposal)
                   Text(
-                    '선생님이 보낸 제안',
+                    AppStrings.proposalDetailFromTeacherSubtitle,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -398,7 +406,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                             ),
                                             const SizedBox(width: 2),
                                             Text(
-                                              '추천',
+                                              AppStrings
+                                                  .proposalDetailRecommendedBadge,
                                               style: AppTypography.caption
                                                   .copyWith(
                                                     color:
@@ -522,17 +531,19 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     teacherProfileAsync.whenOrNull(
       data: (profile) {
         if (profile == null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(AppStrings.teacherProfileNotFound)),
+          );
           return;
         }
 
         final phoneNumber = profile.verification.phoneNumber;
         if (phoneNumber == null || phoneNumber.isEmpty) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('선생님 연락처 정보가 없습니다')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.teacherContactNotAvailable),
+            ),
+          );
           return;
         }
 
@@ -551,7 +562,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
                       // 동적이지만 구조적 역할은 동일.
                       Text(
-                        '${profile.name} 선생님께 연락하기',
+                        AppStrings.teacherContactSheetTitleFormat(profile.name),
                         style: NotebookTypography.appBarTitle,
                       ),
                       const SizedBox(height: AppSpacing.space4),
@@ -560,7 +571,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           backgroundColor: AppColors.paperOk,
                           child: Icon(Icons.call, color: AppColors.paper),
                         ),
-                        title: const Text('전화하기'),
+                        title: const Text(AppStrings.callTeacherAction),
                         subtitle: Text(phoneNumber),
                         onTap: () {
                           Navigator.pop(context);
@@ -575,7 +586,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                             color: AppColors.paper,
                           ),
                         ),
-                        title: const Text('문자 보내기'),
+                        title: const Text(AppStrings.messageTeacherAction),
                         subtitle: Text(phoneNumber),
                         onTap: () {
                           Navigator.pop(context);
@@ -593,13 +604,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     // If data is not available, show loading or error
     if (teacherProfileAsync is AsyncLoading) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 불러오는 중...')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.teacherProfileLoading)),
+      );
     } else if (teacherProfileAsync is AsyncError) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 불러올 수 없습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.teacherProfileLoadError)),
+      );
     }
   }
 
@@ -607,9 +618,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     // Copy to clipboard (url_launcher can be added later for actual call)
     await Clipboard.setData(ClipboardData(text: phoneNumber));
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('전화번호가 복사되었습니다: $phoneNumber')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.phoneNumberCopiedFormat(phoneNumber)),
+        ),
+      );
     }
   }
 
@@ -617,9 +630,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     // Copy to clipboard (url_launcher can be added later for actual SMS)
     await Clipboard.setData(ClipboardData(text: phoneNumber));
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('전화번호가 복사되었습니다: $phoneNumber')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.phoneNumberCopiedFormat(phoneNumber)),
+        ),
+      );
     }
   }
 
@@ -664,7 +679,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
-                      '수강권을 선택해주세요',
+                      AppStrings.proposalDetailSelectTemplateRequired,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.paperAccent,
                       ),
@@ -697,7 +712,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                         : const Icon(Icons.payment),
-                label: const Text('입금 완료했어요'),
+                label: const Text(AppStrings.proposalDetailPaymentDoneAction),
               ),
             ),
 
@@ -708,7 +723,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
               onPressed:
                   _isProcessing ? null : () => _showRejectDialog(proposal),
               child: Text(
-                '이번엔 스킵할게요',
+                AppStrings.proposalDetailSkipAction,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -738,7 +753,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('입금 알림을 보냈습니다'),
+            content: Text(AppStrings.paymentReminderSent),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -749,7 +764,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -789,16 +804,18 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       await notifier.reject(proposal.id, reason);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('이번 제안을 스킵했습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.proposalDetailSkippedSnackbar),
+          ),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
