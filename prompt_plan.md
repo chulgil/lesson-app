@@ -239,7 +239,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-6 issue_form_summary_widgets 22 사이트 (2026-04-29) — SubscriptionSummaryCard + BatchSummaryCard + BatchInfoBanner + AppliedPolicySection. 신규 키 17개 (issueFormSummaryTitle/BatchTitle, TypeLabel, FinalAmountLabel, AmountLabel, PaymentLabel, EndDateLabel, UnpaidLabel, PaymentConfirmed/DiscountValue/BonusValue/PolicyChangeLine 포매터, LessonsTrial/Package/PackageWithBonus/Monthly, BatchBannerTitle/Body, BatchTargetLabel, BatchStudentCount, BatchPerPersonLabel, BatchTotalLabel) + 재사용 8건 (policyApplied/ChangeCancel/NoShow/Carryover, issueFormAmountSection/Discount/Bonus/StartDate). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `5382bb70` (키) + `98873d88` (마이그레이션).
 - 5-3b-6+ expiring_subscriptions_screen 7 사이트 (2026-04-29) — AppBar 3 사이트(loading/error/data) + 학생 수 부제 + 에러 메시지 + 학생 이름 fallback + 빈 상태(title/body) + 발급 버튼. 신규 키 4개(studentsCountSubtitle, studentNameFallback, expiringEmptyTitle, expiringEmptyBody)는 5382bb70 에 이미 존재. 재사용 3건 (subscriptionViewAction, errorTryAgain, issueSubscriptionButton). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `b71e4b53`. 잔여 ~16 파일은 5-3b-7 이후.
 - 5-3b-7 proposal_card_widgets 26 사이트 (2026-04-29) — ProposalStatusBanner 5 + ProposalHeaderCard 1 + ProposalDetailsCard 4 + ProposalMessageCard 1 + ProposalDiscountCard 4 + _formatPrice 3 + ProposalPaymentInfoCard 6 + _PaymentInfoRow 2 + ProposalWaitingCard 3. 신규 키 26개 (proposalBanner 5종, proposalHeaderSubtitle, proposalDetailsLessons/Duration/Validity, proposalMessageCardLabel, proposalDiscountReason/Final, proposalPriceManwon/ManRemainder/Won, proposalPaymentBank/Info/AccountNumber/Holder/Change/Copied/Copy 7종, proposalWaitingTitle/Body/ContactCta) + 재사용 5건 (issueFormSummaryAmountLabel, durationMinutesValue, issueFormValidityTitle, issueFormAmountSectionTitle, issueFormDiscountTitle). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `f22c1675` (키) + `cd586ed5` (마이그레이션). 잔여 ~15 파일은 5-3b-8 이후.
-- 5-3b 잔여 subscription 발급폼/제안 화면·서비스·repository (~15 파일)
+- 5-3b-8 subscription_card 14 사이트 (2026-04-29) — 진행바 2 (남음 prefix, 보너스 분해), 상세 헤더 1 (📋 상세), 상세 행 라벨 8 (• 기본/보너스/사용/잔여/변경/유효기간/결제/5주차) + 값 회차 (`usageCountShort`), 보너스 reason fallback, 월정액 이월 경고, 회차권 자유사용 안내. 신규 키 14개 (subscriptionRemainingPrefix/BonusBreakdown, DetailHeader, DetailRow* 8종, BonusReasonFallback, MonthlyCarryoverWarning, PackageFreeUseInfo) + 재사용 5건 (usageCountShort × 3, issueFormSummaryBonusValue, rescheduleCount). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `3a8cfe39` (키) + `52812ec9` (마이그레이션). 잔여 ~14 파일은 5-3b-9 이후.
+- 5-3b 잔여 subscription 화면·서비스·repository·mock (~14 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -284,7 +285,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-6 issue_form_summary_widgets i18n (22 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-6+ expiring_subscriptions_screen i18n (7 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-7 proposal_card_widgets i18n (26 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-8 subscription 화면·서비스·repository (~15 파일 분할) | 대기 |
+| P2 5-3b-8 subscription_card i18n (14 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-9 subscription 화면·서비스·repository (~14 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
