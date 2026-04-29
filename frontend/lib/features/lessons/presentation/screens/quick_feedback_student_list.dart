@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,14 +29,14 @@ class _QuickFeedbackStudentListState
     final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('피드백 보내기')),
+      appBar: AppBar(title: const Text(AppStrings.sendFeedbackTitle)),
       body: lessonsAsync.when(
         data: (lessons) => _buildBody(lessons),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
             (error, _) => Center(
               child: Text(
-                '데이터를 불러오는데 실패했습니다',
+                AppStrings.loadDataFailed,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -93,7 +94,7 @@ class _QuickFeedbackStudentListState
           child: TextField(
             onChanged: (value) => setState(() => _searchQuery = value),
             decoration: InputDecoration(
-              hintText: '학생 검색...',
+              hintText: AppStrings.studentSearchHint,
               hintStyle: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -122,13 +123,13 @@ class _QuickFeedbackStudentListState
             ),
             children: [
               if (filteredToday.isNotEmpty) ...[
-                _buildSectionHeader('오늘 레슨'),
+                _buildSectionHeader(AppStrings.todayLessons),
                 const SizedBox(height: AppSpacing.space2),
                 ...filteredToday.map(_buildTodayLessonTile),
                 const SizedBox(height: AppSpacing.space4),
               ],
               if (filteredRecent.isNotEmpty) ...[
-                _buildSectionHeader('최근 레슨'),
+                _buildSectionHeader(AppStrings.recentLessons),
                 const SizedBox(height: AppSpacing.space2),
                 ...filteredRecent.map(_buildRecentLessonTile),
               ],
@@ -194,7 +195,12 @@ class _QuickFeedbackStudentListState
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          '${lesson.startTime} 레슨 (${isCompleted ? "완료" : "예정"})',
+          AppStrings.todayLessonSubtitle(
+            lesson.startTime,
+            isCompleted
+                ? AppStrings.statusCompleted
+                : AppStrings.statusUpcoming,
+          ),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -238,7 +244,7 @@ class _QuickFeedbackStudentListState
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          '${lesson.date.month}월 ${lesson.date.day}일 마지막 레슨',
+          AppStrings.lastLessonOn(lesson.date.month, lesson.date.day),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -267,7 +273,9 @@ class _QuickFeedbackStudentListState
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            _searchQuery.isEmpty ? '피드백을 보낼 레슨이 없습니다' : '검색 결과가 없습니다',
+            _searchQuery.isEmpty
+                ? AppStrings.noLessonsForFeedback
+                : AppStrings.searchNoResults,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
