@@ -55,21 +55,21 @@
 
 이슈 본문에 "결정 대기" 섹션으로 명시. 사용자가 답하면 해당 phase 진입.
 
-### Phase 3 — Plan A Phase 1 진입 (RequestEvent 모델 + alembic)
+### Phase 3 — Plan A Phase 1 진입 (RequestEvent 모델 + alembic) ✅ 완료 (2026-04-29)
 
-- [ ] `backend/app/models/request_event.py` 신규 (27 EventType + 15 column)
-- [ ] `backend/alembic/versions/20260428_0000_add_request_events.py` 생성
-- [ ] `backend/app/schemas/request_event.py` Pydantic 스키마
-- [ ] `backend/app/models/__init__.py` 등록
-- [ ] TDD: `test_request_event_persists_27_event_types` (Plan A §4.1)
-- [ ] alembic upgrade/downgrade 왕복 검증
+- [x] `backend/app/models/request_event.py` 신규 (27 EventType + 15 column)
+- [x] `backend/alembic/versions/20260428_0000_add_request_events.py` 생성
+- [x] `backend/app/schemas/request_event.py` Pydantic 스키마
+- [x] `backend/app/models/__init__.py` 등록
+- [x] TDD: `test_request_event_persists_27_event_types` (Plan A §4.1)
+- [ ] alembic upgrade/downgrade 왕복 검증 → **#252 별도 이슈** (사전 체인 단절)
 
-### Phase 4 — 검증 (Phase 3 직후)
+### Phase 4 — 검증 (Phase 3 직후) ✅ 완료 (2026-04-29, alembic 제외)
 
-- [ ] `uv run pytest backend/tests/ -k request_event -v`
-- [ ] `uv run alembic upgrade head && uv run alembic downgrade -1 && uv run alembic upgrade head`
-- [ ] `mypy backend/app/models/request_event.py` 통과
-- [ ] Lore-directive 트레일러 포함 커밋
+- [x] `uv run pytest tests/test_request_events_model.py -v` → **4/4 PASS**
+- [ ] `uv run alembic upgrade head && uv run alembic downgrade -1 && uv run alembic upgrade head` → **#252 차단**
+- [x] `mypy app/models/request_event.py` → Success: no issues found
+- [x] Lore-directive 트레일러 포함 커밋 → **1b14e093**
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
