@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
@@ -140,7 +141,11 @@ class _StepItem extends StatelessWidget {
               width: 28,
               child:
                   isCompleted
-                      ? Icon(Icons.check, size: 18, color: AppColors.paperOk)
+                      ? const NotebookGlyph(
+                        NotebookGlyph.check,
+                        size: 18,
+                        color: AppColors.paperOk,
+                      )
                       : Text(
                         romanOf(step - 1),
                         style: NotebookTypography.roman.copyWith(

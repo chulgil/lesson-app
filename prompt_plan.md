@@ -92,8 +92,52 @@
 2. **시그니처 패턴 확장** (예: `*_card.dart`, `*_section.dart` 중 노트북×스코어 적용 카드)
    - 현재 정책: 강제하지 않음 (A2 선택적 강제)
    - 결정 필요: 훅 적용 범위 확장 여부
+   - 상태: **Phase 4 에서 종결 (cherry-pick 채택)**
 
-이 2 항목은 본 Phase 3 종결 후 별도 plan/이슈로 분기.
+## Phase 4 — 결정 게이트 2 종결 + cherry-pick (완료)
+
+**일자**: 2026-04-29
+**결정 사항**: 훅 패턴 일괄 확장(`*_card.dart` / `*_section.dart`) **지양**.
+
+### 결정 근거
+
+§6.7.3-5 카탈로그 30+ Material `Icons.*` 후보를 전수 분류한 결과:
+
+| 분류 | 비중 | 예시 | A2 정책 적용 |
+|------|------|------|-------------|
+| 시스템 affordance (navigation) | 60%+ | `chevron_right`, `arrow_back`, `close` | Material 유지 (시스템 컨벤션) |
+| Media controls | 20% | `play_arrow`, `pause`, `mic` | Material 유지 (플랫폼 패턴) |
+| Data indicators | 15% | `signal_cellular_*`, `wifi_off` | Material 유지 (즉시 인식) |
+| 손맛 메타포 후보 | <5% | `Icons.check` (체크리스트 완료) | **cherry-pick 대상** |
+
+→ 훅 일괄 확장 시 60% 이상이 잘못된 경고를 발생시켜 노이즈로 작용. **선택적 cherry-pick** 으로 진행.
+
+### Cherry-pick #1 — `getting_started_card.dart`
+
+| 항목 | 변경 |
+|------|------|
+| 파일 | `frontend/lib/features/home/presentation/widgets/getting_started_card.dart` |
+| 자격 | line 138 주석 명시: "로마숫자 or 체크 — Notebook × Score 시그니처" |
+| 변경 | line 143 `Icon(Icons.check, size: 18, color: AppColors.paperOk)` → `NotebookGlyph(NotebookGlyph.check, size: 18, color: AppColors.paperOk)` (체크리스트 완료 ✓) |
+| 보존 | line 183 `Icons.chevron_right` (시스템 navigation affordance) — A2 정책 유지 |
+| 임포트 | `import '../../../../core/widgets/notebook/notebook_glyph.dart';` 추가 |
+
+### 검증 결과 (Phase 4)
+
+| 항목 | 결과 |
+|------|------|
+| flutter analyze (lib/features/home/) | ✅ 0 issues |
+| flutter test (like_stamp + notebook_glyph) | ✅ 21/21 PASS (회귀 없음) |
+| 훅 동작 (시그니처 외부 일반 영역) | ✅ 강제 안 됨 (자발적 cherry-pick) |
+| §9.7 README 갱신 | ✅ Phase 4 row 추가 |
+
+### 후속 cherry-pick 후보 (대기)
+
+추후 시그니처 정렬이 명확한 카드/섹션이 발견되면 동일 패턴으로 진행. 현재 우선순위 후보 없음 (A2 정책상 일반 영역은 Material 유지가 기본).
+
+### 결정 게이트 1 (emoji 30+) — 본 series 와 분리
+
+emoji 마이그레이션은 별도 결정 게이트로 미해결 잔존. 사용자 명시 결정 시 별도 plan/이슈로 분기.
 
 ## 평가 결과 (Phase 1 자체 채점)
 
@@ -362,6 +406,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3b-16 renewal_detail_screen 14 사이트 (2026-04-29) — AppBar(수강권 갱신 제안) + 에러/null 폴백 + 선생님 폴백 + 갱신 헤더(name 포매터) + 템플릿 선택 프롬프트 + 추천 배지 + "지난번과 동일" 힌트 + 입금 알림 SnackBar + 오류 SnackBar × 2 + 수강권 선택 CTA + 나중에 할게요 CTA + 거절 SnackBar. 신규 키 7개 (renewalProposalAppBarTitle, renewalSelectTemplatePrompt, renewalProposedByFormat 포매터, renewalSameAsPreviousHint, renewalSelectButton, renewalDeclineLater, renewalDeclineSnackbar) + 재사용 7건 (errorOccurred, proposalNotFoundEmpty, teacher, templateRecommendedBadge, paymentReminderSent, errorTryAgain × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `6d098429` (키) + `4f8038a8` (마이그레이션). **주의**: 외부 세션이 동시 5-3b-17(proposal_detail_screen) 진행 중 — staged 5-3b-17 키를 잠시 제거 후 본 키 커밋, 즉시 복원하여 외부 세션 작업 보존. 잔여 ~6 파일은 5-3b-17 이후.
 - 5-3b-17 proposal_detail_screen 25 사이트 (2026-04-29) — AppBar(수강권 제안) + 에러/null 폴백 + 템플릿 null 폴백 + 다중 선택 헤더 + 헤더 타이틀(2회 재사용) + 자동 발송 배지 + from-teacher subtitle + 추천 배지 + 연락처 시트(title 포매터/call/message) + 프로필 not-found/contact-not-available + 프로필 loading/load-error + 전화번호 복사 SnackBar 포매터(2건) + 선택 필수 힌트 + 입금 완료 CTA + 스킵 CTA + 입금 알림 SnackBar + 오류 SnackBar × 2 + 스킵 SnackBar. 신규 키 17개 (proposalDetailSelectTemplate/SelectTemplateRequired/AutoSentBadge/FromTeacherSubtitle/RecommendedBadge/PaymentDoneAction/SkipAction/SkippedSnackbar, teacherProfileNotFound/ContactNotAvailable/Loading/LoadError, teacherContactSheetTitleFormat 포매터, callTeacherAction, messageTeacherAction, phoneNumberCopiedFormat 포매터) + 재사용 6건 (proposalCreateAppBarTitle × 2, errorOccurred × 2, proposalNotFoundEmpty, templateNotFound, paymentReminderSent, errorTryAgain × 2). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `e12c813e` (키) + `308f1683` (마이그레이션). **주의**: 외부 세션이 5-3b-16(renewal_detail_screen) 점유 → 본 작업은 5-3b-17 로 재매핑. ⭐ emoji 인라인 보존 (다국어 무관). 잔여 ~5 파일은 5-3b-18 이후.
 - 5-3b-18 subscription_history_section 7 사이트 (2026-04-29) — 섹션 제목(수강 이력) + stat row 라벨 3건(수강 기간/총 수강/출석률) + 값 포매터 2건(N회 완료, M개월 · N회 완료) + import 추가. 신규 키 6개 (subscriptionHistoryTitle/PeriodLabel/TotalLessonsLabel/AttendanceRateLabel + subscriptionTotalUsedFormat 포매터 + subscriptionMonthsAndUsedFormat 포매터). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `074bdeca` (키) + `4f1e0106` (외부 세션이 5-3b-19 키와 함께 마이그레이션 동시 커밋). **주의**: 외부 세션이 5-3b-19 (proposal_settings_screen) 동시 진행 — Remove-Restore 패턴으로 staged 5-3b-19 키 분리 후 본 키 단독 커밋. 마이그레이션은 외부 세션이 자기 키 커밋 시 함께 포함(commit 4f1e0106). 잔여 ~4 파일은 5-3b-20 이후.
+- 5-3b-19 proposal_settings_screen 21 사이트 (2026-04-29) — AppBar 로딩/메인(2회) + 자동 제안 토글(타이틀/서브타이틀/힌트) + 템플릿 섹션(타이틀/힌트/error/empty/info 포매터/추천 배지) + 골든타임 섹션(타이틀/배지/힌트/할인율 라벨/유효시간 라벨/시간 포매터/요약 포매터) + 자동 리마인더 섹션(타이틀×2/힌트/스케줄) + 저장 SnackBar(성공/실패). 신규 키 19개 (proposalSettings AppBarTitle/AutoToggle{Title,Subtitle,Hint}/TemplateSection{Title,Hint}/TemplateEmpty/TemplateInfoFormat 포매터/GoldenTimeTitle/ConversionUpBadge/GoldenTimeHint/DiscountPercentLabel/ValidityHoursLabel/HoursFormat 포매터/GoldenTimeSummaryFormat 포매터/AutoReminder{Title,Hint,Schedule}/SavedSnackbar/SaveFailedSnackbar) + 재사용 2건 (errorOccurred, templateRecommendedBadge). subscription 63/63 PASS, flutter analyze — No issues. 커밋 `4f1e0106` (키) + `1b16c53f` (마이그레이션). **주의**: 외부 세션이 5-3b-18(subscription_history_section) 동시 점유 → 본 작업은 5-3b-19 로 재매핑. ⭐ emoji + `'$v%'` 인라인 보존 (다국어 무관 universal symbol). 잔여 ~4 파일은 5-3b-20 이후.
 - 5-3b 잔여 subscription 화면·repository·mock (~4 파일)
 
 ## 평가 기준 (Rubric, 합격선 7.5)
@@ -418,7 +463,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-16 renewal_detail_screen i18n (14 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-17 proposal_detail_screen i18n (25 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-3b-18 subscription_history_section i18n (7 사이트) | ✅ 완료 (2026-04-29) |
-| **다음** P2 5-3b-19+ subscription 화면·repository (~4 파일 분할) | 대기 |
+| P2 5-3b-19 proposal_settings_screen i18n (21 사이트) | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-3b-20+ subscription 화면·repository (~4 파일 분할) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.

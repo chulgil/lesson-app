@@ -653,8 +653,9 @@ const Icon(Icons.thumb_up_alt, size: 14)
 | **Phase 1** (2026-04-29) | §9 정책 + NotebookGlyph 위젯 + smoke test + 훅 + 규칙 | **완료** |
 | **Phase 2** (2026-04-29) | Pilot — `like_stamp.dart` 2건 NotebookGlyph 치환 (♥/♡) + 21/21 PASS | **완료** |
 | **Phase 3** (2026-04-29) | 시그니처 영역 5 패턴 전수 감사 — 마이그레이션 대상 0건 확정, 게이트 활성 | **완료** |
+| **Phase 4** (2026-04-29) | 결정 게이트 2 — 훅 패턴 일괄 확장 지양, cherry-pick 전략 채택. `getting_started_card.dart` 1건(`Icons.check` → `NotebookGlyph.check`) 치환 | **완료** |
 | **최종** | 시그니처 영역 `Icons.*` 잔재 0건 | **달성** (§9.4 5 패턴 모두) |
-| 별도 결정 게이트 | 일반 영역 emoji (시그니처 외부 30+ 건) · 시그니처 패턴 확장 | 대기 (사용자 결정) |
+| 결정 게이트 1 | 일반 영역 emoji (시그니처 외부 30+ 건) | 대기 (사용자 결정) |
 
 ### 9.8 금지
 
