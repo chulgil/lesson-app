@@ -3970,4 +3970,103 @@ class AppStrings {
 
   /// 저장 실패. 다시 시도해주세요. (저장 실패 SnackBar)
   static const proposalSettingsSaveFailedSnackbar = '저장 실패. 다시 시도해주세요.';
+
+  // ── Lesson Policy Screen (레슨/클래스 정책 설정 5-3b-20) ───────
+
+  /// 클래스 정책 설정 (AppBar — lessonClassId 있는 경우)
+  static const policyClassAppBarTitle = '클래스 정책 설정';
+
+  /// 레슨 정책 설정 (AppBar — 기본)
+  static const policyLessonAppBarTitle = '레슨 정책 설정';
+
+  /// 변경/취소 정책 (섹션 헤더)
+  static const policyChangeCancelHeader = '변경/취소 정책';
+
+  /// 최소 취소 시간 (Chip 입력 타이틀)
+  static const policyMinCancelHoursTitle = '최소 취소 시간';
+
+  /// 시간 전 (suffix)
+  static const policyHoursBeforeSuffix = '시간 전';
+
+  /// $hours시간 (라벨 포매터)
+  static String policyHoursFormat(int hours) => '$hours시간';
+
+  /// 월 변경 횟수 (Chip 입력 타이틀)
+  static const policyMonthlyChangesTitle = '월 변경 횟수';
+
+  /// 무제한 (라벨/요약 값)
+  static const policyUnlimited = '무제한';
+
+  /// $count회 (라벨 포매터)
+  static String policyTimesFormat(int count) => '$count회';
+
+  /// 당일 취소 허용 (토글 라벨)
+  static const policyAllowSameDayCancelToggle = '당일 취소 허용';
+
+  /// 노쇼 정책 (섹션 헤더)
+  static const policyNoShowHeader = '노쇼 정책';
+
+  /// 지각 허용 시간 (Chip 입력 타이틀)
+  static const policyGracePeriodTitle = '지각 허용 시간';
+
+  /// 이월 정책 (월정액) (섹션 헤더)
+  static const policyCarryoverHeader = '이월 정책 (월정액)';
+
+  /// 미사용 수업 이월 허용 (토글 라벨)
+  static const policyAllowCarryoverToggle = '미사용 수업 이월 허용';
+
+  /// 최대 이월 횟수 (Chip 입력 타이틀)
+  static const policyMaxCarryoverTitle = '최대 이월 횟수';
+
+  /// 이월 유효 기간 (Chip 입력 타이틀)
+  static const policyCarryoverPeriodTitle = '이월 유효 기간';
+
+  /// 개월 (suffix)
+  static const policyMonthsSuffix = '개월';
+
+  /// 📋 정책 요약 (요약 섹션 헤더)
+  static const policySummaryHeader = '📋 정책 요약';
+
+  /// 취소 (요약 라벨)
+  static const policyCancelLabel = '취소';
+
+  /// $hours시간 전까지 (요약 값 포매터)
+  static String policyHoursBeforeFormat(int hours) => '$hours시간 전까지';
+
+  /// 변경 (요약 라벨)
+  static const policyChangeLabel = '변경';
+
+  /// 월 $max회 (요약 값 포매터)
+  static String policyMonthlyChangesFormat(int max) => '월 $max회';
+
+  /// 횟수 차감 (요약 값 — 노쇼 ON)
+  static const policyDeductCount = '횟수 차감';
+
+  /// 횟수 유지 (요약 값 — 노쇼 OFF)
+  static const policyKeepCount = '횟수 유지';
+
+  /// 지각 (요약 라벨)
+  static const policyLatenessLabel = '지각';
+
+  /// $minutes분까지 허용 (요약 값 포매터)
+  static String policyLatenessFormat(int minutes) => '$minutes분까지 허용';
+
+  /// 최대 $count회 ($months개월 내) (이월 요약 값 포매터)
+  static String policyCarryoverFormat(int count, int months) =>
+      '최대 $count회 ($months개월 내)';
+
+  /// 불가 (이월 OFF 요약 값)
+  static const policyNotAllowed = '불가';
+
+  /// 관련 설정 (섹션 헤더)
+  static const policyRelatedHeader = '관련 설정';
+
+  /// 수강료 관리 (관련 설정 항목)
+  static const policyTuitionManagement = '수강료 관리';
+
+  /// 템플릿 관리 (관련 설정 항목)
+  static const policyTemplateManagement = '템플릿 관리';
+
+  /// 정책이 저장되었습니다 (저장 성공 SnackBar)
+  static const policySavedSnackbar = '정책이 저장되었습니다';
 }
