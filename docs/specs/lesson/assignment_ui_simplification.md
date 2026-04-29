@@ -92,14 +92,21 @@
 ```
 - 👍 아이콘이 primary 색상으로 filled
 
-### 3.3 좋아요 토글 동작 (§7.133 — LikeStamp 도장 메타포)
+### 3.3 좋아요 토글 동작 (§7.133 — LikeStamp 비대칭 도장)
 
 > 위치: `core/widgets/notebook/like_stamp.dart`
 > 적용: `practice_items_section.dart` (선생님 토글 + 학생 read-only) + `weekly_practice_widget.dart` (학생 측 read-only)
+> 갱신: 2026-04-29 — OFF/ON 동일 pill 구조가 OFF를 "muted ON" 으로 오인시키는 회귀 발견. **비대칭 디자인** 으로 재설계.
 
-**시각 시그널 (이중 인지)**:
-- **OFF (선생님 토글)**: `Icons.thumb_up_alt_outlined` (14px, `AppColors.inkTertiary`) + 라벨 "좋아요" + transparent bg + `AppColors.inkQuaternary` 1px border. pill 모양.
-- **ON (선생님 + 학생 read-only)**: `Icons.thumb_up_alt` filled (14px, `AppColors.paper`) + 라벨 "좋음" + `AppColors.paperAccent` solid bg + 동색 border. **잉크 도장 찍힘** 메타포.
+**핵심 원칙 — verb ↔ noun 인지 카테고리 분리**:
+- OFF = **행동 초대 (verb)**: "좋아요 표시" — 아직 안 한 행위
+- ON  = **기록된 결과 (noun)**: "좋음" — 이미 찍힌 도장
+
+두 상태가 **다른 시각 카테고리**에 속해야 인지 부담 없이 즉각 구분된다.
+
+**시각 시그널**:
+- **OFF (선생님 토글)**: `Icons.thumb_up_alt_outlined` (14px, `AppColors.inkTertiary`) + 라벨 "좋아요 표시" (`captionSmall`, `w500`) — **container/border/bg 없음**. 빈 종이 위 텍스트 링크처럼 보이게 하여 "아직 도장 안 찍힘" 명확화.
+- **ON (선생님 + 학생 read-only)**: `Icons.thumb_up_alt` filled (14px, `AppColors.paper`) + 라벨 "좋음" (`captionSmall`, `w600`) + `AppColors.paperAccent` solid bg + `radiusSmall` pill. **잉크 도장 찍힘** 메타포 유지.
 
 **동작**:
 - **선생님만** 좋아요 버튼 표시 (학생은 ON 결과만 확인, OFF는 비표시)
@@ -108,12 +115,14 @@
 - 학생 뷰: 좋아요가 ON이면 동일 stamp pill 표시 (탭 불가, `onTap == null`)
 
 **거절된 대안**:
-- 👍 emoji 16↔20px 크기 차이 — OS color emoji가 OFF에서도 컬러풀하게 렌더되어 "이미 좋아요됨" 오인. 차이 강도 부족.
-- icon-only 토글 (텍스트 없음) — 학생 측 read-only 의미 모호.
+- ~~OFF/ON 동일 pill outline/filled 차이~~ (이전 §7.133 안) — OFF에서도 border + icon + 라벨 3시그널이 동시 점화되어 "muted ON"으로 인지됨. 사용자 피드백: "좋아요 표시된 것처럼 보임".
+- 👍 emoji 16↔20px 크기 차이 — OS color emoji가 OFF에서도 컬러풀하게 렌더. 차이 강도 부족.
+- 점선 dashed border slot — 14px 점선 가독성 우려, 종이 메타포 약화.
+- icon-only 토글 (텍스트 없음) — verb 의미 전달 실패, 학생 read-only 의미 모호.
 
 **접근성**:
-- `Semantics(button: true, toggled: isLiked, label: '좋아요'/'좋음')` 부여로 스크린리더 지원.
-- 색맹·약시 대응: 모양(outline/filled) + 색(회색/잉크) + 텍스트("좋아요"/"좋음") 3중 시그널.
+- `Semantics(button: true, toggled: isLiked, label: '좋아요 표시'/'좋음')` 부여로 스크린리더 지원.
+- 색맹·약시 대응: 모양(텍스트 링크/pill) + 색(회색/잉크) + 텍스트("좋아요 표시"/"좋음") + **구조 유무**(없음/있음) 4중 시그널.
 
 ---
 
@@ -226,3 +235,4 @@
 |------|------|
 | 2026-03-08 | 초기 스펙 작성 (#87) |
 | 2026-03-08 | 과제 편집 UX 분석 추가 — 유사 서비스 비교, "편집됨" 표시 불필요 결정 |
+| 2026-04-29 | §7.133 LikeStamp 비대칭 디자인 재설계 — OFF는 텍스트 링크(verb), ON은 stamp pill(noun). OFF/ON 동일 pill 회귀 해소 |

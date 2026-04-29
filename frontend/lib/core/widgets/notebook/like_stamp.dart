@@ -7,9 +7,11 @@ import '../../theme/app_typography.dart';
 
 /// Notebook × Score 좋아요 도장(stamp).
 ///
-/// outline ↔ filled stamp pill 이중 시그널로 OFF/ON 을 명확히 구분.
-/// - OFF: outline thumb + 회색 라벨 + transparent bg (선생님 토글 미평가)
-/// - ON : filled thumb + paper 라벨 + paperAccent solid bg (잉크 도장 찍힘)
+/// **OFF/ON 비대칭** — 인지 카테고리 자체를 분리한다.
+/// - OFF (verb, 행동 초대): outline icon + 회색 라벨, **container/border 없음** —
+///   "빈 종이" 처럼 보이게 하여 "아직 도장 찍히지 않음" 을 명확화.
+/// - ON  (noun, 기록된 결과): filled icon + paper 라벨 + paperAccent solid pill —
+///   "잉크 도장 찍힘" 메타포.
 ///
 /// `onTap == null` 이면 read-only (학생 측 read-only 표시 또는 선생님 OFF 비표시).
 class LikeStamp extends StatelessWidget {
@@ -20,39 +22,7 @@ class LikeStamp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stamp = AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space2,
-        vertical: 3,
-      ),
-      decoration: BoxDecoration(
-        color: isLiked ? AppColors.paperAccent : Colors.transparent,
-        border: Border.all(
-          color: isLiked ? AppColors.paperAccent : AppColors.inkQuaternary,
-        ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isLiked ? Icons.thumb_up_alt : Icons.thumb_up_alt_outlined,
-            size: 14,
-            color: isLiked ? AppColors.paper : AppColors.inkTertiary,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            isLiked ? AppStrings.practiceLikeOn : AppStrings.practiceLikeOff,
-            style: AppTypography.captionSmall.copyWith(
-              color: isLiked ? AppColors.paper : AppColors.inkTertiary,
-              fontWeight: FontWeight.w600,
-              height: 1.0,
-            ),
-          ),
-        ],
-      ),
-    );
+    final stamp = isLiked ? _buildOnStamp() : _buildOffLink();
 
     if (onTap == null) return stamp;
 
@@ -64,6 +34,64 @@ class LikeStamp extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: stamp,
+      ),
+    );
+  }
+
+  /// ON 상태: solid stamp pill (잉크 도장 찍힘).
+  Widget _buildOnStamp() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: 3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paperAccent,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.thumb_up_alt, size: 14, color: AppColors.paper),
+          const SizedBox(width: 4),
+          Text(
+            AppStrings.practiceLikeOn,
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.paper,
+              fontWeight: FontWeight.w600,
+              height: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// OFF 상태: 텍스트 링크 — border/bg 없는 verb 행동 초대.
+  Widget _buildOffLink() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: 3,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.thumb_up_alt_outlined,
+            size: 14,
+            color: AppColors.inkTertiary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            AppStrings.practiceLikeOff,
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.inkTertiary,
+              fontWeight: FontWeight.w500,
+              height: 1.0,
+            ),
+          ),
+        ],
       ),
     );
   }
