@@ -26,7 +26,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('이번 주 과제'),
+        title: const Text(AppStrings.weeklyAssignmentTitle),
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -41,7 +41,10 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                     color: AppColors.inkTertiary,
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  Text('데이터를 불러올 수 없습니다', style: AppTypography.bodyMedium),
+                  Text(
+                    AppStrings.cannotLoadData,
+                    style: AppTypography.bodyMedium,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   OutlinedButton(
                     onPressed:
@@ -69,7 +72,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '이번 주 과제가 없습니다',
+              AppStrings.weeklyAssignmentEmpty,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -109,8 +112,8 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           // Incomplete students section
           if (incompleteStudents.isNotEmpty) ...[
             _buildSectionHeader(
-              '미완료 학생',
-              '${incompleteStudents.length}명',
+              AppStrings.incompleteStudentsLabel,
+              AppStrings.peopleCount(incompleteStudents.length),
               AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -123,8 +126,8 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           if (completedStudents.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space5),
             _buildSectionHeader(
-              '완료한 학생',
-              '${completedStudents.length}명',
+              AppStrings.completedStudentsLabel,
+              AppStrings.peopleCount(completedStudents.length),
               AppColors.paperOk,
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -193,14 +196,17 @@ class AssignmentDashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '이번 주 완료율',
+            AppStrings.weeklyCompletionRate,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '${summary.completedItems} / ${summary.totalItems} 과제 완료',
+            AppStrings.assignmentCompletionFormat(
+              summary.completedItems,
+              summary.totalItems,
+            ),
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -218,7 +224,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       children: [
         Expanded(
           child: _buildMiniStatCard(
-            '전체 과제',
+            AppStrings.totalAssignmentsLabel,
             '${summary.totalItems}',
             Icons.assignment_outlined,
             AppColors.ink,
@@ -227,7 +233,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _buildMiniStatCard(
-            '완료 학생',
+            AppStrings.completedStudentsShort,
             '$completedCount',
             Icons.check_circle_outline,
             AppColors.paperOk,
@@ -236,7 +242,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _buildMiniStatCard(
-            '미완료',
+            AppStrings.incompleteShort,
             '$incompleteCount',
             Icons.pending_outlined,
             incompleteCount > 0 ? AppColors.paperAccent : AppColors.paperOk,

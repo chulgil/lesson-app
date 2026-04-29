@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -42,7 +43,7 @@ class AssignmentSummarySection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         NotebookSectionHeader(
-          label: '이번 주 과제',
+          label: AppStrings.weeklyAssignmentTitle,
           trailing: TextButton(
             onPressed: () => context.push(AppRoutes.assignmentDashboard),
             style: TextButton.styleFrom(
@@ -51,7 +52,7 @@ class AssignmentSummarySection extends ConsumerWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              '전체보기',
+              AppStrings.viewAll,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.ink,
                 fontWeight: FontWeight.w600,
@@ -65,7 +66,7 @@ class AssignmentSummarySection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '완료율',
+              AppStrings.completionRateLabel,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -94,7 +95,7 @@ class AssignmentSummarySection extends ConsumerWidget {
         if (summary.incompleteStudents.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '미완료 학생',
+            AppStrings.incompleteStudentsLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
