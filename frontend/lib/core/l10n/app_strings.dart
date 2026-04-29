@@ -3173,6 +3173,37 @@ class AppStrings {
   /// 선생님께 문의하기 (대기 카드 CTA)
   static const proposalWaitingContactCta = '선생님께 문의하기';
 
+  // -- Subscription Domain Services (자동 제안/갱신 메시지 5-3b-8) --
+
+  /// 골든타임 할인 사유 (자동 제안)
+  static String autoProposalGoldenTimeReason(int percent, int hours) =>
+      '골든타임 할인 ($percent%, $hours시간 이내)';
+
+  /// 자동 제안 메시지 인사 ("체험레슨 수고하셨습니다! ")
+  static const autoProposalGreeting = '체험레슨 수고하셨습니다! ';
+
+  /// 자동 제안 골든타임 안내 ("N시간 이내 결제 시 ")
+  static String autoProposalGoldenTimeHours(int hours) => '$hours시간 이내 결제 시 ';
+
+  /// 자동 제안 골든타임 할인율 ("N% 할인이 적용됩니다. ")
+  static String autoProposalGoldenTimePercent(int percent) =>
+      '$percent% 할인이 적용됩니다. ';
+
+  /// 자동 제안 마무리 ("원하시는 수강권을 선택해주세요.")
+  static const autoProposalSelectionPrompt = '원하시는 수강권을 선택해주세요.';
+
+  /// 갱신 메시지 — 모두 소진 ("수강권이 모두 소진되었습니다. ")
+  static const renewalMessageDepleted = '수강권이 모두 소진되었습니다. ';
+
+  /// 갱신 메시지 — 마지막 1회 ("수강권이 마지막 1회 남았습니다. ")
+  static const renewalMessageLastOne = '수강권이 마지막 1회 남았습니다. ';
+
+  /// 갱신 메시지 — N회 남음 ("수강권이 N회 남았습니다. ")
+  static String renewalMessageRemaining(int count) => '수강권이 $count회 남았습니다. ';
+
+  /// 갱신 메시지 마무리 ("이전과 동일한 수강권으로 레슨을 이어가세요.")
+  static const renewalMessageContinue = '이전과 동일한 수강권으로 레슨을 이어가세요.';
+
   // ─── Subscription entities (P2 5-3b-2) ───────────────────────
 
   // LessonPolicy summaries
@@ -3465,6 +3496,34 @@ class AppStrings {
   /// 모든 학생의 수강권이 정상입니다 (empty state body)
   static const expiringEmptyBody = '모든 학생의 수강권이 정상입니다';
 
+  // -- Issue Subscription Actions (수강권 발급 액션 5-3b-10) --
+
+  /// 레슨을 선택해주세요 (validation: membership 미선택)
+  static const chooseLessonValidation = '레슨을 선택해주세요';
+
+  /// 시작일을 선택해주세요 (validation: startDate 미선택)
+  static const chooseStartDateValidation = '시작일을 선택해주세요';
+
+  /// 보너스 사유를 선택해주세요 (validation: bonus 사유 미선택)
+  static const chooseBonusReasonValidation = '보너스 사유를 선택해주세요';
+
+  /// $percent% 할인 (discountReason 합성)
+  static String discountPercentReason(int percent) => '$percent% 할인';
+
+  /// 수강권이 발급되었습니다 (snackbar: 단건 발급 성공)
+  static const subscriptionIssueSuccess = '수강권이 발급되었습니다';
+
+  /// 발급 실패. 다시 시도해주세요. (snackbar: 발급 실패)
+  static const subscriptionIssueFailRetry = '발급 실패. 다시 시도해주세요.';
+
+  /// $count명에게 수강권이 발급되었습니다 (snackbar: 일괄 발급 전체 성공)
+  static String batchSubscriptionIssueSuccess(int count) =>
+      '$count명에게 수강권이 발급되었습니다';
+
+  /// $success명 발급 완료, $fail명 실패 (snackbar: 일괄 발급 부분 성공)
+  static String batchSubscriptionIssuePartial(int success, int fail) =>
+      '$success명 발급 완료, $fail명 실패';
+
   // -- Subscription Display Layer (badge + status colors, P2 5-3b-7a) --
 
   /// $remain/$total회 (badge format for package subscription)
@@ -3547,4 +3606,48 @@ class AppStrings {
 
   /// 유효기간 내 자유롭게 사용 (회차권 카드 안내)
   static const subscriptionPackageFreeUseInfo = '유효기간 내 자유롭게 사용';
+
+  // -- Proposal Confirm Screen (입금 확인 5-3b-9) --
+
+  /// 입금 확인 대기 중인 제안이 없습니다 (빈 상태 타이틀)
+  static const proposalConfirmEmptyTitle = '입금 확인 대기 중인 제안이 없습니다';
+
+  /// 학생이 입금 완료를 알리면 여기에 표시됩니다 (빈 상태 본문)
+  static const proposalConfirmEmptyBody = '학생이 입금 완료를 알리면 여기에 표시됩니다';
+
+  /// 학생 정보 오류 (학생 로딩 실패 fallback)
+  static const studentInfoError = '학생 정보 오류';
+
+  /// 알 수 없는 학생 (학생 데이터 null fallback)
+  static const unknownStudent = '알 수 없는 학생';
+
+  /// 입금 알림: $time (제안 카드 알림 라벨)
+  static String proposalPaymentNotificationFormat(String time) =>
+      '입금 알림: $time';
+
+  /// 템플릿을 찾을 수 없습니다 (템플릿 null fallback)
+  static const templateNotFound = '템플릿을 찾을 수 없습니다';
+
+  /// $total회 · $duration분 · $validity (템플릿 요약 포매터)
+  static String proposalTemplateSummaryFormat(
+    int total,
+    int duration,
+    String validity,
+  ) => '$total회 · $duration분 · $validity';
+
+  /// 입금 미확인 (Inquiry 버튼 + 다이얼로그 타이틀)
+  static const paymentUnverifiedAction = '입금 미확인';
+
+  /// 입금 확인 → 수강권 발급 (확인 버튼)
+  static const paymentVerifyToIssueButton = '입금 확인 → 수강권 발급';
+
+  /// 입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까? (Inquiry 다이얼로그 본문)
+  static const paymentInquiryDialogBody =
+      '입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까?';
+
+  /// 메시지 보내기 (Inquiry 다이얼로그 확인 버튼)
+  static const sendMessage = '메시지 보내기';
+
+  /// 확인 요청 메시지를 보냈습니다 (Inquiry 전송 후 snackbar)
+  static const inquiryMessageSent = '확인 요청 메시지를 보냈습니다';
 }
