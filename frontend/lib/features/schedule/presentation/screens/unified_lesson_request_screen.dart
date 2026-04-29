@@ -201,7 +201,7 @@ class _UnifiedLessonRequestScreenState
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
-              '재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다',
+              AppStrings.returningStudentBanner,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.ink,
                 fontWeight: FontWeight.w600,
@@ -257,7 +257,7 @@ class _UnifiedLessonRequestScreenState
   Widget _buildLessonTypeSection() {
     return _SectionWrapper(
       icon: Icons.school,
-      title: '레슨 유형',
+      title: AppStrings.lessonTypeLabel,
       child: SegmentedButton<LessonRequestType>(
         segments:
             LessonRequestType.values
@@ -303,7 +303,7 @@ class _UnifiedLessonRequestScreenState
 
     return _SectionWrapper(
       icon: Icons.music_note,
-      title: '악기',
+      title: AppStrings.instrumentFallback,
       isRequired: true,
       child: Wrap(
         spacing: AppSpacing.space2,
@@ -342,7 +342,7 @@ class _UnifiedLessonRequestScreenState
   Widget _buildGoalSection() {
     return _SectionWrapper(
       icon: Icons.flag,
-      title: '레슨 목표',
+      title: AppStrings.lessonGoalLabel,
       child: DropdownButtonFormField<UnifiedLessonGoal>(
         initialValue: _selectedGoal,
         decoration: InputDecoration(
@@ -388,7 +388,7 @@ class _UnifiedLessonRequestScreenState
   Widget _buildExperienceSection() {
     return _SectionWrapper(
       icon: Icons.trending_up,
-      title: '경험 수준',
+      title: AppStrings.experienceLevelLabel,
       child: SegmentedButton<UnifiedExperienceLevel>(
         segments:
             UnifiedExperienceLevel.values
@@ -428,7 +428,7 @@ class _UnifiedLessonRequestScreenState
   Widget _buildSlotPickerSection() {
     return _SectionWrapper(
       icon: Icons.calendar_today,
-      title: '희망 레슨 시간',
+      title: AppStrings.preferredLessonTimeLabel,
       isRequired: true,
       child: WeeklyCalendarPicker(
         teacherId: widget.params.teacherId,
@@ -463,7 +463,7 @@ class _UnifiedLessonRequestScreenState
           ),
           const Spacer(),
           Text(
-            '60분',
+            AppStrings.durationMinutesValue(60),
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -505,14 +505,14 @@ class _UnifiedLessonRequestScreenState
   Widget _buildMessageSection() {
     return _SectionWrapper(
       icon: Icons.message,
-      title: '메시지',
-      subtitle: '(선택)',
+      title: AppStrings.messageLabel,
+      subtitle: AppStrings.optionalParen,
       child: TextField(
         controller: _messageController,
         maxLines: 3,
         maxLength: 200,
         decoration: InputDecoration(
-          hintText: '선생님께 전달할 메시지를 입력하세요',
+          hintText: AppStrings.messageHintToTeacher,
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkTertiary,
           ),
@@ -557,14 +557,14 @@ class _UnifiedLessonRequestScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '참고 레슨비',
+                  AppStrings.referencePriceLabel,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${_formatPrice(referencePrice)}원 / 회',
+                  AppStrings.pricePerSession(_formatPrice(referencePrice)),
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.ink,
@@ -616,11 +616,11 @@ class _UnifiedLessonRequestScreenState
 
   bool _validate() {
     if (_selectedInstrument == null) {
-      _showValidationError('악기를 선택해주세요');
+      _showValidationError(AppStrings.validationSelectInstrument);
       return false;
     }
     if (_preferredSlots.isEmpty) {
-      _showValidationError('희망 레슨 시간을 1개 이상 선택해주세요');
+      _showValidationError(AppStrings.validationSelectPreferredTime);
       return false;
     }
     return true;
@@ -683,7 +683,7 @@ class _UnifiedLessonRequestScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('신청 전송에 실패했습니다. 다시 시도해주세요.'),
+            content: Text(AppStrings.requestSubmitFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
