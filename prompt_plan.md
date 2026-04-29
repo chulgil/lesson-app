@@ -1,4 +1,106 @@
-# 추천 액션 순서 P0~P2 — 통합 plan
+# 백엔드 갭 해소 — Phase 1~2 plan (현재 진행)
+
+> 작성일: 2026-04-29
+> 모드: `/plan --eng` + adaptive-quality **ultra** (마이그레이션 + 27 이벤트 SSOT 정렬)
+> 사용자 결정 (2026-04-29):
+> - **a) 동시진행 ok** — 백엔드 트랙은 아래 프론트엔드 P2 5-1j 와 병렬 (트랙 분리)
+> - **b) 옵션 3** — Phase 1 이슈 등록(17건) + Phase 2 결정 게이트 큐잉 + Plan A Phase 1 진입
+> - **c) backend_spec.md 갱신은 별도 이슈로 분리**
+
+## 출처
+
+- `docs/specs/backend/audit/2026-04-28/SUMMARY.md` — 4 도메인 audit, 72 항목 / 13 PASS / 54 갭, 가중 평균 8.6 PASS
+- 패치 plan: `patch_plans/A_request_event_ssot.md`, `B_lesson_enum_align.md`, `C_subscription_expiry_cron.md` (모두 미진입)
+- 현황: 백엔드 마지막 커밋 1주+ 정체, 프론트는 80+ 커밋 (gap 누적)
+
+## 갭 인벤토리 (이슈 등록 대상 17건)
+
+| # | 우선순위 | 도메인 | 갭 | 패치 plan |
+|---|---|---|---|---|
+| 1 | P0 | schedule | request_events 테이블 부재 (27 EventType SSOT) | A |
+| 2 | P0 | schedule | ScheduleException → 슬롯 차단 미반영 | (신규) |
+| 3 | P0 | schedule | Booking overlap 검증 부재 | (신규) |
+| 4 | P0 | lesson | BookingStatus enum 7값 정렬 (approved→confirmed) | B |
+| 5 | P0 | lesson | NoShowPolicy 4값 통합 | B |
+| 6 | P0 | subscription | subscription_expiry_service 부재 | C |
+| 7 | P0 | subscription | status 자동 전이 로직 부재 (active→expiring→expired) | C |
+| 8 | P1 | schedule | RegularLessonScheduleChange 라우터 미노출 | (신규) |
+| 9 | P1 | lesson | LessonService.create pieces 무시 | (신규) |
+| 10 | P1 | lesson | RequestEvent SSOT 의존 갭 (Plan A 후속) | A |
+| 11 | P1 | student | RosterSummary endpoint 부재 | (신규) |
+| 12 | P1 | student | Bulk Teacher Actions (3건) 부재 | (신규) |
+| 13 | P1 | subscription | 만료 알림 발송 (FCM/email) | C |
+| 14 | P1 | subscription | 자동 연장 옵션 처리 | C |
+| 15 | P1 | subscription | 환불/일시정지 정책 미구현 | (신규) |
+| 16 | P1 | subscription | 수강권 사용 횟수 동기화 갭 | (신규) |
+| 17 | docs | backend | backend_spec.md 154→209 endpoints 갱신 (별도) | (docs) |
+
+## Phase 분해
+
+### Phase 1 — 이슈 등록 ✅ 완료 (2026-04-29)
+
+- [x] P0 7건 등록 (#235~#241)
+- [x] P1 9건 등록 (#242~#250)
+- [x] backend_spec.md 갱신 1건 등록 (#251)
+- [x] prompt_plan.md 본 plan 저장
+
+### Phase 2 — 결정 게이트 큐잉 (이슈 본문 메모, 결정 대기)
+
+| 게이트 | 위치 | 옵션 |
+|---|---|---|
+| Plan B §6.1 | BookingStatus.noShow 처리 | 제거 vs 유지 |
+| Plan B §6.2 | BookingStatus.rejected 처리 | 제거 vs 유지 |
+| Plan C §7.1 | Cron 인프라 | APScheduler in-process vs docker cron |
+| Plan C §7.4 | 만료 알림 수신자 범위 | 학생만 vs 학생+학부모+선생님 |
+
+이슈 본문에 "결정 대기" 섹션으로 명시. 사용자가 답하면 해당 phase 진입.
+
+### Phase 3 — Plan A Phase 1 진입 (RequestEvent 모델 + alembic)
+
+- [ ] `backend/app/models/request_event.py` 신규 (27 EventType + 15 column)
+- [ ] `backend/alembic/versions/20260428_0000_add_request_events.py` 생성
+- [ ] `backend/app/schemas/request_event.py` Pydantic 스키마
+- [ ] `backend/app/models/__init__.py` 등록
+- [ ] TDD: `test_request_event_persists_27_event_types` (Plan A §4.1)
+- [ ] alembic upgrade/downgrade 왕복 검증
+
+### Phase 4 — 검증 (Phase 3 직후)
+
+- [ ] `uv run pytest backend/tests/ -k request_event -v`
+- [ ] `uv run alembic upgrade head && uv run alembic downgrade -1 && uv run alembic upgrade head`
+- [ ] `mypy backend/app/models/request_event.py` 통과
+- [ ] Lore-directive 트레일러 포함 커밋
+
+## 평가 기준 (Rubric, 합격선 7.5)
+
+| 기준 | 가중 | 목표 |
+|---|---|---|
+| 완성도 | 40% | 9/10 — 17 이슈 등록 + Plan A Phase 1 RequestEvent 모델·migration·스키마·테스트 |
+| 견고성 | 30% | 8/10 — TDD Red-Green, alembic 왕복 검증 |
+| 일관성 | 20% | 8/10 — Hive entity (typeId 130/131/132) 와 1:1 정합 |
+| 간결성 | 10% | 7/10 — 모델 200줄 이내, migration 단일 파일 |
+
+## 리스크
+
+| 등급 | 리스크 | 완화 |
+|---|---|---|
+| HIGH | enum 7값 정렬이 기존 booking 데이터 깨뜨림 | Plan B 별도 phase, alembic data migration 작성 |
+| HIGH | request_events 테이블이 기존 LessonRequest.status 와 SSOT 충돌 | Plan A Phase 5 에서 Outbox 패턴으로 분리 |
+| MEDIUM | APScheduler vs docker cron 결정 지연 | Phase 2 게이트로 명시 |
+| LOW | 이슈 등록 단순 작업 | gh CLI 검증 (`domain: backend` label 생성 완료) |
+
+## 다음 단계 (실행 순서)
+
+1. ✅ `domain: backend` GitHub label 생성 완료
+2. 🔄 prompt_plan.md 갱신 (이 편집)
+3. P0 7건 이슈 등록 (Phase 1 본 작업)
+4. P1 9건 이슈 등록
+5. backend_spec.md 갱신 1건 이슈 등록
+6. Plan A Phase 1 진입 — RequestEvent 모델 작성
+
+---
+
+# 추천 액션 순서 P0~P2 — 통합 plan (프론트엔드 트랙, 병렬 진행)
 
 > 작성일: 2026-04-28
 > 모드: `/plan --eng` + adaptive-quality **ultra** (스펙 정렬 + 마이그레이션 + 다중 화면 영향)
