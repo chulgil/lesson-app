@@ -4242,4 +4242,92 @@ class AppStrings {
   static const notificationPushPreparingNotice =
       '푸시 알림은 준비 중입니다.\n'
       '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.';
+
+  // ── Subscription Template List Screen (수강권 관리 5-3b-24) ────────
+
+  /// 수강권 관리 (AppBar)
+  static const templateListAppBarTitle = '수강권 관리';
+
+  /// 수강권 추가 (FAB / 빈상태 CTA보조)
+  static const templateAddButton = '수강권 추가';
+
+  /// 수강권을 만들어 학생들에게 제안해보세요 (빈 상태 본문)
+  static const templateEmptyHint = '수강권을 만들어 학생들에게 제안해보세요';
+
+  /// 첫 수강권 만들기 (빈 상태 CTA)
+  static const templateFirstCreate = '첫 수강권 만들기';
+
+  /// 수강권 삭제 (AlertDialog 타이틀)
+  static const templateDeleteDialogTitle = '수강권 삭제';
+
+  /// "$name"을(를) 삭제하시겠습니까? (AlertDialog 본문 — 템플릿 이름 인터폴레이션)
+  static String templateDeleteConfirmFormat(String name) =>
+      '"$name"을(를) 삭제하시겠습니까?';
+
+  /// 비활성 (카드 비활성 배지)
+  static const templateInactiveBadge = '비활성';
+
+  /// 자동 (자동 제안 활성 배지 — flash_on 아이콘 우측 텍스트)
+  static const templateAutoBadge = '자동';
+
+  /// 비활성화 (popup menu — 활성 카드의 toggle 액션)
+  static const templateMenuDeactivate = '비활성화';
+
+  /// 활성화 (popup menu — 비활성 카드의 toggle 액션)
+  static const templateMenuActivate = '활성화';
+
+  /// 수강권 수정 (편집 바텀시트 헤더)
+  static const templateEditSheetTitle = '수강권 수정';
+
+  /// 수강권 수강권 추가 (추가 바텀시트 헤더 — 원본 코드의 중복 단어 보존, 별도 수정 PR 권장)
+  static const templateAddSheetTitle = '수강권 수강권 추가';
+
+  /// 이름 * (이름 필드 라벨)
+  static const templateNameLabel = '이름 *';
+
+  /// 예: 8회권, 기본 패키지 (이름 필드 hint)
+  static const templateNameHint = '예: 8회권, 기본 패키지';
+
+  /// 이름을 입력해주세요 (이름 validator)
+  static const templateNameRequired = '이름을 입력해주세요';
+
+  /// 가격 (원) * (가격 필드 라벨)
+  static const templatePriceLabel = '가격 (원) *';
+
+  /// 예: 400000 (가격 필드 hint)
+  static const templatePriceHint = '예: 400000';
+
+  /// 가격을 입력해주세요 (가격 validator — 빈값)
+  static const templatePriceRequired = '가격을 입력해주세요';
+
+  /// 숫자만 입력해주세요 (가격 validator — 비숫자)
+  static const templatePriceNumbersOnly = '숫자만 입력해주세요';
+
+  /// 예: 가장 인기 있는 패키지입니다 (설명 필드 hint)
+  static const templateDescHint = '예: 가장 인기 있는 패키지입니다';
+
+  /// 수정하기 (저장 버튼 — 편집 모드)
+  static const templateSaveEdit = '수정하기';
+
+  /// 추가하기 (저장 버튼 — 추가 모드)
+  static const templateSaveAdd = '추가하기';
+
+  /// 자동 제안 대상 (Checkbox 라벨)
+  static const templateAutoProposalCheckbox = '자동 제안 대상';
+
+  /// 체험레슨 완료 또는 수강권 만료 시 학생에게\n이 수강권이 자동으로 제안됩니다.
+  static const templateAutoProposalEnabledDesc =
+      '체험레슨 완료 또는 수강권 만료 시 학생에게\n'
+      '이 수강권이 자동으로 제안됩니다.';
+
+  /// 이 수강권은 선생님이 직접 제안할 때만 사용됩니다.\n자동 제안에 포함되지 않습니다.
+  static const templateAutoProposalDisabledDesc =
+      '이 수강권은 선생님이 직접 제안할 때만 사용됩니다.\n'
+      '자동 제안에 포함되지 않습니다.';
+
+  /// 수강권이 수정되었습니다 (저장 SnackBar — 편집)
+  static const templateUpdatedSnackbar = '수강권이 수정되었습니다';
+
+  /// 수강권이 추가되었습니다 (저장 SnackBar — 추가)
+  static const templateAddedSnackbar = '수강권이 추가되었습니다';
 }
