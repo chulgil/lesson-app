@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -34,8 +35,8 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
         ),
         title: expiringSoonAsync.when(
-          loading: () => const Text('수강권 확인'),
-          error: (_, __) => const Text('수강권 확인'),
+          loading: () => const Text(AppStrings.subscriptionViewAction),
+          error: (_, __) => const Text(AppStrings.subscriptionViewAction),
           data: (subscriptions) {
             final expiredSubs = expiredAsync.valueOrNull ?? [];
             final allStudents = {
@@ -45,10 +46,10 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('수강권 확인'),
+                const Text(AppStrings.subscriptionViewAction),
                 if (allStudents.isNotEmpty)
                   Text(
-                    '${allStudents.length}명의 학생',
+                    AppStrings.studentsCountSubtitle(allStudents.length),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
@@ -61,7 +62,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
       ),
       body: expiringSoonAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+        error: (_, __) => const Center(child: Text(AppStrings.errorTryAgain)),
         data: (subscriptions) {
           final expiredSubs = expiredAsync.valueOrNull ?? [];
           final allSubscriptions = [...subscriptions, ...expiredSubs];
@@ -125,7 +126,9 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
         final subs = entry.value;
         final studentName =
             studentNames[studentId] ??
-            '학생 ${studentId.replaceAll('student_', '#')}';
+            AppStrings.studentNameFallback(
+              studentId.replaceAll('student_', '#'),
+            );
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -194,7 +197,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
                   '${AppRoutes.issueSubscription}?studentId=$studentId',
                 ),
             icon: const Icon(Icons.autorenew, size: 18),
-            label: const Text('수강권 발급하기'),
+            label: const Text(AppStrings.issueSubscriptionButton),
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -237,14 +240,14 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '확인이 필요한 수강권이 없습니다',
+            AppStrings.expiringEmptyTitle,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '모든 학생의 수강권이 정상입니다',
+            AppStrings.expiringEmptyBody,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
