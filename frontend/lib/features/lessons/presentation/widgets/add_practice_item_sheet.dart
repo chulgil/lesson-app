@@ -21,9 +21,9 @@ enum RangeType {
   String get label {
     switch (this) {
       case RangeType.measure:
-        return '마디';
+        return AppStrings.measureLabel;
       case RangeType.line:
-        return '줄';
+        return AppStrings.lineLabel;
     }
   }
 }
@@ -141,7 +141,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               ),
 
               // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-              Text('연습 추가', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.addPracticeItemTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space4),
 
               // Repertoire-based form (all practice items are repertoire-based)
@@ -149,7 +152,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
               // Description
               Text(
-                '설명 (선택)',
+                AppStrings.descriptionOptional,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -161,7 +164,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 maxLines: 5,
                 style: NotebookTypography.hand.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(
-                  hintText: '예: 메트로놈 60으로 정확하게!',
+                  hintText: AppStrings.practiceDescriptionHint,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -205,7 +208,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       children: [
         // Repertoire selection
         Text(
-          '레퍼토리',
+          AppStrings.repertoireLabel,
           style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -224,7 +227,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Text(
-                  '레퍼토리를 불러올 수 없습니다',
+                  AppStrings.repertoireLoadFailed,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -236,7 +239,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         // New repertoire name input (if creating new)
         if (_isCreatingNewRepertoire) ...[
           Text(
-            '새 레퍼토리 이름',
+            AppStrings.newRepertoireNameLabel,
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -247,7 +250,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             controller: _newRepertoireNameController,
             style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
-              hintText: '예: 스즈키 5권',
+              hintText: AppStrings.repertoireNameHint,
               border: OutlineInputBorder(),
             ),
           ),
@@ -256,7 +259,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
         // Piece name
         Text(
-          '곡명',
+          AppStrings.pieceNameLabel,
           style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -265,7 +268,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           controller: _pieceNameController,
           style: NotebookTypography.hand.copyWith(color: AppColors.ink),
           decoration: InputDecoration(
-            hintText: '예: 라폴리아',
+            hintText: AppStrings.pieceNameHint,
             border: OutlineInputBorder(),
           ),
         ),
@@ -273,7 +276,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
         // Practice ranges (multiple)
         Text(
-          '연습 구간',
+          AppStrings.practiceSectionLabel,
           style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -318,7 +321,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                         border: Border.all(
                           color:
                               isSelected
@@ -390,7 +395,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                       border: Border.all(
                         color:
                             _isCreatingNewRepertoire
@@ -424,7 +431,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '새 레퍼토리 만들기',
+                    AppStrings.createNewRepertoire,
                     style: AppTypography.bodyMedium.copyWith(
                       color:
                           _isCreatingNewRepertoire
@@ -465,7 +472,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             },
             icon: Icon(Icons.add, size: 18, color: AppColors.inkSecondary),
             label: Text(
-              '구간 추가',
+              AppStrings.addRange,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -538,7 +545,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: '시작',
+                  hintText: AppStrings.rangeStart,
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -568,7 +575,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: '끝',
+                  hintText: AppStrings.rangeEnd,
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -614,22 +621,24 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   Future<void> _submit() async {
     // Validate repertoire selection
     if (!_isCreatingNewRepertoire && _selectedRepertoire == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('레퍼토리를 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.selectRepertoireValidation)),
+      );
       return;
     }
     if (_isCreatingNewRepertoire &&
         _newRepertoireNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('새 레퍼토리 이름을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.enterNewRepertoireNameValidation),
+        ),
+      );
       return;
     }
     if (_pieceNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('곡명을 입력해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.enterPieceNameValidation)),
+      );
       return;
     }
     // Validate all practice ranges
@@ -638,14 +647,14 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       final start = int.tryParse(range.startController.text.trim());
       final end = int.tryParse(range.endController.text.trim());
       if (start == null || end == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.rangeStartEndRequired(i + 1))),
+        );
         return;
       }
       if (start > end) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('구간 ${i + 1}의 시작 번호가 끝 번호보다 클 수 없습니다')),
+          SnackBar(content: Text(AppStrings.rangeInvalidOrder(i + 1))),
         );
         return;
       }
@@ -710,15 +719,15 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('연습이 추가되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.practiceItemAdded)),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
       }
     } finally {
       if (mounted) {

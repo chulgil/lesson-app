@@ -2219,4 +2219,72 @@ class AppStrings {
 
   /// 포인트 추가... (key point input hint)
   static const keyPointAddHint = '포인트 추가...';
+
+  // ── Add Practice Item Sheet (연습 추가 바텀시트 30차) ─
+
+  /// 마디 (range type: measure)
+  static const measureLabel = '마디';
+
+  /// 줄 (range type: line)
+  static const lineLabel = '줄';
+
+  /// 연습 추가 (add practice item sheet title)
+  static const addPracticeItemTitle = '연습 추가';
+
+  /// 설명 (선택) (description optional label)
+  static const descriptionOptional = '설명 (선택)';
+
+  /// 예: 메트로놈 60으로 정확하게! (practice description hint)
+  static const practiceDescriptionHint = '예: 메트로놈 60으로 정확하게!';
+
+  /// 레퍼토리 (repertoire label)
+  static const repertoireLabel = '레퍼토리';
+
+  /// 레퍼토리를 불러올 수 없습니다 (repertoire load error)
+  static const repertoireLoadFailed = '레퍼토리를 불러올 수 없습니다';
+
+  /// 새 레퍼토리 이름 (new repertoire name label)
+  static const newRepertoireNameLabel = '새 레퍼토리 이름';
+
+  /// 예: 스즈키 5권 (repertoire name hint)
+  static const repertoireNameHint = '예: 스즈키 5권';
+
+  /// 곡명 (piece name label)
+  static const pieceNameLabel = '곡명';
+
+  /// 예: 라폴리아 (piece name hint)
+  static const pieceNameHint = '예: 라폴리아';
+
+  /// 연습 구간 (practice section label)
+  static const practiceSectionLabel = '연습 구간';
+
+  /// 새 레퍼토리 만들기 (create new repertoire option)
+  static const createNewRepertoire = '새 레퍼토리 만들기';
+
+  /// 구간 추가 (add range button)
+  static const addRange = '구간 추가';
+
+  /// 시작 (range start hint)
+  static const rangeStart = '시작';
+
+  /// 끝 (range end hint)
+  static const rangeEnd = '끝';
+
+  /// 레퍼토리를 선택해주세요 (validation: select repertoire)
+  static const selectRepertoireValidation = '레퍼토리를 선택해주세요';
+
+  /// 새 레퍼토리 이름을 입력해주세요 (validation: enter new repertoire name)
+  static const enterNewRepertoireNameValidation = '새 레퍼토리 이름을 입력해주세요';
+
+  /// 곡명을 입력해주세요 (validation: enter piece name)
+  static const enterPieceNameValidation = '곡명을 입력해주세요';
+
+  /// 구간 {n}의 시작/끝 번호를 입력해주세요 (validation: range start/end required)
+  static String rangeStartEndRequired(int n) => '구간 $n의 시작/끝 번호를 입력해주세요';
+
+  /// 구간 {n}의 시작 번호가 끝 번호보다 클 수 없습니다 (validation: range order)
+  static String rangeInvalidOrder(int n) => '구간 $n의 시작 번호가 끝 번호보다 클 수 없습니다';
+
+  /// 연습이 추가되었습니다 (practice item added success)
+  static const practiceItemAdded = '연습이 추가되었습니다';
 }
