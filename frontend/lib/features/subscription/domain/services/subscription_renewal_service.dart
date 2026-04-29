@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../entities/subscription.dart';
 import '../entities/subscription_proposal.dart';
 import '../../presentation/providers/subscription_proposal_providers.dart';
@@ -62,17 +63,14 @@ class SubscriptionRenewalService {
       final proposalTemplates = templates;
 
       // 4. Create renewal proposal
-      final notifier = _ref.read(
-        subscriptionProposalNotifierProvider.notifier,
-      );
+      final notifier = _ref.read(subscriptionProposalNotifierProvider.notifier);
 
       final proposal = await notifier.createMultiChoiceProposal(
         teacherId: teacherId,
         studentId: subscription.studentId,
         templateIds: proposalTemplates.map((t) => t.id).toList(),
-        recommendedTemplateId: proposalTemplates.length > 1
-            ? proposalTemplates.first.id
-            : null,
+        recommendedTemplateId:
+            proposalTemplates.length > 1 ? proposalTemplates.first.id : null,
         message: _buildRenewalMessage(subscription),
         isAutoProposal: initiator == RenewalInitiator.system,
         isRenewal: true,
@@ -97,14 +95,14 @@ class SubscriptionRenewalService {
     final buffer = StringBuffer();
 
     if (remaining <= 0) {
-      buffer.write('수강권이 모두 소진되었습니다. ');
+      buffer.write(AppStrings.renewalMessageDepleted);
     } else if (remaining == 1) {
-      buffer.write('수강권이 마지막 1회 남았습니다. ');
+      buffer.write(AppStrings.renewalMessageLastOne);
     } else {
-      buffer.write('수강권이 $remaining회 남았습니다. ');
+      buffer.write(AppStrings.renewalMessageRemaining(remaining));
     }
 
-    buffer.write('이전과 동일한 수강권으로 레슨을 이어가세요.');
+    buffer.write(AppStrings.renewalMessageContinue);
     return buffer.toString();
   }
 }

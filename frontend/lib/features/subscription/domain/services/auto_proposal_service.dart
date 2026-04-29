@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../entities/proposal_settings.dart';
 import '../entities/subscription_proposal.dart';
 import '../entities/subscription_template.dart';
@@ -33,8 +34,9 @@ class AutoProposalService {
     required DateTime trialCompletedAt,
   }) async {
     // 1. Check if auto-proposal is enabled
-    final settings =
-        await _ref.read(teacherProposalSettingsProvider(teacherId).future);
+    final settings = await _ref.read(
+      teacherProposalSettingsProvider(teacherId).future,
+    );
 
     if (!settings.autoProposalEnabled) {
       return null;
@@ -52,8 +54,9 @@ class AutoProposalService {
 
     // 3. Get auto-proposal enabled templates only
     // 🆕 isAutoProposalEnabled = true인 템플릿만 가져옴
-    final templates =
-        await _ref.read(autoProposalTemplatesProvider(teacherId).future);
+    final templates = await _ref.read(
+      autoProposalTemplatesProvider(teacherId).future,
+    );
 
     if (templates.isEmpty) {
       // 자동 제안 대상 템플릿이 없음
@@ -64,9 +67,10 @@ class AutoProposalService {
     List<SubscriptionTemplate> proposalTemplates;
     if (settings.autoProposalTemplateIds.isNotEmpty) {
       // Use only specified templates (that are also auto-proposal enabled)
-      proposalTemplates = templates
-          .where((t) => settings.autoProposalTemplateIds.contains(t.id))
-          .toList();
+      proposalTemplates =
+          templates
+              .where((t) => settings.autoProposalTemplateIds.contains(t.id))
+              .toList();
     } else {
       // Use all auto-proposal enabled templates
       proposalTemplates = templates;
@@ -89,18 +93,19 @@ class AutoProposalService {
 
       discountAmount =
           settings.applyGoldenTimeDiscount(baseTemplate.price) -
-              baseTemplate.price;
+          baseTemplate.price;
       discountAmount = discountAmount.abs(); // Make positive
 
       if (discountAmount > 0) {
-        discountReason =
-            '골든타임 할인 (${settings.goldenTimeDiscountPercent}%, ${settings.goldenTimeHours}시간 이내)';
+        discountReason = AppStrings.autoProposalGoldenTimeReason(
+          settings.goldenTimeDiscountPercent,
+          settings.goldenTimeHours,
+        );
       }
     }
 
     // 6. Create the proposal
-    final notifier =
-        _ref.read(subscriptionProposalNotifierProvider.notifier);
+    final notifier = _ref.read(subscriptionProposalNotifierProvider.notifier);
 
     final proposal = await notifier.createMultiChoiceProposal(
       teacherId: teacherId,
@@ -139,14 +144,20 @@ class AutoProposalService {
 
   String _buildAutoProposalMessage(ProposalSettings settings) {
     final buffer = StringBuffer();
-    buffer.write('체험레슨 수고하셨습니다! ');
+    buffer.write(AppStrings.autoProposalGreeting);
 
     if (settings.hasGoldenTimeDiscount) {
-      buffer.write('${settings.goldenTimeHours}시간 이내 결제 시 ');
-      buffer.write('${settings.goldenTimeDiscountPercent}% 할인이 적용됩니다. ');
+      buffer.write(
+        AppStrings.autoProposalGoldenTimeHours(settings.goldenTimeHours),
+      );
+      buffer.write(
+        AppStrings.autoProposalGoldenTimePercent(
+          settings.goldenTimeDiscountPercent,
+        ),
+      );
     }
 
-    buffer.write('원하시는 수강권을 선택해주세요.');
+    buffer.write(AppStrings.autoProposalSelectionPrompt);
     return buffer.toString();
   }
 }
