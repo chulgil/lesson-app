@@ -4069,4 +4069,46 @@ class AppStrings {
 
   /// 정책이 저장되었습니다 (저장 성공 SnackBar)
   static const policySavedSnackbar = '정책이 저장되었습니다';
+
+  // ── Unified Subscription Sheet (수강권 발급 바텀시트 5-3b-21) ──
+
+  /// 수강권 발급 (바텀시트 헤더)
+  static const unifiedSubscriptionAppBarTitle = '수강권 발급';
+
+  /// 템플릿 선택 (섹션 라벨)
+  static const unifiedSubscriptionTemplateSection = '템플릿 선택';
+
+  /// 등록된 템플릿이 없습니다 (빈 상태)
+  static const unifiedSubscriptionNoTemplates = '등록된 템플릿이 없습니다';
+
+  /// 직접 입력 (확장 토글 라벨)
+  static const unifiedSubscriptionDirectInputToggle = '직접 입력';
+
+  /// 자동: $days일 (자동 산출 유효기간 보조 텍스트)
+  static String unifiedSubscriptionAutoValidityFormat(int days) => '자동: $days일';
+
+  /// $count회 (회차 chip 라벨)
+  static String unifiedSubscriptionLessonChipFormat(int count) => '$count회';
+
+  /// 직접입력 (회차 chip 직접입력 옵션 — space 없음)
+  static const unifiedSubscriptionDirectInputChip = '직접입력';
+
+  /// 금액을 입력하세요 (금액 입력 hint)
+  static const unifiedSubscriptionAmountHint = '금액을 입력하세요';
+
+  /// $days일 (유효기간 chip 라벨)
+  static String unifiedSubscriptionDaysChipFormat(int days) => '$days일';
+
+  /// 바로 발급 (단일 선택 시 outlined 액션)
+  static const unifiedSubscriptionDirectIssueButton = '바로 발급';
+
+  /// $count개 제안 보내기 (복수 템플릿 송신 버튼)
+  static String unifiedSubscriptionMultiSendFormat(int count) =>
+      '$count개 제안 보내기';
+
+  /// 회차 입력 (custom lesson count 다이얼로그 타이틀)
+  static const unifiedSubscriptionLessonCountDialogTitle = '회차 입력';
+
+  /// 횟수를 입력하세요 (custom lesson count 입력 hint)
+  static const unifiedSubscriptionLessonCountHint = '횟수를 입력하세요';
 }
