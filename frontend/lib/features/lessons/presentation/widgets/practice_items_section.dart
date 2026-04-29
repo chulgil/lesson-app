@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/like_stamp.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
@@ -272,13 +273,19 @@ class PracticeItemsSection extends ConsumerWidget {
                     ),
                   ),
 
-                // Like button (teacher: interactive, student: read-only)
+                // Like stamp (teacher: interactive toggle, student: read-only ON only)
                 if (isTeacher)
-                  _buildLikeButton(ref, item)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.space2),
+                    child: LikeStamp(
+                      isLiked: item.hasLike,
+                      onTap: () => _toggleLike(ref, item),
+                    ),
+                  )
                 else if (item.hasLike)
                   Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.space2),
-                    child: const Text('👍', style: TextStyle(fontSize: 18)),
+                    child: LikeStamp(isLiked: true),
                   ),
               ],
             ),
@@ -322,23 +329,6 @@ class PracticeItemsSection extends ConsumerWidget {
     await ref
         .read(practiceItemsNotifierProvider(lessonId).notifier)
         .toggleComplete(item.id, studentId);
-  }
-
-  Widget _buildLikeButton(WidgetRef ref, PracticeItem item) {
-    return GestureDetector(
-      onTap: () => _toggleLike(ref, item),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space1),
-        decoration:
-            item.hasLike
-                ? BoxDecoration(
-                  color: AppColors.paperAccentSoft,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                )
-                : null,
-        child: Text('👍', style: TextStyle(fontSize: item.hasLike ? 20 : 16)),
-      ),
-    );
   }
 
   Future<void> _toggleLike(WidgetRef ref, PracticeItem item) async {

@@ -31,6 +31,7 @@
 |------|------|------|
 | 좋아요 (❤️) | 한 번 누르면 취소 불가 + 완료 시에만 표시 | **토글** (ON/OFF, 언제든 가능) |
 | 좋아요 아이콘 | ❤️ (filled heart, red) | 👍 (thumb up, primary color) |
+| 좋아요 시각 차이 (§7.133) | OS color emoji 16↔20px (모호) | **LikeStamp pill** — outline ↔ filled stamp + 텍스트 라벨 |
 | 완료 표시 | 취소선 + 녹색 테두리 + dimmed 텍스트 | **회색 텍스트만** (체크 아이콘 유지) |
 | 카드 테두리 | 완료 시 녹색 | **완료 시 변경 없음** (체크로 구분) |
 
@@ -91,14 +92,28 @@
 ```
 - 👍 아이콘이 primary 색상으로 filled
 
-### 3.3 좋아요 토글 동작
+### 3.3 좋아요 토글 동작 (§7.133 — LikeStamp 도장 메타포)
 
-- **선생님만** 좋아요 버튼 표시 (학생은 결과만 확인)
-- 완료 여부와 **무관하게** 항상 표시
+> 위치: `core/widgets/notebook/like_stamp.dart`
+> 적용: `practice_items_section.dart` (선생님 토글 + 학생 read-only) + `weekly_practice_widget.dart` (학생 측 read-only)
+
+**시각 시그널 (이중 인지)**:
+- **OFF (선생님 토글)**: `Icons.thumb_up_alt_outlined` (14px, `AppColors.inkTertiary`) + 라벨 "좋아요" + transparent bg + `AppColors.inkQuaternary` 1px border. pill 모양.
+- **ON (선생님 + 학생 read-only)**: `Icons.thumb_up_alt` filled (14px, `AppColors.paper`) + 라벨 "좋음" + `AppColors.paperAccent` solid bg + 동색 border. **잉크 도장 찍힘** 메타포.
+
+**동작**:
+- **선생님만** 좋아요 버튼 표시 (학생은 ON 결과만 확인, OFF는 비표시)
+- 완료 여부와 **무관하게** 항상 표시 (선생님 측)
 - 탭: ON → OFF, OFF → ON (토글)
-- ON 상태: `Icons.thumb_up` (filled, `AppColors.primary`)
-- OFF 상태: `Icons.thumb_up_outlined` (outline, `AppColors.textTertiaryLight`)
-- 학생 뷰: 좋아요가 ON이면 👍 primary 아이콘 표시 (탭 불가)
+- 학생 뷰: 좋아요가 ON이면 동일 stamp pill 표시 (탭 불가, `onTap == null`)
+
+**거절된 대안**:
+- 👍 emoji 16↔20px 크기 차이 — OS color emoji가 OFF에서도 컬러풀하게 렌더되어 "이미 좋아요됨" 오인. 차이 강도 부족.
+- icon-only 토글 (텍스트 없음) — 학생 측 read-only 의미 모호.
+
+**접근성**:
+- `Semantics(button: true, toggled: isLiked, label: '좋아요'/'좋음')` 부여로 스크린리더 지원.
+- 색맹·약시 대응: 모양(outline/filled) + 색(회색/잉크) + 텍스트("좋아요"/"좋음") 3중 시그널.
 
 ---
 
@@ -108,8 +123,11 @@
 
 | 파일 | 변경 내용 |
 |------|----------|
-| `practice_items_section.dart` | UI 전면 단순화 |
+| `practice_items_section.dart` | UI 전면 단순화, §7.133 LikeStamp 적용 |
 | `practice_item.dart` | `toggleLike()` 이미 토글 구현 (변경 없음) |
+| `core/widgets/notebook/like_stamp.dart` (§7.133 신규) | outline ↔ filled stamp pill 위젯, 선생님 토글 + 학생 read-only 양방향 지원 |
+| `weekly_practice_widget.dart` (학생 홈) | hasLike ON 표시를 LikeStamp 로 통일 |
+| `app_strings.dart` | `practiceLikeOff = '좋아요'`, `practiceLikeOn = '좋음'` 추가 |
 
 ### 4.2 practice_items_section.dart 변경 상세
 

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/like_stamp.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
 import '../../../lessons/presentation/widgets/resource_attachment_section.dart';
@@ -319,7 +320,7 @@ class _PracticeItemTile extends ConsumerWidget {
                       ),
                       if (item.hasLike) ...[
                         const SizedBox(width: AppSpacing.space2),
-                        const Text('👍', style: TextStyle(fontSize: 14)),
+                        const LikeStamp(isLiked: true),
                       ],
                     ],
                   ),
