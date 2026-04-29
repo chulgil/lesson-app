@@ -108,10 +108,10 @@ class AppStrings {
   /// 다시 시도 버튼 (에러 재시도)
   static const retry = '다시 시도';
 
-  /// 좋아요 OFF 라벨 (선생님 토글 버튼, 미평가 상태)
-  static const practiceLikeOff = '좋아요';
+  /// 좋아요 OFF 라벨 (선생님 토글, verb — 행동 초대)
+  static const practiceLikeOff = '좋아요 표시';
 
-  /// 좋아요 ON 라벨 (도장 찍힘, 선생님 평가 완료 상태)
+  /// 좋아요 ON 라벨 (도장 찍힘, noun — 기록된 결과)
   static const practiceLikeOn = '좋음';
 
   /// 취소 버튼
@@ -2120,4 +2120,46 @@ class AppStrings {
 
   /// 학생 메모 입력 hint
   static const studentMemoHint = '오늘 배운 것, 어려웠던 점 등을 메모하세요...';
+
+  // ── Edit Lesson (레슨 수정 화면 30차) ─────────────────────────
+  /// 레슨 수정 (AppBar title)
+  static const editLessonTitle = '레슨 수정';
+
+  /// 일시 (date/time section title)
+  static const dateTimeLabel = '일시';
+
+  /// 레슨 내용 (lesson content section title)
+  static const lessonContentLabel = '레슨 내용';
+
+  /// 변경사항 저장 (save changes button)
+  static const saveChangesButton = '변경사항 저장';
+
+  /// $name 학생의 레슨이 취소되었습니다 (cancel snackbar)
+  static String lessonCancelledForStudent(String name) =>
+      '$name 학생의 레슨이 취소되었습니다';
+
+  /// 레슨 취소에 실패했습니다. 다시 시도해주세요. (cancel failure)
+  static const cancelLessonFailedRetry = '레슨 취소에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레슨이 삭제되었습니다 (delete success)
+  static const lessonDeletedMessage = '레슨이 삭제되었습니다';
+
+  /// 레슨 삭제에 실패했습니다. 다시 시도해주세요. (delete failure)
+  static const deleteLessonFailedRetry = '레슨 삭제에 실패했습니다. 다시 시도해주세요.';
+
+  /// 시간 충돌 (conflict dialog title)
+  static const timeConflictTitle = '시간 충돌';
+
+  /// 해당 시간에 이미 '\$name' 레슨이 있습니다. 계속하시겠습니까? (conflict dialog content)
+  static String timeConflictMessage(String name) =>
+      "해당 시간에 이미 '$name' 레슨이 있습니다. 계속하시겠습니까?";
+
+  /// 계속 (continue action)
+  static const continueAction = '계속';
+
+  /// 레슨 정보가 수정되었습니다 (edit success)
+  static const editLessonSuccess = '레슨 정보가 수정되었습니다';
+
+  /// 레슨 수정에 실패했습니다. 다시 시도해주세요. (edit failure)
+  static const editLessonFailedRetry = '레슨 수정에 실패했습니다. 다시 시도해주세요.';
 }
