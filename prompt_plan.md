@@ -75,16 +75,21 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - `flutter test test/features/schedule/` 237/237 PASS
 - 스펙 동기화: `travel_time_spec.md` §7.4/7.5 갱신
 
-## P1-2 Phase 분해
+## P1-2 — 완료 (2026-04-29 검증)
 
-### Phase A — AppBar 통일
-- `LessonRequestsScreen` / `RequestDetailScreen` / `SuggestAlternativeScreen` AppBar 패턴 매핑 → Masthead 정착
+### Phase A — AppBar 통일 ✅ 완료 (commit 99c26539, W2 번들)
+- `AllLessonRequestsScreen` (line 60-65) + `SuggestAlternativeScreen` (line 147-152) → `NotebookTypography.appBarTitle` 적용
+- `RequestDetailScreen._buildChatAppBar` (line 334) — 기존부터 적용 (§7.27 기준)
+- 검증: `flutter analyze` 0 / `flutter test test/features/schedule/` 237/237 PASS
 
-### Phase B — Phase 2 3경로 카드
-- `current_request_box.dart::_buildTeacherPhase2 / _buildStudentPhase2` 의 3 경로 카드 시각 일관성
+### Phase B — Phase 2 3경로 카드 ✅ 완료 (이미 정렬)
+- 3 경로 (선불/후불/무료) 는 `current_request_box.dart` 가 아닌 `proposal_bottom_sheet.dart::_buildPaymentMethodSelector` (line 224-272) 에 위치
+- chip 시각 일관성 OK: 선택 시 `paperAccent` bg + `paper` text + w600, 미선택 시 transparent + `inkSecondary`
+- `current_request_box.dart::_buildPhase2PaymentChoice` 는 단일 진입 버튼 → BottomSheet 호출
 
-### Phase C — 가이드 색상 2색 분기
-- `_getPhaseGuide()` 의 ChapterGuideVariant action/wait 두 값만 사용 확인 (5색 회피)
+### Phase C — 가이드 색상 2색 분기 ✅ 완료 (검증)
+- `request_history_chat.dart::_getPhaseGuide()` 12 상태 전수 확인 → `ChapterGuideVariant.action / .wait` 2색만 사용
+- `ChapterGuideVariant.neutral` 은 `_PhaseGuide` default 정의용, 어느 케이스도 사용 안 함 (5색 회피 정합)
 
 ## P2 진행 상황
 
@@ -116,12 +121,11 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 
 | 작업 | 상태 |
 |---|---|
-| P0-1 / P0-2 / P1-1 Phase A·B·C | ✅ 완료 (2026-04-28) |
-| **다음** P1-2 Phase A — AppBar 통일 (LessonRequestsScreen / RequestDetailScreen / SuggestAlternativeScreen Masthead) | 진입 |
-| P1-2 Phase B — Phase 2 3경로 카드 일관성 | 후속 |
-| P1-2 Phase C — 가이드 색상 2색 분기 검증 | 후속 |
+| P0-1 / P0-2 / P1-1 / P1-2 Phase A·B·C | ✅ 완료 (2026-04-29) |
+| **다음** P2 5-1h booking_reschedule_screen i18n (~22 사이트) | 진입 |
+| P2 5-1i schedule_tab.dart + 작은 파일들 | 후속 |
+| P2 5-2 lessons 도메인 / 5-3 subscription 도메인 | 후속 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
-| P2 5-1h booking_reschedule_screen i18n | P1-2 완료 후 |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
 
