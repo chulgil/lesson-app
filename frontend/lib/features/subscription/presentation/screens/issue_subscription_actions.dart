@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
@@ -48,22 +49,22 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   void issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (selectedMembershipId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('레슨을 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.chooseLessonValidation)),
+      );
       return;
     }
     if (startDate == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('시작일을 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.chooseStartDateValidation)),
+      );
       return;
     }
 
     if (bonusLessons > 0 && effectiveBonusReason == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('보너스 사유를 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.chooseBonusReasonValidation)),
+      );
       return;
     }
 
@@ -105,7 +106,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       originalAmount: discountPercent > 0 ? originalAmount : null,
       discountAmount:
           discountPercent > 0 ? (originalAmount - finalAmount) : null,
-      discountReason: discountPercent > 0 ? '$discountPercent% 할인' : null,
+      discountReason:
+          discountPercent > 0
+              ? AppStrings.discountPercentReason(discountPercent)
+              : null,
       totalRescheduleAllowance: rescheduleAllowance,
       rescheduleDeadlineHours: rescheduleDeadlineHours,
     );
@@ -128,9 +132,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         subscription.membershipId,
       );
       if (teacherId != null) {
-        final relationRepo = ref.read(
-          teacherStudentRelationRepositoryProvider,
-        );
+        final relationRepo = ref.read(teacherStudentRelationRepositoryProvider);
         await relationRepo.onSubscriptionIssued(
           teacherId: teacherId,
           studentId: primaryStudentId,
@@ -146,17 +148,19 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         final repo = ref.read(unifiedLessonRequestRepositoryProvider);
         final request = await repo.getById(lessonRequestId!);
         if (request != null) {
-          await repo.update(request.copyWith(
-            proposalId: subscription.id,
-            status: UnifiedRequestStatus.proposalSent,
-          ));
+          await repo.update(
+            request.copyWith(
+              proposalId: subscription.id,
+              status: UnifiedRequestStatus.proposalSent,
+            ),
+          );
         }
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('수강권이 발급되었습니다'),
+            content: Text(AppStrings.subscriptionIssueSuccess),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -170,7 +174,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             AppRoutes.registerRegularLesson,
             extra: {
               'teacherId': teacherId,
-              'teacherName': '선생님',
+              'teacherName': AppStrings.teacher,
               'studentId': primaryStudentId,
               'studentName': studentName,
             },
@@ -182,8 +186,8 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('발급 실패. 다시 시도해주세요.'),
+          const SnackBar(
+            content: Text(AppStrings.subscriptionIssueFailRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -192,9 +196,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   }
 
   Future<String?> _getTeacherIdFromMembership(String membershipId) async {
-    final memberships = ref.read(
-      studentMembershipsProvider(primaryStudentId),
-    );
+    final memberships = ref.read(studentMembershipsProvider(primaryStudentId));
     final membership = memberships.valueOrNull?.firstWhere(
       (m) => m.id == membershipId,
       orElse: () => throw Exception('Membership not found'),
@@ -208,9 +210,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   }
 
   Future<String> _getStudentName() async {
-    final student = await ref.read(
-      studentProvider(primaryStudentId).future,
-    );
+    final student = await ref.read(studentProvider(primaryStudentId).future);
     return student?.name ?? '';
   }
 
@@ -245,9 +245,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   Future<void> _createScheduleConfirmationCard(
     Subscription subscription,
   ) async {
-    final memberships = ref.read(
-      studentMembershipsProvider(primaryStudentId),
-    );
+    final memberships = ref.read(studentMembershipsProvider(primaryStudentId));
     final membership = memberships.valueOrNull?.firstWhere(
       (m) => m.id == subscription.membershipId,
       orElse: () => throw Exception('Membership not found'),
@@ -261,9 +259,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     final cardType = await _detectScheduleCardType(subscription, membership);
 
-    final suggestedDay = membership.primarySlot != null
-        ? membership.primarySlot!.dayOfWeek + 1
-        : null;
+    final suggestedDay =
+        membership.primarySlot != null
+            ? membership.primarySlot!.dayOfWeek + 1
+            : null;
     final suggestedTime = membership.primarySlot?.startTime;
     final lessonDuration = membership.lessonDuration;
 
@@ -280,7 +279,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           .createCard(
             studentId: primaryStudentId,
             teacherId: lessonClassAsync?.teacherId ?? '',
-            teacherName: lessonClassAsync?.name ?? '선생님',
+            teacherName: lessonClassAsync?.name ?? AppStrings.teacher,
             instrument: membership.instrument,
             subscriptionId: subscription.id,
             cardType: cardType,
@@ -289,9 +288,11 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             suggestedTime: suggestedTime,
             lessonDuration: lessonDuration,
             suggestedDay2: alternatives.isNotEmpty ? alternatives[0].day : null,
-            suggestedTime2: alternatives.isNotEmpty ? alternatives[0].time : null,
+            suggestedTime2:
+                alternatives.isNotEmpty ? alternatives[0].time : null,
             suggestedDay3: alternatives.length > 1 ? alternatives[1].day : null,
-            suggestedTime3: alternatives.length > 1 ? alternatives[1].time : null,
+            suggestedTime3:
+                alternatives.length > 1 ? alternatives[1].time : null,
           );
     } catch (e) {
       debugPrint('Failed to create schedule confirmation card: $e');
@@ -383,16 +384,16 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   void issueBatchSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (startDate == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('시작일을 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.chooseStartDateValidation)),
+      );
       return;
     }
 
     if (bonusLessons > 0 && effectiveBonusReason == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('보너스 사유를 선택해주세요')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.chooseBonusReasonValidation)),
+      );
       return;
     }
 
@@ -443,7 +444,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             discountAmount:
                 discountPercent > 0 ? (originalAmount - finalAmount) : null,
             discountReason:
-                discountPercent > 0 ? '$discountPercent% 할인' : null,
+                discountPercent > 0
+                    ? AppStrings.discountPercentReason(discountPercent)
+                    : null,
             totalRescheduleAllowance: rescheduleAllowance,
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
@@ -453,10 +456,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             final repo = ref.read(unifiedLessonRequestRepositoryProvider);
             final req = await repo.getById(lessonRequestIds[i]);
             if (req != null) {
-              await repo.update(req.copyWith(
-                proposalId: subscription.id,
-                status: UnifiedRequestStatus.proposalSent,
-              ));
+              await repo.update(
+                req.copyWith(
+                  proposalId: subscription.id,
+                  status: UnifiedRequestStatus.proposalSent,
+                ),
+              );
             }
           }
 
@@ -471,14 +476,21 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         if (failCount == 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$successCount명에게 수강권이 발급되었습니다'),
+              content: Text(
+                AppStrings.batchSubscriptionIssueSuccess(successCount),
+              ),
               backgroundColor: AppColors.paperAccent,
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$successCount명 발급 완료, $failCount명 실패'),
+              content: Text(
+                AppStrings.batchSubscriptionIssuePartial(
+                  successCount,
+                  failCount,
+                ),
+              ),
               backgroundColor:
                   failCount == allStudentIds.length
                       ? AppColors.paperAccent
@@ -491,8 +503,8 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('발급 실패. 다시 시도해주세요.'),
+          const SnackBar(
+            content: Text(AppStrings.subscriptionIssueFailRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
