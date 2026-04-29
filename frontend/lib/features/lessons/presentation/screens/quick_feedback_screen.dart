@@ -70,8 +70,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       data: (lesson) {
         if (lesson == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('피드백')),
-            body: const Center(child: Text('레슨을 찾을 수 없습니다')),
+            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
+            body: const Center(child: Text(AppStrings.lessonNotFound)),
           );
         }
 
@@ -79,7 +79,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('${lesson.studentName} 피드백'),
+            title: Text(AppStrings.studentFeedbackTitle(lesson.studentName)),
             actions: [
               if (_isSaving)
                 const Padding(
@@ -108,7 +108,10 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 const SizedBox(height: AppSpacing.space6),
 
                 // Feedback text field
-                _buildSectionHeader(icon: Icons.edit_note, title: '레슨 피드백'),
+                _buildSectionHeader(
+                  icon: Icons.edit_note,
+                  title: AppStrings.lessonFeedbackSection,
+                ),
                 const SizedBox(height: AppSpacing.space3),
                 _buildFeedbackField(),
 
@@ -117,7 +120,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 // Key Points (collapsible)
                 _buildExpandableSection(
                   icon: Icons.lightbulb_outline,
-                  title: '주요 포인트',
+                  title: AppStrings.keyPointsSection,
                   count: _keyPoints.length,
                   isExpanded: _showKeyPoints,
                   onToggle:
@@ -130,7 +133,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 // Practice Tips (collapsible)
                 _buildExpandableSection(
                   icon: Icons.tips_and_updates_outlined,
-                  title: '연습 팁',
+                  title: AppStrings.practiceTipsSection,
                   count: _tipController.text.isNotEmpty ? 1 : 0,
                   isExpanded: _showTips,
                   onToggle: () => setState(() => _showTips = !_showTips),
@@ -162,7 +165,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                                   color: AppColors.paper,
                                 ),
                               )
-                              : const Text('저장하기'),
+                              : const Text(AppStrings.saveAction),
                     ),
                   ),
                 ),
@@ -173,15 +176,15 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       },
       loading:
           () => Scaffold(
-            appBar: AppBar(title: const Text('피드백')),
+            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => Scaffold(
-            appBar: AppBar(title: const Text('피드백')),
+            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
             body: Center(
               child: Text(
-                '데이터를 불러오는데 실패했습니다',
+                AppStrings.loadDataFailed,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -204,13 +207,19 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${formatDateYMD(lesson.date)} ${lesson.startTime} 레슨',
+                  AppStrings.lessonAtDateTime(
+                    formatDateYMD(lesson.date),
+                    lesson.startTime,
+                  ),
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '${lesson.instrument} · ${lesson.duration}분',
+                  AppStrings.instrumentDurationSubtitle(
+                    lesson.instrument,
+                    lesson.duration,
+                  ),
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -288,7 +297,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             return ActionChip(
               avatar: Icon(Icons.add, size: 16, color: AppColors.inkSecondary),
               label: Text(
-                '추가',
+                AppStrings.add,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -314,9 +323,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 ),
               ),
               backgroundColor: AppColors.paperAccentSoft,
-              side: BorderSide(
-                color: AppColors.paperAccentSoft,
-              ),
+              side: BorderSide(color: AppColors.paperAccentSoft),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space1,
               ),
@@ -335,11 +342,13 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       context: context,
       builder:
           (ctx) => AlertDialog(
-            title: const Text('프리셋 추가'),
+            title: const Text(AppStrings.presetAddTitle),
             content: TextField(
               controller: controller,
               autofocus: true,
-              decoration: const InputDecoration(hintText: '피드백 문구 입력'),
+              decoration: const InputDecoration(
+                hintText: AppStrings.presetTextHint,
+              ),
               onSubmitted: (_) {
                 final text = controller.text.trim();
                 if (text.isNotEmpty) {
@@ -382,9 +391,15 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.delete_outline),
-                  title: Text(preset.isDefault ? '숨기기' : '삭제'),
+                  title: Text(
+                    preset.isDefault
+                        ? AppStrings.presetHide
+                        : AppStrings.delete,
+                  ),
                   subtitle: Text(
-                    preset.isDefault ? '기본 프리셋은 숨김 처리됩니다' : '이 프리셋을 삭제합니다',
+                    preset.isDefault
+                        ? AppStrings.presetHideDescription
+                        : AppStrings.presetDeleteDescription,
                   ),
                   onTap: () {
                     Navigator.pop(ctx);
@@ -417,7 +432,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             // §7.130: 선생님 자필 피드백 → Tier 1 Gaegu hand.
             style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
-              hintText: '레슨 피드백을 작성하세요...',
+              hintText: AppStrings.feedbackEditorHint,
               hintStyle: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -462,9 +477,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                       horizontal: 8,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccentSoft,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       '$count',
                       style: AppTypography.caption.copyWith(
@@ -565,7 +578,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         // §7.130: 선생님 자필 연습팁 → Tier 1 Gaegu hand.
         style: NotebookTypography.hand.copyWith(color: AppColors.ink),
         decoration: InputDecoration(
-          hintText: '연습할 때 주의할 점을 적어주세요...',
+          hintText: AppStrings.practiceTipsHint,
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkTertiary,
           ),
@@ -596,7 +609,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         setState(() => _isSaving = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('✅ 피드백이 저장되었습니다'),
+            content: const Text(AppStrings.feedbackSavedSnack),
             backgroundColor: AppColors.paperOk,
             behavior: SnackBarBehavior.floating,
           ),
@@ -608,7 +621,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         setState(() => _isSaving = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('피드백 저장 실패'),
+            content: const Text(AppStrings.feedbackSaveFailed),
             backgroundColor: AppColors.paperAccent,
             behavior: SnackBarBehavior.floating,
           ),
@@ -655,7 +668,7 @@ class _KeyPointInputState extends State<_KeyPointInput> {
             // §7.130: 선생님 keypoint 입력 → Tier 1 Gaegu hand.
             style: NotebookTypography.hand.copyWith(color: AppColors.ink),
             decoration: InputDecoration(
-              hintText: '포인트 추가...',
+              hintText: AppStrings.keyPointAddHint,
               hintStyle: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkTertiary,
               ),
