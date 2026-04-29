@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -41,7 +42,7 @@ class _LessonNoteHistoryScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('레슨 노트'),
+        title: Text(AppStrings.lessonNotesTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -56,7 +57,7 @@ class _LessonNoteHistoryScreenState
               controller: _searchController,
               onChanged: (value) => setState(() => _query = value),
               decoration: InputDecoration(
-                hintText: '노트 검색...',
+                hintText: AppStrings.noteSearchHint,
                 hintStyle: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkTertiary,
                 ),
@@ -139,7 +140,9 @@ class _LessonNoteHistoryScreenState
                 return _buildNotesList(filtered);
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+              error:
+                  (_, __) =>
+                      const Center(child: Text(AppStrings.errorOccurred)),
             ),
           ),
         ],
@@ -166,7 +169,10 @@ class _LessonNoteHistoryScreenState
   Widget _buildEmptyState() {
     return EmptyStateWidget(
       icon: Icons.notes,
-      title: _query.isNotEmpty ? '검색 결과가 없습니다' : '레슨 노트가 없습니다',
+      title:
+          _query.isNotEmpty
+              ? AppStrings.searchNoResults
+              : AppStrings.noLessonNotes,
     );
   }
 
@@ -174,7 +180,7 @@ class _LessonNoteHistoryScreenState
     // Group by month
     final grouped = <String, List<Lesson>>{};
     for (final note in notes) {
-      final key = '${note.date.year}년 ${note.date.month}월';
+      final key = AppStrings.yearMonthLabel(note.date.year, note.date.month);
       grouped.putIfAbsent(key, () => []).add(note);
     }
 
