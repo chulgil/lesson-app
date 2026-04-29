@@ -84,11 +84,15 @@
 - [x] **5c (#239)** NoShowPolicy 4값 단일 SSOT (commit b1daec9a)
   - alembic 0010_unify_no_show_policy, IndividualNoShowPolicy → alias, 203/203 GREEN
 
-### Phase 6 — Plan C subscription expiry (#240) 🔄 진입 대기
+### Phase 6 — Plan C subscription expiry (#240) ✅ 완료 (2026-04-29)
 
-- [ ] **6a** APScheduler in-process + PG advisory lock + cron_dedup 테이블
-- [ ] **6b** subscription_expiry_service 만료 전이 로직 (active→expiring→expired)
-- [ ] **6c (P1, #246)** 만료 알림 발송 (FCM/email)
+- [x] **6a** APScheduler in-process + PG advisory lock + cron_dedup 테이블
+  - 커밋 `07cc7926`. 215/215 GREEN. alembic 0011 add_sub_expiry_dispatch_log.
+- [x] **6b** subscription_expiry_service 만료 전이 로직 (active→expiring→expired)
+  - 커밋 `6162a124`. 225/225 GREEN. KST 자정 단일 진원지 + idempotent.
+- [x] **6c (P1, #246)** 만료 알림 발송 (FCM + dedup) — email 은 별도 plan
+  - 커밋 `1e645264`. 236/236 GREEN. 학생+학부모 dispatch (선생님은 dashboard 뱃지)
+  - cron 등록: `register_daily_kst_job(run_subscription_expiry_job, 00:05 KST)`
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -225,6 +229,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-2c-3 edit_lesson_screen 완료 (2026-04-29) — 13 신규 키 + 5 재사용 (save, student, actionLessonCancel, deleteLessonTitle, lessonDurationLabel), 19 사이트, lessons 46/46 + schedule 237/237 PASS
 - 5-2c-4 quick_feedback_screen 완료 (2026-04-29) — 18 신규 키 + 4 재사용 (add, delete, loadDataFailed, feedbackEditorHint), 22 사이트, lessons 46/46 + schedule 237/237 PASS
 - 5-2c-5 add_practice_item_sheet 잔여 + 5-2c 종료 확인 (2026-04-29) — repertoireSectionCount 1 신규 키, 1 사이트. lesson_detail_screen + add_lesson_screen 은 30차 단계에서 이미 한글 0건 (마이그레이션 완료 상태). 5-2c 전체 완료.
+- 5-2c-6 레슨 위젯 잔여 11파일 (2026-04-29) — 5-2c 클로즈 후 누락 발견. 자료 첨부(YouTube/녹음/외부링크), 연습 과제, 레슨 폼/편집/취소 다이얼로그, 팁 템플릿 바텀시트 전수. 신규 키 ~50개 + 재사용 다수, lessons 46/46 PASS.
 - 5-3 subscription 도메인
 
 ## 평가 기준 (Rubric, 합격선 7.5)
@@ -260,6 +265,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-2c-3 edit_lesson_screen i18n (19 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-2c-4 quick_feedback_screen i18n (22 사이트) | ✅ 완료 (2026-04-29) |
 | P2 5-2c-5 add_practice_item_sheet 잔여 + 5-2c 종료 (1 사이트) | ✅ 완료 (2026-04-29) |
+| P2 5-2c-6 레슨 위젯 잔여 11파일 (~80 사이트) | ✅ 완료 (2026-04-29) |
 | **다음** P2 5-3 subscription 도메인 i18n | 대기 |
 | P2 5-3 subscription 도메인 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
