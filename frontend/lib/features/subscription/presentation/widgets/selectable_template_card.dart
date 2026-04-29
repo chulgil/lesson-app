@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -82,7 +83,7 @@ class SelectableTemplateCard extends StatelessWidget {
                         color: AppColors.paperAccentSoft,
                       ),
                       child: Text(
-                        '⭐ 추천',
+                        AppStrings.templateRecommendedBadgeStar,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,
@@ -127,7 +128,11 @@ class SelectableTemplateCard extends StatelessWidget {
 
               // Summary: lessons, duration, validity
               Text(
-                '${template.totalLessons}회 · ${template.lessonDurationMinutes}분 · ${template.formattedValidity}',
+                AppStrings.templateSummaryLine(
+                  totalLessons: template.totalLessons,
+                  durationMinutes: template.lessonDurationMinutes,
+                  validityLabel: template.formattedValidity,
+                ),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -146,7 +151,9 @@ class SelectableTemplateCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '(1회 ${template.formattedPricePerLesson})',
+                    AppStrings.templatePerLessonPrice(
+                      template.formattedPricePerLesson,
+                    ),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkTertiary,
                     ),

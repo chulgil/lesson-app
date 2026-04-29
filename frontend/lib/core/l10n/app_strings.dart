@@ -956,6 +956,9 @@ class AppStrings {
   /// N회차 미정
   static String sessionPending(int n) => '$n회차 미정';
 
+  /// N회차 예약 필요 (booking required + bookingRequired key)
+  static String sessionBookingRequired(int n) => '$n회차 $bookingRequired';
+
   /// Collapsed session headers for chat layout
   static String sessionCollapsedCompleted(int n, String dateTime) =>
       '$n회차 · $dateTime 완료';
@@ -2821,6 +2824,19 @@ class AppStrings {
 
   /// 선택하기 (수락 버튼)
   static const templateChooseButton = '선택하기';
+
+  /// ⭐ 추천 (selectable template card 배지 — 별 포함)
+  static const templateRecommendedBadgeStar = '⭐ 추천';
+
+  /// N회 · M분 · 유효기간 (selectable template card 요약 라인)
+  static String templateSummaryLine({
+    required int totalLessons,
+    required int durationMinutes,
+    required String validityLabel,
+  }) => '$totalLessons회 · $durationMinutes분 · $validityLabel';
+
+  /// (1회 가격) (selectable template card 회당 가격 부가 라벨)
+  static String templatePerLessonPrice(String price) => '(1회 $price)';
 
   // -- Subscription Policy Sheet (적용 정책 바텀시트) --
 

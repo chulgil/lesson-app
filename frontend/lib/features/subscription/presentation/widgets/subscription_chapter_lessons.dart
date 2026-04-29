@@ -600,7 +600,7 @@ class _SubscriptionChapterLessonsState
       case _SessionStatus.upcoming:
         return AppStrings.sessionPending(session.sessionNumber);
       case _SessionStatus.bookingRequired:
-        return '${session.sessionNumber}회차 ${AppStrings.bookingRequired}';
+        return AppStrings.sessionBookingRequired(session.sessionNumber);
       case _SessionStatus.pending:
         return AppStrings.sessionPending(session.sessionNumber);
     }
