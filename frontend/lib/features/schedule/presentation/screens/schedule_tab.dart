@@ -321,7 +321,7 @@ class ScheduleTab extends ConsumerWidget {
           ],
           const Spacer(),
           Text(
-            '$lessonCount개 레슨',
+            AppStrings.lessonCountWithUnit(lessonCount),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -406,7 +406,7 @@ class ScheduleTab extends ConsumerWidget {
   Widget _buildEmptyState() {
     return const EmptyStateWidget(
       icon: Icons.event_available,
-      title: '예정된 레슨이 없습니다',
+      title: AppStrings.noUpcomingLessons,
       scrollable: true,
     );
   }
@@ -426,8 +426,8 @@ class ScheduleTab extends ConsumerWidget {
   Widget _buildErrorState(WidgetRef ref, Object error) {
     return EmptyStateWidget(
       icon: Icons.error_outline,
-      title: '레슨 정보를 불러오는데 실패했습니다',
-      actionLabel: '다시 시도',
+      title: AppStrings.lessonLoadFailed,
+      actionLabel: AppStrings.retry,
       actionIcon: Icons.refresh,
       onAction: () => ref.invalidate(lessonsProvider),
     );
