@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -30,21 +31,21 @@ class PackageOptionsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ChipInputField(
-          title: '회차',
+          title: AppStrings.issueFormLessonsTitle,
           options: const [4, 8, 12],
           currentValue: totalLessons,
           onChanged: onLessonsChanged,
           controller: lessonsController,
-          suffix: '회',
+          suffix: AppStrings.issueFormLessonsSuffix,
         ),
         const SizedBox(height: AppSpacing.space4),
         ChipInputField(
-          title: '유효기간',
+          title: AppStrings.issueFormValidityTitle,
           options: const [60, 90, 180],
           currentValue: validityDays,
           onChanged: onValidityChanged,
           controller: validityController,
-          suffix: '일',
+          suffix: AppStrings.issueFormValiditySuffix,
         ),
       ],
     );
@@ -68,7 +69,10 @@ class MonthlyOptionsSection extends StatelessWidget {
       children: [
         // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('기간 선택', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.issueFormMonthlySectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Wrap(
           spacing: AppSpacing.space2,
@@ -77,7 +81,7 @@ class MonthlyOptionsSection extends StatelessWidget {
               [1, 3, 6, 12].map((months) {
                 final isSelected = monthsCount == months;
                 return ChoiceChip(
-                  label: Text('$months개월'),
+                  label: Text(AppStrings.issueFormMonthsLabel(months)),
                   selected: isSelected,
                   onSelected: (_) => onChanged(months),
                   selectedColor: AppColors.paperAccentSoft,
@@ -119,7 +123,7 @@ class TrialOptionsSection extends StatelessWidget {
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
-              '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.',
+              AppStrings.issueFormTrialNotice,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.paperAccent,
               ),
