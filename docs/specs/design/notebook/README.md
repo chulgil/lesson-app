@@ -651,7 +651,7 @@ const Icon(Icons.thumb_up_alt, size: 14)
 | Phase | 범위 | 상태 |
 |-------|------|------|
 | **Phase 1** (2026-04-29) | §9 정책 + NotebookGlyph 위젯 + smoke test + 훅 + 규칙 | **완료** |
-| Phase 2 (예정) | Pilot — `like_stamp.dart` 2건 NotebookGlyph 치환 + 시각 회귀 검증 | 대기 |
+| **Phase 2** (2026-04-29) | Pilot — `like_stamp.dart` 2건 NotebookGlyph 치환 (♥/♡) + 21/21 PASS | **완료** |
 | Phase 3+ (도메인별) | 시그니처 영역(매스트헤드/빈 상태/스탬프) 점진 마이그레이션 | 대기 |
 | 최종 | 시그니처 영역 `Icons.*` 잔재 0건 | 대기 |
 

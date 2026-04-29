@@ -4,6 +4,7 @@ import '../../l10n/app_strings.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import 'notebook_glyph.dart';
 
 /// Notebook × Score 좋아요 도장(stamp).
 ///
@@ -52,7 +53,11 @@ class LikeStamp extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.thumb_up_alt, size: 14, color: AppColors.paper),
+          const NotebookGlyph(
+            NotebookGlyph.heartFilled,
+            size: 14,
+            color: AppColors.paper,
+          ),
           const SizedBox(width: 4),
           Text(
             AppStrings.practiceLikeOn,
@@ -77,8 +82,8 @@ class LikeStamp extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.thumb_up_alt_outlined,
+          const NotebookGlyph(
+            NotebookGlyph.heartOutline,
             size: 14,
             color: AppColors.inkTertiary,
           ),

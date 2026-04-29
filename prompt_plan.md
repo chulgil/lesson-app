@@ -46,13 +46,34 @@
 | 훅 동작 (notebook_glyph.dart self-exclusion) | ✅ 0건 |
 | 훅 동작 (일반 영역 negative case) | ✅ 0건 (profile_visibility_widgets) |
 
-## Phase 2 (예정 — 사용자 확인 후)
+## Phase 2 — Pilot (완료)
 
-**Pilot**: `like_stamp.dart` 의 `Icons.thumb_up_alt` (line 55) + `Icons.thumb_up_alt_outlined` (line 81) 을 `NotebookGlyph.heartFilled` / `heartOutline` 으로 치환. 시각 회귀 + LikeStamp 기존 13/13 테스트 통과 확인.
+**대상**: `like_stamp.dart` (시그니처 영역, 좋아요 도장)
+
+| # | 변경 | 결과 |
+|---|------|------|
+| 1 | `Icons.thumb_up_alt` (line 55) → `NotebookGlyph.heartFilled` (♥) | ✅ |
+| 2 | `Icons.thumb_up_alt_outlined` (line 81) → `NotebookGlyph.heartOutline` (♡) | ✅ |
+| 3 | `import 'notebook_glyph.dart';` 추가 | ✅ |
+| 4 | `like_stamp_test.dart` 4 라인 갱신 (`find.byIcon` → `find.text('♥/♡')`) | ✅ |
+
+### 검증 결과 (Phase 2)
+
+| 항목 | 결과 |
+|------|------|
+| flutter test (like_stamp + notebook_glyph) | ✅ 21/21 PASS (LikeStamp 13 + Glyph 8) |
+| flutter analyze | ✅ 0 issues |
+| 훅 동작 (post-migration) | ✅ 0건 경고 (마이그레이션 완료 확인) |
 
 ## Phase 3+ (추후 분할 — 도메인별)
 
 시그니처 영역 점진 마이그레이션. 도메인별 PR 분리. 각 PR 5-15 파일 단위.
+
+### Phase 3 후보 (시그니처 영역 잔존 Icons.* 스캔 결과)
+
+> Phase 2 종료 시점 스캔 — `notebook_glyph.dart` 자체 제외, navigation/utility 후보 식별.
+
+확정 후보 도메인: practice 스탬프 / lesson 마스트헤드 / empty-state 위젯 / parent 손글씨 영역 (구체 파일은 Phase 3 진입 시 grep 으로 확정).
 
 ## 평가 결과 (Phase 1 자체 채점)
 

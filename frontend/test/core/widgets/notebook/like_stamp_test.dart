@@ -29,11 +29,12 @@ void main() {
   }
 
   group('LikeStamp OFF 상태 (verb)', () {
-    testWidgets('outlined icon + "좋아요 표시" 라벨을 렌더한다', (tester) async {
+    testWidgets('hollow heart 글리프(♡) + "좋아요 표시" 라벨을 렌더한다', (tester) async {
       await pumpStamp(tester, isLiked: false, onTap: () {});
 
-      expect(find.byIcon(Icons.thumb_up_alt_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.thumb_up_alt), findsNothing);
+      // §9 Phase 2: Material Icon → NotebookGlyph 마이그레이션
+      expect(find.text('♡'), findsOneWidget);
+      expect(find.text('♥'), findsNothing);
       expect(find.text(AppStrings.practiceLikeOff), findsOneWidget);
       expect(find.text('좋아요 표시'), findsOneWidget);
     });
@@ -69,11 +70,12 @@ void main() {
   });
 
   group('LikeStamp ON 상태 (noun)', () {
-    testWidgets('filled icon + "좋음" 라벨을 렌더한다', (tester) async {
+    testWidgets('filled heart 글리프(♥) + "좋음" 라벨을 렌더한다', (tester) async {
       await pumpStamp(tester, isLiked: true, onTap: () {});
 
-      expect(find.byIcon(Icons.thumb_up_alt), findsOneWidget);
-      expect(find.byIcon(Icons.thumb_up_alt_outlined), findsNothing);
+      // §9 Phase 2: Material Icon → NotebookGlyph 마이그레이션
+      expect(find.text('♥'), findsOneWidget);
+      expect(find.text('♡'), findsNothing);
       expect(find.text(AppStrings.practiceLikeOn), findsOneWidget);
       expect(find.text('좋음'), findsOneWidget);
     });
