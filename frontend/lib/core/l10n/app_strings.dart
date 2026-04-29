@@ -4111,4 +4111,40 @@ class AppStrings {
 
   /// 횟수를 입력하세요 (custom lesson count 입력 hint)
   static const unifiedSubscriptionLessonCountHint = '횟수를 입력하세요';
+
+  // ── Assignment Dashboard / Summary (5-3b-22) ──
+
+  /// 이번 주 과제 (AppBar / 섹션 헤더 공용)
+  static const weeklyAssignmentTitle = '이번 주 과제';
+
+  /// 이번 주 과제가 없습니다 (대시보드 빈 상태)
+  static const weeklyAssignmentEmpty = '이번 주 과제가 없습니다';
+
+  /// 미완료 학생 (섹션 헤더)
+  static const incompleteStudentsLabel = '미완료 학생';
+
+  /// 완료한 학생 (섹션 헤더)
+  static const completedStudentsLabel = '완료한 학생';
+
+  /// 이번 주 완료율 (원형 진행률 카드 라벨)
+  static const weeklyCompletionRate = '이번 주 완료율';
+
+  /// $count명 (학생 수 카운트 — 섹션 헤더 trailing)
+  static String peopleCount(int count) => '$count명';
+
+  /// $done / $total 과제 완료 (전체 진행률 보조 텍스트)
+  static String assignmentCompletionFormat(int done, int total) =>
+      '$done / $total 과제 완료';
+
+  /// 전체 과제 (stat 카드 라벨)
+  static const totalAssignmentsLabel = '전체 과제';
+
+  /// 완료 학생 (stat 카드 — 짧은 라벨)
+  static const completedStudentsShort = '완료 학생';
+
+  /// 미완료 (stat 카드 — 짧은 라벨)
+  static const incompleteShort = '미완료';
+
+  /// 완료율 (요약 섹션 라벨)
+  static const completionRateLabel = '완료율';
 }
