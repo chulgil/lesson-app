@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -21,17 +22,19 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final isTeacher = role == UserRole.teacher;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('알림 설정')),
+      appBar: AppBar(
+        title: const Text(AppStrings.notificationSettingsAppBarTitle),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
           // Master toggle
           _buildSection(
-            title: '전체 알림',
+            title: AppStrings.notificationSettingsMasterSection,
             children: [
               _SwitchTile(
-                title: '알림 받기',
-                subtitle: '모든 알림을 켜거나 끕니다',
+                title: AppStrings.notificationToggleAllTitle,
+                subtitle: AppStrings.notificationToggleAllSubtitle,
                 value: settings.allNotifications,
                 onChanged:
                     (value) => ref
@@ -45,11 +48,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
 
           // Lesson notifications
           _buildSection(
-            title: '레슨 알림',
+            title: AppStrings.notificationSettingsLessonSection,
             children: [
               _SwitchTile(
-                title: '레슨 시작 알림',
-                subtitle: '레슨 30분 전 알림',
+                title: AppStrings.notificationLessonStartTitle,
+                subtitle: AppStrings.notificationLessonStartSubtitle,
                 value: settings.lessonReminder,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -58,8 +61,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
                         .toggleLessonReminder(value),
               ),
               _SwitchTile(
-                title: '레슨 변경 알림',
-                subtitle: '레슨 시간/일정 변경 시',
+                title: AppStrings.notificationLessonChangeTitle,
+                subtitle: AppStrings.notificationLessonChangeSubtitle,
                 value: settings.lessonChange,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -74,11 +77,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
 
           // Subscription notifications
           _buildSection(
-            title: '수강권 알림',
+            title: AppStrings.notificationSettingsSubscriptionSection,
             children: [
               _SwitchTile(
-                title: '수강권 제안 알림',
-                subtitle: '선생님이 수강권을 제안할 때',
+                title: AppStrings.notificationSubscriptionProposalTitle,
+                subtitle: AppStrings.notificationSubscriptionProposalSubtitle,
                 value: settings.subscriptionProposal,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -87,8 +90,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
                         .toggleSubscriptionProposal(value),
               ),
               _SwitchTile(
-                title: '수강권 만료 알림',
-                subtitle: '수강권 만료 7일 전 알림',
+                title: AppStrings.notificationSubscriptionExpiryTitle,
+                subtitle: AppStrings.notificationSubscriptionExpirySubtitle,
                 value: settings.subscriptionExpiry,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -113,11 +116,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
 
           // Practice notifications
           _buildSection(
-            title: '연습 알림',
+            title: AppStrings.notificationSettingsPracticeSection,
             children: [
               _SwitchTile(
-                title: '연습 리마인더',
-                subtitle: '매일 설정한 시간에 알림',
+                title: AppStrings.notificationPracticeReminderTitle,
+                subtitle: AppStrings.notificationPracticeReminderSubtitle,
                 value: settings.practiceReminder,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -126,8 +129,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
                         .togglePracticeReminder(value),
               ),
               _SwitchTile(
-                title: '선생님 피드백',
-                subtitle: '선생님이 피드백을 남길 때',
+                title: AppStrings.teacherFeedbackHeader,
+                subtitle: AppStrings.notificationTeacherFeedbackSubtitle,
                 value: settings.teacherFeedback,
                 enabled: settings.allNotifications,
                 onChanged:
@@ -154,8 +157,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Text(
-                    '푸시 알림은 준비 중입니다.\n'
-                    '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.',
+                    AppStrings.notificationPushPreparingNotice,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.ink,
                       height: 1.5,
@@ -221,39 +223,39 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final masterOn = enabled && expiry.enabled;
 
     return _buildSection(
-      title: '수강권 만료 자동 알림 (선생님)',
+      title: AppStrings.notificationSettingsExpiryAutoSectionTeacher,
       children: [
         _SwitchTile(
-          title: '만료 자동 알림',
-          subtitle: '활성 수강권의 만료 시점에 자동으로 알림',
+          title: AppStrings.notificationExpiryAutoMasterTitle,
+          subtitle: AppStrings.notificationExpiryAutoMasterSubtitle,
           value: expiry.enabled,
           enabled: enabled,
           onChanged: notifier.toggleEnabled,
         ),
         _SwitchTile(
-          title: 'D-14 (14일 전)',
-          subtitle: '여유 있게 재등록 제안 시점',
+          title: AppStrings.notificationExpiryD14Title,
+          subtitle: AppStrings.notificationExpiryD14Subtitle,
           value: expiry.remindAtD14,
           enabled: masterOn,
           onChanged: notifier.toggleD14,
         ),
         _SwitchTile(
-          title: 'D-7 (7일 전)',
-          subtitle: '재등록 유도 주차 알림',
+          title: AppStrings.notificationExpiryD7Title,
+          subtitle: AppStrings.notificationExpiryD7Subtitle,
           value: expiry.remindAtD7,
           enabled: masterOn,
           onChanged: notifier.toggleD7,
         ),
         _SwitchTile(
-          title: 'D-1 (하루 전)',
-          subtitle: '만료 임박 최종 알림',
+          title: AppStrings.notificationExpiryD1Title,
+          subtitle: AppStrings.notificationExpiryD1Subtitle,
           value: expiry.remindAtD1,
           enabled: masterOn,
           onChanged: notifier.toggleD1,
         ),
         _SwitchTile(
-          title: 'D-0 (당일)',
-          subtitle: '만료 당일 보관 이동 알림',
+          title: AppStrings.notificationExpiryD0Title,
+          subtitle: AppStrings.notificationExpiryD0Subtitle,
           value: expiry.remindAtD0,
           enabled: masterOn,
           onChanged: notifier.toggleD0,
