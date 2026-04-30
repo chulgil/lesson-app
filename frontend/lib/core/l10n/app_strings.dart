@@ -4530,4 +4530,102 @@ class AppStrings {
 
   /// 오류가 발생했습니다. (백업 로딩 에러 상태 — 마침표 포함)
   static const backupErrorState = '오류가 발생했습니다.';
+
+  // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
+  /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
+  static const certificateEditAppBarAdd = '자격증 추가';
+
+  /// 자격증 수정 (AppBar 타이틀 — 편집 모드)
+  static const certificateEditAppBarEdit = '자격증 수정';
+
+  /// 음악 교원 자격증 (CertificateType.musicTeacher 라벨)
+  static const certificateTypeMusicTeacher = '음악 교원 자격증';
+
+  /// 문화예술교육사 (CertificateType.cultureArtsEducator 라벨)
+  static const certificateTypeCultureArtsEducator = '문화예술교육사';
+
+  /// 학교 교원 자격증 (CertificateType.schoolTeacher 라벨)
+  static const certificateTypeSchoolTeacher = '학교 교원 자격증';
+
+  /// 음악원 수료증 (CertificateType.conservatory 라벨)
+  static const certificateTypeConservatory = '음악원 수료증';
+
+  /// 음악 학위 (CertificateType.degree 라벨)
+  static const certificateTypeDegree = '음악 학위';
+
+  /// 연주 자격증 (CertificateType.performance 라벨)
+  static const certificateTypePerformance = '연주 자격증';
+
+  /// 기타 (CertificateType.other 라벨)
+  static const certificateTypeOther = '기타';
+
+  /// 카메라로 촬영 (이미지 소스 선택 — camera)
+  static const imageSourceCamera = '카메라로 촬영';
+
+  /// 갤러리에서 선택 (이미지 소스 선택 — gallery)
+  static const imageSourceGallery = '갤러리에서 선택';
+
+  /// 저장 중 오류가 발생했습니다. 다시 시도해주세요. (자격증 저장 실패 SnackBar)
+  static const certificateSaveErrorRetry = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  /// 삭제 중 오류가 발생했습니다. 다시 시도해주세요. (자격증 삭제 실패 SnackBar)
+  static const certificateDeleteErrorRetry = '삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  /// 자격증 삭제 (삭제 확인 다이얼로그 타이틀)
+  static const certificateDeleteDialogTitle = '자격증 삭제';
+
+  /// 이 자격증 정보를 삭제하시겠습니까? (삭제 확인 다이얼로그 본문)
+  static const certificateDeleteConfirm = '이 자격증 정보를 삭제하시겠습니까?';
+
+  /// 자격증 종류 (폼 라벨)
+  static const certificateTypeLabel = '자격증 종류';
+
+  /// 자격증명 (폼 라벨)
+  static const certificateNameLabel = '자격증명';
+
+  /// 예: 중등학교 정교사 2급 (음악) (자격증명 hint)
+  static const certificateNameHint = '예: 중등학교 정교사 2급 (음악)';
+
+  /// 자격증명을 입력해주세요 (자격증명 validator)
+  static const certificateNameRequired = '자격증명을 입력해주세요';
+
+  /// 발급 기관 (폼 라벨)
+  static const certificateIssuingBodyLabel = '발급 기관';
+
+  /// 예: 교육부 (발급 기관 hint)
+  static const certificateIssuingBodyHint = '예: 교육부';
+
+  /// 발급 기관을 입력해주세요 (발급 기관 validator)
+  static const certificateIssuingBodyRequired = '발급 기관을 입력해주세요';
+
+  /// 발급일 (폼 라벨)
+  static const certificateIssueDateLabel = '발급일';
+
+  /// 자격증 번호 (폼 라벨)
+  static const certificateNumberLabel = '자격증 번호';
+
+  /// 선택사항 (자격증 번호 hint — optional indicator)
+  static const certificateNumberHint = '선택사항';
+
+  /// 자격증 이미지 (폼 라벨)
+  static const certificateImageLabel = '자격증 이미지';
+
+  /// 이미지 삭제 (이미지 제거 버튼)
+  static const certificateImageDeleteLabel = '이미지 삭제';
+
+  /// 제출된 자격증은 관리자의 검토 후 승인됩니다. 승인 후 프로필에 인증 뱃지가 표시됩니다. (정보 안내)
+  static const certificateInfoBox =
+      '제출된 자격증은 관리자의 검토 후 승인됩니다. 승인 후 프로필에 인증 뱃지가 표시됩니다.';
+
+  /// 제출하기 (저장 버튼 — 신규 등록)
+  static const certificateSubmitButton = '제출하기';
+
+  /// 수정하기 (저장 버튼 — 편집)
+  static const certificateUpdateButton = '수정하기';
+
+  /// 자격증 이미지를 등록하세요 (빈 이미지 placeholder 타이틀)
+  static const certificateImageEmptyTitle = '자격증 이미지를 등록하세요';
+
+  /// 카메라 촬영 또는 갤러리에서 선택 (빈 이미지 placeholder 힌트)
+  static const certificateImageEmptyHint = '카메라 촬영 또는 갤러리에서 선택';
 }
