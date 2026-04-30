@@ -4738,4 +4738,14 @@ class AppStrings {
 
   /// Step 3 — 첫 레슨 완료 서브타이틀.
   static const gettingStartedStep3Subtitle = '레슨을 탭해 완료 처리하세요';
+
+  // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
+  /// 홈 (bottom nav label, 로마숫자 I)
+  static const homeTabLabel = '홈';
+
+  /// 수강관리 (bottom nav label, 로마숫자 III)
+  static const studentsTabLabel = '수강관리';
+
+  /// 프로필 (bottom nav label, 로마숫자 IV)
+  static const profileTabLabel = '프로필';
 }
