@@ -424,6 +424,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3d-3 getting_started_card 7 사이트 (2026-04-30) — home/ 도메인 온보딩 체크리스트 위젯. 학생 0명일 때 노출되는 3-step Getting Started 카드. 인트로 안내(아래 단계를 따라…) + Step 1~3 × (title + subtitle) = 7 사이트. 신규 키 7개 (gettingStartedIntro, gettingStartedStep1Title/Subtitle 학생 등록하기·첫 학생을 추가해보세요, gettingStartedStep2Title/Subtitle 레슨 일정 만들기·학생 등록 후 레슨을 추가하세요, gettingStartedStep3Title/Subtitle 첫 레슨 완료하기·레슨을 탭해 완료 처리하세요) + 재사용 0건. flutter analyze — No issues. 커밋 `c654e8ff` (키, 외부 세션 backup_service 16 키 동시 번들링됨 — label 5-3d-2 collision 인지) + `82262134` (마이그레이션). **참고**: 'Getting Started' 영문 섹션 헤더는 Notebook × Score 브랜드로 i18n 제외. **외부 세션 동시 작업 감지**: backup_service.dart 키 16개가 동일 5-3d-2 라벨로 외부 세션이 추가했으나 미커밋 상태에서 본 세션 commit 에 함께 포함됨. 키는 추가되어 있으나 backup_service.dart migration 은 외부 세션 처리 대기.
 - 5-3d-4 backup_service 16 사이트 (2026-04-30) — settings/ 도메인 데이터 서비스 레이어(backup_service.dart 619줄). 백업/복원 진행 단계 8건(준비/메타데이터/Hive 내보내기/녹음 추가/ZIP 압축/완료/파일 읽기/버전 확인/Hive 복원/녹음 복원/복원 완료) + 진행률 포매터 2건(녹음 추가 N/M, 녹음 복원 N/M) + 에러 메시지 3건(유효하지 않은 파일/지원되지 않는 버전 포매터/복원 오류 포매터) + 완료 메시지 2건(백업/복원). 신규 키 16개 (backupPreparing/MetadataCreating/HiveExporting/RecordingsAdding/RecordingsAddingProgressFormat/ZipCompressing/Complete/FileReading/InvalidFile/VersionChecking/UnsupportedVersionFormat/HiveRestoring/RecordingsRestoring/RecordingsRestoringProgressFormat + restoreComplete/restoreErrorFormat). 재사용 0건. **번호 충돌 처리**: 키 추가는 5-3d-3 키 커밋(c654e8ff)에 외부 세션 번들링 → 5-3d-2/3 슬롯이 병렬 세션에 선점됨. 본 세션은 5-3d-4 슬롯으로 마이그레이션 단독 커밋 `524b3f8c`. flutter analyze backup_service.dart — No issues. subscription regression 63/63 PASS. 한글 grep — 0 잔존. **참고**: 데이터 서비스 레이어는 사용자 노출 문자열(ChangeNotifier `currentStatus`) 직접 진원지로, presentation 레이어에서 `state.currentStatus` 그대로 표시 → i18n 필수.
 - 5-3d-5 lesson_card 5 사이트 (2026-04-30, retroactive) — home/ 도메인 lesson_card.dart 위젯. 레슨 상태 라벨 4건(예정/완료/취소/결석) + 컨텍스트 배지 1건(개인레슨). 신규 키 0개 — 100% 기존 키 재사용 (statusUpcoming/statusCompleted/statusCancelled/statusAbsent/individualLesson). flutter analyze — No issues. 한글 grep — 0 잔존. **번호/커밋 충돌 처리**: 본 세션이 lesson_card.dart 변경을 stage 한 직후 외부 세션의 plan close 커밋 `2a3cbfc3` (제목 "P2 5-3d-4 backup_service 클로즈")에 lesson_card.dart 변경(11 lines, +5/-3 reuse 패턴)이 동시 번들링됨 → 단일 작업물이 두 라벨에 분산. 본 entry 는 레퍼런스 라벨 5-3d-5 로 retroactive 기록. **교훈**: 같은 working tree 에서 병렬 세션이 `git add <file>` 또는 `git add -p` 로 명시 stage 하지 않으면 다른 세션의 unstaged 변경이 무차별 번들링됨 → 다음 배치부터 `git diff <file>` 으로 외부 WIP 사전 격리 + `git status` 로 stage 직전 재확인 필요.
+- 5-3d-6 home_screen 4 사이트 (2026-04-30) — home/ 도메인 home_screen.dart 화면. 하단 탭 네비게이션 4건(홈/스케줄/수강관리/프로필). 신규 키 3개 (homeTabLabel/studentsTabLabel/profileTabLabel) + 재사용 1건 (scheduleTabTitle 기존 등록). flutter analyze — No issues. 한글 grep — 0 잔존. 커밋 `4a9e597b` (키) + `dc4fc371` (마이그레이션). **참고**: 로마숫자 I/II/III/IV (네비게이션 인덱스 표시)는 Notebook × Score 시그니처 보존 — i18n 제외.
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -498,7 +499,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3d-3 getting_started_card i18n (7 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3d-4 backup_service i18n (16 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3d-5 lesson_card i18n (5 사이트, 100% 재사용, retroactive) | ✅ 완료 (2026-04-30) |
-| **다음** P2 5-3d-6+ home 도메인 잔여 (home_screen) 또는 invite/onboarding 도메인 진입 | 대기 |
+| P2 5-3d-6 home_screen i18n (4 사이트) | ✅ 완료 (2026-04-30) |
+| **다음** P2 5-3d-7+ home 도메인 잔여 (urgent_alert_zone 2 / lesson_request_section 1) 또는 invite/onboarding 도메인 진입 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 | P1-3 schedule_tab 헤더 collapse + sticky week strip (Option C) | 🚧 진행 (2026-04-30) |
 
