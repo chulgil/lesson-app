@@ -4441,6 +4441,20 @@ class AppStrings {
   /// -N명 (학생 현황 이탈 value 포매터, count 는 양수로 받아 부호 자동 부착)
   static String analyticsChurnedCountFormat(int count) => '-$count명';
 
+  // ── Analytics Widgets (analytics 위젯 5-3c-2) ────────────────────────
+
+  /// 레슨 추이 (MonthlyTrendChart 섹션 헤더)
+  static const analyticsLessonTrendSection = '레슨 추이';
+
+  /// N월 (MonthlyTrendChart 월별 라벨 포매터)
+  static String analyticsMonthLabelFormat(int month) => '$month월';
+
+  /// 연습률 TOP 5 (PracticeRankingList 섹션 헤더)
+  static const analyticsPracticeRankingSection = '연습률 TOP 5';
+
+  /// 연습 데이터가 없습니다 (PracticeRankingList 빈 상태)
+  static const analyticsNoPracticeData = '연습 데이터가 없습니다';
+
   // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
   /// 레퍼토리 편집 (AppBar 타이틀)
   static const editRepertoireAppBarTitle = '레퍼토리 편집';
