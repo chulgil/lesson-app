@@ -502,7 +502,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3d-6 home_screen i18n (4 사이트) | ✅ 완료 (2026-04-30) |
 | **다음** P2 5-3d-7+ home 도메인 잔여 (urgent_alert_zone 2 / lesson_request_section 1) 또는 invite/onboarding 도메인 진입 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
-| P1-3 schedule_tab 헤더 collapse + sticky week strip (Option C) | 🚧 진행 (2026-04-30) |
+| P1-3 schedule_tab 헤더 collapse + sticky week strip (Option C) | ✅ 완료 (2026-04-30) |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
 
