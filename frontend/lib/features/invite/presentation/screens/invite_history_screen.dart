@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -21,7 +22,7 @@ class InviteHistoryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('초대 내역'),
+        title: const Text(AppStrings.inviteHistoryTooltip),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -29,7 +30,7 @@ class InviteHistoryScreen extends ConsumerWidget {
       ),
       body: myInvites.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildError('초대 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
+        error: (_, __) => _buildError(AppStrings.inviteHistoryLoadErrorRetry),
         data: (invites) {
           if (invites.isEmpty) {
             return _buildEmpty();
@@ -50,7 +51,7 @@ class InviteHistoryScreen extends ConsumerWidget {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '초대 내역을 불러오는 중 오류가 발생했습니다',
+              AppStrings.inviteHistoryLoadErrorDescription,
               style: AppTypography.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -83,7 +84,7 @@ class InviteHistoryScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
             // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
             Text(
-              '생성한 초대가 없습니다',
+              AppStrings.inviteHistoryEmptyTitle,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -91,7 +92,7 @@ class InviteHistoryScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '초대 링크를 생성하면\n여기에 기록이 표시됩니다.',
+              AppStrings.inviteHistoryEmptyBody,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -116,7 +117,10 @@ class InviteHistoryScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
         if (activeInvites.isNotEmpty) ...[
-          _buildSectionHeader('활성 초대', activeInvites.length),
+          _buildSectionHeader(
+            AppStrings.inviteHistoryActiveSection,
+            activeInvites.length,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...activeInvites.map(
             (invite) => Padding(
@@ -132,7 +136,10 @@ class InviteHistoryScreen extends ConsumerWidget {
         if (activeInvites.isNotEmpty && inactiveInvites.isNotEmpty)
           const SizedBox(height: AppSpacing.space4),
         if (inactiveInvites.isNotEmpty) ...[
-          _buildSectionHeader('만료/취소된 초대', inactiveInvites.length),
+          _buildSectionHeader(
+            AppStrings.inviteHistoryInactiveSection,
+            inactiveInvites.length,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...inactiveInvites.map(
             (invite) => Padding(
@@ -181,19 +188,19 @@ class InviteHistoryScreen extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('초대 취소'),
-            content: const Text('이 초대 링크를 취소하시겠습니까?\n취소 후에는 이 코드로 연결할 수 없습니다.'),
+            title: const Text(AppStrings.inviteRevokeDialogTitle),
+            content: const Text(AppStrings.inviteRevokeDialogContent),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('아니오'),
+                child: const Text(AppStrings.inviteRevokeDialogNo),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                 ),
-                child: const Text('취소하기'),
+                child: const Text(AppStrings.cancelRequestAction),
               ),
             ],
           ),
@@ -205,9 +212,9 @@ class InviteHistoryScreen extends ConsumerWidget {
           .revokeInvite(invite.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('초대가 취소되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.inviteRevokedSnack)),
+        );
       }
     }
   }
@@ -216,7 +223,7 @@ class InviteHistoryScreen extends ConsumerWidget {
     Clipboard.setData(ClipboardData(text: code));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('초대 코드가 복사되었습니다'),
+        content: Text(AppStrings.inviteCodeCopiedSnack),
         duration: Duration(seconds: 2),
       ),
     );
@@ -302,7 +309,7 @@ class _InviteCard extends StatelessWidget {
                     size: 18,
                     color: AppColors.paperAccent,
                   ),
-                  tooltip: '코드 복사',
+                  tooltip: AppStrings.inviteCodeCopyTooltip,
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.all(AppSpacing.space1),
                 ),
@@ -315,7 +322,7 @@ class _InviteCard extends StatelessWidget {
               Icon(Icons.people, size: 14, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space1),
               Text(
-                '${invite.useCount}회 사용',
+                AppStrings.inviteUseCountFormat(invite.useCount),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -355,11 +362,9 @@ class _InviteCard extends StatelessWidget {
                 onPressed: onRevoke,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
-                  side: BorderSide(
-                    color: AppColors.paperAccent,
-                  ),
+                  side: BorderSide(color: AppColors.paperAccent),
                 ),
-                child: const Text('초대 취소'),
+                child: const Text(AppStrings.inviteRevokeDialogTitle),
               ),
             ),
           ],
@@ -373,11 +378,11 @@ class _InviteCard extends StatelessWidget {
     final diff = now.difference(date);
 
     if (diff.inDays == 0) {
-      return '오늘';
+      return AppStrings.todayLabel;
     } else if (diff.inDays == 1) {
-      return '어제';
+      return AppStrings.yesterdayLabel;
     } else if (diff.inDays < 7) {
-      return '${diff.inDays}일 전';
+      return AppStrings.timeAgoDays(diff.inDays);
     } else {
       return '${date.month}/${date.day}';
     }
