@@ -4653,6 +4653,32 @@ class AppStrings {
   /// 섹션 변경 (connected 카드 change IconButton tooltip)
   static const allRecordingsChangeSectionTooltip = '섹션 변경';
 
+  // ── Orphan Recordings Screen (미연결 녹음 관리 5-3d-9) ──────────────────
+  /// 새로고침 (경로 복구 포함) (orphan refresh tooltip — 경로 복구 부가 동작 명시)
+  static const orphanRecordingsRefreshTooltip = '새로고침 (경로 복구 포함)';
+
+  /// 연결되지 않은 녹음이 없습니다 (orphan empty state title)
+  static const orphanRecordingsEmptyTitle = '연결되지 않은 녹음이 없습니다';
+
+  /// 모든 녹음이 섹션에 연결되어 있습니다 (orphan empty state subtitle)
+  static const orphanRecordingsEmptySubtitle = '모든 녹음이 섹션에 연결되어 있습니다';
+
+  /// 진단 정보 (orphan diagnostic card 헤더)
+  static const orphanRecordingsDiagnosticTitle = '진단 정보';
+
+  /// Hive에 저장된 녹음 (orphan diagnostic stat — 전체 Hive 레코드 수 라벨)
+  static const orphanRecordingsHiveCountLabel = 'Hive에 저장된 녹음';
+
+  /// 섹션 수 (orphan diagnostic stat — 섹션 총 개수 라벨)
+  static const orphanRecordingsSectionCountLabel = '섹션 수';
+
+  /// $count개의 녹음이 섹션에 연결되지 않았습니다.\n각 녹음을 섹션에 연결하거나 삭제할 수 있습니다. (orphan list 안내 포매터)
+  static String orphanRecordingsDescriptionFormat(int count) =>
+      '$count개의 녹음이 섹션에 연결되지 않았습니다.\n각 녹음을 섹션에 연결하거나 삭제할 수 있습니다.';
+
+  /// $n개 (count + 한국어 단위 — 다도메인 재사용 가능)
+  static String countItemsSuffix(int n) => '$n개';
+
   // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
   /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
   static const certificateEditAppBarAdd = '자격증 추가';
