@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -53,14 +54,17 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
   @override
   Widget build(BuildContext context) {
     final userRole = ref.watch(currentInviteUserRoleProvider);
-    final targetRole = userRole == InviteUserRole.teacher ? '학생' : '선생님';
+    final targetRole =
+        userRole == InviteUserRole.teacher
+            ? AppStrings.student
+            : AppStrings.teacher;
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.paper,
-        title: Text('$targetRole QR 스캔'),
+        title: Text(AppStrings.inviteScanAppBarTitleFormat(targetRole)),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
@@ -69,12 +73,12 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
           IconButton(
             icon: Icon(_torchEnabled ? Icons.flash_on : Icons.flash_off),
             onPressed: _toggleTorch,
-            tooltip: '플래시',
+            tooltip: AppStrings.inviteScanFlashTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.flip_camera_ios),
             onPressed: _switchCamera,
-            tooltip: '카메라 전환',
+            tooltip: AppStrings.inviteScanCameraSwitchTooltip,
           ),
         ],
       ),
@@ -155,7 +159,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
             child: Column(
               children: [
                 Text(
-                  '$targetRole의 QR 코드를 스캔하세요',
+                  AppStrings.inviteScanPromptFormat(targetRole),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paper,
                     fontWeight: FontWeight.w600,
@@ -164,7 +168,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  'QR 코드가 프레임 안에 들어오도록 해주세요',
+                  AppStrings.inviteScanFrameInstruction,
                   style: AppTypography.bodySmall.copyWith(
                     // 안내 서브텍스트 — Material Colors.white70 → paper 70% alpha.
                     color: AppColors.paper.withValues(alpha: 0.7),
@@ -187,8 +191,10 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               },
               icon: const Icon(Icons.dialpad, color: AppColors.paper),
               label: Text(
-                '코드로 입력하기',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.paper),
+                AppStrings.inviteScanEnterCodeAlternative,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.paper,
+                ),
               ),
             ),
           ),
@@ -273,14 +279,14 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
               context.push(AppRoutes.inviteConfirm, extra: invite);
             }
           } else {
-            _showError('유효하지 않은 초대 코드입니다');
+            _showError(AppStrings.inviteCodeInvalid);
           }
         }
       } else {
-        _showError('올바른 QR 코드가 아닙니다');
+        _showError(AppStrings.inviteScanInvalidQr);
       }
     } catch (e) {
-      _showError('QR 코드 처리 중 오류가 발생했습니다');
+      _showError(AppStrings.inviteScanProcessingError);
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
