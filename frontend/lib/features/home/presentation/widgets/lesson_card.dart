@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -122,18 +123,18 @@ class LessonCard extends ConsumerWidget {
     switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
-        return '예정';
+        return AppStrings.statusUpcoming;
       case LessonStatus.completed:
-        return '완료';
+        return AppStrings.statusCompleted;
       case LessonStatus.cancelled:
       case LessonStatus.cancelledByStudentAdvance:
       case LessonStatus.cancelledByTeacher:
       case LessonStatus.cancelledMutual:
-        return '취소';
+        return AppStrings.statusCancelled;
       case LessonStatus.noShow:
       case LessonStatus.cancelledByStudentLate:
       case LessonStatus.studentAbsent:
-        return '결석';
+        return AppStrings.statusAbsent;
     }
   }
 
@@ -177,7 +178,7 @@ class LessonCard extends ConsumerWidget {
       if (lessonClass != null) {
         final isAcademy = lessonClass.type == LessonClassType.academy;
         contextBadge = Text(
-          isAcademy ? lessonClass.name : '개인레슨',
+          isAcademy ? lessonClass.name : AppStrings.individualLesson,
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
