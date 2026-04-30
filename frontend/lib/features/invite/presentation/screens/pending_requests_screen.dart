@@ -23,7 +23,7 @@ class PendingRequestsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('연결 요청'),
+        title: const Text(AppStrings.pendingRequestsAppBarTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -31,7 +31,7 @@ class PendingRequestsScreen extends ConsumerWidget {
       ),
       body: pendingRequests.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildError('요청 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
+        error: (_, __) => _buildError(AppStrings.pendingRequestsLoadErrorRetry),
         data: (requests) {
           if (requests.isEmpty) {
             return _buildEmpty(userRole);
@@ -52,7 +52,7 @@ class PendingRequestsScreen extends ConsumerWidget {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '요청 목록을 불러오는 중 오류가 발생했습니다',
+              AppStrings.pendingRequestsLoadErrorDescription,
               style: AppTypography.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -85,15 +85,15 @@ class PendingRequestsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
             // Notebook × Score: 빈 상태 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
             Text(
-              '대기 중인 연결 요청이 없습니다',
+              AppStrings.pendingRequestsEmptyTitle,
               style: NotebookTypography.appBarTitle,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               userRole == InviteUserRole.teacher
-                  ? '학생이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.'
-                  : '선생님이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.',
+                  ? AppStrings.pendingRequestsEmptyTeacher
+                  : AppStrings.pendingRequestsEmptyStudent,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -140,7 +140,9 @@ class PendingRequestsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '${request.requesterName ?? request.requesterRole.label}님과 연결되었습니다!',
+            AppStrings.connectionAcceptedFormat(
+              request.requesterName ?? request.requesterRole.label,
+            ),
           ),
           backgroundColor: AppColors.paperOk,
         ),
@@ -157,9 +159,11 @@ class PendingRequestsScreen extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('연결 거절'),
+            title: const Text(AppStrings.connectionRejectDialogTitle),
             content: Text(
-              '${request.requesterName ?? request.requesterRole.label}님의 연결 요청을 거절하시겠습니까?',
+              AppStrings.connectionRejectConfirmFormat(
+                request.requesterName ?? request.requesterRole.label,
+              ),
             ),
             actions: [
               TextButton(
@@ -171,7 +175,7 @@ class PendingRequestsScreen extends ConsumerWidget {
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                 ),
-                child: const Text('거절'),
+                child: const Text(AppStrings.statusRejected),
               ),
             ],
           ),
@@ -183,9 +187,9 @@ class PendingRequestsScreen extends ConsumerWidget {
           .rejectRequest(request.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('요청이 거절되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.connectionRejected)),
+        );
       }
     }
   }
@@ -259,7 +263,7 @@ class _RequestCard extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
-                          '${method.label}로 연결 요청',
+                          AppStrings.connectionMethodLabelFormat(method.label),
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.inkSecondary,
                           ),
@@ -307,7 +311,7 @@ class _RequestCard extends StatelessWidget {
                       vertical: AppSpacing.space3,
                     ),
                   ),
-                  child: const Text('거절'),
+                  child: const Text(AppStrings.statusRejected),
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -331,7 +335,7 @@ class _RequestCard extends StatelessWidget {
                               color: AppColors.paper,
                             ),
                           )
-                          : const Text('수락'),
+                          : const Text(AppStrings.accept),
                 ),
               ),
             ],
@@ -347,13 +351,13 @@ class _RequestCard extends StatelessWidget {
     Color color;
 
     if (remaining.inDays > 0) {
-      text = '${remaining.inDays}일 남음';
+      text = AppStrings.daysRemainingFormat(remaining.inDays);
       color = AppColors.inkSecondary;
     } else if (remaining.inHours > 0) {
-      text = '${remaining.inHours}시간 남음';
+      text = AppStrings.hoursRemainingFormat(remaining.inHours);
       color = AppColors.paperAccent;
     } else {
-      text = '곧 만료';
+      text = AppStrings.expiresVerySoon;
       color = AppColors.paperAccent;
     }
 
