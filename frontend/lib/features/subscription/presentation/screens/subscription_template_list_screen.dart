@@ -25,7 +25,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('수강권 관리'),
+        title: const Text(AppStrings.templateListAppBarTitle),
         backgroundColor: AppColors.paperDark,
         elevation: 0,
         actions: [
@@ -36,7 +36,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
               );
             },
             icon: const Icon(Icons.settings_outlined),
-            tooltip: '자동 제안 설정',
+            tooltip: AppStrings.proposalSettingsAppBarTitle,
           ),
         ],
       ),
@@ -49,7 +49,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddTemplateDialog(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('수강권 추가'),
+        label: const Text(AppStrings.templateAddButton),
       ),
     );
   }
@@ -92,14 +92,14 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '등록된 수강권이 없습니다',
+              AppStrings.noSubscriptionsRegisteredTitle,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '수강권을 만들어 학생들에게 제안해보세요',
+              AppStrings.templateEmptyHint,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -109,7 +109,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () => _showAddTemplateDialog(context, ref),
               icon: const Icon(Icons.add),
-              label: const Text('첫 수강권 만들기'),
+              label: const Text(AppStrings.templateFirstCreate),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
               ),
@@ -134,7 +134,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '데이터를 불러올 수 없습니다',
+              AppStrings.cannotLoadData,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -211,8 +211,10 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('수강권 삭제'),
-            content: Text('"${template.name}"을(를) 삭제하시겠습니까?'),
+            title: const Text(AppStrings.templateDeleteDialogTitle),
+            content: Text(
+              AppStrings.templateDeleteConfirmFormat(template.name),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -302,7 +304,7 @@ class _TemplateCard extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  '비활성',
+                                  AppStrings.templateInactiveBadge,
                                   style: AppTypography.caption.copyWith(
                                     color: AppColors.inkTertiary,
                                   ),
@@ -333,7 +335,7 @@ class _TemplateCard extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
-                                      '자동',
+                                      AppStrings.templateAutoBadge,
                                       style: AppTypography.caption.copyWith(
                                         color: AppColors.paperOk,
                                         fontWeight: FontWeight.w500,
@@ -396,7 +398,11 @@ class _TemplateCard extends StatelessWidget {
                                   size: 20,
                                 ),
                                 const SizedBox(width: AppSpacing.space2),
-                                Text(template.isActive ? '비활성화' : '활성화'),
+                                Text(
+                                  template.isActive
+                                      ? AppStrings.templateMenuDeactivate
+                                      : AppStrings.templateMenuActivate,
+                                ),
                               ],
                             ),
                           ),
@@ -411,7 +417,7 @@ class _TemplateCard extends StatelessWidget {
                                 ),
                                 SizedBox(width: AppSpacing.space2),
                                 Text(
-                                  '삭제',
+                                  AppStrings.delete,
                                   style: TextStyle(
                                     color: AppColors.paperAccent,
                                   ),
@@ -431,7 +437,9 @@ class _TemplateCard extends StatelessWidget {
                 children: [
                   _DetailChip(
                     icon: Icons.schedule,
-                    label: '${template.lessonDurationMinutes}분',
+                    label: AppStrings.durationMinutesValue(
+                      template.lessonDurationMinutes,
+                    ),
                     isActive: template.isActive,
                   ),
                   const SizedBox(width: AppSpacing.space2),
@@ -443,7 +451,9 @@ class _TemplateCard extends StatelessWidget {
                   const SizedBox(width: AppSpacing.space2),
                   _DetailChip(
                     icon: Icons.calculate_outlined,
-                    label: '회당 ${template.formattedPricePerLesson}',
+                    label: AppStrings.templateUnitPriceLabel(
+                      template.formattedPricePerLesson,
+                    ),
                     isActive: template.isActive,
                   ),
                 ],
@@ -622,7 +632,9 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
               // Notebook × Score: 바텀시트 헤더 Playfair 승격 (§7.27 + §7.87-h
               // 2원 유한집합).
               Text(
-                isEditing ? '수강권 수정' : '수강권 수강권 추가',
+                isEditing
+                    ? AppStrings.templateEditSheetTitle
+                    : AppStrings.templateAddSheetTitle,
                 style: NotebookTypography.sectionTitle,
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -631,12 +643,12 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: '이름 *',
-                  hintText: '예: 8회권, 기본 패키지',
+                  labelText: AppStrings.templateNameLabel,
+                  hintText: AppStrings.templateNameHint,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '이름을 입력해주세요';
+                    return AppStrings.templateNameRequired;
                   }
                   return null;
                 },
@@ -654,7 +666,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                     _isCustomLessons = isCustom;
                   });
                 },
-                label: '레슨 횟수',
+                label: AppStrings.lessonCountLabel,
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -669,7 +681,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                     _isCustomDuration = isCustom;
                   });
                 },
-                label: '수업 시간',
+                label: AppStrings.infoLabelDuration,
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -684,7 +696,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                     _isCustomValidity = isCustom;
                   });
                 },
-                label: '유효기간',
+                label: AppStrings.validityPeriod,
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -692,17 +704,17 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
-                  labelText: '가격 (원) *',
-                  hintText: '예: 400000',
+                  labelText: AppStrings.templatePriceLabel,
+                  hintText: AppStrings.templatePriceHint,
                   prefixText: '₩ ',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '가격을 입력해주세요';
+                    return AppStrings.templatePriceRequired;
                   }
                   if (int.tryParse(value) == null) {
-                    return '숫자만 입력해주세요';
+                    return AppStrings.templatePriceNumbersOnly;
                   }
                   return null;
                 },
@@ -713,8 +725,8 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '설명 (선택)',
-                  hintText: '예: 가장 인기 있는 패키지입니다',
+                  labelText: AppStrings.descriptionOptional,
+                  hintText: AppStrings.templateDescHint,
                 ),
                 maxLines: 2,
               ),
@@ -748,7 +760,9 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                             ),
                           )
                           : Text(
-                            isEditing ? '수정하기' : '추가하기',
+                            isEditing
+                                ? AppStrings.templateSaveEdit
+                                : AppStrings.templateSaveAdd,
                             style: AppTypography.bodyLarge.copyWith(
                               color: AppColors.paper,
                               fontWeight: FontWeight.w600,
@@ -819,7 +833,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '자동 제안 대상',
+                        AppStrings.templateAutoProposalCheckbox,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
                           color:
@@ -841,10 +855,8 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
             padding: const EdgeInsets.only(left: 32),
             child: Text(
               _isAutoProposalEnabled
-                  ? '체험레슨 완료 또는 수강권 만료 시 학생에게\n'
-                      '이 수강권이 자동으로 제안됩니다.'
-                  : '이 수강권은 선생님이 직접 제안할 때만 사용됩니다.\n'
-                      '자동 제안에 포함되지 않습니다.',
+                  ? AppStrings.templateAutoProposalEnabledDesc
+                  : AppStrings.templateAutoProposalDisabledDesc,
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkSecondary,
                 height: 1.4,
@@ -887,7 +899,11 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? '수강권이 수정되었습니다' : '수강권이 추가되었습니다'),
+            content: Text(
+              isEditing
+                  ? AppStrings.templateUpdatedSnackbar
+                  : AppStrings.templateAddedSnackbar,
+            ),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -896,7 +912,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorTryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
