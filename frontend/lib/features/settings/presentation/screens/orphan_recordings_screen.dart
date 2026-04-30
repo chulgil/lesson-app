@@ -27,7 +27,7 @@ class OrphanRecordingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('연결되지 않은 녹음'),
+        title: const Text(AppStrings.allRecordingsOrphanedSection),
         backgroundColor: AppColors.paperDark,
         elevation: 0,
         foregroundColor: AppColors.ink,
@@ -40,7 +40,7 @@ class OrphanRecordingsScreen extends ConsumerWidget {
                   .refreshFromHive();
               ref.invalidate(orphanedRecordingsWithDiagnosticProvider);
             },
-            tooltip: '새로고침 (경로 복구 포함)',
+            tooltip: AppStrings.orphanRecordingsRefreshTooltip,
           ),
         ],
       ),
@@ -70,7 +70,7 @@ class OrphanRecordingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     const Text(
-                      '오류가 발생했습니다.',
+                      AppStrings.allRecordingsErrorState,
                       style: TextStyle(color: AppColors.paperAccent),
                     ),
                     const SizedBox(height: AppSpacing.space4),
@@ -106,8 +106,8 @@ class _EmptyStateWithDiagnostic extends StatelessWidget {
         SizedBox(height: MediaQuery.of(context).size.height * 0.15),
         const EmptyStateWidget(
           icon: Icons.check_circle_outline,
-          title: '연결되지 않은 녹음이 없습니다',
-          subtitle: '모든 녹음이 섹션에 연결되어 있습니다',
+          title: AppStrings.orphanRecordingsEmptyTitle,
+          subtitle: AppStrings.orphanRecordingsEmptySubtitle,
         ),
       ],
     );
@@ -125,7 +125,6 @@ class _DiagnosticCard extends StatelessWidget {
       elevation: 0,
       color: AppColors.paperAccentSoft,
       shape: RoundedRectangleBorder(
-        
         side: BorderSide(color: AppColors.paperAccentSoft),
       ),
       child: Padding(
@@ -135,10 +134,14 @@ class _DiagnosticCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
+                Icon(
+                  Icons.info_outline,
+                  size: 18,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 const Text(
-                  '진단 정보',
+                  AppStrings.orphanRecordingsDiagnosticTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.paperAccent,
@@ -148,11 +151,17 @@ class _DiagnosticCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space3),
             _buildStatRow(
-              'Hive에 저장된 녹음',
-              '${diagnostic.totalRecordingsInHive}개',
+              AppStrings.orphanRecordingsHiveCountLabel,
+              AppStrings.countItemsSuffix(diagnostic.totalRecordingsInHive),
             ),
-            _buildStatRow('섹션 수', '${diagnostic.totalSections}개'),
-            _buildStatRow('연결되지 않은 녹음', '${diagnostic.orphanCount}개'),
+            _buildStatRow(
+              AppStrings.orphanRecordingsSectionCountLabel,
+              AppStrings.countItemsSuffix(diagnostic.totalSections),
+            ),
+            _buildStatRow(
+              AppStrings.allRecordingsOrphanedSection,
+              AppStrings.countItemsSuffix(diagnostic.orphanCount),
+            ),
           ],
         ),
       ),
@@ -205,7 +214,9 @@ class _RecordingsListWithDiagnostic extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.space4),
             child: Text(
-              '${diagnostic.orphans.length}개의 녹음이 섹션에 연결되지 않았습니다.\n각 녹음을 섹션에 연결하거나 삭제할 수 있습니다.',
+              AppStrings.orphanRecordingsDescriptionFormat(
+                diagnostic.orphans.length,
+              ),
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -290,7 +301,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       MaterialPageRoute(
         builder:
             (context) => SectionPickerScreen(
-              title: '녹음을 연결할 섹션 선택',
+              title: AppStrings.allRecordingsSectionPickerTitle,
               recording: widget.recording,
             ),
       ),
@@ -303,12 +314,16 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('녹음이 "${result.section.pieceName}"에 연결되었습니다')),
+          SnackBar(
+            content: Text(
+              AppStrings.allRecordingsLinkedFormat(result.section.pieceName),
+            ),
+          ),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('연결 중 오류가 발생했습니다'),
+            content: Text(AppStrings.allRecordingsLinkError),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -321,8 +336,8 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('녹음 삭제'),
-            content: const Text('이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+            title: const Text(AppStrings.allRecordingsDeleteDialogTitle),
+            content: const Text(AppStrings.allRecordingsDeleteDialogContent),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -330,7 +345,9 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -343,9 +360,9 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
           .deleteRecording(widget.recording.id);
 
       if (success && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음이 삭제되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.allRecordingsDeletedSnack)),
+        );
       }
     }
   }
@@ -425,7 +442,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                   onPressed: _showAssignmentSheet,
                   icon: const Icon(Icons.link),
                   color: AppColors.paperAccent,
-                  tooltip: '섹션에 연결',
+                  tooltip: AppStrings.allRecordingsLinkSectionTooltip,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                     minWidth: 40,
@@ -437,7 +454,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                   onPressed: _confirmDelete,
                   icon: const Icon(Icons.delete_outline),
                   color: AppColors.paperAccent,
-                  tooltip: '삭제',
+                  tooltip: AppStrings.delete,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                     minWidth: 40,
