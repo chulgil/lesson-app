@@ -47,7 +47,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(
-          userRole == InviteUserRole.teacher ? '학생 초대하기' : '선생님 연결하기',
+          userRole == InviteUserRole.teacher
+              ? AppStrings.inviteScreenTitleTeacher
+              : AppStrings.inviteScreenTitleStudent,
         ),
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -57,7 +59,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => context.push(AppRoutes.inviteHistory),
-            tooltip: '초대 내역',
+            tooltip: AppStrings.inviteHistoryTooltip,
           ),
         ],
       ),
@@ -84,7 +86,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '초대 링크 생성 중 오류가 발생했습니다',
+              AppStrings.inviteCreateErrorTitle,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -92,7 +94,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '잠시 후 다시 시도해주세요',
+              AppStrings.inviteCreateErrorSubtitle,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -110,7 +112,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   }
 
   Widget _buildContent(Invite invite, InviteUserRole userRole) {
-    final targetRole = userRole == InviteUserRole.teacher ? '학생' : '선생님';
+    final targetRole =
+        userRole == InviteUserRole.teacher
+            ? AppStrings.student
+            : AppStrings.teacher;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -130,7 +135,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Text(
-                    '$targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요',
+                    AppStrings.inviteShareGuideFormat(targetRole),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.paperAccent,
                     ),
@@ -186,7 +191,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       child: Column(
         children: [
           // Notebook × Score: QR 코드 카드 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
-          Text('QR 코드', style: NotebookTypography.appBarTitle),
+          Text(
+            AppStrings.qrCodeSectionTitle,
+            style: NotebookTypography.appBarTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
           QrImageView(
             data: invite.qrCodeData,
@@ -204,7 +212,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '대면 수업 시 스캔하세요',
+            AppStrings.qrCodeScanInstruction,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -225,7 +233,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       child: Column(
         children: [
           Text(
-            '초대 코드',
+            AppStrings.inviteCodeSectionTitle,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -245,14 +253,14 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               IconButton(
                 onPressed: () => _copyCode(invite.inviteCode),
                 icon: const Icon(Icons.copy),
-                tooltip: '코드 복사',
+                tooltip: AppStrings.inviteCodeCopyTooltip,
                 color: AppColors.paperAccent,
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '앱에서 직접 입력할 수 있는 코드입니다',
+            AppStrings.inviteCodeManualEntryHint,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -270,14 +278,12 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           child: ElevatedButton.icon(
             onPressed: () => _shareLink(invite),
             icon: const Icon(Icons.share),
-            label: const Text('링크 공유하기'),
+            label: const Text(AppStrings.inviteShareLinkButton),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               foregroundColor: AppColors.paper,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
           ),
         ),
@@ -288,7 +294,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _copyLink(invite.inviteUrl),
                 icon: const Icon(Icons.link),
-                label: const Text('링크 복사'),
+                label: const Text(AppStrings.inviteCopyLinkButton),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                   side: BorderSide(color: AppColors.paperAccent),
@@ -306,7 +312,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _shareToKakao(invite),
                 icon: const Icon(Icons.chat_bubble),
-                label: const Text('카카오톡'),
+                label: const Text(AppStrings.inviteKakaoButton),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.ink,
                   backgroundColor: AppColors.kakaoBackground,
@@ -333,7 +339,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         Icon(Icons.access_time, size: 16, color: AppColors.inkSecondary),
         const SizedBox(width: AppSpacing.space1),
         Text(
-          '유효기간: ${invite.formattedExpiry}',
+          AppStrings.inviteExpiryFormat(invite.formattedExpiry),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -350,7 +356,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         const Divider(),
         const SizedBox(height: AppSpacing.space4),
         Text(
-          '다른 방법으로 연결하기',
+          AppStrings.inviteAlternativeOptionsTitle,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -363,11 +369,11 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
             child: Icon(Icons.qr_code_scanner, color: AppColors.paperAccent),
           ),
-          title: const Text('QR 코드 스캔'),
+          title: const Text(AppStrings.inviteScanQrTitle),
           subtitle: Text(
             userRole == InviteUserRole.teacher
-                ? '학생의 QR 코드 스캔하기'
-                : '선생님의 QR 코드 스캔하기',
+                ? AppStrings.inviteScanQrTeacherSubtitle
+                : AppStrings.inviteScanQrStudentSubtitle,
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => context.push(AppRoutes.inviteScan),
@@ -381,8 +387,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
             child: Icon(Icons.dialpad, color: AppColors.ink),
           ),
-          title: const Text('초대 코드 입력'),
-          subtitle: const Text('6자리 코드로 연결하기'),
+          title: const Text(AppStrings.inviteCodeAppBarTitle),
+          subtitle: const Text(AppStrings.inviteCodeInputShortSubtitle),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => context.push(AppRoutes.inviteCode),
         ),
@@ -396,8 +402,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               ),
               child: Icon(Icons.search, color: AppColors.paperAccent),
             ),
-            title: const Text('선생님 검색'),
-            subtitle: const Text('앱에서 선생님 찾기'),
+            title: const Text(AppStrings.inviteTeacherSearchTitle),
+            subtitle: const Text(AppStrings.inviteTeacherSearchSubtitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(AppRoutes.teacherSearch),
           ),
@@ -409,7 +415,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     Clipboard.setData(ClipboardData(text: code));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('초대 코드가 복사되었습니다'),
+        content: Text(AppStrings.inviteCodeCopiedSnack),
         duration: Duration(seconds: 2),
       ),
     );
@@ -419,7 +425,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     Clipboard.setData(ClipboardData(text: url));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('초대 링크가 복사되었습니다'),
+        content: Text(AppStrings.inviteLinkCopiedSnack),
         duration: Duration(seconds: 2),
       ),
     );
@@ -427,16 +433,19 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
   void _shareLink(Invite invite) {
     final userRole = ref.read(currentInviteUserRoleProvider);
-    final roleText = userRole == InviteUserRole.teacher ? '선생님' : '학생';
+    final roleText =
+        userRole == InviteUserRole.teacher
+            ? AppStrings.teacher
+            : AppStrings.student;
 
     SharePlus.instance.share(
       ShareParams(
-        text:
-            '레슨앱에서 저와 함께해요!\n\n'
-            '초대 코드: ${invite.inviteCode}\n'
-            '또는 링크: ${invite.inviteUrl}\n\n'
-            '- $roleText 드림',
-        subject: '레슨앱 초대',
+        text: AppStrings.inviteShareMessageFormat(
+          invite.inviteCode,
+          invite.inviteUrl,
+          roleText,
+        ),
+        subject: AppStrings.inviteShareSubject,
       ),
     );
   }
