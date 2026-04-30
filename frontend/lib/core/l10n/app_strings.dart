@@ -4934,4 +4934,92 @@ class AppStrings {
 
   /// $hours시간 남음 — 만료까지 시간.
   static String hoursRemainingFormat(int hours) => '$hours시간 남음';
+
+  // ── Invite Screen (초대 생성 화면 5-3d-12) ──────────────────────────────
+  /// 학생 초대하기 — AppBar 타이틀 (선생님 시점).
+  static const inviteScreenTitleTeacher = '학생 초대하기';
+
+  /// 선생님 연결하기 — AppBar 타이틀 (학생 시점).
+  static const inviteScreenTitleStudent = '선생님 연결하기';
+
+  /// 초대 내역 — history IconButton 툴팁.
+  static const inviteHistoryTooltip = '초대 내역';
+
+  /// 초대 링크 생성 중 오류 — error 타이틀.
+  static const inviteCreateErrorTitle = '초대 링크 생성 중 오류가 발생했습니다';
+
+  /// 잠시 후 다시 시도해주세요 — error 본문.
+  static const inviteCreateErrorSubtitle = '잠시 후 다시 시도해주세요';
+
+  /// $targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요 — 헤더 안내.
+  static String inviteShareGuideFormat(String targetRole) =>
+      '$targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요';
+
+  /// QR 코드 — QR 카드 섹션 타이틀.
+  static const qrCodeSectionTitle = 'QR 코드';
+
+  /// 대면 수업 시 스캔하세요 — QR 카드 안내.
+  static const qrCodeScanInstruction = '대면 수업 시 스캔하세요';
+
+  /// 초대 코드 — 코드 카드 섹션 타이틀.
+  static const inviteCodeSectionTitle = '초대 코드';
+
+  /// 코드 복사 — copy IconButton 툴팁.
+  static const inviteCodeCopyTooltip = '코드 복사';
+
+  /// 앱에서 직접 입력할 수 있는 코드입니다 — 코드 카드 본문.
+  static const inviteCodeManualEntryHint = '앱에서 직접 입력할 수 있는 코드입니다';
+
+  /// 링크 공유하기 — primary share 버튼.
+  static const inviteShareLinkButton = '링크 공유하기';
+
+  /// 링크 복사 — secondary copy 버튼.
+  static const inviteCopyLinkButton = '링크 복사';
+
+  /// 카카오톡 — Kakao 공유 버튼.
+  static const inviteKakaoButton = '카카오톡';
+
+  /// 유효기간: $formatted — 만료 정보.
+  static String inviteExpiryFormat(String formatted) => '유효기간: $formatted';
+
+  /// 다른 방법으로 연결하기 — alternative options 섹션 헤더.
+  static const inviteAlternativeOptionsTitle = '다른 방법으로 연결하기';
+
+  /// QR 코드 스캔 — alternative ListTile 타이틀.
+  static const inviteScanQrTitle = 'QR 코드 스캔';
+
+  /// 학생의 QR 코드 스캔하기 — 선생님 시점 부제.
+  static const inviteScanQrTeacherSubtitle = '학생의 QR 코드 스캔하기';
+
+  /// 선생님의 QR 코드 스캔하기 — 학생 시점 부제.
+  static const inviteScanQrStudentSubtitle = '선생님의 QR 코드 스캔하기';
+
+  /// 6자리 코드로 연결하기 — code-input ListTile 부제.
+  static const inviteCodeInputShortSubtitle = '6자리 코드로 연결하기';
+
+  /// 선생님 검색 — teacher-search ListTile 타이틀 (학생 전용).
+  static const inviteTeacherSearchTitle = '선생님 검색';
+
+  /// 앱에서 선생님 찾기 — teacher-search ListTile 부제.
+  static const inviteTeacherSearchSubtitle = '앱에서 선생님 찾기';
+
+  /// 초대 코드가 복사되었습니다 — 코드 복사 SnackBar.
+  static const inviteCodeCopiedSnack = '초대 코드가 복사되었습니다';
+
+  /// 초대 링크가 복사되었습니다 — 링크 복사 SnackBar.
+  static const inviteLinkCopiedSnack = '초대 링크가 복사되었습니다';
+
+  /// 레슨앱 초대 공유 메시지 ($code, $url, $role) — multi-line share text.
+  static String inviteShareMessageFormat(
+    String code,
+    String url,
+    String role,
+  ) =>
+      '레슨앱에서 저와 함께해요!\n\n'
+      '초대 코드: $code\n'
+      '또는 링크: $url\n\n'
+      '- $role 드림';
+
+  /// 레슨앱 초대 — share subject.
+  static const inviteShareSubject = '레슨앱 초대';
 }
