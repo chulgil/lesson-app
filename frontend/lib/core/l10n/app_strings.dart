@@ -4387,4 +4387,57 @@ class AppStrings {
 
   /// 공개 프로필 미리보기 (Preview 버튼 라벨)
   static const profileVisibilityPreviewButton = '공개 프로필 미리보기';
+
+  // ── Teacher Analytics Dashboard (선생님 통계 대시보드 5-3c-1) ────────
+
+  /// 통계 (AppBar 타이틀)
+  static const analyticsAppBarTitle = '통계';
+
+  /// 총 레슨 (StatCard 타이틀)
+  static const analyticsTotalLessons = '총 레슨';
+
+  /// 완료 N회 (StatCard subtitle 포매터 — 총 레슨 카드)
+  static String analyticsCompletedFormat(int count) => '완료 $count회';
+
+  /// 취소 N회 (StatCard subtitle 포매터 — 출석률 카드)
+  static String analyticsCancelledFormat(int count) => '취소 $count회';
+
+  /// 학생 수 (StatCard 타이틀)
+  static const analyticsStudentCountLabel = '학생 수';
+
+  /// 신규 +N명 (StatCard subtitle 포매터 — 학생 수 카드)
+  static String analyticsNewStudentsFormat(int count) => '신규 +$count명';
+
+  /// 월 수입 (StatCard 타이틀)
+  static const analyticsMonthlyRevenue = '월 수입';
+
+  /// 수익 현황 (섹션 헤더)
+  static const analyticsRevenueSection = '수익 현황';
+
+  /// 이번 달 수익 (라벨)
+  static const analyticsThisMonthRevenue = '이번 달 수익';
+
+  /// +12.3% / -5.2% (수익 변화 포매터, sign 포함)
+  static String analyticsRevenueChangeFormat(double percent) {
+    final sign = percent >= 0 ? '+' : '';
+    return '$sign${percent.toStringAsFixed(1)}%';
+  }
+
+  /// 학생 현황 (섹션 헤더)
+  static const analyticsStudentSection = '학생 현황';
+
+  /// 총 학생 (학생 현황 stat 라벨)
+  static const analyticsTotalStudentsLabel = '총 학생';
+
+  /// 신규 (학생 현황 stat 라벨)
+  static const analyticsNewLabel = '신규';
+
+  /// +N명 (학생 현황 신규 value 포매터)
+  static String analyticsNewCountFormat(int count) => '+$count명';
+
+  /// 이탈 (학생 현황 stat 라벨)
+  static const analyticsChurnedLabel = '이탈';
+
+  /// -N명 (학생 현황 이탈 value 포매터, count 는 양수로 받아 부호 자동 부착)
+  static String analyticsChurnedCountFormat(int count) => '-$count명';
 }
