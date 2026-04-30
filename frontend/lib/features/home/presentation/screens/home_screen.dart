@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
@@ -54,10 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, 'I', '홈'),
-              _buildNavItem(1, 'II', '스케줄'),
-              _buildNavItem(2, 'III', '수강관리'),
-              _buildNavItem(3, 'IV', '프로필'),
+              _buildNavItem(0, 'I', AppStrings.homeTabLabel),
+              _buildNavItem(1, 'II', AppStrings.scheduleTabTitle),
+              _buildNavItem(2, 'III', AppStrings.studentsTabLabel),
+              _buildNavItem(3, 'IV', AppStrings.profileTabLabel),
             ],
           ),
         ),
