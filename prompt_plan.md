@@ -420,6 +420,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3c-2 analytics widgets 4 사이트 (2026-04-30) — analytics/ 도메인 잔여 위젯 2개 마이그레이션. monthly_trend_chart.dart 2건(`'레슨 추이'` 섹션 헤더 + `'${t.month.month}월'` 월별 라벨 포매터) + practice_ranking_list.dart 2건(`'연습률 TOP 5'` 섹션 헤더 + `'연습 데이터가 없습니다'` 빈 상태). 신규 키 4개 (analyticsLessonTrendSection / analyticsMonthLabelFormat 포매터 / analyticsPracticeRankingSection / analyticsNoPracticeData) + 재사용 0건 (모두 위젯 고유 텍스트). flutter analyze lib/features/analytics/ — No issues found. 커밋 `cd6af092` (키) + `464a58a0` (마이그레이션). **참고**: 정수 표기(`'$rank'`, `'$percent%'`)는 i18n 제외 (visual format with literal symbols). 월별 라벨은 단일 포매터로 캡슐화 — 다국어 월 표기 차이 흡수.
 - P2 5-3c analytics 도메인 종결 (2026-04-30) — production presentation 코드 100% 완료 (teacher_dashboard_screen + 위젯 2개 = 26 사이트). **policy 제외 잔여**: mock_analytics_repository.dart ~10 mock 사이트 — 도메인 정책상 i18n 마이그레이션 제외. 다음 워크스트림은 P2 5-3d settings/onboarding/home/invite 차도메인 (~30 파일).
 - 5-3d-1 backup_settings_screen 2 사이트 (2026-04-30) — settings/ 도메인 첫 진입(P2 5-3d). 녹음 백업 설정 화면. AppBar 1건(`'녹음 백업'`) + 에러 상태 1건(`'오류가 발생했습니다.'` 마침표 포함, errorOccurred 와 미세 차이로 재사용 회피). 신규 키 2개 (backupAppBarTitle, backupErrorState) + 재사용 1건 (AppStrings.retry — 이미 마이그레이션됨). flutter analyze — No issues. subscription 63/63 PASS (regression gate), 한글 grep — 0 잔존 (코드/주석 클린). 커밋 `e46ec53c` (키) + `6d3d817a` (마이그레이션). **참고**: settings/ 도메인 잔여 후보 — backup_service.dart(13 사이트), all_recordings_screen.dart, orphan_recordings_screen.dart 후속 청크.
+- 5-3d-2 dashboard_tab 13 사이트 (2026-04-30) — home/ 도메인 첫 진입. 선생님 홈 대시보드 위젯. Programme 마스트헤드(오늘의 레슨/Korean lesson count formatter) + Today's Programme 헤더(일괄 피드백/전체보기) + 통계 카드 2× (오늘 레슨/이번 달 × usageCountShort) + 빈 상태(타이틀/서브타이틀/액션) + 더보기 버튼(N개 레슨 더보기) + Fine. 푸터(통계 더보기) + 에러 카드 + 알림 tooltip. 신규 키 8개 (dashboardProgrammeTitle, dashboardLessonCountFormat — 한국어 서수 0~10편 + count fallback, dashboardLessonsLoadError, dashboardThisMonth, dashboardEmptyTitle/Subtitle, dashboardMoreLessonsFormat, dashboardAnalyticsMoreLink) + 재사용 5건 (notifications, todayLessons, bulkFeedbackTitle, viewAll, lessonAddTitle) + usageCountShort 포매터 도입(`${count}회` 인라인 → 단일 포매터). 부수 변경: `_koreanLessonCount` private 헬퍼 → AppStrings 로 이동(테스트 가능성 + 다국어 단일 진원지). flutter analyze — No issues. 커밋 `3a6f4bd7` (키) + `fba24c75` (마이그레이션). **Notebook × Score 시그니처 보존**: Programme for $dayLabel / Today's Programme / $month月 $day日 / Fine. / LESSONAZA / VOL.$roman·NO.$day — 영문/CJK 브랜드 자산은 i18n 제외 (구체적 디자인 가이드 §1).
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -490,7 +491,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-27 certificate_edit_screen i18n (36 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3c analytics 도메인 종결 (mock seed 10 사이트 정책 제외) | ✅ 완료 (2026-04-30) |
 | P2 5-3d-1 backup_settings_screen i18n (2 사이트) | ✅ 완료 (2026-04-30) |
-| **다음** P2 5-3d-2+ settings 도메인 잔여 (backup_service / all_recordings / orphan_recordings) | 대기 |
+| P2 5-3d-2 dashboard_tab i18n (13 사이트) | ✅ 완료 (2026-04-30) |
+| **다음** P2 5-3d-3+ home 도메인 잔여 (getting_started_card / lesson_card / home_screen) 또는 settings 잔여 | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
