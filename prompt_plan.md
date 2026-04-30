@@ -418,6 +418,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3c-1 teacher_dashboard_screen 22 사이트 (2026-04-30) — analytics/ 도메인 첫 진입(P2 5-3c). 선생님 통계 대시보드 화면. AppBar 1건(통계) + 에러 1건(cannotLoadData 재사용) + StatCard 2×2 그리드 4 카드(총 레슨/출석률/학생 수/월 수입) × (title + value 포매터 + subtitle 포매터) = 11 sites + Revenue 섹션 3건(수익 현황 헤더/이번 달 수익 라벨/수익 변화 % sign 포매터) + Student 섹션 6건(학생 현황 헤더/총 학생/신규/이탈 + 3 value 포매터). 신규 키 16개 (analyticsAppBarTitle/TotalLessons/StudentCountLabel/MonthlyRevenue/RevenueSection/ThisMonthRevenue/StudentSection/TotalStudentsLabel/NewLabel/ChurnedLabel + Completed/Cancelled/NewStudents/RevenueChange/NewCount/ChurnedCount Format 포매터) + 재사용 6건 (cannotLoadData × 1, subscriptionAttendanceRateLabel × 1, peopleCount × 3 — 학생 수 카드 + 총 학생 stat + 이탈 0 fallback, usageCountShort × 1). subscription 63/63 PASS (regression gate), flutter analyze — No issues. 커밋 `2aef57d5` (키) + `76610b98` (마이그레이션). **참고**: 부호 + 백분율 포매팅을 단일 포매터(analyticsRevenueChangeFormat) 로 캡슐화 — 다국어에서 부호 위치/소수점 표기 차이 흡수. 잔여 analytics presentation 미정 (mock_analytics_repository.dart 10건은 mock seed data 정책 제외, monthly_trend_chart.dart 1건 + practice_ranking_list.dart 2건 = 3 위젯 사이트 후보).
 - 5-3c-2 analytics widgets 4 사이트 (2026-04-30) — analytics/ 도메인 잔여 위젯 2개 마이그레이션. monthly_trend_chart.dart 2건(`'레슨 추이'` 섹션 헤더 + `'${t.month.month}월'` 월별 라벨 포매터) + practice_ranking_list.dart 2건(`'연습률 TOP 5'` 섹션 헤더 + `'연습 데이터가 없습니다'` 빈 상태). 신규 키 4개 (analyticsLessonTrendSection / analyticsMonthLabelFormat 포매터 / analyticsPracticeRankingSection / analyticsNoPracticeData) + 재사용 0건 (모두 위젯 고유 텍스트). flutter analyze lib/features/analytics/ — No issues found. 커밋 `cd6af092` (키) + `464a58a0` (마이그레이션). **참고**: 정수 표기(`'$rank'`, `'$percent%'`)는 i18n 제외 (visual format with literal symbols). 월별 라벨은 단일 포매터로 캡슐화 — 다국어 월 표기 차이 흡수.
 - P2 5-3c analytics 도메인 종결 (2026-04-30) — production presentation 코드 100% 완료 (teacher_dashboard_screen + 위젯 2개 = 26 사이트). **policy 제외 잔여**: mock_analytics_repository.dart ~10 mock 사이트 — 도메인 정책상 i18n 마이그레이션 제외. 다음 워크스트림은 P2 5-3d settings/onboarding/home/invite 차도메인 (~30 파일).
+- 5-3d-1 backup_settings_screen 2 사이트 (2026-04-30) — settings/ 도메인 첫 진입(P2 5-3d). 녹음 백업 설정 화면. AppBar 1건(`'녹음 백업'`) + 에러 상태 1건(`'오류가 발생했습니다.'` 마침표 포함, errorOccurred 와 미세 차이로 재사용 회피). 신규 키 2개 (backupAppBarTitle, backupErrorState) + 재사용 1건 (AppStrings.retry — 이미 마이그레이션됨). flutter analyze — No issues. subscription 63/63 PASS (regression gate), 한글 grep — 0 잔존 (코드/주석 클린). 커밋 `e46ec53c` (키) + `6d3d817a` (마이그레이션). **참고**: settings/ 도메인 잔여 후보 — backup_service.dart(13 사이트), all_recordings_screen.dart, orphan_recordings_screen.dart 후속 청크.
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -486,7 +487,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3b-26 edit_repertoire_screen i18n (28 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3c-2 analytics widgets i18n (4 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3c analytics 도메인 종결 (mock seed 10 사이트 정책 제외) | ✅ 완료 (2026-04-30) |
-| **다음** P2 5-3d settings/onboarding/home/invite 차도메인 i18n (~30 파일) | 대기 |
+| P2 5-3d-1 backup_settings_screen i18n (2 사이트) | ✅ 완료 (2026-04-30) |
+| **다음** P2 5-3d-2+ settings 도메인 잔여 (backup_service / all_recordings / orphan_recordings) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 
 > **세션 분할 전략**: 한 세션에 P0-1 한 phase 단위. ultra 모드 검증 강도 유지.
