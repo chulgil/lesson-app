@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -48,7 +49,7 @@ class GettingStartedCard extends ConsumerWidget {
               const NotebookSectionHeader(label: 'Getting Started'),
               const SizedBox(height: AppSpacing.space2),
               Text(
-                '아래 단계를 따라 레슨 관리를 시작하세요',
+                AppStrings.gettingStartedIntro,
                 style: NotebookTypography.hand.copyWith(
                   fontSize: 14,
                   color: AppColors.inkSecondary,
@@ -57,16 +58,16 @@ class GettingStartedCard extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space3),
               _StepItem(
                 step: 1,
-                title: '학생 등록하기',
-                subtitle: '첫 학생을 추가해보세요',
+                title: AppStrings.gettingStartedStep1Title,
+                subtitle: AppStrings.gettingStartedStep1Subtitle,
                 isCompleted: false,
                 onTap: () => context.push(AppRoutes.addStudentMethod),
               ),
               const SizedBox(height: AppSpacing.space2),
               _StepItem(
                 step: 2,
-                title: '레슨 일정 만들기',
-                subtitle: '학생 등록 후 레슨을 추가하세요',
+                title: AppStrings.gettingStartedStep2Title,
+                subtitle: AppStrings.gettingStartedStep2Subtitle,
                 isCompleted: hasLessons,
                 onTap:
                     students.isEmpty
@@ -78,8 +79,8 @@ class GettingStartedCard extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space2),
               _StepItem(
                 step: 3,
-                title: '첫 레슨 완료하기',
-                subtitle: '레슨을 탭해 완료 처리하세요',
+                title: AppStrings.gettingStartedStep3Title,
+                subtitle: AppStrings.gettingStartedStep3Subtitle,
                 isCompleted: hasCompletedLesson,
                 onTap:
                     hasLessons
