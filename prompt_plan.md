@@ -66,7 +66,7 @@ body = 385/700 = 55%
 - 스크롤 다운 시 자연스럽게 collapse — Apple/Google Calendar 패턴 (HIG 준수)
 - 사용자 제안의 "헤더 비우기" 는 BLOCK 게이트 위반 → 거절. collapse 로 동등 효과 달성.
 
-## Phase A — weeklyGrid 모드 collapse 적용 (현재 진행)
+## Phase A — weeklyGrid 모드 collapse 적용 ✅ 완료 (2026-04-30, commits a46ae78d + 22abfd3e)
 
 ### 산출물 5 파일
 
@@ -142,11 +142,26 @@ body = 385/700 = 55%
 
 | Phase | 내용 | 상태 |
 |-------|------|------|
-| A | weeklyGrid 모드 collapse 적용 | 진행 중 |
+| A | weeklyGrid 모드 collapse 적용 | ✅ 완료 (a46ae78d feat + 22abfd3e test) |
 | B | timeline 모드 collapse | 대기 (사용자 검증 후) |
 | C | ViewModeToggle sticky 이동 | 대기 |
 | D | 헤더 padding 압축 | 대기 |
 | E | 통합 회귀 가드 | 대기 |
+
+### Phase A 클로즈 노트 (2026-04-30)
+
+**검증 결과**:
+- flutter analyze: 0 issues (schedule feature + tests)
+- 테스트 5/5 PASS (기존 4 list 회귀 가드 + 신규 1 weeklyGrid 회귀 가드)
+- 시그니처 4대(SCHEDULE / Programme of Schedule / 스케줄 / ThinRule) 펼친 상태에서 모두 보존
+- weeklyGrid 자체 ScrollController 제거 → 외부 CustomScrollView 합류, body 영역 55% → 80% 확보
+
+**산출물**:
+- feat: `schedule_view_mode_provider.dart` (forTesting 생성자) + `schedule_tab.dart` (분기 통합) + `schedule_weekly_grid_view.dart` (ConsumerWidget 전환)
+- test: `schedule_tab_layout_test.dart` (weeklyGrid 회귀 가드 + Hive 우회)
+- docs: 본 클로즈 노트
+
+**다음 단계**: 사용자 실기 검증 후 Phase B (timeline 모드 collapse) 착수.
 
 ---
 
