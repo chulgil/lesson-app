@@ -4531,6 +4531,61 @@ class AppStrings {
   /// 오류가 발생했습니다. (백업 로딩 에러 상태 — 마침표 포함)
   static const backupErrorState = '오류가 발생했습니다.';
 
+  // ── Backup Service Progress (백업/복원 진행 상태 5-3d-2) ───────────────
+
+  /// 백업 준비 중... (createBackup 진입)
+  static const backupPreparing = '백업 준비 중...';
+
+  /// 메타데이터 생성 중... (백업 메타데이터 생성 단계)
+  static const backupMetadataCreating = '메타데이터 생성 중...';
+
+  /// Hive 데이터 내보내기 중... (백업 Hive 박스 export 단계)
+  static const backupHiveExporting = 'Hive 데이터 내보내기 중...';
+
+  /// 녹음 파일 추가 중... (백업 녹음 파일 추가 단계 — 시작 헤더)
+  static const backupRecordingsAdding = '녹음 파일 추가 중...';
+
+  /// 녹음 파일 추가 중... (current/total) — 백업 녹음 파일 추가 진행 포매터
+  static String backupRecordingsAddingProgressFormat(int current, int total) =>
+      '녹음 파일 추가 중... ($current/$total)';
+
+  /// ZIP 압축 중... (백업 ZIP 인코딩 단계)
+  static const backupZipCompressing = 'ZIP 압축 중...';
+
+  /// 백업 완료 (백업 성공 종결)
+  static const backupComplete = '백업 완료';
+
+  /// 백업 파일 읽는 중... (restoreFromBackup 진입)
+  static const backupFileReading = '백업 파일 읽는 중...';
+
+  /// 유효하지 않은 백업 파일입니다. (메타데이터 누락 시 실패 사유)
+  static const backupInvalidFile = '유효하지 않은 백업 파일입니다.';
+
+  /// 백업 버전 확인 중... (복원 버전 호환성 단계)
+  static const backupVersionChecking = '백업 버전 확인 중...';
+
+  /// 지원되지 않는 백업 버전입니다: $version (호환 불가 실패 포매터)
+  static String backupUnsupportedVersionFormat(String version) =>
+      '지원되지 않는 백업 버전입니다: $version';
+
+  /// Hive 데이터 복원 중... (복원 Hive 박스 import 단계)
+  static const backupHiveRestoring = 'Hive 데이터 복원 중...';
+
+  /// 녹음 파일 복원 중... (복원 녹음 파일 단계 — 시작 헤더)
+  static const backupRecordingsRestoring = '녹음 파일 복원 중...';
+
+  /// 녹음 파일 복원 중... (processed/total) — 복원 녹음 파일 진행 포매터
+  static String backupRecordingsRestoringProgressFormat(
+    int processed,
+    int total,
+  ) => '녹음 파일 복원 중... ($processed/$total)';
+
+  /// 복원 완료 (복원 성공 종결)
+  static const restoreComplete = '복원 완료';
+
+  /// 복원 중 오류 발생: $error (복원 catch 블록 실패 사유 포매터)
+  static String restoreErrorFormat(Object error) => '복원 중 오류 발생: $error';
+
   // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
   /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
   static const certificateEditAppBarAdd = '자격증 추가';
@@ -4660,4 +4715,27 @@ class AppStrings {
 
   /// 통계 더보기 — Fine. 푸터 링크.
   static const dashboardAnalyticsMoreLink = '통계 더보기';
+
+  // ── Getting Started Card (홈 온보딩 체크리스트 5-3d-3) ────────────────────
+
+  /// Getting Started 인트로 안내 — 학생 0명일 때 노출.
+  static const gettingStartedIntro = '아래 단계를 따라 레슨 관리를 시작하세요';
+
+  /// Step 1 — 학생 등록 타이틀.
+  static const gettingStartedStep1Title = '학생 등록하기';
+
+  /// Step 1 — 학생 등록 서브타이틀.
+  static const gettingStartedStep1Subtitle = '첫 학생을 추가해보세요';
+
+  /// Step 2 — 레슨 일정 만들기 타이틀.
+  static const gettingStartedStep2Title = '레슨 일정 만들기';
+
+  /// Step 2 — 레슨 일정 만들기 서브타이틀.
+  static const gettingStartedStep2Subtitle = '학생 등록 후 레슨을 추가하세요';
+
+  /// Step 3 — 첫 레슨 완료 타이틀.
+  static const gettingStartedStep3Title = '첫 레슨 완료하기';
+
+  /// Step 3 — 첫 레슨 완료 서브타이틀.
+  static const gettingStartedStep3Subtitle = '레슨을 탭해 완료 처리하세요';
 }
