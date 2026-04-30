@@ -4586,6 +4586,73 @@ class AppStrings {
   /// 복원 중 오류 발생: $error (복원 catch 블록 실패 사유 포매터)
   static String restoreErrorFormat(Object error) => '복원 중 오류 발생: $error';
 
+  // ── All Recordings Screen (전체 녹음 관리 5-3d-5) ────────────────────────
+  /// 전체 녹음 파일 (AppBar 타이틀)
+  static const allRecordingsAppBarTitle = '전체 녹음 파일';
+
+  /// 녹음 가져오기 (파일 가져오기 IconButton tooltip)
+  static const allRecordingsImportTooltip = '녹음 가져오기';
+
+  /// 새로고침 (refresh IconButton tooltip — 다도메인 재사용 가능)
+  static const refreshTooltip = '새로고침';
+
+  /// 오류가 발생했습니다. (per-domain error state — backup/profileVisibility 패턴)
+  static const allRecordingsErrorState = '오류가 발생했습니다.';
+
+  /// 파일을 읽을 수 없습니다 (file path null SnackBar)
+  static const allRecordingsFileReadError = '파일을 읽을 수 없습니다';
+
+  /// 녹음 파일을 가져왔습니다: $fileName (import success SnackBar 포매터)
+  static String allRecordingsImportedFormat(String fileName) =>
+      '녹음 파일을 가져왔습니다: $fileName';
+
+  /// 파일 가져오기 중 오류가 발생했습니다 (import failure SnackBar)
+  static const allRecordingsImportError = '파일 가져오기 중 오류가 발생했습니다';
+
+  /// 오류가 발생했습니다. 다시 시도해주세요. (generic catch-all retry SnackBar — 다도메인 재사용)
+  static const errorOccurredRetryAgain = '오류가 발생했습니다. 다시 시도해주세요.';
+
+  /// 연결되지 않은 녹음 (orphaned recordings 섹션 헤더)
+  static const allRecordingsOrphanedSection = '연결되지 않은 녹음';
+
+  /// 연결된 녹음 (connected recordings 섹션 헤더)
+  static const allRecordingsConnectedSection = '연결된 녹음';
+
+  /// 연결됨 (stats card connected 라벨)
+  static const allRecordingsConnectedStatLabel = '연결됨';
+
+  /// 미연결 (stats card orphaned 라벨)
+  static const allRecordingsOrphanedStatLabel = '미연결';
+
+  /// 녹음을 연결할 섹션 선택 (SectionPickerScreen title)
+  static const allRecordingsSectionPickerTitle = '녹음을 연결할 섹션 선택';
+
+  /// 녹음이 "$sectionName"에 연결되었습니다 (link success SnackBar 포매터)
+  static String allRecordingsLinkedFormat(String sectionName) =>
+      '녹음이 "$sectionName"에 연결되었습니다';
+
+  /// 연결 중 오류가 발생했습니다 (reassign failure SnackBar)
+  static const allRecordingsLinkError = '연결 중 오류가 발생했습니다';
+
+  /// 녹음 삭제 (delete confirm Dialog title)
+  static const allRecordingsDeleteDialogTitle = '녹음 삭제';
+
+  /// 이 녹음을 영구적으로 삭제하시겠습니까? + 이 작업은 되돌릴 수 없습니다. (delete confirm Dialog content)
+  static const allRecordingsDeleteDialogContent =
+      '이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.';
+
+  /// 녹음이 삭제되었습니다 (delete success SnackBar)
+  static const allRecordingsDeletedSnack = '녹음이 삭제되었습니다';
+
+  /// 연결되지 않음 (orphaned 인라인 카드 라벨)
+  static const allRecordingsOrphanedInline = '연결되지 않음';
+
+  /// 섹션에 연결 (orphaned 카드 link IconButton tooltip)
+  static const allRecordingsLinkSectionTooltip = '섹션에 연결';
+
+  /// 섹션 변경 (connected 카드 change IconButton tooltip)
+  static const allRecordingsChangeSectionTooltip = '섹션 변경';
+
   // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
   /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
   static const certificateEditAppBarAdd = '자격증 추가';
@@ -4748,4 +4815,24 @@ class AppStrings {
 
   /// 프로필 (bottom nav label, 로마숫자 IV)
   static const profileTabLabel = '프로필';
+
+  // ── Urgent Alert Zone (홈 긴급 메모 스트립 5-3d-7) ──────────────────────
+  /// 미수금 alert 텍스트 — 만원/원 단위 자동 선택 + 학생 수.
+  /// 예: '미수금 5만원 (3명)' / '미수금 5000원 (1명)'
+  static String urgentAlertOutstandingFormat(
+    int totalAmount,
+    int studentCount,
+  ) {
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
+    return '미수금 $formattedAmount ($studentCount명)';
+  }
+
+  /// 접기 — expand toggle 축소 라벨.
+  static const urgentAlertCollapse = '접기';
+
+  /// 외 $count건 — expand toggle 확장 라벨.
+  static String urgentAlertMoreFormat(int count) => '외 $count건';
 }
