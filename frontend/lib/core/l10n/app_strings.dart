@@ -4711,6 +4711,33 @@ class AppStrings {
   /// 코드 확인 중 오류가 발생했습니다 (lookup catch 블록)
   static const inviteCodeLookupError = '코드 확인 중 오류가 발생했습니다';
 
+  // ── Invite QR Scan Screen (초대 QR 스캔 5-3d-13) ──────────────────────
+  /// $targetRole QR 스캔 (AppBar 타이틀 — 선생님/학생 동적)
+  static String inviteScanAppBarTitleFormat(String targetRole) =>
+      '$targetRole QR 스캔';
+
+  /// 플래시 (스캐너 플래시 토글 tooltip)
+  static const inviteScanFlashTooltip = '플래시';
+
+  /// 카메라 전환 (전·후면 카메라 전환 tooltip)
+  static const inviteScanCameraSwitchTooltip = '카메라 전환';
+
+  /// $targetRole의 QR 코드를 스캔하세요 (스캔 안내 프롬프트 — 동적)
+  static String inviteScanPromptFormat(String targetRole) =>
+      '$targetRole의 QR 코드를 스캔하세요';
+
+  /// QR 코드가 프레임 안에 들어오도록 해주세요 (프레임 안내 서브텍스트)
+  static const inviteScanFrameInstruction = 'QR 코드가 프레임 안에 들어오도록 해주세요';
+
+  /// 코드로 입력하기 (QR 스캔 대안 — 코드 입력 화면 진입)
+  static const inviteScanEnterCodeAlternative = '코드로 입력하기';
+
+  /// 올바른 QR 코드가 아닙니다 (QR 파싱 실패 메시지)
+  static const inviteScanInvalidQr = '올바른 QR 코드가 아닙니다';
+
+  /// QR 코드 처리 중 오류가 발생했습니다 (QR 처리 catch 블록)
+  static const inviteScanProcessingError = 'QR 코드 처리 중 오류가 발생했습니다';
+
   // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
   /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
   static const certificateEditAppBarAdd = '자격증 추가';
