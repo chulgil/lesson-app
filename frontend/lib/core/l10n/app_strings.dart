@@ -4440,4 +4440,73 @@ class AppStrings {
 
   /// -N명 (학생 현황 이탈 value 포매터, count 는 양수로 받아 부호 자동 부착)
   static String analyticsChurnedCountFormat(int count) => '-$count명';
+
+  // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
+  /// 레퍼토리 편집 (AppBar 타이틀)
+  static const editRepertoireAppBarTitle = '레퍼토리 편집';
+
+  /// 레퍼토리를 찾을 수 없습니다 (null 상태)
+  static const repertoireNotFound = '레퍼토리를 찾을 수 없습니다';
+
+  /// 기본 정보 (섹션 헤더)
+  static const basicInfoTitle = '기본 정보';
+
+  /// 레퍼토리 이름, 설명 설정 (기본 정보 섹션 subtitle)
+  static const editRepertoireBasicInfoSubtitle = '레퍼토리 이름, 설명 설정';
+
+  /// 레퍼토리 이름 * (이름 입력 라벨)
+  static const repertoireNameLabel = '레퍼토리 이름 *';
+
+  /// 예: 스즈키 6권, 바흐 협주곡 (이름 입력 hint)
+  static const editRepertoireNameHint = '예: 스즈키 6권, 바흐 협주곡';
+
+  /// 레퍼토리 이름을 입력해주세요 (이름 입력 validator)
+  static const repertoireNameRequired = '레퍼토리 이름을 입력해주세요';
+
+  /// 예: Bach Violin Concerto in A minor (설명 입력 hint)
+  static const repertoireDescriptionHint = '예: Bach Violin Concerto in A minor';
+
+  /// 시작일 선택 (start date picker helpText)
+  static const selectStartDate = '시작일 선택';
+
+  /// 종료일 선택 (end date picker helpText)
+  static const selectEndDate = '종료일 선택';
+
+  /// 설정 안함 (매일 반복) (end date placeholder)
+  static const endDateNotSetDaily = '설정 안함 (매일 반복)';
+
+  /// 레퍼토리 수정에 실패했습니다. 다시 시도해주세요. (저장 실패 SnackBar)
+  static const editRepertoireUpdateFailedRetry = '레퍼토리 수정에 실패했습니다. 다시 시도해주세요.';
+
+  /// 관리 (관리 섹션 헤더 타이틀)
+  static const managementSectionTitle = '관리';
+
+  /// 레퍼토리를 아카이브하거나 삭제합니다 (관리 섹션 description)
+  static const managementSectionDescription = '레퍼토리를 아카이브하거나 삭제합니다';
+
+  /// 아카이브 (다이얼로그 타이틀 + 액션 버튼)
+  static const archiveButton = '아카이브';
+
+  /// 이 레퍼토리를 아카이브하시겠습니까?\n아카이브된 레퍼토리는 목록에서 숨겨집니다. (아카이브 확인 다이얼로그 본문)
+  static const archiveRepertoireConfirm =
+      '이 레퍼토리를 아카이브하시겠습니까?\n아카이브된 레퍼토리는 목록에서 숨겨집니다.';
+
+  /// 레퍼토리가 아카이브되었습니다 (아카이브 성공 SnackBar)
+  static const repertoireArchivedSnackbar = '레퍼토리가 아카이브되었습니다';
+
+  /// 아카이브에 실패했습니다. 다시 시도해주세요. (아카이브 실패 SnackBar)
+  static const archiveFailedRetry = '아카이브에 실패했습니다. 다시 시도해주세요.';
+
+  /// 레퍼토리 삭제 (다이얼로그 타이틀 + 액션 버튼)
+  static const deleteRepertoireTitle = '레퍼토리 삭제';
+
+  /// 이 레퍼토리를 삭제하시겠습니까?\n연결된 모든 섹션과 녹음이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다. (삭제 확인 다이얼로그 본문)
+  static const deleteRepertoireConfirm =
+      '이 레퍼토리를 삭제하시겠습니까?\n연결된 모든 섹션과 녹음이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.';
+
+  /// 레퍼토리가 삭제되었습니다 (삭제 성공 SnackBar)
+  static const repertoireDeletedSnackbar = '레퍼토리가 삭제되었습니다';
+
+  /// 삭제에 실패했습니다. 다시 시도해주세요. (삭제 실패 SnackBar)
+  static const deleteFailedRetry = '삭제에 실패했습니다. 다시 시도해주세요.';
 }
