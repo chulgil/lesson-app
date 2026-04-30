@@ -23,7 +23,7 @@ class BackupSettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('녹음 백업'),
+        title: const Text(AppStrings.backupAppBarTitle),
         backgroundColor: AppColors.paperDark,
         elevation: 0,
         foregroundColor: AppColors.ink,
@@ -43,7 +43,7 @@ class BackupSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   const Text(
-                    '오류가 발생했습니다.',
+                    AppStrings.backupErrorState,
                     style: TextStyle(color: AppColors.paperAccent),
                   ),
                   const SizedBox(height: AppSpacing.space4),
