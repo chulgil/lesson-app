@@ -4679,6 +4679,38 @@ class AppStrings {
   /// $n개 (count + 한국어 단위 — 다도메인 재사용 가능)
   static String countItemsSuffix(int n) => '$n개';
 
+  // ── Invite Code Input Screen (초대 코드 입력 5-3d-11) ──────────────────
+  /// 초대 코드 입력 (AppBar 타이틀)
+  static const inviteCodeAppBarTitle = '초대 코드 입력';
+
+  /// $targetRole의 초대 코드를 입력하세요 (입력 안내 — 선생님/학생 동적)
+  static String inviteCodeInputPromptFormat(String targetRole) =>
+      '$targetRole의 초대 코드를 입력하세요';
+
+  /// 6자리 숫자 코드를 입력해주세요 (입력 서브타이틀)
+  static const inviteCodeInputSubtitle = '6자리 숫자 코드를 입력해주세요';
+
+  /// 클립보드에서 붙여넣기 (붙여넣기 액션 라벨)
+  static const inviteCodePasteFromClipboard = '클립보드에서 붙여넣기';
+
+  /// QR 코드 스캔하기 (QR 스캔 대안 라벨)
+  static const inviteCodeQrScan = 'QR 코드 스캔하기';
+
+  /// 클립보드에 유효한 코드가 없습니다 (붙여넣기 실패 메시지)
+  static const inviteCodeClipboardInvalid = '클립보드에 유효한 코드가 없습니다';
+
+  /// 초대 코드를 찾을 수 없습니다 (lookup 결과 없음)
+  static const inviteCodeNotFound = '초대 코드를 찾을 수 없습니다';
+
+  /// 만료된 초대 코드입니다 (InviteStatus.expired)
+  static const inviteCodeExpired = '만료된 초대 코드입니다';
+
+  /// 유효하지 않은 초대 코드입니다 (InviteStatus 그 외 invalid)
+  static const inviteCodeInvalid = '유효하지 않은 초대 코드입니다';
+
+  /// 코드 확인 중 오류가 발생했습니다 (lookup catch 블록)
+  static const inviteCodeLookupError = '코드 확인 중 오류가 발생했습니다';
+
   // ── Certificate Edit Screen (자격증 편집 5-3b-27) ──────────────────────
   /// 자격증 추가 (AppBar 타이틀 — 신규 등록 모드)
   static const certificateEditAppBarAdd = '자격증 추가';
