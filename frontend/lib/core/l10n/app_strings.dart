@@ -4523,4 +4523,11 @@ class AppStrings {
 
   /// 삭제에 실패했습니다. 다시 시도해주세요. (삭제 실패 SnackBar)
   static const deleteFailedRetry = '삭제에 실패했습니다. 다시 시도해주세요.';
+
+  // ── Backup Settings Screen (녹음 백업 설정 5-3d-1) ──────────────────────
+  /// 녹음 백업 (AppBar 타이틀)
+  static const backupAppBarTitle = '녹음 백업';
+
+  /// 오류가 발생했습니다. (백업 로딩 에러 상태 — 마침표 포함)
+  static const backupErrorState = '오류가 발생했습니다.';
 }
