@@ -11,6 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/backup_state.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 
@@ -25,7 +26,7 @@ class BackupService {
   Future<File> createBackup({
     void Function(double progress, String status)? onProgress,
   }) async {
-    onProgress?.call(0.0, '백업 준비 중...');
+    onProgress?.call(0.0, AppStrings.backupPreparing);
 
     final archive = Archive();
     final docsDir = await getApplicationDocumentsDirectory();
@@ -44,7 +45,7 @@ class BackupService {
       }
     }
 
-    onProgress?.call(0.1, '메타데이터 생성 중...');
+    onProgress?.call(0.1, AppStrings.backupMetadataCreating);
 
     // Create metadata
     final metadata = await _createMetadata(
@@ -52,24 +53,24 @@ class BackupService {
       totalSizeBytes: totalSize,
     );
     final metadataJson = jsonEncode(metadata.toJson());
-    archive.addFile(ArchiveFile(
-      'metadata.json',
-      metadataJson.length,
-      utf8.encode(metadataJson),
-    ));
+    archive.addFile(
+      ArchiveFile(
+        'metadata.json',
+        metadataJson.length,
+        utf8.encode(metadataJson),
+      ),
+    );
 
-    onProgress?.call(0.2, 'Hive 데이터 내보내기 중...');
+    onProgress?.call(0.2, AppStrings.backupHiveExporting);
 
     // Export Hive boxes
     final hiveSnapshot = await _exportHiveBoxes();
     final hiveJson = jsonEncode(hiveSnapshot);
-    archive.addFile(ArchiveFile(
-      'hive_snapshot.json',
-      hiveJson.length,
-      utf8.encode(hiveJson),
-    ));
+    archive.addFile(
+      ArchiveFile('hive_snapshot.json', hiveJson.length, utf8.encode(hiveJson)),
+    );
 
-    onProgress?.call(0.3, '녹음 파일 추가 중...');
+    onProgress?.call(0.3, AppStrings.backupRecordingsAdding);
 
     // Add recording files
     for (var i = 0; i < recordingFiles.length; i++) {
@@ -77,18 +78,20 @@ class BackupService {
       final relativePath = file.path.substring(docsDir.path.length + 1);
       final bytes = await file.readAsBytes();
 
-      archive.addFile(ArchiveFile(
-        relativePath,
-        bytes.length,
-        bytes,
-      ));
+      archive.addFile(ArchiveFile(relativePath, bytes.length, bytes));
 
       // Update progress
       final progress = 0.3 + (0.6 * (i + 1) / recordingFiles.length);
-      onProgress?.call(progress, '녹음 파일 추가 중... (${i + 1}/${recordingFiles.length})');
+      onProgress?.call(
+        progress,
+        AppStrings.backupRecordingsAddingProgressFormat(
+          i + 1,
+          recordingFiles.length,
+        ),
+      );
     }
 
-    onProgress?.call(0.9, 'ZIP 압축 중...');
+    onProgress?.call(0.9, AppStrings.backupZipCompressing);
 
     // Encode to ZIP
     final zipBytes = ZipEncoder().encode(archive);
@@ -102,14 +105,19 @@ class BackupService {
       await backupDir.create(recursive: true);
     }
 
-    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
-    final backupFile = File('${backupDir.path}/backup_$timestamp.$backupExtension');
+    final timestamp = DateTime.now()
+        .toIso8601String()
+        .replaceAll(':', '-')
+        .replaceAll('.', '-');
+    final backupFile = File(
+      '${backupDir.path}/backup_$timestamp.$backupExtension',
+    );
     await backupFile.writeAsBytes(zipBytes);
 
     // Save last backup date
     await _saveLastBackupDate(DateTime.now());
 
-    onProgress?.call(1.0, '백업 완료');
+    onProgress?.call(1.0, AppStrings.backupComplete);
 
     return backupFile;
   }
@@ -120,7 +128,7 @@ class BackupService {
     void Function(double progress, String status)? onProgress,
   }) async {
     try {
-      onProgress?.call(0.0, '백업 파일 읽는 중...');
+      onProgress?.call(0.0, AppStrings.backupFileReading);
 
       final bytes = await backupFile.readAsBytes();
       final archive = ZipDecoder().decodeBytes(bytes);
@@ -144,27 +152,29 @@ class BackupService {
       }
 
       if (metadata == null) {
-        return RestoreResult.failure('유효하지 않은 백업 파일입니다.');
+        return RestoreResult.failure(AppStrings.backupInvalidFile);
       }
 
-      onProgress?.call(0.1, '백업 버전 확인 중...');
+      onProgress?.call(0.1, AppStrings.backupVersionChecking);
 
       // Check backup version compatibility
       if (!_isVersionCompatible(metadata.backupVersion)) {
         return RestoreResult.failure(
-          '지원되지 않는 백업 버전입니다: ${metadata.backupVersion}',
+          AppStrings.backupUnsupportedVersionFormat(metadata.backupVersion),
         );
       }
 
-      onProgress?.call(0.2, 'Hive 데이터 복원 중...');
+      onProgress?.call(0.2, AppStrings.backupHiveRestoring);
 
       // Restore Hive data first
       if (hiveSnapshotFile != null) {
-        final hiveJson = jsonDecode(utf8.decode(hiveSnapshotFile.content as List<int>));
+        final hiveJson = jsonDecode(
+          utf8.decode(hiveSnapshotFile.content as List<int>),
+        );
         restoredBoxEntries = await _restoreHiveBoxes(hiveJson, docsDir.path);
       }
 
-      onProgress?.call(0.4, '녹음 파일 복원 중...');
+      onProgress?.call(0.4, AppStrings.backupRecordingsRestoring);
 
       // Restore recording files
       final recordingFiles = archive.where(
@@ -190,10 +200,16 @@ class BackupService {
 
         processedFiles++;
         final progress = 0.4 + (0.5 * processedFiles / totalFiles);
-        onProgress?.call(progress, '녹음 파일 복원 중... ($processedFiles/$totalFiles)');
+        onProgress?.call(
+          progress,
+          AppStrings.backupRecordingsRestoringProgressFormat(
+            processedFiles,
+            totalFiles,
+          ),
+        );
       }
 
-      onProgress?.call(1.0, '복원 완료');
+      onProgress?.call(1.0, AppStrings.restoreComplete);
 
       return RestoreResult(
         success: true,
@@ -202,7 +218,7 @@ class BackupService {
         restoredBoxEntries: restoredBoxEntries,
       );
     } catch (e) {
-      return RestoreResult.failure('복원 중 오류 발생: $e');
+      return RestoreResult.failure(AppStrings.restoreErrorFormat(e));
     }
   }
 
@@ -246,11 +262,13 @@ class BackupService {
     await for (final entity in backupDir.list()) {
       if (entity is File && entity.path.endsWith('.$backupExtension')) {
         final stat = await entity.stat();
-        backups.add(BackupFileInfo(
-          file: entity,
-          createdAt: stat.modified,
-          sizeBytes: stat.size,
-        ));
+        backups.add(
+          BackupFileInfo(
+            file: entity,
+            createdAt: stat.modified,
+            sizeBytes: stat.size,
+          ),
+        );
       }
     }
 
@@ -277,7 +295,9 @@ class BackupService {
     final boxCounts = <String, int>{};
 
     try {
-      final practiceRecordingsBox = Hive.box<PracticeRecording>('practice_recordings');
+      final practiceRecordingsBox = Hive.box<PracticeRecording>(
+        'practice_recordings',
+      );
       boxCounts['practice_recordings'] = practiceRecordingsBox.length;
     } catch (e) {
       // Box not open
@@ -300,10 +320,13 @@ class BackupService {
 
     // Export practice_recordings box
     try {
-      final practiceRecordingsBox = await Hive.openBox<PracticeRecording>('practice_recordings');
-      export['practice_recordings'] = practiceRecordingsBox.values
-          .map((r) => _practiceRecordingToJson(r))
-          .toList();
+      final practiceRecordingsBox = await Hive.openBox<PracticeRecording>(
+        'practice_recordings',
+      );
+      export['practice_recordings'] =
+          practiceRecordingsBox.values
+              .map((r) => _practiceRecordingToJson(r))
+              .toList();
     } catch (e) {
       // Could not export practice_recordings
     }
@@ -323,14 +346,18 @@ class BackupService {
     // Export metronome_settings box
     try {
       final metronomeBox = await Hive.openBox('metronome_settings');
-      export['metronome_settings'] = Map<String, dynamic>.from(metronomeBox.toMap());
+      export['metronome_settings'] = Map<String, dynamic>.from(
+        metronomeBox.toMap(),
+      );
     } catch (e) {
       // Could not export metronome_settings
     }
 
     // Export smart_recording_settings box
     try {
-      final smartRecordingBox = await Hive.openBox<Map>('smart_recording_settings');
+      final smartRecordingBox = await Hive.openBox<Map>(
+        'smart_recording_settings',
+      );
       final smartRecordingData = <String, dynamic>{};
       for (final key in smartRecordingBox.keys) {
         smartRecordingData[key.toString()] = smartRecordingBox.get(key);
@@ -343,7 +370,10 @@ class BackupService {
     return export;
   }
 
-  Future<int> _restoreHiveBoxes(Map<String, dynamic> data, String currentDocsPath) async {
+  Future<int> _restoreHiveBoxes(
+    Map<String, dynamic> data,
+    String currentDocsPath,
+  ) async {
     int restoredCount = 0;
 
     // Restore practice_repertoires FIRST (before recordings)
@@ -352,7 +382,8 @@ class BackupService {
     if (data.containsKey('practice_repertoires')) {
       try {
         final box = await Hive.openBox('practice_repertoires');
-        final repertoires = data['practice_repertoires'] as Map<String, dynamic>;
+        final repertoires =
+            data['practice_repertoires'] as Map<String, dynamic>;
 
         for (final entry in repertoires.entries) {
           if (!box.containsKey(entry.key)) {
@@ -373,20 +404,28 @@ class BackupService {
     if (data.containsKey('practice_recordings')) {
       try {
         // Use openBox instead of box to ensure box is opened even on fresh install
-        final box = await Hive.openBox<PracticeRecording>('practice_recordings');
+        final box = await Hive.openBox<PracticeRecording>(
+          'practice_recordings',
+        );
         final recordings = data['practice_recordings'] as List;
 
         for (final item in recordings) {
-          var recording = _practiceRecordingFromJson(item as Map<String, dynamic>);
+          var recording = _practiceRecordingFromJson(
+            item as Map<String, dynamic>,
+          );
 
           // Update file path to current documents directory
-          final updatedFilePath = _updateFilePath(recording.filePath, currentDocsPath);
+          final updatedFilePath = _updateFilePath(
+            recording.filePath,
+            currentDocsPath,
+          );
           if (updatedFilePath != recording.filePath) {
             recording = recording.copyWith(filePath: updatedFilePath);
           }
 
           // Try section matching if section doesn't exist
-          if (sectionIdMapping != null && sectionIdMapping.containsKey(recording.sectionId)) {
+          if (sectionIdMapping != null &&
+              sectionIdMapping.containsKey(recording.sectionId)) {
             final newSectionId = sectionIdMapping[recording.sectionId]!;
             if (newSectionId != recording.sectionId) {
               recording = recording.copyWith(sectionId: newSectionId);
@@ -428,7 +467,8 @@ class BackupService {
       try {
         // Use openBox instead of box to ensure box is opened even on fresh install
         final box = await Hive.openBox<Map>('smart_recording_settings');
-        final settings = data['smart_recording_settings'] as Map<String, dynamic>;
+        final settings =
+            data['smart_recording_settings'] as Map<String, dynamic>;
 
         for (final entry in settings.entries) {
           if (!box.containsKey(entry.key)) {
@@ -512,7 +552,10 @@ class BackupService {
     }
 
     // Build section lookup by unique key: repertoireName|pieceName|rangeType|startMeasure|endMeasure|startLine|endLine
-    String buildSectionKey(String repertoireName, Map<String, dynamic> section) {
+    String buildSectionKey(
+      String repertoireName,
+      Map<String, dynamic> section,
+    ) {
       final pieceName = section['pieceName'] as String? ?? '';
       final rangeType = section['rangeType'] as String? ?? 'measure';
       final startMeasure = section['startMeasure'] as int? ?? 0;
