@@ -89,7 +89,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레퍼토리 수정에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.editRepertoireUpdateFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -106,8 +106,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('아카이브'),
-            content: const Text('이 레퍼토리를 아카이브하시겠습니까?\n아카이브된 레퍼토리는 목록에서 숨겨집니다.'),
+            title: const Text(AppStrings.archiveButton),
+            content: const Text(AppStrings.archiveRepertoireConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -115,7 +115,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('아카이브'),
+                child: const Text(AppStrings.archiveButton),
               ),
             ],
           ),
@@ -142,16 +142,16 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
           .updateRepertoire(archivedRepertoire);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('레퍼토리가 아카이브되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.repertoireArchivedSnackbar)),
+        );
         context.pop(true);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('아카이브에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.archiveFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -168,10 +168,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('레퍼토리 삭제'),
-            content: const Text(
-              '이 레퍼토리를 삭제하시겠습니까?\n연결된 모든 섹션과 녹음이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
-            ),
+            title: const Text(AppStrings.deleteRepertoireTitle),
+            content: const Text(AppStrings.deleteRepertoireConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -195,9 +193,9 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
           .deleteRepertoire(widget.repertoireId, widget.studentId);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('레퍼토리가 삭제되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.repertoireDeletedSnackbar)),
+        );
         // Pop twice to go back to the list
         context.pop();
         context.pop();
@@ -206,7 +204,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.deleteFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -224,7 +222,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       initialDate: _startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: '시작일 선택',
+      helpText: AppStrings.selectStartDate,
     );
     if (picked != null) {
       setState(() {
@@ -243,7 +241,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       initialDate: _endDate ?? _startDate,
       firstDate: _startDate,
       lastDate: DateTime(2030),
-      helpText: '종료일 선택',
+      helpText: AppStrings.selectEndDate,
     );
     if (picked != null) {
       setState(() => _endDate = picked);
@@ -259,13 +257,13 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('레퍼토리 편집')),
+      appBar: AppBar(title: const Text(AppStrings.editRepertoireAppBarTitle)),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (e, st) => const Center(child: Text(AppStrings.errorOccurred)),
         data: (repertoire) {
           if (repertoire == null) {
-            return const Center(child: Text('레퍼토리를 찾을 수 없습니다'));
+            return const Center(child: Text(AppStrings.repertoireNotFound));
           }
 
           _initializeFromRepertoire(repertoire);
@@ -282,8 +280,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   // ========================================
                   const SectionHeader(
                     icon: '📋',
-                    title: '기본 정보',
-                    subtitle: '레퍼토리 이름, 설명 설정',
+                    title: AppStrings.basicInfoTitle,
+                    subtitle: AppStrings.editRepertoireBasicInfoSubtitle,
                   ),
                   const SizedBox(height: AppSpacing.space4),
 
@@ -291,14 +289,14 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: '레퍼토리 이름 *',
-                      hintText: '예: 스즈키 6권, 바흐 협주곡',
+                      labelText: AppStrings.repertoireNameLabel,
+                      hintText: AppStrings.editRepertoireNameHint,
                       prefixIcon: Icon(Icons.library_music),
                     ),
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return '레퍼토리 이름을 입력해주세요';
+                        return AppStrings.repertoireNameRequired;
                       }
                       return null;
                     },
@@ -310,8 +308,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   TextFormField(
                     controller: _descriptionController,
                     decoration: const InputDecoration(
-                      labelText: '설명 (선택)',
-                      hintText: '예: Bach Violin Concerto in A minor',
+                      labelText: AppStrings.descriptionOptional,
+                      hintText: AppStrings.repertoireDescriptionHint,
                       prefixIcon: Icon(Icons.description),
                     ),
                     maxLines: 2,
@@ -329,7 +327,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                     onStartDateTap: _selectStartDate,
                     onEndDateTap: _selectEndDate,
                     onEndDateClear: _clearEndDate,
-                    endDatePlaceholder: '설정 안함 (매일 반복)',
+                    endDatePlaceholder: AppStrings.endDateNotSetDaily,
                     showHintMessage: true,
                   ),
 
@@ -350,7 +348,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                                   color: AppColors.paper,
                                 ),
                               )
-                              : const Text('변경사항 저장'),
+                              : const Text(AppStrings.saveChangesButton),
                     ),
                   ),
 
@@ -361,8 +359,8 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   // ========================================
                   const SettingSectionHeader(
                     icon: '🗄️',
-                    title: '관리',
-                    description: '레퍼토리를 아카이브하거나 삭제합니다',
+                    title: AppStrings.managementSectionTitle,
+                    description: AppStrings.managementSectionDescription,
                   ),
                   const SizedBox(height: AppSpacing.space3),
 
@@ -372,7 +370,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _archive,
                       icon: const Icon(Icons.archive_outlined),
-                      label: const Text('아카이브'),
+                      label: const Text(AppStrings.archiveButton),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,
                         side: const BorderSide(color: AppColors.paperAccent),
@@ -388,7 +386,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _delete,
                       icon: const Icon(Icons.delete_forever),
-                      label: const Text('레퍼토리 삭제'),
+                      label: const Text(AppStrings.deleteRepertoireTitle),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,
                         side: const BorderSide(color: AppColors.paperAccent),
