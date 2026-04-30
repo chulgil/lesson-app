@@ -51,15 +51,19 @@ class _ProfileVisibilityScreenState
           .updateVisibilitySettings(_settings);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('설정이 저장되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.proposalSettingsSavedSnackbar),
+          ),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
+          const SnackBar(
+            content: Text(AppStrings.profileVisibilitySaveErrorSnackbar),
+          ),
         );
       }
     } finally {
@@ -75,7 +79,7 @@ class _ProfileVisibilityScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('공개 프로필 설정'),
+        title: const Text(AppStrings.profileVisibilityAppBarTitle),
         actions: [
           if (_hasChanges)
             TextButton(
@@ -93,10 +97,15 @@ class _ProfileVisibilityScreenState
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error:
+            (_, __) => const Center(
+              child: Text(AppStrings.profileVisibilityErrorState),
+            ),
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('프로필을 찾을 수 없습니다'));
+            return const Center(
+              child: Text(AppStrings.profileVisibilityNullState),
+            );
           }
           return _buildContent(context, profile);
         },
@@ -122,12 +131,14 @@ class _ProfileVisibilityScreenState
         const SizedBox(height: AppSpacing.space4),
 
         // Section visibility settings
-        const VisibilitySectionTitle(title: '항목별 공개 범위'),
+        const VisibilitySectionTitle(
+          title: AppStrings.profileVisibilitySectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
 
         VisibilityTile(
-          title: '이름',
-          subtitle: '프로필에 표시되는 이름',
+          title: AppStrings.profileVisibilityNameTitle,
+          subtitle: AppStrings.profileVisibilityNameSubtitle,
           icon: Icons.person,
           value: _settings.nameVisibility,
           onChanged:
@@ -135,8 +146,8 @@ class _ProfileVisibilityScreenState
         ),
 
         VisibilityTile(
-          title: '프로필 사진',
-          subtitle: '프로필 이미지',
+          title: AppStrings.profileVisibilityPhotoTitle,
+          subtitle: AppStrings.profileVisibilityPhotoSubtitle,
           icon: Icons.photo_camera,
           value: _settings.photoVisibility,
           onChanged:
@@ -144,8 +155,8 @@ class _ProfileVisibilityScreenState
         ),
 
         VisibilityTile(
-          title: '연락처',
-          subtitle: '전화번호, 이메일 등',
+          title: AppStrings.profileVisibilityContactTitle,
+          subtitle: AppStrings.profileVisibilityContactSubtitle,
           icon: Icons.phone,
           value: _settings.contactVisibility,
           onChanged:
@@ -153,8 +164,8 @@ class _ProfileVisibilityScreenState
         ),
 
         VisibilityTile(
-          title: '레슨료',
-          subtitle: '레슨 가격 정보',
+          title: AppStrings.profileVisibilityFeeTitle,
+          subtitle: AppStrings.profileVisibilityFeeSubtitle,
           icon: Icons.payments,
           value: _settings.feeVisibility,
           onChanged:
@@ -162,8 +173,8 @@ class _ProfileVisibilityScreenState
         ),
 
         VisibilityTile(
-          title: '경력',
-          subtitle: '학력 및 경력 정보',
+          title: AppStrings.profileVisibilityCareerTitle,
+          subtitle: AppStrings.profileVisibilityCareerSubtitle,
           icon: Icons.work,
           value: _settings.careerVisibility,
           onChanged:
@@ -171,8 +182,8 @@ class _ProfileVisibilityScreenState
         ),
 
         VisibilityTile(
-          title: '자격증',
-          subtitle: '인증된 자격증 정보',
+          title: AppStrings.profileVisibilityCertificateTitle,
+          subtitle: AppStrings.profileVisibilityCertificateSubtitle,
           icon: Icons.verified,
           value: _settings.certificateVisibility,
           onChanged:
@@ -199,7 +210,7 @@ class _ProfileVisibilityScreenState
                   settings: _settings,
                 ),
             icon: const Icon(Icons.preview),
-            label: const Text('공개 프로필 미리보기'),
+            label: const Text(AppStrings.profileVisibilityPreviewButton),
           ),
         ),
       ],
