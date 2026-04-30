@@ -4861,4 +4861,45 @@ class AppStrings {
 
   /// 외 $count건 — expand toggle 확장 라벨.
   static String urgentAlertMoreFormat(int count) => '외 $count건';
+
+  // ── Pending Requests Screen (연결 요청 대기 5-3d-10) ───────────────────
+  /// 연결 요청 — AppBar 타이틀.
+  static const pendingRequestsAppBarTitle = '연결 요청';
+
+  /// 요청 목록을 불러올 수 없습니다 — 로드 에러 짧은 안내.
+  static const pendingRequestsLoadErrorRetry = '요청 목록을 불러올 수 없습니다. 다시 시도해주세요.';
+
+  /// 요청 목록을 불러오는 중 오류 — 로드 에러 위젯 본문.
+  static const pendingRequestsLoadErrorDescription = '요청 목록을 불러오는 중 오류가 발생했습니다';
+
+  /// 대기 중인 연결 요청이 없습니다 — empty state 타이틀.
+  static const pendingRequestsEmptyTitle = '대기 중인 연결 요청이 없습니다';
+
+  /// 학생이 초대 코드를 사용하면\n여기에 요청이 표시됩니다 — 선생님 시점.
+  static const pendingRequestsEmptyTeacher = '학생이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.';
+
+  /// 선생님이 초대 코드를 사용하면\n여기에 요청이 표시됩니다 — 학생 시점.
+  static const pendingRequestsEmptyStudent = '선생님이 초대 코드를 사용하면\n여기에 요청이 표시됩니다.';
+
+  /// $name님과 연결되었습니다 — 수락 SnackBar.
+  static String connectionAcceptedFormat(String name) => '$name님과 연결되었습니다!';
+
+  /// 연결 거절 — 거절 다이얼로그 타이틀.
+  static const connectionRejectDialogTitle = '연결 거절';
+
+  /// $name님의 연결 요청을 거절하시겠습니까 — 거절 다이얼로그 본문.
+  static String connectionRejectConfirmFormat(String name) =>
+      '$name님의 연결 요청을 거절하시겠습니까?';
+
+  /// 요청이 거절되었습니다 — 거절 SnackBar.
+  static const connectionRejected = '요청이 거절되었습니다';
+
+  /// $method로 연결 요청 — 연결 방법 메타 라벨.
+  static String connectionMethodLabelFormat(String method) => '$method로 연결 요청';
+
+  /// $days일 남음 — 만료까지 일수.
+  static String daysRemainingFormat(int days) => '$days일 남음';
+
+  /// $hours시간 남음 — 만료까지 시간.
+  static String hoursRemainingFormat(int hours) => '$hours시간 남음';
 }
