@@ -12,6 +12,7 @@ import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/image_utils.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
@@ -42,13 +43,14 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   String? _existingImageUrl; // Existing remote image URL (edit mode)
 
   final Map<CertificateType, String> _typeLabels = {
-    CertificateType.musicTeacher: '음악 교원 자격증',
-    CertificateType.cultureArtsEducator: '문화예술교육사',
-    CertificateType.schoolTeacher: '학교 교원 자격증',
-    CertificateType.conservatory: '음악원 수료증',
-    CertificateType.degree: '음악 학위',
-    CertificateType.performance: '연주 자격증',
-    CertificateType.other: '기타',
+    CertificateType.musicTeacher: AppStrings.certificateTypeMusicTeacher,
+    CertificateType.cultureArtsEducator:
+        AppStrings.certificateTypeCultureArtsEducator,
+    CertificateType.schoolTeacher: AppStrings.certificateTypeSchoolTeacher,
+    CertificateType.conservatory: AppStrings.certificateTypeConservatory,
+    CertificateType.degree: AppStrings.certificateTypeDegree,
+    CertificateType.performance: AppStrings.certificateTypePerformance,
+    CertificateType.other: AppStrings.certificateTypeOther,
   };
 
   @override
@@ -86,12 +88,12 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.camera_alt),
-                  title: const Text('카메라로 촬영'),
+                  title: const Text(AppStrings.imageSourceCamera),
                   onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo_library),
-                  title: const Text('갤러리에서 선택'),
+                  title: const Text(AppStrings.imageSourceGallery),
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
               ],
@@ -189,7 +191,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
+          const SnackBar(content: Text(AppStrings.certificateSaveErrorRetry)),
         );
       }
     } finally {
@@ -206,8 +208,8 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('자격증 삭제'),
-            content: const Text('이 자격증 정보를 삭제하시겠습니까?'),
+            title: const Text(AppStrings.certificateDeleteDialogTitle),
+            content: const Text(AppStrings.certificateDeleteConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -236,7 +238,9 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('삭제 중 오류가 발생했습니다. 다시 시도해주세요.')),
+            const SnackBar(
+              content: Text(AppStrings.certificateDeleteErrorRetry),
+            ),
           );
           setState(() => _isLoading = false);
         }
@@ -248,7 +252,11 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEdit ? '자격증 수정' : '자격증 추가'),
+        title: Text(
+          _isEdit
+              ? AppStrings.certificateEditAppBarEdit
+              : AppStrings.certificateEditAppBarAdd,
+        ),
         actions: [
           if (_isEdit)
             IconButton(
@@ -271,7 +279,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           ),
           children: [
             // Certificate type
-            _buildLabel('자격증 종류', required: true),
+            _buildLabel(AppStrings.certificateTypeLabel, required: true),
             const SizedBox(height: AppSpacing.space2),
             DropdownButtonFormField<CertificateType>(
               initialValue: _selectedType,
@@ -293,14 +301,16 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space4),
 
             // Certificate name
-            _buildLabel('자격증명', required: true),
+            _buildLabel(AppStrings.certificateNameLabel, required: true),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _nameController,
-              decoration: _inputDecoration(hintText: '예: 중등학교 정교사 2급 (음악)'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.certificateNameHint,
+              ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '자격증명을 입력해주세요';
+                  return AppStrings.certificateNameRequired;
                 }
                 return null;
               },
@@ -309,14 +319,16 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space4),
 
             // Issuing body
-            _buildLabel('발급 기관', required: true),
+            _buildLabel(AppStrings.certificateIssuingBodyLabel, required: true),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _issuingBodyController,
-              decoration: _inputDecoration(hintText: '예: 교육부'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.certificateIssuingBodyHint,
+              ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '발급 기관을 입력해주세요';
+                  return AppStrings.certificateIssuingBodyRequired;
                 }
                 return null;
               },
@@ -325,7 +337,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space4),
 
             // Issue date
-            _buildLabel('발급일'),
+            _buildLabel(AppStrings.certificateIssueDateLabel),
             const SizedBox(height: AppSpacing.space2),
             InkWell(
               onTap: _selectDate,
@@ -341,7 +353,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${_issueDate.year}년 ${_issueDate.month}월 ${_issueDate.day}일',
+                      formatDateYMDKorean(_issueDate),
                       style: AppTypography.bodyMedium,
                     ),
                     Icon(
@@ -357,17 +369,19 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space4),
 
             // Certificate number
-            _buildLabel('자격증 번호'),
+            _buildLabel(AppStrings.certificateNumberLabel),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _certificateNumberController,
-              decoration: _inputDecoration(hintText: '선택사항'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.certificateNumberHint,
+              ),
             ),
 
             const SizedBox(height: AppSpacing.space4),
 
             // Image upload
-            _buildLabel('자격증 이미지'),
+            _buildLabel(AppStrings.certificateImageLabel),
             const SizedBox(height: AppSpacing.space2),
             GestureDetector(
               onTap: _pickImage,
@@ -400,7 +414,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                     color: AppColors.paperAccent,
                   ),
                   label: Text(
-                    '이미지 삭제',
+                    AppStrings.certificateImageDeleteLabel,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.paperAccent,
                     ),
@@ -423,7 +437,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '제출된 자격증은 관리자의 검토 후 승인됩니다. 승인 후 프로필에 인증 뱃지가 표시됩니다.',
+                      AppStrings.certificateInfoBox,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -457,7 +471,9 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                           ),
                         )
                         : Text(
-                          _isEdit ? '수정하기' : '제출하기',
+                          _isEdit
+                              ? AppStrings.certificateUpdateButton
+                              : AppStrings.certificateSubmitButton,
                           style: AppTypography.button,
                         ),
               ),
@@ -509,7 +525,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 borderRadius: BorderRadius.zero,
               ),
               child: Text(
-                '탭하여 변경',
+                AppStrings.tapToChange,
                 style: AppTypography.caption.copyWith(color: AppColors.paper),
               ),
             ),
@@ -545,7 +561,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                 borderRadius: BorderRadius.zero,
               ),
               child: Text(
-                '탭하여 변경',
+                AppStrings.tapToChange,
                 style: AppTypography.caption.copyWith(color: AppColors.paper),
               ),
             ),
@@ -569,14 +585,14 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '자격증 이미지를 등록하세요',
+            AppStrings.certificateImageEmptyTitle,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '카메라 촬영 또는 갤러리에서 선택',
+            AppStrings.certificateImageEmptyHint,
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
