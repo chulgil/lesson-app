@@ -4330,4 +4330,61 @@ class AppStrings {
 
   /// 수강권이 추가되었습니다 (저장 SnackBar — 추가)
   static const templateAddedSnackbar = '수강권이 추가되었습니다';
+
+  // ── Profile Visibility Screen (공개 프로필 설정 5-3b-25) ────────
+
+  /// 공개 프로필 설정 (AppBar)
+  static const profileVisibilityAppBarTitle = '공개 프로필 설정';
+
+  /// 저장 중 오류가 발생했습니다. 다시 시도해주세요. (저장 실패 SnackBar)
+  static const profileVisibilitySaveErrorSnackbar =
+      '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  /// 오류가 발생했습니다. (프로필 로딩 에러 상태)
+  static const profileVisibilityErrorState = '오류가 발생했습니다.';
+
+  /// 프로필을 찾을 수 없습니다 (프로필 null 상태)
+  static const profileVisibilityNullState = '프로필을 찾을 수 없습니다';
+
+  /// 항목별 공개 범위 (섹션 타이틀)
+  static const profileVisibilitySectionTitle = '항목별 공개 범위';
+
+  /// 이름 (VisibilityTile title — 이름 항목)
+  static const profileVisibilityNameTitle = '이름';
+
+  /// 프로필에 표시되는 이름 (VisibilityTile subtitle — 이름 항목)
+  static const profileVisibilityNameSubtitle = '프로필에 표시되는 이름';
+
+  /// 프로필 사진 (VisibilityTile title — 사진 항목)
+  static const profileVisibilityPhotoTitle = '프로필 사진';
+
+  /// 프로필 이미지 (VisibilityTile subtitle — 사진 항목)
+  static const profileVisibilityPhotoSubtitle = '프로필 이미지';
+
+  /// 연락처 (VisibilityTile title — 연락처 항목)
+  static const profileVisibilityContactTitle = '연락처';
+
+  /// 전화번호, 이메일 등 (VisibilityTile subtitle — 연락처 항목)
+  static const profileVisibilityContactSubtitle = '전화번호, 이메일 등';
+
+  /// 레슨료 (VisibilityTile title — 레슨료 항목)
+  static const profileVisibilityFeeTitle = '레슨료';
+
+  /// 레슨 가격 정보 (VisibilityTile subtitle — 레슨료 항목)
+  static const profileVisibilityFeeSubtitle = '레슨 가격 정보';
+
+  /// 경력 (VisibilityTile title — 경력 항목)
+  static const profileVisibilityCareerTitle = '경력';
+
+  /// 학력 및 경력 정보 (VisibilityTile subtitle — 경력 항목)
+  static const profileVisibilityCareerSubtitle = '학력 및 경력 정보';
+
+  /// 자격증 (VisibilityTile title — 자격증 항목)
+  static const profileVisibilityCertificateTitle = '자격증';
+
+  /// 인증된 자격증 정보 (VisibilityTile subtitle — 자격증 항목)
+  static const profileVisibilityCertificateSubtitle = '인증된 자격증 정보';
+
+  /// 공개 프로필 미리보기 (Preview 버튼 라벨)
+  static const profileVisibilityPreviewButton = '공개 프로필 미리보기';
 }
