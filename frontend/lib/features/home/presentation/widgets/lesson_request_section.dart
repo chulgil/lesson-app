@@ -181,7 +181,7 @@ class LessonRequestSection extends ConsumerWidget {
                   color: AppColors.ink,
                 ),
                 label: Text(
-                  '전체보기',
+                  AppStrings.viewAll,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w600,

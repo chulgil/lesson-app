@@ -58,15 +58,13 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
     // 1. Unpaid (highest priority — vermillion)
     unpaidSummary.whenData((summary) {
       if (summary.totalAmount > 0) {
-        final formattedAmount =
-            summary.totalAmount >= 10000
-                ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
-                : '${summary.totalAmount}원';
-
         items.add(
           _AlertItem(
             icon: Icons.account_balance_wallet_outlined,
-            text: '미수금 $formattedAmount (${summary.studentCount}명)',
+            text: AppStrings.urgentAlertOutstandingFormat(
+              summary.totalAmount,
+              summary.studentCount,
+            ),
             urgent: true,
             onTap: () => context.push(AppRoutes.outstandingPayments),
           ),
@@ -262,7 +260,9 @@ class _ExpandToggle extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              expanded ? '접기' : '외 $count건',
+              expanded
+                  ? AppStrings.urgentAlertCollapse
+                  : AppStrings.urgentAlertMoreFormat(count),
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
