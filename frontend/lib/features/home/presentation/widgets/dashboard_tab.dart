@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -123,7 +124,9 @@ class DashboardTab extends ConsumerWidget {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
+                error:
+                    (error, _) =>
+                        _buildErrorCard(AppStrings.dashboardLessonsLoadError),
               ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -162,7 +165,7 @@ class DashboardTab extends ConsumerWidget {
           color: AppColors.ink,
           size: 22,
         ),
-        tooltip: '알림',
+        tooltip: AppStrings.notifications,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
       ),
@@ -189,10 +192,13 @@ class DashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
-          Text('오늘의 레슨', style: NotebookTypography.masthead),
+          Text(
+            AppStrings.dashboardProgrammeTitle,
+            style: NotebookTypography.masthead,
+          ),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${_koreanLessonCount(lessonCount)}',
+            '${now.month}月 ${now.day}日  ·  ${AppStrings.dashboardLessonCountFormat(lessonCount)}',
             style: NotebookTypography.mastheadDate,
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -217,13 +223,6 @@ class DashboardTab extends ConsumerWidget {
     return _englishWeekdays[idx];
   }
 
-  String _koreanLessonCount(int count) {
-    if (count == 0) return '예정된 레슨 없음';
-    const korean = ['한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
-    final label = count <= korean.length ? korean[count - 1] : '$count';
-    return '$label 편의 수업';
-  }
-
   /// "VOL. IV · NO. 18 · APR MMXXVI" 형식 메타 생성.
   /// 알림 아이콘이 자리를 차지하므로 실제 렌더에는 사용되지 않지만,
   /// NotebookMasthead 의 ``meta`` 요구사항을 만족시키기 위해 유지.
@@ -239,41 +238,49 @@ class DashboardTab extends ConsumerWidget {
     final todayCard = todayLessons.when(
       data:
           (lessons) => StatCard(
-            title: '오늘 레슨',
-            value: '${lessons.length}회',
+            title: AppStrings.todayLessons,
+            value: AppStrings.usageCountShort(lessons.length),
             color: AppColors.ink,
             icon: Icons.today,
             onTap: onViewAllLessons,
           ),
       loading:
           () => StatCard(
-            title: '오늘 레슨',
+            title: AppStrings.todayLessons,
             value: '-',
             color: AppColors.ink,
             icon: Icons.today,
           ),
       error:
-          (_, __) => StatCard(title: '오늘 레슨', value: '-', color: AppColors.ink),
+          (_, __) => StatCard(
+            title: AppStrings.todayLessons,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     final monthCard = lessonStatsAsync.when(
       data:
           (stats) => StatCard(
-            title: '이번 달',
-            value: '${stats['completed'] ?? 0}회',
+            title: AppStrings.dashboardThisMonth,
+            value: AppStrings.usageCountShort(stats['completed'] ?? 0),
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
             onTap: () => context.push(AppRoutes.analytics),
           ),
       loading:
           () => StatCard(
-            title: '이번 달',
+            title: AppStrings.dashboardThisMonth,
             value: '-',
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
           ),
       error:
-          (_, __) => StatCard(title: '이번 달', value: '-', color: AppColors.ink),
+          (_, __) => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
@@ -323,7 +330,7 @@ class DashboardTab extends ConsumerWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              '일괄 피드백',
+              AppStrings.bulkFeedbackTitle,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
@@ -339,7 +346,7 @@ class DashboardTab extends ConsumerWidget {
               color: AppColors.ink,
             ),
             label: Text(
-              '전체보기',
+              AppStrings.viewAll,
               style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
             ),
             style: TextButton.styleFrom(
@@ -356,9 +363,9 @@ class DashboardTab extends ConsumerWidget {
     if (lessons.isEmpty) {
       return EmptyStateWidget(
         icon: Icons.event_available,
-        title: '오늘 예정된 레슨이 없습니다',
-        subtitle: '비어 있는 프로그램 — 새 레슨을 추가해 보세요.',
-        actionLabel: '레슨 추가',
+        title: AppStrings.dashboardEmptyTitle,
+        subtitle: AppStrings.dashboardEmptySubtitle,
+        actionLabel: AppStrings.lessonAddTitle,
         actionIcon: Icons.add,
         onAction: () => context.push(AppRoutes.addLesson),
       );
@@ -414,7 +421,7 @@ class DashboardTab extends ConsumerWidget {
                 foregroundColor: AppColors.ink,
               ),
               child: Text(
-                '${lessons.length - 5}개 레슨 더보기',
+                AppStrings.dashboardMoreLessonsFormat(lessons.length - 5),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.ink,
                   fontWeight: FontWeight.w600,
@@ -443,7 +450,7 @@ class DashboardTab extends ConsumerWidget {
               onPressed: () => context.push(AppRoutes.analytics),
               icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
               label: Text(
-                '통계 더보기',
+                AppStrings.dashboardAnalyticsMoreLink,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.ink,
                   fontWeight: FontWeight.w600,
