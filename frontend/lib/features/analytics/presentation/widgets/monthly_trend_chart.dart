@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -22,7 +23,10 @@ class MonthlyTrendChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 차트 카드 섹션 헤더도 Playfair sectionTitle 로 통일.
-        Text('레슨 추이', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.analyticsLessonTrendSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           height: 180,
@@ -49,7 +53,7 @@ class MonthlyTrendChart extends StatelessWidget {
             children:
                 trendData.map((t) {
                   return Text(
-                    '${t.month.month}월',
+                    AppStrings.analyticsMonthLabelFormat(t.month.month),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkTertiary,
                     ),

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -20,7 +21,10 @@ class PracticeRankingList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 랭킹 카드 섹션 헤더도 Playfair sectionTitle 로 통일.
-        Text('연습률 TOP 5', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.analyticsPracticeRankingSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           decoration: BoxDecoration(
@@ -33,7 +37,7 @@ class PracticeRankingList extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.space6),
                     child: Center(
                       child: Text(
-                        '연습 데이터가 없습니다',
+                        AppStrings.analyticsNoPracticeData,
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.inkTertiary,
                         ),
