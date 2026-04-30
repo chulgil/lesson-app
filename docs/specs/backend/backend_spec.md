@@ -1,6 +1,7 @@
 # Backend Spec — Lessonaza API
 
-> 작성일: 2026-03-16 | 상태: Phase 1 완료
+> 작성일: 2026-03-16 | 갱신: 2026-04-28 | 상태: Phase 1 완료, audit 후속 patch 필요
+> 갱신 사유: 프론트 80+ 커밋 진척 vs 백엔드 정체. audit 결과 `audit/2026-04-28/SUMMARY.md` 참조.
 
 ## 개요
 
@@ -52,31 +53,52 @@ FastAPI + PostgreSQL + Supabase Auth 기반 백엔드 API.
 | 교육자료 | teaching_resources | YouTube/오디오/외부링크 교육자료 |
 | 리뷰 | teacher_reviews | 선생님 리뷰/평점 |
 | 스케줄 확장 | schedule_exceptions, group_class_schedules, group_class_bookings | 스케줄 예외, 그룹수업 세션/예약 |
-| 노쇼/변경 | no_show_records, lesson_schedule_changes | 노쇼 기록, 일정 변경 요청 |
+| 노쇼/변경 | no_show_records, request_events, lesson_schedule_changes (legacy) | 노쇼 기록, 레슨 신청 이벤트(SSOT), 일정 변경 요청(deprecated, Phase 4 drop 예정) |
 | 연습 | practice_logs | 일별 연습 기록 |
 
 ## API 엔드포인트 현황
 
-**총 154개 엔드포인트** (기존 ~100 + 신규 ~54)
+**총 209개 엔드포인트** (2026-04-28 기준, +55 신규)
 
-### 신규 라우터
+### 신규 라우터 (Migration 0002 전후)
 
 | 라우터 | Prefix | 주요 기능 |
 |--------|--------|-----------|
 | invites | `/api/v1/invites` | 초대 CRUD, 연결 요청/응답, 연결 관리 |
 | gamification | `/api/v1/gamification` | 학생 게이미피케이션 조회, 포인트 수여 |
-| settings | `/api/v1/settings` | 선생님/수강권/제안/알림 설정, 피드백 프리셋, 교육자료 |
+| settings_api | `/api/v1/settings` | 선생님/수강권/제안/알림 설정, 피드백 프리셋, 교육자료 |
 | reviews | `/api/v1/reviews` | 리뷰 CRUD, 리뷰 요약 |
 | groups | `/api/v1/groups` | 그룹수업 스케줄/예약, 출석, 노쇼 기록 |
-| practice-logs | `/api/v1/practice-logs` | 연습 기록 CRUD, 주간/월간 통계 |
+| practice_logs | `/api/v1/practice-logs` | 연습 기록 CRUD, 주간/월간 통계 |
+
+### 추가 라우터 (3/16 spec 미반영분)
+
+| 라우터 | Prefix | 주요 기능 |
+|--------|--------|-----------|
+| ai_notes | `/api/v1/ai-notes` | Whisper STT + GPT 레슨 노트 자동 생성 |
+| device_tokens | `/api/v1/device-tokens` | FCM 디바이스 토큰 등록/해지 |
+| locations | `/api/v1/locations` | 레슨 장소 CRUD |
+| parents | `/api/v1/parents` | 학부모-자녀 관계 |
+| profile_images | `/api/v1/profile-images` | 프로필 이미지 업로드 |
+| scheduler | `/api/v1/scheduler` | 출석 자동화 스케줄러 (만료 알림 cron 미존재) |
+
+### 라우터별 endpoint 카운트
+
+총 27 라우터 (2026-04-30 +1: `request_events`), 분포는 `audit/2026-04-28/_inventory.md` 참조.
+
+### Plan A SSOT 라우터 (2026-04-30 Phase 3-1)
+
+| 라우터 | Prefix | 주요 기능 |
+|--------|--------|-----------|
+| request_events | `/api/v1/schedule` | 레슨 신청 이벤트 (chat history) CRUD: `lesson-requests/{id}/events` POST·GET, `request-events/{id}` GET·PATCH. 27 event_type × 2 schedule_change_type. 프론트 Hive `RequestEvent` (typeId 131) 와 1:1 매핑. |
 
 ## 아키텍처
 
 ```
 app/
-├── api/v1/          # 19개 라우터 (엔드포인트 정의)
+├── api/v1/          # 26개 라우터 (엔드포인트 정의, 209 endpoints)
 ├── services/        # 18개 서비스 (비즈니스 로직)
-├── models/          # 14개 모델 파일 (64 테이블)
+├── models/          # 23개 모델 파일 (64+ 테이블, alembic 0006+ 추가분)
 ├── schemas/         # 17개 스키마 파일 (Pydantic v2)
 ├── core/            # config, database, deps, security, i18n, storage
 └── main.py
@@ -90,11 +112,30 @@ app/
 - **Timestamps**: TimestampMixin (created_at, updated_at)
 - **Pagination**: PaginatedResponse[T] 제네릭 (page, size, total, pages)
 
-## 다음 단계
+## 다음 단계 (2026-04-28 audit 우선순위 반영)
 
-1. [ ] 기존 schedule 라우터의 exception 스텁을 새 ScheduleException 모델로 연결
-2. [ ] Analytics 라우터 추가 (집계 쿼리)
-3. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환)
-4. [ ] Supabase Auth 실제 연동 테스트
-5. [ ] Redis 캐시 레이어 추가
-6. [ ] FCM Push Notification 연동
+### P0 — 즉시 차단 갭 (audit SUMMARY §3)
+
+1. [ ] **Schedule** `get_available_slots` → ScheduleException + booking overlap + travel_time 통합
+2. [x] **Schedule/Lesson** `request_events` 테이블 신설 + `lesson_schedule_changes` 정리 (RequestEvent SSOT) — 2026-04-30 Phase 3-1 완료. 라우터 4개(`POST/GET/PATCH /api/v1/schedule/{lesson-requests/{id}/events,request-events/{id}}`), 서비스, 마이그레이션 `add_request_events` + `backup_lsc_legacy` 적용. Phase 4 에서 `lesson_schedule_changes` 제거 예정 (>= 2026-05-14).
+3. [ ] **Lesson** `BookingStatus`/`NoShowPolicy` enum 정렬 (alembic 마이그레이션)
+4. [ ] **Subscription** `subscription_expiry_service` cron + `Subscription.status` 자동 전이
+
+### P1 — 기능 차단 갭 (audit SUMMARY §4)
+
+5. [ ] `LessonScheduleChange` HTTP 라우터 연결
+6. [ ] `LessonService.create()` pieces 무시 버그 수정
+7. [ ] `MakeupLesson` endpoint 신설 + `scheduled_lesson_id` 컬럼 추가
+8. [ ] `ScheduleConfirmationCard` endpoint 신설
+9. [ ] `GET /students/summary` 신설 (RosterSummary 카운트 집계)
+10. [ ] Phase 5b 4-axis 토글 ↔ subscription_settings 컬럼 정렬
+
+### 인프라 (audit SUMMARY §6)
+
+11. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환)
+12. [ ] Supabase Auth 실제 연동 테스트
+13. [ ] Redis 캐시 레이어 추가
+14. [ ] docker-compose 에 cron 컨테이너 추가 (scheduler 확장)
+15. [ ] Analytics 라우터 추가 (집계 쿼리)
+
+> 상세 갭 + 권장 조치 + 후속 plan 분기는 `audit/2026-04-28/SUMMARY.md` 참조.

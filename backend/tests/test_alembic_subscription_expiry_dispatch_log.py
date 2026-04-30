@@ -23,11 +23,18 @@ def test_dispatch_log_revision_chains_after_no_show_policy() -> None:
     assert rev.down_revision == "unify_no_show_policy"
 
 
-def test_dispatch_log_is_alembic_head() -> None:
-    """0011 이 단일 head."""
+def test_dispatch_log_chains_to_current_head() -> None:
+    """0011 이 head 체인 안에 있고, 단일 head 가 유지된다.
+
+    2026-04-30 Phase 3-1 에서 `backup_lsc_legacy` 가 0011 위에 추가되어
+    head 가 이동했다. 0011 자체가 head 였던 시점은 끝났지만, 단일 head
+    유지(linear chain)는 보장.
+    """
     script = _script()
     heads = list(script.get_heads())
-    assert heads == ["add_sub_expiry_dispatch_log"], f"expected single head add_sub_expiry_dispatch_log, got {heads}"
+    assert len(heads) == 1, f"expected single head, got {heads}"
+    walked = {rev.revision for rev in script.walk_revisions()}
+    assert "add_sub_expiry_dispatch_log" in walked
 
 
 def test_dispatch_log_migration_creates_unique_constraint() -> None:

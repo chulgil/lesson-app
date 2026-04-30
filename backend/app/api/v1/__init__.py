@@ -14,13 +14,14 @@ from app.api.v1 import (
     lessons,
     locations,
     notifications,
-    profile_images,
     parents,
     payments,
     practice,
     practice_logs,
+    profile_images,
     recordings,
     relationships,
+    request_events,
     reviews,
     schedule,
     scheduler,
@@ -54,6 +55,7 @@ api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(groups.router, prefix="/groups", tags=["groups"])
 api_router.include_router(locations.router, prefix="/locations", tags=["locations"])
 api_router.include_router(lesson_requests.router, prefix="/schedule/lesson-requests", tags=["lesson-requests"])
+api_router.include_router(request_events.router, prefix="/schedule", tags=["request-events"])
 api_router.include_router(profile_images.router, prefix="/profile-images", tags=["profile-images"])
 api_router.include_router(ai_notes.router, prefix="/ai-notes", tags=["ai-notes"])
 api_router.include_router(device_tokens.router, prefix="/device-tokens", tags=["device-tokens"])

@@ -147,6 +147,43 @@ POST /api/lesson-requests/expire (internal/cron)
 - 만료 24시간 전 푸시 알림 발송
 - 매일 00:00 UTC 실행
 
+### 7. RequestEvent (Plan A SSOT, 2026-04-30 Phase 3-1)
+
+> 프론트 Hive `RequestEvent` (typeId 131) 와 1:1 매핑.
+> 27개 event_type, 2개 schedule_change_type. 레거시 `lesson_schedule_changes` 대체.
+
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/schedule/lesson-requests/{request_id}/events` | 이벤트 추가 (chat 메시지 1건) |
+| GET | `/api/v1/schedule/lesson-requests/{request_id}/events` | 이벤트 목록 (오래된 순) |
+| GET | `/api/v1/schedule/request-events/{event_id}` | 단일 이벤트 조회 |
+| PATCH | `/api/v1/schedule/request-events/{event_id}` | 부분 수정 (`message`, `selected_slot_index`) |
+
+**Request body (POST):**
+
+```json
+{
+  "request_id": "string",
+  "actor_type": "student | teacher",
+  "actor_id": "string",
+  "event_type": "initialRequest | approve | proposeAlternative | ...",
+  "suggested_slots": [{"start_time": "14:00", "end_time": "15:00", "is_selected": false}],
+  "selected_slot_index": null,
+  "message": "string?",
+  "schedule_change_type": "singleLesson | bulkChange | null",
+  "proposed_day_of_week": 0,
+  "proposed_time": "HH:MM",
+  "subscription_id": "string?",
+  "session_number": 0
+}
+```
+
+**권한:**
+- `request_id` 의 lesson_request 참여자(teacher/student)만 POST/GET.
+- `actor_id` 는 인증 사용자와 일치해야 함 (위반 시 403).
+- PATCH 는 작성자만 (위반 시 403).
+- 알 수 없는 `request_id` / `event_id` → 404.
+
 ## 인증/권한
 
 - 모든 엔드포인트: Bearer JWT 필수

@@ -1,4 +1,113 @@
-# 스케줄 탭 UX 재설계 — body 영역 80% 확보 (현재 진행)
+# 백엔드 갭 해소 Phase 3 — RequestEvent SSOT 완결 + 미점검 도메인 audit (현재 진행)
+
+> 작성일: 2026-04-30
+> 모드: `/plan --eng` + adaptive-quality **balanced** (감사 + 라우터). 단 데이터 이관 마이그레이션은 **ultra** (data migration)
+> 사용자 결정 (2026-04-30):
+> - **옵션 (b) 권장 채택** — Phase 3-1 (RequestEvent SSOT 완결) + Phase 3-2 (미점검 도메인 audit) 병렬
+> - 출처: `docs/specs/backend/audit/2026-04-28/SUMMARY.md` + 2026-04-30 검증 (3 패치 plan 코드 반영도 + 미점검 도메인 스캔)
+
+## 배경 — 2026-04-28 audit + 2026-04-30 재검증
+
+| 영역 | 패치 plan | 코드 반영 (4-30) | 잔여 |
+|------|----------|:--------------:|------|
+| Lesson enum 정렬 | B | **APPLIED** ✓ | 없음 |
+| Subscription 만료 cron | C | **APPLIED** ✓ | 없음 |
+| RequestEvent SSOT | A | **PARTIAL** ⚠️ | 라우터 미연결 + 구 테이블 미드롭 |
+| 미점검 도메인 | — | 공백 | analytics(HIGH) / onboarding(HIGH) / home(MEDIUM) |
+
+> P0 7건 중 4건 완료, 3건(P0-1/P0-2/P0-4 = RequestEvent) 부분. P1 9건 미착수.
+
+## ASCII 아키텍처
+
+```
+┌──────────────── Phase 3 백엔드 갭 해소 ─────────────────┐
+│                                                       │
+│  Phase 3-1 (P0)         Phase 3-2 (P0)                │
+│  RequestEvent 완결       미점검 도메인 audit            │
+│  ┌──────────────┐       ┌──────────────────┐          │
+│  │ 라우터 신설   │       │ analytics 갭     │          │
+│  │ 데이터 이관   │  ⟶   │ onboarding 갭    │          │
+│  │ 구표 drop    │       │ home/student/    │          │
+│  │ 회귀 테스트   │       │ parent_home 갭   │          │
+│  └──────────────┘       │ SUMMARY 종합     │          │
+│  ultra 모드             └──────────────────┘          │
+│                         balanced 모드                  │
+│        ↓                       ↓                      │
+│  3-1 머지 → 사용자 검증 → Phase 3-3 (P1 잔여) 백로그   │
+└───────────────────────────────────────────────────────┘
+```
+
+## Phase 3-1 — RequestEvent SSOT 완결
+
+**산출물 (예상 7~10 파일)**:
+
+| # | 파일 | 변경 |
+|---|------|------|
+| 1 | `backend/app/api/v1/request_events.py` | 신설. `POST/GET /lesson-requests/{id}/events`, `PATCH /events/{id}` |
+| 2 | `backend/app/services/request_event_service.py` | 보강 — 라우터 호환 시그니처 정렬 |
+| 3 | `backend/app/main.py` | 라우터 등록 |
+| 4 | `backend/alembic/versions/0008_drop_lesson_schedule_changes.py` | 데이터 이관 SQL + drop |
+| 5 | `backend/tests/test_request_events_endpoints.py` | CRUD 4종 + 권한 + 멀티디바이스 sync |
+| 6 | `docs/specs/backend/backend_spec.md` | endpoint 카운트 갱신 |
+| 7 | `docs/specs/lesson/` | RequestEvent SSOT 명시 |
+| 8 | `docs/specs/schedule/` | lesson_schedule_changes 폐기 명시 |
+| 9 | `backend/scripts/seeds/scenarios/request_events.py` | (선택) 챗 사례 5종 |
+
+**리스크 + 게이트**:
+- 데이터 이관 dry-run 필수 (`alembic upgrade --sql`)
+- backup table (`lesson_schedule_changes_backup_20260430`) 14일 보존
+- frontend Remote 전환은 별도 PR (이번 plan 범위 외)
+
+## Phase 3-2 — 미점검 도메인 audit 보강
+
+**산출물 (4 파일, 코드 변경 없음)**:
+
+| # | 파일 | 내용 |
+|---|------|------|
+| 1 | `docs/specs/backend/audit/2026-04-30/analytics.md` | spec 574줄 ↔ 백엔드 0 갭 인벤토리 |
+| 2 | `docs/specs/backend/audit/2026-04-30/onboarding.md` | spec 304줄 ↔ wizard flow 영속화 갭 |
+| 3 | `docs/specs/backend/audit/2026-04-30/home.md` | home/student_home/parent_home 매핑 |
+| 4 | `docs/specs/backend/audit/2026-04-30/SUMMARY.md` | 4-28 SUMMARY + 4-30 추가분 종합 |
+
+## Phase 3-3 — P1 잔여 (별도 plan, 항목별 PR)
+
+| ID | 항목 | 파일 |
+|----|------|:----:|
+| P1-5 | `LessonService.create()` pieces 무시 버그 | 1~2 |
+| P1-8 | `GET /students/summary` 신설 | 3~4 |
+| P1-3/4 | ScheduleException 통합 + travel_time | 5 |
+| P1-6/7 | MakeupLesson + ScheduleConfirmationCard endpoint | 9 |
+| P1-9 | Phase 5b 4-axis ↔ subscription_settings 정렬 | 3 |
+
+## 평가 기준 (Rubric, 합격선 7.5)
+
+| 기준 | 목표 |
+|------|:---:|
+| 완성도 | 8/10 — Phase 3-1 라우터 + 이관 + 테스트 통과, 3-2 audit 4 파일 산출 |
+| 견고성 | 9/10 — data migration ultra 모드 + dry-run + backup |
+| 일관성 | 8/10 — audit 템플릿 + RequestEvent SSOT 명시 |
+| 간결성 | 7/10 — 두 Phase 별도 커밋 |
+
+## 리스크
+
+- **HIGH**: `lesson_schedule_changes` drop 시 row 손실 — backup + dry-run 필수
+- **HIGH**: RequestEvent 라우터 미연결 상태로 frontend Remote 전환 시 챗 빔 회귀
+- **MEDIUM**: 미점검 도메인 audit 결과 추가 P0 발견 가능
+- **LOW**: P1 잔여는 Phase 3-3 백로그로 분리
+
+## 다음 단계
+
+1. Phase 3-2 audit 보강 (병렬, 안전, 빠름)
+2. Phase 3-1 RequestEvent 사전 코드 매핑 → 라우터/마이그/테스트 작성
+3. 검증 (pytest + dry-run + lint)
+4. 별도 커밋 (audit 1건, RequestEvent 1건)
+5. PR 생성은 사용자 승인 후
+
+---
+
+## 이전 계획
+
+# 스케줄 탭 UX 재설계 — body 영역 80% 확보 (Phase A 완료)
 
 > 작성일: 2026-04-30
 > 모드: `/plan --eng` + adaptive-quality **balanced** (UI 리팩토링, 5 파일 / 시그니처 4대 BLOCK 게이트 보존)

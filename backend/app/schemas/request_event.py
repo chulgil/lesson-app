@@ -36,6 +36,13 @@ class RequestEventCreate(BaseModel):
     session_number: int | None = None
 
 
+class RequestEventUpdate(BaseModel):
+    """Payload for PATCH /request-events/{id} — partial update."""
+
+    selected_slot_index: int | None = None
+    message: str | None = None
+
+
 class RequestEventResponse(BaseModel):
     """Response shape for events list / single fetch."""
 
