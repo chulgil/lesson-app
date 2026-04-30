@@ -57,7 +57,7 @@ class _TeacherDashboardScreenState
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('통계'),
+        title: const Text(AppStrings.analyticsAppBarTitle),
       ),
       body: Column(
         children: [
@@ -80,7 +80,7 @@ class _TeacherDashboardScreenState
                         ),
                         const SizedBox(height: AppSpacing.space3),
                         Text(
-                          '데이터를 불러올 수 없습니다',
+                          AppStrings.cannotLoadData,
                           style: AppTypography.bodyMedium,
                         ),
                         const SizedBox(height: AppSpacing.space3),
@@ -184,9 +184,11 @@ class _TeacherDashboardScreenState
           children: [
             Expanded(
               child: StatCard(
-                title: '총 레슨',
-                value: '${stats.totalLessons}회',
-                subtitle: '완료 ${stats.completedLessons}회',
+                title: AppStrings.analyticsTotalLessons,
+                value: AppStrings.usageCountShort(stats.totalLessons),
+                subtitle: AppStrings.analyticsCompletedFormat(
+                  stats.completedLessons,
+                ),
                 color: AppColors.paperAccent,
                 icon: Icons.school,
               ),
@@ -194,9 +196,11 @@ class _TeacherDashboardScreenState
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: StatCard(
-                title: '출석률',
+                title: AppStrings.subscriptionAttendanceRateLabel,
                 value: '${stats.attendanceRate.toStringAsFixed(1)}%',
-                subtitle: '취소 ${stats.cancelledLessons}회',
+                subtitle: AppStrings.analyticsCancelledFormat(
+                  stats.cancelledLessons,
+                ),
                 color: AppColors.paperOk,
                 icon: Icons.check_circle_outline,
                 onTap: () => context.push(AppRoutes.teacherAttendance),
@@ -209,9 +213,11 @@ class _TeacherDashboardScreenState
           children: [
             Expanded(
               child: StatCard(
-                title: '학생 수',
-                value: '${stats.totalStudents}명',
-                subtitle: '신규 +${stats.newStudents}명',
+                title: AppStrings.analyticsStudentCountLabel,
+                value: AppStrings.peopleCount(stats.totalStudents),
+                subtitle: AppStrings.analyticsNewStudentsFormat(
+                  stats.newStudents,
+                ),
                 color: AppColors.ink,
                 icon: Icons.people_outline,
               ),
@@ -219,7 +225,7 @@ class _TeacherDashboardScreenState
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: StatCard(
-                title: '월 수입',
+                title: AppStrings.analyticsMonthlyRevenue,
                 value: formatWonWithComma(stats.totalRevenue),
                 color: AppColors.paperAccent,
                 icon: Icons.payments_outlined,
@@ -238,7 +244,10 @@ class _TeacherDashboardScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 교사 대시보드 섹션 헤더도 Playfair sectionTitle 로 통일.
-        Text('수익 현황', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.analyticsRevenueSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -253,7 +262,7 @@ class _TeacherDashboardScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '이번 달 수익',
+                      AppStrings.analyticsThisMonthRevenue,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -277,7 +286,7 @@ class _TeacherDashboardScreenState
                   color: (isPositive
                           ? AppColors.paperOk
                           : AppColors.paperAccent)
-                      .withValues(alpha: 0.1)
+                      .withValues(alpha: 0.1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -292,7 +301,9 @@ class _TeacherDashboardScreenState
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
-                      '${isPositive ? '+' : ''}${stats.revenueChangePercent.toStringAsFixed(1)}%',
+                      AppStrings.analyticsRevenueChangeFormat(
+                        stats.revenueChangePercent,
+                      ),
                       style: AppTypography.bodyMedium.copyWith(
                         color:
                             isPositive
@@ -315,7 +326,10 @@ class _TeacherDashboardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('학생 현황', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.analyticsStudentSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -326,20 +340,24 @@ class _TeacherDashboardScreenState
           child: Row(
             children: [
               _buildStudentStatItem(
-                '총 학생',
-                '${stats.totalStudents}명',
+                AppStrings.analyticsTotalStudentsLabel,
+                AppStrings.peopleCount(stats.totalStudents),
                 AppColors.ink,
               ),
               _buildDivider(),
               _buildStudentStatItem(
-                '신규',
-                '+${stats.newStudents}명',
+                AppStrings.analyticsNewLabel,
+                AppStrings.analyticsNewCountFormat(stats.newStudents),
                 AppColors.paperOk,
               ),
               _buildDivider(),
               _buildStudentStatItem(
-                '이탈',
-                stats.churnedStudents > 0 ? '-${stats.churnedStudents}명' : '0명',
+                AppStrings.analyticsChurnedLabel,
+                stats.churnedStudents > 0
+                    ? AppStrings.analyticsChurnedCountFormat(
+                      stats.churnedStudents,
+                    )
+                    : AppStrings.peopleCount(0),
                 stats.churnedStudents > 0
                     ? AppColors.paperAccent
                     : AppColors.inkTertiary,
