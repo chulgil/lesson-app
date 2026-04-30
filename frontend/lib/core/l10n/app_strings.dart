@@ -5049,4 +5049,42 @@ class AppStrings {
 
   /// 레슨앱 초대 — share subject.
   static const inviteShareSubject = '레슨앱 초대';
+
+  // ── Invite History Screen (초대 내역 5-3d-14) ──────────────────────────
+  /// 초대 목록을 불러올 수 없습니다. 다시 시도해주세요. — 로딩 실패.
+  static const inviteHistoryLoadErrorRetry = '초대 목록을 불러올 수 없습니다. 다시 시도해주세요.';
+
+  /// 초대 내역을 불러오는 중 오류가 발생했습니다 — 에러 화면 본문.
+  static const inviteHistoryLoadErrorDescription = '초대 내역을 불러오는 중 오류가 발생했습니다';
+
+  /// 생성한 초대가 없습니다 — 빈 상태 헤드라인.
+  static const inviteHistoryEmptyTitle = '생성한 초대가 없습니다';
+
+  /// 초대 링크를 생성하면\n여기에 기록이 표시됩니다. — 빈 상태 본문.
+  static const inviteHistoryEmptyBody = '초대 링크를 생성하면\n여기에 기록이 표시됩니다.';
+
+  /// 활성 초대 — 활성 섹션 헤더.
+  static const inviteHistoryActiveSection = '활성 초대';
+
+  /// 만료/취소된 초대 — 비활성 섹션 헤더.
+  static const inviteHistoryInactiveSection = '만료/취소된 초대';
+
+  /// 초대 취소 — 취소 다이얼로그 타이틀 + 카드 액션 버튼 라벨.
+  static const inviteRevokeDialogTitle = '초대 취소';
+
+  /// 이 초대 링크를 취소하시겠습니까?\n취소 후에는 이 코드로 연결할 수 없습니다. — 취소 다이얼로그 본문.
+  static const inviteRevokeDialogContent =
+      '이 초대 링크를 취소하시겠습니까?\n취소 후에는 이 코드로 연결할 수 없습니다.';
+
+  /// 아니오 — 취소 다이얼로그 부정 버튼 (기존 표기 유지).
+  static const inviteRevokeDialogNo = '아니오';
+
+  /// 초대가 취소되었습니다 — 취소 완료 SnackBar.
+  static const inviteRevokedSnack = '초대가 취소되었습니다';
+
+  /// $count회 사용 — 초대 카드 사용 횟수.
+  static String inviteUseCountFormat(int count) => '$count회 사용';
+
+  /// 어제 — 1일 전 라벨.
+  static const yesterdayLabel = '어제';
 }
