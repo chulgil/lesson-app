@@ -4628,4 +4628,36 @@ class AppStrings {
 
   /// 카메라 촬영 또는 갤러리에서 선택 (빈 이미지 placeholder 힌트)
   static const certificateImageEmptyHint = '카메라 촬영 또는 갤러리에서 선택';
+
+  // ── Dashboard Tab (홈 대시보드 5-3d-2) ──────────────────────────────────
+
+  /// 오늘의 레슨 — Programme 페이지 타이틀 (Notebook × Score 브랜드).
+  static const dashboardProgrammeTitle = '오늘의 레슨';
+
+  /// 레슨 카운트 — 한국어 서수 렌더링 (한/두/세 편의 수업).
+  /// count == 0 일 때 '예정된 레슨 없음'.
+  static String dashboardLessonCountFormat(int count) {
+    if (count == 0) return '예정된 레슨 없음';
+    const korean = ['한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
+    final label = count <= korean.length ? korean[count - 1] : '$count';
+    return '$label 편의 수업';
+  }
+
+  /// 레슨 로딩 실패 에러 카드 메시지.
+  static const dashboardLessonsLoadError = '레슨을 불러올 수 없습니다';
+
+  /// 이번 달 — 통계 카드 타이틀.
+  static const dashboardThisMonth = '이번 달';
+
+  /// 오늘 레슨 빈 상태 — 타이틀.
+  static const dashboardEmptyTitle = '오늘 예정된 레슨이 없습니다';
+
+  /// 오늘 레슨 빈 상태 — 서브타이틀.
+  static const dashboardEmptySubtitle = '비어 있는 프로그램 — 새 레슨을 추가해 보세요.';
+
+  /// 레슨 더보기 — 5건 초과 시 노출 ("12개 레슨 더보기").
+  static String dashboardMoreLessonsFormat(int count) => '$count개 레슨 더보기';
+
+  /// 통계 더보기 — Fine. 푸터 링크.
+  static const dashboardAnalyticsMoreLink = '통계 더보기';
 }
