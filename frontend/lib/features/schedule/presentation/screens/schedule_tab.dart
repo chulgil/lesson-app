@@ -19,6 +19,7 @@ import '../providers/schedule_view_mode_provider.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
+import '../widgets/sticky_schedule_header_delegate.dart';
 
 /// State provider for teacher selected date
 final teacherSelectedDateProvider = StateProvider<DateTime>((ref) {
@@ -37,20 +38,147 @@ class ScheduleTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final viewMode = ref.watch(scheduleViewModeProvider);
+
+    // §7.X — list 모드는 CustomScrollView 로 헤더 collapse + WeekStrip sticky.
+    // timeline/weeklyGrid 은 자체 스크롤이 있어 외부 collapse 적용 시 충돌
+    // (weeklyGrid 은 ScrollController 보유) → 기존 Column 유지.
+    if (viewMode == ScheduleViewMode.list) {
+      return _buildCollapsibleListLayout(context, ref);
+    }
+    return _buildPinnedLayout(context, ref, viewMode);
+  }
+
+  /// list 모드 전용 — Masthead/Programme/Toggle 은 스크롤시 사라지고,
+  /// CompactWeekStrip + DateHeader 는 SliverPersistentHeader 로 sticky.
+  Widget _buildCollapsibleListLayout(BuildContext context, WidgetRef ref) {
     final selectedDate = ref.watch(teacherSelectedDateProvider);
     final sortType = ref.watch(teacherLessonSortTypeProvider);
-    final viewMode = ref.watch(scheduleViewModeProvider);
+    final lessonsAsync = ref.watch(lessonsProvider);
+
+    return lessonsAsync.when(
+      data: (lessons) {
+        final dayLessons =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .toList();
+        switch (sortType) {
+          case LessonSortType.timeAsc:
+            dayLessons.sort((a, b) => a.startTime.compareTo(b.startTime));
+          case LessonSortType.nameAsc:
+            dayLessons.sort((a, b) => a.studentName.compareTo(b.studentName));
+        }
+        final lessonDates =
+            lessons
+                .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
+                .toSet();
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader(context, ref)),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: StickyScheduleHeaderDelegate(
+                height: _stickyHeaderHeight,
+                child: _buildStickyHeaderContent(
+                  context: context,
+                  ref: ref,
+                  selectedDate: selectedDate,
+                  sortType: sortType,
+                  lessonCount: dayLessons.length,
+                  markerDates: lessonDates,
+                ),
+              ),
+            ),
+            if (dayLessons.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _buildEmptyState(scrollable: false),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenPadding,
+                ),
+                sliver: SliverList.builder(
+                  itemCount: dayLessons.length,
+                  itemBuilder:
+                      (context, index) =>
+                          _SwipeableLessonCard(lesson: dayLessons[index]),
+                ),
+              ),
+          ],
+        );
+      },
+      loading:
+          () => CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(context, ref)),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: StickyScheduleHeaderDelegate(
+                  height: _stickyHeaderHeight,
+                  child: _buildStickyHeaderContent(
+                    context: context,
+                    ref: ref,
+                    selectedDate: selectedDate,
+                    sortType: sortType,
+                    lessonCount: 0,
+                    markerDates: const <DateTime>{},
+                  ),
+                ),
+              ),
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          ),
+      error:
+          (error, _) => CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(context, ref)),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: StickyScheduleHeaderDelegate(
+                  height: _stickyHeaderHeight,
+                  child: _buildStickyHeaderContent(
+                    context: context,
+                    ref: ref,
+                    selectedDate: selectedDate,
+                    sortType: sortType,
+                    lessonCount: 0,
+                    markerDates: const <DateTime>{},
+                  ),
+                ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _buildErrorState(ref, error),
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// timeline/weeklyGrid 모드 — 기존 Column 레이아웃 (자체 스크롤 컨트롤러 보존).
+  Widget _buildPinnedLayout(
+    BuildContext context,
+    WidgetRef ref,
+    ScheduleViewMode viewMode,
+  ) {
+    final selectedDate = ref.watch(teacherSelectedDateProvider);
+    final sortType = ref.watch(teacherLessonSortTypeProvider);
     final lessonsAsync = ref.watch(lessonsProvider);
 
     return Column(
       children: [
-        // Header: title + view toggle + add button
         _buildHeader(context, ref),
-
-        // Calendar: unified CompactWeekStrip for all view modes
-        // §7.126 — 모든 모드 헤더 동일 사이즈 (screenPadding 좌우).
-        // 주간 그리드는 시간 라벨 폭(16) 을 헤더 좌측 패딩 영역에
-        // 흡수시켜 정렬 (schedule_weekly_grid_view.dart §7.126 참조).
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
@@ -90,35 +218,23 @@ class ScheduleTab extends ConsumerWidget {
                 ),
           ),
         ),
-
         const SizedBox(height: AppSpacing.space3),
-
-        // Content: switches between list view, timeline view, and weekly grid
-        // Timeline/weekly grid support horizontal swipe for day/week navigation
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onHorizontalDragEnd:
-                (viewMode == ScheduleViewMode.list)
-                    ? null
-                    : (details) {
-                      final velocity = details.primaryVelocity ?? 0;
-                      if (velocity.abs() < 100) return;
-                      final delta =
-                          viewMode == ScheduleViewMode.timeline
-                              ? const Duration(
-                                days: 1,
-                              ) // day-by-day for timeline
-                              : const Duration(
-                                days: 7,
-                              ); // week-by-week for grid
-                      final newDate =
-                          velocity > 0
-                              ? selectedDate.subtract(delta)
-                              : selectedDate.add(delta);
-                      ref.read(teacherSelectedDateProvider.notifier).state =
-                          newDate;
-                    },
+            onHorizontalDragEnd: (details) {
+              final velocity = details.primaryVelocity ?? 0;
+              if (velocity.abs() < 100) return;
+              final delta =
+                  viewMode == ScheduleViewMode.timeline
+                      ? const Duration(days: 1)
+                      : const Duration(days: 7);
+              final newDate =
+                  velocity > 0
+                      ? selectedDate.subtract(delta)
+                      : selectedDate.add(delta);
+              ref.read(teacherSelectedDateProvider.notifier).state = newDate;
+            },
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child:
@@ -142,6 +258,46 @@ class ScheduleTab extends ConsumerWidget {
       ],
     );
   }
+
+  /// Sticky 영역 내부 — CompactWeekStrip + space + DateHeader.
+  /// 높이는 [_stickyHeaderHeight] 와 일치해야 함.
+  Widget _buildStickyHeaderContent({
+    required BuildContext context,
+    required WidgetRef ref,
+    required DateTime selectedDate,
+    required LessonSortType sortType,
+    required int lessonCount,
+    required Set<DateTime> markerDates,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: CompactWeekStrip(
+            selectedDate: selectedDate,
+            onDateSelected: (date) {
+              ref.read(teacherSelectedDateProvider.notifier).state = date;
+            },
+            markerDates: markerDates,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        _buildDateHeader(ref, selectedDate, lessonCount, sortType),
+        const SizedBox(height: AppSpacing.space3),
+      ],
+    );
+  }
+
+  /// Sticky 영역 고정 높이 — space2(8) + CompactWeekStrip(약 103: 헤더 26 + space 4
+  /// + 데이 스트립 73) + space3(12) + DateHeader(약 30) + space3(12) ≈ 165 → 안전 여유 +3.
+  /// 위젯이 변경되면 layout test 가 회귀를 잡는다.
+  static const double _stickyHeaderHeight = 168.0;
 
   Widget _buildViewContent({
     Key? key,
@@ -403,11 +559,11 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return const EmptyStateWidget(
+  Widget _buildEmptyState({bool scrollable = true}) {
+    return EmptyStateWidget(
       icon: Icons.event_available,
       title: AppStrings.noUpcomingLessons,
-      scrollable: true,
+      scrollable: scrollable,
     );
   }
 
