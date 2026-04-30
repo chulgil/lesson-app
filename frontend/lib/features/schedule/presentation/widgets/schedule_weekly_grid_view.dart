@@ -29,30 +29,18 @@ const double _weeklyGridTimeColumnWidth = 16;
 /// Weekly summary grid showing 7-day overview of lessons.
 /// Bird's eye view with instrument-colored cells, today highlight,
 /// and drill-down to timeline view.
-class ScheduleWeeklyGridView extends ConsumerStatefulWidget {
+/// §7.X — 외부 CustomScrollView 의 sliver 로 사용되도록 자체 ScrollController 를
+/// 보유하지 않는다. 부모(`schedule_tab.dart`)가 `SliverToBoxAdapter` 등으로
+/// 감싸서 헤더 collapse + sticky WeekStrip 패턴을 weeklyGrid 모드에도 적용.
+class ScheduleWeeklyGridView extends ConsumerWidget {
   final DateTime selectedDate;
 
   const ScheduleWeeklyGridView({super.key, required this.selectedDate});
 
-  @override
-  ConsumerState<ScheduleWeeklyGridView> createState() =>
-      _ScheduleWeeklyGridViewState();
-}
-
-class _ScheduleWeeklyGridViewState
-    extends ConsumerState<ScheduleWeeklyGridView> {
-  final ScrollController _scrollController = ScrollController();
-
-  DateTime get _weekStart => getWeekStart(widget.selectedDate);
+  DateTime get _weekStart => getWeekStart(selectedDate);
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final weekLessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
     final availabilityAsync = ref.watch(
       teacherAvailabilityProvider('teacher_1'),
@@ -61,14 +49,25 @@ class _ScheduleWeeklyGridViewState
     return weekLessonsAsync.when(
       data: (lessons) {
         final availability = availabilityAsync.valueOrNull;
-        return _buildGrid(lessons, availability);
+        return _buildGrid(context, lessons, availability);
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('불러오기 실패: $e')),
+      // Sliver 환경에서 unbounded vertical 을 피하기 위해 고정 높이로 감싼다.
+      loading:
+          () => const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (e, _) =>
+              SizedBox(height: 240, child: Center(child: Text('불러오기 실패: $e'))),
     );
   }
 
-  Widget _buildGrid(List<Lesson> lessons, TeacherAvailability? availability) {
+  Widget _buildGrid(
+    BuildContext context,
+    List<Lesson> lessons,
+    TeacherAvailability? availability,
+  ) {
     if (lessons.isEmpty) {
       return _buildEmptyWeek();
     }
@@ -95,48 +94,39 @@ class _ScheduleWeeklyGridViewState
         _weekStart.add(const Duration(days: 7)).isAfter(now);
     final todayIndex = isCurrentWeek ? (now.weekday - 1) : -1;
 
+    // 외부 sliver 가 스크롤을 처리한다. 자체 Expanded/SingleChildScrollView 제거.
+    // 그리드 본체는 고정 높이 (gridHeight) 로 계산되어 SliverToBoxAdapter 안에서
+    // 자연스럽게 스크롤된다. SummaryBar 도 같은 sliver 안에서 그리드 하단에 위치.
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Grid + Summary
-        Expanded(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Padding(
-                    // §7.126 — 비대칭 외부 패딩.
-                    // 좌측 0: 시간 라벨이 헤더의 좌측 패딩 영역(0~16) 에 흡수.
-                    // 우측 screenPadding(16): 헤더 우측과 일치, 7번째 컬럼
-                    // 끝 X 가 헤더 7컬럼 끝 X 와 정렬.
-                    padding: const EdgeInsets.only(
-                      right: AppSpacing.screenPadding,
-                    ),
-                    child: _buildGridBody(
-                      lessonMap,
-                      uniqueLessonCounts,
-                      startHour,
-                      endHour,
-                      todayDate,
-                      restKinds,
-                      availability: availability,
-                      travelSlotMap: travelSlotMap,
-                      todayIndex: todayIndex,
-                      now: now,
-                    ),
-                  ),
-                ),
-              ),
-              // Summary bar (fixed at bottom)
-              _buildSummaryBar(lessons),
-            ],
+        Padding(
+          // §7.126 — 비대칭 외부 패딩.
+          // 좌측 0: 시간 라벨이 헤더의 좌측 패딩 영역(0~16) 에 흡수.
+          // 우측 screenPadding(16): 헤더 우측과 일치, 7번째 컬럼
+          // 끝 X 가 헤더 7컬럼 끝 X 와 정렬.
+          padding: const EdgeInsets.only(right: AppSpacing.screenPadding),
+          child: _buildGridBody(
+            context,
+            lessonMap,
+            uniqueLessonCounts,
+            startHour,
+            endHour,
+            todayDate,
+            restKinds,
+            availability: availability,
+            travelSlotMap: travelSlotMap,
+            todayIndex: todayIndex,
+            now: now,
           ),
         ),
+        _buildSummaryBar(context, lessons),
       ],
     );
   }
 
   Widget _buildGridBody(
+    BuildContext context,
     Map<int, Map<int, Lesson>> lessonMap,
     Map<int, int> uniqueLessonCounts,
     int startHour,
@@ -220,6 +210,7 @@ class _ScheduleWeeklyGridViewState
                       ),
                       Expanded(
                         child: _buildGridCell(
+                          context,
                           lessonMap,
                           dayIndex,
                           hour * 60,
@@ -233,6 +224,7 @@ class _ScheduleWeeklyGridViewState
                       ),
                       Expanded(
                         child: _buildGridCell(
+                          context,
                           lessonMap,
                           dayIndex,
                           hour * 60 + 30,
@@ -355,6 +347,7 @@ class _ScheduleWeeklyGridViewState
   }
 
   Widget _buildGridCell(
+    BuildContext context,
     Map<int, Map<int, Lesson>> lessonMap,
     int dayIndex,
     int slotMinutes,
@@ -423,7 +416,7 @@ class _ScheduleWeeklyGridViewState
                 ? null
                 : () {
                   HapticFeedback.lightImpact();
-                  _navigateToAddLesson(date, hour, minute);
+                  _navigateToAddLesson(context, date, hour, minute);
                 },
         child:
             cellOverlay == null
@@ -553,7 +546,7 @@ class _ScheduleWeeklyGridViewState
     );
   }
 
-  Widget _buildSummaryBar(List<Lesson> lessons) {
+  Widget _buildSummaryBar(BuildContext context, List<Lesson> lessons) {
     final totalMinutes = lessons.fold<int>(0, (sum, l) => sum + l.duration);
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
@@ -713,7 +706,12 @@ class _ScheduleWeeklyGridViewState
     }
   }
 
-  void _navigateToAddLesson(DateTime date, int hour, int minute) {
+  void _navigateToAddLesson(
+    BuildContext context,
+    DateTime date,
+    int hour,
+    int minute,
+  ) {
     final dateStr =
         '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     context.push(

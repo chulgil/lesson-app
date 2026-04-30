@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
@@ -15,13 +16,18 @@ const _hiveKey = 'schedule_view_mode';
 /// Provider for schedule view mode with Hive persistence.
 final scheduleViewModeProvider =
     StateNotifierProvider<ScheduleViewModeNotifier, ScheduleViewMode>((ref) {
-  return ScheduleViewModeNotifier();
-});
+      return ScheduleViewModeNotifier();
+    });
 
 class ScheduleViewModeNotifier extends StateNotifier<ScheduleViewMode> {
   ScheduleViewModeNotifier() : super(ScheduleViewMode.list) {
     _loadFromHive();
   }
+
+  /// Test-only: bypass Hive 비동기 로드. 테스트가 Hive openBox 와 경합하지
+  /// 않도록 즉시 고정 상태로 시작 — Phase A weeklyGrid 회귀 가드용.
+  @visibleForTesting
+  ScheduleViewModeNotifier.forTesting(super.initial);
 
   Future<void> _loadFromHive() async {
     try {

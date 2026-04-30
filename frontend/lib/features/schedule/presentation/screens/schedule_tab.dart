@@ -40,18 +40,24 @@ class ScheduleTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final viewMode = ref.watch(scheduleViewModeProvider);
 
-    // §7.X — list 모드는 CustomScrollView 로 헤더 collapse + WeekStrip sticky.
-    // timeline/weeklyGrid 은 자체 스크롤이 있어 외부 collapse 적용 시 충돌
-    // (weeklyGrid 은 ScrollController 보유) → 기존 Column 유지.
-    if (viewMode == ScheduleViewMode.list) {
-      return _buildCollapsibleListLayout(context, ref);
+    // §7.X / Phase A — list + weeklyGrid 모드는 CustomScrollView 로
+    // 헤더 collapse + WeekStrip sticky 패턴을 공유.
+    // weeklyGrid 모드는 자체 ScrollController 를 제거하고 외부 sliver 위임.
+    // timeline 모드는 자체 스크롤이 있어 별도 처리 (Phase B 예정).
+    if (viewMode == ScheduleViewMode.timeline) {
+      return _buildPinnedLayout(context, ref, viewMode);
     }
-    return _buildPinnedLayout(context, ref, viewMode);
+    return _buildCollapsibleListLayout(context, ref, viewMode);
   }
 
-  /// list 모드 전용 — Masthead/Programme/Toggle 은 스크롤시 사라지고,
+  /// list + weeklyGrid 모드 — Masthead/Programme/Toggle 은 스크롤시 사라지고,
   /// CompactWeekStrip + DateHeader 는 SliverPersistentHeader 로 sticky.
-  Widget _buildCollapsibleListLayout(BuildContext context, WidgetRef ref) {
+  /// 본문 sliver 는 viewMode 에 따라 분기.
+  Widget _buildCollapsibleListLayout(
+    BuildContext context,
+    WidgetRef ref,
+    ScheduleViewMode viewMode,
+  ) {
     final selectedDate = ref.watch(teacherSelectedDateProvider);
     final sortType = ref.watch(teacherLessonSortTypeProvider);
     final lessonsAsync = ref.watch(lessonsProvider);
@@ -95,7 +101,13 @@ class ScheduleTab extends ConsumerWidget {
                 ),
               ),
             ),
-            if (dayLessons.isEmpty)
+            if (viewMode == ScheduleViewMode.weeklyGrid)
+              // weeklyGrid 은 자체 weekLessonsProvider 로 데이터를 가져오며
+              // (gridHeight 가 큰 경우) 외부 sliver 가 스크롤을 처리한다.
+              SliverToBoxAdapter(
+                child: ScheduleWeeklyGridView(selectedDate: selectedDate),
+              )
+            else if (dayLessons.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: _buildEmptyState(scrollable: false),
@@ -166,7 +178,9 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  /// timeline/weeklyGrid 모드 — 기존 Column 레이아웃 (자체 스크롤 컨트롤러 보존).
+  /// timeline 모드 — 자체 스크롤 컨트롤러 충돌 우려로 collapse 미적용.
+  /// weeklyGrid 는 Phase A 에서 collapse 패턴으로 이전했고, list 는 처음부터 적용.
+  /// timeline collapse 는 Phase B 에서 처리 예정.
   Widget _buildPinnedLayout(
     BuildContext context,
     WidgetRef ref,
@@ -225,33 +239,22 @@ class ScheduleTab extends ConsumerWidget {
             onHorizontalDragEnd: (details) {
               final velocity = details.primaryVelocity ?? 0;
               if (velocity.abs() < 100) return;
-              final delta =
-                  viewMode == ScheduleViewMode.timeline
-                      ? const Duration(days: 1)
-                      : const Duration(days: 7);
+              // timeline 모드만 이 레이아웃을 사용 — 1일 단위 좌우 스와이프.
+              const delta = Duration(days: 1);
               final newDate =
                   velocity > 0
                       ? selectedDate.subtract(delta)
                       : selectedDate.add(delta);
               ref.read(teacherSelectedDateProvider.notifier).state = newDate;
             },
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child:
-                  viewMode == ScheduleViewMode.weeklyGrid
-                      ? ScheduleWeeklyGridView(
-                        key: const ValueKey(ScheduleViewMode.weeklyGrid),
-                        selectedDate: selectedDate,
-                      )
-                      : _buildViewContent(
-                        key: ValueKey(viewMode),
-                        lessonsAsync: lessonsAsync,
-                        selectedDate: selectedDate,
-                        sortType: sortType,
-                        viewMode: viewMode,
-                        ref: ref,
-                        context: context,
-                      ),
+            child: _buildViewContent(
+              key: ValueKey(viewMode),
+              lessonsAsync: lessonsAsync,
+              selectedDate: selectedDate,
+              sortType: sortType,
+              viewMode: viewMode,
+              ref: ref,
+              context: context,
             ),
           ),
         ),
