@@ -1,3 +1,157 @@
+# 스케줄 탭 UX 재설계 — body 영역 80% 확보 (현재 진행)
+
+> 작성일: 2026-04-30
+> 모드: `/plan --eng` + adaptive-quality **balanced** (UI 리팩토링, 5 파일 / 시그니처 4대 BLOCK 게이트 보존)
+> 사용자 결정 (2026-04-30):
+> - **방향 A** — 모든 모드(list/timeline/weeklyGrid)에 P1-3 collapse 확장 + ViewModeToggle sticky 영역 이동
+> - **Phase A 단독 우선 머지** — weeklyGrid 가 진짜 통증 (body 55% → 80%). 사용자 검증 후 B~D 순차
+> - **시그니처 4대 BLOCK 정책 유지** — "Programme of Schedule" 비우는 안 거절, collapse-on-scroll 로 효과 동등 (Apple/Google Calendar 패턴)
+
+## 배경 — 사용자 통증
+
+> "선생님 화면의 스케쥴의 경우 특히 주간 스케쥴의 경우 여전히 스크롤되는 영역이 좁아서 확인이 힘듭니다. ... UX전문가 관점에서 다시 분석해서 선생님이 인지하기쉽고 편하게 작업할수있도록 개선해주세요."
+
+### 현재 (iPhone 13 mini, 700px viewport 기준)
+
+```
+[weeklyGrid mode — 현재]              [list mode — 현재 (P1-3 적용됨)]
+┌──────────────────────┐              ┌──────────────────────┐
+│ NotebookMasthead     │ 60px         │ Sliver: Header       │ collapse OK
+│ Programme + 스케줄    │ 80px         │ Sliver: Sticky 168px │ pinned OK
+│ ThinRule + Toggle    │ 60px         │  ├ WeekStrip         │
+│ ─── 헤더 200px ───   │              │  └ DateHeader        │
+│ WeekStrip 115px      │ always fixed │ Sliver: 레슨카드 list │ body OK
+│ ─── 기준선 315px ─── │              └──────────────────────┘
+│                      │
+│ Expanded (385px)     │ body = 55%   ✓ list 모드는 정상
+│ ├ WeeklyGrid (자체   │
+│ │   ScrollController)│
+│ └ SummaryBar         │
+└──────────────────────┘
+body = 385/700 = 55%
+✗ weeklyGrid · timeline 은 헤더 collapse 미적용
+```
+
+### 핵심 발견
+
+- P1-3 commit `7820b470` 에서 list 모드에만 CustomScrollView + SliverPersistentHeader pinned 적용
+- weeklyGrid/timeline 은 자체 ScrollController 충돌 우려로 기존 Column 유지 (`_buildPinnedLayout`)
+- 결과: weeklyGrid 모드가 가장 좁다 (body 55% on iPhone 13 mini)
+
+## 방향 A 채택 — collapse 모든 모드 확장 + 토글 sticky 이동
+
+```
+[Phase A~D 완료 시]
+┌──────────────────────┐
+│ Sliver: Header       │ collapse (스크롤 시 사라짐)
+│  ├ NotebookMasthead  │
+│  ├ Programme/스케줄  │
+│  └ ThinRule          │
+├──────────────────────┤
+│ Sliver: Sticky ~150px│ pinned
+│  ├ WeekStrip         │
+│  ├ DateHeader+Toggle │ ← Toggle sticky 영역으로 이동
+│  └ space             │
+├──────────────────────┤
+│ Sliver: Body         │
+│  └ 모드별 콘텐츠     │ body ~80%
+│    (list/timeline/   │   (550/700)
+│     weeklyGrid)      │
+└──────────────────────┘
+```
+
+### 시그니처 4대 BLOCK 게이트 (Notebook × Score §1.2) 유지
+
+- "SCHEDULE" eyebrow / "Programme of Schedule" / "스케줄" Playfair / ThinRule → **펼친 상태에서 모두 보존**
+- 스크롤 다운 시 자연스럽게 collapse — Apple/Google Calendar 패턴 (HIG 준수)
+- 사용자 제안의 "헤더 비우기" 는 BLOCK 게이트 위반 → 거절. collapse 로 동등 효과 달성.
+
+## Phase A — weeklyGrid 모드 collapse 적용 (현재 진행)
+
+### 산출물 5 파일
+
+| # | 파일 | 변경 |
+|---|------|------|
+| 1 | `frontend/lib/features/schedule/presentation/screens/schedule_tab.dart` | `_buildPinnedLayout` 의 weeklyGrid 분기 → `_buildCollapsibleListLayout` 로 통합 |
+| 2 | `frontend/lib/features/schedule/presentation/widgets/schedule_weekly_grid_view.dart` | 자체 `ScrollController` 제거, 외부 sliver 위임. SummaryBar 는 sliver 분리 또는 마지막 SliverToBoxAdapter |
+| 3 | `frontend/lib/features/schedule/presentation/widgets/sticky_schedule_header_delegate.dart` | (선택) 높이 168 유지, weeklyGrid 모드에서 DateHeader 생략 분기 |
+| 4 | `frontend/test/features/schedule/screens/schedule_tab_layout_test.dart` | weeklyGrid 모드 회귀 가드 추가 (CustomScrollView + sticky header + 크래시 없음) |
+| 5 | `prompt_plan.md` | Phase A 종료 기록 |
+
+### 구현 세부
+
+#### A1. schedule_tab.dart 통합
+
+- `if (viewMode == ScheduleViewMode.list)` 분기 제거
+- 단일 `_buildCollapsibleListLayout` 진입, viewMode 에 따라 body sliver 만 분기:
+  - list: 기존 SliverList 유지
+  - weeklyGrid: `SliverFillRemaining(hasScrollBody: false, child: ScheduleWeeklyGridView)`
+- 또는 SliverToBoxAdapter + SliverFillRemaining 으로 grid + summaryBar 분리
+
+#### A2. schedule_weekly_grid_view.dart 수정
+
+- `_scrollController` 필드 + `dispose()` 제거
+- `SingleChildScrollView(controller: _scrollController, child: ...)` 제거 → 직접 child
+- 외부 CustomScrollView 가 스크롤을 처리 → 내부는 fixed-height widget
+- SummaryBar 는 별도 sliver 또는 그리드 본체 하단에 stack 결합
+
+#### A3. sticky 영역 weeklyGrid 분기
+
+- weeklyGrid 모드는 DateHeader 불필요 (이미 컬럼별 일자가 WeekStrip 에 표시됨)
+- StickyScheduleHeaderDelegate 가 viewMode 인지하거나, 호출측에서 height 다르게 전달
+- 또는 DateHeader 를 weeklyGrid 모드에서도 표시 (선택된 날짜 강조 효과) — Phase B 에서 결정
+
+### 검증 기준
+
+| 항목 | 합격 |
+|---|---|
+| flutter analyze | 0 issues |
+| schedule_tab_layout_test.dart 전체 PASS | 4/4 (기존 4건 회귀 없음) |
+| 신규 weeklyGrid 회귀 가드 | 1건 추가 (CustomScrollView + 크래시 없음) |
+| 시그니처 4대 BLOCK 게이트 | 펼친 상태에서 모두 검출 |
+| 실기 검증 | 수동 (사용자) — body 55% → 75%+ 체감 |
+
+### 평가 루브릭 (rubric-evaluation 기준)
+
+| 기준 | 목표 | 가중치 |
+|---|---|---|
+| 완성도 | weeklyGrid 모드에서 collapse 동작 + body 75%+ 확보 | 40% |
+| 견고성 | 회귀 가드 추가 + 기존 list 회귀 없음 | 30% |
+| 일관성 | 시그니처 4대 BLOCK 게이트 보존 + AppColors/AppSpacing 준수 | 20% |
+| 간결성 | 5 파일 / 약 150~200 라인 변경 | 10% |
+
+## Phase B — timeline 모드 collapse (보류)
+
+`schedule_timeline_view.dart` 자체 스크롤 분석 후 같은 패턴 적용. Phase A 사용자 검증 후 진행.
+
+## Phase C — ViewModeToggle sticky 영역 이동 (보류)
+
+현재 `_buildHeader` 의 Toggle 을 `_buildStickyHeaderContent` 의 DateHeader 옆으로 이동. body 영역 추가 +20px 확보.
+
+## Phase D — 헤더 padding 압축 (보류)
+
+`_buildHeader` 의 `EdgeInsets.only(top: 18, bottom: 14)` → `top: 12, bottom: 10` 수준으로 축소 (~10px 절감).
+
+## Phase E — 회귀 가드 강화 (보류)
+
+전 모드(list/timeline/weeklyGrid) 의 시그니처 4대 + 크래시 부재 + collapse 동작 통합 가드.
+
+---
+
+## 진행 현황
+
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| A | weeklyGrid 모드 collapse 적용 | 진행 중 |
+| B | timeline 모드 collapse | 대기 (사용자 검증 후) |
+| C | ViewModeToggle sticky 이동 | 대기 |
+| D | 헤더 padding 압축 | 대기 |
+| E | 통합 회귀 가드 | 대기 |
+
+---
+
+## 이전 계획
+
 # Notebook × Score §9 아이콘 정책 강제 — Phase 1 plan (현재 진행)
 
 > 작성일: 2026-04-29
@@ -429,6 +583,7 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 - 5-3d-8 all_recordings_screen 24 사이트 (2026-04-30) — settings/ 도메인 전체 녹음 관리 화면(562줄). AppBar 1건(전체 녹음 파일) + 툴팁 4건(녹음 가져오기/새로고침 범용/섹션에 연결·섹션 변경/삭제 재사용) + 에러/SnackBar 6건(per-domain error state/파일 읽기 실패/import 실패/link 실패/deleted snack/일반 retry 범용) + 포매터 2건(importedFormat fileName/linkedFormat sectionName) + 섹션 헤더 2건(연결되지 않은/연결된 녹음) + 스탯 라벨 3건(전체 재사용/연결됨/미연결) + 빈 상태 1건(recordingsEmpty 재사용) + 다이얼로그 2건(녹음 삭제/영구 삭제 안내) + SectionPicker 1건(녹음을 연결할 섹션 선택) + 인라인 라벨 1건(연결되지 않음). 신규 키 21개 + 재사용 3건(AppStrings.all/recordingsEmpty/delete) + 인라인 3건(cancel/delete/retry 기존). **범용 키 도입 2건**: refreshTooltip / errorOccurredRetryAgain — orphan_recordings_screen 후속 청크에서 재사용 예상. **번호 충돌 처리 (재발 #3)**: 키 커밋이 외부 세션 5-3d-7 키 커밋(67cbe3b8)에 무차별 번들링됨 (단일 git add 시점에 working tree 의 외부 unstaged 변경 흡수) → 마이그레이션은 `f9af18ee` 단독 커밋. 키는 67cbe3b8 안에 (mislabeled 5-3d-7), 마이그레이션은 5-3d-8 슬롯 단독. flutter analyze — No issues. subscription regression 63/63 PASS. 한글 grep — 1건 (L485 doc comment `// Repertoire > Section name (or "연결되지 않음")` 개발자 참조용 보존). **참고**: settings/ 도메인 잔여 — orphan_recordings_screen.dart 16 사이트가 차기 후보.
 - 5-3d-9 orphan_recordings_screen 19 사이트 (2026-04-30) — settings/ 도메인 미연결 녹음 관리 화면(479줄). AppBar 1건(orphan section 재사용) + 툴팁 3건(refresh 경로 복구 부가/섹션에 연결 재사용/삭제 재사용) + 에러 상태 1건(allRecordings 재사용) + 빈 상태 2건(empty title/subtitle) + 진단 카드 5건(diagnostic title/Hive count label/section count label + countItemsSuffix×3) + 안내 포매터 1건(orphans length count + 2줄 설명) + SectionPicker 1건(재사용) + 다이얼로그 4건(title/content/cancel/delete 모두 재사용) + SnackBar 3건(linkedFormat/linkError/deletedSnack 재사용). 신규 키 8개 (orphanRecordings 7개: refreshTooltip/emptyTitle/emptySubtitle/diagnosticTitle/hiveCountLabel/sectionCountLabel/descriptionFormat + 범용 1개: countItemsSuffix) + all_recordings 도메인 키 9건 재사용 (orphanedSection/errorState/sectionPickerTitle/linkedFormat/linkError/deleteDialogTitle/deleteDialogContent/deletedSnack/linkSectionTooltip) + 기존 cancel/delete/retry 3건 재사용. bpm 1건 (`'${bpm}bpm'`) — 기술 단위 i18n 제외. **범용 키 추가 1건**: countItemsSuffix(int n) → `'$n개'` (다도메인 재사용 가능). **단독 커밋**: 키 `e07911dd` + 마이그레이션 `1b98e256` — 외부 세션 번들링 회피 성공. flutter analyze — No issues. subscription regression 63/63 PASS. 한글 grep — 0 잔존. **settings/ 도메인 잔여**: 본 청크로 settings/presentation/screens/ 의 backup/all_recordings/orphan/profile_visibility 4파일 종결. 차기 후보 — settings/presentation/widgets/ 또는 invite/onboarding 도메인 진입.
 - 5-3d-10 pending_requests_screen 17 사이트 (2026-04-30) — invite/ 도메인 진입 — 연결 요청 대기 화면(373줄). AppBar 1건(연결 요청) + 에러/empty 5건(load error retry/load error description/empty title/empty teacher/empty student — teacher↔student 시점 분기 줄바꿈 문자열 보존) + 수락 SnackBar 1건(connectionAcceptedFormat name) + 거절 다이얼로그 4건(title/content formatter/cancel 재사용/statusRejected 재사용) + 거절 SnackBar 1건(connectionRejected) + 카드 메타 1건(connectionMethodLabelFormat method.label) + 액션 버튼 2건(거절 statusRejected 재사용 / 수락 accept 재사용) + 만료 시간 라벨 3건(daysRemainingFormat / hoursRemainingFormat / expiresVerySoon 재사용). 신규 키 13개 + 재사용 4건 (cancel/accept/statusRejected/expiresVerySoon). **단독 커밋**: 키 `d796ab3b` + 마이그레이션 `d0eef9d7` — 외부 세션 번들링 회피 성공. flutter analyze — No issues. 한글 grep — 0 잔존 (코멘트의 한글 doc 보존). **invite/ 도메인 잔여**: my_connections 31 / invite_screen 26 / invite_confirm 25 / invite_history 17 / code_input 8 / scan_invite 6. **번호 처리**: 외부 세션이 5-3d-8(all_recordings) + 5-3d-9(orphan_recordings) 선점 → 본 세션 5-3d-10 채택.
+- 5-3d-11 code_input_screen 12 사이트 (2026-04-30) — invite/ 도메인 6자리 초대 코드 입력 화면(343줄). AppBar 1건(초대 코드 입력) + 동적 타겟 라벨 2건(teacher/student 기존 키 재사용) + 입력 안내 포매터 1건($targetRole의 초대 코드를 입력하세요) + 서브타이틀 1건(6자리 숫자 코드를 입력해주세요) + 액션 라벨 2건(클립보드에서 붙여넣기/QR 코드 스캔하기) + 에러 메시지 5건(클립보드 invalid/notFound/expired/invalid/lookupError) + Submit 버튼 1건(confirm 재사용). 신규 키 10개 (inviteCodeAppBarTitle/inviteCodeInputPromptFormat/inviteCodeInputSubtitle/inviteCodePasteFromClipboard/inviteCodeQrScan/inviteCodeClipboardInvalid/inviteCodeNotFound/inviteCodeExpired/inviteCodeInvalid/inviteCodeLookupError) + AppStrings.teacher/student/confirm 3건 재사용. 단독 커밋 — 키 `dee089a5` + 마이그 `df9682eb`. flutter analyze — No issues. subscription 63/63 PASS. 한글 grep — 1건 (L100 doc comment 보존). **참고**: 외부 세션 5-3d-10 entry 의 잔여 카운트(code_input 8)와 본 entry(12)는 grep 시점 차이 — 본 작업 마이그레이션은 12사이트 기준 진행.
 
 ## 평가 기준 (Rubric, 합격선 7.5)
 
@@ -509,7 +664,8 @@ phase_a_mapping.md 분석 + 추가 grep 결과:
 | P2 5-3d home 도메인 종결 (32 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3d-9 orphan_recordings_screen i18n (19 사이트) | ✅ 완료 (2026-04-30) |
 | P2 5-3d-10 pending_requests_screen i18n (17 사이트) | ✅ 완료 (2026-04-30) |
-| **다음** P2 5-3d-11+ invite/ 도메인 잔여 (my_connections 31 / invite_screen 26 등) | 대기 |
+| P2 5-3d-11 code_input_screen i18n (12 사이트) | ✅ 완료 (2026-04-30) |
+| **다음** P2 5-3d-12+ invite/ 도메인 잔여 (scan_invite 15 / invite_history 21 / invite_screen 32 / invite_confirm 33 / my_connections 43) | 대기 |
 | P1-1 후속 — TimeException UI 부분 차단 시간 입력 | 별도 phase |
 | P1-3 schedule_tab 헤더 collapse + sticky week strip (Option C) | ✅ 완료 (2026-04-30) |
 
