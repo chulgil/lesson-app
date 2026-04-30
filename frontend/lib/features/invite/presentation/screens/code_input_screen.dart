@@ -57,12 +57,15 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
   @override
   Widget build(BuildContext context) {
     final userRole = ref.watch(currentInviteUserRoleProvider);
-    final targetRole = userRole == InviteUserRole.teacher ? '학생' : '선생님';
+    final targetRole =
+        userRole == InviteUserRole.teacher
+            ? AppStrings.student
+            : AppStrings.teacher;
 
     return Scaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('초대 코드 입력'),
+        title: const Text(AppStrings.inviteCodeAppBarTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -96,7 +99,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
               // Title
               // Notebook × Score: 초대 코드 입력 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
               Text(
-                '$targetRole의 초대 코드를 입력하세요',
+                AppStrings.inviteCodeInputPromptFormat(targetRole),
                 style: NotebookTypography.appBarTitle,
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +108,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
 
               // Subtitle
               Text(
-                '6자리 숫자 코드를 입력해주세요',
+                AppStrings.inviteCodeInputSubtitle,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -148,7 +151,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
               TextButton.icon(
                 onPressed: _pasteFromClipboard,
                 icon: const Icon(Icons.paste),
-                label: const Text('클립보드에서 붙여넣기'),
+                label: const Text(AppStrings.inviteCodePasteFromClipboard),
               ),
 
               const SizedBox(height: AppSpacing.space4),
@@ -192,7 +195,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                   context.push(AppRoutes.inviteScan);
                 },
                 icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('QR 코드 스캔하기'),
+                label: const Text(AppStrings.inviteCodeQrScan),
               ),
 
               const SizedBox(height: AppSpacing.space4),
@@ -277,7 +280,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
     final text = data!.text!.replaceAll(RegExp(r'[^0-9]'), '');
     if (text.length < 6) {
       setState(() {
-        _errorMessage = '클립보드에 유효한 코드가 없습니다';
+        _errorMessage = AppStrings.inviteCodeClipboardInvalid;
       });
       return;
     }
@@ -309,7 +312,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
 
       if (invite == null) {
         setState(() {
-          _errorMessage = '초대 코드를 찾을 수 없습니다';
+          _errorMessage = AppStrings.inviteCodeNotFound;
         });
         return;
       }
@@ -318,8 +321,8 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
         setState(() {
           _errorMessage =
               invite.status == InviteStatus.expired
-                  ? '만료된 초대 코드입니다'
-                  : '유효하지 않은 초대 코드입니다';
+                  ? AppStrings.inviteCodeExpired
+                  : AppStrings.inviteCodeInvalid;
         });
         return;
       }
@@ -330,7 +333,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = '코드 확인 중 오류가 발생했습니다';
+        _errorMessage = AppStrings.inviteCodeLookupError;
       });
     } finally {
       if (mounted) {
