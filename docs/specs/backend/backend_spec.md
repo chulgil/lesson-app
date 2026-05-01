@@ -98,3 +98,21 @@ app/
 4. [ ] Supabase Auth 실제 연동 테스트
 5. [ ] Redis 캐시 레이어 추가
 6. [ ] FCM Push Notification 연동
+7. [ ] Subscription Expiry Dispatcher 스케줄러 진입점 연결 (D-7/D-1 알림, 만료 30일 후 expired→past 자동 전환)
+
+## 결제 라우터 정책 (CRITICAL — 작업 전 필독)
+
+**`payments` 라우터는 PG 연동 미진행이 정책상 의도된 상태**. 수동 입금확인 워크플로우만 제공한다.
+
+| 구분 | 상태 |
+|------|------|
+| PG SDK (Toss / Portone / 카카오페이 / 이니시스) | **미채택** |
+| Webhook (PG → 서버) | **없음** |
+| 카드 토큰화 / PCI-DSS | **없음** |
+| 자동 입금 매칭 | **없음** |
+| 영수증 발행 / 정산 / 에스크로 | **없음** |
+| 수동 워크플로우 API (student-confirm / teacher-confirm / teacher-reject / refund / overdue / remind) | **유지** |
+
+**상세 정책**: [`docs/specs/subscription/payment_architecture.md`](../subscription/payment_architecture.md) — 현행 정책 + 미래 PG 도입 시 양방향 정산 설계 요건 SSOT.
+
+PG 도입을 결정하면 [`payment_architecture.md`](../subscription/payment_architecture.md) §3 "미래 — PG 도입 시 신규 설계 요건"의 미정 항목(정산 주기 / 수수료 모델 / 사업자 구분 / 환불 흐름 / 에스크로 / PG 선택)을 먼저 답한 뒤 별도 Phase 로 진행.

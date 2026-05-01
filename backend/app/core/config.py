@@ -28,11 +28,6 @@ class Settings(BaseSettings):
     APPLE_KEY_ID: str = ""
     APPLE_PRIVATE_KEY_PATH: str = ""
 
-    # Payment Gateway (Toss Payments)
-    PG_PROVIDER: str = "toss"
-    TOSS_CLIENT_KEY: str = ""
-    TOSS_SECRET_KEY: str = ""
-
     # Vultr Object Storage
     VULTR_STORAGE_ENDPOINT: str = ""
     VULTR_STORAGE_ACCESS_KEY: str = ""

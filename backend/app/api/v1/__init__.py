@@ -14,11 +14,10 @@ from app.api.v1 import (
     lessons,
     locations,
     notifications,
-    profile_images,
     parents,
-    payments,
     practice,
     practice_logs,
+    profile_images,
     recordings,
     relationships,
     reviews,
@@ -58,4 +57,3 @@ api_router.include_router(profile_images.router, prefix="/profile-images", tags=
 api_router.include_router(ai_notes.router, prefix="/ai-notes", tags=["ai-notes"])
 api_router.include_router(device_tokens.router, prefix="/device-tokens", tags=["device-tokens"])
 api_router.include_router(scheduler.router, prefix="/scheduler", tags=["scheduler"])
-api_router.include_router(payments.router, prefix="/payments", tags=["payments"])

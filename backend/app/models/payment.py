@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -14,7 +14,7 @@ class PaymentType(str, enum.Enum):
 
 class PaymentStatus(str, enum.Enum):
     pending = "pending"
-    paid = "paid"
+    studentConfirmed = "studentConfirmed"
     confirmed = "confirmed"
     overdue = "overdue"
     cancelled = "cancelled"
@@ -88,14 +88,6 @@ class Payment(UUIDMixin, TimestampMixin, Base):
     parent_notified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     parent_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    # PG (Payment Gateway) integration fields
-    pg_provider: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    pg_transaction_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    pg_order_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    pg_payment_key: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    pg_response: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    pg_failure_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-
     __table_args__ = (
         Index("idx_payment_student", "student_id"),
         Index("idx_payment_status", "status"),
@@ -130,6 +122,4 @@ class TuitionSettings(UUIDMixin, TimestampMixin, Base):
     )
     default_billing_parent_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
-    __table_args__ = (
-        Index("uk_tuition_student", "student_id", unique=True),
-    )
+    __table_args__ = (Index("uk_tuition_student", "student_id", unique=True),)
