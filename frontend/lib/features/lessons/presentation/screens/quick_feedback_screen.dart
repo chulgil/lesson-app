@@ -15,7 +15,6 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../providers/feedback_template_providers.dart';
 import '../widgets/feedback_template_picker_sheet.dart';
-import '../widgets/replace_feedback_confirm_dialog.dart';
 
 /// Quick feedback writing screen for a specific lesson.
 /// Supports feedback text, key points, and practice tips.
@@ -249,15 +248,13 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     final selected = await FeedbackTemplatePickerSheet.show(context);
     if (selected == null || !mounted) return;
 
-    final hasExisting = _feedbackController.text.trim().isNotEmpty;
-    if (hasExisting) {
-      final confirmed = await ReplaceFeedbackConfirmDialog.show(context);
-      if (!confirmed || !mounted) return;
-    }
-
+    // 누적 추가: 빈 본문이면 그대로, 기존 본문이 있으면 빈 줄로 구분 후 끝에 append.
+    final existing = _feedbackController.text.trimRight();
+    final hasExisting = existing.isNotEmpty;
+    final body = hasExisting ? '$existing\n\n${selected.body}' : selected.body;
     _feedbackController.value = TextEditingValue(
-      text: selected.body,
-      selection: TextSelection.collapsed(offset: selected.body.length),
+      text: body,
+      selection: TextSelection.collapsed(offset: body.length),
     );
     setState(() => _hasChanges = true);
 
@@ -270,8 +267,12 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.feedbackTemplateAppliedSnack),
+        SnackBar(
+          content: Text(
+            hasExisting
+                ? AppStrings.feedbackTemplateAddedSnack
+                : AppStrings.feedbackTemplateAppliedSnack,
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );

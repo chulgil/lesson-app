@@ -1,6 +1,6 @@
 # 레슨 피드백 템플릿 (Feedback Template)
 
-> 마지막 업데이트: 2026-05-01 (§7.136 마지널리아 패턴 반영)
+> 마지막 업데이트: 2026-05-01 (§7.136 마지널리아 패턴 + §7.137 다중 누적 반영)
 
 선생님이 레슨 피드백을 빠르게 작성할 수 있도록 본문 템플릿을 미리 등록하고 1탭으로 적용하는 기능.
 
@@ -65,14 +65,14 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
             ├─ 카테고리 필터 칩 (전체 + 5개)
             ├─ 자주 사용 섹션 (검색·필터 없을 때만, Top 3)
             └─ 전체 템플릿 섹션
-       └─ 선택 시:
-            ├─ 본문이 비어 있으면 즉시 교체
-            └─ 본문이 있으면 ReplaceFeedbackConfirmDialog → 확인 시 교체
-       └─ 교체 후:
-            ├─ Undo snapshot push (교체 직전 본문)
-            ├─ TextEditingController에 body 전체 대입 (커서 끝)
-            ├─ usageCount +1 (unawaited, 비차단)
-            └─ 적용 안내 SnackBar
+       └─ 선택 시 (다중 누적 §7.137):
+            ├─ 본문이 비어 있으면 그대로 삽입 → SnackBar "적용했습니다"
+            └─ 본문이 있으면 `trimRight() + '\n\n' + 신규 body` 끝에 append
+                → SnackBar "추가되었습니다"
+       └─ 적용 후:
+            ├─ Undo snapshot push (적용 직전 본문)
+            ├─ TextEditingController에 합쳐진 본문 대입 (커서 끝)
+            └─ usageCount +1 (unawaited, 비차단)
 ```
 
 기존 chip line(`_buildPresetChips`, `_insertPreset` 외 4개 메서드 / `feedbackPresets` 상수)은 두 진입점 모두에서 삭제. 본문 작성 영역 위에 단일 "템플릿 가져오기" 버튼만 노출.
@@ -116,7 +116,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 
 **Q1**: TipTemplate 재사용 vs 신규 entity → **신규** (피드백/팁은 본문 길이·사용 빈도가 다르고 카테고리 체계도 다름)
 **Q2**: chip line 잔존 vs 제거 → **제거** (사용률 낮음, 짧은 단어 누적은 결국 본문이 되지 못함)
-**Q3**: 기존 본문에 append vs 전체 교체 → **교체 + 확인 다이얼로그** (template = 완성된 문장, append는 의미 없음)
+**Q3** (§7.137 갱신): 기존 본문에 append vs 전체 교체 → **append 누적 채택**. 처음 결정은 "교체 + 확인 다이얼로그"였으나 실사용에서 선생님은 한 레슨에 **여러 측면**(예: "박자" + "활 주법" + "표현")을 한 번에 피드백하는 패턴이 자연스러움. 교체는 두 번째 템플릿 선택 시 첫 번째 내용을 잃어 누적 작성을 막는 마찰. → 빈 본문은 그대로 삽입, 기존 본문이 있으면 `trimRight() + '\n\n' + 신규` 로 끝에 append. 확인 다이얼로그(`ReplaceFeedbackConfirmDialog` 호출처) 제거. 위젯 자체는 보존(추후 "교체" 옵션 도입 시 재사용 가능).
 **Q4**: tags를 본문에 자동 prepend → **하지 않음** (메타데이터 전용; 검색·필터에만 사용)
 **Q5**: 두 진입점 라벨 통일 → **"템플릿 가져오기"** (행위가 명확한 동사형, 두 화면 동일)
 **Q6**: Undo snapshot 단위 — 글자 vs 묶음 → **debounce 1.5s 묶음 + 템플릿 적용 즉시** (글자 단위는 무용지물)
