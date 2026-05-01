@@ -173,8 +173,14 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.chat_outlined,
-                label: '피드백 템플릿',
-                subtitle: '자주 쓰는 레슨 피드백 문구',
+                label: AppStrings.feedbackTemplateMenuTitle,
+                subtitle: AppStrings.feedbackTemplateMenuSubtitle,
+                onTap: () => context.push(AppRoutes.feedbackTemplateManagement),
+              ),
+              _MenuItem(
+                icon: Icons.tips_and_updates_outlined,
+                label: '연습 팁 템플릿',
+                subtitle: '학생에게 보내는 짧은 연습 팁',
                 onTap: () => context.push(AppRoutes.tipTemplateManagement),
               ),
             ],
@@ -385,9 +391,7 @@ class ProfileTab extends ConsumerWidget {
           icon: const Icon(Icons.visibility_outlined, size: 18),
           label: const Text('내 프로필 미리보기'),
           style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: AppColors.paperAccent,
-            ),
+            side: BorderSide(color: AppColors.paperAccent),
             foregroundColor: AppColors.paperAccent,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             shape: const RoundedRectangleBorder(),

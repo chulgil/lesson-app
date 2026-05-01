@@ -6,6 +6,7 @@ import '../../../features/profile/presentation/screens/instrument_management_scr
 import '../../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
 import '../../../features/profile/presentation/screens/payment_management_screen.dart';
 import '../../../features/profile/presentation/screens/repertoire_management_screen.dart';
+import '../../../features/profile/presentation/screens/feedback_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/tip_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/extended_profile_screen.dart';
 import '../../../features/profile/presentation/screens/education_edit_screen.dart';
@@ -55,6 +56,13 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.tipTemplateManagement,
     name: 'tipTemplateManagement',
     builder: (context, state) => const TipTemplateManagementScreen(),
+  ),
+
+  // Feedback Template Management
+  GoRoute(
+    path: AppRoutes.feedbackTemplateManagement,
+    name: 'feedbackTemplateManagement',
+    builder: (context, state) => const FeedbackTemplateManagementScreen(),
   ),
 
   // Extended Profile

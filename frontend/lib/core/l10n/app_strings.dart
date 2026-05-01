@@ -5087,4 +5087,37 @@ class AppStrings {
 
   /// 어제 — 1일 전 라벨.
   static const yesterdayLabel = '어제';
+
+  // ── Feedback Template (선생님 피드백 템플릿) ─────────────────────
+
+  static const feedbackTemplateMenuTitle = '피드백 템플릿';
+  static const feedbackTemplateMenuSubtitle = '레슨 피드백 본문을 미리 등록';
+  static const feedbackTemplateScreenTitle = '피드백 템플릿';
+  static const feedbackTemplateAddTitle = '새 템플릿 추가';
+  static const feedbackTemplateEditTitle = '템플릿 수정';
+  static const feedbackTemplateEmptyTitle = '등록된 피드백 템플릿이 없습니다';
+  static const feedbackTemplateEmptyBody = '자주 쓰는 피드백을 미리 등록해 1탭으로 사용하세요';
+  static const feedbackTemplateTitleLabel = '제목';
+  static const feedbackTemplateTitleHint = '예: 활 주법 연습';
+  static const feedbackTemplateBodyLabel = '피드백 본문';
+  static const feedbackTemplateBodyHint = '학생에게 전달할 피드백 전체 내용을 입력하세요';
+  static const feedbackTemplateTagsLabel = '태그 (검색용)';
+  static const feedbackTemplateTagsHint = '쉼표로 구분 (예: 음정, 리듬)';
+  static const feedbackTemplateCategoryLabel = '카테고리';
+  static const feedbackTemplatePickerTitle = '피드백 템플릿 선택';
+  static const feedbackTemplatePickerSearchHint = '제목·본문·태그 검색';
+  static const feedbackTemplatePickerSelectButton = '템플릿 선택';
+  static const feedbackTemplatePickerFrequentSection = '자주 사용';
+  static const feedbackTemplatePickerAllSection = '전체 템플릿';
+  static const feedbackTemplatePickerEmptyResult = '검색 결과가 없습니다';
+  static const feedbackTemplateReplaceConfirmTitle = '피드백 본문을 교체하시겠습니까?';
+  static const feedbackTemplateReplaceConfirmContent =
+      '현재 입력한 피드백이 선택한 템플릿으로 교체됩니다.';
+  static const feedbackTemplateReplaceConfirmCta = '교체';
+  static const feedbackTemplateAddedSnack = '템플릿이 추가되었습니다';
+  static const feedbackTemplateUpdatedSnack = '템플릿이 수정되었습니다';
+  static const feedbackTemplateDeletedSnack = '템플릿이 삭제되었습니다';
+  static const feedbackTemplateAppliedSnack = '템플릿을 적용했습니다';
+  static const feedbackTemplateValidateTitle = '제목을 입력하세요';
+  static const feedbackTemplateValidateBody = '본문을 입력하세요';
 }

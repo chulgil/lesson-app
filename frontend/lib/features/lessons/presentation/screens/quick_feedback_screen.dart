@@ -12,8 +12,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_crud_provider.dart';
-import '../../domain/entities/feedback_preset.dart';
-import '../providers/feedback_preset_providers.dart';
+import '../providers/feedback_template_providers.dart';
+import '../widgets/feedback_template_picker_sheet.dart';
+import '../widgets/replace_feedback_confirm_dialog.dart';
 
 /// Quick feedback writing screen for a specific lesson.
 /// Supports feedback text, key points, and practice tips.
@@ -243,174 +244,52 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     );
   }
 
-  void _insertPreset(String preset) {
-    final currentText = _feedbackController.text;
-    final selection = _feedbackController.selection;
+  Future<void> _applyTemplate() async {
+    final selected = await FeedbackTemplatePickerSheet.show(context);
+    if (selected == null || !mounted) return;
 
-    String newText;
-    int newCursorPos;
-
-    if (currentText.isEmpty) {
-      newText = preset;
-      newCursorPos = preset.length;
-    } else if (selection.isValid &&
-        selection.baseOffset == selection.extentOffset) {
-      // Insert at cursor position
-      final before = currentText.substring(0, selection.baseOffset);
-      final after = currentText.substring(selection.baseOffset);
-      final separator = before.isNotEmpty && !before.endsWith('\n') ? '\n' : '';
-      newText = '$before$separator$preset$after';
-      newCursorPos = before.length + separator.length + preset.length;
-    } else {
-      // Append at end
-      newText = '$currentText\n$preset';
-      newCursorPos = newText.length;
+    final hasExisting = _feedbackController.text.trim().isNotEmpty;
+    if (hasExisting) {
+      final confirmed = await ReplaceFeedbackConfirmDialog.show(context);
+      if (!confirmed || !mounted) return;
     }
 
     _feedbackController.value = TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newCursorPos),
+      text: selected.body,
+      selection: TextSelection.collapsed(offset: selected.body.length),
     );
     setState(() => _hasChanges = true);
-  }
 
-  Widget _buildPresetChips() {
-    final presetsAsync = ref.watch(feedbackPresetNotifierProvider());
-
-    return presetsAsync.when(
-      data: (presets) => _buildPresetChipList(presets),
-      loading: () => const SizedBox(height: 34),
-      error: (_, __) => const SizedBox(height: 34),
+    // Bump usage counter (fire-and-forget; failure is non-fatal UX-wise).
+    unawaited(
+      ref
+          .read(feedbackTemplatesNotifierProvider.notifier)
+          .useTemplate(selected.id),
     );
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.feedbackTemplateAppliedSnack),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
-  Widget _buildPresetChipList(List<FeedbackPreset> presets) {
-    return SizedBox(
-      height: 34,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: presets.length + 1, // +1 for add button
-        separatorBuilder: (_, __) => const SizedBox(width: 6),
-        itemBuilder: (context, index) {
-          // Last item: add button
-          if (index == presets.length) {
-            return ActionChip(
-              avatar: Icon(Icons.add, size: 16, color: AppColors.inkSecondary),
-              label: Text(
-                AppStrings.add,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-              backgroundColor: AppColors.paperDark,
-              side: BorderSide(color: AppColors.inkQuaternary),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space1,
-              ),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onPressed: _showAddPresetDialog,
-            );
-          }
-
-          final preset = presets[index];
-          return GestureDetector(
-            onLongPress: () => _showPresetOptions(preset),
-            child: ActionChip(
-              label: Text(
-                preset.text,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.paperAccent,
-                ),
-              ),
-              backgroundColor: AppColors.paperAccentSoft,
-              side: BorderSide(color: AppColors.paperAccentSoft),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space1,
-              ),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onPressed: () => _insertPreset(preset.text),
-            ),
-          );
-        },
+  Widget _buildTemplateButton() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: OutlinedButton.icon(
+        onPressed: _applyTemplate,
+        icon: const Icon(Icons.description_outlined, size: 18),
+        label: const Text(AppStrings.feedbackTemplatePickerSelectButton),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, AppSpacing.buttonHeight),
+          foregroundColor: AppColors.paperAccent,
+          side: BorderSide(color: AppColors.paperAccent),
+        ),
       ),
-    );
-  }
-
-  void _showAddPresetDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text(AppStrings.presetAddTitle),
-            content: TextField(
-              controller: controller,
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: AppStrings.presetTextHint,
-              ),
-              onSubmitted: (_) {
-                final text = controller.text.trim();
-                if (text.isNotEmpty) {
-                  ref
-                      .read(feedbackPresetNotifierProvider().notifier)
-                      .addPreset(text);
-                  Navigator.pop(ctx);
-                }
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  final text = controller.text.trim();
-                  if (text.isNotEmpty) {
-                    ref
-                        .read(feedbackPresetNotifierProvider().notifier)
-                        .addPreset(text);
-                    Navigator.pop(ctx);
-                  }
-                },
-                child: const Text(AppStrings.add),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showPresetOptions(FeedbackPreset preset) {
-    showModalBottomSheet(
-      context: context,
-      builder:
-          (ctx) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.delete_outline),
-                  title: Text(
-                    preset.isDefault
-                        ? AppStrings.presetHide
-                        : AppStrings.delete,
-                  ),
-                  subtitle: Text(
-                    preset.isDefault
-                        ? AppStrings.presetHideDescription
-                        : AppStrings.presetDeleteDescription,
-                  ),
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    ref
-                        .read(feedbackPresetNotifierProvider().notifier)
-                        .deletePreset(preset.id);
-                  },
-                ),
-              ],
-            ),
-          ),
     );
   }
 
@@ -418,7 +297,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildPresetChips(),
+        _buildTemplateButton(),
         const SizedBox(height: AppSpacing.space2),
         Container(
           decoration: BoxDecoration(
