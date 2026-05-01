@@ -72,6 +72,8 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
        └─ 적용 후:
             ├─ Undo snapshot push (적용 직전 본문)
             ├─ TextEditingController에 합쳐진 본문 대입 (커서 끝)
+            ├─ TextField scrollController.maxScrollExtent 로 200ms easeOut 스크롤
+            │   (append된 새 본문 끝이 시야에 들어오도록)
             └─ usageCount +1 (unawaited, 비차단)
 ```
 

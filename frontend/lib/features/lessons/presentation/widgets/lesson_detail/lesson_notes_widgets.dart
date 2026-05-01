@@ -75,6 +75,7 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
   static const Duration _undoSnapshotDebounce = Duration(milliseconds: 1500);
 
   late TextEditingController _controller;
+  final ScrollController _editorScroll = ScrollController();
   _SaveStatus _saveStatus = _SaveStatus.idle;
   Timer? _statusResetTimer;
   Timer? _snapshotTimer;
@@ -95,8 +96,21 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
   void dispose() {
     _statusResetTimer?.cancel();
     _snapshotTimer?.cancel();
+    _editorScroll.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  /// 본문 끝(append된 새 템플릿)이 보이도록 다음 프레임에 스크롤.
+  void _scrollToEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_editorScroll.hasClients) return;
+      _editorScroll.animateTo(
+        _editorScroll.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   /// 현재 컨트롤러 텍스트가 마지막 snapshot과 다르면 stack에 push.
@@ -153,6 +167,8 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
       selection: TextSelection.collapsed(offset: body.length),
     );
     _onChanged(body);
+    // append된 새 본문 끝이 보이도록 내부 스크롤 다운.
+    _scrollToEnd();
 
     // usageCount +1 — 실패해도 UX에 영향 없으므로 fire-and-forget.
     unawaited(
@@ -282,6 +298,7 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
           child: TextField(
             maxLines: 6,
             controller: _controller,
+            scrollController: _editorScroll,
             onChanged: _onChanged,
             // 선생님 피드백 = 자필 본문 → Tier 1 Gaegu hand
             // (README §1.1.1, §7.129 사용자 입력 정렬).

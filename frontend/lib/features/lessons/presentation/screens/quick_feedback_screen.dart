@@ -31,6 +31,7 @@ class QuickFeedbackScreen extends ConsumerStatefulWidget {
 class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   late TextEditingController _feedbackController;
   late TextEditingController _tipController;
+  final ScrollController _feedbackScroll = ScrollController();
   final List<String> _keyPoints = [];
   bool _hasChanges = false;
   bool _isSaving = false;
@@ -48,6 +49,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   void dispose() {
     _feedbackController.dispose();
     _tipController.dispose();
+    _feedbackScroll.dispose();
     super.dispose();
   }
 
@@ -257,6 +259,15 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       selection: TextSelection.collapsed(offset: body.length),
     );
     setState(() => _hasChanges = true);
+    // append된 새 본문 끝이 보이도록 내부 스크롤 다운.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_feedbackScroll.hasClients) return;
+      _feedbackScroll.animateTo(
+        _feedbackScroll.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
 
     // Bump usage counter (fire-and-forget; failure is non-fatal UX-wise).
     unawaited(
@@ -320,6 +331,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
           ),
           child: TextField(
             controller: _feedbackController,
+            scrollController: _feedbackScroll,
             maxLines: 6,
             onChanged: (_) => setState(() => _hasChanges = true),
             // §7.130: 선생님 자필 피드백 → Tier 1 Gaegu hand.
