@@ -57,7 +57,7 @@ class LessonDetailSectionHeader extends StatelessWidget {
 ///
 /// §7.135: chip line(`feedbackPresets` 단어 누적) → 템플릿 1탭 본문 교체.
 /// §7.136: Notebook × Score 마지널리아 패턴 — 본문 위 28px 단일 행에
-/// 좌측 `※ 템플릿 가져오기`(NotebookGlyph + Gaegu handEmphasis), 우측
+/// 좌측 `※ 템플릿으로 피드백 추가`(NotebookGlyph + Gaegu handEmphasis), 우측
 /// `↶` undo (Material 시스템 affordance). Stack overlay 폐기로 본문/액션
 /// 시선이 한 행에 정렬, OutlinedButton 의 시각적 무게 제거.
 class LessonNoteEditor extends ConsumerStatefulWidget {
@@ -227,7 +227,7 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
 
   /// Marginalia row — 본문 위 28px 단일 행.
   ///
-  /// 좌: `※ 템플릿 가져오기` (NotebookGlyph + Gaegu, 여백 주석 메타포).
+  /// 좌: `※ 템플릿으로 피드백 추가` (NotebookGlyph + Gaegu, 여백 주석 메타포).
   /// 우: `↶` undo (Material 시스템 affordance).
   /// 두 액션이 한 쌍("교체"-"되돌리기")이므로 같은 행에 배치.
   Widget _buildMarginaliaRow({required bool canUndo}) {

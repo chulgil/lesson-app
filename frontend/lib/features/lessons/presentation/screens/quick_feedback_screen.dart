@@ -290,8 +290,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     }
   }
 
-  /// §7.136: Notebook × Score 마지널리아 — `※ 템플릿 가져오기` (NotebookGlyph
-  /// + Gaegu handEmphasis). 본문 위 InkWell 한 행, OutlinedButton 시각적 무게 제거.
+  /// §7.136: Notebook × Score 마지널리아 — `※ 템플릿으로 피드백 추가`
+  /// (NotebookGlyph + Gaegu handEmphasis). 본문 위 InkWell 한 행,
+  /// OutlinedButton 시각적 무게 제거.
   Widget _buildTemplateMarginalia() {
     return InkWell(
       onTap: _applyTemplate,

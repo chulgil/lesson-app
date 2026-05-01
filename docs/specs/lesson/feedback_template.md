@@ -58,7 +58,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 
 ```
 [진입점]
-  └─ 마지널리아 행 — `※ 템플릿 가져오기` (NotebookGlyph.referenceMark
+  └─ 마지널리아 행 — `※ 템플릿으로 피드백 추가` (NotebookGlyph.referenceMark
      + NotebookTypography.handEmphasis / paperAccent / InkWell)
        └─ FeedbackTemplatePickerSheet (DraggableScrollableSheet 0.75 / max 0.95)
             ├─ 검색 (제목·본문·태그)
@@ -77,7 +77,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
             └─ usageCount +1 (unawaited, 비차단)
 ```
 
-기존 chip line(`_buildPresetChips`, `_insertPreset` 외 4개 메서드 / `feedbackPresets` 상수)은 두 진입점 모두에서 삭제. 본문 작성 영역 위에 단일 "템플릿 가져오기" 버튼만 노출.
+기존 chip line(`_buildPresetChips`, `_insertPreset` 외 4개 메서드 / `feedbackPresets` 상수)은 두 진입점 모두에서 삭제. 본문 작성 영역 위에 단일 "템플릿으로 피드백 추가" 마지널리아 행만 노출.
 
 `feedbackPresets` 상수 자체는 `MockFeedbackTemplateRepository` 시드 정합 검증(`feedback_template_repository.dart`)에서 길이 비교에 사용되므로 보존. UI 진입점에서만 제거.
 
@@ -87,7 +87,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 
 | 항목 | 결정 |
 |---|---|
-| 위치 | 본문 위 **마지널리아 행** 우측 (`Icons.undo`, 18px). Stack overlay 폐기 — 템플릿 가져오기와 한 쌍이므로 같은 행에 정렬 (LessonNoteEditor §7.136). QuickFeedbackScreen 은 Undo 미적용 (신규 작성). |
+| 위치 | 본문 위 **마지널리아 행** 우측 (`Icons.undo`, 18px). Stack overlay 폐기 — 템플릿 추가 액션과 한 쌍이므로 같은 행에 정렬 (LessonNoteEditor §7.136). QuickFeedbackScreen 은 Undo 미적용 (신규 작성). |
 | 색상 | 비활성: `inkTertiary` / 활성: `paperAccent` |
 | Tooltip | "되돌리기" |
 | Snapshot 단위 | 타이핑 정지 1.5초 debounce + 템플릿 적용 시 즉시 push |
@@ -120,7 +120,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 **Q2**: chip line 잔존 vs 제거 → **제거** (사용률 낮음, 짧은 단어 누적은 결국 본문이 되지 못함)
 **Q3** (§7.137 갱신): 기존 본문에 append vs 전체 교체 → **append 누적 채택**. 처음 결정은 "교체 + 확인 다이얼로그"였으나 실사용에서 선생님은 한 레슨에 **여러 측면**(예: "박자" + "활 주법" + "표현")을 한 번에 피드백하는 패턴이 자연스러움. 교체는 두 번째 템플릿 선택 시 첫 번째 내용을 잃어 누적 작성을 막는 마찰. → 빈 본문은 그대로 삽입, 기존 본문이 있으면 `trimRight() + '\n\n' + 신규` 로 끝에 append. 확인 다이얼로그(`ReplaceFeedbackConfirmDialog` 호출처) 제거. 위젯 자체는 보존(추후 "교체" 옵션 도입 시 재사용 가능).
 **Q4**: tags를 본문에 자동 prepend → **하지 않음** (메타데이터 전용; 검색·필터에만 사용)
-**Q5**: 두 진입점 라벨 통일 → **"템플릿 가져오기"** (행위가 명확한 동사형, 두 화면 동일)
+**Q5** (§7.137 갱신): 두 진입점 라벨 통일 → 변천 "템플릿 선택"(모호) → "템플릿 가져오기"(1회성 import 뉘앙스) → **"템플릿으로 피드백 추가"** 채택. §7.137 누적 추가가 본질이 된 후 "가져오기"는 1회성 import 뉘앙스로 누적 의도가 약함. 메모 톤 명사화로 Gaegu 손글씨 영역과 정렬, "피드백" 명시로 진입점 컨텍스트 강화.
 **Q6**: Undo snapshot 단위 — 글자 vs 묶음 → **debounce 1.5s 묶음 + 템플릿 적용 즉시** (글자 단위는 무용지물)
 **Q7**: Undo 활성 시 색상 강조 — 회색 고정 vs `paperAccent` → **활성 시 `paperAccent`** (행동 가능 시그널)
 **Q8** (§7.136): 템플릿 트리거 형태 — OutlinedButton + Material `description_outlined` vs **마지널리아 행** (`※` + Gaegu) → **마지널리아 행 채택**. 본문이 Gaegu 손글씨 영역인데 OutlinedButton paperAccent 테두리는 "교과서 위 디지털 툴바" 느낌으로 시각적 무게가 본문 컨테이너와 경합. `※`(NotebookGlyph.referenceMark) + Gaegu handEmphasis 라벨은 **여백 주석** 메타포로 본문 위 28px 한 행에 가볍게 얹혀, 액션-본문 시선 단절을 제거. LessonNoteEditor 는 Undo 와 한 쌍으로 같은 행 좌우 배치 (Stack overlay 폐기). `description_outlined` Material 아이콘은 §9 일반 영역이라 허용되긴 하나, 본 화면에서는 손맛 메타포가 우세.
