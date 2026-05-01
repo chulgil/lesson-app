@@ -5106,7 +5106,11 @@ class AppStrings {
   static const feedbackTemplateCategoryLabel = '카테고리';
   static const feedbackTemplatePickerTitle = '피드백 템플릿 선택';
   static const feedbackTemplatePickerSearchHint = '제목·본문·태그 검색';
-  static const feedbackTemplatePickerSelectButton = '템플릿 선택';
+  // §7.135: 두 진입점(QuickFeedback / LessonNoteEditor) 라벨 통일.
+  // 행위가 명확한 동사형 — "템플릿 가져오기" (이전: "템플릿 선택").
+  static const feedbackTemplatePickerSelectButton = '템플릿 가져오기';
+  static const lessonNoteUndoTooltip = '되돌리기';
+  static const lessonNoteUndoSnack = '되돌렸습니다';
   static const feedbackTemplatePickerFrequentSection = '자주 사용';
   static const feedbackTemplatePickerAllSection = '전체 템플릿';
   static const feedbackTemplatePickerEmptyResult = '검색 결과가 없습니다';
