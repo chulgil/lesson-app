@@ -9,6 +9,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../providers/feedback_template_providers.dart';
 import '../feedback_template_picker_sheet.dart';
@@ -55,9 +56,11 @@ class LessonDetailSectionHeader extends StatelessWidget {
 
 /// Note editor widget for lesson feedback.
 ///
-/// §7.135: chip line(`feedbackPresets` 단어 누적) → 템플릿 1탭 본문 교체로
-/// 전환. `QuickFeedbackScreen`과 동일 패턴이며 진입점만 다름. 본문 영역 위에
-/// "템플릿 가져오기" 단일 버튼, 우하단 Stack에 다단계 Undo 아이콘.
+/// §7.135: chip line(`feedbackPresets` 단어 누적) → 템플릿 1탭 본문 교체.
+/// §7.136: Notebook × Score 마지널리아 패턴 — 본문 위 28px 단일 행에
+/// 좌측 `※ 템플릿 가져오기`(NotebookGlyph + Gaegu handEmphasis), 우측
+/// `↶` undo (Material 시스템 affordance). Stack overlay 폐기로 본문/액션
+/// 시선이 한 행에 정렬, OutlinedButton 의 시각적 무게 제거.
 class LessonNoteEditor extends ConsumerStatefulWidget {
   final String? initialText;
   final ValueChanged<String>? onChanged;
@@ -206,18 +209,56 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
     );
   }
 
-  Widget _buildTemplateButton() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton.icon(
-        onPressed: _applyTemplate,
-        icon: const Icon(Icons.description_outlined, size: 18),
-        label: const Text(AppStrings.feedbackTemplatePickerSelectButton),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(0, AppSpacing.buttonHeight),
-          foregroundColor: AppColors.paperAccent,
-          side: BorderSide(color: AppColors.paperAccent),
-        ),
+  /// Marginalia row — 본문 위 28px 단일 행.
+  ///
+  /// 좌: `※ 템플릿 가져오기` (NotebookGlyph + Gaegu, 여백 주석 메타포).
+  /// 우: `↶` undo (Material 시스템 affordance).
+  /// 두 액션이 한 쌍("교체"-"되돌리기")이므로 같은 행에 배치.
+  Widget _buildMarginaliaRow({required bool canUndo}) {
+    return SizedBox(
+      height: 28,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // 좌: ※ + Gaegu handEmphasis 라벨. InkWell tap → 템플릿 시트.
+          InkWell(
+            onTap: _applyTemplate,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space1,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const NotebookGlyph(
+                    NotebookGlyph.referenceMark,
+                    size: 14,
+                    color: AppColors.paperAccent,
+                  ),
+                  const SizedBox(width: AppSpacing.space1),
+                  Text(
+                    AppStrings.feedbackTemplatePickerSelectButton,
+                    style: NotebookTypography.handEmphasis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          // 우: 되돌리기 — Material undo (system affordance, §9 일반 영역).
+          IconButton(
+            onPressed: canUndo ? _undo : null,
+            icon: const Icon(Icons.undo),
+            iconSize: 18,
+            // 활성 시 paperAccent — 행동 가능 시그널.
+            color: canUndo ? AppColors.paperAccent : AppColors.inkTertiary,
+            tooltip: AppStrings.lessonNoteUndoTooltip,
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            padding: EdgeInsets.zero,
+          ),
+        ],
       ),
     );
   }
@@ -229,57 +270,31 @@ class _LessonNoteEditorState extends ConsumerState<LessonNoteEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // §7.135: 본문 영역 위 단일 "템플릿 가져오기" 버튼 (chip line 폐지).
-        _buildTemplateButton(),
-        const SizedBox(height: AppSpacing.space2),
+        // §7.136: 마지널리아 행 — 템플릿 + Undo 한 쌍을 본문 위에 정렬.
+        _buildMarginaliaRow(canUndo: canUndo),
 
-        // Text editor + Undo overlay (Stack 우하단).
-        Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.paper,
-                border: Border.all(color: AppColors.inkQuaternary),
+        // 본문 — Stack overlay 폐기, 단일 컨테이너.
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.paper,
+            border: Border.all(color: AppColors.inkQuaternary),
+          ),
+          child: TextField(
+            maxLines: 6,
+            controller: _controller,
+            onChanged: _onChanged,
+            // 선생님 피드백 = 자필 본문 → Tier 1 Gaegu hand
+            // (README §1.1.1, §7.129 사용자 입력 정렬).
+            style: NotebookTypography.hand,
+            decoration: InputDecoration(
+              hintText: AppStrings.feedbackEditorHint,
+              hintStyle: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkTertiary,
               ),
-              child: TextField(
-                maxLines: 6,
-                controller: _controller,
-                onChanged: _onChanged,
-                // 선생님 피드백 = 자필 본문 → Tier 1 Gaegu hand
-                // (README §1.1.1, §7.129 사용자 입력 정렬).
-                style: NotebookTypography.hand,
-                decoration: InputDecoration(
-                  hintText: AppStrings.feedbackEditorHint,
-                  hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.fromLTRB(
-                    AppSpacing.space4,
-                    AppSpacing.space4,
-                    // 우측 패딩을 늘려 텍스트와 Undo 아이콘이 겹치지 않게.
-                    AppSpacing.space8,
-                    AppSpacing.space4,
-                  ),
-                ),
-              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(AppSpacing.space4),
             ),
-            Positioned(
-              right: AppSpacing.space1,
-              bottom: AppSpacing.space1,
-              child: IconButton(
-                onPressed: canUndo ? _undo : null,
-                icon: const Icon(Icons.undo),
-                iconSize: 18,
-                // 활성 시 paperAccent — 행동 가능 시그널.
-                color: canUndo ? AppColors.paperAccent : AppColors.inkTertiary,
-                tooltip: AppStrings.lessonNoteUndoTooltip,
-                visualDensity: VisualDensity.compact,
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ],
+          ),
         ),
 
         // Save status

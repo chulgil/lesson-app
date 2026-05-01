@@ -1,6 +1,6 @@
 # 레슨 피드백 템플릿 (Feedback Template)
 
-> 마지막 업데이트: 2026-05-01
+> 마지막 업데이트: 2026-05-01 (§7.136 마지널리아 패턴 반영)
 
 선생님이 레슨 피드백을 빠르게 작성할 수 있도록 본문 템플릿을 미리 등록하고 1탭으로 적용하는 기능.
 
@@ -58,7 +58,8 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 
 ```
 [진입점]
-  └─ "템플릿 가져오기" 버튼 (description_outlined / paperAccent / OutlinedButton)
+  └─ 마지널리아 행 — `※ 템플릿 가져오기` (NotebookGlyph.referenceMark
+     + NotebookTypography.handEmphasis / paperAccent / InkWell)
        └─ FeedbackTemplatePickerSheet (DraggableScrollableSheet 0.75 / max 0.95)
             ├─ 검색 (제목·본문·태그)
             ├─ 카테고리 필터 칩 (전체 + 5개)
@@ -84,7 +85,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 
 | 항목 | 결정 |
 |---|---|
-| 위치 | TextField 컨테이너 내부 Stack 우하단 (`Icons.undo`, 18px) |
+| 위치 | 본문 위 **마지널리아 행** 우측 (`Icons.undo`, 18px). Stack overlay 폐기 — 템플릿 가져오기와 한 쌍이므로 같은 행에 정렬 (LessonNoteEditor §7.136). QuickFeedbackScreen 은 Undo 미적용 (신규 작성). |
 | 색상 | 비활성: `inkTertiary` / 활성: `paperAccent` |
 | Tooltip | "되돌리기" |
 | Snapshot 단위 | 타이핑 정지 1.5초 debounce + 템플릿 적용 시 즉시 push |
@@ -97,7 +98,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 - 글자 단위 undo — 사용자 의도가 "묶음 단위" 회복이므로 debounce 묶음으로 충분
 - 다른 위젯(KeyPoints, PracticeTips)으로 확장 — 본 스펙은 피드백 본문 한정
 
-**시그니처 영역 외 Material 아이콘 허용** — `lesson_notes_widgets.dart`는 Notebook×Score §9 일반 영역(navigation/utility)에 해당.
+**시그니처 영역 외 Material 아이콘 허용** — `lesson_notes_widgets.dart`는 Notebook×Score §9 일반 영역(navigation/utility)에 해당. 단, 템플릿 트리거는 §7.136 에서 손맛 메타포가 더 적합하다고 판단하여 NotebookGlyph + Gaegu 마지널리아로 채택. Undo 는 시스템 affordance 컨벤션(되돌리기 = `↶`)을 따라 Material 유지.
 
 ## 관리자(선생님) 흐름
 
@@ -120,6 +121,7 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 **Q5**: 두 진입점 라벨 통일 → **"템플릿 가져오기"** (행위가 명확한 동사형, 두 화면 동일)
 **Q6**: Undo snapshot 단위 — 글자 vs 묶음 → **debounce 1.5s 묶음 + 템플릿 적용 즉시** (글자 단위는 무용지물)
 **Q7**: Undo 활성 시 색상 강조 — 회색 고정 vs `paperAccent` → **활성 시 `paperAccent`** (행동 가능 시그널)
+**Q8** (§7.136): 템플릿 트리거 형태 — OutlinedButton + Material `description_outlined` vs **마지널리아 행** (`※` + Gaegu) → **마지널리아 행 채택**. 본문이 Gaegu 손글씨 영역인데 OutlinedButton paperAccent 테두리는 "교과서 위 디지털 툴바" 느낌으로 시각적 무게가 본문 컨테이너와 경합. `※`(NotebookGlyph.referenceMark) + Gaegu handEmphasis 라벨은 **여백 주석** 메타포로 본문 위 28px 한 행에 가볍게 얹혀, 액션-본문 시선 단절을 제거. LessonNoteEditor 는 Undo 와 한 쌍으로 같은 행 좌우 배치 (Stack overlay 폐기). `description_outlined` Material 아이콘은 §9 일반 영역이라 허용되긴 하나, 본 화면에서는 손맛 메타포가 우세.
 
 ## 검증
 

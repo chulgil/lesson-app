@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../providers/feedback_template_providers.dart';
@@ -277,17 +278,30 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     }
   }
 
-  Widget _buildTemplateButton() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton.icon(
-        onPressed: _applyTemplate,
-        icon: const Icon(Icons.description_outlined, size: 18),
-        label: const Text(AppStrings.feedbackTemplatePickerSelectButton),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(0, AppSpacing.buttonHeight),
-          foregroundColor: AppColors.paperAccent,
-          side: BorderSide(color: AppColors.paperAccent),
+  /// §7.136: Notebook × Score 마지널리아 — `※ 템플릿 가져오기` (NotebookGlyph
+  /// + Gaegu handEmphasis). 본문 위 InkWell 한 행, OutlinedButton 시각적 무게 제거.
+  Widget _buildTemplateMarginalia() {
+    return InkWell(
+      onTap: _applyTemplate,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const NotebookGlyph(
+              NotebookGlyph.referenceMark,
+              size: 14,
+              color: AppColors.paperAccent,
+            ),
+            const SizedBox(width: AppSpacing.space1),
+            Text(
+              AppStrings.feedbackTemplatePickerSelectButton,
+              style: NotebookTypography.handEmphasis,
+            ),
+          ],
         ),
       ),
     );
@@ -297,8 +311,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTemplateButton(),
-        const SizedBox(height: AppSpacing.space2),
+        _buildTemplateMarginalia(),
         Container(
           decoration: BoxDecoration(
             color: AppColors.paper,
