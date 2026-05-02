@@ -714,7 +714,7 @@ LessonClass와 연계하여 레슨 장소를 체계적으로 관리합니다.
 ## 관련 문서
 
 - [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md) - 3자 관계 상세 UI/UX 설계
-- [invite_system_v2.md](../invite/invite_system_v2.md) - 양방향 초대 시스템
+- [invite_system_v2.md](../lesson/invite/invite_system_v2.md) - 양방향 초대 시스템
 - [parent_system.md](../user/parent_system.md) - 학부모 시스템
 
 ---

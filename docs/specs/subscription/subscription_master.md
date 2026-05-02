@@ -1222,10 +1222,10 @@ class LessonRequest extends HiveObject {
 | [lesson_request_system.md](./lesson_request_system.md) | 학생 레슨 요청 (원본) |
 | [privacy_policy.md](./privacy_policy.md) | 개인정보처리방침 (원본) |
 | [terms_of_service.md](./terms_of_service.md) | 이용약관 (원본) |
-| [payment_unified_spec.md](../payment/payment_unified_spec.md) | 결제 시스템 통합 스펙 (원본) |
-| [subscription_based_relationship.md](../invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
+| [payment_unified_spec.md](../_archive/old/payment_unified_spec.md) | 결제 시스템 통합 스펙 (아카이브됨) |
+| [subscription_based_relationship.md](../lesson/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용 시간 |
-| [flow_with_app.md](../lesson/flow_with_app.md) | 레슨 플로우 |
+| [flow_with_app.md](../_archive/old/flow_with_app.md) | 레슨 플로우 (아카이브됨) |
 | [subscription.md](../../schema/entities/subscription.md) | Subscription 엔티티 스키마 |
 | [payment.md](../../schema/entities/payment.md) | Payment 엔티티 스키마 |
 

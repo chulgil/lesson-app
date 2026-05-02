@@ -23,7 +23,7 @@
 | **학원 소속 선생님** | 학원에 소속되어 활동 | 학원 ID |
 | **겸업** | 개인 + 학원 소속 동시 | Context에 따라 다름 |
 
-> **Note**: 학원 소속 가입은 [초대 시스템](../invite/invite_system_v2.md#학원-선생님-초대-시스템) 참조
+> **Note**: 학원 소속 가입은 [초대 시스템](../lesson/invite/invite_system_v2.md#학원-선생님-초대-시스템) 참조
 
 ### 핵심 결정사항
 
@@ -402,7 +402,7 @@
 | 데이터 소유권 | 학원 학생 데이터는 학원 소유 |
 | 정산 | 학원 통해 정산 (학원 설정에 따름) |
 
-> **자세한 내용**: [초대 시스템 v2 - 학원-선생님 초대](../invite/invite_system_v2.md#학원-선생님-초대-시스템)
+> **자세한 내용**: [초대 시스템 v2 - 학원-선생님 초대](../lesson/invite/invite_system_v2.md#학원-선생님-초대-시스템)
 
 ---
 
@@ -411,7 +411,7 @@
 | 문서 | 설명 |
 |------|------|
 | [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md) | 학원-선생님-학생 3자 관계 |
-| [invite_system_v2.md](../invite/invite_system_v2.md) | 초대 시스템 (학원-선생님 포함) |
-| [trial_lesson_system.md](../trial/trial_lesson_system.md) | 체험 레슨 예약 |
-| [payment_unified_spec.md](../payment/payment_unified_spec.md) | 통합 결제 스펙 |
+| [invite_system_v2.md](../lesson/invite/invite_system_v2.md) | 초대 시스템 (학원-선생님 포함) |
+| [trial_lesson_system.md](../_archive/old/trial_lesson_system.md) | 체험 레슨 예약 (아카이브됨) |
+| [payment_unified_spec.md](../_archive/old/payment_unified_spec.md) | 통합 결제 스펙 (아카이브됨) |
 | [notification_system.md](../notification/notification_system.md) | 알림 시스템 |

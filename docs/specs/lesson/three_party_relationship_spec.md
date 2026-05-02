@@ -2,7 +2,7 @@
 
 > 작성일: 2026-01-24
 > 상태: 📋 설계 중
-> 관련 문서: [student_class_system.md](../student/student_class_system.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [student_centered_architecture.md](student_centered_architecture.md), [subscription_based_relationship.md](../invite/subscription_based_relationship.md)
+> 관련 문서: [student_class_system.md](../student/student_class_system.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [student_centered_architecture.md](student_centered_architecture.md), [subscription_based_relationship.md](../lesson/invite/subscription_based_relationship.md)
 
 ---
 
@@ -1003,5 +1003,5 @@ TeacherStudentRelation {
 
 - [subscription_system_spec.md](../subscription/subscription_system_spec.md) - 수강권 시스템 및 학원 모드
 - [student_centered_architecture.md](student_centered_architecture.md) - PracticeSpace 아키텍처
-- [invite_system_v2.md](../invite/invite_system_v2.md) - 양방향 초대 시스템
-- [payment_unified_spec.md](../payment/payment_unified_spec.md) - 결제 시스템
+- [invite_system_v2.md](../lesson/invite/invite_system_v2.md) - 양방향 초대 시스템
+- [payment_unified_spec.md](../_archive/old/payment_unified_spec.md) - 결제 시스템 (아카이브됨)

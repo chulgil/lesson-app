@@ -1282,9 +1282,9 @@ frontend/lib/features/schedule/
 | [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 시스템 |
 | [lesson_request_system.md](../subscription/lesson_request_system.md) | 레슨 요청 시스템 (재등록) |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용시간 |
-| [payment_unified_spec.md](../payment/payment_unified_spec.md) | 결제 시스템 통합 |
-| [subscription_based_relationship.md](../invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
-| [invite_system_v2.md](../invite/invite_system_v2.md) | 초대 시스템 |
+| [payment_unified_spec.md](../_archive/old/payment_unified_spec.md) | 결제 시스템 통합 (아카이브됨) |
+| [subscription_based_relationship.md](invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
+| [invite_system_v2.md](invite/invite_system_v2.md) | 초대 시스템 |
 | [student_class_system.md](../student/student_class_system.md) | LessonClass, ClassMembership 엔티티 |
 | [ux_guidelines.md](../design/ux_guidelines.md) | UX 가이드라인 |
 | [notification_system.md](../notification/notification_system.md) | 알림 시스템 |

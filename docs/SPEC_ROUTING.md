@@ -90,7 +90,7 @@
 
 | 경로 | 이유 |
 |------|------|
-| `_archive/` | 폐기된 스펙 (old/ 76개 + phase-log 등) |
+| `_archive/` | 폐기된 스펙 (old/ 76개 + 대체된 디자인/레슨 스펙) |
 | `requirement/requirement.md` | 2025-12 기준, 현재 정책과 충돌 (특히 결제) |
 | `requirement/implementation_status.md` | 오래된 상태 추적 |
 | `design/design_master.md` | `notebook/README.md`가 최신 디자인 SSOT |
@@ -124,8 +124,8 @@
 - 금지: `_archive/`, `requirement/`
 
 ### 수정 범위
-- 프론트: `features/[domain]/`
-- 백엔드: `backend/routers/[domain].py`
+- 프론트: `frontend/lib/features/[domain]/`
+- 백엔드: `backend/app/api/v1/[domain].py` + `backend/app/services/` + `backend/app/schemas/`
 - 스펙: `specs/[domain]/[master].md` §[섹션] 업데이트
 
 ### 금지사항

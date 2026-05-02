@@ -169,65 +169,39 @@ docs/specs/
 │
 ├── lesson/                     # 레슨 도메인
 │   ├── lesson_master.md        ← Master Spec
-│   └── (개별 스펙 16개 - 아카이브)
+│   └── invite/                 # 초대/관계 시스템 (정식 경로)
 │
 ├── practice/                   # 연습 도메인
-│   ├── practice_master.md      ← Master Spec
-│   └── (개별 스펙 18개 - 아카이브)
+│   └── practice_master.md      ← Master Spec
 │
 ├── subscription/               # 구독/결제 도메인
-│   ├── subscription_master.md  ← Master Spec
-│   └── (개별 스펙 8개 - 아카이브)
+│   └── subscription_master.md  ← Master Spec
 │
-├── user/                       # 사용자 도메인 (auth+invite+student+review+trial 통합)
-│   ├── user_master.md          ← Master Spec
-│   └── (개별 스펙 4개 - 아카이브)
+├── user/                       # 사용자 도메인
+│   └── user_master.md          ← Master Spec
 │
 ├── schedule/                   # 스케줄 도메인
-│   ├── schedule_master.md      ← Master Spec
-│   └── (개별 스펙 2개 - 아카이브)
-│
-├── metronome/                  # 메트로놈 도메인
-│   ├── metronome_master.md     ← Master Spec
-│   └── (개별 스펙 4개 - 아카이브)
+│   └── schedule_master.md      ← Master Spec
 │
 ├── design/                     # 디자인 도메인
-│   ├── design_master.md        ← Master Spec
-│   └── (개별 스펙 6개 - 아카이브)
+│   ├── notebook/README.md      ← ⭐ 디자인 SSOT (Notebook × Score)
+│   └── ux_guidelines.md        # UX 원칙
 │
 ├── notification/               # 알림 도메인
-│   ├── notification_master.md  ← Master Spec
-│   └── notification_system.md  (원본 참조용 유지)
+│   └── notification_master.md  ← Master Spec
 │
-├── calendar/                   # 캘린더 (신규)
+├── metronome/                  # 메트로놈 도메인
+│   └── metronome_master.md     ← Master Spec
+│
+├── calendar/                   # 캘린더
 │   └── calendar_master.md      ← Master Spec
 │
-├── onboarding/                 # 온보딩 (신규)
-│   └── onboarding_master.md    ← Master Spec
+├── onboarding/ | student_home/ | follow/ | settings/
+│   └── [domain]_master.md      ← Master Spec
 │
-├── student_home/               # 학생홈 (신규)
-│   └── student_home_master.md  ← Master Spec
-│
-├── follow/                     # 팔로우 (신규)
-│   └── follow_master.md        ← Master Spec
-│
-├── settings/                   # 설정 (신규)
-│   └── settings_master.md      ← Master Spec
-│
-├── dev/                        # 개발 참고
-│   ├── implementation_roadmap.md
-│   ├── test_data.md
-│   └── test_scenarios.md
-│
-├── old/                        # 아카이브 (원본 유지)
-│   └── (20개 - 대체됨/참고용)
-│
-├── auth/                       # → user_master.md로 통합됨
-├── invite/                     # → user_master.md로 통합됨
-├── student/                    # → user_master.md로 통합됨
-├── review/                     # → user_master.md로 통합됨
-├── trial/                      # → user_master.md로 통합됨
-└── payment/                    # → subscription_master.md로 통합됨
+├── backend/                    # 백엔드 스펙
+├── dev/                        # 개발 참고 (roadmap_v2, test_data 등)
+└── _archive/                   # ❌ 사용 금지 (폐기된 문서)
 ```
 
 ---

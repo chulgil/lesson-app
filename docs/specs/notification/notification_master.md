@@ -499,8 +499,8 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 |------|------|
 | [notification_system.md](notification_system.md) | 기존 스펙 (알림 채널, 타이밍, 와이어프레임 상세) |
 | [수강권 시스템](../subscription/subscription_system_spec.md) | 수강권 만료 알림 |
-| [초대 시스템](../invite/invite_system_v2.md) | 학원 관련 알림 |
-| [수강권 기반 관계](../invite/subscription_based_relationship.md) | 관계 상태 변경 알림 |
+| [초대 시스템](../lesson/invite/invite_system_v2.md) | 학원 관련 알림 |
+| [수강권 기반 관계](../lesson/invite/subscription_based_relationship.md) | 관계 상태 변경 알림 |
 | [팔로우 시스템](../follow/follow_master.md) | 팔로우 알림 (NEW_FOLLOWER 등) |
 
 ---

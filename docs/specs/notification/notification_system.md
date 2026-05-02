@@ -297,7 +297,7 @@ String buildNotificationBody(
 
 ### 5. 관계/팔로우 관련 알림
 
-> **참조**: [수강권 중심 관계 모델](../invite/subscription_based_relationship.md)
+> **참조**: [수강권 중심 관계 모델](../lesson/invite/subscription_based_relationship.md)
 >
 > 선생님-학생 관계는 **수강권 기반**으로 자동 관리됩니다.
 > **팔로우**는 소식 구독 용도로 분리되었습니다.
@@ -372,7 +372,7 @@ String buildNotificationBody(
 
 ### 7. 학원 관련 알림
 
-> 학원-선생님 관계 알림. 자세한 내용은 [초대 시스템 v2](../invite/invite_system_v2.md#학원-선생님-초대-시스템) 참조.
+> 학원-선생님 관계 알림. 자세한 내용은 [초대 시스템 v2](../lesson/invite/invite_system_v2.md#학원-선생님-초대-시스템) 참조.
 
 | 알림 ID | 유형 | 수신자 | 타이밍 | 푸시 | 인앱 |
 |---------|------|--------|--------|------|------|

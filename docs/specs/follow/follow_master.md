@@ -17,7 +17,7 @@
 
 ### 참조 문서
 
-- [수강권 중심 관계 모델](../invite/subscription_based_relationship.md)
+- [수강권 중심 관계 모델](../lesson/invite/subscription_based_relationship.md)
 
 ---
 
@@ -311,7 +311,7 @@ Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
 
 | 스펙 | 관계 |
 |------|------|
-| [수강권 기반 관계 모델](../invite/subscription_based_relationship.md) | 팔로우와 레슨 관계 분리 설계 |
+| [수강권 기반 관계 모델](../lesson/invite/subscription_based_relationship.md) | 팔로우와 레슨 관계 분리 설계 |
 | [알림 시스템](../notification/notification_master.md) | 팔로우 알림 (NEW_FOLLOWER, TEACHER_NEWS 등) |
 
 ---

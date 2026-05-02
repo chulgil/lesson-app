@@ -4,7 +4,7 @@
 > 마지막 업데이트: 2026-01-24
 > 상태: 확정
 > 엔티티 스키마: [parent.md](../../schema/entities/parent.md)
-> 연관 스펙: [invite_system_v2.md](../invite/invite_system_v2.md), [practice_system.md](../practice/practice_system.md), [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md)
+> 연관 스펙: [invite_system_v2.md](../lesson/invite/invite_system_v2.md), [practice_system.md](../practice/practice_system.md), [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md)
 
 ## 개요
 

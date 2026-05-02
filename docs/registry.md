@@ -91,7 +91,7 @@
 
 | 도메인 | 마스터 문서 |
 |--------|-----------|
-| 디자인 | [design_master.md](specs/design/design_master.md) |
+| 디자인 | [notebook/README.md](specs/design/notebook/README.md) (**SSOT**) |
 | 레슨 | [lesson_master.md](specs/lesson/lesson_master.md) |
 | 수강권 | [subscription_master.md](specs/subscription/subscription_master.md) |
 | 스케줄 | [schedule_master.md](specs/schedule/schedule_master.md) |
@@ -101,7 +101,7 @@
 | 알림 | [notification_master.md](specs/notification/notification_master.md) |
 | 온보딩 | [onboarding_master.md](specs/onboarding/onboarding_master.md) |
 | 메트로놈 | [metronome_master.md](specs/metronome/metronome_master.md) |
-| 팔로우/초대 | [follow_master.md](specs/follow/follow_master.md) |
+| 팔로우 | [follow_master.md](specs/follow/follow_master.md) |
 | 설정 | [settings_master.md](specs/settings/settings_master.md) |
 | 학생 홈 | [student_home_master.md](specs/student_home/student_home_master.md) |
 

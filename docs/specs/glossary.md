@@ -278,7 +278,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 문서 | 설명 |
 |------|------|
-| [subscription_based_relationship.md](./invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 상세 |
-| [invite_system_v2.md](./invite/invite_system_v2.md) | 초대/연결 시스템 |
-| [flow_with_app.md](./lesson/flow_with_app.md) | 앱 사용 플로우 |
+| [subscription_based_relationship.md](./lesson/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 상세 |
+| [invite_system_v2.md](./lesson/invite/invite_system_v2.md) | 초대/연결 시스템 |
+| [flow_with_app.md](./_archive/old/flow_with_app.md) | 앱 사용 플로우 (아카이브됨) |
 | [ux_guidelines.md](./design/ux_guidelines.md) | UX 가이드라인 |
