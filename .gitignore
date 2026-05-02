@@ -146,3 +146,6 @@ design-plan/
 # Autopus local project scaffolding (tool artifact, not for commit)
 .autopus/
 autopus.yaml
+
+# BMAD generated research/planning output
+_bmad-output/
