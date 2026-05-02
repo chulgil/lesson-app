@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lesson_app/core/network/api_client.dart';
-import 'package:lesson_app/features/schedule/data/repositories/remote_unified_lesson_request_repository.dart';
-import 'package:lesson_app/features/schedule/domain/entities/request_event.dart';
-import 'package:lesson_app/features/schedule/domain/entities/unified_lesson_request.dart';
+import 'package:lessonaza/core/network/api_client.dart';
+import 'package:lessonaza/features/schedule/data/repositories/remote_unified_lesson_request_repository.dart';
+import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
+import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 
 void main() {
   test('getEventsByRequestId fetches persisted request events', () async {
