@@ -74,11 +74,13 @@ FastAPI + PostgreSQL + Supabase Auth 기반 백엔드 API.
 
 ```
 app/
-├── api/v1/          # 19개 라우터 (엔드포인트 정의)
-├── services/        # 18개 서비스 (비즈니스 로직)
-├── models/          # 14개 모델 파일 (64 테이블)
-├── schemas/         # 17개 스키마 파일 (Pydantic v2)
+├── api/v1/          # 27개 라우터 (엔드포인트 정의)
+├── services/        # 30개 서비스 (비즈니스 로직)
+├── models/          # 26개 모델 파일 (64+ 테이블)
+├── schemas/         # 24개 스키마 파일 (Pydantic v2)
 ├── core/            # config, database, deps, security, i18n, storage
+├── jobs/            # 백그라운드 작업 (스케줄러 등)
+├── utils/           # 헬퍼 유틸리티
 └── main.py
 ```
 

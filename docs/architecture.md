@@ -1,13 +1,13 @@
 # 레슨 앱 아키텍처
 
-> 마지막 업데이트: 2026-03-25
+> 마지막 업데이트: 2026-05-02
 
 ## 개요
 
 레슨 앱은 **Clean Architecture** 원칙과 **Feature-based 구조**를 결합한 Flutter 앱입니다.
 
-- **20개 feature 도메인**, features/ 내 약 660개 파일
-- **11개 core 모듈** (booking Shared Kernel 포함)
+- **20개 feature 도메인**, features/ 내 **870개** 파일
+- **14개 core 모듈** (booking Shared Kernel, l10n, providers, services 포함)
 - 레거시 디렉토리 0개 (models/, providers/, repositories/, services/, shared/ 모두 제거 완료)
 
 > ⚠️ **프로젝트 구조 변경 (2026-02-02)**
@@ -49,7 +49,7 @@ schedule ↔ lessons 간 공유 타입(LessonBooking, TimeSlot, BookingRepositor
 
 ```
 frontend/lib/
-├── core/                    # 공통 유틸리티 (11개 모듈)
+├── core/                    # 공통 유틸리티 (14개 모듈)
 │   ├── audio/               # 오디오 엔진 (메트로놈, 녹음, 튜너, 스토리지)
 │   ├── booking/             # Shared Kernel (LessonBooking, TimeSlot)
 │   ├── auth/                # 인증 공통 로직
@@ -62,6 +62,9 @@ frontend/lib/
 │   │   ├── app_routes.dart  # 라우트 상수
 │   │   └── routes/          # 도메인별 라우트
 │   ├── theme/               # AppColors, AppTypography
+│   ├── l10n/                # 다국어 문자열 (AppStrings)
+│   ├── providers/           # 코어 Provider
+│   ├── services/            # 코어 서비스 레이어
 │   ├── utils/               # 공통 유틸리티 함수
 │   └── widgets/             # 공통 재사용 위젯 (Selectors, StatCard 등)
 │
@@ -87,10 +90,8 @@ frontend/lib/
 │   ├── students/            # 학생 관리
 │   └── subscription/        # 수강권/결제
 │
-├── models/                  # 레거시 모델 (re-export, 30개 파일)
-├── providers/               # 레거시 Provider (re-export, 46개 파일)
-├── repositories/            # 레거시 Repository (re-export, 21개 파일)
-└── services/                # 서비스 레이어
+├── main.dart
+└── firebase_options.dart
 ```
 
 ---
@@ -303,7 +304,6 @@ features/students/
 |------|------|------|
 | Feature UI 상태 | `features/[domain]/presentation/providers/` | lesson_providers.dart |
 | 공유 상태 | `features/auth/presentation/providers/` | user_role_provider.dart |
-| 레거시 (re-export) | `frontend/lib/providers/[domain]/` | → feature로 연결 |
 
 ### Provider 네이밍 규칙
 ```
@@ -346,10 +346,10 @@ features/[domain]/domain/entities/[model].dart
 frontend/lib/core/models/shared_enums.dart  # AgeGroup, ConnectionStatus 등
 ```
 
-### 레거시 모델 (re-export)
+### 공유 타입 (core/models/)
 ```dart
-// frontend/lib/models/lesson.dart
-export '../features/lessons/domain/entities/lesson.dart';
+// frontend/lib/core/models/shared_enums.dart
+// AgeGroup, ConnectionStatus 등 도메인 횡단 enum
 ```
 
 ---
@@ -443,27 +443,6 @@ widgets/lesson_detail/
 
 ---
 
-## 하위 호환성
-
-### Re-export 패턴
-기존 import를 유지하면서 새 위치로 이동:
-
-```dart
-// frontend/lib/models/student.dart (기존 위치)
-export '../features/students/domain/entities/student.dart';
-
-// frontend/lib/providers/lesson/lesson_providers.dart (기존 위치)
-export '../../features/lessons/presentation/providers/lesson_providers.dart';
-```
-
-### 점진적 마이그레이션
-1. 새 위치에 파일 생성
-2. 기존 위치에 re-export 설정
-3. 새 코드는 새 위치에서 import
-4. 레거시 import도 동작 유지
-
----
-
 ## Claude 작업 가이드
 
 ### 새 기능 추가 시
@@ -477,7 +456,6 @@ export '../../features/lessons/presentation/providers/lesson_providers.dart';
 1. `frontend/lib/features/[domain]/presentation/providers/` 에 생성
 2. `@riverpod` 어노테이션 사용
 3. `cd frontend && dart run build_runner build` 실행
-4. 기존 호환성 필요시 `frontend/lib/providers/`에 re-export
 
 ### 모델 추가 시
 1. `frontend/lib/features/[domain]/domain/entities/` 에 생성
