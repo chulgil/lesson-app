@@ -96,204 +96,65 @@ frontend/lib/
 
 ---
 
-## Feature별 상세 구조
+## 도메인 건강도 매트릭스 (2026-05-02)
 
-### analytics (분석 대시보드)
-선생님 월별 통계, 수입/레슨 차트, 학생 연습률 랭킹을 제공하는 분석 대시보드.
-- 주요 화면: `AnalyticsDashboardScreen`
-- 주요 엔티티: 월별 통계, 수입 데이터, 연습률 랭킹
+### 프론트엔드 20개 도메인
 
-### auth (인증)
-Google SSO 기반 로그인, 역할 선택(선생님/학생/학부모) 처리.
-- 주요 화면: `LoginScreen`, `RoleSelectionScreen`
-- 주요 Provider: `userRoleProvider`, `authStateProvider`
+| 도메인 | 파일 | 화면 | Provider | Repository | 백엔드 | 비고 |
+|--------|:----:|:----:|:--------:|:----------:|:------:|------|
+| **practice** | 176 | 16 | 39 | M5+R4 | ✅ | 최대 도메인, mixin 패턴 |
+| **schedule** | 113 | 17 | 10 | M4+R4 | ✅ | +services, +utils |
+| **subscription** | 99 | 14 | 10 | M6+R6 | ✅ | Facade 패턴 |
+| **lessons** | 94 | 7 | 21 | M3+R3 | ✅ | +services, +constants |
+| **students** | 86 | 5 | 20 | M4+R4 | ✅ | +services |
+| profile | 51 | 15 | 9 | — | ✅ | cross-domain repo (onboarding, invite) |
+| student_home | 42 | 8 | 6 | M+R | ✅ | |
+| parent_home | 38 | 3 | 7 | R | ✅ | |
+| gamification | 24 | 1 | 8 | M+R | ✅ | Phase 1-3 완료 |
+| follow | 21 | 2 | 4 | M2+R2 | ✅ | Phase 2 부분 완료 |
+| notifications | 21 | 1 | 4 | R | ✅ | Remote 전용 (Mock 없음) |
+| auth | 20 | 5 | 3 | R | ✅ | |
+| settings | 15 | 3 | 6 | R | ✅ | |
+| home | 14 | 2 | 1 | — | — | UI 전용 (공유 서비스 사용) |
+| search | 13 | 3 | 3 | R2 | ✅ | |
+| onboarding | 12 | 5 | 3 | R | ✅ | |
+| relationship | 11 | 0 | 2 | M+R | ✅ | 데이터 전용 (화면 없음) |
+| analytics | 10 | 1 | 2 | M+R | ✅ | |
+| invite | 9 | 7 | 0 | R | ✅ | |
+| booking | 1 | 0 | 0 | — | — | Facade 전용 (core/booking/) |
 
-### calendar (캘린더)
-월간/주간 캘린더 뷰로 레슨 일정을 시각화.
-- 주요 화면: `CalendarScreen`
-- 레슨/스케줄 데이터를 캘린더 형식으로 표시
+> **M** = Mock, **R** = Remote. 예: M5+R4 = Mock 5개 + Remote 4개 repository
 
-### follow (팔로우/연결)
-선생님-학생 간 팔로우/연결 관계 요청 및 승인 관리.
-- 주요 엔티티: `FollowRequest`, `FollowStatus`
-- 연결 요청 발송, 수락/거절 처리
+### 백엔드 27개 라우터 (252 엔드포인트)
 
-### gamification (게이미피케이션)
-연습/레슨 활동에 대한 포인트 적립, 레벨업, 뱃지 획득 시스템.
-- 주요 화면: `GamificationDashboardScreen`
-- 주요 엔티티: `UserPoints`, `Level`, `Badge`, `Achievement`
+| 라우터 | EP | 서비스 | 테스트 | 라우터 | EP | 서비스 | 테스트 |
+|--------|:--:|--------|:------:|--------|:--:|--------|:------:|
+| parents | 21 | parent_service | ✅ | schedule | 7 | schedule_service | ✅ |
+| lessons | 20 | lesson_service | ✅ | locations | 7 | location_service | ❌ |
+| subscriptions | 18 | subscription_service | ✅ | auth | 6 | auth_service | ✅ |
+| settings_api | 16 | settings_service | ✅ | users | 6 | user_service | ✅ |
+| practice | 15 | practice_service | ✅ | reviews | 5 | review_service | ✅ |
+| groups | 15 | schedule_ext_service | ✅ | memberships | 4 | lesson_service | ❌ |
+| lesson_requests | 13 | lesson_request_service | ❌ | notifications | 4 | notification_service | ✅ |
+| students | 10 | student_service | ✅ | scheduler | 4 | attendance_scheduler | ❌ |
+| teachers | 10 | teacher_service | ✅ | ai_notes | 2 | ai_notes_service | ❌ |
+| relationships | 10 | relationship_service | ✅ | device_tokens | 2 | device_token_service | ❌ |
+| bookings | 9 | schedule_service | ✅ | gamification | 2 | gamification_service | ✅ |
+| invites | 8 | invite_service | ✅ | profile_images | 2 | profile_image_service | ❌ |
+| practice_logs | 8 | practice_log_service | ✅ | | | | |
+| recordings | 7 | recording_service | ✅ | | | | |
 
-### home (선생님 홈)
-선생님 메인 대시보드. 오늘 레슨, 빠른 도구, 학생 현황 요약 표시.
-- 주요 화면: `DashboardTab`
-- 탭 기반 네비게이션의 진입점
+> 테스트 미작성 라우터 7개: lesson_requests, locations, memberships, scheduler, ai_notes, device_tokens, profile_images
 
-### invite (초대)
-선생님이 학생/학부모에게 초대 코드를 발송하고 확인하는 기능.
-- 주요 엔티티: `Invite`, `InviteCode`
-- 초대 링크 생성, 코드 검증
+### 특수 패턴
 
-### lessons (레슨)
-```
-features/lessons/
-├── domain/
-│   └── entities/
-│       ├── lesson.dart
-│       ├── payment.dart
-│       ├── tip_template.dart
-│       ├── teaching_resource.dart  # 교재/자료 관리
-│       └── attendance_stats.dart   # 출석 통계
-├── data/
-│   └── repositories/
-│       └── mock_lesson_repository.dart
-└── presentation/
-    ├── screens/
-    ├── widgets/
-    │   ├── lesson_detail/   # 분할된 위젯
-    │   └── section_detail/
-    └── providers/
-        ├── lesson_providers.dart
-        ├── lesson_crud_provider.dart
-        ├── payment_providers.dart
-        ├── booking_providers.dart
-        └── tip_template_providers.dart
-```
-
-### notifications (알림)
-앱 내 알림 센터. 레슨/연습/결제 관련 알림 수신 및 읽음 처리.
-- 주요 엔티티: `Notification`, `NotificationSettings`
-- 주요 Provider: `notificationProviders`
-
-### onboarding (온보딩)
-신규 사용자 회원가입 플로우. 역할별 프로필 설정, 악기 선택 등.
-- 주요 화면: `OnboardingScreen`, `ProfileSetupScreen`
-- 역할(선생님/학생/학부모)에 따른 분기 처리
-
-### parent_home (학부모)
-```
-features/parent_home/
-├── domain/
-│   └── entities/
-│       ├── parent.dart
-│       ├── parent_child_relation.dart
-│       └── parent_notification_settings.dart
-└── presentation/
-    ├── screens/
-    └── providers/
-        ├── parent_providers.dart
-        ├── child_profile_provider.dart
-        └── user_profile_provider.dart
-```
-
-### practice (연습)
-```
-features/practice/
-├── domain/
-│   └── entities/
-│       ├── practice_task.dart
-│       ├── practice_log.dart
-│       ├── practice_streak.dart
-│       ├── practice_repertoire.dart
-│       └── recording.dart
-├── data/
-│   └── repositories/
-│       └── mock_practice_repository.dart
-└── presentation/
-    ├── screens/
-    ├── widgets/
-    │   ├── goal/                # 연습 목표
-    │   ├── metronome/           # 메트로놈 UI
-    │   ├── notes/               # 연습 노트
-    │   ├── practice_tools/      # 연습 도구 모달
-    │   ├── section_detail/      # 구간 상세
-    │   ├── section_form/        # 구간 편집
-    │   ├── section_management/  # 구간 CRUD
-    │   ├── smart_recording/     # 스마트 녹음
-    │   ├── stats/               # 통계 위젯
-    │   ├── tuner/               # 튜너 UI
-    │   └── waveform/            # 파형 시각화
-    └── providers/
-        ├── practice_providers.dart
-        ├── practice_crud_provider.dart
-        ├── practice_streak_provider.dart
-        ├── practice_item_providers.dart
-        ├── practice_repertoire_providers.dart
-        ├── metronome_provider.dart
-        ├── recording_provider.dart
-        └── smart_recording_provider.dart
-```
-
-### profile (프로필)
-```
-features/profile/
-├── domain/
-│   └── entities/
-│       ├── invite.dart
-│       └── review.dart
-└── presentation/
-    ├── screens/
-    └── providers/
-        ├── invite_provider.dart
-        └── teacher_extended_profile_provider.dart
-```
-
-### relationship (선생님-학생 관계)
-선생님-학생 연결 상태 관리. 관계 생성/해제, 상태 조회.
-- 주요 엔티티: `Relationship`, `ConnectionStatus`
-- 학생 목록과 연결 상태 동기화
-
-### schedule (스케줄)
-레슨 스케줄 관리, 예약/취소, 그룹수업 시간표, 가용 시간 설정.
-- 주요 화면: `ScheduleTab`, `AvailabilityScreen`
-- 주요 엔티티: `ScheduleCard`, `AvailabilityBlock`, `GroupLesson`
-
-### search (선생님 검색)
-학생/학부모가 선생님을 검색하고 필터링하는 기능.
-- 주요 화면: `TeacherSearchScreen`
-- 악기, 지역, 레슨 유형 등 필터 지원
-
-### settings (앱 설정)
-앱 환경설정, 데이터 백업/복원, 녹음 파일 관리.
-- 주요 화면: `SettingsScreen`
-- 백업, 알림 설정, 녹음 저장소 관리
-
-### student_home (학생 홈)
-학생 메인 대시보드. 연습 현황, 다음 레슨, 체험 레슨 신청 등.
-- 주요 화면: `StudentDashboardTab`
-- 연습 통계, 과제 목록, 게이미피케이션 위젯 포함
-
-### students (학생 관리)
-```
-features/students/
-├── domain/
-│   └── entities/
-│       ├── student.dart
-│       ├── lesson_class.dart          # 클래스/소속 그룹 (학원/개인)
-│       ├── class_membership.dart      # 학생-클래스 관계 (레슨 정보)
-│       └── lesson_location.dart       # 레슨 장소
-├── data/
-│   └── repositories/
-│       ├── mock_student_repository.dart
-│       ├── mock_lesson_class_repository.dart
-│       └── mock_membership_repository.dart
-└── presentation/
-    ├── screens/
-    ├── widgets/
-    │   └── student_detail/  # 분할된 위젯
-    └── providers/
-        ├── student_providers.dart
-        ├── student_crud_provider.dart
-        ├── student_stats_provider.dart
-        ├── lesson_class_providers.dart
-        └── membership_providers.dart
-```
-
-> 📐 **엔티티 설계**: [docs/specs/student/student_class_system.md](specs/student/student_class_system.md) 참조
-
-### subscription (수강권/결제)
-수강권 생성/관리, 결제 기록, 선생님 제안 기능.
-- 주요 엔티티: `Subscription`, `SubscriptionPlan`, `Payment`
-- 수강권 유효기간, 잔여 횟수 추적
+| 패턴 | 도메인 | 설명 |
+|------|--------|------|
+| **Facade** | booking, subscription | 단일 진입점으로 복잡한 하위 API 캡슐화 |
+| **Cross-domain repo** | profile | Remote 구현체가 onboarding/, invite/에 위치 (의도적 재사용) |
+| **데이터 전용** | relationship | 화면 없이 Provider만 제공 (다른 도메인에서 참조) |
+| **UI 전용** | home | Repository 없이 공유 서비스/Provider 조합 |
+| **Mixin 합성** | practice | 6개 mixin으로 repository 기능 합성 |
 
 ---
 
