@@ -90,10 +90,10 @@
 
 | 경로 | 이유 |
 |------|------|
-| `_archive/` | 폐기된 스펙 (old/ 76개 + 대체된 디자인/레슨 스펙) |
+| `_archive/` | 폐기된 스펙. **AI 작업 시 참조 금지**. 활성 문서에서 역사 참고 링크는 `(아카이브됨)` 표기로 허용 |
 | `requirement/requirement.md` | 2025-12 기준, 현재 정책과 충돌 (특히 결제) |
 | `requirement/implementation_status.md` | 오래된 상태 추적 |
-| `design/design_master.md` | `notebook/README.md`가 최신 디자인 SSOT |
+| `design/design_master.md` | `notebook/README.md`가 최신 디자인 SSOT. 파일 상단에 폐기 배너 추가됨 |
 | `dev/implementation_roadmap.md` (v1) | v2로 대체됨 → `_archive/`로 이동 완료 |
 
 ---

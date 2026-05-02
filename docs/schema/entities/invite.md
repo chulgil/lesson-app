@@ -2,7 +2,7 @@
 
 > 작성일: 2026-01-24
 > 상태: 📋 설계 완료 (미구현)
-> 관련 스펙: [invite_system_v2.md](../../specs/invite/invite_system_v2.md), [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md)
+> 관련 스펙: [invite_system_v2.md](../../specs/lesson/invite/invite_system_v2.md), [subscription_based_relationship.md](../../specs/lesson/invite/subscription_based_relationship.md)
 
 ---
 
@@ -11,7 +11,7 @@
 > 선생님-학생 관계는 **수강권 중심 모델**로 변경되었습니다.
 > 새 엔티티는 아래 문서를 참조하세요:
 >
-> **👉 [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md)**
+> **👉 [subscription_based_relationship.md](../../specs/lesson/invite/subscription_based_relationship.md)**
 >
 > 새 엔티티:
 > - `TeacherStudentRelation` (TypeId: 90) - 레슨 관계
@@ -336,8 +336,8 @@ lib/features/students/domain/entities/practice_level.dart
 
 | 문서 | 설명 |
 |------|------|
-| [invite_system_v2.md](../../specs/invite/invite_system_v2.md) | 초대 시스템 스펙 (수강권 기반) |
-| [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
+| [invite_system_v2.md](../../specs/lesson/invite/invite_system_v2.md) | 초대 시스템 스펙 (수강권 기반) |
+| [subscription_based_relationship.md](../../specs/lesson/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
 | [glossary.md](../../specs/glossary.md) | 용어 정의 |
 | [student.md](student.md) | 학생 엔티티 (ConnectionStatus) |
 | [parent.md](parent.md) | 학부모 엔티티 (ParentTeacherConnection) |

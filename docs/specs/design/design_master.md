@@ -1,7 +1,10 @@
 # Design System Master Spec
 
-> 구현 상태: ⚠️ 부분 구현 — 토큰 시스템 구현, UX 법칙 적용 미검증
-> Last updated: 2026-03-07
+> **⚠️ DEPRECATED** — 이 문서는 더 이상 디자인 SSOT가 아닙니다.
+> **현재 디자인 SSOT**: [`design/notebook/README.md`](notebook/README.md) (Notebook × Score 디자인 시스템)
+> 이 문서는 2026-03-07 기준의 초기 디자인 시스템이며, notebook/README.md로 대체되었습니다.
+>
+> 구 상태: 부분 구현 — 토큰 시스템 구현, UX 법칙 적용 미검증
 > 통합 출처: ux_guidelines.md, figma/design_system.md, role_based_screens.md, teacher_app_screens.md, booking_system_comparison.md, competitor_ux_analysis.md
 
 ---

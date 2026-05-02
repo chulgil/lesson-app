@@ -172,7 +172,7 @@
 
 - 레슨 카드: [lesson_master.md](../lesson/lesson_master.md)
 - 수강관리 (탭): [user_master.md §4.3](../user/user_master.md)
-- 디자인: [design_master.md](../design/design_master.md)
+- 디자인: [notebook/README.md](../design/notebook/README.md)
 - UX 원칙: [ux_guidelines.md](../design/ux_guidelines.md)
 
 ---

@@ -470,5 +470,5 @@ lib/features/search/domain/entities/teacher_search_result.dart
 |------|------|
 | [teacher_registration.md](../../specs/user/teacher_registration.md) | 선생님 등록 시스템 스펙 |
 | [three_party_relationship_spec.md](../../specs/lesson/three_party_relationship_spec.md) | 학원-선생님-학생 관계 |
-| [invite_system_v2.md](../../specs/invite/invite_system_v2.md) | 초대 시스템 |
+| [invite_system_v2.md](../../specs/lesson/invite/invite_system_v2.md) | 초대 시스템 |
 | [review.md](review.md) | 리뷰 시스템 (TeacherBadge 포함) |

@@ -1716,7 +1716,7 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | 수강권 시스템 | `specs/subscription/subscription_system_spec.md` | 수강권 비즈니스 로직 상세 |
 | 통합 결제 | `specs/payment/payment_unified_spec.md` | 결제/정산 상세 |
 | 알림 시스템 | `specs/notification/notification_system.md` | 알림 상세 |
-| 앱 사용 플로우 | `specs/lesson/flow_with_app.md` | 신규/재등록/앱 전환 플로우 |
+| 앱 사용 플로우 | `specs/_archive/old/flow_with_app.md` | 신규/재등록/앱 전환 플로우 (아카이브됨, lesson_master.md 참조) |
 
 ---
 

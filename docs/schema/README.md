@@ -102,19 +102,19 @@ docs/schema/
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
-| TeacherStudentRelation | 수강권 기반 레슨 관계 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 90 |
-| RelationshipStatus | 관계 상태 enum | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 91 |
-| NotificationSetting | 레슨 알림/공유 설정 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 92 |
-| Follow | 소식 구독 (팔로우) | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 93 |
-| FollowTargetType | 팔로우 대상 타입 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 94 |
+| TeacherStudentRelation | 수강권 기반 레슨 관계 | [subscription_based_relationship.md](../specs/lesson/invite/subscription_based_relationship.md) | 90 |
+| RelationshipStatus | 관계 상태 enum | [subscription_based_relationship.md](../specs/lesson/invite/subscription_based_relationship.md) | 91 |
+| NotificationSetting | 레슨 알림/공유 설정 | [subscription_based_relationship.md](../specs/lesson/invite/subscription_based_relationship.md) | 92 |
+| Follow | 소식 구독 (팔로우) | [subscription_based_relationship.md](../specs/lesson/invite/subscription_based_relationship.md) | 93 |
+| FollowTargetType | 팔로우 대상 타입 | [subscription_based_relationship.md](../specs/lesson/invite/subscription_based_relationship.md) | 94 |
 
 ### 초대/학원
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
-| [Membership](entities/invite.md#membership-학원-멤버십) | 학원-사용자 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
-| [TeacherSettings](entities/invite.md#teachersettings-선생님-설정) | 선생님 초대 설정 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
-| [PracticeLevel](entities/invite.md#practicelevel-연습-레벨) | 연습 레벨 (성과) | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+| [Membership](entities/invite.md#membership-학원-멤버십) | 학원-사용자 관계 | [invite_system_v2.md](../specs/lesson/invite/invite_system_v2.md) | TBD |
+| [TeacherSettings](entities/invite.md#teachersettings-선생님-설정) | 선생님 초대 설정 | [invite_system_v2.md](../specs/lesson/invite/invite_system_v2.md) | TBD |
+| [PracticeLevel](entities/invite.md#practicelevel-연습-레벨) | 연습 레벨 (성과) | [invite_system_v2.md](../specs/lesson/invite/invite_system_v2.md) | TBD |
 
 ### 알림
 

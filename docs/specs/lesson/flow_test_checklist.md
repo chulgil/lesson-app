@@ -1,9 +1,9 @@
 # 레슨 플로우 테스트 체크리스트
 
 > 마지막 업데이트: 2026-01-30
-> 기준 문서: [flow_with_app.md](flow_with_app.md)
+> 기준 문서: [lesson_master.md](lesson_master.md) (구 flow_with_app.md → 아카이브됨)
 
-이 문서는 `flow_with_app.md`의 시퀀스 다이어그램을 기반으로 작성된 역할별 테스트 체크리스트입니다.
+이 문서는 `lesson_master.md`의 레슨 플로우를 기반으로 작성된 역할별 테스트 체크리스트입니다.
 사용자가 실제 화면에서 각 기능을 테스트할 수 있도록 단계별로 정리되어 있습니다.
 
 ---
