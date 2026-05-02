@@ -175,16 +175,19 @@ class RemoteUnifiedLessonRequestRepository
 
   @override
   Future<List<RequestEvent>> getEventsByRequestId(String requestId) async {
-    // Events are embedded in the request's time_proposals field
-    // For now, return empty list — events will be managed locally
-    // until backend adds dedicated events endpoint
-    return [];
+    final response = await _apiClient.get('$_basePath/$requestId/events');
+    final items = response.data as List<dynamic>;
+    return items
+        .map((json) => RequestEvent.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Future<RequestEvent> addEvent(RequestEvent event) async {
-    // Events are managed through status changes and proposals
-    // Backend handles event creation internally
-    return event;
+    final response = await _apiClient.post(
+      '$_basePath/${event.requestId}/events',
+      data: event.toJson(),
+    );
+    return RequestEvent.fromJson(response.data as Map<String, dynamic>);
   }
 }
