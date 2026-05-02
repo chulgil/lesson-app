@@ -1,10 +1,18 @@
 // ignore_for_file: avoid_relative_lib_imports
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lessonaza/features/relationship/data/repositories/mock_teacher_student_relation_repository.dart';
+import 'package:lessonaza/features/relationship/domain/entities/relationship_status.dart';
+import 'package:lessonaza/features/relationship/presentation/providers/relationship_providers.dart';
+import 'package:lessonaza/features/schedule/data/repositories/mock_schedule_confirmation_card_repository.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_unified_lesson_request_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
-
+import 'package:lessonaza/features/schedule/presentation/providers/schedule_confirmation_card_providers.dart';
+import 'package:lessonaza/features/schedule/presentation/providers/unified_lesson_request_providers.dart';
+import 'package:lessonaza/features/subscription/data/repositories/mock_subscription_repository.dart';
+import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 
 void main() {
   late MockUnifiedLessonRequestRepository repository;
@@ -62,19 +70,20 @@ void main() {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
 
-      final todayRequests = allRequests.where((r) {
-        if (r.status.isActive) return true;
-        if (r.status == UnifiedRequestStatus.completed &&
-            r.confirmedAt != null) {
-          final confirmedDate = DateTime(
-            r.confirmedAt!.year,
-            r.confirmedAt!.month,
-            r.confirmedAt!.day,
-          );
-          return confirmedDate == today;
-        }
-        return false;
-      }).toList();
+      final todayRequests =
+          allRequests.where((r) {
+            if (r.status.isActive) return true;
+            if (r.status == UnifiedRequestStatus.completed &&
+                r.confirmedAt != null) {
+              final confirmedDate = DateTime(
+                r.confirmedAt!.year,
+                r.confirmedAt!.month,
+                r.confirmedAt!.day,
+              );
+              return confirmedDate == today;
+            }
+            return false;
+          }).toList();
 
       // Sort: pending first, then by createdAt desc
       todayRequests.sort((a, b) {
@@ -99,8 +108,11 @@ void main() {
             r.confirmedAt!.month,
             r.confirmedAt!.day,
           );
-          expect(confirmedDate, equals(today),
-              reason: 'Completed requests should be from today only');
+          expect(
+            confirmedDate,
+            equals(today),
+            reason: 'Completed requests should be from today only',
+          );
         }
       }
 
@@ -111,8 +123,11 @@ void main() {
           seenNonPending = true;
         }
         if (seenNonPending) {
-          expect(r.status, isNot(UnifiedRequestStatus.pending),
-              reason: 'Pending requests should come before non-pending');
+          expect(
+            r.status,
+            isNot(UnifiedRequestStatus.pending),
+            reason: 'Pending requests should come before non-pending',
+          );
         }
       }
     });
@@ -253,11 +268,94 @@ void main() {
 
       final events = await repository.getEventsByRequestId('ulr_1');
       expect(
-        events.any((e) =>
-            e.eventType == RequestEventType.proposeAlternative &&
-            e.suggestedSlots.isNotEmpty),
+        events.any(
+          (e) =>
+              e.eventType == RequestEventType.proposeAlternative &&
+              e.suggestedSlots.isNotEmpty,
+        ),
         isTrue,
       );
+    });
+  });
+
+  group('issueSubscription action', () {
+    test('creates subscription and schedule confirmation card', () async {
+      final requestRepository = MockUnifiedLessonRequestRepository();
+      final subscriptionRepository = MockSubscriptionRepository();
+      final cardRepository = MockScheduleConfirmationCardRepository();
+      final relationRepository = MockTeacherStudentRelationRepository();
+      final container = ProviderContainer(
+        overrides: [
+          unifiedLessonRequestRepositoryProvider.overrideWithValue(
+            requestRepository,
+          ),
+          subscriptionRepositoryProvider.overrideWithValue(
+            subscriptionRepository,
+          ),
+          scheduleConfirmationCardRepositoryProvider.overrideWith(
+            (ref) => cardRepository,
+          ),
+          teacherStudentRelationRepositoryProvider.overrideWith(
+            (ref) => relationRepository,
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final request = UnifiedLessonRequest(
+        id: 'issue-request-001',
+        studentId: 'issue-student-001',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.regular,
+        instrument: '피아노',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        preferredDay: 2,
+        preferredTime: '15:00',
+        preferredDuration: 50,
+        suggestedPrice: 180000,
+        status: UnifiedRequestStatus.paymentNotified,
+        createdAt: DateTime(2026, 5, 2),
+      );
+      await requestRepository.create(request);
+
+      await UnifiedLessonRequestActions(container).issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+      );
+
+      final subscriptions = await subscriptionRepository.getByStudentId(
+        request.studentId,
+      );
+      final createdSubscription = subscriptions.singleWhere(
+        (subscription) => subscription.studentId == request.studentId,
+      );
+      expect(createdSubscription.amount, 180000);
+      expect(createdSubscription.paymentConfirmed, isTrue);
+
+      final relation = await relationRepository.getRelation(
+        request.teacherId,
+        request.studentId,
+      );
+      expect(relation, isNotNull);
+      expect(relation!.status, RelationshipStatus.active);
+      expect(relation.activeSubscriptionId, createdSubscription.id);
+
+      final cards = await cardRepository.getPendingCardsForStudent(
+        request.studentId,
+      );
+      final createdCard = cards.singleWhere(
+        (card) => card.lessonRequestId == request.id,
+      );
+      expect(createdCard.subscriptionId, createdSubscription.id);
+      expect(createdCard.suggestedDay, 3);
+      expect(createdCard.suggestedTime, '15:00');
+      expect(createdCard.lessonDuration, 50);
+
+      final updatedRequest = await requestRepository.getById(request.id);
+      expect(updatedRequest!.status, UnifiedRequestStatus.subscriptionIssued);
     });
   });
 }

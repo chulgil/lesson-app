@@ -24,6 +24,20 @@ from app.schemas.schedule import (
 )
 
 
+def _parse_time_to_minutes(t: str) -> int:
+    """Parse "HH:MM" to total minutes since midnight."""
+    parts = t.split(":")
+    return int(parts[0]) * 60 + int(parts[1])
+
+
+def _slot_overlaps_blocked(slot_start: int, slot_end: int, blocked: list[tuple[int, int]]) -> bool:
+    """Return True if the slot [slot_start, slot_end) overlaps any blocked range."""
+    for b_start, b_end in blocked:
+        if slot_start < b_end and slot_end > b_start:
+            return True
+    return False
+
+
 class ScheduleService:
     """Handle teacher availability, booking lifecycle, and schedule exceptions."""
 
@@ -168,6 +182,7 @@ class ScheduleService:
         from datetime import date as date_type
 
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
+        from app.models.schedule_ext import ExceptionType, ScheduleException
         from app.schemas.schedule import SlotStatus
 
         d = date_type.fromisoformat(date)
@@ -201,6 +216,28 @@ class ScheduleService:
         )
         booked_times = {b.scheduled_time for b in bookings.all()}
 
+        # Get schedule exceptions (holiday/vacation) covering this date (#236)
+        exceptions = await self.db.scalars(
+            select(ScheduleException).where(
+                ScheduleException.teacher_availability_id == avail.id,
+                ScheduleException.type.in_([ExceptionType.holiday, ExceptionType.vacation]),
+                ScheduleException.start_date <= d,
+                ScheduleException.end_date >= d,
+            )
+        )
+        exception_list = exceptions.all()
+
+        # Determine if this is a whole-day exception or collect partial ranges
+        whole_day_blocked = False
+        blocked_ranges: list[tuple[int, int]] = []
+        for exc in exception_list:
+            if exc.start_time is None:
+                whole_day_blocked = True
+                break
+            exc_start = _parse_time_to_minutes(exc.start_time)
+            exc_end = _parse_time_to_minutes(exc.end_time)
+            blocked_ranges.append((exc_start, exc_end))
+
         # Generate slots from availability
         slots: list[SlotStatus] = []
         for ts in time_slots.all():
@@ -217,12 +254,20 @@ class ScheduleService:
                 slot_end_minutes = current + duration
                 slot_end_time = f"{slot_end_minutes // 60:02d}:{slot_end_minutes % 60:02d}"
 
-                is_booked = slot_time in booked_times
+                if whole_day_blocked:
+                    slot_status = "unavailable"
+                elif _slot_overlaps_blocked(current, slot_end_minutes, blocked_ranges):
+                    slot_status = "unavailable"
+                elif slot_time in booked_times:
+                    slot_status = "booked"
+                else:
+                    slot_status = "available"
+
                 slots.append(
                     SlotStatus(
                         start_time=slot_time,
                         end_time=slot_end_time,
-                        status="booked" if is_booked else "available",
+                        status=slot_status,
                     )
                 )
                 current += 30  # 30-minute interval
@@ -324,9 +369,48 @@ class ScheduleService:
         items = [BookingResponse.model_validate(b) for b in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
+    async def _check_booking_overlap(
+        self,
+        teacher_id: str,
+        scheduled_date: Any,
+        scheduled_time: str,
+        duration: int,
+    ) -> None:
+        """Raise 409 if the slot overlaps with existing bookings (#237)."""
+        from datetime import datetime, timedelta
+
+        from app.models.schedule import LessonBooking
+
+        new_start = datetime.strptime(scheduled_time, "%H:%M")
+        new_end = new_start + timedelta(minutes=duration)
+
+        existing = await self.db.scalars(
+            select(LessonBooking).where(
+                LessonBooking.teacher_id == teacher_id,
+                LessonBooking.scheduled_date == scheduled_date,
+                LessonBooking.status.in_(["pending", "confirmed"]),
+            )
+        )
+
+        for booking in existing.all():
+            ex_start = datetime.strptime(booking.scheduled_time, "%H:%M")
+            ex_end = ex_start + timedelta(minutes=booking.duration)
+            if new_start < ex_end and new_end > ex_start:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="해당 시간에 이미 예약이 있습니다",
+                )
+
     async def create_booking(self, data: BookingCreate, current_user: Any) -> BookingResponse:
         """Create a new booking request."""
         from app.models.schedule import LessonBooking
+
+        await self._check_booking_overlap(
+            teacher_id=data.teacher_id,
+            scheduled_date=data.scheduled_date,
+            scheduled_time=data.scheduled_time,
+            duration=data.duration,
+        )
 
         booking = LessonBooking(
             teacher_id=data.teacher_id,
@@ -421,6 +505,13 @@ class ScheduleService:
     async def create_makeup_booking(self, data: MakeupBookingCreate, current_user: Any) -> BookingResponse:
         """Create a makeup lesson booking."""
         from app.models.schedule import LessonBooking
+
+        await self._check_booking_overlap(
+            teacher_id=current_user.id,
+            scheduled_date=data.scheduled_date,
+            scheduled_time=data.scheduled_time,
+            duration=data.duration,
+        )
 
         booking = LessonBooking(
             teacher_id=current_user.id,

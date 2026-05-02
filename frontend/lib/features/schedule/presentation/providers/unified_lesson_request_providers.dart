@@ -1,11 +1,16 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../relationship/presentation/providers/relationship_providers.dart';
+import '../../../subscription/domain/entities/subscription.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
 import '../../data/repositories/remote_unified_lesson_request_repository.dart';
 import '../../domain/entities/request_event.dart';
+import '../../domain/entities/schedule_confirmation_card.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
+import 'schedule_confirmation_card_providers.dart';
 
 part 'unified_lesson_request_providers.g.dart';
 
@@ -638,7 +643,8 @@ class UnifiedLessonRequestActions {
   }
 
   /// Issue subscription (무료/후불/입금확인 후).
-  /// Sets request status to subscriptionIssued.
+  /// Creates the subscription, creates a schedule confirmation card, and sets
+  /// request status to subscriptionIssued.
   Future<void> issueSubscription(
     String requestId,
     String teacherId,
@@ -647,7 +653,15 @@ class UnifiedLessonRequestActions {
     String? message,
   }) async {
     final request = await _repository.getById(requestId);
+    Subscription? subscription;
     if (request != null) {
+      subscription = await _createSubscriptionForRequest(
+        request,
+        paymentConfirmed: paymentConfirmed,
+      );
+      await _activateRelationshipForRequest(request, subscription);
+      await _createScheduleConfirmationCardForRequest(request, subscription);
+
       final updated = request.copyWith(
         status: UnifiedRequestStatus.subscriptionIssued,
       );
@@ -664,11 +678,91 @@ class UnifiedLessonRequestActions {
         message:
             message ??
             (paymentConfirmed ? '수강권이 발행되었습니다' : '수강권이 발행되었습니다 (후불)'),
+        subscriptionId: subscription?.id,
         createdAt: DateTime.now(),
       ),
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  Future<Subscription> _createSubscriptionForRequest(
+    UnifiedLessonRequest request, {
+    required bool paymentConfirmed,
+  }) async {
+    final repository = ref.read(subscriptionRepositoryProvider);
+    final now = DateTime.now();
+    final subscription = Subscription(
+      id: 'sub_${now.microsecondsSinceEpoch}',
+      studentId: request.studentId,
+      membershipId: '',
+      type:
+          request.type == LessonRequestType.trial
+              ? SubscriptionType.trial
+              : SubscriptionType.monthly,
+      totalLessons: request.type == LessonRequestType.trial ? 1 : null,
+      lessonsPerMonth: request.type == LessonRequestType.regular ? 4 : null,
+      usedLessons: 0,
+      startDate: now,
+      amount: request.suggestedPrice ?? 0,
+      status: SubscriptionStatus.active,
+      createdAt: now,
+      paymentConfirmed: paymentConfirmed,
+      paymentMethod:
+          paymentConfirmed ? SubscriptionPaymentMethod.bankTransfer : null,
+      paymentConfirmedAt: paymentConfirmed ? now : null,
+    );
+    return repository.create(subscription);
+  }
+
+  Future<void> _createScheduleConfirmationCardForRequest(
+    UnifiedLessonRequest request,
+    Subscription subscription,
+  ) async {
+    final repository = ref.read(scheduleConfirmationCardRepositoryProvider);
+    final teacherNames = ref.read(teacherNameMapProvider);
+    final primarySlot =
+        request.preferredSlots.isNotEmpty ? request.preferredSlots.first : null;
+    final suggestedDay =
+        request.preferredDay != null
+            ? request.preferredDay! + 1
+            : primarySlot?.dayOfWeek != null
+            ? primarySlot!.dayOfWeek! + 1
+            : null;
+    final suggestedTime = request.preferredTime ?? primarySlot?.startTime;
+
+    await repository.createCard(
+      ScheduleConfirmationCard(
+        id: '',
+        studentId: request.studentId,
+        teacherId: request.teacherId,
+        teacherName: teacherNames[request.teacherId] ?? '선생님',
+        instrument: request.instrument,
+        subscriptionId: subscription.id,
+        suggestedDay: suggestedDay,
+        suggestedTime: suggestedTime,
+        lessonDuration: request.preferredDuration,
+        cardType:
+            request.isReturningStudent
+                ? ScheduleCardType.reEnrollment
+                : ScheduleCardType.afterTrial,
+        createdAt: DateTime.now(),
+        totalLessons: subscription.totalLessonsForDisplay,
+        lessonRequestId: request.id,
+      ),
+    );
+  }
+
+  Future<void> _activateRelationshipForRequest(
+    UnifiedLessonRequest request,
+    Subscription subscription,
+  ) async {
+    final repository = ref.read(teacherStudentRelationRepositoryProvider);
+    await repository.onSubscriptionIssued(
+      teacherId: request.teacherId,
+      studentId: request.studentId,
+      subscriptionId: subscription.id,
+    );
   }
 
   // ── Phase 3: Lesson Progress ───────────────────────────
