@@ -11,11 +11,11 @@
 
 ```
 Phase 1: 레슨 신청 (CURRENT — 구현 완료)
-  레슨신청 → 시간협상 → 스케줄확정 → 수강권제안 → 결제
+  레슨신청 → 시간협상 → 스케줄확정
 
 Phase 2: 수강권 & 입금 (NEW — v2 설계 완료 2026-03-30)
   3가지 경로: 무료발급(체험) / 선불(기본) / 후불
-  → 상세: "Phase 2 결제 플로우 설계" 섹션 참조
+  → 상세: "Phase 2 입금 확인 플로우 설계" 섹션 참조
 
 Phase 3: 레슨 진행 (NEW)
   레슨 1회차 완료 → 2회차 완료 → ... → 수강 완료
@@ -28,7 +28,7 @@ Phase 3: 레슨 진행 (NEW)
 ┌─────────────────────────────────────┐
 │  ← 김민지 · 바이올린               │  AppBar
 │  Progress: ●──●──●──○──○           │  Phase indicator
-│           신청 확정 결제 진행 완료    │
+│           신청 확정 입금 진행 완료    │
 ├─────────────────────────────────────┤
 │                                     │
 │  ┌ 📋 레슨 신청 — 4/1 완료    [▼]  │  Chapter 1 (collapsed)
@@ -53,7 +53,7 @@ Phase 3: 레슨 진행 (NEW)
 | Chapter | Collapsed (완료) | Expanded (활성) |
 |---------|------------------|-----------------|
 | 레슨 신청 | 아이콘 + 한 줄 요약 + 확정 일시 | 전체 채팅 이벤트 (기존 UI) |
-| 수강권 | 아이콘 + 수강권 타입 + 회차 | 제안/수락/결제 이벤트 |
+| 수강권 | 아이콘 + 수강권 타입 + 회차 | 제안/수락/입금 이벤트 |
 | 레슨 진행 | - (항상 확장) | 회차별 완료/예정 리스트 |
 
 - 탭하면 접기/펼치기 토글
@@ -78,7 +78,8 @@ enum RequestEventType {
 
   // Chapter 2: 수강권 & 입금 (NEW)
   paymentRequested,      // 선생님 → 학생: 입금 안내
-  paymentConfirmed,      // 학생/학부모: 입금 완료 알림
+  paymentNotified,       // 학생/학부모 → 선생님: 입금 완료 알림
+  paymentConfirmed,      // 선생님: 입금 확인
   subscriptionIssued,    // 시스템: 수강권 발행 완료
 
   // Chapter 3: 레슨 진행 (NEW)
@@ -123,13 +124,13 @@ enum UnifiedRequestStatus {
 ```dart
 RequestPhase get currentPhase {
   return switch (status) {
-    // Phase 1: 신청~결제
+    // Phase 1: 레슨 신청~시간 확정
     pending || negotiating || approved || timeConfirmed
-        || proposalSent || proposalAccepted || paymentNotified
         => RequestPhase.request,
 
-    // Phase 2: 수강권 발행
-    subscriptionIssued => RequestPhase.subscription,
+    // Phase 2: 수강권 제안~입금 확인~수강권 발급
+    proposalSent || proposalAccepted || paymentNotified || subscriptionIssued
+        => RequestPhase.subscription,
 
     // Phase 3: 레슨 진행
     inProgress => RequestPhase.lessons,
@@ -146,15 +147,15 @@ RequestPhase get currentPhase {
 | Phase | Teacher Actions | Student Actions |
 |-------|----------------|-----------------|
 | 신청 | 수락/거절/역제안 | 대기/역제안 |
-| 수강권 | 결제 경로 선택 (아래 상세) | 입금 완료 알림 |
+| 수강권 | 입금 확인 방식 선택 (아래 상세) | 입금 완료 알림 |
 | 레슨 진행 | 레슨 완료/취소/시간변경/메모 | 시간 변경 요청 |
 | 완료 | 연장 제안 | 재수강 신청 |
 
-## Phase 2 결제 플로우 설계 (v2, 2026-03-30)
+## Phase 2 입금 확인 플로우 설계 (v2, 2026-03-30)
 
 > Phase 1 완료(timeConfirmed) → Phase 2 진입 시, 레슨 타입과 입금 확인 방식에 따라 3가지 경로로 분기.
 
-### 결제 경로 3가지
+### 입금 확인 경로 3가지
 
 ```
 timeConfirmed (시간 확정됨)
@@ -166,20 +167,20 @@ timeConfirmed (시간 확정됨)
     │   흐름: timeConfirmed → proposalSent → proposalAccepted
     │         → paymentNotified → (학생 입금) → (선생님 확인)
     │         → subscriptionIssued
-    │   결제: 수강권 발급 전 완료
+    │   입금: 수강권 발급 전 확인
     │
     ├─ 경로 B: 먼저 발급 (후불)
     │   UI: "먼저 발급 (후불)" 카드
     │   흐름: timeConfirmed → subscriptionIssued (paymentConfirmed=false)
     │         → (레슨 진행 중) → paymentRequested → paymentConfirmed
-    │   결제: 수강권 발급 후 나중에 안내
-    │   ⚠️ 미수금으로 관리 (대시보드 미수금 목록 표시)
+    │   입금: 수강권 발급 후 나중에 안내
+    │   ⚠️ 입금 확인 대기로 관리 (대시보드 입금 확인 대기 목록 표시)
     │
     └─ 경로 C: 무료 발급
         UI: "무료 발급" 카드
         조건: 모든 레슨 타입에서 선택 가능 (체험/정규/회차)
         흐름: timeConfirmed → subscriptionIssued (amount=0, paymentConfirmed=true)
-        결제: 없음. 즉시 수강권 발급
+        입금: 없음. 즉시 수강권 발급
 ```
 
 > **v2 변경 (2026-04-01)**: 무료 발급이 체험레슨에만 한정되지 않고, 모든 레슨 타입에서
@@ -187,18 +188,18 @@ timeConfirmed (시간 확정됨)
 
 ### 경로별 상태 전이 테이블
 
-| From | Action | To | 조건 | 결제 상태 |
+| From | Action | To | 조건 | 입금 상태 |
 |------|--------|----|------|----------|
 | timeConfirmed | 무료 수강권 발급 | subscriptionIssued | trial + 무료 | N/A |
 | timeConfirmed | 선불 입금 안내 | proposalSent | 기본 경로 | 대기 |
-| timeConfirmed | 후불 수강권 발급 | subscriptionIssued | 후불 선택 | 미수금 |
+| timeConfirmed | 후불 수강권 발급 | subscriptionIssued | 후불 선택 | 입금 확인 대기 |
 | proposalSent | 학생 수락 | proposalAccepted | - | 대기 |
 | proposalAccepted | 학생 입금 완료 | paymentNotified | - | 입금 알림 |
 | paymentNotified | 선생님 입금 확인 | subscriptionIssued | - | 완료 |
 
 ### Phase 2 선생님 액션 박스 UI
 
-#### 시간 확정 직후 (timeConfirmed) — 결제 경로 선택
+#### 시간 확정 직후 (timeConfirmed) — 입금 확인 경로 선택
 
 ```
 ┌──────────────────────────────────────────────┐
@@ -275,7 +276,7 @@ timeConfirmed (시간 확정됨)
 
 ```
 ┌──────────────────────────────────────────────┐
-│ 💳 결제하기                                   │
+│ 💳 입금하기                                   │
 │                                              │
 │ 아래 계좌로 입금 후 버튼을 눌러주세요.          │
 │ 계좌: [선생님 계좌 정보]                       │
@@ -290,8 +291,8 @@ timeConfirmed (시간 확정됨)
 후불(경로 B)로 발급된 수강권은 `paymentConfirmed=false` 상태입니다.
 
 - **대시보드**: 입금 확인 대기 N건 뱃지 표시
-- **미수금 목록**: 학생별 미수금 수강권 리스트
-- **입금 안내**: 미수금 수강권에서 "입금 안내 보내기" 버튼
+- **입금 확인 대기 목록**: 학생별 입금 확인 대기 수강권 리스트
+- **입금 안내**: 입금 확인 대기 수강권에서 "입금 안내 보내기" 버튼
 - **입금 확인**: 학생 입금 → 선생님 확인 → `paymentConfirmed=true`
 
 ### 구현 우선순위
@@ -302,7 +303,7 @@ timeConfirmed (시간 확정됨)
 | 2 | 후불 즉시 발급 카드 (경로 B) | Low |
 | 3 | 무료 발급 카드 (경로 C) | Low |
 | 4 | 2단계 입금 확인 (학생→선생님) | Medium |
-| 5 | 미수금 대시보드 | Medium |
+| 5 | 입금 확인 대기 대시보드 | Medium |
 
 ## Progress Bar Component
 
@@ -310,7 +311,7 @@ timeConfirmed (시간 확정됨)
 class LessonProgressBar extends StatelessWidget {
   final RequestPhase currentPhase;
   // Renders: ●──●──●──○──○
-  //          신청 확정 결제 진행 완료
+  //          신청 확정 입금 진행 완료
 }
 ```
 
@@ -320,12 +321,12 @@ class LessonProgressBar extends StatelessWidget {
 |------|------|------|----------|
 | 1 | 신청 | 학생이 레슨 신청 → 선생님이 수락/거절/시간 협상 | pending ~ approved |
 | 2 | 확정 | 양측 스케줄 합의 완료 | timeConfirmed |
-| 3 | 결제 | 입금 안내 → 학생 입금 → 선생님 확인 → 수강권 발급 | proposalSent ~ subscriptionIssued |
+| 3 | 입금 | 입금 안내 → 학생 입금 완료 알림 → 선생님 확인 → 수강권 발급 | proposalSent ~ subscriptionIssued |
 | 4 | 진행 | 레슨 1회차 ~ N회차 진행 중 | inProgress |
 | 5 | 완료 | 수강권 회차/기간 소진으로 자동 완료 | completed |
 
-> **참고**: "결제" 단계는 결제 + 수강권 발급까지를 포함합니다.
-> 체험레슨(무료)의 경우 결제를 스킵하고 수강권이 즉시 발급됩니다.
+> **참고**: "입금" 단계는 무통장입금 안내/알림/확인과 수강권 발급까지를 포함합니다.
+> 체험레슨(무료)의 경우 입금을 스킵하고 수강권이 즉시 발급됩니다.
 > 후불의 경우 수강권이 먼저 발급되고 입금 확인은 나중에 진행됩니다.
 
 ## Chapter Summary Widget

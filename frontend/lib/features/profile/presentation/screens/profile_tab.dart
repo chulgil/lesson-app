@@ -58,7 +58,7 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space5),
 
-          // Stats section (팔로워 → 미수금)
+          // Stats section (팔로워 → 입금 확인 대기)
           _buildStatsSection(ref, teacherId),
 
           const SizedBox(height: AppSpacing.space5),
@@ -504,7 +504,7 @@ class ProfileTab extends ConsumerWidget {
     return null;
   }
 
-  /// 자주 쓰는 설정 3개 카드 (가용시간 · 미수금 · 수강권 템플릿).
+  /// 자주 쓰는 설정 3개 카드 (가용시간 · 입금 확인 대기 · 수강권 템플릿).
   Widget _buildQuickShortcuts(BuildContext context, String teacherId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -521,7 +521,7 @@ class ProfileTab extends ConsumerWidget {
           Expanded(
             child: _ShortcutCard(
               icon: Icons.warning_amber_outlined,
-              label: '미수금',
+              label: '입금대기',
               onTap: () => context.push(AppRoutes.outstandingPayments),
             ),
           ),
@@ -541,7 +541,7 @@ class ProfileTab extends ConsumerWidget {
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
-    // 팔로워 → 미수금으로 교체 (profile_master.md §2.4)
+    // 팔로워 → 입금 확인 대기로 교체 (profile_master.md §2.4)
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
 
     final studentCountValue =
@@ -580,7 +580,7 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('미수금', unpaidValue),
+            _buildStatItem('입금대기', unpaidValue),
           ],
         ),
       ),

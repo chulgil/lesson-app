@@ -1050,7 +1050,7 @@ class _StudentCard extends ConsumerWidget {
 
     return subscriptionsAsync.when(
       data: (subscriptions) {
-        // Unpaid takes highest priority
+        // Deposit confirmation pending takes highest priority.
         final hasUnpaid = subscriptions.any((s) => s.isUnpaid);
         if (hasUnpaid) {
           return SizedBox(
@@ -1067,7 +1067,7 @@ class _StudentCard extends ConsumerWidget {
                   border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
-                  '미수금',
+                  '입금대기',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,

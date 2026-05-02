@@ -110,7 +110,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         paymentConfirmedAt: now.subtract(const Duration(days: 25)),
       ),
 
-      // sub_pkg_04: student_12 (박준혁, active 미수금) - 바이올린 8회 패키지, 1/8 사용, paymentConfirmed=false
+      // sub_pkg_04: student_12 (박준혁, active 입금 확인 대기) - 바이올린 8회 패키지, 1/8 사용, paymentConfirmed=false
       Subscription(
         id: 'sub_pkg_04',
         studentId: 'student_12',
@@ -124,7 +124,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         status: SubscriptionStatus.active,
         billingType: BillingType.perPackage,
         createdAt: now.subtract(const Duration(days: 7)),
-        paymentConfirmed: false, // 미수금!
+        paymentConfirmed: false, // 입금 확인 대기
       ),
 
       // ═══════════════════════════════════════════════════════════════════
@@ -825,7 +825,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       ),
 
       // ═══════════════════════════════════════════════════════════════════
-      // sub_pkg_04: 1 lesson used (student_12, 박준혁 바이올린 8회 미수금)
+      // sub_pkg_04: 1 lesson used (student_12, 박준혁 바이올린 8회 입금 확인 대기)
       // ═══════════════════════════════════════════════════════════════════
       SubscriptionUsage(
         id: 'usage_pkg04_1',

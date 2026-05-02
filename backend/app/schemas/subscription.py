@@ -3,7 +3,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field, field_validator
 
 # ---------------------------------------------------------------------------
 # Subscription
@@ -113,9 +113,16 @@ class SubscriptionUsageCreate(BaseModel):
 
 
 class ConfirmPaymentRequest(BaseModel):
-    """Confirm payment on a subscription."""
+    """Confirm a manual tuition deposit on a subscription."""
 
     payment_method: str | None = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_current_payment_method(cls, value: str | None) -> str | None:
+        if value == "card":
+            raise ValueError("card/PG payments are not supported for current tuition deposits")
+        return value
 
 
 # ---------------------------------------------------------------------------
@@ -175,6 +182,10 @@ class SubscriptionProposalResponse(BaseModel):
     template_ids: list[str] | None = None
     recommended_template_id: str | None = None
     selected_template_id: str | None = None
+    payment_status: str | None = None
+    payment_notified_at: _dt.datetime | None = None
+    confirmed_at: _dt.datetime | None = None
+    subscription_id: str | None = None
     rejection_reason: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None

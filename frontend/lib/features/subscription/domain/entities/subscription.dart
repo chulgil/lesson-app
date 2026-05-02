@@ -165,7 +165,7 @@ class Subscription extends HiveObject {
 
   // === Payment info (integrated from legacy Payment entity) ===
 
-  /// Payment confirmed by teacher. false = unpaid (미수금).
+  /// Manual deposit confirmed by teacher. false = deposit confirmation pending.
   @HiveField(21)
   final bool paymentConfirmed;
 

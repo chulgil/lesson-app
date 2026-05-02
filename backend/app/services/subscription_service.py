@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -223,13 +224,14 @@ class SubscriptionService:
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
     ) -> SubscriptionResponse:
-        """Mark a subscription as paid."""
+        """Confirm a manual tuition deposit."""
         from app.models.subscription import Subscription
 
         sub = await self.db.get(Subscription, subscription_id)
         if sub is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
         sub.payment_confirmed = True
+        sub.payment_confirmed_at = datetime.now(timezone.utc)
         if data.payment_method:
             sub.payment_method = data.payment_method
         await self.db.flush()
@@ -364,6 +366,7 @@ class SubscriptionService:
 
         if data.action == "accept":
             proposal.status = "paymentNotified"
+            proposal.payment_notified_at = datetime.now(timezone.utc)
             proposal.selected_template_id = data.selected_template_id
         elif data.action == "reject":
             proposal.status = "rejected"
@@ -378,14 +381,56 @@ class SubscriptionService:
     async def confirm_proposal(
         self, proposal_id: str, current_user: Any
     ) -> SubscriptionProposalResponse:
-        """Confirm a proposal after payment (creates the subscription)."""
-        from app.models.subscription import SubscriptionProposal
+        """Confirm a manual deposit and issue the subscription."""
+        from app.models.subscription import (
+            PaymentMethod,
+            ProposalPaymentStatus,
+            Subscription,
+            SubscriptionProposal,
+            SubscriptionStatus,
+            SubscriptionTemplate,
+        )
 
         proposal = await self.db.get(SubscriptionProposal, proposal_id)
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
+        if proposal.status != "paymentNotified":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Proposal must be paymentNotified before confirmation",
+            )
+
+        now = datetime.now(timezone.utc)
+        if not proposal.subscription_id:
+            template_id = (
+                proposal.selected_template_id
+                or proposal.recommended_template_id
+                or proposal.template_id
+            )
+            template = await self.db.get(SubscriptionTemplate, template_id) if template_id else None
+            sub = Subscription(
+                student_id=proposal.student_id,
+                membership_id="",
+                type=template.type if template else "monthly",
+                total_lessons=template.lessons_count if template else None,
+                lessons_per_month=template.lessons_per_month if template else None,
+                amount=template.amount if template else 0,
+                status=SubscriptionStatus.active,
+                payment_confirmed=True,
+                payment_method=PaymentMethod.bankTransfer,
+                paid_at=proposal.payment_notified_at or now,
+                payment_confirmed_at=now,
+                discount_amount=proposal.discount_amount,
+                discount_reason=proposal.discount_reason,
+            )
+            self.db.add(sub)
+            await self.db.flush()
+            proposal.subscription_id = sub.id
+
         proposal.status = "confirmed"
+        proposal.payment_status = ProposalPaymentStatus.completed
+        proposal.confirmed_at = now
         await self.db.flush()
         await self.db.refresh(proposal)
         return SubscriptionProposalResponse.model_validate(proposal)

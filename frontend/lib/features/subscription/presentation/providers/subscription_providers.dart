@@ -141,7 +141,7 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     return updated;
   }
 
-  /// Confirm payment on a subscription (resolve 미수금).
+  /// Confirm manual deposit on a subscription.
   Future<Subscription> confirmPayment(
     String id, {
     SubscriptionPaymentMethod? paymentMethod,
@@ -230,7 +230,7 @@ class MembershipSubscriptionNotifier extends _$MembershipSubscriptionNotifier {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Unpaid (미수금) Providers
+// Deposit confirmation pending providers
 // ═══════════════════════════════════════════════════════════════════
 
 /// Get unpaid subscriptions for a teacher.

@@ -13,12 +13,12 @@
 
 레거시 결제 및 청구서 엔티티 기록입니다. 현행 구현 근거가 아니며, 최신 정책은 `subscription_master.md`와 `payment_architecture.md`를 따릅니다.
 
-### Subscription 결제 필드 (신규, HiveField 21-27)
+### Subscription 입금 필드 (신규, HiveField 21-27)
 
 | Field | Type | 설명 |
 |-------|------|------|
-| `paymentConfirmed` | `bool` | false = 미수금 |
-| `paymentMethod` | `SubscriptionPaymentMethod?` | 현금/계좌이체/카드/기타 |
+| `paymentConfirmed` | `bool` | false = 입금 확인 대기 |
+| `paymentMethod` | `SubscriptionPaymentMethod?` | 현금/계좌이체/기타. `card`는 레거시 직렬화 호환용이며 현행 API 입력 금지 |
 | `paidAt` | `DateTime?` | 학생 입금완료 시점 |
 | `paymentConfirmedAt` | `DateTime?` | 선생님 확인 시점 |
 | `discountAmount` | `int?` | 할인 금액 |

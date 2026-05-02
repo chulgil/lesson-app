@@ -2116,7 +2116,7 @@ for (final req in pendingRequests) {
 | 학생 | ✅ 입금 기록 (본인) | ✅ 본인 + 선생님 확인 상태 |
 | 학부모 | ✅ 입금 기록 (자녀) | ✅ 자녀 + 선생님 확인 상태 |
 
-#### 결제 플로우
+#### 입금 확인 플로우
 
 ```
 [선생님]                      [학생/학부모]
@@ -2140,26 +2140,31 @@ for (final req in pendingRequests) {
     │                         4. 선생님 확인 상태 표시
 ```
 
-#### 결제 상태 및 모델
+#### 입금 상태 및 모델
 
-> 📦 **엔티티 정의**: [payment.md](../../schema/entities/payment.md)
+> 📦 **SSOT**: [subscription_master.md](../subscription/subscription_master.md), [payment_architecture.md](../subscription/payment_architecture.md)
+>
+> 현행 초대/수강권 흐름은 별도 `Payment` 엔티티나 `/payments/*` API를 만들지 않는다.
+> 선생님/학원 ↔ 학생/학부모 간 무통장입금을 전제로 하며, 앱은 `Subscription` / `SubscriptionProposal`의 입금 상태만 기록한다.
+> 카드/PG/환불/정산은 현재 스펙 범위가 아니며, 향후 앱관리자가 선생님/학생에게 사용료를 청구하는 별도 스펙에서 정의한다.
 
-**PaymentStatus**
+**입금 상태**
 
 | 값 | 설명 |
 |------|------|
-| pending | 청구됨 (입금 대기) |
-| studentConfirmed | 입금완료 표시 (학생) |
-| confirmed | 확인 완료 (선생님) |
-| overdue | 연체 (마감일 초과) |
+| `proposalSent` | 선생님/학원이 수강권과 입금 안내를 보냄 |
+| `proposalAccepted` | 학생/학부모가 수강권 조건을 수락함 |
+| `paymentNotified` | 학생/학부모가 외부 입금 완료를 알림 |
+| `confirmed` | 선생님/학원이 입금을 확인함 |
+| `subscriptionIssued` | 입금 확인 후 수강권이 발급됨 |
 
-> **Note**: 기존 스펙의 `paid` 상태는 구현 시 `studentConfirmed`로 변경됨 (2단계 확인 지원)
+> **Note**: 레거시 `PaymentStatus`, `paid`, `studentConfirmed`, `overdue`는 현행 구현 지시가 아니다.
 
-#### 연결 상태별 결제 기능
+#### 연결 상태별 입금 확인 기능
 
 | 기능 | 미연결 | 연결 후 |
 |------|:------:|:------:|
-| 수강료 청구 (선생님) | ✅ 수기 기록 | ✅ + 알림 발송 |
+| 입금 안내 (선생님) | ✅ 수기 기록 | ✅ + 알림 발송 |
 | 입금 기록 (학생/학부모) | ❌ | ✅ 앱에서 입력 |
 | 입금 확인 (선생님) | ✅ 수기 | ✅ 앱에서 확인 |
 | **선생님 확인 상태 표시** | ❌ | ✅ 학생/학부모가 확인 |

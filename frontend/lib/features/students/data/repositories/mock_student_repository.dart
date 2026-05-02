@@ -51,7 +51,8 @@ class MockStudentRepository implements StudentRepository {
         address: '서울시 강남구 역삼동',
         addressDetail: '역삼아파트 101동 1201호',
         district: '강남구 역삼동',
-        notes: '장기 수강생 (2년). 수강권 14개 보유 이력. 콩쿠르 준비 중. '
+        notes:
+            '장기 수강생 (2년). 수강권 14개 보유 이력. 콩쿠르 준비 중. '
             '주 2회 레슨으로 집중 훈련.',
       ),
 
@@ -85,7 +86,8 @@ class MockStudentRepository implements StudentRepository {
         address: '서울시 강남구 개포동',
         addressDetail: '개포주공 3단지 205동',
         district: '강남구 개포동',
-        notes: '신규 수강생 (2개월). 체험 레슨 후 정규 등록. '
+        notes:
+            '신규 수강생 (2개월). 체험 레슨 후 정규 등록. '
             '바이엘 진도 중. 집중력 좋음.',
       ),
 
@@ -115,7 +117,8 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 500)),
         birthDate: DateTime(2008, 11, 3),
         practiceLevel: PracticeLevel.excellent,
-        notes: '고급 학생. 첼로 메인 + 피아노 부전공. '
+        notes:
+            '고급 학생. 첼로 메인 + 피아노 부전공. '
             '음대 입시 준비 중. 90분 레슨.',
       ),
 
@@ -147,7 +150,8 @@ class MockStudentRepository implements StudentRepository {
         postalCode: '06524',
         address: '서울시 서초구 반포동',
         district: '서초구 반포동',
-        notes: '체험 레슨 1회 완료. 학부모와 정규 등록 상담 예정. '
+        notes:
+            '체험 레슨 1회 완료. 학부모와 정규 등록 상담 예정. '
             '30분 체험 레슨 진행.',
       ),
 
@@ -179,7 +183,8 @@ class MockStudentRepository implements StudentRepository {
         birthDate: DateTime(2017, 9, 28),
         manualAgeGroup: AgeGroup.child,
         practiceLevel: PracticeLevel.average,
-        notes: '초등학생 (3학년). 학부모 앱 연결됨. '
+        notes:
+            '초등학생 (3학년). 학부모 앱 연결됨. '
             '스즈키 3권 진행 중. 연습 습관 잘 잡혀 있음.',
       ),
 
@@ -213,7 +218,8 @@ class MockStudentRepository implements StudentRepository {
         breakReason: '중간고사 시험 기간',
         expectedReturnDate: now.add(const Duration(days: 10)),
         practiceLevel: PracticeLevel.onBreak,
-        notes: '시험 기간 단기 휴강 (2주). 3월 중순 복귀 예정. '
+        notes:
+            '시험 기간 단기 휴강 (2주). 3월 중순 복귀 예정. '
             '쇼팽 발라드 진도 중. 수강권 잔여 2회.',
       ),
 
@@ -245,7 +251,8 @@ class MockStudentRepository implements StudentRepository {
         breakReason: '손목 부상 치료',
         expectedReturnDate: now.add(const Duration(days: 45)),
         practiceLevel: PracticeLevel.onBreak,
-        notes: '손목 부상으로 장기 휴강 (2개월). 4월 중순 복귀 예정. '
+        notes:
+            '손목 부상으로 장기 휴강 (2개월). 4월 중순 복귀 예정. '
             '학부모와 주기적 연락 중. 수강권 유효기간 연장 처리 완료.',
       ),
 
@@ -273,7 +280,8 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 850)),
         birthDate: DateTime(2006, 4, 18),
         practiceLevel: PracticeLevel.excellent,
-        notes: '수료 완료 (2년 수강). 음대 합격 후 졸업. '
+        notes:
+            '수료 완료 (2년 수강). 음대 합격 후 졸업. '
             '총 96회 레슨 완료. 우수 수료생.',
       ),
 
@@ -298,7 +306,8 @@ class MockStudentRepository implements StudentRepository {
         connectionStatus: ConnectionStatus.offline,
         birthDate: DateTime(2016, 8, 14),
         practiceLevel: PracticeLevel.poor,
-        notes: '수강권 만료 후 미갱신. 3회 연락 시도했으나 응답 없음. '
+        notes:
+            '수강권 만료 후 미갱신. 3회 연락 시도했으나 응답 없음. '
             '연습 참여율 저조했음. 재등록 가능성 낮음.',
       ),
 
@@ -323,7 +332,8 @@ class MockStudentRepository implements StudentRepository {
         connectionStatus: ConnectionStatus.offline,
         birthDate: DateTime(2011, 6, 30),
         practiceLevel: PracticeLevel.average,
-        notes: '다른 선생님으로 변경 (거리 문제). 총 40회 레슨. '
+        notes:
+            '다른 선생님으로 변경 (거리 문제). 총 40회 레슨. '
             '원만하게 종료. 추후 재등록 가능성 있음.',
       ),
 
@@ -357,11 +367,12 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 440)),
         birthDate: DateTime(2013, 2, 11),
         practiceLevel: PracticeLevel.excellent,
-        notes: '복수 악기 수강생. 월요일 바이올린, 목요일 피아노. '
+        notes:
+            '복수 악기 수강생. 월요일 바이올린, 목요일 피아노. '
             '두 악기 모두 중급 수준. 월 수강료 36만원 (18만 x 2).',
       ),
 
-      // student_12: 미수금 있는 학생
+      // student_12: 입금 확인 대기 수강권이 있는 학생
       Student(
         id: 'student_12',
         name: '박준혁',
@@ -387,7 +398,8 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 115)),
         birthDate: DateTime(2015, 10, 7),
         practiceLevel: PracticeLevel.poor,
-        notes: '미수금 있음 (2개월분 32만원). 학부모에게 납부 안내 2회 발송. '
+        notes:
+            '입금 확인 대기 있음 (2개월분 32만원). 학부모에게 입금 안내 2회 발송. '
             '연습 참여율 저조. 동기부여 방법 논의 필요.',
       ),
     ]);

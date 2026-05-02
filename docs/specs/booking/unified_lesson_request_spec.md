@@ -416,8 +416,10 @@ enum UnifiedRequestStatus {
   timeConfirmed,     // 시간 확정
   proposalSent,      // 수강권 제안 발송됨
   proposalAccepted,  // 수강권 수락됨
-  paymentNotified,   // 학생 입금 확인 완료 알림
-  completed,         // 수강권 발급 완료
+  paymentNotified,   // 학생/학부모가 입금 완료를 알림
+  subscriptionIssued,// 선생님 입금 확인 후 수강권 발급 완료
+  inProgress,        // 레슨 진행 중
+  completed,         // 전체 레슨 완료
   rejected,          // 거절됨
   cancelled,         // 학생 취소
   expired,           // 만료

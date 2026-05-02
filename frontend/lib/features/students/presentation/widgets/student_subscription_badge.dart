@@ -119,10 +119,10 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
     String label;
     IconData? icon;
 
-    // Unpaid takes highest priority
+    // Deposit confirmation pending takes highest priority.
     if (subscription.isUnpaid) {
       textColor = AppColors.paperAccent;
-      label = '미수금';
+      label = '입금대기';
       icon = Icons.warning_amber_rounded;
     } else if (subscription.status == SubscriptionStatus.expired) {
       textColor = AppColors.paperAccent;

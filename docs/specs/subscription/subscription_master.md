@@ -632,8 +632,8 @@ void onPaymentConfirmed(Proposal proposal) {
 | 상태 | 의미 | 구현 위치 |
 |------|------|-----------|
 | `pending` | 제안됨, 학생 확인 대기 | `SubscriptionProposal` |
-| `paymentNotified` | 학생/학부모가 외부 입금 후 앱에서 입금 완료 표시 | `SubscriptionProposal.payment_status` |
-| `confirmed` | 선생님/학원이 실제 입금 확인 후 수강권 발급/확정 | `SubscriptionProposal`, `Subscription` |
+| `paymentNotified` | 학생/학부모가 외부 입금 후 앱에서 입금 완료 표시 | `SubscriptionProposal.status` |
+| `confirmed` | 선생님/학원이 실제 입금 확인 후 수강권 발급/확정 | `SubscriptionProposal.status`, `Subscription.paymentConfirmed` |
 
 이 상태는 결제 API가 아니라 수강권 발급 흐름의 일부다.
 
