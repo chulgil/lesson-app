@@ -9,7 +9,7 @@
 ```
 
 > ⚠️ `docs/requirement/` 는 HISTORICAL (2025-12 기준). 현재 정책은 각 도메인 마스터 참조.
-> ⚠️ `docs/specs/_archive/` 는 사용 금지 (폐기 문서).
+> ⚠️ `docs/specs/_archive/` — 작업 근거로 읽지 말 것. 활성 문서의 (아카이브됨) 링크는 출처 표시일 뿐.
 
 ## 스펙 우선 개발
 

@@ -71,11 +71,12 @@ docs/
     ├── design/notebook/     # Notebook × Score 디자인 시스템 (SSOT)
     ├── lesson/invite/       # 초대/관계 시스템 (정식 경로)
     ├── backend/             # 백엔드 스펙
-    └── _archive/            # ❌ 사용 금지 (폐기된 문서)
+    └── _archive/            # ❌ 작업 근거로 읽지 말 것 (폐기 문서)
 ```
 
 > **SSOT 규칙**: 마스터와 하위 문서 충돌 시 마스터가 우선. 디자인은 `notebook/README.md`가 SSOT.
-> **금지 경로**: `_archive/`, `requirement/requirement.md` (결제 정책 충돌)
+> **`_archive/`**: 작업 근거로 읽지 말 것. 활성 문서의 (아카이브됨) 링크는 출처 표시일 뿐.
+> **`requirement/`**: HISTORICAL (결제 정책 충돌 — 현재 SSOT는 각 도메인 마스터)
 
 ## 사용법
 

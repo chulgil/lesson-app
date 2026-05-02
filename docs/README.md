@@ -49,7 +49,7 @@ docs/
 2. **디자인 시스템** → `specs/design/notebook/README.md`가 최종 기준
 3. **초대/관계** → `specs/lesson/invite/`가 정식 경로
 4. **마스터와 하위 문서 충돌 시** → 마스터가 우선
-5. **`_archive/` 문서** → 참고 금지
+5. **`_archive/` 문서** → 작업 근거로 읽지 말 것. 활성 문서의 (아카이브됨) 링크는 출처 표시일 뿐
 6. **`requirement/`** → HISTORICAL (현재 정책은 각 도메인 마스터 참조)
 
 ---
