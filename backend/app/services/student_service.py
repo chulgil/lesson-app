@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
-from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentUpdate
+from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentSummaryResponse, StudentUpdate
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
@@ -146,6 +146,30 @@ class StudentService:
             practice_streak=0,
             total_practice_minutes=0,
             repertoire_count=0,
+        )
+
+    async def get_summary(self, current_user: Any) -> StudentSummaryResponse:
+        """Return summary statistics for a teacher's students."""
+        from app.models.student import Student
+
+        tid = await resolve_teacher_id(self.db, current_user.id)
+        query = select(Student).where(Student.teacher_id == tid)
+
+        result = await self.db.scalars(query)
+        students = result.all()
+
+        total_count = len(students)
+        active_count = sum(1 for s in students if s.status == "active")
+        by_instrument: dict[str, int] = {}
+        for s in students:
+            instrument = s.instrument or ""
+            if instrument:
+                by_instrument[instrument] = by_instrument.get(instrument, 0) + 1
+
+        return StudentSummaryResponse(
+            total_count=total_count,
+            active_count=active_count,
+            by_instrument=by_instrument,
         )
 
     # ------------------------------------------------------------------

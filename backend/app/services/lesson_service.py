@@ -16,6 +16,7 @@ from app.schemas.lesson import (
     LessonClassUpdate,
     LessonCreate,
     LessonFeedbackUpdate,
+    LessonPieceResponse,
     LessonResponse,
     LessonUpdate,
     MembershipCreate,
@@ -30,6 +31,27 @@ class LessonService:
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    # ------------------------------------------------------------------
+    # Pieces helper
+    # ------------------------------------------------------------------
+
+    async def _load_pieces(self, lesson_id: str) -> list[LessonPieceResponse]:
+        """Load pieces for a lesson."""
+        from app.models.lesson import LessonPiece
+
+        result = await self.db.scalars(
+            select(LessonPiece)
+            .where(LessonPiece.lesson_id == lesson_id)
+            .order_by(LessonPiece.sort_order)
+        )
+        return [LessonPieceResponse.model_validate(p) for p in result.all()]
+
+    async def _build_response(self, lesson: Any) -> LessonResponse:
+        """Build a LessonResponse with pieces loaded."""
+        resp = LessonResponse.model_validate(lesson)
+        resp.pieces = await self._load_pieces(lesson.id)
+        return resp
 
     # ------------------------------------------------------------------
     # Lessons
@@ -68,7 +90,7 @@ class LessonService:
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.order_by(Lesson.date.desc()).offset(offset).limit(size))
-        items = [LessonResponse.model_validate(lesson) for lesson in result.all()]
+        items = [await self._build_response(lesson) for lesson in result.all()]
 
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -97,8 +119,24 @@ class LessonService:
         )
         self.db.add(lesson)
         await self.db.flush()
+
+        if data.pieces:
+            from app.models.lesson import LessonPiece
+
+            for idx, piece in enumerate(data.pieces):
+                self.db.add(
+                    LessonPiece(
+                        lesson_id=lesson.id,
+                        name=piece.name,
+                        composer=piece.composer,
+                        movement=piece.movement,
+                        sort_order=idx,
+                    )
+                )
+            await self.db.flush()
+
         await self.db.refresh(lesson)
-        return LessonResponse.model_validate(lesson)
+        return await self._build_response(lesson)
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:
         """Return a lesson by ID."""
@@ -107,7 +145,7 @@ class LessonService:
         lesson = await self.db.get(Lesson, lesson_id)
         if lesson is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
-        return LessonResponse.model_validate(lesson)
+        return await self._build_response(lesson)
 
     async def update(self, lesson_id: str, data: LessonUpdate, current_user: Any) -> LessonResponse:
         """Update a lesson."""
@@ -120,9 +158,31 @@ class LessonService:
         update_data = data.model_dump(exclude_unset=True, exclude={"pieces"})
         for key, value in update_data.items():
             setattr(lesson, key, value)
+
+        if data.pieces is not None:
+            from app.models.lesson import LessonPiece
+
+            # Delete existing pieces and replace with new ones
+            existing = await self.db.scalars(
+                select(LessonPiece).where(LessonPiece.lesson_id == lesson_id)
+            )
+            for p in existing.all():
+                await self.db.delete(p)
+
+            for idx, piece in enumerate(data.pieces):
+                self.db.add(
+                    LessonPiece(
+                        lesson_id=lesson_id,
+                        name=piece.name,
+                        composer=piece.composer,
+                        movement=piece.movement,
+                        sort_order=idx,
+                    )
+                )
+
         await self.db.flush()
         await self.db.refresh(lesson)
-        return LessonResponse.model_validate(lesson)
+        return await self._build_response(lesson)
 
     async def update_status(self, lesson_id: str, new_status: str, current_user: Any) -> LessonResponse:
         """Change lesson status."""
@@ -134,7 +194,7 @@ class LessonService:
         lesson.status = new_status
         await self.db.flush()
         await self.db.refresh(lesson)
-        return LessonResponse.model_validate(lesson)
+        return await self._build_response(lesson)
 
     async def update_feedback(
         self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any
@@ -152,7 +212,7 @@ class LessonService:
             lesson.practice_tips = data.practice_tips
         await self.db.flush()
         await self.db.refresh(lesson)
-        return LessonResponse.model_validate(lesson)
+        return await self._build_response(lesson)
 
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""
@@ -165,7 +225,7 @@ class LessonService:
             .order_by(Lesson.date)
             .limit(limit)
         )
-        return [LessonResponse.model_validate(lesson) for lesson in result.all()]
+        return [await self._build_response(lesson) for lesson in result.all()]
 
     async def get_recent(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return recently completed lessons."""
@@ -180,7 +240,7 @@ class LessonService:
             .order_by(Lesson.date.desc())
             .limit(limit)
         )
-        return [LessonResponse.model_validate(lesson) for lesson in result.all()]
+        return [await self._build_response(lesson) for lesson in result.all()]
 
     # ------------------------------------------------------------------
     # Lesson classes

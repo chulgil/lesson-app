@@ -109,3 +109,11 @@ class StudentStatsResponse(BaseModel):
     practice_streak: int = 0
     total_practice_minutes: int = 0
     repertoire_count: int = 0
+
+
+class StudentSummaryResponse(BaseModel):
+    """Summary statistics for a teacher's students."""
+
+    total_count: int = 0
+    active_count: int = 0
+    by_instrument: dict[str, int] = {}

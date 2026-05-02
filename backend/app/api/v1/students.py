@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from app.core.deps import get_current_student, get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
-from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentUpdate
+from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentSummaryResponse, StudentUpdate
 from app.services.student_service import StudentService
 
 
@@ -86,6 +86,21 @@ async def create_student(
     """Register a new student under the current teacher."""
     service = StudentService(db)
     return await service.create(body, current_user)
+
+
+@router.get(
+    "/summary",
+    response_model=StudentSummaryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get student summary statistics",
+)
+async def get_student_summary(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentSummaryResponse:
+    """Return summary statistics (total, active, by instrument) for the teacher's students."""
+    service = StudentService(db)
+    return await service.get_summary(current_user)
 
 
 @router.get(
