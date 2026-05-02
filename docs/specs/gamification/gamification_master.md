@@ -61,7 +61,10 @@
 
 → [docs/schema/entities/gamification.md](../../schema/entities/gamification.md)
 
-## 5. 향후 계획
+## 5. 구현 현황
 
-- Phase 2: 리더보드 (선생님 내 학생 랭킹)
-- Phase 3: 도전 과제 (주간/월간 미션)
+| Phase | 범위 | 상태 |
+|-------|------|:----:|
+| **Phase 1** | 포인트/레벨/뱃지 자동 수여 | ✅ 완료 |
+| **Phase 2** | 리더보드 (주간 랭킹) | ✅ 구현 완료 (`weekly_ranking_card.dart`) |
+| **Phase 3** | 도전 과제 (미션) | ✅ 구현 완료 (`challenges_card.dart`) |

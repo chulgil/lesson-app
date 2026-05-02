@@ -442,8 +442,7 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | **Service** | `domain/services/connection_notification_service.dart` | 연결 알림 생성 |
 | **Service** | `domain/services/proposal_notification_service.dart` | 수강권 제안 알림 생성 |
 | **Service** | `domain/services/notification_scheduler_service.dart` | 알림 예약/취소 |
-| **Mock Repository** | `data/repositories/mock_notification_repository.dart` | Mock 데이터 |
-| **Remote Repository** | `data/repositories/remote_notification_repository.dart` | 백엔드 API 연동 |
+| **Remote Repository** | `data/repositories/remote_notification_repository.dart` | 백엔드 API 연동 (Mock 없음 — remote 전용) |
 | **Provider** | `presentation/providers/notification_providers.dart` | 모든 알림 Provider |
 | **Screen** | `presentation/screens/notification_list_screen.dart` | 알림 목록 화면 |
 | **Widget** | `presentation/widgets/notification_bell_icon.dart` | 앱바 알림 벨 아이콘 |

@@ -300,10 +300,10 @@ Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
 | Phase | 범위 | 상태 |
 |-------|------|:----:|
 | **Phase 1 (MVP)** | Follow 엔티티, Repository (Mock/Remote), 기본 Provider | ✅ 완료 |
-| **Phase 2** | FollowButton 위젯, 선생님 프로필/검색에서 팔로우 기능 통합 | 미구현 |
+| **Phase 2** | FollowButton 위젯, 선생님 프로필/검색에서 팔로우 기능 통합 | ⚠️ 부분 |
 | **Phase 3** | FollowListScreen, FollowFeedScreen, FollowCard, 피드 시스템 | ✅ 완료 (2026-03) |
 
-**Phase 2 미구현 사항**: FollowButton 위젯의 선생님 프로필/검색 화면 통합은 선생님 프로필 화면 완성 후 진행
+**Phase 2 상태**: FollowButton 위젯 구현 완료 (`follow_button.dart`). 선생님 프로필/검색 화면 통합은 미완료
 
 ---
 
