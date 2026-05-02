@@ -16,15 +16,13 @@ class RemoteUnifiedLessonRequestRepository
   @override
   Future<UnifiedLessonRequest> create(UnifiedLessonRequest request) async {
     final response = await _apiClient.post(_basePath, data: request.toJson());
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<UnifiedLessonRequest?> getById(String id) async {
     final response = await _apiClient.get('$_basePath/$id');
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -55,7 +53,8 @@ class RemoteUnifiedLessonRequestRepository
 
   @override
   Future<List<UnifiedLessonRequest>> getPendingByTeacherId(
-      String teacherId) async {
+    String teacherId,
+  ) async {
     final response = await _apiClient.get(
       _basePath,
       queryParameters: {'teacher_id': teacherId, 'status': 'pending'},
@@ -73,8 +72,7 @@ class RemoteUnifiedLessonRequestRepository
       '$_basePath/${request.id}',
       data: request.toJson(),
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -83,8 +81,7 @@ class RemoteUnifiedLessonRequestRepository
       '$_basePath/$id/status',
       data: {'status': 'approved'},
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -93,8 +90,7 @@ class RemoteUnifiedLessonRequestRepository
       '$_basePath/$id/status',
       data: {'status': 'pending'},
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -106,8 +102,7 @@ class RemoteUnifiedLessonRequestRepository
         if (reason != null) 'decline_reason': reason,
       },
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -119,18 +114,20 @@ class RemoteUnifiedLessonRequestRepository
     final response = await _apiClient.post(
       '$_basePath/$id/propose-alternatives',
       data: {
-        'slots': slots
-            .map((s) => {
-                  'day_of_week': s.dayOfWeek,
-                  'start_time': s.startTime,
-                  'end_time': s.endTime,
-                })
-            .toList(),
+        'slots':
+            slots
+                .map(
+                  (s) => {
+                    'day_of_week': s.dayOfWeek,
+                    'start_time': s.startTime,
+                    'end_time': s.endTime,
+                  },
+                )
+                .toList(),
         if (message != null) 'message': message,
       },
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -146,8 +143,7 @@ class RemoteUnifiedLessonRequestRepository
         if (message != null) 'message': message,
       },
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -164,13 +160,12 @@ class RemoteUnifiedLessonRequestRepository
             'day_of_week': slot.dayOfWeek,
             'start_time': slot.startTime,
             'end_time': slot.endTime,
-          }
+          },
         ],
         if (message != null) 'message': message,
       },
     );
-    return UnifiedLessonRequest.fromJson(
-        response.data as Map<String, dynamic>);
+    return UnifiedLessonRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override

@@ -158,32 +158,32 @@ enum UnifiedRequestStatus {
   }
 
   bool get isActive => [
-        UnifiedRequestStatus.pending,
-        UnifiedRequestStatus.approved,
-        UnifiedRequestStatus.negotiating,
-        UnifiedRequestStatus.timeConfirmed,
-        UnifiedRequestStatus.proposalSent,
-        UnifiedRequestStatus.proposalAccepted,
-        UnifiedRequestStatus.paymentNotified,
-        UnifiedRequestStatus.subscriptionIssued,
-        UnifiedRequestStatus.inProgress,
-      ].contains(this);
+    UnifiedRequestStatus.pending,
+    UnifiedRequestStatus.approved,
+    UnifiedRequestStatus.negotiating,
+    UnifiedRequestStatus.timeConfirmed,
+    UnifiedRequestStatus.proposalSent,
+    UnifiedRequestStatus.proposalAccepted,
+    UnifiedRequestStatus.paymentNotified,
+    UnifiedRequestStatus.subscriptionIssued,
+    UnifiedRequestStatus.inProgress,
+  ].contains(this);
 
   bool get isTerminal => [
-        UnifiedRequestStatus.completed,
-        UnifiedRequestStatus.rejected,
-        UnifiedRequestStatus.cancelled,
-        UnifiedRequestStatus.expired,
-      ].contains(this);
+    UnifiedRequestStatus.completed,
+    UnifiedRequestStatus.rejected,
+    UnifiedRequestStatus.cancelled,
+    UnifiedRequestStatus.expired,
+  ].contains(this);
 }
 
 /// Lifecycle phase for chapter-based UI.
 enum RequestPhase {
-  request,       // Phase 1: 레슨 신청 → 입금
-  subscription,  // Phase 2: 수강권 발행
-  lessons,       // Phase 3: 레슨 진행
-  completed,     // 전체 완료
-  terminal,      // 거절/취소/만료
+  request, // Phase 1: 레슨 신청 → 입금
+  subscription, // Phase 2: 수강권 발행
+  lessons, // Phase 3: 레슨 진행
+  completed, // 전체 완료
+  terminal, // 거절/취소/만료
 }
 
 /// Who proposed the time slot
@@ -193,7 +193,7 @@ enum ProposerRole {
   student,
 
   @HiveField(1)
-  teacher;
+  teacher,
 }
 
 /// Action type in a time proposal
@@ -209,7 +209,7 @@ enum ProposalAction {
   reject,
 
   @HiveField(3)
-  counterPropose;
+  counterPropose,
 }
 
 /// A time slot option within a proposal
@@ -537,12 +537,10 @@ class UnifiedLessonRequest extends HiveObject {
   }
 
   /// Whether the student is waiting for the teacher to send a proposal.
-  bool get isWaitingForProposal =>
-      status == UnifiedRequestStatus.timeConfirmed;
+  bool get isWaitingForProposal => status == UnifiedRequestStatus.timeConfirmed;
 
   /// Whether a proposal has been received (awaiting student action).
-  bool get isProposalReceived =>
-      status == UnifiedRequestStatus.proposalSent;
+  bool get isProposalReceived => status == UnifiedRequestStatus.proposalSent;
 
   /// Whether payment is pending (accepted but not yet confirmed by teacher).
   bool get isPaymentPending =>
@@ -556,8 +554,7 @@ class UnifiedLessonRequest extends HiveObject {
   bool get isAcademy => academyId != null;
 
   /// Whether the request is expired by date (7 days from creation).
-  bool get isExpiredByDate =>
-      DateTime.now().difference(createdAt).inDays >= 7;
+  bool get isExpiredByDate => DateTime.now().difference(createdAt).inDays >= 7;
 
   /// Last message from the most recent event (for list preview).
   String? get lastMessage => null; // TODO: Populate from RequestEvent list
@@ -599,8 +596,7 @@ class UnifiedLessonRequest extends HiveObject {
     return switch (status) {
       UnifiedRequestStatus.pending ||
       UnifiedRequestStatus.negotiating ||
-      UnifiedRequestStatus.approved =>
-        RequestPhase.request,
+      UnifiedRequestStatus.approved => RequestPhase.request,
       // Phase 2 (Subscription): timeConfirmed → proposal → payment → issue
       UnifiedRequestStatus.timeConfirmed ||
       UnifiedRequestStatus.proposalSent ||
@@ -611,8 +607,7 @@ class UnifiedLessonRequest extends HiveObject {
       UnifiedRequestStatus.completed => RequestPhase.completed,
       UnifiedRequestStatus.rejected ||
       UnifiedRequestStatus.cancelled ||
-      UnifiedRequestStatus.expired =>
-        RequestPhase.terminal,
+      UnifiedRequestStatus.expired => RequestPhase.terminal,
     };
   }
 
@@ -631,14 +626,15 @@ class UnifiedLessonRequest extends HiveObject {
   String get teacherActionLabel {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return AppStrings.actionRequired;        // 확인 필요
+        return AppStrings.actionRequired; // 확인 필요
       case UnifiedRequestStatus.approved:
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
-            ? AppStrings.responseRequired          // 응답 필요
-            : AppStrings.responseWaiting;          // 응답 대기
+            ? AppStrings
+                .responseRequired // 응답 필요
+            : AppStrings.responseWaiting; // 응답 대기
       case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.proposalNeeded;          // 제안 작성
+        return AppStrings.proposalNeeded; // 제안 작성
       case UnifiedRequestStatus.proposalSent:
         return AppStrings.teacherWaitingAccept;
       case UnifiedRequestStatus.proposalAccepted:
@@ -665,20 +661,21 @@ class UnifiedLessonRequest extends HiveObject {
   String get studentActionLabel {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return AppStrings.studentRequestSent;      // 요청 전송됨
+        return AppStrings.studentRequestSent; // 요청 전송됨
       case UnifiedRequestStatus.approved:
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
-            ? AppStrings.studentResponseWaiting    // 선생님 응답 대기
-            : AppStrings.studentResponseRequired;  // 응답 필요
+            ? AppStrings
+                .studentResponseWaiting // 선생님 응답 대기
+            : AppStrings.studentResponseRequired; // 응답 필요
       case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.studentWaitingProposal;  // 수강권 대기
+        return AppStrings.studentWaitingProposal; // 수강권 대기
       case UnifiedRequestStatus.proposalSent:
-        return AppStrings.studentProposalArrived;  // 수강권 도착
+        return AppStrings.studentProposalArrived; // 수강권 도착
       case UnifiedRequestStatus.proposalAccepted:
         return AppStrings.studentPaymentRequired;
       case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.studentPaymentWaiting;   // 입금 확인 중
+        return AppStrings.studentPaymentWaiting; // 입금 확인 중
       case UnifiedRequestStatus.completed:
         return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:

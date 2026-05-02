@@ -54,7 +54,10 @@ void main() {
   group('canTransitionTo', () {
     test('timeConfirmed → proposalSent (유효)', () {
       final request = createRequest(status: UnifiedRequestStatus.timeConfirmed);
-      expect(request.canTransitionTo(UnifiedRequestStatus.proposalSent), isTrue);
+      expect(
+        request.canTransitionTo(UnifiedRequestStatus.proposalSent),
+        isTrue,
+      );
     });
 
     test('timeConfirmed → completed (체험 무료 경로, 유효)', () {
@@ -64,12 +67,20 @@ void main() {
 
     test('proposalSent → proposalAccepted (유효)', () {
       final request = createRequest(status: UnifiedRequestStatus.proposalSent);
-      expect(request.canTransitionTo(UnifiedRequestStatus.proposalAccepted), isTrue);
+      expect(
+        request.canTransitionTo(UnifiedRequestStatus.proposalAccepted),
+        isTrue,
+      );
     });
 
     test('proposalAccepted → paymentNotified (유효)', () {
-      final request = createRequest(status: UnifiedRequestStatus.proposalAccepted);
-      expect(request.canTransitionTo(UnifiedRequestStatus.paymentNotified), isTrue);
+      final request = createRequest(
+        status: UnifiedRequestStatus.proposalAccepted,
+      );
+      expect(
+        request.canTransitionTo(UnifiedRequestStatus.paymentNotified),
+        isTrue,
+      );
     });
 
     test('paymentNotified → subscriptionIssued (입금 확인 후 수강권 발급, 유효)', () {
@@ -85,7 +96,10 @@ void main() {
 
     test('pending → proposalSent (무효 — 시간 확정 건너뜀)', () {
       final request = createRequest(status: UnifiedRequestStatus.pending);
-      expect(request.canTransitionTo(UnifiedRequestStatus.proposalSent), isFalse);
+      expect(
+        request.canTransitionTo(UnifiedRequestStatus.proposalSent),
+        isFalse,
+      );
     });
 
     test('completed → pending (무효 — 터미널에서 되돌리기)', () {
@@ -120,21 +134,29 @@ void main() {
     });
 
     test('isProposalReceived — paymentNotified', () {
-      final request = createRequest(status: UnifiedRequestStatus.paymentNotified);
+      final request = createRequest(
+        status: UnifiedRequestStatus.paymentNotified,
+      );
       expect(request.isProposalReceived, isFalse);
     });
 
     test('isPaymentPending — proposalAccepted or paymentNotified', () {
       expect(
-        createRequest(status: UnifiedRequestStatus.proposalAccepted).isPaymentPending,
+        createRequest(
+          status: UnifiedRequestStatus.proposalAccepted,
+        ).isPaymentPending,
         isTrue,
       );
       expect(
-        createRequest(status: UnifiedRequestStatus.paymentNotified).isPaymentPending,
+        createRequest(
+          status: UnifiedRequestStatus.paymentNotified,
+        ).isPaymentPending,
         isTrue,
       );
       expect(
-        createRequest(status: UnifiedRequestStatus.proposalSent).isPaymentPending,
+        createRequest(
+          status: UnifiedRequestStatus.proposalSent,
+        ).isPaymentPending,
         isFalse,
       );
     });
@@ -236,7 +258,9 @@ void main() {
     });
 
     test('입금완료', () {
-      final request = createRequest(status: UnifiedRequestStatus.paymentNotified);
+      final request = createRequest(
+        status: UnifiedRequestStatus.paymentNotified,
+      );
       expect(request.statusChipLabel, '입금완료');
     });
 

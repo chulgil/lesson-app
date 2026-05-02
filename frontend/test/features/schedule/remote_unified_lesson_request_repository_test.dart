@@ -40,7 +40,10 @@ void main() {
     final events = await repository.getEventsByRequestId('request-001');
 
     expect(requests.single.method, 'GET');
-    expect(requests.single.path, '/schedule/lesson-requests/request-001/events');
+    expect(
+      requests.single.path,
+      '/schedule/lesson-requests/request-001/events',
+    );
     expect(events.single.eventType, RequestEventType.subscriptionIssued);
   });
 
@@ -86,9 +89,14 @@ void main() {
     );
 
     expect(requests.single.method, 'POST');
-    expect(requests.single.path, '/schedule/lesson-requests/request-001/events');
-    expect((requests.single.data as Map<String, dynamic>)['event_type'],
-        'subscriptionIssued');
+    expect(
+      requests.single.path,
+      '/schedule/lesson-requests/request-001/events',
+    );
+    expect(
+      (requests.single.data as Map<String, dynamic>)['event_type'],
+      'subscriptionIssued',
+    );
     expect(event.id, 'event-001');
   });
 }

@@ -40,22 +40,31 @@ void main() {
 
     test('lessonRequest does not contain deprecated terms', () {
       for (final term in deprecatedTerms) {
-        expect(AppStrings.lessonRequest, isNot(contains(term)),
-            reason: 'lessonRequest should not contain "$term"');
+        expect(
+          AppStrings.lessonRequest,
+          isNot(contains(term)),
+          reason: 'lessonRequest should not contain "$term"',
+        );
       }
     });
 
     test('accept does not contain deprecated terms', () {
       for (final term in ['승인', '확인', '거절']) {
-        expect(AppStrings.accept, isNot(contains(term)),
-            reason: 'accept should not contain "$term"');
+        expect(
+          AppStrings.accept,
+          isNot(contains(term)),
+          reason: 'accept should not contain "$term"',
+        );
       }
     });
 
     test('unavailable does not contain deprecated terms', () {
       for (final term in ['거절', '거부', '불가']) {
-        expect(AppStrings.unavailable, isNot(contains(term)),
-            reason: 'unavailable should not contain "$term"');
+        expect(
+          AppStrings.unavailable,
+          isNot(contains(term)),
+          reason: 'unavailable should not contain "$term"',
+        );
       }
     });
 
@@ -159,18 +168,33 @@ void main() {
   });
 
   group('AppStrings - Cross-reference Consistency', () {
-    test('lessonRequestTitle and lessonRequestFormTitle use same base term', () {
-      // Both should reference the same core concept
-      expect(AppStrings.lessonRequestTitle, contains(AppStrings.lessonRequest));
-      expect(AppStrings.lessonRequestFormTitle, contains(AppStrings.lessonRequest));
-    });
+    test(
+      'lessonRequestTitle and lessonRequestFormTitle use same base term',
+      () {
+        // Both should reference the same core concept
+        expect(
+          AppStrings.lessonRequestTitle,
+          contains(AppStrings.lessonRequest),
+        );
+        expect(
+          AppStrings.lessonRequestFormTitle,
+          contains(AppStrings.lessonRequest),
+        );
+      },
+    );
 
     test('requestCompleteTitle references lessonRequest term', () {
-      expect(AppStrings.requestCompleteTitle, contains(AppStrings.lessonRequest));
+      expect(
+        AppStrings.requestCompleteTitle,
+        contains(AppStrings.lessonRequest),
+      );
     });
 
     test('requestCompleteHeader references lessonRequest term', () {
-      expect(AppStrings.requestCompleteHeader, contains(AppStrings.lessonRequest));
+      expect(
+        AppStrings.requestCompleteHeader,
+        contains(AppStrings.lessonRequest),
+      );
     });
   });
 }
