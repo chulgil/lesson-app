@@ -38,10 +38,11 @@
 | `specs/notification/` | `features/notifications/` | 단수↔복수 |
 | `specs/metronome/`, `specs/practice/` (tuner) | `features/practice/` | 메트로놈/튜너는 연습 도메인 하위 |
 | `specs/user/` (auth+invite+review+trial 통합) | `features/auth/`, `features/invite/`, `features/profile/` | 1 스펙 → 다수 도메인 |
-| (마스터 스펙 없음) | `features/gamification/` | practice_master #6에서 언급 |
+| `specs/gamification/` | `features/gamification/` | gamification_master.md |
+| `specs/home/` | `features/home/` | home_master.md |
+| `specs/relationship/` | `features/relationship/` | relationship_master.md |
+| `specs/profile/` | `features/profile/` | profile_master.md |
 | (마스터 스펙 없음) | `features/analytics/` | lesson_master에서 언급 |
-| (마스터 스펙 없음) | `features/home/` | design_master에서 언급 |
-| (마스터 스펙 없음) | `features/relationship/` | follow_master에서 언급 |
 
 ---
 

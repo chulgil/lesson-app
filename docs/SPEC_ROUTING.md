@@ -52,25 +52,29 @@
 
 ---
 
-## 2. 마스터 스펙 SSOT 목록 (13개)
+## 2. 마스터 스펙 SSOT 목록 (17개)
 
 > **규칙**: 마스터와 하위 문서가 충돌하면 마스터가 우선
 
-| # | 도메인 | 마스터 | 라인 | 대상 |
-|---|--------|--------|:----:|------|
-| 1 | 레슨 | `lesson/lesson_master.md` | 1334 | F+B |
-| 2 | 연습 | `practice/practice_master.md` | 1713 | F+B |
-| 3 | 스케줄 | `schedule/schedule_master.md` | 1503 | F+B |
-| 4 | 수강권 | `subscription/subscription_master.md` | 1255 | F+B |
-| 5 | 사용자 | `user/user_master.md` | 1753 | F+B |
-| 6 | 디자인 | `design/notebook/README.md` | 664 | **F** |
-| 7 | 알림 | `notification/notification_master.md` | 516 | B |
-| 8 | 메트로놈 | `metronome/metronome_master.md` | 821 | **F** |
-| 9 | 온보딩 | `onboarding/onboarding_master.md` | 304 | F |
-| 10 | 캘린더 | `calendar/calendar_master.md` | 184 | F |
-| 11 | 학생홈 | `student_home/student_home_master.md` | 355 | F |
-| 12 | 팔로우 | `follow/follow_master.md` | 324 | F+B |
-| 13 | 설정 | `settings/settings_master.md` | 320 | F |
+| # | 도메인 | 마스터 | 대상 |
+|---|--------|--------|------|
+| 1 | 레슨 | `lesson/lesson_master.md` | F+B |
+| 2 | 연습 | `practice/practice_master.md` | F+B |
+| 3 | 스케줄 | `schedule/schedule_master.md` | F+B |
+| 4 | 수강권 | `subscription/subscription_master.md` | F+B |
+| 5 | 사용자 | `user/user_master.md` | F+B |
+| 6 | 디자인 | `design/notebook/README.md` | **F** |
+| 7 | 알림 | `notification/notification_master.md` | B |
+| 8 | 메트로놈 | `metronome/metronome_master.md` | **F** |
+| 9 | 온보딩 | `onboarding/onboarding_master.md` | F |
+| 10 | 캘린더 | `calendar/calendar_master.md` | F |
+| 11 | 학생홈 | `student_home/student_home_master.md` | F |
+| 12 | 팔로우 | `follow/follow_master.md` | F+B |
+| 13 | 설정 | `settings/settings_master.md` | F |
+| 14 | 홈 | `home/home_master.md` | F |
+| 15 | 프로필 | `profile/profile_master.md` | F |
+| 16 | 게이미피케이션 | `gamification/gamification_master.md` | F |
+| 17 | 관계 | `relationship/relationship_master.md` | F+B |
 
 **F** = 프론트엔드, **B** = 백엔드, **F+B** = 양쪽
 

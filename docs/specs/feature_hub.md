@@ -25,6 +25,10 @@
 | 11 | 학생홈 | [student_home_master.md](student_home/student_home_master.md) | 신규 | 코드 역공학 |
 | 12 | 팔로우 | [follow_master.md](follow/follow_master.md) | 신규 | Phase 1,3 완료 / Phase 2 미구현 |
 | 13 | 설정 | [settings_master.md](settings/settings_master.md) | 신규 | 코드 역공학 |
+| 14 | 홈 | [home_master.md](home/home_master.md) | 신규 | 선생님 홈 대시보드 |
+| 15 | 프로필 | [profile_master.md](profile/profile_master.md) | 신규 | 프로필 편집/사진 |
+| 16 | 게이미피케이션 | [gamification_master.md](gamification/gamification_master.md) | 신규 | 포인트/레벨/뱃지 |
+| 17 | 관계 | [relationship_master.md](relationship/relationship_master.md) | 신규 | 선생님-학생 관계 관리 |
 
 ### 기타 루트 문서
 
