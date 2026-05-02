@@ -312,13 +312,13 @@ class DashboardTab extends ConsumerWidget {
         // 로마숫자 카운트 — Notebook × Score 4대 시그니처 (Roman numerals)
         Text(
           lessonCount > 0 ? romanOf(lessonCount - 1) : '—',
-          style: NotebookTypography.roman.copyWith(fontSize: 16),
+          style: NotebookTypography.roman,
         ),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
             'Today\'s Programme',
-            style: NotebookTypography.mastheadLabel.copyWith(fontSize: 13),
+            style: NotebookTypography.sectionTitle,
           ),
         ),
         if (lessonCount > 0)

@@ -131,7 +131,7 @@ class MyBookingsScreen extends ConsumerWidget {
               children: [
                 Text(
                   '$teacherName${instrument != null ? ' · $instrument' : ''}',
-                  style: NotebookTypography.pieceTitle.copyWith(fontSize: 15),
+                  style: NotebookTypography.pieceTitle,
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Row(

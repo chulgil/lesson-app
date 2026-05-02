@@ -267,7 +267,64 @@ Phase 4 수정을 진행한다면:
 
 **권장 진행 순서**: 4a → 4b → 4c (BLOCK 먼저, FLAG 다음, 강화는 선택)
 
-## 9. Notebook × Score 통일성 원칙 (추후 규칙화)
+## 9. 타이포그래피 위계 규칙 — 음악 레슨 관리 도구
+
+> 2026-05-02 추가 — 선생님 홈 "다음 레슨" 폰트 축소 이슈 대응
+
+Notebook × Score는 **콘서트 프로그램이 아니라 음악 레슨 관리 도구**의 디자인 시스템이다. 클래식 음악 문화에 익숙한 선생님·학생이 편안하게 느끼는 시각 언어를 차용했을 뿐, 앱의 정보 위계는 사용자의 **업무 흐름**이 결정한다.
+
+### 9.1 역할별 스캔 우선순위
+
+**선생님이 홈화면에서 가장 먼저 찾는 정보:**
+
+| 순위 | 질문 | 대응 UI 요소 | 토큰 |
+|------|------|-------------|------|
+| 1 | "다음 레슨 몇 시?" | 레슨 카드 시간 | IBM Plex Mono 13px |
+| 2 | "누구 레슨?" | 레슨 카드 학생·악기 | `pieceTitle` 16px |
+| 3 | "급한 건 있나?" | 긴급 알림 존 | `bodyMedium` 14px w600 |
+| 4 | "오늘 몇 개 남았지?" | 통계 카드 | `pieceTitle` 24px override |
+
+**학생이 홈화면에서 가장 먼저 찾는 정보:**
+
+| 순위 | 질문 | 대응 UI 요소 |
+|------|------|-------------|
+| 1 | "다음 레슨 언제?" | 다음 레슨 카드 |
+| 2 | "오늘 연습할 곡은?" | 과제 섹션 |
+| 3 | "선생님 피드백 왔나?" | 최근 피드백 |
+
+### 9.2 위계 매핑 — 업무 흐름 기반
+
+| 기능적 역할 | NotebookTypography 토큰 | 크기 | 근거 |
+|------------|------------------------|------|------|
+| 페이지 식별 | `masthead` | 38px | 어떤 화면인지 한눈에 인식 |
+| 섹션 구분 | `sectionTitle` | 17px | 정보 영역 시작점 |
+| **핵심 정보 (학생·악기)** | **`pieceTitle`** | **16px** | **스캔 2순위 — 축소 금지** |
+| 시간 데이터 | IBM Plex Mono | 13px | 모노스페이스라 작아도 가독성 유지 |
+| 부가 맥락 (곡명 등) | `bodyMedium` | 14px | 핵심 정보의 보충 |
+| 메타 (날짜·카운트) | `mastheadLabel` / `mastheadDate` | 12-13px | 배경 정보 |
+
+### 9.3 금지 패턴
+
+| 패턴 | 이유 | 대안 |
+|------|------|------|
+| `pieceTitle.copyWith(fontSize: 15)` | 스캔 2순위 정보 축소 — 가독성 저하 | `pieceTitle` 기본값(16px) 사용 |
+| `mastheadLabel`을 섹션 헤더로 사용 | 의미적 오용 — mastheadLabel은 부제용 | `sectionTitle`(17px) 사용 |
+| `roman.copyWith(fontSize: ...)` override | 로마숫자 크기 불일치 유발 | `roman` 기본값(14px) 사용 |
+
+### 9.4 검증 grep
+
+```bash
+# pieceTitle 축소 검출 (금지)
+grep -rn "pieceTitle\.copyWith.*fontSize" --include="*.dart" features/
+
+# mastheadLabel의 비-masthead 사용 (의심)
+grep -rn "mastheadLabel" --include="*.dart" features/ | grep -v "masthead\|Programme\|programme"
+
+# roman 크기 override (의심)
+grep -rn "roman\.copyWith.*fontSize" --include="*.dart" features/
+```
+
+## 10. Notebook × Score 통일성 원칙 (추후 규칙화)
 
 이번 Audit 에서 도출된 규칙:
 

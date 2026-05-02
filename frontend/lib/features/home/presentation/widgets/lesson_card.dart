@@ -71,9 +71,7 @@ class LessonCard extends ConsumerWidget {
                     children: [
                       Text(
                         '${lesson.studentName} · ${lesson.instrument}',
-                        style: NotebookTypography.pieceTitle.copyWith(
-                          fontSize: 15,
-                        ),
+                        style: NotebookTypography.pieceTitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -83,7 +81,7 @@ class LessonCard extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
                             lesson.pieces.first.displayName,
-                            style: AppTypography.bodySmall.copyWith(
+                            style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.inkSecondary,
                             ),
                             maxLines: 1,
