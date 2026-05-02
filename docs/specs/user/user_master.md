@@ -1294,7 +1294,7 @@ features/profile/
     ├── career_edit_screen.dart
     ├── instrument_management_screen.dart
     ├── lesson_time_settings_screen.dart
-    └── payment_management_screen.dart
+    └── outstanding_payments_screen.dart
 ```
 
 ### 6.2 선생님 검색/발견

@@ -1058,7 +1058,7 @@ class LessonRequest extends HiveObject {
 | 2026-03-12 | **제안/발급 통합 (Template-First UX v7)**: 섹션 3.1 전면 개편 — Selectable Card UI, 최대 3개 선택, 즉시 발급 옵션 추가, 직접 입력 Fallback |
 | 2026-03-07 | Enum 정의 추가(2.2.2) 후 섹션 넘버링 수정 (2.2.3~2.2.9), 링크 검증 완료 |
 | 2026-03-06 | 마스터 스펙 초판 작성 (9개 문서 통합) |
-| 2026-02-06 | UnpaidPolicy 삭제, paymentConfirmed 기반 단순 미수금 모델 |
+| 2026-02-06 | UnpaidPolicy 삭제, paymentConfirmed 기반 단순 입금 확인 대기 모델 |
 | 2026-02-02 | 레슨 요청 시스템 v4 (복수 선택 제안 기능) |
 | 2026-02-01 | 수강권 제안 v6 (제안 상세 헤더 UI 개선) |
 | 2026-01-30 | 수강권 제안 v5 (앱 전환 플로우, 자동 스케줄 보완) |
