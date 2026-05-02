@@ -99,12 +99,17 @@
 
 ## 4. 코드 위치
 
-| 레이어 | 파일 |
-|--------|------|
-| 엔티티 | `features/profile/domain/entities/` (invite, review, teacher, teacher_profile 등) |
-| Provider | `features/profile/presentation/providers/` (invite, profile, extended_profile) |
-| 화면 | `features/profile/presentation/screens/` (profile_tab, extended_profile 등 12개) |
-| 위젯 (신규) | `features/profile/presentation/widgets/profile_completion_gauge.dart`, `profile_quick_shortcuts.dart` |
+| 레이어 | 파일 | 비고 |
+|--------|------|------|
+| 엔티티 | `features/profile/domain/entities/` (12개: invite, review, teacher, teacher_profile 등) | |
+| Repository 인터페이스 | `features/profile/domain/repositories/` (3개: teacher_profile, teacher, invite) | Mock 구현 포함 |
+| Remote 구현체 | `features/onboarding/data/repositories/remote_teacher_profile_repository.dart` | cross-domain 재사용 |
+| Remote 구현체 | `features/invite/data/repositories/remote_invite_repository.dart` | cross-domain 재사용 |
+| Provider | `features/profile/presentation/providers/` (invite, profile, extended_profile 등 9개) | |
+| 화면 | `features/profile/presentation/screens/` (15개) | |
+| 위젯 | `features/profile/presentation/widgets/` | |
+
+> **구조 참고**: Remote Repository가 `onboarding/`, `invite/` 도메인에 위치하는 것은 cross-domain 재사용 패턴. profile 도메인 내에 별도 data/ 계층을 두지 않는 것은 의도적 설계.
 
 ---
 
