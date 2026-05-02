@@ -61,6 +61,15 @@ class SubscriptionCreate(BaseModel):
     total_lessons: int | None = None
     amount: int | None = None
     start_date: _dt.date | None = None
+    payment_confirmed: bool = True
+    payment_method: str | None = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_current_payment_method(cls, value: str | None) -> str | None:
+        if value == "card":
+            raise ValueError("card/PG payments are not supported for current tuition deposits")
+        return value
 
 
 class SubscriptionUpdate(BaseModel):
@@ -204,7 +213,7 @@ class SubscriptionProposalCreate(BaseModel):
 class ProposalRespondRequest(BaseModel):
     """Student response to a proposal (accept or reject)."""
 
-    action: str  # "accept" | "reject"
+    action: str  # "notify_payment" | "accept" | "reject"
     selected_template_id: str | None = None
     rejection_reason: str | None = None
 

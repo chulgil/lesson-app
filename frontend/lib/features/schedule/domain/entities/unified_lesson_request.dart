@@ -526,7 +526,7 @@ class UnifiedLessonRequest extends HiveObject {
       UnifiedRequestStatus.cancelled,
     },
     UnifiedRequestStatus.paymentNotified: {
-      UnifiedRequestStatus.completed,
+      UnifiedRequestStatus.subscriptionIssued,
       UnifiedRequestStatus.cancelled,
     },
   };

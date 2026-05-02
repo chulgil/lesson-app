@@ -22,6 +22,7 @@ from app.schemas.lesson_request import (
     RequestEventResponse,
     TimeProposalCreate,
 )
+from app.schemas.request_event import RequestEventCreate
 
 
 class LessonRequestService:
@@ -129,6 +130,47 @@ class LessonRequestService:
         """Return a single lesson request."""
         request = await self._get_request_for_user(request_id, current_user)
         return await self._to_response(request)
+
+    async def get_events(self, request_id: str, current_user: Any) -> list[RequestEventResponse]:
+        """Return request events for an accessible lesson request."""
+        await self._get_request_for_user(request_id, current_user)
+        events = await self._get_events(request_id)
+        return [RequestEventResponse.model_validate(event) for event in events]
+
+    async def add_event(
+        self,
+        request_id: str,
+        data: RequestEventCreate,
+        current_user: Any,
+    ) -> RequestEventResponse:
+        """Persist a request event sent by the remote frontend repository."""
+        from app.models.request_event import RequestEvent
+
+        if data.request_id != request_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Event request_id must match path request_id",
+            )
+
+        await self._get_request_for_user(request_id, current_user)
+        event = RequestEvent(
+            request_id=request_id,
+            actor_type=data.actor_type,
+            actor_id=data.actor_id,
+            event_type=data.event_type,
+            suggested_slots=[slot.model_dump() for slot in data.suggested_slots],
+            selected_slot_index=data.selected_slot_index,
+            message=data.message,
+            schedule_change_type=data.schedule_change_type,
+            proposed_day_of_week=data.proposed_day_of_week,
+            proposed_time=data.proposed_time,
+            subscription_id=data.subscription_id,
+            session_number=data.session_number,
+        )
+        self.db.add(event)
+        await self.db.flush()
+        await self.db.refresh(event)
+        return RequestEventResponse.model_validate(event)
 
     async def update(
         self, request_id: str, data: LessonRequestUpdate, current_user: Any
@@ -583,6 +625,9 @@ class LessonRequestService:
             "proposalSent": "proposalSent",
             "proposalAccepted": "proposalAccepted",
             "paymentNotified": "paymentNotified",
+            "paymentConfirmed": "paymentConfirmed",
+            "subscriptionIssued": "subscriptionIssued",
+            "inProgress": "subscriptionIssued",
             "completed": "completed",
             "cancelled": "cancel",
             "expired": "expire",

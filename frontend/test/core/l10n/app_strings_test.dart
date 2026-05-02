@@ -148,6 +148,14 @@ void main() {
       expect(result, contains('5'));
       expect(result, isNotEmpty);
     });
+
+    test('urgentAlertOutstandingFormat uses deposit-only wording', () {
+      final result = AppStrings.urgentAlertOutstandingFormat(50000, 3);
+
+      expect(result, contains('입금'));
+      expect(result, isNot(contains('미수금')));
+      expect(result, isNot(contains('결제')));
+    });
   });
 
   group('AppStrings - Cross-reference Consistency', () {

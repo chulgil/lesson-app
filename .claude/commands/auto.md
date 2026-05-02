@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*), Bash(flutter:*), Bash(dart:*), Bash(dart run build_runner:*), Bash(pod:*), Bash(gh:*), Bash(make:*), Bash(python3:*), Read, Write, Edit, Glob, Grep, Task
+allowed-tools: Bash(git:*), Bash(npm:*), Bash(pnpm:*), Bash(npx:*), Bash(go:*), Bash(cargo:*), Bash(make:*), Bash(python:*), Read, Write, Edit, Glob, Grep, Task
 description: 계획부터 PR까지 원버튼 자동 실행. 중간에 멈추지 않습니다.
 argument-hint: [작업 설명] [--mode feature|bugfix|refactor]
 ---
@@ -162,6 +162,39 @@ ultrawork 모드를 사용하여 중간에 멈추지 않는다.
 
 ======================================================================
 ```
+
+---
+
+## 5단계: 교훈 수집 (OH 패턴)
+
+파이프라인 완료 후, 에러 또는 재시도가 발생했던 경우에만 교훈을 수집한다.
+
+### 트리거 조건
+
+다음 중 하나라도 해당되면 교훈 수집을 실행:
+- handoff-verify에서 1회 이상 실패 후 재시도
+- code-review에서 HIGH 이상 이슈 발견
+- TDD 사이클에서 GREEN 도달까지 3회 이상 시도
+- 사용자가 중간에 방향 수정 요청
+
+### 수집 내용
+
+```
+## 교훈 (자동 수집)
+- **문제**: [무엇이 잘못되었는가]
+- **원인**: [왜 발생했는가]
+- **개선 방향**:
+  - [ ] rules/ 업데이트 필요 → 어떤 규칙?
+  - [ ] 스킬 추출 필요 → 어떤 반복 패턴?
+  - [ ] 훅 추가 필요 → 어떤 자동화?
+  - [ ] 개선 불필요 (일회성 문제)
+```
+
+### 행동
+
+- 교훈이 rules/ 업데이트를 필요로 하면 해당 파일 수정을 제안 (자동 수정하지 않음)
+- 교훈이 스킬 추출을 필요로 하면 `/learn` 스킬 실행을 제안
+- 트리거 조건에 해당하지 않으면 이 단계를 건너뛴다
 
 ---
 

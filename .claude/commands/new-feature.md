@@ -1,45 +1,34 @@
-# New Feature
+---
+description: 새 feature 를 7-phase 워크플로우로 시작. Phase 1 인터뷰부터 진입.
+---
 
-$ARGUMENTS 기능을 Feature-First Clean Architecture로 구현하기 위한 스펙을 작성해줘.
+# /new-feature
 
-## 절차
+## 용도
 
-### 1단계: 기존 코드 분석
-- `frontend/lib/features/` 아래 기존 구조 확인
-- 유사한 기능이 이미 있는지 확인
-- 재사용 가능한 공통 위젯 (`core/widgets/`) 확인
+Brand-new feature 를 처음부터 끝까지 하네스 프로토콜로 진행합니다.
 
-### 2단계: 스펙 문서 작성 (코드 작성 금지)
-`docs/specs/[domain]/` 에 스펙 문서를 작성:
+## 흐름
 
-```markdown
-# [기능명] 스펙
+1. 사용자에게 **feature 이름** 을 물음 (slug 형태: `lesson-booking`)
+2. 오늘 날짜 + feature-slug 로 파일 경로 계산
+3. **Phase 1 (cg-interview)** 을 스킬로 호출
+   - `.harness/interview/{YYYY-MM-DD}-{feature-slug}.md` 생성
+4. 사용자 승인 후 **Phase 2 (cg-spec-and-harness)** 진행
+5. 이후 Phase 3 → 6 까지 순차 실행, 각 phase 경계에서 `/compact` 제안
 
-## 개요
-## 상세 동작 (플로우/조건/예외)
-## UI 구조
-## 관련 엔티티 / Provider
-## 수락 기준
-## 엣지 케이스
+## 스킵 조건
+
+- 사용자가 "간단한 fix 야" 라고 명시 → Phase 2 (스펙 lite) 만 만들고 Phase 5 직행 허용
+- docs only 변경 → 전체 스킵
+
+## 체크포인트
+
+각 phase 완료 시 아래를 확인하고 사용자에게 명시적 승인 요청:
+
 ```
-
-### 3단계: 사용자 승인 대기
-스펙을 사용자에게 보여주고 승인을 받을 것.
-**승인 없이 코드를 작성하지 마.**
-
-### 4단계: 구현 (승인 후)
+[Phase N 완료]
+- 산출물: {path}
+- 다음 Phase: {next}
+- 계속 진행하시겠습니까? (y/수정/중단)
 ```
-frontend/lib/features/[domain]/
-├── domain/entities/        # 엔티티
-├── data/repositories/      # Mock Repository
-└── presentation/
-    ├── screens/            # 화면
-    ├── widgets/            # 위젯
-    └── providers/          # @riverpod Provider
-```
-
-### 5단계: 검증
-- `flutter analyze` 경고 없음
-- `dart run build_runner build --delete-conflicting-outputs` 성공
-- Mock Repository에 테스트 데이터 존재
-- 관련 스펙 문서 업데이트 완료

@@ -267,6 +267,60 @@ async def test_unified_lesson_request_actions_endpoint_records_events(
 
 
 @pytest.mark.asyncio
+async def test_lesson_request_events_endpoint_persists_remote_repository_events(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="event-teacher", role="teacher", name="이벤트 선생님")
+    await create_test_user(
+        user_id="event-student",
+        role="student",
+        name="이벤트 학생",
+        email="event-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("event-student", "student"),
+        json={
+            "teacher_id": "event-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    post_response = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("event-teacher", "teacher"),
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "event-teacher",
+            "event_type": "subscriptionIssued",
+            "message": "입금 확인 후 수강권을 발급했습니다.",
+            "subscription_id": "subscription-001",
+        },
+    )
+    assert post_response.status_code == 201
+    assert post_response.json()["event_type"] == "subscriptionIssued"
+
+    get_response = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("event-teacher", "teacher"),
+    )
+    assert get_response.status_code == 200
+    assert [event["event_type"] for event in get_response.json()] == [
+        "initialRequest",
+        "subscriptionIssued",
+    ]
+
+
+@pytest.mark.asyncio
 async def test_lesson_request_accepts_frontend_spec_keys_and_camel_case_actions(
     client: AsyncClient,
     create_test_user,

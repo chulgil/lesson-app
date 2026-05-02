@@ -90,6 +90,8 @@ class SubscriptionService:
             total_lessons=data.total_lessons,
             amount=data.amount or 0,
             start_date=data.start_date,
+            payment_confirmed=data.payment_confirmed,
+            payment_method=data.payment_method,
         )
         self.db.add(sub)
         await self.db.flush()
@@ -364,7 +366,7 @@ class SubscriptionService:
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
-        if data.action == "accept":
+        if data.action in ("notify_payment", "accept"):
             proposal.status = "paymentNotified"
             proposal.payment_notified_at = datetime.now(timezone.utc)
             proposal.selected_template_id = data.selected_template_id

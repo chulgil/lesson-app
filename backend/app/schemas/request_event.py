@@ -55,4 +55,4 @@ class RequestEventResponse(BaseModel):
     subscription_id: str | None = None
     session_number: int | None = None
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None = None

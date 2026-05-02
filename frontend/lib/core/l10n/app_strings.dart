@@ -4902,8 +4902,8 @@ class AppStrings {
   static const profileTabLabel = '프로필';
 
   // ── Urgent Alert Zone (홈 긴급 메모 스트립 5-3d-7) ──────────────────────
-  /// 미수금 alert 텍스트 — 만원/원 단위 자동 선택 + 학생 수.
-  /// 예: '미수금 5만원 (3명)' / '미수금 5000원 (1명)'
+  /// 입금 확인 대기 alert 텍스트 — 만원/원 단위 자동 선택 + 학생 수.
+  /// 예: '입금 확인 대기 5만원 (3명)' / '입금 확인 대기 5000원 (1명)'
   static String urgentAlertOutstandingFormat(
     int totalAmount,
     int studentCount,
@@ -4912,7 +4912,7 @@ class AppStrings {
         totalAmount >= 10000
             ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
             : '$totalAmount원';
-    return '미수금 $formattedAmount ($studentCount명)';
+    return '입금 확인 대기 $formattedAmount ($studentCount명)';
   }
 
   /// 접기 — expand toggle 축소 라벨.

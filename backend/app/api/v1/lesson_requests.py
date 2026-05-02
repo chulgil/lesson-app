@@ -20,6 +20,7 @@ from app.schemas.lesson_request import (
     LessonRequestUpdate,
     TimeProposalCreate,
 )
+from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.services.lesson_request_service import LessonRequestService
 
 router = APIRouter()
@@ -113,6 +114,39 @@ async def get_lesson_request(
     """Return a single lesson request by ID."""
     service = LessonRequestService(db)
     return await service.get_by_id(request_id, current_user)
+
+
+@router.get(
+    "/{request_id}/events",
+    response_model=list[RequestEventResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List lesson request events",
+)
+async def list_lesson_request_events(
+    request_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[RequestEventResponse]:
+    """Return request events sorted by creation time."""
+    service = LessonRequestService(db)
+    return await service.get_events(request_id, current_user)
+
+
+@router.post(
+    "/{request_id}/events",
+    response_model=RequestEventResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add lesson request event",
+)
+async def add_lesson_request_event(
+    request_id: str,
+    body: RequestEventCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RequestEventResponse:
+    """Persist an event from the remote lesson request repository."""
+    service = LessonRequestService(db)
+    return await service.add_event(request_id, body, current_user)
 
 
 @router.put(

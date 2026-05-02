@@ -131,3 +131,14 @@ async def test_request_event_15_columns_layout(db_session: AsyncSession) -> None
         "updated_at",  # TimestampMixin (백엔드 표준)
     }
     assert columns == expected, f"컬럼 불일치: 기대 {expected}, 실제 {columns}"
+
+
+def test_lesson_request_status_to_event_mapping_uses_phase2_events() -> None:
+    """Backend status history must preserve Phase 2 deposit/subscription events."""
+    from app.services.lesson_request_service import LessonRequestService
+
+    service = LessonRequestService(db=None)  # type: ignore[arg-type]
+
+    assert service._event_type_for_status("paymentNotified") == "paymentNotified"
+    assert service._event_type_for_status("paymentConfirmed") == "paymentConfirmed"
+    assert service._event_type_for_status("subscriptionIssued") == "subscriptionIssued"

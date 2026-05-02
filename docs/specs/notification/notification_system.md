@@ -131,7 +131,7 @@ String buildNotificationBody(
 ├── 연습 리마인더
 ├── 스트릭 위험 경고
 ├── 취소/변경 긴급 알림
-└── 결제 관련 알림
+└── 입금 상태 알림
 
 인앱 알림 (알림센터)
 ├── 모든 푸시 알림 기록
@@ -205,17 +205,17 @@ String buildNotificationBody(
 | `PRACTICE_ASSIGNED` | 연습 과제 등록 | 학생 | 등록 시 | ✓ | ✓ |
 | `WEEKLY_GOAL_ACHIEVED` | 주간 목표 달성 | 학생 | 달성 시 | ✓ | ✓ |
 
-### 3. 결제 관련 알림
+### 3. 입금 상태 알림
 
 | 알림 ID | 유형 | 수신자 | 타이밍 | 푸시 | 인앱 |
 |---------|------|--------|--------|------|------|
 | `PAYMENT_REQUESTED` | 입금 안내 | 학생 | 요청 시 | ✓ | ✓ |
-| `PAYMENT_REMINDER` | 결제 독촉 | 학생 | D-3, D-1 | ✓ | ✓ |
-| `PAYMENT_RECEIVED` | 입금 확인 | 선생님 | 입금 시 | ✓ | ✓ |
+| `PAYMENT_REMINDER` | 입금 확인 대기 알림 | 학생 | D-3, D-1 | ✓ | ✓ |
+| `PAYMENT_RECEIVED` | 입금 완료 알림 | 선생님 | 학생/학부모 알림 시 | ✓ | ✓ |
 | `PAYMENT_CONFIRMED` | 입금 확인 완료 | 학생 | 확인 후 | ✓ | ✓ |
 | `LESSONS_RUNNING_LOW` | 레슨 소진 예정 | 학생 | 잔여 1회 | ✓ | ✓ |
 | `MONTHLY_SCHEDULE_CREATED` | 🆕 월정액 스케줄 생성 | 학생 | 월초/입금 예정일 | ✓ | ✓ |
-| `MONTHLY_PAYMENT_PENDING` | 🆕 월정액 결제 대기 | 선생님 | 스케줄 생성 시 | ✗ | ✓ |
+| `MONTHLY_PAYMENT_PENDING` | 🆕 월정액 입금 확인 대기 | 선생님 | 스케줄 생성 시 | ✗ | ✓ |
 
 ### 3-1. 수강권 관련 알림 (🆕)
 
@@ -496,7 +496,7 @@ bool shouldSendNotification(
 │                                     │
 │  입금 상태 알림                           │
 │  ┌─────────────────────────────────┐│
-│  │ 결제 리마인더              [ON] ││
+│  │ 입금 확인 대기 알림        [ON] ││
 │  │ 레슨 소진 알림             [ON] ││
 │  └─────────────────────────────────┘│
 │                                     │
@@ -819,7 +819,7 @@ context.push(AppRoutes.notifications);
 ### Phase 2
 
 1. 스트릭 위험 알림
-2. 결제 관련 알림
+2. 입금 상태 알림
 3. 알림 설정 화면 (학생/선생님)
 4. 방해금지 시간대
 

@@ -108,6 +108,11 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     payment_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    @property
+    def payment_status(self) -> str:
+        """Current tuition deposit status for API responses."""
+        return "completed" if self.payment_confirmed else "pending"
+
     # Discount
     discount_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
     discount_reason: Mapped[str | None] = mapped_column(Text, nullable=True)

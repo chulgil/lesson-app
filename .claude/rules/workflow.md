@@ -1,47 +1,44 @@
-# 작업 워크플로우 — 개발 순서와 체크리스트
+# Workflow Rules
 
-## 작업 시작 전
+> 이 규칙은 매 세션 자동 로딩되어 워크플로우를 강제합니다.
+
+## 7-Phase 기본 흐름
+
+모든 비자명한 작업(3파일 이상 변경 or 새 feature)은 다음 순서를 따릅니다:
 
 ```
-1. docs/SPEC_ROUTING.md  → 작업 유형별 필수/보조/금지 문서 확인
-2. docs/specs/[domain]/[domain]_master.md  → 해당 도메인 마스터 (SSOT)
-3. docs/architecture.md  → 구조 파악 (필요 시)
+Phase 0: cg-brownfield-scan   (기존 코드 스캔, 처음 1회만)
+Phase 1: cg-interview          (요구사항 인터뷰)
+Phase 2: cg-spec-and-harness   (공식 스펙 작성)
+Phase 3: cg-visuals            (Mermaid 다이어그램)
+Phase 4: cg-decomposition      (DAG 분해)
+Phase 5: cg-execution-loop     (구현 루프)
+Phase 6: cg-evaluation         (3-critic 평가)
 ```
 
-> ⚠️ `docs/requirement/` 는 HISTORICAL (2025-12 기준). 현재 정책은 각 도메인 마스터 참조.
-> ⚠️ `docs/specs/_archive/` — 작업 근거로 읽지 말 것. 활성 문서의 (아카이브됨) 링크는 출처 표시일 뿐.
+각 phase 의 상세는 `.claude/skills/<phase>/SKILL.md` 참조.
 
-## 스펙 우선 개발
+## 예외 (간단한 작업)
 
-> ⚠️ **필수**: 요구사항 → 스펙 문서 → 사용자 승인 → 코드 구현
+다음은 phase 전체를 건너뛸 수 있습니다:
+- 오탈자 / docs 수정
+- 1-2 파일 버그 수정
+- 의존성 업데이트
 
-| 상황 | Claude 행동 |
-|------|------------|
-| 새 기능 | `docs/specs/[domain]/`에 스펙 작성 → 사용자 확인 → 구현 |
-| 기존 수정 | 기존 스펙 확인 → 변경 반영 → 사용자 확인 → 구현 |
-| 버그 수정 | 스펙과 동작 비교 → 코드 수정 |
+단, `.harness/current.md` 의 품질 계약은 여전히 준수해야 합니다.
 
-## 새 코드 작성 위치
+## 문서 우선 (Spec First)
 
-| 항목 | 위치 |
-|------|------|
-| 엔티티 | `features/[domain]/domain/entities/` |
-| Provider | `features/[domain]/presentation/providers/` (@riverpod) |
-| 화면/위젯 | `features/[domain]/presentation/screens/`, `widgets/` |
-| 라우트 | `core/router/routes/` + `app_routes.dart` 상수 |
+**코드보다 스펙이 먼저 존재해야 합니다.** Phase 2 완료 없이 Phase 5 를 시작하지 마세요.
 
-## 작업 완료 체크리스트
+## 역피드백 (Feedback Loop)
 
-1. [ ] `flutter analyze` 경고 없음
-2. [ ] `build_runner build` 코드 생성
-3. [ ] Mock Repository 테스트 데이터 확인
-4. [ ] `docs/specs/` 문서 업데이트 — 매핑 규칙: [doc-sync.md](doc-sync.md)
-5. [ ] 커밋 메시지 한글 (Conventional Commits)
+- Phase 6 의 critic 이 FAIL 하면 Phase 5 로 복귀
+- 스펙이 잘못된 걸 발견하면 Phase 2 로 복귀 (단방향 아님)
+- Lore: 결정을 바꾸면 커밋 메시지 trailer 에 `Lore-directive:` 로 기록
 
-## 문서 동기화 (이중 안전장치)
+## 컨텍스트 관리
 
-> CH03 패턴: 코드 변경 = 문서 변경. 프롬프트(규칙) + 훅(알림)으로 동기화율 강제.
-
-- 코드 편집 시 `check-doc-sync.sh` 훅이 stderr로 관련 스펙 경로를 안내한다
-- 경고가 뜨면 **같은 편집 세션에서** 해당 스펙 문서도 업데이트한다
-- 매핑 테이블: [doc-sync.md](doc-sync.md)
+- 작업의 자연스러운 경계(phase 전환)에서 `/compact` 허용
+- 컨텍스트 50% 초과 시 새 세션 시작 고려
+- 중요 결정은 `.harness/spec/` 또는 `.harness/knowledge/` 에 저장 (메모리 아님)

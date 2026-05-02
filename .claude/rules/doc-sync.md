@@ -1,64 +1,66 @@
-# 문서 동기화 규칙 — 코드 변경 = 문서 변경
+# Doc Sync — Spec ↔ Code 동기화
 
-> 출처: CH03 "문서화 자동화 & 팀 단위 AI 코딩 에이전트 운영 규칙"
-> 이중 안전장치: **프롬프트(이 규칙) + 훅(check-doc-sync.sh)** 으로 문서 동기화율 강제.
-> 원칙: 코드를 바꿀 때 반드시 관련 스펙 문서를 같은 커밋에서 함께 업데이트.
+> 핵심 원칙: **코드 변경은 스펙 변경을 수반한다. 스펙 없이 머지 금지.**
 
-## 매핑 (CRITICAL)
+## 동기화 대상
 
-| 코드 변경 경로 | 업데이트할 문서 |
-|----------------|-----------------|
-| `frontend/lib/features/lessons/**` | `docs/specs/lesson/` |
-| `frontend/lib/features/students/**` | `docs/specs/student/` |
-| `frontend/lib/features/notifications/**` | `docs/specs/notification/` |
-| `frontend/lib/features/<domain>/**` (나머지 1:1) | `docs/specs/<domain>/` |
-| `frontend/lib/core/audio/*metronome*` | `docs/specs/metronome/` |
-| `frontend/lib/core/audio/*recording*` | `docs/specs/recording/` |
-| `frontend/lib/core/audio/*tuner*` | `docs/specs/tuner/` |
-| `frontend/lib/core/router/**` | `docs/architecture.md` |
-| `frontend/ios/Runner/Metronome*` | `docs/specs/metronome/` |
-| `backend/**/routes|routers|endpoints|api/**` | `docs/specs/backend/` (API 섹션) |
-| `backend/**/models|schemas|migration*` | `docs/specs/backend/` (데이터 섹션) |
-
-복수→단수 변환 (`lessons`→`lesson`, `students`→`student`, `notifications`→`notification`)에 주의.
-
-## 동작 흐름
-
-```
-1. 코드 파일 편집
-2. PostToolUse 훅(check-doc-sync.sh)이 경로 매칭 검사
-3. 매칭되는 스펙 폴더가 실제 존재하면 stderr로 알림 출력
-4. Claude는 이 알림을 보고 관련 스펙 문서도 함께 편집
-5. 코드 + 문서 하나의 커밋으로 동시 반영
-```
-
-## Claude 행동 지침
-
-| 상황 | 행동 |
+| 소스 | 타겟 |
 |------|------|
-| 훅이 경로를 알려줌 | 해당 스펙 폴더의 관련 .md 파일을 읽고, 변경이 필요한 부분 업데이트 |
-| 스펙 폴더는 있지만 관련 .md가 없음 | 새 스펙 파일을 추가하거나, 기존 index 문서에 섹션 추가 |
-| 스펙 폴더 자체가 없음 | 신규 도메인이므로 `docs/specs/<domain>/overview.md` 생성 검토 |
-| 간단한 버그 수정이라 스펙 영향 없음 | 커밋 본문에 `docs: 스펙 변경 없음 (동작 유지)` 명시 |
+| 새 API 엔드포인트 | `.harness/spec/{...}.md` §4 인터페이스 |
+| DB 스키마 변경 | `.harness/spec/{...}.md` §4 스키마 + 마이그레이션 노트 |
+| UI 컴포넌트 추가 | `.harness/visuals/{feature}/` |
+| 아키텍처 결정 | 커밋 trailer `Lore-directive:` |
+| 거절된 대안 | 커밋 trailer `Lore-rejected:` |
 
-## 절대 하지 말 것
-
-- 훅 경고를 무시하고 코드만 커밋
-- 스펙과 다른 동작을 구현하면서 스펙을 고치지 않음
-- "나중에 문서 업데이트" 라고 남기기 — CH03에서 지적한 팀의 가장 오래된 거짓말
-
-## 커밋 메시지 예시
+## 워크플로우
 
 ```
-feat(lesson): 레슨 취소 시 수강권 복원 로직 추가
-
-- frontend/lib/features/lessons/ 비즈니스 로직 변경
-- docs/specs/lesson/cancel_policy.md 정책 업데이트
+1. 스펙을 먼저 수정 (Phase 2)
+2. 다이어그램 동기화 (Phase 3)
+3. DAG 재계산 (Phase 4, 영향 받는 job 만)
+4. 구현 (Phase 5)
+5. 평가 (Phase 6)
 ```
 
-## 매핑 확장
+**역순은 금지**: "코드부터 짜고 스펙은 나중에" = 의도가 구현에 오염됨.
 
-새 도메인/모듈이 추가되면 두 곳을 모두 업데이트한다.
+## 체크 시점
 
-1. 이 파일의 매핑 테이블
-2. `.claude/hooks/check-doc-sync.sh` 의 경로 매칭 블록
+| 시점 | 체크 |
+|------|------|
+| PR 생성 시 | 스펙 파일이 diff 에 포함되었는가? |
+| 커밋 전 | 스펙의 §2 성공 기준과 구현이 일치하는가? |
+| Phase 6 | Code Critic 이 "스펙의 모든 기준이 구현" 확인 |
+
+## Drift 감지
+
+다음은 "docs drift" 신호:
+- 코드에는 있지만 스펙에 없는 엔드포인트
+- 스펙에는 있지만 테스트에 없는 성공 기준
+- 커밋 메시지에 "WIP", "TODO" 가 머지됨
+
+발견 시 즉시 수정. 방치하면 하네스가 무너집니다.
+
+## 예외
+
+- 내부 리팩토링 (외부 동작 불변) → 스펙 변경 불필요, 커밋 메시지로만 기록
+- 성능 튜닝 → §5 비기능 요구사항의 측정값만 갱신
+
+## 상위 규칙과의 관계
+
+doc-sync 는 스펙/문서 동기화만 담당한다. 품질·검증·커밋 관련은 각각 분리된 규칙을 따른다:
+
+| 관심사 | 규칙 파일 |
+|---|---|
+| 코딩 원칙 (12개) | [golden-principles.md](golden-principles.md) |
+| 증거 기반 완료, Red-Green 검증 | [verification.md](verification.md) |
+| 4-기준 자가평가 (Phase 6) | [rubric-evaluation.md](rubric-evaluation.md) |
+| 서브에이전트 결과 포맷 (200단어) | [subagent-output.md](subagent-output.md) |
+| git trailer 결정 기록 | [lore-commit.md](lore-commit.md) |
+| Immutability, 파일 크기, 에러 처리 | [coding-style.md](coding-style.md) |
+| 상호작용 (가정 명시, 결론 우선, 분석) | [interaction.md](interaction.md) |
+| 보안 체크리스트, 시크릿 관리 | [security.md](security.md) |
+| 2단계 스킬 로딩 (토큰 절약) | [skill-loading.md](skill-loading.md) |
+| 날짜/시간 계산 (LLM 산술 금지) | [date-calculation.md](date-calculation.md) |
+
+`Lore-directive:` 트레일러로 기록된 아키텍처 결정은 doc-sync 의 "아키텍처 결정" 항목과 일대일 대응된다.

@@ -6,7 +6,7 @@
 
 ## 1. 개요
 
-레슨 앱의 알림 시스템. 레슨, 연습, 결제, 관계, 수강권 등 앱 전반의 이벤트를 사용자에게 전달한다.
+레슨 앱의 알림 시스템. 레슨, 연습, 입금 상태, 관계, 수강권 등 앱 전반의 이벤트를 사용자에게 전달한다.
 
 도서관의 게시판(인앱)과 문자(푸시)를 함께 운영하는 것과 같다. 중요한 소식은 문자로 즉시 보내고, 모든 소식은 게시판에 기록한다.
 
@@ -149,9 +149,9 @@
 | `lessonCompleted` | 레슨 종료 시 | 레슨 완료 | "김민수 바이올린 레슨이 완료되었습니다" | check_circle | `/lessons/{id}` |
 | `lessonNoteShared` | 선생님 레슨 노트 작성 시 | 레슨 노트 | "선생님이 레슨 노트를 공유했습니다" | note | `/lessons/{id}/note` |
 | `lessonsRunningLow` | 수강권 잔여 횟수 ≤ 2 | 수강권 임박 | "김민수 수강권 1회 남음" | warning | `/subscriptions/{id}` |
-| `paymentRequested` | 수강권 발급 후 미입금 | 입금 안내 | "김민수 수강권 입금을 확인해주세요" | payment | `/subscriptions/{id}` |
-| `paymentReminder` | 발급 후 3일 미입금 | 입금 확인 대기 알림 | "김민수 수강권 입금대기" | payment | `/subscriptions/{id}` |
-| `paymentReceived` | 입금 확인 시 | 입금 확인 | "김민수 수강권 입금이 확인되었습니다" | payment | `/subscriptions/{id}` |
+| `paymentRequested` | 수강권 입금 안내 발송 | 입금 안내 | "김민수 수강권 입금 안내가 도착했습니다" | payment | `/subscriptions/{id}` |
+| `paymentReminder` | 입금 확인 대기 지속 | 입금 확인 대기 알림 | "김민수 수강권 입금 확인 대기 중" | payment | `/subscriptions/{id}` |
+| `paymentReceived` | 학생/학부모 입금 완료 알림 | 입금 완료 알림 | "김민수님이 입금 완료를 알렸습니다" | payment | `/subscriptions/{id}` |
 | `streakMilestone` | 연속 N일 달성 | 연습 축하 | "7일 연속 연습!" | celebration | `/practice/stats` |
 | `streakWarning` | 연속 기록 위기 (당일 미연습) | 스트릭 경고 | "연속 연습 기록이 끊어질 수 있어요" | warning | `/practice` |
 | `practiceReminder` | 설정된 연습 리마인더 시간 | 연습 알림 | "오늘의 연습 목표를 달성해보세요" | music_note | `/practice` |
@@ -175,7 +175,7 @@
 | 레벨 | 용도 | 아이콘 배경색 |
 |------|------|-------------|
 | `urgent` | 레슨 시작, 노쇼 | error (빨간) |
-| `high` | 결제, 취소, 연결 | secondary (오렌지) |
+| `high` | 입금 상태, 취소, 연결 | secondary (오렌지) |
 | `normal` | 리마인더 | primary (보라) |
 | `low` | 성과, 보고서 | secondary (회색) |
 
@@ -311,7 +311,7 @@ StudentNotificationSettings
 ├── practiceReminderTime: TimeOfDay      // 연습 리마인더 시간 (기본 19:00)
 ├── streakWarningEnabled: bool           // 스트릭 경고 (기본 true)
 ├── streakWarningTime: TimeOfDay         // 스트릭 경고 시간 (기본 21:00)
-├── paymentReminderEnabled: bool         // 결제 리마인더 (기본 true)
+├── paymentReminderEnabled: bool         // 입금 확인 대기 알림 (기본 true)
 ├── dndEnabled: bool                     // 방해금지 (기본 true)
 ├── dndStart: TimeOfDay                  // DND 시작 (기본 22:00)
 ├── dndEnd: TimeOfDay                    // DND 종료 (기본 08:00)
@@ -326,7 +326,7 @@ TeacherNotificationSettings
 ├── lessonReminderTimes: List<Duration>  // 리마인더 시간 (기본 24시간 전)
 ├── newStudentAlert: bool                // 새 학생 (기본 true)
 ├── trialBookingAlert: bool              // 체험레슨 요청 (기본 true)
-├── paymentReceivedAlert: bool           // 입금 확인 (기본 true)
+├── paymentReceivedAlert: bool           // 입금 완료 알림 (기본 true)
 ├── studentPracticeReport: bool          // 학생 연습 현황 (기본 false)
 ├── reviewReceivedAlert: bool            // 리뷰 알림 (기본 true)
 ├── dndEnabled: bool                     // 방해금지 (기본 true)
