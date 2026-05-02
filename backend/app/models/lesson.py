@@ -104,6 +104,7 @@ class ClassMembership(UUIDMixin, TimestampMixin, Base):
     lesson_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     lesson_duration: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    travel_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     __table_args__ = (
         Index("idx_membership_class", "lesson_class_id"),
