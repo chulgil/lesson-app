@@ -31,7 +31,7 @@
 | `successLight` | #E8F5E9 | 완료 배경 | 성공 토스트 배경 |
 | `warning` | #F4A460 | 경고/주의 | 잔여 횟수 적음, 임박 |
 | `warningLight` | #FFF3E0 | 경고 배경 | 경고 카드 배경 |
-| `error` | #DC143C | 오류/삭제/긴급 | 미수금, 삭제 버튼, 결석 |
+| `error` | #DC143C | 오류/삭제/긴급 | 입금 기한 초과, 삭제 버튼, 결석 |
 | `errorLight` | #FFEBEE | 오류 배경 | 에러 카드 배경 |
 | `info` | #4A90D9 | 정보/안내 | 내 예약, 안내 텍스트 |
 | `infoLight` | #E3F2FD | 정보 배경 | 정보 카드 배경 |
@@ -170,7 +170,7 @@ Q: 이 색상은 무엇을 의미하나?
 ### 2.3 정보 우선순위
 
 ```
-1순위: 긴급 (error 색상) — 미수금 D+, 승인 대기
+1순위: 긴급 (error 색상) — 입금 기한 초과 D+, 승인 대기
 2순위: 오늘 — 당일 레슨/과제
 3순위: 트렌드 — 스트릭, 주간 연습, 월간 레슨
 4순위: 도구 — 메트로놈, 튜너, 녹음
@@ -197,7 +197,7 @@ Q: 이 색상은 무엇을 의미하나?
 
 **근거**: 토스 홈 패턴 — 사용자 인지 부하 감소. 5가지 알림 동시 표시는 과부하.
 
-**Top 1 결정 우선순위**: 미수금 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
+**Top 1 결정 우선순위**: 입금 확인 대기 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
 
 ### 2.6 Progressive Disclosure (점진적 공개)
 
@@ -301,7 +301,7 @@ Container(
 | 활성/수강중 | `primary.withAlpha(25)` | `primary` |
 | 완료 | `successLight` | `success` |
 | 경고/만료임박 | `warningLight` | `warning` |
-| 오류/미수금 | `errorLight` | `error` |
+| 오류/입금 기한 초과 | `errorLight` | `error` |
 | 비활성 | `surfaceSecondaryLight` | `textTertiaryLight` |
 
 ### 3.5 선택자 칩 스타일
