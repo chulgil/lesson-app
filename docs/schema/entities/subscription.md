@@ -1571,4 +1571,4 @@ Future<Subscription> updateSubscription({
 
 - [ClassMembership](class_membership.md) - 소속 관계
 - [Student](student.md) - 학생
-- [Payment](../../specs/payment/payment_unified_spec.md) - 결제
+- [payment_architecture.md](../../specs/subscription/payment_architecture.md) - 현행 무통장입금 정책 + 미래 앱 사용료 과금 경계

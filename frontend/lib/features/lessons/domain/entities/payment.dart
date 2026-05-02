@@ -1,5 +1,8 @@
-// Payment domain entity
-// Moved from lib/features/lessons/domain/entities/payment.dart for Clean Architecture
+// Legacy tuition deposit record.
+//
+// Current production payment policy is subscription-based bank-transfer/cash
+// status tracking only. Do not expose this as an independent in-app payment
+// feature until the future app-admin billing spec is approved.
 
 import 'package:flutter/material.dart';
 

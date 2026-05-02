@@ -34,7 +34,14 @@ class BillingTargetType(str, enum.Enum):
 
 
 class Payment(UUIDMixin, TimestampMixin, Base):
-    """Payment record for lessons."""
+    """Legacy tuition deposit record.
+
+    This model is not an app-managed payment or PG integration surface.
+    Current tuition flows are handled outside the app and represented through
+    subscription/proposal status; no `/payments/*` API should be inferred from
+    this table. Future app-admin billing must use separate AppPayment-style
+    models after a dedicated billing spec is approved.
+    """
 
     __tablename__ = "payments"
 
@@ -97,7 +104,11 @@ class Payment(UUIDMixin, TimestampMixin, Base):
 
 
 class TuitionSettings(UUIDMixin, TimestampMixin, Base):
-    """Per-student tuition configuration."""
+    """Legacy per-student tuition deposit preferences.
+
+    Kept separate from future Lessonaza app usage-fee billing. Do not use this
+    model for PG, card, receipt, settlement, or app-admin SaaS payment logic.
+    """
 
     __tablename__ = "tuition_settings"
 

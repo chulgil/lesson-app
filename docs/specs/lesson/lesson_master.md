@@ -294,20 +294,20 @@ Phase 3: 소진 임박
 
 ---
 
-### 3.5 결제/미수금 관리 플로우 (Payment)
+### 3.5 수강권 입금 상태 플로우 (Tuition Deposit)
 
-#### 3.5.1 결제 상태 모델
+#### 3.5.1 입금 상태 모델
 
-결제 정보는 `Subscription` 엔티티에 직접 포함된다 (별도 Payment 엔티티 아님).
+현재 앱은 선생님/학생/학부모 간 실제 결제를 처리하지 않는다. 수강료는 앱 밖에서 무통장입금/현금으로 처리하고, 앱은 `Subscription` 엔티티의 입금 확인 상태만 기록한다 (별도 Payment 엔티티/API 아님).
 
 **두 가지 경로:**
 
 | 경로 | 설명 | paymentConfirmed |
 |------|------|:----------------:|
 | **선불 (Proposal 경로)** | 제안 -> 입금대기 -> 입금완료 -> 발급완료 | 항상 true |
-| **후불 (직접 발급)** | 직접발급 -> 미수금 또는 결제완료 | false -> true |
+| **후불 (직접 발급)** | 직접발급 -> 입금 확인 대기 또는 입금확인 | false -> true |
 
-**미수금 판별:**
+**입금 확인 대기 판별:**
 ```dart
 bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
 ```
@@ -332,11 +332,11 @@ bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
     -> 나중에 입금확인 시 paymentConfirmed: true로 전환
 ```
 
-#### 3.5.4 미수금 관리
+#### 3.5.4 입금 확인 대기 관리
 
-선생님 앱에서 미수금 대시보드 제공:
-- 총 미수금 금액, 건수, 학생 수
-- 개별 미결제 수강권 카드 (입금확인 / 알림 보내기 버튼)
+선생님 앱에서 입금 확인 대기 대시보드 제공:
+- 총 입금 확인 대기 금액, 건수, 학생 수
+- 개별 입금 확인 대기 수강권 카드 (입금확인 / 알림 보내기 버튼)
 
 #### 3.5.5 개선 효과
 
@@ -1130,7 +1130,7 @@ enum LessonType {
 | 레슨 통계 | `features/lessons/presentation/providers/lesson_stats_provider.dart` |
 | 레슨 노트 | `features/lessons/presentation/providers/lesson_note_providers.dart` |
 | 예약 관리 | `features/lessons/presentation/providers/booking_providers.dart` |
-| 결제 관리 | `features/lessons/presentation/providers/payment_providers.dart` |
+| 레거시 입금 기록 | `features/lessons/presentation/providers/payment_providers.dart` |
 
 > 모든 경로는 `frontend/lib/` 기준 상대 경로
 
@@ -1230,7 +1230,7 @@ frontend/lib/features/schedule/
 | **체험 레슨 예약** | 구현 완료 | 90% | LessonBookingScreen + WeekCalendar + 시간 칩 |
 | **정기 레슨 등록** | 부분 구현 | 60% | 제안 플로우 보완 필요 |
 | **수강권 발급** | 구현 완료 | 85% | IssueSubscriptionScreen, SubscriptionDetailScreen |
-| **결제/미수금 관리** | 구현 완료 | 85% | PaymentManagementScreen, 2단계 입금확인 |
+| **수강권 입금 상태 기록** | 구현 완료 | 85% | 수강권 제안/확정 상태로 기록, 독립 결제 기능 아님 |
 | **회차권 레슨** | 부분 구현 | 70% | 기본 플로우 구현, 알림 미연동 |
 | **레슨 취소/변경** | 구현 완료 | 80% | BookingCancelScreen, BookingRescheduleScreen |
 | **노쇼 처리** | 부분 구현 | 40% | 엔티티 설계 완료, 상세 처리 미구현 |

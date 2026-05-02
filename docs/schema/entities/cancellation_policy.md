@@ -177,7 +177,7 @@ class PenaltyResult {
   final PaymentMethod paymentMethod;      // 선결제/후결제
   final int chargeAmount;                 // 과금 금액
   final bool lessonDeducted;              // 레슨 차감 여부 (선결제)
-  final String? invoiceId;                // 청구서 ID (후결제)
+  final String? invoiceId;                // 레거시 필드, 현행 청구서 기능 없음
 }
 ```
 
@@ -214,4 +214,4 @@ lib/features/schedule/domain/entities/cancellation_record.dart
 | 문서 | 설명 |
 |------|------|
 | [trial_lesson_system.md](../../specs/trial/trial_lesson_system.md) | 체험 레슨 시스템 스펙 |
-| [payment_unified_spec.md](../../specs/payment/payment_unified_spec.md) | 결제 시스템 |
+| [payment_architecture.md](../../specs/subscription/payment_architecture.md) | 현행 무통장입금 정책 + 미래 앱 사용료 과금 경계 |

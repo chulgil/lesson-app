@@ -66,7 +66,6 @@ class AppRoutes {
   static const instrumentManagement = '/profile/instruments';
   static const repertoireManagement = '/profile/repertoire';
   static const lessonTimeSettings = '/profile/lesson-time';
-  static const paymentManagement = '/profile/payments';
   static const tipTemplateManagement = '/profile/templates';
   static const feedbackTemplateManagement = '/profile/feedback-templates';
   static const extendedProfile = '/profile/extended';

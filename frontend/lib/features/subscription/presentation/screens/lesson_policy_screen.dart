@@ -407,7 +407,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         _buildRelatedSettingItem(
           icon: Icons.payments_outlined,
           label: AppStrings.policyTuitionManagement,
-          onTap: () => context.push(AppRoutes.paymentManagement),
+          onTap: () => context.push(AppRoutes.outstandingPayments),
         ),
         _buildRelatedSettingItem(
           icon: Icons.library_books_outlined,

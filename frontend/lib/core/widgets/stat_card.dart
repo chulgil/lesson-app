@@ -15,7 +15,7 @@ import '../theme/notebook_typography.dart';
 /// - 부제: `caption` + `inkTertiary`
 ///
 /// Used in:
-/// - PaymentManagementScreen · ParentDashboardTab · HomeScreen · StudentStatsCards
+/// - OutstandingPaymentsScreen · ParentDashboardTab · HomeScreen · StudentStatsCards
 ///
 /// 호환성: 기존 `color` 파라미터는 API 보존을 위해 유지하되 내부에서 무시.
 /// 전 화면이 Notebook × Score 컨셉으로 전환 중 — 중간 단계에서 단일 룩 강제.

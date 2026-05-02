@@ -267,7 +267,7 @@ class _DeleteButton extends StatelessWidget {
           builder:
               (context) => AlertDialog(
                 title: const Text('결제 삭제'),
-                content: const Text('이 결제 내역을 삭제하시겠습니까?'),
+                content: const Text('이 입금 기록을 삭제하시겠습니까?'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),

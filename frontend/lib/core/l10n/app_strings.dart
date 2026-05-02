@@ -912,8 +912,8 @@ class AppStrings {
   /// 수강권 정보 챕터
   static const chapterSubscriptionInfo = '수강권 정보';
 
-  /// 결제 내역 챕터
-  static const chapterPaymentHistory = '결제 내역';
+  /// 입금 상태 챕터
+  static const chapterPaymentHistory = '입금 상태';
 
   /// 레슨 진행 챕터
   static String chapterLessonProgress(int used, int total) =>
@@ -4061,8 +4061,8 @@ class AppStrings {
   /// 관련 설정 (섹션 헤더)
   static const policyRelatedHeader = '관련 설정';
 
-  /// 수강료 관리 (관련 설정 항목)
-  static const policyTuitionManagement = '수강료 관리';
+  /// 입금 확인 대기 (관련 설정 항목)
+  static const policyTuitionManagement = '입금 확인 대기';
 
   /// 템플릿 관리 (관련 설정 항목)
   static const policyTemplateManagement = '템플릿 관리';

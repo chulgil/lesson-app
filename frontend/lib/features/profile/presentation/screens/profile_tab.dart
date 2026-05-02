@@ -22,7 +22,7 @@ import '../providers/teacher_extended_profile_provider.dart';
 /// Menu groups:
 /// 1. 내 소개 — profile editing, instruments, credentials, preview
 /// 2. 레슨 운영 — time, availability, policy, repertoire, templates
-/// 3. 수강권·결제 — subscription templates, outstanding, history
+/// 3. 수강권·입금 — subscription templates, deposit status, bank account
 /// 4. 설정 — notifications, recordings, visibility
 /// 5. 지원 — help, app info
 /// 6. 계정 — terms, privacy, logout
@@ -71,9 +71,9 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space5),
 
-          // 💳 수강권·결제 (상단 이동 — 자주 쓰는 것 먼저)
+          // 💳 수강권·입금 (상단 이동 — 자주 쓰는 것 먼저)
           _buildMenuSection(
-            title: '수강권·결제',
+            title: '수강권·입금',
             items: [
               _MenuItem(
                 icon: Icons.card_membership,
@@ -83,15 +83,9 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.warning_amber_outlined,
-                label: '미수금 관리',
-                subtitle: '결제 대기 중인 수강권',
+                label: '입금 확인 대기',
+                subtitle: '입금 확인이 필요한 수강권',
                 onTap: () => context.push(AppRoutes.outstandingPayments),
-              ),
-              _MenuItem(
-                icon: Icons.receipt_long_outlined,
-                label: '결제 내역',
-                subtitle: '전체 결제 이력 확인',
-                onTap: () => context.push(AppRoutes.paymentManagement),
               ),
               _MenuItem(
                 icon: Icons.account_balance_outlined,

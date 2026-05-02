@@ -6,6 +6,12 @@ import '../../domain/repositories/payment_repository.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import 'payment_repository_provider.dart';
 
+// Legacy independent payment providers.
+//
+// Current payment policy uses Subscription payment status and deposit
+// confirmation screens. These providers must not be routed as a current
+// payment-management feature until a future billing spec is approved.
+
 /// All payments provider
 final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
   final repository = ref.watch(paymentRepositoryProvider);

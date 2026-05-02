@@ -111,13 +111,13 @@
 | 튜너 (YIN 피치 감지) | - | O | - | 완료 |
 | 중앙 연습 버튼 (FAB) | - | O | - | 완료 |
 
-### 3.4 구독/결제 → [subscription_master.md](subscription/subscription_master.md)
+### 3.4 수강권/입금 상태 → [subscription_master.md](subscription/subscription_master.md)
 
 | 기능 | T | S | P | 상태 |
 |------|:-:|:-:|:-:|:----:|
 | 수강권 시스템 | O | O | - | 완료 |
 | 수강권 제안 플로우 | O | O | - | 완료 |
-| 통합 결제 시스템 | O | O | - | 완료 |
+| 수강권 입금 상태 | O | O | - | 완료 |
 | 수강권 상태 컬러 | O | O | - | 완료 |
 | 취소/변경 정책 | O | O | - | 완료 |
 | 레슨 정책 설정 | O | - | - | 설계 |

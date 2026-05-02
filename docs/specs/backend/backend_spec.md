@@ -100,19 +100,24 @@ app/
 6. [ ] FCM Push Notification 연동
 7. [ ] Subscription Expiry Dispatcher 스케줄러 진입점 연결 (D-7/D-1 알림, 만료 30일 후 expired→past 자동 전환)
 
-## 결제 라우터 정책 (CRITICAL — 작업 전 필독)
+## 결제 경계 정책 (CRITICAL — 작업 전 필독)
 
-**`payments` 라우터는 PG 연동 미진행이 정책상 의도된 상태**. 수동 입금확인 워크플로우만 제공한다.
+현행 수강료 흐름은 **선생님/학원 ↔ 학생/학부모 무통장입금**이다. 앱은 수강권 제안, 입금 완료 표시, 수강권 확정 상태만 기록한다.
+
+**`payments` 라우터는 현행 구현 대상이 아니다.** `/payments/*`, `payment_service`, 독립 결제 스키마를 새로 만들지 않는다. 수강권 입금 상태는 `/subscriptions/*` 흐름의 `SubscriptionProposal` / `Subscription` 상태로 처리한다.
 
 | 구분 | 상태 |
 |------|------|
+| 선생님/학원 수강료 | **앱 밖 무통장입금 / 현금 등 외부 결제** |
+| 현행 백엔드 API | **`/subscriptions/*` 중심 상태 기록** |
+| `/payments/*` 라우터 | **정의하지 않음 / 구현 금지** |
 | PG SDK (Toss / Portone / 카카오페이 / 이니시스) | **미채택** |
 | Webhook (PG → 서버) | **없음** |
 | 카드 토큰화 / PCI-DSS | **없음** |
 | 자동 입금 매칭 | **없음** |
 | 영수증 발행 / 정산 / 에스크로 | **없음** |
-| 수동 워크플로우 API (student-confirm / teacher-confirm / teacher-reject / refund / overdue / remind) | **유지** |
+| 앱관리자 사용료 과금 | **향후 별도 스펙 완료 후 구현** |
 
-**상세 정책**: [`docs/specs/subscription/payment_architecture.md`](../subscription/payment_architecture.md) — 현행 정책 + 미래 PG 도입 시 양방향 정산 설계 요건 SSOT.
+**상세 정책**: [`docs/specs/subscription/payment_architecture.md`](../subscription/payment_architecture.md) — 현행 무통장입금 정책 + 미래 앱 사용료 과금 경계 SSOT.
 
-PG 도입을 결정하면 [`payment_architecture.md`](../subscription/payment_architecture.md) §3 "미래 — PG 도입 시 신규 설계 요건"의 미정 항목(정산 주기 / 수수료 모델 / 사업자 구분 / 환불 흐름 / 에스크로 / PG 선택)을 먼저 답한 뒤 별도 Phase 로 진행.
+향후 결제가 필요해지는 경우는 Lessonaza 앱관리자가 선생님/학생/학부모/학원에게 사용료를 받는 구조에 한정한다. 이때는 `payment_architecture.md` §3에 따라 별도 앱 사용료 결제 스펙을 먼저 작성하고, 현행 수강권/입금 상태 기록과 물리적으로 분리한다.

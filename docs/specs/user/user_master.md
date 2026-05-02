@@ -31,9 +31,9 @@ Lessonaza는 음악 레슨 관리 앱으로, 선생님-학생-학부모 3자 간
 
 | 역할 | 설명 | 계정 유형 |
 |------|------|----------|
-| **선생님 (Teacher)** | 레슨 제공, 학생 관리, 과제 배정, 결제 관리 | 소셜 로그인 계정 |
+| **선생님 (Teacher)** | 레슨 제공, 학생 관리, 과제 배정, 수강권 입금 상태 관리 | 소셜 로그인 계정 |
 | **학생 (Student)** | 레슨 수강, 연습 기록, 과제 수행 | 소셜 로그인 계정 (만 14세 이상) 또는 자녀 프로필 (만 14세 미만) |
-| **학부모 (Parent)** | 자녀 레슨 모니터링, 결제, 과제 확인 | 소셜 로그인 계정 |
+| **학부모 (Parent)** | 자녀 레슨 모니터링, 수강권 입금 상태 확인, 과제 확인 | 소셜 로그인 계정 |
 
 #### UserRole Enum (정식 정의)
 
@@ -971,7 +971,7 @@ class Follow extends HiveObject {
 | 클래스 관리 화면 | ✅ 부분 구현 |
 | Subscription 엔티티 | ✅ 엔티티 정의 완료 |
 | 데이터 마이그레이션 | ❌ 미구현 |
-| 결제/정산 클래스별 분리 | ❌ 미구현 |
+| 수강권 입금 상태 클래스별 분리 | ❌ 미구현 (결제/정산 기능은 현행 스펙 범위 밖) |
 
 #### 관련 파일
 
@@ -1077,7 +1077,7 @@ class ChildProfile {
 | 메트로놈 사용 | O (자녀와 함께) |
 | 녹음 | O (자녀 연습) |
 | 레슨 노트 확인 | O |
-| 결제 관리 | O (수강료 입금 기록) |
+| 입금 상태 확인 | O (수강료 입금 확인 상태) |
 | 레슨 알림 | O (리마인더 수신) |
 
 ### 5.2 학부모 대시보드
@@ -1099,7 +1099,7 @@ class ChildProfile {
 - 다음 레슨 카드 (D-day, 날짜/시간, 선생님)
 - 이번 주 연습 캘린더 (요일별 완료 상태)
 - 최근 과제 목록 (우선순위별)
-- 결제 현황 카드
+- 수강권 입금 상태 카드
 
 #### 레슨 탭 (ParentLessonsTab)
 
@@ -1117,7 +1117,7 @@ class ChildProfile {
 
 - 프로필 정보 (아바타, 이름, 이메일)
 - 연결된 자녀 관리
-- 알림 설정 (과제/레슨/연습/결제)
+- 알림 설정 (과제/레슨/연습/입금 상태)
 - 설정 (다크 모드, 언어, 녹음 백업)
 - 지원 (도움말, 피드백, 앱 정보)
 - 계정 (이용약관, 개인정보처리방침, 로그아웃)
@@ -1168,7 +1168,7 @@ class UserProfile {
 | 다음 레슨 정보 | ❌ 하드코딩 | lessonProvider 연동 | lesson_schedule |
 | 연습 캘린더 | ❌ 하드코딩 | practiceCompletionProvider 연동 | practice_screen_spec |
 | 최근 과제 | ❌ 하드코딩 | assignmentProvider 연동 | - |
-| 결제 현황 | ❌ 하드코딩 | paymentProvider 연동 | payment_unified_spec |
+| 수강권 입금 상태 | ❌ 하드코딩 | subscriptionProvider 연동 | subscription_master §4 |
 | 레슨 목록/노트 | ❌ 하드코딩 | lessonProvider 연동 | lesson_note_spec |
 
 #### 구현 상태
@@ -1187,7 +1187,7 @@ class UserProfile {
 | ChildProfileManager (CRUD) | ✅ 구현 완료 |
 | ChildProfileFormScreen (자녀 등록/수정) | ✅ 구현 완료 |
 | RemoteParentRepository | ✅ 구현 완료 |
-| 실데이터 연동 (퀵스탯, 과제, 결제 등) | ❌ 미구현 |
+| 실데이터 연동 (퀵스탯, 과제, 입금 상태 등) | ❌ 미구현 |
 
 #### 관련 파일
 
@@ -1272,7 +1272,7 @@ features/parent_home/
 | 악기 관리 | ✅ 구현 완료 |
 | 레슨 시간 설정 | ✅ 구현 완료 |
 | 공개 범위 설정 | ✅ 구현 완료 |
-| 결제 관리 | ✅ 구현 완료 |
+| 입금 상태 관리 | ✅ 구현 완료 |
 | 레퍼토리 관리 | ✅ 구현 완료 |
 
 #### 관련 파일
@@ -1714,7 +1714,7 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | Google SSO | `specs/auth/google_sso_setup_guide.md` | SSO 설정 가이드 (본 문서에 통합) |
 | 3자 관계 | `specs/lesson/three_party_relationship_spec.md` | 학원-선생님-학생 관계 상세 |
 | 수강권 시스템 | `specs/subscription/subscription_system_spec.md` | 수강권 비즈니스 로직 상세 |
-| 통합 결제 | `specs/payment/payment_unified_spec.md` | 결제/정산 상세 |
+| 수강료 입금 정책 | `specs/subscription/payment_architecture.md` | 무통장입금 정책, 앱 사용료 결제는 향후 별도 스펙 |
 | 알림 시스템 | `specs/notification/notification_system.md` | 알림 상세 |
 | 앱 사용 플로우 | `specs/_archive/old/flow_with_app.md` | 신규/재등록/앱 전환 플로우 (아카이브됨, lesson_master.md 참조) |
 

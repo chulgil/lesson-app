@@ -11,7 +11,7 @@ import '../../../../core/theme/app_colors.dart';
 // ignore: unused-enum
 enum ParentPermission {
   viewOnly, // 열람만 가능
-  managePayments, // 결제 관리
+  managePayments, // 수강권 입금 상태 관리
   manageLessons, // 레슨 관리 (일정 변경 등)
   fullAccess; // 전체 권한
 
@@ -20,7 +20,7 @@ enum ParentPermission {
       case ParentPermission.viewOnly:
         return '열람 전용';
       case ParentPermission.managePayments:
-        return '결제 관리';
+        return '입금 상태 관리';
       case ParentPermission.manageLessons:
         return '레슨 관리';
       case ParentPermission.fullAccess:
@@ -28,7 +28,7 @@ enum ParentPermission {
     }
   }
 
-  /// Check if permission allows payments
+  /// Check if permission allows tuition deposit status actions.
   bool get canManagePayments =>
       this == ParentPermission.managePayments ||
       this == ParentPermission.fullAccess;

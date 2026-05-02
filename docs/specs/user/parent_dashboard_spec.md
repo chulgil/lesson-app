@@ -62,7 +62,7 @@
 | 다음 레슨 정보 | ❌ 하드코딩 | lessonProvider 연동 | lesson_schedule |
 | 연습 캘린더 | ❌ 하드코딩 | practiceCompletionProvider 연동 | practice_screen_spec |
 | 최근 과제 | ❌ 하드코딩 | assignmentProvider 연동 | — |
-| 결제 현황 | ❌ 하드코딩 | paymentProvider 연동 | payment_unified_spec |
+| 수강권 입금 상태 | ❌ 하드코딩 | subscriptionProvider 연동 | subscription_master §4 |
 | 레슨 목록 | ❌ 하드코딩 | lessonProvider 연동 | lesson_schedule |
 | 레슨 노트 | ❌ 하드코딩 | lessonProvider 연동 | lesson_note_spec |
 | 과제 목록 | ❌ 하드코딩 | assignmentProvider 연동 | — |

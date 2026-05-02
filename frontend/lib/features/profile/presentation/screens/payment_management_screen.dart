@@ -10,7 +10,11 @@ import '../../../../features/lessons/domain/entities/payment.dart';
 import '../../../lessons/presentation/providers/payment_providers.dart';
 import '../widgets/payment_management/payment_management_widgets.dart';
 
-/// Payment management screen - overview of all payments.
+/// Legacy independent payment management screen.
+///
+/// Not routed in the current app. Current production policy is external
+/// bank-transfer/cash tuition deposit tracking through Subscription status only.
+/// Future app-admin billing requires a separate approved spec before exposure.
 class PaymentManagementScreen extends ConsumerStatefulWidget {
   const PaymentManagementScreen({super.key});
 
@@ -173,7 +177,7 @@ class _PaymentManagementScreenState
           Icon(Icons.receipt_long, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '결제 내역이 없습니다',
+            '입금 기록이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),

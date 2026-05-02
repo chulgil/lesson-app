@@ -20,7 +20,7 @@ docs/schema/
 │   ├── lesson_location.md      # LessonLocation (레슨 장소)
 │   ├── lesson_schedule.md      # LessonSchedule (스케줄 설정)
 │   ├── parent.md               # Parent (학부모, 자녀, 연결, 설정)
-│   ├── payment.md              # Payment, Invoice (결제)
+│   ├── payment.md              # Payment, Invoice (레거시, 현행 구현 근거 아님)
 │   ├── practice_goal.md        # PracticeGoal (연습 목표)
 │   ├── practice_note.md        # PracticeNote (연습노트)
 │   ├── practice_space.md       # PracticeSpace (연습 공간)
@@ -69,7 +69,7 @@ docs/schema/
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
-| [Payment](entities/payment.md) | 결제, 청구서 | [payment_unified_spec.md](../specs/payment/payment_unified_spec.md) | 70-80 |
+| [Payment](entities/payment.md) | 레거시 입금 기록, 청구서 이력 | [payment_architecture.md](../specs/subscription/payment_architecture.md) | 70-80 |
 | [Subscription](entities/subscription.md) | 수강권, 부가 서비스, 교차 수강 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 55-62 |
 | SubscriptionTemplate | 수강권 템플릿 (선생님 재사용) | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 80 |
 | SubscriptionProposal | 수강권 제안 | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 81-82 |
@@ -138,7 +138,7 @@ docs/schema/
 | 63-72 | 학부모 | Parent (63), Child (64), ParentChildRelation (65), ConnectionStatus (66), ProfileType (67), ParentPermission (68), UserProfile (69), ParentTeacherConnection (70), ParentVisibilitySettings (71), ParentNotificationSettings (72) |
 | 85-88 | 레슨 요청 | LessonRequest (85), LessonRequestType (86), LessonRequestStatus (87), RequestedStartTiming (88) |
 | 90-94 | 관계/팔로우 | TeacherStudentRelation (90), RelationshipStatus (91), NotificationSetting (92), Follow (93), FollowTargetType (94) |
-| 73-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
+| 73-80 | 레거시 입금 기록 | Payment, Invoice, TeacherPaymentConfig (현행 구현 근거 아님) |
 | 81-89 | 연습공간 | PracticeSpace, CoachConnection, Assignment, InviteCode |
 | 90-93 | 예약 | Booking, LessonType, BookingStatus, TeacherStudentRelation |
 | 94-101 | 스케줄 | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy |

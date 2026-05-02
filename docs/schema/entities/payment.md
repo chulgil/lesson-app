@@ -1,15 +1,17 @@
 # Payment 엔티티
 
-> 마지막 업데이트: 2026-02-06
-> 관련 스펙: [payment_unified_spec.md](../../specs/payment/payment_unified_spec.md)
+> 마지막 업데이트: 2026-05-02
+> 정책 SSOT: [payment_architecture.md](../../specs/subscription/payment_architecture.md)
 >
 > **⚠️ DEPRECATED**: Payment 엔티티는 레거시입니다.
-> 결제 정보는 `Subscription` 엔티티에 통합되었습니다.
+> 현행 수강료 흐름은 선생님/학원 ↔ 학생/학부모 무통장입금이며, 앱은 수강권 상태만 기록합니다.
+> 결제 정보는 `Subscription` / `SubscriptionProposal` 상태에 통합되었습니다.
+> `/payments/*`, 청구서, PG, 정산, 환불 기능의 구현 지시로 사용하지 마세요.
 > 상세: [Payment→Subscription 통합 세션 로그](../../session/2026-02-06_payment_redesign.md)
 
 ## 개요
 
-결제 및 청구서 관련 엔티티입니다. 2단계 입금확인 시스템을 지원합니다.
+레거시 결제 및 청구서 엔티티 기록입니다. 현행 구현 근거가 아니며, 최신 정책은 `subscription_master.md`와 `payment_architecture.md`를 따릅니다.
 
 ### Subscription 결제 필드 (신규, HiveField 21-27)
 

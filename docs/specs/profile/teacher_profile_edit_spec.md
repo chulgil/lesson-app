@@ -40,10 +40,9 @@ ProfileTab (선생님 프로필) — 1탭 접근 원칙
 │   ├── 레퍼토리 관리       → RepertoireManagementScreen
 │   └── 피드백 템플릿       → TipTemplateManagementScreen
 │
-├── [수강권·결제]
+├── [수강권·입금 상태]
 │   ├── 수강권 템플릿       → SubscriptionTemplateListScreen
-│   ├── 미수금 관리         → OutstandingPaymentsScreen
-│   └── 결제 내역           → PaymentManagementScreen
+│   └── 입금 확인 상태      → Subscription status views
 │
 ├── [설정] — 알림, 녹음, 공개 설정
 ├── [지원] — 도움말, 앱 정보
@@ -52,9 +51,9 @@ ProfileTab (선생님 프로필) — 1탭 접근 원칙
 
 **v2.0 개선사항** (2026-03-26):
 1. 악기 관리를 3탭→1탭으로 승격 (ExtendedProfile 경유 제거)
-2. 숨겨진 4개 화면 메뉴 노출 (결제, 미수금, 피드백 템플릿, 프로필 미리보기)
+2. 숨겨진 화면 메뉴 노출 (입금 확인 상태, 피드백 템플릿, 프로필 미리보기)
 3. 레슨 관련 설정 통합 (레퍼토리, 피드백 템플릿을 "레슨 운영"에 그룹핑)
-4. 수강권·결제 섹션 신설
+4. 수강권·입금 섹션 신설
 5. 사진 편집 진입점 단일화 (BasicInfoEdit에서만)
 6. 프로필 탭 헤더 간소화 (중복 소개글/배지 제거)
 

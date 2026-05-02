@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../features/profile/presentation/screens/instrument_management_screen.dart';
 import '../../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
-import '../../../features/profile/presentation/screens/payment_management_screen.dart';
 import '../../../features/profile/presentation/screens/repertoire_management_screen.dart';
 import '../../../features/profile/presentation/screens/feedback_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/tip_template_management_screen.dart';
@@ -42,13 +41,6 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.lessonTimeSettings,
     name: 'lessonTimeSettings',
     builder: (context, state) => const LessonTimeSettingsScreen(),
-  ),
-
-  // Payment Management
-  GoRoute(
-    path: AppRoutes.paymentManagement,
-    name: 'paymentManagement',
-    builder: (context, state) => const PaymentManagementScreen(),
   ),
 
   // Tip Template Management

@@ -1,6 +1,6 @@
 # 알림 시스템 Master Spec
 
-> 구현 상태: ⚠️ 부분 구현 (90%) — FCM 푸시 미구현
+> 구현 상태: ⚠️ 부분 구현 (90%) — FCM 인프라 구현, Firebase 설정 대기
 > Last updated: 2026-03-07
 > 기존 스펙: [notification_system.md](notification_system.md)
 
