@@ -25,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import NotificationPriority
 from app.models.parent import Parent, ParentChildRelation
+from app.models.settings import SubscriptionSettings
 from app.models.student import Student
 from app.models.subscription_expiry import SubscriptionExpiryDispatchLog
 from app.services.notification_service import NotificationService
@@ -133,6 +134,15 @@ class SubscriptionExpiryDispatcher:
         await self.db.flush()
         return True
 
+    async def _get_alert_days_set(self, teacher_id: str) -> set[int]:
+        """Return the teacher's enabled alert milestones (default: {14,7,1,0})."""
+        settings = await self.db.scalar(
+            select(SubscriptionSettings).where(SubscriptionSettings.teacher_id == teacher_id)
+        )
+        if settings and settings.renewal_alert_days_set is not None:
+            return set(settings.renewal_alert_days_set)
+        return {14, 7, 1, 0}
+
     async def dispatch_milestones(self, milestones: list[dict[str, Any]], *, today_kst: date) -> dict[str, int]:
         """Dispatch FCM + in-app notifications for each milestone hit.
 
@@ -141,12 +151,23 @@ class SubscriptionExpiryDispatcher:
             today_kst: KST 자정 기준 today (dedup sent_date 키).
 
         Returns:
-            {"sent": int, "deduplicated": int}
+            {"sent": int, "deduplicated": int, "filtered": int}
         """
         sent = 0
         deduplicated = 0
+        filtered = 0
+
+        # Cache teacher alert settings per teacher_id
+        _alert_cache: dict[str, set[int]] = {}
 
         for milestone in milestones:
+            # Check if this milestone is enabled in teacher's settings (#250)
+            teacher_id = milestone.get("teacher_id", "")
+            if teacher_id not in _alert_cache:
+                _alert_cache[teacher_id] = await self._get_alert_days_set(teacher_id)
+            if milestone["days_left"] not in _alert_cache[teacher_id]:
+                filtered += 1
+                continue
             student_id = milestone["student_id"]
             recipients = await self._resolve_recipients(student_id)
 
@@ -169,4 +190,4 @@ class SubscriptionExpiryDispatcher:
                         milestone["days_left"],
                     )
 
-        return {"sent": sent, "deduplicated": deduplicated}
+        return {"sent": sent, "deduplicated": deduplicated, "filtered": filtered}

@@ -38,6 +38,9 @@ class SubscriptionSettings(UUIDMixin, TimestampMixin, Base):
     organization_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     renewal_alert_threshold: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     renewal_alert_days: Mapped[int] = mapped_column(Integer, nullable=False, default=7)
+    renewal_alert_days_set: Mapped[list | None] = mapped_column(
+        JSON, nullable=True, default=lambda: [14, 7, 1, 0],
+    )
     discount_policies: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=list)
     enable_push_notification: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     enable_badge: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

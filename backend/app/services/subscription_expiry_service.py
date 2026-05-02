@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.lesson import ClassMembership, LessonClass
 from app.models.subscription import Subscription, SubscriptionStatus
 
 logger = logging.getLogger(__name__)
@@ -110,11 +111,20 @@ class SubscriptionExpiryService:
                 transitions += 1
 
             if days_left in NOTIFY_MILESTONES:
+                # Resolve teacher_id via membership → lesson_class (#250)
+                teacher_id = ""
+                membership = await self.db.get(ClassMembership, sub.membership_id)
+                if membership:
+                    lesson_class = await self.db.get(LessonClass, membership.lesson_class_id)
+                    if lesson_class:
+                        teacher_id = lesson_class.teacher_id
+
                 milestones.append(
                     {
                         "subscription_id": sub.id,
                         "student_id": sub.student_id,
                         "membership_id": sub.membership_id,
+                        "teacher_id": teacher_id,
                         "days_left": days_left,
                         "end_date": sub.end_date,
                     }

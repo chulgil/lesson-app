@@ -48,6 +48,7 @@ class SubscriptionSettingsResponse(BaseModel):
     teacher_id: str | None = None
     renewal_alert_threshold: int
     renewal_alert_days: int
+    renewal_alert_days_set: list[int] = [14, 7, 1, 0]
     discount_policies: list[dict] = []
     enable_push_notification: bool
     enable_badge: bool
@@ -57,6 +58,7 @@ class SubscriptionSettingsResponse(BaseModel):
 class SubscriptionSettingsUpdate(BaseModel):
     renewal_alert_threshold: int | None = None
     renewal_alert_days: int | None = None
+    renewal_alert_days_set: list[int] | None = None
     discount_policies: list[dict] | None = None
     enable_push_notification: bool | None = None
     enable_badge: bool | None = None
