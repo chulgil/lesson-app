@@ -1,8 +1,9 @@
 # Document Index
 
-> 최종 업데이트: 2026-04-15
-> 목적: Claude가 작업 시작 시 이 파일을 읽고 필요한 문서를 빠르게 찾기 위한 인덱스
-> 정리: 2026-04-15 — 마스터에 통합된 56개 개별 스펙을 old/로 이동 (144→88개)
+> 최종 업데이트: 2026-05-02
+> 목적: 사람이 전체 문서 구조를 파악하기 위한 인덱스
+> AI 작업 지시용: **[SPEC_ROUTING.md](SPEC_ROUTING.md)** 참조
+> 정리: 2026-05-02 — old/ + 대용량 히스토리 → _archive/ 이동 (177→88개, 87K→40K줄)
 
 ---
 
@@ -12,7 +13,7 @@
 
 | 도메인 | 마스터 문서 | 핵심 내용 |
 |--------|-----------|----------|
-| 디자인 시스템 | [design_master.md](specs/design/design_master.md) | 색상, 타이포, 컴포넌트, 경쟁사 분석 |
+| 디자인 시스템 | [notebook/README.md](specs/design/notebook/README.md) | Notebook × Score 디자인 시스템 (**SSOT**) |
 | 레슨 | [lesson_master.md](specs/lesson/lesson_master.md) | 레슨 CRUD, 예약, 취소, 노트, 3자 관계 |
 | 수강권 | [subscription_master.md](specs/subscription/subscription_master.md) | 수강권 발급, 결제 확인, 정책 |
 | 스케줄 | [schedule_master.md](specs/schedule/schedule_master.md) | 캘린더, 가용시간, 스케줄 확인 카드 |
@@ -22,7 +23,7 @@
 | 알림 | [notification_master.md](specs/notification/notification_master.md) | 알림 유형, 푸시 설정 |
 | 온보딩 | [onboarding_master.md](specs/onboarding/onboarding_master.md) | 온보딩 플로우 |
 | 메트로놈 | [metronome_master.md](specs/metronome/metronome_master.md) | 메트로놈 기능, 쉼표 패턴 |
-| 팔로우/초대 | [follow_master.md](specs/follow/follow_master.md) | 선생님-학생 연결, 초대 시스템 |
+| 팔로우 | [follow_master.md](specs/follow/follow_master.md) | 소식 구독 (초대는 `lesson/invite/` 참조) |
 | 설정 | [settings_master.md](specs/settings/settings_master.md) | 앱 설정, 녹음 관리 |
 | 학생 홈 | [student_home_master.md](specs/student_home/student_home_master.md) | 학생 앱 홈 화면 |
 
@@ -58,14 +59,10 @@
 
 | 문서 | 역할 | 언제 참조? |
 |------|------|----------|
-| [teacher_app_screens.md](specs/design/teacher_app_screens.md) | 선생님 앱 4탭 화면 와이어프레임 | 선생님 화면 UI 구현 시 |
-| [role_based_screens.md](specs/design/role_based_screens.md) | 역할별(선생님/학생/학부모) 화면 개요 | 역할별 차이 확인 시 |
+| [notebook/README.md](specs/design/notebook/README.md) | **Notebook × Score 디자인 시스템 (최신 SSOT)** | UI 구현 시 |
 | [ux_guidelines.md](specs/design/ux_guidelines.md) | UX 원칙, 상호작용 패턴 | UI 구현 판단 시 |
-| [teacher_ux_review.md](specs/design/teacher_ux_review.md) | 선생님 앱 UX 검토 결과 + 개선 이슈 | UX 개선 작업 시 |
-| [student_ux_review.md](specs/design/student_ux_review.md) | 학생 앱 UX 검토 결과 | 학생 UX 개선 작업 시 |
-| [competitor_ux_analysis.md](specs/design/competitor_ux_analysis.md) | 경쟁사 UX 분석 | 기능 비교 시 |
-| [booking_system_comparison.md](specs/design/booking_system_comparison.md) | 예약 시스템 비교 분석 | 예약 UX 설계 시 |
-| [design_system.md](specs/design/figma/design_system.md) | Figma 디자인 시스템 | 디자인 토큰 확인 시 |
+| [detail_screen_template.md](specs/design/detail_screen_template.md) | 상세 화면 공통 템플릿 | 새 상세 화면 추가 시 |
+| [notebook/home_screens_audit.md](specs/design/notebook/home_screens_audit.md) | 홈화면 감사 결과 + 타이포 위계 규칙 | 홈화면 수정 시 |
 
 ---
 
@@ -73,15 +70,11 @@
 
 | 문서 | 역할 |
 |------|------|
-| [requirement.md](requirement/requirement.md) | 전체 요구사항 정의 |
-| [requirement2.md](requirement/requirement2.md) | 추가 요구사항 |
-| [implementation_status.md](requirement/implementation_status.md) | 구현 상태 (Phase별) |
 | [implementation_roadmap_v2.md](specs/dev/implementation_roadmap_v2.md) | 6단계 구현 로드맵 (최신) |
-| [implementation_roadmap.md](specs/dev/implementation_roadmap.md) | 구현 로드맵 v1 (이전 버전) |
 | [beta_readiness.md](specs/dev/beta_readiness.md) | 베타 준비 상태 |
-| [launch_roadmap.md](launch_roadmap.md) | 런칭 로드맵 |
 | [test_scenarios.md](specs/dev/test_scenarios.md) | 테스트 시나리오 |
 | [test_data.md](specs/dev/test_data.md) | 테스트 데이터 |
+| [requirement.md](requirement/requirement.md) | ⚠️ HISTORICAL — 2025-12 기준, SSOT는 각 도메인 마스터 |
 
 ---
 
@@ -227,10 +220,10 @@
 
 ## Deprecated
 
-> **specs/old/ -- 사용 금지 (deprecated). 최신 스펙은 각 도메인 디렉토리 참조.**
+> **specs/_archive/ — 사용 금지 (deprecated)**
 >
-> `specs/old/` 디렉토리의 문서들은 더 이상 유효하지 않습니다. 절대 참조하지 마세요.
-> 최신 스펙은 `specs/[domain]/` 또는 해당 도메인의 마스터 문서를 확인하세요.
+> `_archive/` 디렉토리에는 old/ 76개 + phase-log + 대체된 스펙이 보관되어 있습니다.
+> 절대 참조하지 마세요. 최신 스펙은 `specs/[domain]/` 마스터 문서를 확인하세요.
 
 ---
 

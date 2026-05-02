@@ -58,26 +58,24 @@ lesson-app 프로젝트의 **문서 앵커 인덱스**를 제공하고 특정 �
 
 ```
 docs/
+├── SPEC_ROUTING.md          # ⭐ AI 작업 지시용 라우팅 (필수/보조/금지 문서)
+├── DOCUMENT_INDEX.md        # 전체 인덱스 (사람용)
+├── README.md                # 프로젝트 문서 개요
 ├── architecture.md          # 상세 아키텍처 가이드
-├── launch_roadmap.md        # 출시 로드맵
-├── refactoring_tasks.md     # 리팩토링 현황
-├── README.md                # 문서 인덱스
-├── requirement/             # 요구사항
+├── requirement/             # ⚠️ HISTORICAL (2025-12 기준)
 ├── proposal/                # 기획 제안서
-├── research/                # 시장 조사 (경쟁사 분석 등)
-├── _components/             # UI 컴포넌트 가이드
-├── _patterns/               # 디자인 패턴 가이드
-├── _tokens/                 # 디자인 토큰 (색상, 타이포)
+├── research/                # 시장 조사
 ├── schema/entities/         # 엔티티 스키마
 └── specs/                   # 기능 명세 (도메인별)
-    ├── design/              # UX 가이드라인
-    ├── practice/            # 연습 기능 스펙
-    ├── metronome/           # 메트로놈 스펙
-    ├── recording/           # 녹음 기능 스펙
-    ├── invite/              # 초대 시스템 스펙
-    ├── lesson/              # 레슨 스펙
-    └── subscription/        # 구독/결제 스펙
+    ├── [domain]/[domain]_master.md  ← SSOT (13개 마스터)
+    ├── design/notebook/     # Notebook × Score 디자인 시스템 (SSOT)
+    ├── lesson/invite/       # 초대/관계 시스템 (정식 경로)
+    ├── backend/             # 백엔드 스펙
+    └── _archive/            # ❌ 사용 금지 (폐기된 문서)
 ```
+
+> **SSOT 규칙**: 마스터와 하위 문서 충돌 시 마스터가 우선. 디자인은 `notebook/README.md`가 SSOT.
+> **금지 경로**: `_archive/`, `requirement/requirement.md` (결제 정책 충돌)
 
 ## 사용법
 

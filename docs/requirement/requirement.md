@@ -2,7 +2,14 @@
 
 > 작성일: 2025-12-21
 > 최종 수정: 2025-12-26
-> 상태: Phase 1 진행 중 (95% 완료)
+> 상태: **⚠️ HISTORICAL** — 2025-12 기준 초기 요구사항. 현재 정책과 충돌하는 내용 포함.
+>
+> **현재 SSOT는 각 도메인 마스터 스펙입니다:**
+> - 결제/수강권 → `docs/specs/subscription/subscription_master.md`
+> - 레슨 → `docs/specs/lesson/lesson_master.md`
+> - 전체 인덱스 → `docs/SPEC_ROUTING.md`
+>
+> 특히 결제 관련(카카오페이/토스 등)은 본 문서가 아닌 subscription_master.md를 따르십시오.
 
 ---
 

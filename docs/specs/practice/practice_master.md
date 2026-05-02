@@ -1675,7 +1675,7 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | 튜너 | `docs/specs/tuner/` | 실시간 음고 감지 |
 | 학생 홈 | `docs/specs/user/` | 학생 홈 화면 탭 구성 |
 | 학부모 대시보드 | `docs/specs/user/parent_dashboard_spec.md` | 학부모 연습 현황 |
-| 수강권/구독 | `docs/specs/invite/subscription_based_relationship.md` | 공유 권한 기준 |
+| 수강권/구독 | `docs/specs/lesson/invite/subscription_based_relationship.md` | 공유 권한 기준 |
 | 알림 | `docs/specs/notification/` | 연습 완료 알림, 스트릭 경고 |
 | 디자인 토큰 | `docs/_tokens/` | 색상, 타이포그래피 |
 | UX 가이드라인 | `docs/specs/design/ux_guidelines.md` | 원샷 UX 원칙 |

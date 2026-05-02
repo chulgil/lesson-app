@@ -3,10 +3,13 @@
 ## 작업 시작 전
 
 ```
-1. docs/architecture.md  → 구조 파악
-2. docs/specs/[domain]/  → 관련 스펙 확인
-3. docs/requirement/     → 요구사항 확인
+1. docs/SPEC_ROUTING.md  → 작업 유형별 필수/보조/금지 문서 확인
+2. docs/specs/[domain]/[domain]_master.md  → 해당 도메인 마스터 (SSOT)
+3. docs/architecture.md  → 구조 파악 (필요 시)
 ```
+
+> ⚠️ `docs/requirement/` 는 HISTORICAL (2025-12 기준). 현재 정책은 각 도메인 마스터 참조.
+> ⚠️ `docs/specs/_archive/` 는 사용 금지 (폐기 문서).
 
 ## 스펙 우선 개발
 

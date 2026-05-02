@@ -1,6 +1,6 @@
 # Feature Hub - 기능 x 역할 x 스펙 매트릭스
 
-> Last updated: 2026-03-12
+> Last updated: 2026-05-02
 > 상태: 관리 중
 > 목적: 전체 기능의 스펙/코드/상태를 한눈에 파악하는 중앙 허브
 
@@ -19,11 +19,11 @@
 | 5 | 스케줄 | [schedule_master.md](schedule/schedule_master.md) | 2개 | 가용시간 + 확인카드 |
 | 6 | 메트로놈 | [metronome_master.md](metronome/metronome_master.md) | 4개 | 시스템 + 사운드 + 서브디비전 |
 | 7 | 알림 | [notification_master.md](notification/notification_master.md) | 1개 보강 | 기존 스펙 + 구현 코드 통합 |
-| 8 | 디자인 | [design_master.md](design/design_master.md) | 6개 | UX + 토큰 + 화면설계 + 경쟁분석 |
+| 8 | 디자인 | [notebook/README.md](design/notebook/README.md) | — | Notebook × Score 디자인 시스템 (**SSOT**) |
 | 9 | 캘린더 | [calendar_master.md](calendar/calendar_master.md) | 신규 | 코드 역공학 |
 | 10 | 온보딩 | [onboarding_master.md](onboarding/onboarding_master.md) | 신규 | 코드 역공학 |
 | 11 | 학생홈 | [student_home_master.md](student_home/student_home_master.md) | 신규 | 코드 역공학 |
-| 12 | 팔로우 | [follow_master.md](follow/follow_master.md) | 신규 | 코드 역공학 |
+| 12 | 팔로우 | [follow_master.md](follow/follow_master.md) | 신규 | Phase 1,3 완료 / Phase 2 미구현 |
 | 13 | 설정 | [settings_master.md](settings/settings_master.md) | 신규 | 코드 역공학 |
 
 ### 기타 루트 문서

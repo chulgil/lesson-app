@@ -1707,8 +1707,8 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | 학부모 로그인 | `specs/user/parent_login_flow.md` | 로그인 플로우 (본 문서에 통합) |
 | 선생님 등록 | `specs/user/teacher_registration.md` | 선생님 온보딩 (본 문서에 통합) |
 | 학생 클래스 | `specs/student/student_class_system.md` | 클래스 시스템 (본 문서에 통합) |
-| 초대 시스템 v2 | `specs/invite/invite_system_v2.md` | 초대 시스템 (본 문서에 통합) |
-| 수강권 관계 | `specs/invite/subscription_based_relationship.md` | 관계 모델 (본 문서에 통합) |
+| 초대 시스템 v2 | `specs/lesson/invite/invite_system_v2.md` | 초대 시스템 (본 문서에 통합) |
+| 수강권 관계 | `specs/lesson/invite/subscription_based_relationship.md` | 관계 모델 (본 문서에 통합) |
 | 리뷰 시스템 | `specs/review/review_system.md` | 리뷰 시스템 (본 문서에 통합) |
 | 체험 레슨 | `specs/trial/trial_lesson_system.md` | 체험 레슨 (본 문서에 통합) |
 | Google SSO | `specs/auth/google_sso_setup_guide.md` | SSO 설정 가이드 (본 문서에 통합) |
