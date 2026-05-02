@@ -539,7 +539,7 @@ class RequestHistoryChat extends StatelessWidget {
         isTeacher
             ? _PhaseGuide(
               title: title,
-              situation: '수강권 종류와 결제 방법을 선택해 발급해주세요',
+              situation: '수강권 종류와 입금 확인 방식을 선택해 발급해주세요',
               variant: ChapterGuideVariant.action,
             )
             : _PhaseGuide(
@@ -570,7 +570,7 @@ class RequestHistoryChat extends StatelessWidget {
             )
             : _PhaseGuide(
               title: title,
-              situation: '결제를 완료해주세요',
+              situation: '입금 후 완료 알림을 보내주세요',
               variant: ChapterGuideVariant.action,
             ),
 

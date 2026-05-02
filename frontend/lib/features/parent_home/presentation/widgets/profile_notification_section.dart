@@ -128,8 +128,8 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildDivider(),
                     _buildNotificationItem(
                       icon: Icons.payment,
-                      label: '결제 알림',
-                      subtitle: '결제 요청, 완료 확인 (필수)',
+                      label: '입금 상태 알림',
+                      subtitle: '입금 안내, 입금 확인 (필수)',
                       value: true,
                       isRequired: true,
                       onChanged: null,

@@ -130,7 +130,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
                     const SizedBox(height: AppSpacing.space6),
 
-                    // ── 5순위: 결제 현황 ─────────────────────────
+                    // ── 5순위: 입금 상태 ─────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
@@ -737,7 +737,7 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildPaymentStatus() {
     return SectionCard(
       romanIndex: 3,
-      title: '결제 현황',
+      title: '입금 상태',
       icon: Icons.payment,
       child: Column(
         children: [
@@ -749,7 +749,7 @@ class ParentDashboardTab extends ConsumerWidget {
                 children: [
                   Text('1월 수강료', style: AppTypography.bodyMedium),
                   Text(
-                    '결제 기한: 12/28',
+                    '입금 예정일: 12/28',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -774,10 +774,10 @@ class ParentDashboardTab extends ConsumerWidget {
                       color: AppColors.paperAccentSoft,
                       borderRadius: BorderRadius.zero,
                     ),
-                    // "미결제" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
+                    // "입금대기" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
                     // italic (README §1.1 4계층, §7.127 Gaegu 회피).
                     child: Text(
-                      '미결제',
+                      '입금대기',
                       style: NotebookTypography.indicatorLabel,
                     ),
                   ),
@@ -788,7 +788,7 @@ class ParentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           SizedBox(
             width: double.infinity,
-            child: FilledButton(onPressed: () {}, child: const Text('결제하기')),
+            child: FilledButton(onPressed: () {}, child: const Text('입금 안내 확인')),
           ),
         ],
       ),

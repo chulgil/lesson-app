@@ -179,7 +179,7 @@ enum UnifiedRequestStatus {
 
 /// Lifecycle phase for chapter-based UI.
 enum RequestPhase {
-  request,       // Phase 1: 레슨 신청 → 결제
+  request,       // Phase 1: 레슨 신청 → 입금
   subscription,  // Phase 2: 수강권 발행
   lessons,       // Phase 3: 레슨 진행
   completed,     // 전체 완료

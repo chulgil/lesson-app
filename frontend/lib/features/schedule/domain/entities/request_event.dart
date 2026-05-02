@@ -82,7 +82,7 @@ enum RequestEventType {
   @HiveField(12)
   withdrawApproval,
 
-  // Phase 2: 수강권 & 결제 (NEW)
+  // Phase 2: 수강권 & 입금 (NEW)
   @HiveField(13)
   paymentRequested,
 
@@ -331,7 +331,7 @@ class RequestEvent {
         return AppStrings.chatCompleted;
       case RequestEventType.withdrawApproval:
         return AppStrings.chatWithdrawApproval;
-      // Phase 2: 수강권 & 결제
+      // Phase 2: 수강권 & 입금
       case RequestEventType.paymentRequested:
         return AppStrings.chatPaymentRequested;
       case RequestEventType.paymentConfirmed:

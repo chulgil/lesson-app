@@ -47,13 +47,13 @@
 ├─────────────────────────────────────────────────┤
 │ [B] Triage Banner (신규)                         │
 │     ┌──────┬──────┬──────┐                      │
-│     │만료임박│미결제│체험중│ ← 탭 → 해당 필터 적용 │
+│     │만료임박│입금대기│체험중│ ← 탭 → 해당 필터 적용 │
 │     │ 3명  │ 2명  │ 1명  │                      │
 │     └──────┴──────┴──────┘                      │
 ├─────────────────────────────────────────────────┤
 │ [C] Search + Filter Chips (확장)                 │
 │     🔍 검색바                                    │
-│     [전체][활성][임박][미결제][체험][보관]       │
+│     [전체][활성][임박][입금대기][체험][보관]       │
 ├─────────────────────────────────────────────────┤
 │ [D] Student List (카드 재설계)                   │
 │     ┌─────────────────────────────┐             │
@@ -85,7 +85,7 @@
 | 칸 | 라벨 | 카운트 정의 | 색상 | 탭 동작 |
 |---|-----|-----------|------|--------|
 | 1 | 만료임박 | 활성 수강권(`SubscriptionStatus.active/expiringSoon`) 중 `endDate - today ≤ 14일` 학생 수 | `AppColors.paperAccent` (Vermillion) | 필터 `expiring` 적용 |
-| 2 | 미결제 | `Subscription.paymentConfirmed == false` 학생 수 | `AppColors.paperWarn` | 필터 `unpaid` 적용 |
+| 2 | 입금대기 | `Subscription.paymentConfirmed == false` 학생 수 | `AppColors.paperWarn` | 필터 `unpaid` 적용 |
 | 3 | 체험중 | `ClassMembership.status == MembershipStatus.trial` 학생 수 | `AppColors.paperOk` | 필터 `trial` 적용 |
 
 **디자인 토큰**:
@@ -103,7 +103,7 @@
 | 기존 | 신규 추가 | 의미 |
 |-----|---------|------|
 | all / good / normal / poor / paused | **expiring** | 만료임박 (D-14 이내) |
-| | **unpaid** | 미결제 (pendingPayment) |
+| | **unpaid** | 입금대기 (pendingPayment) |
 | | **trial** | 체험 중 |
 | | **archive** | 만료 수강권만 있는 학생 |
 
@@ -128,7 +128,7 @@
 - 색상: 기본 ink, 80%+ 사용 시 paperAccent
 
 **D-day chip**:
-- 월간제: 다음 결제일 기준 `billingDay` 까지 남은 일수
+- 월간제: 다음 입금 예정일 기준 `billingDay` 까지 남은 일수
 - 횟수제: 예상 소진일 (최근 사용 속도 기반 — MVP 에서는 `endDate` 사용)
 - 표시 규칙: D-14 이상이면 숨김, D-14~D-8 중성(ink), D-7~D-1 경고(paperAccent), D-0 이하 만료(paperError)
 
@@ -282,7 +282,7 @@ List<StudentWithMembership> _applyFilter(
 | 화면 진입 | 혼란 | **안심** (배너가 우선순위 노출) |
 | 만료 임박 파악 | 불안 | **통제감** (빨간 배너 1탭 접근) |
 | 만료 학생 재등록 | 좌절 | **기회감** (보관 chip + CTA) |
-| 현금흐름 파악 | 불가시 | **명료** (미결제 배너) |
+| 현금흐름 파악 | 불가시 | **명료** (입금대기 배너) |
 
 ---
 

@@ -69,6 +69,7 @@ enum SubscriptionPaymentMethod {
   @HiveField(1)
   bankTransfer,
 
+  @Deprecated('Card/PG is not part of the current tuition deposit policy.')
   @HiveField(2)
   card,
 

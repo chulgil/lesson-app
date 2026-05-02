@@ -109,8 +109,9 @@ class Subscription {
   @HiveField(2)
   final String membershipId;        // 소속 관계 ID (FK → ClassMembership)
 
+  @Deprecated('Use paymentConfirmed instead. Legacy field; do not use for new work.')
   @HiveField(3)
-  final String? paymentId;          // 연결된 결제 ID (선택)
+  final String? paymentId;          // 레거시 결제 ID (신규 구현 금지)
 
   // 수강권 정보
   @HiveField(4)
@@ -299,6 +300,7 @@ class Subscription {
     String? id,
     String? studentId,
     String? membershipId,
+    @Deprecated('Use paymentConfirmed instead. Legacy field; do not use for new work.')
     String? paymentId,
     SubscriptionType? type,
     int? totalLessons,
@@ -362,7 +364,7 @@ class Subscription {
 | `id` | String | ✅ | UUID |
 | `studentId` | String | ✅ | 학생 ID (FK → Student) |
 | `membershipId` | String | ✅ | 소속 관계 ID (FK → ClassMembership) |
-| `paymentId` | String? | - | 연결된 결제 ID |
+| `paymentId` | String? | - | **Deprecated** 레거시 결제 ID. 신규 구현은 `paymentConfirmed`/`paymentStatus` 사용 |
 | `type` | SubscriptionType | ✅ | trial, monthly, package |
 | `totalLessons` | int? | - | 패키지: 총 횟수 (예: 8) |
 | `lessonsPerMonth` | int? | - | 월정액: 월 포함 횟수 (예: 4) |
@@ -433,7 +435,6 @@ class Subscription {
   "id": "sub_monthly_001",
   "studentId": "student_1",
   "membershipId": "cm_001",
-  "paymentId": "pay_001",
   "type": "monthly",
   "totalLessons": null,
   "lessonsPerMonth": 4,
@@ -454,7 +455,6 @@ class Subscription {
   "id": "sub_monthly_002",
   "studentId": "student_2",
   "membershipId": "cm_002",
-  "paymentId": "pay_002",
   "type": "monthly",
   "lessonsPerMonth": 4,
   "usedLessons": 3,
@@ -474,7 +474,6 @@ class Subscription {
   "id": "sub_monthly_003",
   "studentId": "student_1",
   "membershipId": "cm_001",
-  "paymentId": "pay_003",
   "type": "monthly",
   "lessonsPerMonth": 4,
   "usedLessons": 4,
@@ -494,7 +493,6 @@ class Subscription {
   "id": "sub_package_001",
   "studentId": "student_1",
   "membershipId": "cm_001",
-  "paymentId": "pay_004",
   "type": "package",
   "totalLessons": 8,
   "lessonsPerMonth": null,
@@ -515,7 +513,6 @@ class Subscription {
   "id": "sub_package_002",
   "studentId": "student_3",
   "membershipId": "cm_003",
-  "paymentId": "pay_005",
   "type": "package",
   "totalLessons": 8,
   "usedLessons": 6,
@@ -535,7 +532,6 @@ class Subscription {
   "id": "sub_package_003",
   "studentId": "student_2",
   "membershipId": "cm_002",
-  "paymentId": "pay_006",
   "type": "package",
   "totalLessons": 4,
   "usedLessons": 4,
@@ -555,7 +551,6 @@ class Subscription {
   "id": "sub_paused_001",
   "studentId": "student_4",
   "membershipId": "cm_004",
-  "paymentId": "pay_007",
   "type": "package",
   "totalLessons": 8,
   "usedLessons": 2,
@@ -575,7 +570,6 @@ class Subscription {
   "id": "sub_cross_001",
   "studentId": "student_1",
   "membershipId": "cm_001",
-  "paymentId": "pay_008",
   "type": "package",
   "totalLessons": 8,
   "usedLessons": 3,
@@ -599,7 +593,6 @@ class Subscription {
   "id": "sub_multi_001",
   "studentId": "student_2",
   "membershipId": "cm_002",
-  "paymentId": "pay_009",
   "type": "package",
   "totalLessons": 8,
   "usedLessons": 2,
@@ -623,7 +616,6 @@ class Subscription {
   "id": "sub_monthly_bonus_001",
   "studentId": "student_1",
   "membershipId": "cm_001",
-  "paymentId": "pay_010",
   "type": "monthly",
   "totalLessons": null,
   "lessonsPerMonth": 4,
@@ -650,7 +642,6 @@ class Subscription {
   "id": "sub_package_billing_001",
   "studentId": "student_3",
   "membershipId": "cm_003",
-  "paymentId": "pay_011",
   "type": "package",
   "totalLessons": 8,
   "lessonsPerMonth": null,
@@ -1199,6 +1190,7 @@ class SubscriptionTemplate {
   Subscription createSubscription({
     required String studentId,
     required String membershipId,
+    @Deprecated('Use paymentConfirmed instead. Legacy field; do not use for new work.')
     String? paymentId,
   }) {
     final now = DateTime.now();

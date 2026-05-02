@@ -3,7 +3,7 @@
 
 /// Notification category for grouping settings
 enum NotificationCategory {
-  payment, // Required, cannot be disabled
+  payment, // Deposit status, required, cannot be disabled
   lesson,
   assignment,
   practice,
@@ -13,7 +13,7 @@ enum NotificationCategory {
   String get label {
     switch (this) {
       case NotificationCategory.payment:
-        return '결제';
+        return '입금 상태';
       case NotificationCategory.lesson:
         return '레슨';
       case NotificationCategory.assignment:
@@ -51,7 +51,7 @@ class ParentNotificationSettings {
   final String id;
   final String parentId;
 
-  // Payment (required, always ON)
+  // Deposit status (required, always ON)
   final bool paymentRequest; // Cannot be disabled
   final bool paymentComplete; // Cannot be disabled
   final bool paymentDueSoon; // Configurable
@@ -84,7 +84,7 @@ class ParentNotificationSettings {
   const ParentNotificationSettings({
     required this.id,
     required this.parentId,
-    // Payment (required)
+    // Deposit status (required)
     this.paymentRequest = true, // Cannot change
     this.paymentComplete = true, // Cannot change
     this.paymentDueSoon = true,
@@ -125,9 +125,9 @@ class ParentNotificationSettings {
   Map<NotificationCategory, List<NotificationItem>> get groupedSettings {
     return {
       NotificationCategory.payment: [
-        NotificationItem('결제 요청', paymentRequest, isRequired: true),
-        NotificationItem('결제 완료 확인', paymentComplete, isRequired: true),
-        NotificationItem('결제 기한 임박', paymentDueSoon),
+        NotificationItem('입금 안내', paymentRequest, isRequired: true),
+        NotificationItem('입금 확인', paymentComplete, isRequired: true),
+        NotificationItem('입금 예정일 임박', paymentDueSoon),
       ],
       NotificationCategory.lesson: [
         NotificationItem('레슨 일정 변경', lessonChange, isRecommended: true),
@@ -201,7 +201,7 @@ class ParentNotificationSettings {
     return ParentNotificationSettings(
       id: id ?? this.id,
       parentId: parentId ?? this.parentId,
-      // Payment required fields cannot be changed
+      // Deposit status required fields cannot be changed
       paymentRequest: true,
       paymentComplete: true,
       paymentDueSoon: paymentDueSoon ?? this.paymentDueSoon,

@@ -367,7 +367,7 @@ class SubscriptionCard extends StatelessWidget {
               _formatDate(subscription.endDate!),
             ),
           ],
-          // 결제 방식 (선생님/학원용)
+          // 입금 확인 방식 (선생님/학원용)
           if (subscription.billingTypeLabel != null) ...[
             _buildDetailRow(
               AppStrings.subscriptionDetailRowPayment,

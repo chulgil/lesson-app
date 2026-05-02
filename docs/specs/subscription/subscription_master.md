@@ -166,10 +166,10 @@ enum SubscriptionStatus {
   paused,       // 일시정지 (학생 요청)
 }
 
-/// 결제 방식
+/// 과금 기준
 enum BillingType {
-  perPackage, // 회차 결제 (수업 시작 전 일괄)
-  monthly,    // 월정액 결제 (매월 고정일)
+  perPackage, // 회차 기준 입금
+  monthly,    // 월정액 기준 입금
 }
 
 /// 5주차 정책 (월정액 전용)
@@ -180,11 +180,11 @@ enum FifthWeekPolicy {
   optional, // 학생 선택
 }
 
-/// 결제 수단
+/// 입금 수단
 enum SubscriptionPaymentMethod {
   cash,         // 현금
   bankTransfer, // 계좌이체
-  card,         // 카드
+  card,         // Deprecated: 현행 수강료 입금 정책에서는 사용 금지
   other,        // 기타
 }
 ```
@@ -197,8 +197,8 @@ enum SubscriptionPaymentMethod {
 | `totalLessons` | 1 | - | 8 | 총 횟수 |
 | `usedLessons` | 0~1 | 매월 리셋 | 누적 | 사용 횟수 |
 | `bonusCount` | - | 5주차 등 | 이벤트 | 보너스 횟수 |
-| `billingType` | - | monthly | perPackage | 결제 방식 |
-| `billingDay` | - | 27 | - | 결제일 (월정액) |
+| `billingType` | - | monthly | perPackage | 입금 확인 방식 |
+| `billingDay` | - | 27 | - | 입금 예정일 (월정액) |
 | `startDate` | O | O | O | 시작일 |
 | `endDate` | - | O | O | 만료일 |
 | `carryOver` | - | false | true | 이월 가능 여부 |
@@ -278,7 +278,7 @@ int get remainingLessons {
 [수강권 생성]
      │
      ▼
-  pending ──── 결제 완료 ────▶ active
+  pending ──── 입금 확인 완료 ────▶ active
   (대기)                       (활성)
                                  │
                   ┌──────────────┼──────────────┐
@@ -544,7 +544,7 @@ void onPaymentConfirmed(Proposal proposal) {
 
 #### 3.3.5 앱 전환 (기존 정기레슨 → 앱)
 
-이미 결제 완료된 상태이므로 입금 확인 없이 바로 수강권 발급.
+이미 입금 확인 완료된 상태이므로 입금 확인 없이 바로 수강권 발급.
 
 | 항목 | 일반 발급 | 앱 전환 |
 |------|----------|--------|

@@ -31,7 +31,7 @@ class CurrentRequestBox extends StatefulWidget {
   final int? initialSelectedSlot;
 
   // Phase 2 callbacks
-  final VoidCallback? onSendPaymentGuide; // 선불: 결제 안내 BottomSheet
+  final VoidCallback? onSendPaymentGuide; // 선불: 입금 안내 BottomSheet
   final VoidCallback? onIssuePostpaid; // 후불: 수강권 먼저 발급
   final VoidCallback? onIssueFree; // 무료: 체험 수강권 발급
   final VoidCallback? onConfirmPayment; // 학생: 입금 완료
@@ -444,7 +444,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 3. 학생이 수강권 수락 → 결제 대기
+    // 3. 학생이 수강권 수락 → 입금 완료 알림 대기
     if (status == UnifiedRequestStatus.proposalAccepted) {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,

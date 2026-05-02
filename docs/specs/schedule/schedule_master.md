@@ -561,7 +561,7 @@ pending -> dismissed (카드 닫기/만료)
 |------|------|
 | `pending` | 요청 대기 (7일 만료) |
 | `proposalSent` | 수강권 제안됨 |
-| `accepted` | 수락 + 결제 완료 |
+| `accepted` | 수락 + 입금 확인 완료 |
 | `declined` | 선생님 거절 (사유 포함) |
 | `expired` | 7일 만료 |
 | `cancelled` | 학생 취소 |
@@ -1246,7 +1246,7 @@ enum MakeupReason {
 enum LessonRequestStatus {
   pending,         // 요청 대기 (7일 만료)
   proposalSent,    // 수강권 제안됨
-  accepted,        // 수락 + 결제 완료
+  accepted,        // 수락 + 입금 확인 완료
   declined,        // 선생님 거절 (사유 포함)
   expired,         // 7일 만료
   cancelled,       // 학생 취소

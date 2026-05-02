@@ -408,8 +408,8 @@ class AppStrings {
   /// 입금 확인 중
   static const studentPaymentWaiting = '입금 확인 중';
 
-  /// 결제 필요 (학생이 결제해야 함)
-  static const studentPaymentRequired = '결제 필요';
+  /// 입금 필요 (학생이 앱 밖에서 입금해야 함)
+  static const studentPaymentRequired = '입금 필요';
 
   /// 선생님 이름 포맷
   static String teacherDisplayName(String name) => '$name 선생님';
@@ -447,7 +447,7 @@ class AppStrings {
   static const eventPaymentNotified = '입금 알림';
   static const eventCompleted = '발급 완료';
   static const eventWithdrawApproval = '결정 변경';
-  static const eventPaymentRequested = '결제 안내';
+  static const eventPaymentRequested = '입금 안내';
   static const eventPaymentConfirmed = '입금 확인';
   static const eventSubscriptionIssued = '수강권 발행';
   static const eventLessonCompleted = '레슨 완료';
@@ -471,7 +471,7 @@ class AppStrings {
   static const chatPaymentNotified = '입금했습니다';
   static const chatCompleted = '수강권이 발급되었습니다';
   static const chatWithdrawApproval = '결정을 변경했습니다';
-  static const chatPaymentRequested = '결제 안내를 보냈습니다';
+  static const chatPaymentRequested = '입금 안내를 보냈습니다';
   static const chatPaymentConfirmed = '입금을 확인했습니다';
   static const chatSubscriptionIssued = '수강권이 발행되었습니다';
   static const chatLessonCompleted = '레슨이 완료되었습니다';
@@ -527,7 +527,7 @@ class AppStrings {
 
   static const phaseRequest = '신청';
   static const phaseConfirmed = '확정';
-  static const phasePayment = '결제';
+  static const phasePayment = '입금';
   static const phaseLessons = '진행';
   static const phaseCompleted = '완료';
 
@@ -544,7 +544,7 @@ class AppStrings {
   // ── Chapter Titles ────────────────────────────────────────
 
   static const chapterRequest = '레슨 신청';
-  static const chapterSubscription = '수강권 & 결제';
+  static const chapterSubscription = '수강권 & 입금';
   static const chapterLessons = '레슨 진행';
 
   // ── Profile Menu ──────────────────────────────────────────
@@ -589,19 +589,19 @@ class AppStrings {
   static const phase2SelectMethod = '수강권 발급 방법을 선택하세요';
 
   /// Phase 2: 선불 카드
-  static const methodPrepaidTitle = '결제 후 발급 (선불)';
-  static const methodPrepaidDesc = '학생에게 결제 안내를 보내고, 입금 확인 후 수강권이 발급됩니다';
+  static const methodPrepaidTitle = '입금 확인 후 발급 (선불)';
+  static const methodPrepaidDesc = '학생에게 입금 안내를 보내고, 입금 확인 후 수강권이 발급됩니다';
 
   /// Phase 2: 후불 카드
   static const methodPostpaidTitle = '먼저 발급 (후불)';
-  static const methodPostpaidDesc = '수강권을 바로 발급하고, 결제는 나중에 받습니다';
+  static const methodPostpaidDesc = '수강권을 바로 발급하고, 입금 확인은 나중에 합니다';
 
   /// Phase 2: 무료 카드
   static const methodFreeTitle = '무료 발급';
-  static const methodFreeDesc = '결제 없이 수강권을 바로 발급합니다';
+  static const methodFreeDesc = '입금 없이 수강권을 바로 발급합니다';
 
-  /// Phase 2: Teacher → 결제 안내 전송 (선불)
-  static const actionSendPaymentGuide = '결제 안내 보내기';
+  /// Phase 2: Teacher → 입금 안내 전송 (선불)
+  static const actionSendPaymentGuide = '입금 안내 보내기';
 
   /// Phase 2: Teacher → 후불 수강권 발급
   static const actionIssuePostpaid = '수강권 먼저 발급';
@@ -618,7 +618,7 @@ class AppStrings {
   /// Phase 2: 시간 확정 후 안내 메시지
   static const phase2TimeConfirmedTeacher = '수강권 발급 방법을 선택해주세요';
   static const phase2TimeConfirmedTrial = '체험레슨이 확정되었습니다';
-  static const phase2WaitingPaymentStudent = '결제를 완료해주세요';
+  static const phase2WaitingPaymentStudent = '입금 후 완료 알림을 보내주세요';
   static const phase2PaymentReceivedTeacher = '학생이 입금을 완료했습니다';
 
   // ── Action Box Messages (Phase 2 대기 상태) ─────────────────
@@ -626,8 +626,8 @@ class AppStrings {
   /// 선생님: 학생 수강권 수락 대기
   static const actionBoxWaitingAccept = '학생의 수강권 수락을 기다리고 있습니다';
 
-  /// 선생님: 학생 결제 대기
-  static const actionBoxWaitingPayment = '학생의 결제를 기다리고 있습니다';
+  /// 선생님: 학생 입금 완료 알림 대기
+  static const actionBoxWaitingPayment = '학생의 입금 완료 알림을 기다리고 있습니다';
 
   /// 선생님: 수강권 발행 완료
   static const actionBoxSubscriptionReady =
@@ -647,8 +647,8 @@ class AppStrings {
   /// 입금 확인 후 수강권 발급 메시지 (이벤트 기록용)
   static const paymentVerifiedMessage = '입금이 확인되어 수강권이 발급되었습니다';
 
-  /// 결제 안내 BottomSheet
-  static const paymentGuideTitle = '결제 안내 보내기';
+  /// 입금 안내 BottomSheet
+  static const paymentGuideTitle = '입금 안내 보내기';
   static const subscriptionTypeMonthly = '월정액';
   static const subscriptionTypePackage = '회차권';
   static const totalLessonsLabel = '총 회차';
@@ -660,7 +660,7 @@ class AppStrings {
 
   /// Proposal BottomSheet (v8 통합)
   static const proposalTitle = '수강권 발급';
-  static const proposalPaymentMethod = '결제 방법';
+  static const proposalPaymentMethod = '입금 확인 방식';
   static const proposalSelectTemplates = '수강권 선택 (최대 3개)';
   static const proposalBankAccount = '입금 계좌';
   static const proposalSend = '제안 보내기';
@@ -921,20 +921,20 @@ class AppStrings {
 
   // === Chapter payment detail strings ===
 
-  /// 결제 상태
-  static const paymentStatus = '결제 상태';
+  /// 입금 상태
+  static const paymentStatus = '입금 상태';
 
-  /// 결제완료
-  static const paymentCompleted = '결제완료';
+  /// 입금 확인 완료
+  static const paymentCompleted = '입금 확인 완료';
 
-  /// 미결제
-  static const paymentPending = '미결제';
+  /// 입금 확인 대기
+  static const paymentPending = '입금 확인 대기';
 
-  /// 결제 방법
-  static const paymentMethod = '결제 방법';
+  /// 입금 방법
+  static const paymentMethod = '입금 방법';
 
-  /// 결제일
-  static const paymentDate = '결제일';
+  /// 입금일
+  static const paymentDate = '입금일';
 
   /// 확인일
   static const confirmationDate = '확인일';
@@ -2913,18 +2913,18 @@ class AppStrings {
   static const issueFormTypeMonthlyDescription =
       '월 단위 정기 수강권입니다. 고정된 요일·시간에 레슨이 자동 배정되어 스케줄 관리가 편리합니다.';
 
-  /// 결제 방식 (섹션 제목)
-  static const issueFormPaymentSectionTitle = '결제 방식';
+  /// 입금 확인 방식 (섹션 제목)
+  static const issueFormPaymentSectionTitle = '입금 확인 방식';
 
-  /// 선불 (결제 칩 라벨)
+  /// 선불 (입금 확인 칩 라벨)
   static const issueFormPaymentPrepaidLabel = '선불';
 
-  /// 후불 (결제 칩 라벨)
+  /// 후불 (입금 확인 칩 라벨)
   static const issueFormPaymentPostpaidLabel = '후불';
 
   /// 후불 수강권 안내
   static const issueFormPaymentPostpaidNotice =
-      '후불 수강권은 미수금으로 표시됩니다. 입금 확인 후 결제완료 처리할 수 있습니다.';
+      '후불 수강권은 입금 확인 대기로 표시됩니다. 입금 확인 후 완료 처리할 수 있습니다.';
 
   /// 정가 (섹션 제목)
   static const issueFormAmountSectionTitle = '정가';
@@ -3020,22 +3020,22 @@ class AppStrings {
   /// 유형 (요약 행 라벨)
   static const issueFormSummaryTypeLabel = '유형';
 
-  /// 결제금액 (요약 행 라벨)
-  static const issueFormSummaryFinalAmountLabel = '결제금액';
+  /// 입금 예정 금액 (요약 행 라벨)
+  static const issueFormSummaryFinalAmountLabel = '입금 예정 금액';
 
   /// 금액 (요약 행 라벨)
   static const issueFormSummaryAmountLabel = '금액';
 
-  /// 결제 (요약 행 라벨)
-  static const issueFormSummaryPaymentLabel = '결제';
+  /// 입금 상태 (요약 행 라벨)
+  static const issueFormSummaryPaymentLabel = '입금 상태';
 
   /// 만료일 (요약 행 라벨)
   static const issueFormSummaryEndDateLabel = '만료일';
 
-  /// 미결제 (후불) (결제 미확인 시 표기)
-  static const issueFormSummaryUnpaidLabel = '미결제 (후불)';
+  /// 입금 확인 대기 (후불) (입금 미확인 시 표기)
+  static const issueFormSummaryUnpaidLabel = '입금 확인 대기 (후불)';
 
-  /// $method (확인됨) (결제 확인 시 표기)
+  /// $method (확인됨) (입금 확인 시 표기)
   static String issueFormSummaryPaymentConfirmed(String method) =>
       '$method (확인됨)';
 
@@ -3116,9 +3116,9 @@ class AppStrings {
   /// 레슨시간 (디테일 행 라벨)
   static const proposalDetailsDurationLabel = '레슨시간';
 
-  /// 결제일로부터 $validity (유효기간 값 포매터)
+  /// 입금 확인일로부터 $validity (유효기간 값 포매터)
   static String proposalDetailsValidityValue(String validity) =>
-      '결제일로부터 $validity';
+      '입금 확인일로부터 $validity';
 
   /// 선생님 메시지 (메시지 카드 라벨)
   static const proposalMessageCardLabel = '선생님 메시지';
@@ -3126,8 +3126,8 @@ class AppStrings {
   /// 할인 적용 (할인 카드 기본 사유)
   static const proposalDiscountReasonDefault = '할인 적용';
 
-  /// 결제가 (할인 카드 최종 라벨)
-  static const proposalDiscountFinalLabel = '결제가';
+  /// 입금 예정 금액 (할인 카드 최종 라벨)
+  static const proposalDiscountFinalLabel = '입금 예정 금액';
 
   /// $man만원 (가격 포매터: 만 단위 정확히)
   static String proposalPriceManwon(int man) => '$man만원';
@@ -3142,8 +3142,8 @@ class AppStrings {
   /// 계좌 미등록 (입금 정보 카드 fallback)
   static const proposalPaymentBankNotRegistered = '계좌 미등록';
 
-  /// 결제 정보 (입금 정보 카드 제목)
-  static const proposalPaymentInfoTitle = '결제 정보';
+  /// 입금 정보 (입금 정보 카드 제목)
+  static const proposalPaymentInfoTitle = '입금 정보';
 
   /// 은행 (입금 정보 행 라벨)
   static const proposalPaymentBankLabel = '은행';
@@ -3182,8 +3182,8 @@ class AppStrings {
   /// 자동 제안 메시지 인사 ("체험레슨 수고하셨습니다! ")
   static const autoProposalGreeting = '체험레슨 수고하셨습니다! ';
 
-  /// 자동 제안 골든타임 안내 ("N시간 이내 결제 시 ")
-  static String autoProposalGoldenTimeHours(int hours) => '$hours시간 이내 결제 시 ';
+  /// 자동 제안 골든타임 안내 ("N시간 이내 등록 시 ")
+  static String autoProposalGoldenTimeHours(int hours) => '$hours시간 이내 등록 시 ';
 
   /// 자동 제안 골든타임 할인율 ("N% 할인이 적용됩니다. ")
   static String autoProposalGoldenTimePercent(int percent) =>
@@ -3256,17 +3256,17 @@ class AppStrings {
   static const bulkPurchaseBonus = '대량 구매 보너스';
 
   // ProposalPaymentStatus
-  /// 결제 대기
-  static const proposalPaymentStatusPending = '결제 대기';
+  /// 입금 확인 대기
+  static const proposalPaymentStatusPending = '입금 확인 대기';
 
-  /// 결제 완료
-  static const proposalPaymentStatusCompleted = '결제 완료';
+  /// 입금 확인 완료
+  static const proposalPaymentStatusCompleted = '입금 확인 완료';
 
   /// 입금 확인 필요
   static const proposalPaymentDescPending = '입금 확인 필요';
 
-  /// 이미 결제됨
-  static const proposalPaymentDescCompleted = '이미 결제됨';
+  /// 이미 입금 확인됨
+  static const proposalPaymentDescCompleted = '이미 입금 확인됨';
 
   // ProposalStatus
   /// 제안됨
@@ -3323,18 +3323,18 @@ class AppStrings {
   /// 계좌이체
   static const paymentMethodBankTransfer = '계좌이체';
 
-  /// 카드
-  static const paymentMethodCard = '카드';
+  /// 카드 (레거시)
+  static const paymentMethodCard = '카드(레거시)';
 
-  /// 기타 (결제 수단)
+  /// 기타 (입금 수단)
   static const paymentMethodOther = '기타';
 
   // Subscription payment status / type / status / summary
-  /// 결제완료
-  static const paymentStatusPaid = '결제완료';
+  /// 입금 확인 완료
+  static const paymentStatusPaid = '입금 확인 완료';
 
-  /// 미결제
-  static const paymentStatusUnpaid = '미결제';
+  /// 입금 확인 대기
+  static const paymentStatusUnpaid = '입금 확인 대기';
 
   /// 체험 (수강권 유형)
   static const subscriptionTypeTrial = '체험';
@@ -3414,8 +3414,8 @@ class AppStrings {
   /// N원
   static String amountWon(int amount) => '$amount원';
 
-  /// 회차 결제 (BillingType.perPackage)
-  static const billingTypePerPackage = '회차 결제';
+  /// 회차 기준 입금 (BillingType.perPackage)
+  static const billingTypePerPackage = '회차 기준 입금';
 
   /// 월정액 (매월 N일) — BillingType.monthly with day
   static String billingTypeMonthlyWithDay(int day) => '월정액 (매월 $day일)';
@@ -3592,8 +3592,8 @@ class AppStrings {
   /// • 유효기간
   static const subscriptionDetailRowExpiry = '• 유효기간';
 
-  /// • 결제
-  static const subscriptionDetailRowPayment = '• 결제';
+  /// • 입금
+  static const subscriptionDetailRowPayment = '• 입금';
 
   /// • 5주차
   static const subscriptionDetailRowFifthWeek = '• 5주차';
@@ -3724,7 +3724,7 @@ class AppStrings {
   /// 다음에 할게요 (제안 거절 버튼)
   static const proposalDeclineNextTime = '다음에 할게요';
 
-  /// 선택 후 위 계좌로 입금해 주세요 (결제 안내 캡션)
+  /// 선택 후 위 계좌로 입금해 주세요 (입금 안내 캡션)
   static const paymentDepositInstruction = '선택 후 위 계좌로 입금해 주세요';
 
   /// 수강권을 선택했습니다 (수락 성공 SnackBar)
@@ -3937,9 +3937,9 @@ class AppStrings {
   /// 전환율 UP (배지)
   static const proposalSettingsConversionUpBadge = '전환율 UP';
 
-  /// 체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다 (섹션 힌트)
+  /// 체험 완료 후 일정 시간 내 등록 시 할인을 적용합니다 (섹션 힌트)
   static const proposalSettingsGoldenTimeHint =
-      '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다';
+      '체험 완료 후 일정 시간 내 등록 시 할인을 적용합니다';
 
   /// 할인율 (드롭다운 라벨)
   static const proposalSettingsDiscountPercentLabel = '할인율';
@@ -3950,11 +3950,11 @@ class AppStrings {
   /// $hours시간 (시간 드롭다운 항목 포매터)
   static String proposalSettingsHoursFormat(int hours) => '$hours시간';
 
-  /// 체험 후 $hours시간 이내 결제 시 $percent% 할인 (요약 메시지 포매터)
+  /// 체험 후 $hours시간 이내 등록 시 $percent% 할인 (요약 메시지 포매터)
   static String proposalSettingsGoldenTimeSummaryFormat(
     int hours,
     int percent,
-  ) => '체험 후 $hours시간 이내 결제 시 $percent% 할인';
+  ) => '체험 후 $hours시간 이내 등록 시 $percent% 할인';
 
   /// 자동 리마인더 (섹션 타이틀)
   static const proposalSettingsAutoReminderTitle = '자동 리마인더';

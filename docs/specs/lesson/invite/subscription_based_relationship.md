@@ -179,7 +179,7 @@ enum RelationshipStatus {
 │  │ (임시 상태) │                                                     │
 │  └──────┬──────┘                                                     │
 │         │                                                             │
-│         │ 선생님이 수강권 등록 (결제 완료로 발급)                     │
+│         │ 선생님이 수강권 등록 (입금 확인 완료로 발급)                     │
 │         ▼                                                             │
 │  ┌─────────────┐                                                     │
 │  │   active    │ ←── 스케줄 직접 입력                                │
@@ -407,7 +407,7 @@ class NotificationSetting {
   /// 레슨 리마인더 알림
   final bool lessonReminderEnabled;
 
-  /// 결제 알림
+  /// 입금 상태 알림
   final bool paymentReminderEnabled;
 
   final DateTime updatedAt;
@@ -421,7 +421,7 @@ class NotificationSetting {
 | 푸시 알림 | ✅ On | ✅ |
 | 연습 공유 | ✅ On | ✅ |
 | 레슨 리마인더 | ✅ On | ✅ |
-| 결제 알림 | ✅ On | ✅ |
+| 입금 상태 알림 | ✅ On | ✅ |
 
 ### 4.4 알림 끄기 vs 관계 종료
 
@@ -651,7 +651,7 @@ sequenceDiagram
         Note over S,T: Step 2: 선생님이 수강권 등록
         T->>App: 학생 목록에서 학생 선택
         T->>App: "수강권 등록" → 잔여 횟수 입력
-        T->>App: 결제 상태 = "결제 완료로 발급"
+        T->>App: 결제 상태 = "입금 확인 완료로 발급"
         App->>App: Subscription 생성
         App->>App: status = active
         App->>S: 🔔 "수강권 등록 완료"
@@ -805,8 +805,8 @@ void issueSubscriptionForAppTransition({
 │  │ 레슨 리마인더                                   [🔵 ON]  │    │
 │  │ 레슨 1시간 전, 전날 알림                                 │    │
 │  ├─────────────────────────────────────────────────────────┤    │
-│  │ 결제 알림                                       [🔵 ON]  │    │
-│  │ 수강권 만료, 결제 요청 알림                              │    │
+│  │ 입금 상태 알림                                       [🔵 ON]  │    │
+│  │ 수강권 만료, 입금 안내 알림                              │    │
 │  ├─────────────────────────────────────────────────────────┤    │
 │  │ 과제 알림                                       [🔵 ON]  │    │
 │  │ 새 과제 배정, 연습 리마인더                              │    │

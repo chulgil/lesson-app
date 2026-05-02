@@ -20,7 +20,7 @@ import '../../domain/entities/child_profile.dart';
 import '../providers/child_profile_provider.dart';
 import 'parent_dashboard_tab.dart';
 
-/// Parent's per-child subscription / payment status view.
+/// Parent's per-child subscription / deposit status view.
 ///
 /// Lists subscriptions of the currently selected child, grouped by status.
 /// Reuses [SubscriptionTicketCard] — this tab is a parent-scoped read view,
@@ -36,7 +36,7 @@ class ParentPaymentsTab extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('결제·수강권'),
+        title: const Text('입금·수강권'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -407,7 +407,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      // Notebook × Score: 학부모 결제 탭 섹션 헤더도 Playfair sectionTitle 로 통일.
+      // Notebook × Score: 학부모 입금 탭 섹션 헤더도 Playfair sectionTitle 로 통일.
       child: Text(
         title,
         style: NotebookTypography.sectionTitle.copyWith(

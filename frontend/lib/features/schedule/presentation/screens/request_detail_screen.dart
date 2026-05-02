@@ -1204,7 +1204,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       );
     }
 
-    // Phase 2: 수강권 & 결제 — show if past Phase 2
+    // Phase 2: 수강권 & 입금 — show if past Phase 2
     if (_isPhaseCompleted(phase, RequestPhase.subscription)) {
       final isExpanded = _expandedChapters.contains(RequestPhase.subscription);
       chapters.add(

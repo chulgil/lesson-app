@@ -35,7 +35,7 @@
 /// ### Proposals
 /// - `teacherProposalsProvider(teacherId)` — 선생님의 전체 제안
 /// - `activeTeacherProposalsProvider(teacherId)` — 진행 중 제안
-/// - `awaitingConfirmationProposalsProvider(teacherId)` — 결제 확인 대기
+/// - `awaitingConfirmationProposalsProvider(teacherId)` — 입금 확인 대기
 /// - `studentProposalsProvider(studentId)` — 학생의 전체 제안
 /// - `activeStudentProposalsProvider(studentId)` — 학생 진행 중 제안
 /// - `pendingStudentProposalsProvider(studentId)` — 학생 대기 중 제안
@@ -65,7 +65,7 @@
 ///   - `.updateSubscription(subscription)` — 수정
 ///   - `.useLesson(id)` — 1회 사용
 ///   - `.useReschedule(id)` — 변경 1회 사용
-///   - `.confirmPayment(id)` — 결제 확인
+///   - `.confirmPayment(id)` — 입금 확인
 ///   - `.pause(id)` / `.resume(id)` — 일시정지/재개
 ///
 /// ### MembershipSubscriptionNotifier (멤버십별)
@@ -79,8 +79,8 @@
 ///   ref.read(subscriptionProposalNotifierProvider.notifier)
 ///   - `.createProposal(...)` — 단일 제안
 ///   - `.createMultiChoiceProposal(...)` — 복수 선택 제안
-///   - `.notifyPayment(proposalId)` — 결제 알림
-///   - `.confirmPayment(proposalId, subscriptionId)` — 결제 확인
+///   - `.notifyPayment(proposalId)` — 입금 완료 알림
+///   - `.confirmPayment(proposalId, subscriptionId)` — 입금 확인
 ///   - `.reject(proposalId, reason)` — 거절
 ///   - `.cancel(proposalId)` — 취소
 ///   - `.selectTemplate(proposalId, templateId)` — 템플릿 선택

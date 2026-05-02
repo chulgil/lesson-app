@@ -770,7 +770,7 @@ enum StudentFilter {
   poor('부족'),
   paused('휴강'),
   expiring('만료임박'),
-  unpaid('미결제'),
+  unpaid('입금대기'),
   trial('체험'),
   archive('보관');
 

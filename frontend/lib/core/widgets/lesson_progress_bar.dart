@@ -8,7 +8,7 @@ import '../theme/app_typography.dart';
 
 /// 5-phase progress bar for the lesson lifecycle chapter model.
 ///
-/// Displays: 신청 → 확정 → 결제 → 진행 → 완료
+/// Displays: 신청 → 확정 → 입금 → 진행 → 완료
 ///
 /// Visual encoding (standard stepper pattern):
 /// - Completed: filled circle + checkmark (✓)

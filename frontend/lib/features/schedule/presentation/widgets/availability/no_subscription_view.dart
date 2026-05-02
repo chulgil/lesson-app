@@ -112,7 +112,7 @@ class NoSubscriptionView extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   _buildFlowStep(1, '선생님이 수강권 제안'),
-                  _buildFlowStep(2, '학생이 수강권 선택 및 결제'),
+                  _buildFlowStep(2, '학생이 수강권 선택 및 입금'),
                   _buildFlowStep(3, '선생님이 입금 확인 후 발급'),
                   _buildFlowStep(4, '레슨 시간 선택', isLast: true),
                 ],
@@ -174,7 +174,7 @@ class NoSubscriptionView extends ConsumerWidget {
               const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Text(
-                  '$teacherName 선생님이 수강권을 제안했습니다!\n제안을 확인하고 결제해 주세요.',
+                  '$teacherName 선생님이 수강권을 제안했습니다!\n제안을 확인하고 입금해 주세요.',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.paperOk,
                     fontWeight: FontWeight.w500,

@@ -416,7 +416,7 @@ enum UnifiedRequestStatus {
   timeConfirmed,     // 시간 확정
   proposalSent,      // 수강권 제안 발송됨
   proposalAccepted,  // 수강권 수락됨
-  paymentNotified,   // 학생 결제 완료 알림
+  paymentNotified,   // 학생 입금 확인 완료 알림
   completed,         // 수강권 발급 완료
   rejected,          // 거절됨
   cancelled,         // 학생 취소

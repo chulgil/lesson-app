@@ -734,14 +734,14 @@ class MockUnifiedLessonRequestRepository
         selectedSlotIndex: 0,
         createdAt: today.subtract(const Duration(days: 29)),
       ),
-      // Phase 2 events (payment)
+      // Phase 2 events (deposit status)
       RequestEvent(
         id: 'evt_12_3',
         requestId: 'ulr_12',
         actorType: ProposerRole.teacher,
         actorId: 'teacher_1',
         eventType: RequestEventType.paymentRequested,
-        message: '정규 10회 수강권 결제를 안내드립니다',
+        message: '정규 10회 수강권 입금을 안내드립니다',
         createdAt: today.subtract(const Duration(days: 28)),
       ),
       RequestEvent(
@@ -793,7 +793,7 @@ class MockUnifiedLessonRequestRepository
     ]);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 13. 수강권 발행됨 (Phase 2) — subscriptionIssued, 결제 완료 후 수강권 발급
+    // 13. 수강권 발행됨 (Phase 2) — subscriptionIssued, 입금 확인 후 수강권 발급
     // ─────────────────────────────────────────────────────────────────────────
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_13',
@@ -843,7 +843,7 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.teacher,
         actorId: 'teacher_1',
         eventType: RequestEventType.paymentRequested,
-        message: '정규 8회 수강권 결제를 안내드립니다',
+        message: '정규 8회 수강권 입금을 안내드립니다',
         createdAt: today.subtract(const Duration(days: 7)),
       ),
       RequestEvent(

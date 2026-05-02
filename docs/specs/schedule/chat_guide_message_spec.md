@@ -53,7 +53,7 @@
 | approved/negotiating | 응답 필요 / 선생님 응답 대기 | 제안된 시간을 확인하고 수락해주세요 | 수락/역제안 버튼 |
 | timeConfirmed | 수강권 대기 | 선생님이 수강권 안내를 보내면 알림을 드립니다 | - |
 | proposalSent | 수강권 도착 | 수강권 안내를 확인하고 수락 또는 거절해주세요 | 수락/거절 버튼 |
-| proposalAccepted | **결제 필요** | 결제를 완료해주세요 | 입금 완료 버튼 |
+| proposalAccepted | **입금 필요** | 입금 후 완료 알림을 보내주세요 | 입금 완료 버튼 |
 | paymentNotified | 입금 확인 중 | 선생님이 확인하면 수강권이 발급됩니다 | 대기 메시지 |
 | subscriptionIssued | 수강권발행 | 레슨을 시작할 준비가 완료되었습니다 | - |
 | inProgress | 레슨진행 | 레슨 일정에 맞춰 참석해주세요 | - |

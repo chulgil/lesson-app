@@ -69,7 +69,7 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
               _buildNavItem(0, 'I', '홈'),
               _buildNavItem(1, 'II', '레슨'),
               _buildNavItem(2, 'III', '과제'),
-              _buildNavItem(3, 'IV', '결제'),
+              _buildNavItem(3, 'IV', '입금'),
               _buildNavItem(4, 'V', '프로필'),
             ],
           ),
@@ -121,7 +121,7 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
         const ParentDashboardTab(), // Shows child's practice overview
         const ParentLessonsTab(), // Shows child's upcoming lessons
         const ParentAssignmentsTab(), // Shows child's assignments
-        const ParentPaymentsTab(), // Shows child's subscriptions / payments
+        const ParentPaymentsTab(), // Shows child's subscriptions / deposit status
         const ParentProfileTab(),
       ];
     }

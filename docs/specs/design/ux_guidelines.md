@@ -107,7 +107,7 @@ Q: 이 색상은 무엇을 의미하나?
 |------|------|------|
 | `hand` | Gaegu 16 | **사람의 액션 산출물 일체**: 선생님 피드백 입력/표시, 학생 메모 입력/표시, 연습노트 본문, 곡 메모, 연습 과제 제목·설명, 레퍼토리·곡명 입력, 일괄 피드백 입력/미리보기 — TextField input style 도 포함 (§7.129, §7.130) |
 | `handOk` | Gaegu 13 / paperOk | 자필 완료 마크 ("✓ 보잉 좋음") |
-| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "미결제") |
+| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "입금대기") |
 | `pieceTitle` | Playfair w700 | 곡 제목, 카드 헤더 |
 | `sectionTitle` | Playfair italic | 섹션 헤더 |
 | `roman` / `romanActive` | Playfair italic | 로마숫자 인덱스 |

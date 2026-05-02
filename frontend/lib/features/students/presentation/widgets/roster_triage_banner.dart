@@ -7,7 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../providers/student_roster_summary_provider.dart';
 
-/// 수강 관리 탭 triage 배너 — 만료임박 / 미결제 / 체험 3칸.
+/// 수강 관리 탭 triage 배너 — 만료임박 / 입금대기 / 체험 3칸.
 ///
 /// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.1
 ///
@@ -61,7 +61,7 @@ class RosterTriageBanner extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: _TriageCard(
-            label: '미결제',
+            label: '입금대기',
             count: summary.unpaidCount,
             accent: AppColors.paperHighlight,
             onTap:

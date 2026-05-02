@@ -56,7 +56,7 @@
 | `practiceAssigned` | normal | X | O |
 | `weeklyGoalAchieved` | low | X | O |
 
-#### 결제 알림
+#### 입금 상태 알림
 
 | 타입 | 우선순위 | DND 우회 | 푸시 |
 |------|---------|---------|------|
@@ -149,9 +149,9 @@
 | `lessonCompleted` | 레슨 종료 시 | 레슨 완료 | "김민수 바이올린 레슨이 완료되었습니다" | check_circle | `/lessons/{id}` |
 | `lessonNoteShared` | 선생님 레슨 노트 작성 시 | 레슨 노트 | "선생님이 레슨 노트를 공유했습니다" | note | `/lessons/{id}/note` |
 | `lessonsRunningLow` | 수강권 잔여 횟수 ≤ 2 | 수강권 임박 | "김민수 수강권 1회 남음" | warning | `/subscriptions/{id}` |
-| `paymentRequested` | 수강권 발급 후 미입금 | 결제 요청 | "김민수 수강권 결제를 확인해주세요" | payment | `/subscriptions/{id}` |
-| `paymentReminder` | 발급 후 3일 미입금 | 미수금 알림 | "김민수 수강권 미결제" | payment | `/subscriptions/{id}` |
-| `paymentReceived` | 입금 확인 시 | 입금 확인 | "김민수 수강권 결제가 확인되었습니다" | payment | `/subscriptions/{id}` |
+| `paymentRequested` | 수강권 발급 후 미입금 | 입금 안내 | "김민수 수강권 입금을 확인해주세요" | payment | `/subscriptions/{id}` |
+| `paymentReminder` | 발급 후 3일 미입금 | 입금 확인 대기 알림 | "김민수 수강권 입금대기" | payment | `/subscriptions/{id}` |
+| `paymentReceived` | 입금 확인 시 | 입금 확인 | "김민수 수강권 입금이 확인되었습니다" | payment | `/subscriptions/{id}` |
 | `streakMilestone` | 연속 N일 달성 | 연습 축하 | "7일 연속 연습!" | celebration | `/practice/stats` |
 | `streakWarning` | 연속 기록 위기 (당일 미연습) | 스트릭 경고 | "연속 연습 기록이 끊어질 수 있어요" | warning | `/practice` |
 | `practiceReminder` | 설정된 연습 리마인더 시간 | 연습 알림 | "오늘의 연습 목표를 달성해보세요" | music_note | `/practice` |
