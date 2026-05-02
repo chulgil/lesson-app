@@ -2,7 +2,7 @@
 
 > 마지막 업데이트: 2026-03-02
 
-MySQL 8.0 · `lesson_app` 데이터베이스 · `utf8mb4_unicode_ci`
+PostgreSQL 17 · `lessonaza` 데이터베이스 · Alembic 관리 스키마
 
 ---
 
@@ -60,10 +60,10 @@ MySQL 8.0 · `lesson_app` 데이터베이스 · `utf8mb4_unicode_ci`
 
 ## 공통 규칙
 
-- **PK**: `CHAR(36)` UUID v4
-- **타임스탬프**: UTC `DATETIME`, `created_at` + `updated_at`
+- **PK**: `VARCHAR(36)` UUID v4
+- **타임스탬프**: UTC `TIMESTAMPTZ`, `created_at` + `updated_at`
 - **삭제**: Soft delete (`is_active` 또는 `is_archived`)
-- **문자열**: `utf8mb4` 인코딩
+- **문자열**: PostgreSQL 기본 UTF-8 인코딩
 - **금액**: `INT` (최소 통화 단위 — KRW: 원, USD: 센트, JPY: 엔)
 - **인덱스 네이밍**: `idx_{table}_{column}`
 

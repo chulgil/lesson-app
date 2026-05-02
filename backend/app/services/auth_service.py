@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -67,10 +67,10 @@ class AuthService:
         """
         from app.core.config import settings
 
-        if settings.ENVIRONMENT not in ("development", "beta"):
+        if settings.ENVIRONMENT != "development":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Dev login is only available in development/beta environment",
+                detail="Dev login is only available in development environment",
             )
 
         from app.models.user import User, UserRole
@@ -157,14 +157,14 @@ class AuthService:
 
     async def logout(self, user_id: str, refresh_token: str) -> None:
         """Blacklist the given refresh token."""
-        from datetime import datetime, timedelta, timezone
+        from datetime import timedelta
 
         from app.core.security import decode_refresh_token
         from app.models.user import TokenBlacklist
 
         payload = decode_refresh_token(refresh_token)
         jti = payload.get("jti", "") if payload else ""
-        expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+        expires_at = datetime.now(UTC) + timedelta(days=30)
 
         blacklist_entry = TokenBlacklist(
             jti=jti,
@@ -281,26 +281,16 @@ class AuthService:
         if not request.identity_token:
             raise HTTPException(status_code=400, detail="identity_token is required for Apple login")
 
-        if settings.APPLE_CLIENT_ID:
-            # Production: verify JWT signature via Apple's JWKS
-            from app.core.security import verify_apple_identity_token
+        if not settings.APPLE_CLIENT_ID:
+            raise HTTPException(status_code=401, detail="Apple login is not configured")
 
-            try:
-                verified = await verify_apple_identity_token(request.identity_token)
-                payload = {"sub": verified["id"], "email": verified.get("email")}
-            except Exception:
-                raise HTTPException(status_code=401, detail="Invalid Apple identity token")
-        else:
-            # Development: decode without verification (APPLE_CLIENT_ID not set)
-            import jwt
+        from app.core.security import verify_apple_identity_token
 
-            try:
-                payload = jwt.decode(
-                    request.identity_token,
-                    options={"verify_signature": False},
-                )
-            except Exception:
-                raise HTTPException(status_code=401, detail="Invalid Apple identity token")
+        try:
+            verified = await verify_apple_identity_token(request.identity_token)
+            payload = {"sub": verified["id"], "email": verified.get("email")}
+        except Exception:
+            raise HTTPException(status_code=401, detail="Invalid Apple identity token")
 
         user_data = request.user or {}
         name_data = user_data.get("name", {})
@@ -391,7 +381,7 @@ class AuthService:
         if user is None:
             user = User(
                 email=provider_user.get("email"),
-                name=provider_user.get("name"),
+                name=provider_user.get("name") or provider_user.get("email") or provider_user["provider_user_id"],
                 profile_image_url=provider_user.get("profile_image_url"),
                 locale=request.locale or "ko",
                 country=request.country or "KR",

@@ -68,14 +68,13 @@ class LessonService:
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.order_by(Lesson.date.desc()).offset(offset).limit(size))
-        items = [LessonResponse.model_validate(l) for l in result.all()]
+        items = [LessonResponse.model_validate(lesson) for lesson in result.all()]
 
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def create(self, data: LessonCreate, current_user: Any) -> LessonResponse:
         """Create a new lesson."""
         from app.models.lesson import Lesson
-
         from app.models.student import Student
 
         tid = await resolve_teacher_id(self.db, current_user.id)
@@ -166,7 +165,7 @@ class LessonService:
             .order_by(Lesson.date)
             .limit(limit)
         )
-        return [LessonResponse.model_validate(l) for l in result.all()]
+        return [LessonResponse.model_validate(lesson) for lesson in result.all()]
 
     async def get_recent(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return recently completed lessons."""
@@ -174,11 +173,14 @@ class LessonService:
 
         result = await self.db.scalars(
             select(Lesson)
-            .where(Lesson.teacher_id == await resolve_teacher_id(self.db, current_user.id), Lesson.status == "completed")
+            .where(
+                Lesson.teacher_id == await resolve_teacher_id(self.db, current_user.id),
+                Lesson.status == "completed",
+            )
             .order_by(Lesson.date.desc())
             .limit(limit)
         )
-        return [LessonResponse.model_validate(l) for l in result.all()]
+        return [LessonResponse.model_validate(lesson) for lesson in result.all()]
 
     # ------------------------------------------------------------------
     # Lesson classes
@@ -295,6 +297,37 @@ class LessonService:
         )
         return [MembershipResponse.model_validate(m) for m in result.all()]
 
+    async def get_memberships(
+        self,
+        current_user: Any,
+        *,
+        student_id: str | None = None,
+        class_id: str | None = None,
+    ) -> list[MembershipResponse]:
+        """List memberships with flat student/class filters."""
+        from app.models.lesson import ClassMembership, LessonClass
+
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        query = select(ClassMembership)
+
+        if student_id:
+            query = query.where(ClassMembership.student_id == student_id)
+        if class_id:
+            query = query.where(ClassMembership.lesson_class_id == class_id)
+
+        if role == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            query = query.join(LessonClass, LessonClass.id == ClassMembership.lesson_class_id).where(
+                LessonClass.teacher_id == teacher_id
+            )
+        elif role == "student":
+            query = query.where(ClassMembership.student_id == current_user.id)
+        else:
+            query = query.where(ClassMembership.student_id == current_user.id)
+
+        result = await self.db.scalars(query)
+        return [MembershipResponse.model_validate(membership) for membership in result.all()]
+
     async def get_membership_by_id(self, membership_id: str, current_user: Any) -> MembershipResponse:
         """Return a single membership."""
         from app.models.lesson import ClassMembership
@@ -302,6 +335,7 @@ class LessonService:
         m = await self.db.get(ClassMembership, membership_id)
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+        await self._assert_membership_access(m, current_user)
         return MembershipResponse.model_validate(m)
 
     async def add_membership(
@@ -333,6 +367,7 @@ class LessonService:
         m = await self.db.get(ClassMembership, membership_id)
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+        await self._assert_membership_access(m, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -343,10 +378,55 @@ class LessonService:
 
     async def remove_membership(self, class_id: str, membership_id: str, current_user: Any) -> None:
         """Remove a membership from a class."""
+        await self.remove_membership_by_id(membership_id, current_user)
+
+    async def update_membership_status(
+        self,
+        membership_id: str,
+        new_status: str,
+        current_user: Any,
+    ) -> MembershipResponse:
+        """Update only membership status."""
         from app.models.lesson import ClassMembership
 
         m = await self.db.get(ClassMembership, membership_id)
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+        await self._assert_membership_access(m, current_user, require_teacher=True)
+        m.status = new_status
+        await self.db.flush()
+        await self.db.refresh(m)
+        return MembershipResponse.model_validate(m)
+
+    async def remove_membership_by_id(self, membership_id: str, current_user: Any) -> None:
+        """Remove a membership without requiring class_id context."""
+        from app.models.lesson import ClassMembership
+
+        m = await self.db.get(ClassMembership, membership_id)
+        if m is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+        await self._assert_membership_access(m, current_user, require_teacher=True)
         await self.db.delete(m)
         await self.db.flush()
+
+    async def _assert_membership_access(
+        self,
+        membership: Any,
+        current_user: Any,
+        *,
+        require_teacher: bool = False,
+    ) -> None:
+        from app.models.lesson import LessonClass
+
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            class_teacher_id = await self.db.scalar(
+                select(LessonClass.teacher_id).where(LessonClass.id == membership.lesson_class_id)
+            )
+            if class_teacher_id == teacher_id:
+                return
+        elif not require_teacher and role == "student" and membership.student_id == current_user.id:
+            return
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to access membership")

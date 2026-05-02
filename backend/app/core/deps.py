@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import Callable
 from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, Query, Request, status
@@ -10,27 +10,11 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import AsyncSessionLocal
+from app.core.database import get_db
 from app.core.security import verify_token
 from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
-
-
-# ---------------------------------------------------------------------------
-# Database session
-# ---------------------------------------------------------------------------
-
-
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Yield an async database session with automatic commit/rollback."""
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
 
 
 # ---------------------------------------------------------------------------

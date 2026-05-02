@@ -13,7 +13,13 @@ from app.models.lesson import (  # noqa: F401
     LessonRecording,
 )
 from app.models.notification import Notification  # noqa: F401
-from app.models.parent import Parent, ParentChildRelation, ParentTeacherConnection  # noqa: F401
+from app.models.parent import (  # noqa: F401
+    Parent,
+    ParentChildRelation,
+    ParentInvitation,
+    ParentTeacherConnection,
+    ParentVisibilitySettings,
+)
 from app.models.payment import Payment, TuitionSettings  # noqa: F401
 from app.models.policy import LessonPolicy, MakeupLesson, ScheduleConfirmationCard  # noqa: F401
 from app.models.practice import (  # noqa: F401

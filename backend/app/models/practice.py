@@ -1,27 +1,27 @@
-import enum
 from datetime import date, datetime
+from enum import StrEnum
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
-class RangeType(str, enum.Enum):
+class RangeType(StrEnum):
     full = "full"
     line = "line"
     measure = "measure"
     measures = "measures"
 
 
-class PracticeItemType(str, enum.Enum):
+class PracticeItemType(StrEnum):
     repertoire = "repertoire"
     technique = "technique"
     theory = "theory"
     custom = "custom"
 
 
-class PracticeItemPriority(str, enum.Enum):
+class PracticeItemPriority(StrEnum):
     must = "must"
     should = "should"
     could = "could"
@@ -107,7 +107,9 @@ class PracticeRecording(UUIDMixin, Base):
     __tablename__ = "practice_recordings"
 
     section_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    student_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     file_path: Mapped[str] = mapped_column(Text, nullable=False)
+    file_key: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     bpm: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -120,6 +122,7 @@ class PracticeRecording(UUIDMixin, Base):
 
     __table_args__ = (
         Index("idx_practice_rec_section", "section_id"),
+        Index("idx_practice_rec_student", "student_id"),
     )
 
 

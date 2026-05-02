@@ -3,23 +3,48 @@
 import datetime as _dt
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class LessonRequestCreate(BaseModel):
     """Create a unified lesson request from student to teacher."""
 
-    teacher_id: str
+    model_config = ConfigDict(populate_by_name=True)
+
+    teacher_id: str = Field(validation_alias=AliasChoices("teacher_id", "teacherId"))
     # Unified fields
-    request_type: Literal["trial", "regular"] | None = None
+    request_type: Literal["trial", "regular"] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("request_type", "type"),
+    )
     instrument: str | None = Field(default=None, max_length=50)
     goal: Literal["hobby", "exam", "major", "other"] | None = None
-    experience_level: Literal["beginner", "intermediate", "advanced"] | None = None
-    preferred_day: int | None = Field(default=None, ge=0, le=6)  # 0=Mon...6=Sun
-    preferred_time: str | None = Field(default=None, max_length=5)  # HH:MM
-    preferred_duration: int | None = Field(default=None, ge=15, le=180)  # minutes
+    experience_level: Literal["beginner", "intermediate", "advanced"] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("experience_level", "experience"),
+    )
+    preferred_day: int | None = Field(
+        default=None,
+        ge=0,
+        le=6,
+        validation_alias=AliasChoices("preferred_day", "preferredDay"),
+    )  # 0=Mon...6=Sun
+    preferred_time: str | None = Field(
+        default=None,
+        max_length=5,
+        validation_alias=AliasChoices("preferred_time", "preferredTime"),
+    )  # HH:MM
+    preferred_duration: int | None = Field(
+        default=None,
+        ge=15,
+        le=180,
+        validation_alias=AliasChoices("preferred_duration", "preferredDuration"),
+    )  # minutes
     message: str | None = Field(default=None, max_length=500)
-    is_returning_student: bool = False
+    is_returning_student: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("is_returning_student", "isReturningStudent"),
+    )
     # Legacy fields (backward compatibility)
     preferred_timing: str = "afterConsultation"  # nextWeek, nextMonth, afterConsultation
     keep_previous_schedule: bool = False
@@ -49,9 +74,11 @@ class LessonRequestResponse(BaseModel):
     teacher_id: str
     # Unified fields
     request_type: str | None = None
+    type: str | None = None
     instrument: str | None = None
     goal: str | None = None
     experience_level: str | None = None
+    experience: str | None = None
     preferred_day: int | None = None
     preferred_time: str | None = None
     preferred_duration: int | None = None
@@ -76,6 +103,41 @@ class LessonRequestResponse(BaseModel):
     confirmed_at: _dt.datetime | None = None
     cancelled_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
+    events: list["RequestEventResponse"] = Field(default_factory=list)
+
+
+class RequestEventResponse(BaseModel):
+    """Chat-history event for a lesson request."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    request_id: str
+    actor_type: str
+    actor_id: str
+    event_type: str
+    suggested_slots: list | None = Field(default_factory=list)
+    selected_slot_index: int | None = None
+    message: str | None = None
+    created_at: _dt.datetime
+    schedule_change_type: str | None = None
+    proposed_day_of_week: int | None = None
+    proposed_time: str | None = None
+    subscription_id: str | None = None
+    session_number: int | None = None
+
+
+class LessonRequestCalendarItem(BaseModel):
+    """Aggregated request count for a preferred day."""
+
+    day_of_week: int
+    count: int
+
+
+class LessonRequestCalendarResponse(BaseModel):
+    """Calendar markers for accessible lesson requests."""
+
+    items: list[LessonRequestCalendarItem]
 
 
 class LessonRequestStatusUpdate(BaseModel):
@@ -93,9 +155,11 @@ class LessonRequestStatusUpdate(BaseModel):
 class TimeSlotOptionSchema(BaseModel):
     """A single time slot option within a proposal."""
 
-    day_of_week: int  # 0=Mon...6=Sun
-    start_time: str  # HH:MM
-    end_time: str  # HH:MM
+    model_config = ConfigDict(populate_by_name=True)
+
+    day_of_week: int = Field(validation_alias=AliasChoices("day_of_week", "dayOfWeek"))  # 0=Mon...6=Sun
+    start_time: str = Field(validation_alias=AliasChoices("start_time", "startTime"))  # HH:MM
+    end_time: str = Field(validation_alias=AliasChoices("end_time", "endTime"))  # HH:MM
 
 
 class TimeProposalCreate(BaseModel):
@@ -108,5 +172,43 @@ class TimeProposalCreate(BaseModel):
 class AlternativeAccept(BaseModel):
     """Student accepts one of the teacher's proposed alternatives."""
 
-    selected_slot_index: int = Field(ge=0, le=2)  # 0-based, max 3 slots
+    model_config = ConfigDict(populate_by_name=True)
+
+    selected_slot_index: int = Field(
+        ge=0,
+        le=2,
+        validation_alias=AliasChoices("selected_slot_index", "selectedSlotIndex"),
+    )  # 0-based, max 3 slots
     message: str | None = Field(default=None, max_length=500)
+
+
+class LessonRequestAction(BaseModel):
+    """Unified action endpoint payload for lesson request lifecycle."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    action: Literal[
+        "approve",
+        "reject",
+        "proposeAlternative",
+        "acceptAlternative",
+        "counterPropose",
+        "cancel",
+    ]
+    slots: list[TimeSlotOptionSchema] | None = Field(
+        default=None,
+        max_length=3,
+        validation_alias=AliasChoices("slots", "suggestedSlots"),
+    )
+    selected_slot_index: int | None = Field(
+        default=None,
+        ge=0,
+        le=2,
+        validation_alias=AliasChoices("selected_slot_index", "selectedSlotIndex"),
+    )
+    message: str | None = Field(default=None, max_length=500)
+    decline_reason: str | None = Field(
+        default=None,
+        max_length=500,
+        validation_alias=AliasChoices("decline_reason", "declineReason"),
+    )

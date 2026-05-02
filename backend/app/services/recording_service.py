@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, UploadFile, status
@@ -43,6 +43,7 @@ class RecordingService:
         recording = PracticeRecording(
             section_id=section_id,
             student_id=user.id,
+            file_path=file_key,
             file_url=file_url,
             file_key=file_key,
             duration_seconds=duration_seconds,
@@ -66,7 +67,7 @@ class RecordingService:
         """List recordings with optional filters."""
         from app.models.practice import PracticeRecording
 
-        query = select(PracticeRecording)
+        query = select(PracticeRecording).where(await self._access_filter(PracticeRecording, user))
         if section_id:
             query = query.where(PracticeRecording.section_id == section_id)
         if student_id:
@@ -83,23 +84,15 @@ class RecordingService:
 
     async def get_by_id(self, recording_id: str, current_user: Any) -> RecordingResponse:
         """Return recording metadata."""
-        from app.models.practice import PracticeRecording
-
-        rec = await self.db.get(PracticeRecording, recording_id)
-        if rec is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        rec = await self._get_accessible_recording(recording_id, current_user)
         return RecordingResponse.model_validate(rec)
 
     async def get_download_url(self, recording_id: str, current_user: Any) -> dict:
         """Generate a presigned download URL."""
-        from app.models.practice import PracticeRecording
-
-        rec = await self.db.get(PracticeRecording, recording_id)
-        if rec is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        rec = await self._get_accessible_recording(recording_id, current_user)
 
         download_url = await self._generate_presigned_url(rec.file_key)
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        expires_at = datetime.now(UTC) + timedelta(hours=1)
 
         return {
             "download_url": download_url,
@@ -108,11 +101,7 @@ class RecordingService:
 
     async def delete(self, recording_id: str, current_user: Any) -> None:
         """Delete recording (file + metadata)."""
-        from app.models.practice import PracticeRecording
-
-        rec = await self.db.get(PracticeRecording, recording_id)
-        if rec is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        rec = await self._get_accessible_recording(recording_id, current_user)
 
         # Delete from storage
         await self._delete_from_storage(rec.file_key)
@@ -124,15 +113,14 @@ class RecordingService:
         """Mark a recording as the representative for its section."""
         from app.models.practice import PracticeRecording
 
-        rec = await self.db.get(PracticeRecording, recording_id)
-        if rec is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        rec = await self._get_accessible_recording(recording_id, current_user)
 
         # Unset previous representative for the same section
         if rec.section_id:
             result = await self.db.scalars(
                 select(PracticeRecording).where(
                     PracticeRecording.section_id == rec.section_id,
+                    PracticeRecording.student_id == current_user.id,
                     PracticeRecording.is_representative == True,  # noqa: E712
                 )
             )
@@ -146,19 +134,111 @@ class RecordingService:
 
     async def create_share_link(self, recording_id: str, current_user: Any) -> dict:
         """Generate a shareable link for a recording."""
-        from app.models.practice import PracticeRecording
-
-        rec = await self.db.get(PracticeRecording, recording_id)
-        if rec is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        await self._get_accessible_recording(recording_id, current_user)
 
         share_token = str(uuid.uuid4())
-        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        expires_at = datetime.now(UTC) + timedelta(days=7)
 
         return {
             "share_url": f"https://api.lessonaza.app/shared/recordings/{share_token}",
             "expires_at": expires_at.isoformat(),
         }
+
+    async def _get_accessible_recording(self, recording_id: str, current_user: Any) -> Any:
+        """Return a recording when the current user may view it."""
+        from app.models.practice import PracticeRecording
+
+        rec = await self.db.scalar(
+            select(PracticeRecording).where(
+                PracticeRecording.id == recording_id,
+                await self._access_filter(PracticeRecording, current_user),
+            )
+        )
+        if rec is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        return rec
+
+    async def _access_filter(self, recording_model: Any, current_user: Any) -> Any:
+        """Build the recording visibility condition for a user.
+
+        Students can access their own recordings. Teachers can also access recordings
+        for students who have an active app-connected teacher-student relation.
+        """
+        accessible_student_ids = {current_user.id}
+
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role == "teacher":
+            from app.models.relationship import RelationStatus, TeacherStudentRelation
+            from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+            teacher_id = await try_resolve_teacher_id(self.db, current_user.id)
+            if teacher_id:
+                result = await self.db.scalars(
+                    select(TeacherStudentRelation.student_id).where(
+                        TeacherStudentRelation.teacher_id == teacher_id,
+                        TeacherStudentRelation.status == RelationStatus.active,
+                        TeacherStudentRelation.is_app_connected == True,  # noqa: E712
+                        TeacherStudentRelation.can_view_practice == True,  # noqa: E712
+                    )
+                )
+                candidate_student_ids = result.all()
+                accessible_student_ids.update(
+                    await self._filter_students_with_practice_share_enabled(
+                        candidate_student_ids,
+                        current_user.id,
+                    )
+                )
+        elif role == "parent":
+            accessible_student_ids.update(await self._parent_visible_recording_student_ids(current_user.id))
+
+        return recording_model.student_id.in_(accessible_student_ids)
+
+    async def _filter_students_with_practice_share_enabled(
+        self,
+        student_ids: list[str],
+        teacher_user_id: str,
+    ) -> list[str]:
+        """Keep students whose per-target practice sharing is enabled.
+
+        Missing notification settings use the frontend/spec default: enabled.
+        """
+        if not student_ids:
+            return []
+
+        from app.models.settings import NotificationSettings
+
+        disabled_result = await self.db.scalars(
+            select(NotificationSettings.user_id).where(
+                NotificationSettings.user_id.in_(student_ids),
+                NotificationSettings.target_user_id == teacher_user_id,
+                NotificationSettings.practice_share_enabled == False,  # noqa: E712
+            )
+        )
+        disabled_student_ids = set(disabled_result.all())
+        return [student_id for student_id in student_ids if student_id not in disabled_student_ids]
+
+    async def _parent_visible_recording_student_ids(self, parent_user_id: str) -> list[str]:
+        """Return linked child IDs whose recordings are visible to this parent."""
+        from app.models.parent import Parent, ParentChildRelation, ParentVisibilitySettings
+
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == parent_user_id))
+        if parent is None:
+            return []
+
+        linked_result = await self.db.scalars(
+            select(ParentChildRelation.student_id).where(ParentChildRelation.parent_id == parent.id)
+        )
+        linked_student_ids = linked_result.all()
+        if not linked_student_ids:
+            return []
+
+        visible_result = await self.db.scalars(
+            select(ParentVisibilitySettings.student_id).where(
+                ParentVisibilitySettings.student_id.in_(linked_student_ids),
+                ParentVisibilitySettings.can_view_recordings == True,  # noqa: E712
+            )
+        )
+        return visible_result.all()
 
     # ------------------------------------------------------------------
     # Storage helpers (Vultr Object Storage via boto3)
@@ -174,18 +254,18 @@ class RecordingService:
             session = aioboto3.Session()
             async with session.client(
                 "s3",
-                endpoint_url=settings.vultr_storage_endpoint,
-                aws_access_key_id=settings.vultr_storage_access_key,
-                aws_secret_access_key=settings.vultr_storage_secret_key,
+                endpoint_url=settings.VULTR_STORAGE_ENDPOINT,
+                aws_access_key_id=settings.VULTR_STORAGE_ACCESS_KEY,
+                aws_secret_access_key=settings.VULTR_STORAGE_SECRET_KEY,
             ) as s3:
                 content = await file.read()
                 await s3.put_object(
-                    Bucket=settings.vultr_storage_bucket,
+                    Bucket=settings.VULTR_STORAGE_BUCKET,
                     Key=file_key,
                     Body=content,
                     ContentType=file.content_type or "audio/m4a",
                 )
-            return f"{settings.vultr_storage_endpoint}/{settings.vultr_storage_bucket}/{file_key}"
+            return f"{settings.VULTR_STORAGE_ENDPOINT}/{settings.VULTR_STORAGE_BUCKET}/{file_key}"
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -202,13 +282,13 @@ class RecordingService:
             session = aioboto3.Session()
             async with session.client(
                 "s3",
-                endpoint_url=settings.vultr_storage_endpoint,
-                aws_access_key_id=settings.vultr_storage_access_key,
-                aws_secret_access_key=settings.vultr_storage_secret_key,
+                endpoint_url=settings.VULTR_STORAGE_ENDPOINT,
+                aws_access_key_id=settings.VULTR_STORAGE_ACCESS_KEY,
+                aws_secret_access_key=settings.VULTR_STORAGE_SECRET_KEY,
             ) as s3:
                 url = await s3.generate_presigned_url(
                     "get_object",
-                    Params={"Bucket": settings.vultr_storage_bucket, "Key": file_key},
+                    Params={"Bucket": settings.VULTR_STORAGE_BUCKET, "Key": file_key},
                     ExpiresIn=3600,
                 )
             return url
@@ -225,12 +305,12 @@ class RecordingService:
             session = aioboto3.Session()
             async with session.client(
                 "s3",
-                endpoint_url=settings.vultr_storage_endpoint,
-                aws_access_key_id=settings.vultr_storage_access_key,
-                aws_secret_access_key=settings.vultr_storage_secret_key,
+                endpoint_url=settings.VULTR_STORAGE_ENDPOINT,
+                aws_access_key_id=settings.VULTR_STORAGE_ACCESS_KEY,
+                aws_secret_access_key=settings.VULTR_STORAGE_SECRET_KEY,
             ) as s3:
                 await s3.delete_object(
-                    Bucket=settings.vultr_storage_bucket,
+                    Bucket=settings.VULTR_STORAGE_BUCKET,
                     Key=file_key,
                 )
         except Exception:

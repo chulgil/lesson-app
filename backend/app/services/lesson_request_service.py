@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -12,10 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson_request import (
     AlternativeAccept,
+    LessonRequestAction,
+    LessonRequestCalendarItem,
+    LessonRequestCalendarResponse,
     LessonRequestCreate,
     LessonRequestResponse,
     LessonRequestStatusUpdate,
     LessonRequestUpdate,
+    RequestEventResponse,
     TimeProposalCreate,
 )
 
@@ -41,6 +45,7 @@ class LessonRequestService:
         from app.models.schedule import LessonRequest
 
         query = select(LessonRequest)
+        query = await self._apply_access_filter(query, user)
         if teacher_id:
             query = query.where(LessonRequest.teacher_id == teacher_id)
         if student_id:
@@ -54,7 +59,7 @@ class LessonRequestService:
         result = await self.db.scalars(
             query.order_by(LessonRequest.created_at.desc()).offset(offset).limit(size)
         )
-        items = [LessonRequestResponse.model_validate(r) for r in result.all()]
+        items = [await self._to_response(r) for r in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def _match_price(self, teacher_id: str, instrument: str | None, experience_level: str | None) -> int | None:
@@ -106,50 +111,45 @@ class LessonRequestService:
             previous_lesson_day=data.previous_lesson_day,
             previous_lesson_time=data.previous_lesson_time,
             previous_lesson_duration=data.previous_lesson_duration,
-            expires_at=datetime.now(timezone.utc) + timedelta(days=14),
+            expires_at=datetime.now(UTC) + timedelta(days=14),
         )
         self.db.add(request)
         await self.db.flush()
+        await self._add_event(
+            request_id=request.id,
+            actor_type="student",
+            actor_id=current_user.id,
+            event_type="initialRequest",
+            message=data.message,
+        )
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
 
-    async def get_by_id(self, request_id: str) -> LessonRequestResponse:
+    async def get_by_id(self, request_id: str, current_user: Any) -> LessonRequestResponse:
         """Return a single lesson request."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
-        return LessonRequestResponse.model_validate(request)
+        request = await self._get_request_for_user(request_id, current_user)
+        return await self._to_response(request)
 
     async def update(
         self, request_id: str, data: LessonRequestUpdate, current_user: Any
     ) -> LessonRequestResponse:
         """Update a lesson request."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        request = await self._get_request_for_user(request_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(request, key, value)
         await self.db.flush()
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
 
     async def update_status(
         self, request_id: str, data: LessonRequestStatusUpdate, current_user: Any
     ) -> LessonRequestResponse:
         """Change lesson request status."""
-        from app.models.schedule import LessonRequest
+        request = await self._get_request_for_user(request_id, current_user)
 
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
-
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         request.status = data.status
         request.status_updated_at = now
 
@@ -167,17 +167,21 @@ class LessonRequestService:
         elif data.status == "cancelled":
             request.cancelled_at = now
 
+        await self._add_event(
+            request_id=request.id,
+            actor_type=self._actor_type(current_user),
+            actor_id=current_user.id,
+            event_type=self._event_type_for_status(data.status),
+            message=data.decline_reason,
+            subscription_id=data.proposal_id if data.status == "proposalSent" else None,
+        )
         await self.db.flush()
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
 
     async def delete(self, request_id: str, current_user: Any) -> None:
         """Delete a lesson request."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        request = await self._get_request_for_user(request_id, current_user)
         await self.db.delete(request)
         await self.db.flush()
 
@@ -185,11 +189,8 @@ class LessonRequestService:
         self, request_id: str, data: TimeProposalCreate, current_user: Any
     ) -> LessonRequestResponse:
         """Teacher proposes up to 3 alternative time slots."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        request = await self._get_request_for_user(request_id, current_user)
+        self._require_actor(current_user, "teacher")
 
         if request.status not in ("pending", "negotiating"):
             raise HTTPException(
@@ -211,7 +212,7 @@ class LessonRequestService:
                 detail="Maximum negotiation rounds reached",
             )
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         proposals = list(request.time_proposals or [])
 
         # Prevent consecutive teacher proposals (must wait for student response)
@@ -237,19 +238,24 @@ class LessonRequestService:
         request.current_round = current_round + 1
         request.status_updated_at = now
 
+        await self._add_event(
+            request_id=request.id,
+            actor_type="teacher",
+            actor_id=current_user.id,
+            event_type="proposeAlternative",
+            suggested_slots=[s.model_dump() for s in data.slots],
+            message=data.message,
+        )
         await self.db.flush()
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
 
     async def accept_alternative(
         self, request_id: str, data: AlternativeAccept, current_user: Any
     ) -> LessonRequestResponse:
         """Student accepts one of teacher's proposed alternative slots."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        request = await self._get_request_for_user(request_id, current_user)
+        self._require_actor(current_user, "student")
 
         if request.status != "negotiating":
             raise HTTPException(
@@ -273,7 +279,7 @@ class LessonRequestService:
                 detail="Invalid slot index",
             )
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         selected_slot = slots[data.selected_slot_index]
         accept_entry = {
             "proposer_id": current_user.id,
@@ -292,19 +298,25 @@ class LessonRequestService:
         request.preferred_day = selected_slot.get("day_of_week")
         request.preferred_time = selected_slot.get("start_time")
 
+        await self._add_event(
+            request_id=request.id,
+            actor_type="student",
+            actor_id=current_user.id,
+            event_type="acceptAlternative",
+            suggested_slots=[selected_slot],
+            selected_slot_index=data.selected_slot_index,
+            message=data.message,
+        )
         await self.db.flush()
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
 
     async def counter_propose(
         self, request_id: str, data: TimeProposalCreate, current_user: Any
     ) -> LessonRequestResponse:
         """Student counter-proposes a different time slot."""
-        from app.models.schedule import LessonRequest
-
-        request = await self.db.get(LessonRequest, request_id)
-        if request is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        request = await self._get_request_for_user(request_id, current_user)
+        self._require_actor(current_user, "student")
 
         if request.status != "negotiating":
             raise HTTPException(
@@ -330,14 +342,20 @@ class LessonRequestService:
         current_round = request.current_round or 0
         if current_round >= max_rounds:
             # Auto-expire
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             request.status = "expired"
             request.status_updated_at = now
+            await self._add_event(
+                request_id=request.id,
+                actor_type="system",
+                actor_id="system",
+                event_type="expire",
+            )
             await self.db.flush()
             await self.db.refresh(request)
-            return LessonRequestResponse.model_validate(request)
+            return await self._to_response(request)
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         proposals = list(request.time_proposals or [])
         counter_entry = {
             "proposer_id": current_user.id,
@@ -352,18 +370,102 @@ class LessonRequestService:
         request.time_proposals = proposals
         request.status_updated_at = now
 
+        await self._add_event(
+            request_id=request.id,
+            actor_type="student",
+            actor_id=current_user.id,
+            event_type="counterPropose",
+            suggested_slots=[s.model_dump() for s in data.slots],
+            message=data.message,
+        )
         await self.db.flush()
         await self.db.refresh(request)
-        return LessonRequestResponse.model_validate(request)
+        return await self._to_response(request)
+
+    async def apply_action(
+        self, request_id: str, data: LessonRequestAction, current_user: Any
+    ) -> LessonRequestResponse:
+        """Apply the spec-defined unified lifecycle action."""
+        if data.action == "approve":
+            return await self.update_status(
+                request_id,
+                LessonRequestStatusUpdate(status="approved"),
+                current_user,
+            )
+        if data.action == "reject":
+            return await self.update_status(
+                request_id,
+                LessonRequestStatusUpdate(
+                    status="rejected",
+                    decline_reason=data.decline_reason or data.message,
+                ),
+                current_user,
+            )
+        if data.action == "cancel":
+            return await self.update_status(
+                request_id,
+                LessonRequestStatusUpdate(status="cancelled"),
+                current_user,
+            )
+        if data.action == "proposeAlternative":
+            if not data.slots:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="slots are required")
+            return await self.propose_alternatives(
+                request_id,
+                TimeProposalCreate(slots=data.slots, message=data.message),
+                current_user,
+            )
+        if data.action == "counterPropose":
+            if not data.slots:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="slots are required")
+            return await self.counter_propose(
+                request_id,
+                TimeProposalCreate(slots=data.slots, message=data.message),
+                current_user,
+            )
+        if data.action == "acceptAlternative":
+            if data.selected_slot_index is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="selected_slot_index is required",
+                )
+            return await self.accept_alternative(
+                request_id,
+                AlternativeAccept(
+                    selected_slot_index=data.selected_slot_index,
+                    message=data.message,
+                ),
+                current_user,
+            )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported action")
+
+    async def get_calendar(self, current_user: Any) -> LessonRequestCalendarResponse:
+        """Return preferred-day counts for lesson requests visible to the user."""
+        from app.models.schedule import LessonRequest
+
+        query = (
+            select(LessonRequest.preferred_day, func.count())
+            .where(LessonRequest.preferred_day.is_not(None))
+            .group_by(LessonRequest.preferred_day)
+            .order_by(LessonRequest.preferred_day)
+        )
+        query = await self._apply_access_filter(query, current_user)
+        rows = (await self.db.execute(query)).all()
+        return LessonRequestCalendarResponse(
+            items=[
+                LessonRequestCalendarItem(day_of_week=int(day), count=int(count))
+                for day, count in rows
+            ]
+        )
 
     async def process_expired(self) -> int:
         """Mark expired requests. Returns count of processed items."""
         from app.models.schedule import LessonRequest
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         result = await self.db.scalars(
             select(LessonRequest).where(
-                LessonRequest.status == "pending",
+                LessonRequest.status.in_(["pending", "negotiating"]),
                 LessonRequest.expires_at <= now,
             )
         )
@@ -371,7 +473,118 @@ class LessonRequestService:
         for request in result.all():
             request.status = "expired"
             request.status_updated_at = now
+            await self._add_event(
+                request_id=request.id,
+                actor_type="system",
+                actor_id="system",
+                event_type="expire",
+            )
             count += 1
         if count:
             await self.db.flush()
         return count
+
+    async def _to_response(self, request: Any) -> LessonRequestResponse:
+        events = await self._get_events(request.id)
+        response = LessonRequestResponse.model_validate(request)
+        response.type = request.request_type
+        response.experience = request.experience_level
+        response.events = [RequestEventResponse.model_validate(event) for event in events]
+        return response
+
+    async def _get_events(self, request_id: str) -> list[Any]:
+        from app.models.request_event import RequestEvent
+
+        result = await self.db.scalars(
+            select(RequestEvent)
+            .where(RequestEvent.request_id == request_id)
+            .order_by(RequestEvent.created_at.asc(), RequestEvent.id.asc())
+        )
+        return list(result.all())
+
+    async def _add_event(
+        self,
+        *,
+        request_id: str,
+        actor_type: str,
+        actor_id: str,
+        event_type: str,
+        suggested_slots: list | None = None,
+        selected_slot_index: int | None = None,
+        message: str | None = None,
+        subscription_id: str | None = None,
+    ) -> None:
+        from app.models.request_event import RequestEvent, RequestEventType
+
+        self.db.add(
+            RequestEvent(
+                request_id=request_id,
+                actor_type=actor_type,
+                actor_id=actor_id,
+                event_type=RequestEventType(event_type),
+                suggested_slots=suggested_slots or [],
+                selected_slot_index=selected_slot_index,
+                message=message,
+                subscription_id=subscription_id,
+            )
+        )
+
+    async def _get_request_for_user(self, request_id: str, current_user: Any) -> Any:
+        from app.models.schedule import LessonRequest
+
+        request = await self.db.get(LessonRequest, request_id)
+        if request is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+        if not await self._can_access_request(request, current_user):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return request
+
+    async def _can_access_request(self, request: Any, current_user: Any) -> bool:
+        role = self._actor_type(current_user)
+        if role == "student":
+            return request.student_id == current_user.id
+        if role == "teacher":
+            return request.teacher_id in await self._teacher_identifiers(current_user.id)
+        return False
+
+    async def _apply_access_filter(self, query: Any, current_user: Any) -> Any:
+        from app.models.schedule import LessonRequest
+
+        role = self._actor_type(current_user)
+        if role == "student":
+            return query.where(LessonRequest.student_id == current_user.id)
+        if role == "teacher":
+            return query.where(LessonRequest.teacher_id.in_(await self._teacher_identifiers(current_user.id)))
+        return query.where(False)
+
+    async def _teacher_identifiers(self, user_id: str) -> list[str]:
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        identifiers = [user_id]
+        teacher_profile_id = await try_resolve_teacher_id(self.db, user_id)
+        if teacher_profile_id and teacher_profile_id not in identifiers:
+            identifiers.append(teacher_profile_id)
+        return identifiers
+
+    def _actor_type(self, user: Any) -> str:
+        role = getattr(user, "role", None)
+        return getattr(role, "value", role) or ""
+
+    def _require_actor(self, user: Any, expected_role: str) -> None:
+        if self._actor_type(user) != expected_role:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    def _event_type_for_status(self, request_status: str) -> str:
+        status_events = {
+            "approved": "approve",
+            "rejected": "reject",
+            "pending": "withdrawApproval",
+            "timeConfirmed": "acceptAlternative",
+            "proposalSent": "proposalSent",
+            "proposalAccepted": "proposalAccepted",
+            "paymentNotified": "paymentNotified",
+            "completed": "completed",
+            "cancelled": "cancel",
+            "expired": "expire",
+        }
+        return status_events.get(request_status, "message")

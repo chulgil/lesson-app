@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DATABASE_ECHO: bool = False
 
     # JWT
-    JWT_SECRET_KEY: str = "change-me-in-production"
+    JWT_SECRET_KEY: str = "dev-only-insecure-jwt-secret-change-before-production"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 30

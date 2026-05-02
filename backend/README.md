@@ -1,6 +1,6 @@
 # Lessonaza Backend
 
-> FastAPI + MySQL 8.0 + Docker | [lessonaza.app](https://lessonaza.app)
+> FastAPI + PostgreSQL 17 + Docker | [lessonaza.app](https://lessonaza.app)
 
 음악 레슨/연습 관리 앱 Lessonaza의 백엔드 API 서버
 
@@ -10,7 +10,7 @@
 |------|------|
 | Framework | FastAPI |
 | ORM | SQLAlchemy 2.0 (async) |
-| Database | MySQL 8.0 |
+| Database | PostgreSQL 17 |
 | Auth | JWT + OAuth (Google, Kakao, Apple) |
 | Storage | Vultr Object Storage |
 | Package Manager | UV |

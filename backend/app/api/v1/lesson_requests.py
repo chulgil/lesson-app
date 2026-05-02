@@ -12,6 +12,8 @@ from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.lesson_request import (
     AlternativeAccept,
+    LessonRequestAction,
+    LessonRequestCalendarResponse,
     LessonRequestCreate,
     LessonRequestResponse,
     LessonRequestStatusUpdate,
@@ -67,6 +69,37 @@ async def create_lesson_request(
 
 
 @router.get(
+    "/calendar",
+    response_model=LessonRequestCalendarResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get lesson request calendar markers",
+)
+async def get_lesson_request_calendar(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> LessonRequestCalendarResponse:
+    """Return preferred-day counts for lesson requests visible to the user."""
+    service = LessonRequestService(db)
+    return await service.get_calendar(current_user)
+
+
+@router.post(
+    "/expire",
+    response_model=SuccessResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Expire stale lesson requests",
+)
+async def expire_lesson_requests(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SuccessResponse:
+    """Mark expired lesson requests using the spec-defined route."""
+    service = LessonRequestService(db)
+    count = await service.process_expired()
+    return SuccessResponse(message=f"Processed {count} expired requests")
+
+
+@router.get(
     "/{request_id}",
     response_model=LessonRequestResponse,
     status_code=status.HTTP_200_OK,
@@ -79,7 +112,7 @@ async def get_lesson_request(
 ) -> LessonRequestResponse:
     """Return a single lesson request by ID."""
     service = LessonRequestService(db)
-    return await service.get_by_id(request_id)
+    return await service.get_by_id(request_id, current_user)
 
 
 @router.put(
@@ -131,6 +164,23 @@ async def propose_alternatives(
     """Teacher proposes up to 3 alternative time slots."""
     service = LessonRequestService(db)
     return await service.propose_alternatives(request_id, body, current_user)
+
+
+@router.post(
+    "/{request_id}/actions",
+    response_model=LessonRequestResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Apply lesson request action",
+)
+async def apply_lesson_request_action(
+    request_id: str,
+    body: LessonRequestAction,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> LessonRequestResponse:
+    """Apply a unified lesson request lifecycle action."""
+    service = LessonRequestService(db)
+    return await service.apply_action(request_id, body, current_user)
 
 
 @router.post(

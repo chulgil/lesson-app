@@ -14,7 +14,7 @@
 |------|------|------|------|
 | Framework | FastAPI | 0.115+ | async 지원 |
 | ORM | SQLAlchemy | 2.0+ | async engine |
-| Database | MySQL | 8.0+ | codenavi 서버 |
+| Database | PostgreSQL | 17+ | Docker / codenavi 서버 |
 | Schema | Pydantic | v2 | 요청/응답 직렬화 |
 | Auth | JWT + OAuth2 | - | Google/Kakao/Apple |
 | i18n | 자체 구현 | - | ko, en, ja (확장 가능) |
@@ -145,9 +145,9 @@ backend/
 │  - Table definitions            │  Mapped columns + relationships
 │  - Query helpers                │  자주 쓰는 필터 조합
 ├─────────────────────────────────┤
-│  Database                       │  MySQL 8.0 (async)
+│  Database                       │  PostgreSQL 17 (async)
 │  - Alembic migrations           │  스키마 버전 관리
-│  - Connection pooling           │  asyncmy 드라이버
+│  - Connection pooling           │  asyncpg 드라이버
 └─────────────────────────────────┘
 ```
 
@@ -172,7 +172,7 @@ Schema    Schema (Pydantic v2)
 
 ```bash
 # Database
-DATABASE_URL=mysql+asyncmy://user:pass@localhost:3306/lesson_app
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/lessonaza
 DATABASE_ECHO=false
 
 # JWT

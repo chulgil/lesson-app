@@ -98,9 +98,12 @@ class RelationshipService:
         *, subscription_id: str | None = None, booking_id: str | None = None,
         last_lesson_day: str | None = None, last_lesson_time: str | None = None,
         last_lesson_duration: int | None = None,
+        can_view_practice: bool | None = None,
+        can_comment: bool | None = None,
+        can_suggest_assignments: bool | None = None,
     ) -> Any:
         """Change the status of a relationship with optional metadata."""
-        from datetime import datetime, timezone
+        from datetime import UTC, datetime
 
         from app.models.relationship import TeacherStudentRelation
 
@@ -121,11 +124,70 @@ class RelationshipService:
             relation.last_lesson_day = last_lesson_day
             relation.last_lesson_time = last_lesson_time
             relation.last_lesson_duration = last_lesson_duration
-            relation.schedule_recorded_at = datetime.now(timezone.utc)
+            relation.schedule_recorded_at = datetime.now(UTC)
+        if can_view_practice is not None:
+            relation.can_view_practice = can_view_practice
+        if can_comment is not None:
+            relation.can_comment = can_comment
+        if can_suggest_assignments is not None:
+            relation.can_suggest_assignments = can_suggest_assignments
 
         await self.db.flush()
         await self.db.refresh(relation)
         return relation
+
+    async def get_notification_settings(self, user_id: str, target_user_id: str, current_user: Any) -> Any:
+        """Return notification settings for a user/target pair, creating defaults when absent."""
+        self._assert_notification_settings_owner(user_id, current_user)
+        from app.models.settings import NotificationSettings
+
+        settings = await self.db.scalar(
+            select(NotificationSettings).where(
+                NotificationSettings.user_id == user_id,
+                NotificationSettings.target_user_id == target_user_id,
+            )
+        )
+        if settings is None:
+            settings = NotificationSettings(user_id=user_id, target_user_id=target_user_id)
+            self.db.add(settings)
+            await self.db.flush()
+            await self.db.refresh(settings)
+        return settings
+
+    async def save_notification_settings(self, data: dict[str, Any], current_user: Any) -> Any:
+        """Create or update notification settings from frontend payload."""
+        user_id = data["user_id"]
+        target_user_id = data["target_user_id"]
+        settings = await self.get_notification_settings(user_id, target_user_id, current_user)
+
+        for key in (
+            "push_enabled",
+            "practice_share_enabled",
+            "lesson_reminder_enabled",
+            "payment_reminder_enabled",
+        ):
+            if key in data:
+                setattr(settings, key, data[key])
+
+        await self.db.flush()
+        await self.db.refresh(settings)
+        return settings
+
+    async def delete_notification_settings(self, setting_id: str, current_user: Any) -> None:
+        """Delete notification settings owned by the current user."""
+        from app.models.settings import NotificationSettings
+
+        settings = await self.db.get(NotificationSettings, setting_id)
+        if settings is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification settings not found")
+        self._assert_notification_settings_owner(settings.user_id, current_user)
+
+        await self.db.delete(settings)
+        await self.db.flush()
+
+    def _assert_notification_settings_owner(self, user_id: str, current_user: Any) -> None:
+        if user_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot manage another user's settings")
 
     async def follow(self, following_id: str, target_type: str, current_user: Any) -> Any:
         """Follow a user."""

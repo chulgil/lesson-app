@@ -2,6 +2,7 @@
 
 from unittest.mock import patch
 
+import jwt
 import pytest
 from httpx import AsyncClient
 
@@ -129,3 +130,52 @@ async def test_dev_login_blocked_in_production(client: AsyncClient):
             json={"email": "hacker@evil.com", "role": "teacher"},
         )
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dev_login_blocked_in_beta(client: AsyncClient):
+    """POST /api/v1/auth/dev-login returns 403 in beta-like environments."""
+    with patch("app.core.config.settings.ENVIRONMENT", "beta"):
+        response = await client.post(
+            "/api/v1/auth/dev-login",
+            json={"email": "hacker@evil.com", "role": "teacher"},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_apple_oauth_requires_configured_client_id(client: AsyncClient):
+    """Apple login must not accept identity tokens without configured audience verification."""
+    identity_token = jwt.encode(
+        {"sub": "apple-user-id", "email": "apple@example.com"},
+        key="",
+        algorithm="none",
+    )
+
+    with patch("app.core.config.settings.APPLE_CLIENT_ID", ""):
+        response = await client.post(
+            "/api/v1/auth/oauth/apple",
+            json={
+                "provider": "apple",
+                "identity_token": identity_token,
+            },
+        )
+
+    assert response.status_code == 401
+
+
+def test_production_jwt_secret_must_be_strong():
+    """Token creation fails in production when JWT_SECRET_KEY is default or too short."""
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "production"),
+        patch("app.core.config.settings.JWT_SECRET_KEY", "change-me-in-production"),
+    ):
+        with pytest.raises(RuntimeError, match="JWT_SECRET_KEY"):
+            create_access_token(data={"sub": "test-user-id"})
+
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "production"),
+        patch("app.core.config.settings.JWT_SECRET_KEY", "short-secret"),
+    ):
+        with pytest.raises(RuntimeError, match="JWT_SECRET_KEY"):
+            create_refresh_token(data={"sub": "test-user-id"})

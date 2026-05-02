@@ -21,16 +21,24 @@ class RemoteMembershipRepository implements MembershipRepository {
 
   @override
   Future<List<ClassMembership>> getByStudentId(String studentId) async {
-    // Backend doesn't have direct student-based membership query
-    // TODO: Add GET /memberships?student_id= endpoint
-    return [];
+    final response = await _apiClient.get(
+      '/memberships',
+      queryParameters: {'student_id': studentId},
+    );
+    final items = response.data as List<dynamic>;
+    return items
+        .map((e) => ClassMembership.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Future<ClassMembership?> getById(String id) async {
-    // Use class memberships list — need class_id context
-    // TODO: Add GET /memberships/{id} flat endpoint
-    return null;
+    try {
+      final response = await _apiClient.get('/memberships/$id');
+      return ClassMembership.fromJson(response.data as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -55,14 +63,15 @@ class RemoteMembershipRepository implements MembershipRepository {
 
   @override
   Future<void> updateStatus(String id, MembershipStatus status) async {
-    // Backend doesn't have dedicated status endpoint — use full update
-    // TODO: Add PATCH /memberships/{id}/status endpoint
+    await _apiClient.patch(
+      '/memberships/$id/status',
+      data: {'status': status.name},
+    );
   }
 
   @override
   Future<void> delete(String id) async {
-    // Need class_id for nested URL — delete by iterating
-    // TODO: Add flat DELETE /memberships/{id} endpoint
+    await _apiClient.delete('/memberships/$id');
   }
 
   @override

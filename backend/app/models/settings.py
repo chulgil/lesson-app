@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -97,14 +97,14 @@ class ParentNotificationSettings(UUIDMixin, TimestampMixin, Base):
     payment_due_soon: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     lesson_change: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     lesson_cancel: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    lesson_start: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    lesson_end: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    lesson_start: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    lesson_end: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     new_assignment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     assignment_incomplete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    practice_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    streak_achievement: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    practice_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    streak_achievement: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     teacher_message: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    lesson_note_update: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    lesson_note_update: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     weekly_report: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     monthly_report: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 

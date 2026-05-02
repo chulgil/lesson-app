@@ -19,9 +19,23 @@ KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me"
 # Apple JWKS endpoint
 APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys"
 
+_INSECURE_JWT_SECRETS = {
+    "change-me-in-production",
+    "dev-only-insecure-jwt-secret-change-before-production",
+}
+
+
+def _assert_safe_jwt_secret() -> None:
+    """Prevent production-like environments from signing tokens with weak defaults."""
+    if settings.ENVIRONMENT not in {"production", "beta"}:
+        return
+    if settings.JWT_SECRET_KEY in _INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
+        raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
+
 
 def create_access_token(data: dict[str, Any]) -> str:
     """Create a JWT access token with expiration."""
+    _assert_safe_jwt_secret()
     to_encode = data.copy()
     expire = datetime.now(UTC) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({
@@ -34,6 +48,7 @@ def create_access_token(data: dict[str, Any]) -> str:
 
 def create_refresh_token(data: dict[str, Any]) -> str:
     """Create a JWT refresh token with 30-day expiration and unique jti."""
+    _assert_safe_jwt_secret()
     to_encode = data.copy()
     expire = datetime.now(UTC) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({

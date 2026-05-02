@@ -1,5 +1,5 @@
-import enum
 from datetime import datetime
+from enum import StrEnum
 
 from sqlalchemy import Boolean, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -7,9 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, UUIDMixin
 
 
-class RelationStatus(str, enum.Enum):
+class RelationStatus(StrEnum):
     pending = "pending"
-    trialBooked = "trialBooked"
+    trialBooked = "trialBooked"  # noqa: N815
     active = "active"
     inactive = "inactive"
     expired = "expired"
@@ -17,7 +17,7 @@ class RelationStatus(str, enum.Enum):
     disconnected = "disconnected"
 
 
-class FollowTargetType(str, enum.Enum):
+class FollowTargetType(StrEnum):
     teacher = "teacher"
     academy = "academy"
 
@@ -54,6 +54,11 @@ class TeacherStudentRelation(UUIDMixin, Base):
     is_manually_registered: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_app_connected: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     app_connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Practice visibility permissions (CoachConnection-compatible)
+    can_view_practice: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    can_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    can_suggest_assignments: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     # Schedule restoration
     last_lesson_day: Mapped[str | None] = mapped_column(String(10), nullable=True)

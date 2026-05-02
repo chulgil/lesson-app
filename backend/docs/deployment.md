@@ -2,6 +2,11 @@
 
 > 마지막 업데이트: 2026-03-02
 
+> ⚠️ 현재 코드와 Docker Compose 기준 실제 DB는 PostgreSQL 17입니다.
+> 이 문서는 과거 MySQL/systemd 배포안이 많이 남아 있어 참고용으로만 사용하고,
+> 실제 배포는 `backend/docker-compose.yml`, `backend/docker-compose.beta.yml`,
+> `backend/env.beta.example`을 기준으로 진행하세요.
+
 ## 개요
 
 codenavi 서버(108.61.162.25)에 FastAPI 백엔드를 배포하는 가이드.

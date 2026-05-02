@@ -46,6 +46,10 @@ class RelationshipStatusUpdate(BaseModel):
     last_lesson_day: str | None = None
     last_lesson_time: str | None = None
     last_lesson_duration: int | None = None
+    # Practice visibility permissions
+    can_view_practice: bool | None = None
+    can_comment: bool | None = None
+    can_suggest_assignments: bool | None = None
 
 
 class RelationshipResponse(BaseModel):
@@ -78,6 +82,11 @@ class RelationshipResponse(BaseModel):
     is_app_connected: bool = False
     app_connected_at: datetime | None = None
 
+    # Practice visibility permissions
+    can_view_practice: bool = True
+    can_comment: bool = True
+    can_suggest_assignments: bool = True
+
     # Schedule restoration
     last_lesson_day: str | None = None
     last_lesson_time: str | None = None
@@ -89,6 +98,34 @@ class RelationshipResponse(BaseModel):
     termination_reason: str | None = None
 
     created_at: datetime | None = None
+
+
+class NotificationSettingResponse(BaseModel):
+    """Per-relationship notification settings."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    user_id: str
+    target_user_id: str
+    push_enabled: bool = True
+    practice_share_enabled: bool = True
+    lesson_reminder_enabled: bool = True
+    payment_reminder_enabled: bool = True
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class NotificationSettingUpdate(BaseModel):
+    """Create or update notification settings."""
+
+    id: str | None = None
+    user_id: str
+    target_user_id: str
+    push_enabled: bool | None = None
+    practice_share_enabled: bool | None = None
+    lesson_reminder_enabled: bool | None = None
+    payment_reminder_enabled: bool | None = None
 
 
 class FollowRequest(BaseModel):
@@ -113,6 +150,54 @@ class FollowResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Relationships
 # ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/relationships/notification-settings",
+    response_model=NotificationSettingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get relationship notification settings",
+)
+async def get_notification_settings(
+    user_id: str,
+    target_user_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationSettingResponse:
+    """Return notification settings for a relationship target."""
+    service = RelationshipService(db)
+    return await service.get_notification_settings(user_id, target_user_id, current_user)
+
+
+@router.put(
+    "/relationships/notification-settings",
+    response_model=NotificationSettingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Save relationship notification settings",
+)
+async def save_notification_settings(
+    body: NotificationSettingUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationSettingResponse:
+    """Create or update notification settings."""
+    service = RelationshipService(db)
+    return await service.save_notification_settings(body.model_dump(exclude_none=True), current_user)
+
+
+@router.delete(
+    "/relationships/notification-settings/{setting_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete relationship notification settings",
+)
+async def delete_notification_settings(
+    setting_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete notification settings."""
+    service = RelationshipService(db)
+    await service.delete_notification_settings(setting_id, current_user)
 
 
 @router.post(
@@ -205,6 +290,9 @@ async def update_relationship_status(
         last_lesson_day=body.last_lesson_day,
         last_lesson_time=body.last_lesson_time,
         last_lesson_duration=body.last_lesson_duration,
+        can_view_practice=body.can_view_practice,
+        can_comment=body.can_comment,
+        can_suggest_assignments=body.can_suggest_assignments,
     )
 
 

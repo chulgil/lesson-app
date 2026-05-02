@@ -23,11 +23,45 @@ def test_dispatch_log_revision_chains_after_no_show_policy() -> None:
     assert rev.down_revision == "unify_no_show_policy"
 
 
-def test_dispatch_log_is_alembic_head() -> None:
-    """0011 이 단일 head."""
+def test_parent_api_spec_alignment_is_alembic_head() -> None:
+    """신규 parent API spec alignment migration 이 단일 head."""
     script = _script()
     heads = list(script.get_heads())
-    assert heads == ["add_sub_expiry_dispatch_log"], f"expected single head add_sub_expiry_dispatch_log, got {heads}"
+    assert heads == ["align_parent_api_spec"], (
+        f"expected single head align_parent_api_spec, got {heads}"
+    )
+
+
+def test_recording_owner_file_key_chains_after_dispatch_log() -> None:
+    """recording owner/file_key migration follows payment cleanup migration."""
+    script = _script()
+    rev = script.get_revision("add_recording_owner_file_key")
+    assert rev is not None
+    assert rev.down_revision == "drop_pg_fields"
+
+
+def test_relationship_practice_permissions_chains_after_recording_owner() -> None:
+    """relationship practice permissions migration follows recording owner migration."""
+    script = _script()
+    rev = script.get_revision("add_relation_practice_permissions")
+    assert rev is not None
+    assert rev.down_revision == "add_recording_owner_file_key"
+
+
+def test_parent_visibility_settings_chains_after_relationship_permissions() -> None:
+    """parent visibility settings migration follows relationship permissions migration."""
+    script = _script()
+    rev = script.get_revision("add_parent_visibility_settings")
+    assert rev is not None
+    assert rev.down_revision == "add_relation_practice_permissions"
+
+
+def test_parent_api_spec_alignment_chains_after_parent_visibility_settings() -> None:
+    """parent API spec alignment migration follows parent visibility settings migration."""
+    script = _script()
+    rev = script.get_revision("align_parent_api_spec")
+    assert rev is not None
+    assert rev.down_revision == "add_parent_visibility_settings"
 
 
 def test_dispatch_log_migration_creates_unique_constraint() -> None:
