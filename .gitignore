@@ -135,8 +135,8 @@ frontend/logs/
 .svn/
 
 # Claude local settings
-.claude/settings.local.json
-.claude/harness-signals/
+**/.claude/settings.local.json
+**/.claude/harness-signals/
 backend/test.db
 .serena/project.yml
 
