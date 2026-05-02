@@ -49,7 +49,7 @@ backend/
 │   │   ├── lesson_class.py           # LessonClass, ClassMembership
 │   │   ├── lesson.py                 # Lesson, LessonPiece, LessonRecording
 │   │   ├── subscription.py           # Subscription, SubscriptionUsage, Template, Proposal
-│   │   ├── payment.py                # Payment, TuitionSettings
+│   │   ├── payment.py                # Payment, TuitionSettings (레거시 상태 기록용, API 없음)
 │   │   ├── practice.py               # PracticeRepertoire, Section, Recording, Note, Goal, Streak
 │   │   ├── practice_item.py          # PracticeItem (teacher assignments)
 │   │   ├── schedule.py               # TeacherAvailability, TimeSlot, LessonBooking
@@ -67,7 +67,6 @@ backend/
 │   │   ├── student.py                # StudentCreate, StudentRead, StudentUpdate
 │   │   ├── lesson.py                 # LessonCreate, LessonRead, LessonUpdate
 │   │   ├── subscription.py           # SubscriptionCreate, TemplateCreate, ProposalCreate
-│   │   ├── payment.py                # PaymentCreate, PaymentRead
 │   │   ├── practice.py               # RepertoireCreate, SectionCreate, RecordingUpload
 │   │   ├── schedule.py               # AvailabilityUpdate, BookingCreate
 │   │   ├── notification.py           # NotificationRead
@@ -84,7 +83,6 @@ backend/
 │   │       ├── lesson_classes.py     # /lesson-classes/*
 │   │       ├── lessons.py            # /lessons/*
 │   │       ├── subscriptions.py      # /subscriptions/*
-│   │       ├── payments.py           # /payments/*
 │   │       ├── practice.py           # /practice/*
 │   │       ├── practice_items.py     # /practice-items/*
 │   │       ├── recordings.py         # /recordings/*
@@ -103,7 +101,6 @@ backend/
 │   │   ├── recording_service.py      # 녹음 업로드/다운로드 (Object Storage)
 │   │   ├── schedule_service.py       # 가용시간 + 예약
 │   │   ├── notification_service.py   # 알림 생성 + 발송
-│   │   └── payment_service.py        # 결제 상태 관리
 │   │
 │   └── utils/
 │       ├── datetime_utils.py         # UTC ↔ 사용자 타임존 변환
@@ -528,7 +525,7 @@ Flutter Repository 인터페이스와 백엔드 API의 1:1 매핑:
 | `RecordingRepository` | `/api/v1/recordings/*` | `RecordingService` |
 | `ScheduleRepository` | `/api/v1/schedule/*` | `ScheduleService` |
 | `NotificationRepository` | `/api/v1/notifications/*` | `NotificationService` |
-| `PaymentRepository` | `/api/v1/payments/*` | `PaymentService` |
+| `PaymentRepository` | - | 현행 구현 대상 아님. 수강료 입금 상태는 `SubscriptionRepository`/`/api/v1/subscriptions/*` 흐름에서 기록 |
 
 → 상세 엔드포인트: [api_spec.md](api_spec.md)
 → DB 스키마: [database_schema.md](database_schema.md)

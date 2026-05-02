@@ -23,12 +23,12 @@ def test_dispatch_log_revision_chains_after_no_show_policy() -> None:
     assert rev.down_revision == "unify_no_show_policy"
 
 
-def test_parent_api_spec_alignment_is_alembic_head() -> None:
-    """신규 parent API spec alignment migration 이 단일 head."""
+def test_subscription_alert_days_set_is_alembic_head() -> None:
+    """수강권 알림 일자 설정 migration 이 단일 head."""
     script = _script()
     heads = list(script.get_heads())
-    assert heads == ["align_parent_api_spec"], (
-        f"expected single head align_parent_api_spec, got {heads}"
+    assert heads == ["add_subscription_alert_days_set"], (
+        f"expected single head add_subscription_alert_days_set, got {heads}"
     )
 
 
@@ -62,6 +62,14 @@ def test_parent_api_spec_alignment_chains_after_parent_visibility_settings() -> 
     rev = script.get_revision("align_parent_api_spec")
     assert rev is not None
     assert rev.down_revision == "add_parent_visibility_settings"
+
+
+def test_subscription_alert_days_set_chains_after_parent_api_spec_alignment() -> None:
+    """subscription alert days-set migration follows parent API spec alignment."""
+    script = _script()
+    rev = script.get_revision("add_subscription_alert_days_set")
+    assert rev is not None
+    assert rev.down_revision == "align_parent_api_spec"
 
 
 def test_dispatch_log_migration_creates_unique_constraint() -> None:

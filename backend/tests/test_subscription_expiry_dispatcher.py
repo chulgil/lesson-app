@@ -194,6 +194,29 @@ async def test_dispatch_different_milestones_record_separately(db_session: Async
 
 
 @pytest.mark.asyncio
+async def test_dispatch_filters_disabled_teacher_alert_milestone(db_session: AsyncSession) -> None:
+    """선생님 설정에서 빠진 D-day milestone 은 발송하지 않는다."""
+    from app.models.notification import Notification
+    from app.models.settings import SubscriptionSettings
+    from app.services.subscription_expiry_dispatcher import SubscriptionExpiryDispatcher
+
+    await _make_user(db_session, user_id="t1", role="teacher")
+    await _make_user(db_session, user_id="su1", role="student")
+    await _make_student(db_session, student_id="s1", teacher_id="t1", user_id="su1")
+    db_session.add(SubscriptionSettings(teacher_id="t1", renewal_alert_days_set=[1]))
+    await db_session.flush()
+
+    dispatcher = SubscriptionExpiryDispatcher(db_session)
+    milestone = _milestone(sub_id="sub1", student_id="s1", days_left=7, end_date=date(2026, 5, 9))
+    milestone["teacher_id"] = "t1"
+    result = await dispatcher.dispatch_milestones([milestone], today_kst=_TODAY_KST)
+
+    assert result == {"sent": 0, "deduplicated": 0, "filtered": 1}
+    notifs = (await db_session.scalars(select(Notification))).all()
+    assert len(notifs) == 0
+
+
+@pytest.mark.asyncio
 async def test_dispatch_priority_high_for_d0_d1(db_session: AsyncSession) -> None:
     """D-0/D-1 → priority=high, D-7/D-14 → normal."""
     from app.models.notification import Notification, NotificationPriority

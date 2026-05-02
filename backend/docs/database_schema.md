@@ -28,7 +28,7 @@ PostgreSQL 17 · `lessonaza` 데이터베이스 · Alembic 관리 스키마
 | 16 | `subscription_usages` | 수강권 사용 기록 | → subscriptions |
 | 17 | `subscription_templates` | 수강권 템플릿 | → teachers |
 | 18 | `subscription_proposals` | 수강권 제안 | → teachers, students, templates |
-| 19 | `payments` | 결제 | → students |
+| 19 | `payments` | 레거시 입금 상태 기록 | → students |
 | 20 | `tuition_settings` | 수업료 설정 | → students |
 | 21 | `practice_repertoires` | 연습 레퍼토리 | → students |
 | 22 | `practice_sections` | 연습 섹션 | → practice_repertoires |
@@ -552,9 +552,11 @@ CREATE TABLE subscription_proposals (
 
 ---
 
-## 7. 결제
+## 7. 입금 상태 기록
 
 ### payments
+
+레거시 테이블이다. 현행 백엔드는 독립 `/payments/*` API를 제공하지 않으며, 수강권 입금 상태는 `subscriptions` / `subscription_proposals` 흐름에서 기록한다. 앱관리자 사용료 과금은 향후 별도 스펙 완료 후 분리된 모델/API로 설계한다.
 
 ```sql
 CREATE TABLE payments (
@@ -1234,7 +1236,7 @@ INSERT INTO supported_locales VALUES
 | practice_repertoires | `(student_id, start_date, end_date)` | 학생별 기간 조회 |
 | daily_practice_statuses | `(section_id, date)` UNIQUE | 섹션별 날짜 유일 |
 | notifications | `(user_id, read_at)` | 읽지 않은 알림 조회 |
-| payments | `(period_start, period_end)` | 기간별 결제 조회 |
+| payments | `(period_start, period_end)` | 레거시 기간별 입금 상태 조회 |
 
 ### FK Cascade 규칙
 

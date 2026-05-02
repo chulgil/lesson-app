@@ -3,7 +3,6 @@
 import pytest
 from httpx import AsyncClient
 
-
 # ---------------------------------------------------------------------------
 # Teacher Settings
 # ---------------------------------------------------------------------------
@@ -54,6 +53,7 @@ async def test_get_subscription_settings_default(client: AsyncClient, auth_heade
     assert response.status_code == 200
     data = response.json()
     assert data["renewal_alert_threshold"] == 2
+    assert data["renewal_alert_days_set"] == [14, 7, 1, 0]
     assert data["enable_push_notification"] is True
 
 
@@ -65,11 +65,12 @@ async def test_update_subscription_settings(client: AsyncClient, auth_headers, c
     response = await client.put(
         "/api/v1/settings/subscription",
         headers=auth_headers,
-        json={"renewal_alert_threshold": 5, "notify_parent": False},
+        json={"renewal_alert_threshold": 5, "renewal_alert_days_set": [7, 1], "notify_parent": False},
     )
     assert response.status_code == 200
     data = response.json()
     assert data["renewal_alert_threshold"] == 5
+    assert data["renewal_alert_days_set"] == [7, 1]
     assert data["notify_parent"] is False
 
 

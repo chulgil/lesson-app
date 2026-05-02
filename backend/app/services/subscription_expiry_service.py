@@ -73,6 +73,7 @@ class SubscriptionExpiryService:
                     "subscription_id": str,
                     "student_id": str,
                     "membership_id": str,
+                    "teacher_id": str,
                     "days_left": int,             # 0 / 1 / 7 / 14
                     "end_date": date,
                 }],

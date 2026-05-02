@@ -426,7 +426,7 @@ Access 토큰 갱신.
 | Recordings | 🔍 | ✅ (자기 것) | 🔍 (자녀) |
 | Schedule | ✅ (자기 것) | 🔍 | ❌ |
 | Bookings | ✅ (관리) | ✅ (예약) | ✅ (자녀 대리) |
-| Payments | ✅ (관리) | 🔍 + 확인 | 🔍 + 확인 |
+| Tuition Deposit Status | ✅ (수강권 입금 확인) | ✅ (입금 완료 알림) | ✅ (자녀 입금 완료 알림) |
 | Notifications | ✅ | ✅ | ✅ |
 
 ### 의존성 주입 패턴

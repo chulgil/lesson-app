@@ -1110,67 +1110,13 @@ Access 토큰 갱신
 
 ---
 
-## 16. Payments (8 endpoints)
+## 16. Payments
 
-### GET /payments `[Auth]`
-결제 목록
+현행 API는 독립 `/payments/*` 엔드포인트를 제공하지 않는다.
 
-| 파라미터 | 타입 | 설명 |
-|----------|------|------|
-| `student_id` | string | 학생 필터 |
-| `status` | string | 상태 필터 |
-| `date_from` | string | 시작일 |
-| `date_to` | string | 종료일 |
+선생님/학생/학부모 간 수강료는 앱 밖에서 무통장입금/현금 등으로 처리하고, 앱은 `/subscriptions/*` 흐름에서 수강권 제안, 입금 완료 알림, 선생님 입금 확인 상태만 기록한다. 레거시 `Payment` 모델이나 `payments` 테이블이 남아 있더라도 현행 API 구현 지시로 해석하지 않는다.
 
-### POST /payments `[Auth: Teacher]`
-결제 생성
-
-**Request:**
-```json
-{
-  "student_id": "uuid",
-  "amount": 200000,
-  "due_date": "2026-03-10",
-  "lesson_count": 4,
-  "period_start": "2026-03-01",
-  "period_end": "2026-03-31"
-}
-```
-
-### GET /payments/{id} `[Auth]`
-결제 상세
-
-### PUT /payments/{id} `[Auth: Teacher]`
-결제 수정
-
-### PATCH /payments/{id}/confirm `[Auth: Teacher]`
-결제 확인 (선생님)
-
-### PATCH /payments/{id}/student-confirm `[Auth: Student/Parent]`
-결제 확인 (학생/학부모)
-
-### GET /payments/summary `[Auth: Teacher]`
-결제 요약 (대시보드)
-
-| 파라미터 | 타입 | 설명 |
-|----------|------|------|
-| `year` | int | 연도 |
-| `month` | int | 월 |
-
-**Response (200):**
-```json
-{
-  "total_received": 2400000,
-  "total_pending": 600000,
-  "total_overdue": 200000,
-  "paid_students": 10,
-  "unpaid_students": 3,
-  "overdue_students": 1
-}
-```
-
-### DELETE /payments/{id} `[Auth: Teacher]`
-결제 취소
+앱관리자가 선생님/학생에게 사용료를 과금하는 구조는 향후 별도 스펙 완료 후 `AppPayment` 계열의 분리된 모델/API로 설계한다.
 
 ---
 
@@ -1233,9 +1179,8 @@ Hive 데이터 일괄 업로드 (마이그레이션용)
 | Relationships | 6 |
 | Parents | 6 |
 | Notifications | 4 |
-| Payments | 8 |
 | Migration | 2 |
-| **Total** | **119** |
+| **Total** | **111** |
 
 ---
 
