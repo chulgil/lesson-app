@@ -507,51 +507,64 @@ class _PaymentInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkSecondary,
+        SizedBox(
+          width: 88,
+          child: Text(
+            label,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
         ),
-        Row(
-          children: [
-            Text(
-              value,
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (copyable) ...[
-              const SizedBox(width: AppSpacing.space2),
-              InkWell(
-                onTap: () {
-                  Clipboard.setData(ClipboardData(text: value));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(AppStrings.proposalPaymentAccountCopied),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-                  child: Text(
-                    AppStrings.proposalPaymentCopyLabel,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
+              if (copyable) ...[
+                const SizedBox(width: AppSpacing.space2),
+                InkWell(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: value));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(AppStrings.proposalPaymentAccountCopied),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+                    child: Text(
+                      AppStrings.proposalPaymentCopyLabel,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.paperAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ],
     );
