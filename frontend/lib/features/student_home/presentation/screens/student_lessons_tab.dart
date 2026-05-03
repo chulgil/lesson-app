@@ -196,6 +196,7 @@ class StudentLessonsTab extends ConsumerWidget {
             icon: const Icon(Icons.add, size: 18),
             label: const Text('예약'),
             style: FilledButton.styleFrom(
+              minimumSize: Size(0, AppSpacing.buttonHeight),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
