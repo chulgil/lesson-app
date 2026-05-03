@@ -43,9 +43,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       data: (repertoires) => _getPracticedDates(repertoires),
     );
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
+    return Column(
           children: [
             // Header
             Padding(
@@ -213,7 +211,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
             ),
           ],
         ),
-      ),
     );
   }
 
