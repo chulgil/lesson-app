@@ -63,7 +63,7 @@ class TimeContextBanner extends StatelessWidget {
             child: Text(
               message,
               style: NotebookTypography.hand.copyWith(
-                fontSize: 15,
+                fontSize: 18,
                 color: AppColors.ink,
               ),
             ),
