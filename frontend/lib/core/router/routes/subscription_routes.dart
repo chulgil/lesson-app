@@ -58,6 +58,7 @@ List<RouteBase> subscriptionRoutes = [
       final studentIdsParam = state.uri.queryParameters['studentIds'];
       final studentIdParam = state.uri.queryParameters['studentId'];
       final membershipId = state.uri.queryParameters['membershipId'];
+      final templateId = state.uri.queryParameters['templateId'];
 
       final lessonRequestId = state.uri.queryParameters['lessonRequestId'];
       final lessonRequestIdsParam =
@@ -89,6 +90,7 @@ List<RouteBase> subscriptionRoutes = [
       return IssueSubscriptionScreen(
         studentIds: studentIds,
         membershipId: membershipId,
+        templateId: templateId,
         lessonRequestId: lessonRequestId,
         lessonRequestIds: lessonRequestIds,
       );

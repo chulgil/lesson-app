@@ -46,6 +46,7 @@ class TemplateChoiceCard extends StatelessWidget {
         children: [
           // Title row with recommended badge
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (isRecommended) ...[
                 Container(
@@ -64,10 +65,14 @@ class TemplateChoiceCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.space2),
               ],
-              Text(
-                template.name,
-                style: AppTypography.headingSmall.copyWith(
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  template.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.headingSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

@@ -12,7 +12,9 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
+import '../../domain/entities/subscription_template.dart';
 import '../providers/lesson_policy_providers.dart';
+import '../providers/subscription_template_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
 import '../widgets/issue_form_membership_widgets.dart';
 import '../widgets/issue_form_sections.dart';
@@ -29,6 +31,7 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   /// For batch issuance, this will contain multiple IDs.
   final List<String> studentIds;
   final String? membershipId;
+  final String? templateId;
   final String? lessonRequestId;
   final List<String> lessonRequestIds;
 
@@ -36,6 +39,7 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
     super.key,
     required this.studentIds,
     this.membershipId,
+    this.templateId,
     this.lessonRequestId,
     this.lessonRequestIds = const [],
   });
@@ -75,6 +79,7 @@ class _IssueSubscriptionScreenState
   int _rescheduleDeadlineHours = 12;
   String? _selectedLocationId;
   int _travelTimeMinutes = 0;
+  String? _appliedTemplateId;
 
   // 선생님 정책 기본값 연동.
   // 수강권 생성 시 정책값을 기본으로 표기하되, 실제 컨트롤은 수강권 단위.
@@ -175,13 +180,17 @@ class _IssueSubscriptionScreenState
 
   @override
   Widget build(BuildContext context) {
+    _scheduleTemplateDefaults();
+
     final membershipsAsync =
         widget.isBatchMode
             ? const AsyncValue<List<ClassMembership>>.data([])
             : ref.watch(studentMembershipsProvider(widget.primaryStudentId));
 
     // Pre-fill amount from student.monthlyFee (once only)
-    if (!_hasPrefilledAmount && !widget.isBatchMode) {
+    if (!_hasPrefilledAmount &&
+        !widget.isBatchMode &&
+        widget.templateId == null) {
       final studentAsync = ref.watch(studentProvider(widget.primaryStudentId));
       studentAsync.whenData((student) {
         if (student != null && student.monthlyFee > 0 && _originalAmount == 0) {
@@ -248,6 +257,35 @@ class _IssueSubscriptionScreenState
               ),
       bottomNavigationBar: _buildBottomBar(),
     );
+  }
+
+  void _scheduleTemplateDefaults() {
+    final templateId = widget.templateId;
+    if (templateId == null || _appliedTemplateId == templateId) return;
+
+    final templateAsync = ref.watch(subscriptionTemplateProvider(templateId));
+    templateAsync.whenData((template) {
+      if (template == null || _appliedTemplateId == template.id) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _appliedTemplateId == template.id) return;
+        _applyTemplateDefaults(template);
+      });
+    });
+  }
+
+  void _applyTemplateDefaults(SubscriptionTemplate template) {
+    setState(() {
+      _selectedType = SubscriptionType.package;
+      _totalLessons = template.totalLessons;
+      _validityDays = template.validityDays;
+      _originalAmount = template.price;
+      _rescheduleAllowance = template.rescheduleAllowance;
+      _lessonsController.text = template.totalLessons.toString();
+      _validityController.text = template.validityDays.toString();
+      _amountController.text = template.price.toString();
+      _hasPrefilledAmount = true;
+      _appliedTemplateId = template.id;
+    });
   }
 
   Widget _buildForm(List<ClassMembership> memberships) {
