@@ -173,23 +173,33 @@ class StudentDashboardTab extends ConsumerWidget {
         const ThinRule(),
         const SizedBox(height: AppSpacing.space3),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text('Fine.', style: NotebookTypography.fine),
             const Spacer(),
-            TextButton.icon(
-              onPressed: () => context.push(AppRoutes.practice),
-              icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
-              label: Text(
-                '연습 기록 더보기',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.ink,
-                  fontWeight: FontWeight.w600,
+            Flexible(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => context.push(AppRoutes.practice),
+                  icon: const Icon(
+                    Icons.bar_chart,
+                    size: 16,
+                    color: AppColors.ink,
+                  ),
+                  label: Text(
+                    '연습 기록 더보기',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
                 ),
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
             ),
           ],

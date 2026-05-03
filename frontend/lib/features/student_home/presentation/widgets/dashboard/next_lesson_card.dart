@@ -158,8 +158,7 @@ class NextLessonCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // 로마숫자 인덱스 — Notebook × Score 시그니처 (Phase 4c)
                       Text(
@@ -177,18 +176,22 @@ class NextLessonCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.paper.withValues(alpha: 0.2),
-                        ),
-                        child: Text(
-                          typeText,
-                          style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.paper,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper.withValues(alpha: 0.2),
+                          ),
+                          child: Text(
+                            typeText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.captionSmall.copyWith(
+                              color: AppColors.paper,
+                            ),
                           ),
                         ),
                       ),

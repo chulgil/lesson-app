@@ -619,15 +619,23 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             Expanded(
               child: Text(
                 template.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
             ),
-            Text(
-              template.summaryText,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkSecondary,
+            const SizedBox(width: AppSpacing.space2),
+            Flexible(
+              child: Text(
+                template.summaryText,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
               ),
             ),
           ],
