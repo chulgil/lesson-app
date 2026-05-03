@@ -1898,8 +1898,8 @@ class AppStrings {
   static const goToMain = '메인으로 가기';
 
   // ── Unified Lesson Request (통합 레슨 신청) ─────────────
-  /// 재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다 (returning student banner)
-  static const returningStudentBanner = '재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다';
+  /// 재수강 신청 안내 (returning student banner)
+  static const returningStudentBanner = '재수강 신청 — 선생님의 최신 가능 시간 중 다시 선택해주세요';
 
   /// 레슨 목표 (section title)
   static const lessonGoalLabel = '레슨 목표';

@@ -384,6 +384,8 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
             child: Text(
               _priorityLabel(priority),
               style: AppTypography.bodyMedium.copyWith(
+                fontSize: AppTypography.bodyMedium.fontSize! * 2,
+                height: 1,
                 fontWeight: FontWeight.bold,
                 color: AppColors.paper,
               ),
@@ -424,16 +426,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   }
 
   Color _priorityColor(int priority) {
-    switch (priority) {
-      case 1:
-        return AppColors.paperAccent;
-      case 2:
-        return AppColors.paperAccentSoft;
-      case 3:
-        return AppColors.paperAccentSoft.withValues(alpha: 0.7);
-      default:
-        return AppColors.paperAccent;
-    }
+    return AppColors.paperAccent;
   }
 
   String _priorityLabel(int priority) {
