@@ -2,6 +2,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
 import 'package:lessonaza/features/relationship/data/repositories/mock_teacher_student_relation_repository.dart';
 import 'package:lessonaza/features/relationship/domain/entities/relationship_status.dart';
 import 'package:lessonaza/features/relationship/presentation/providers/relationship_providers.dart';
@@ -22,6 +23,51 @@ void main() {
   });
 
   group('requestEventsProvider logic', () {
+    test(
+      'createRequest fills empty studentId from current user context',
+      () async {
+        final requestRepository = MockUnifiedLessonRequestRepository();
+        final container = ProviderContainer(
+          overrides: [
+            currentUserIdProvider.overrideWithValue('student_context_001'),
+            unifiedLessonRequestRepositoryProvider.overrideWithValue(
+              requestRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final request = UnifiedLessonRequest(
+          id: 'create-request-001',
+          studentId: '',
+          teacherId: 'teacher_1',
+          type: LessonRequestType.regular,
+          instrument: '피아노',
+          goal: UnifiedLessonGoal.hobby,
+          experience: UnifiedExperienceLevel.beginner,
+          preferredSlots: [
+            PreferredTimeSlot(
+              priority: 1,
+              dayOfWeek: 2,
+              startTime: '15:00',
+              endTime: '16:00',
+            ),
+          ],
+          createdAt: DateTime(2026, 5, 3),
+        );
+
+        final created = await UnifiedLessonRequestActions(
+          container,
+        ).createRequest(request);
+
+        expect(created.studentId, 'student_context_001');
+        final stored = await requestRepository.getById(request.id);
+        expect(stored!.studentId, 'student_context_001');
+        final events = await requestRepository.getEventsByRequestId(request.id);
+        expect(events.single.actorId, 'student_context_001');
+      },
+    );
+
     test('getEventsByRequestId returns events sorted by createdAt', () async {
       final events = await repository.getEventsByRequestId('ulr_1');
 

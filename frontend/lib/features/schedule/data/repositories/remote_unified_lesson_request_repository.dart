@@ -68,6 +68,22 @@ class RemoteUnifiedLessonRequestRepository
 
   @override
   Future<UnifiedLessonRequest> update(UnifiedLessonRequest request) async {
+    if (request.status != UnifiedRequestStatus.pending ||
+        request.proposalId != null) {
+      final response = await _apiClient.patch(
+        '$_basePath/${request.id}/status',
+        data: {
+          'status': request.status.name,
+          if (request.rejectionReason != null)
+            'decline_reason': request.rejectionReason,
+          if (request.proposalId != null) 'proposal_id': request.proposalId,
+        },
+      );
+      return UnifiedLessonRequest.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    }
+
     final response = await _apiClient.put(
       '$_basePath/${request.id}',
       data: request.toJson(),

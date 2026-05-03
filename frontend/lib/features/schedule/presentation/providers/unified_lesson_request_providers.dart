@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
 import '../../../subscription/domain/entities/subscription.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
@@ -208,7 +209,12 @@ class UnifiedLessonRequestActions {
   Future<UnifiedLessonRequest> createRequest(
     UnifiedLessonRequest request,
   ) async {
-    final result = await _repository.create(request);
+    final studentId =
+        request.studentId.isNotEmpty
+            ? request.studentId
+            : ref.read(currentUserIdProvider);
+    final effectiveRequest = request.copyWith(studentId: studentId);
+    final result = await _repository.create(effectiveRequest);
 
     // Create initial request event
     await _repository.addEvent(
@@ -216,10 +222,10 @@ class UnifiedLessonRequestActions {
         id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
         requestId: result.id,
         actorType: ProposerRole.student,
-        actorId: request.studentId,
+        actorId: studentId,
         eventType: RequestEventType.initialRequest,
         suggestedSlots:
-            request.preferredSlots
+            effectiveRequest.preferredSlots
                 .map(
                   (ps) => TimeSlotOption(
                     id: 'slot_${ps.priority}',
@@ -229,14 +235,14 @@ class UnifiedLessonRequestActions {
                   ),
                 )
                 .toList(),
-        message: request.message,
+        message: effectiveRequest.message,
         createdAt: DateTime.now(),
       ),
     );
 
     _invalidateProviders(
-      request.teacherId,
-      request.studentId,
+      effectiveRequest.teacherId,
+      studentId,
       requestId: result.id,
     );
     return result;

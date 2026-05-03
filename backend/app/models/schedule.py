@@ -170,13 +170,14 @@ class LessonRequest(UUIDMixin, Base):
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Unified lesson request fields
-    request_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # trial, regular
+    request_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # trial, regular, package
     instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
     goal: Mapped[str | None] = mapped_column(String(20), nullable=True)  # hobby, exam, major, other
     experience_level: Mapped[str | None] = mapped_column(String(20), nullable=True)  # beginner, intermediate, advanced
     preferred_day: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 0=Mon...6=Sun
     preferred_time: Mapped[str | None] = mapped_column(String(5), nullable=True)  # HH:MM
     preferred_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)  # minutes
+    preferred_slots: Mapped[list | None] = mapped_column(JSON, nullable=True)
     is_returning_student: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     time_proposals: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     current_round: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

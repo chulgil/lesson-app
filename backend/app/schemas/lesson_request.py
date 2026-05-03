@@ -13,7 +13,7 @@ class LessonRequestCreate(BaseModel):
 
     teacher_id: str = Field(validation_alias=AliasChoices("teacher_id", "teacherId"))
     # Unified fields
-    request_type: Literal["trial", "regular"] | None = Field(
+    request_type: Literal["trial", "regular", "package"] | None = Field(
         default=None,
         validation_alias=AliasChoices("request_type", "type"),
     )
@@ -40,6 +40,11 @@ class LessonRequestCreate(BaseModel):
         le=180,
         validation_alias=AliasChoices("preferred_duration", "preferredDuration"),
     )  # minutes
+    preferred_slots: list["PreferredTimeSlotSchema"] = Field(
+        default_factory=list,
+        max_length=3,
+        validation_alias=AliasChoices("preferred_slots", "preferredSlots"),
+    )
     message: str | None = Field(default=None, max_length=500)
     is_returning_student: bool = Field(
         default=False,
@@ -62,6 +67,7 @@ class LessonRequestUpdate(BaseModel):
     preferred_day: int | None = None
     preferred_time: str | None = None
     preferred_duration: int | None = None
+    preferred_slots: list["PreferredTimeSlotSchema"] | None = None
 
 
 class LessonRequestResponse(BaseModel):
@@ -82,6 +88,7 @@ class LessonRequestResponse(BaseModel):
     preferred_day: int | None = None
     preferred_time: str | None = None
     preferred_duration: int | None = None
+    preferred_slots: list["PreferredTimeSlotSchema"] = Field(default_factory=list)
     is_returning_student: bool = False
     time_proposals: list | dict | None = None
     current_round: int = 0
@@ -146,7 +153,7 @@ class LessonRequestStatusUpdate(BaseModel):
     status: Literal[
         "pending", "approved", "rejected", "negotiating", "timeConfirmed",
         "proposalSent", "proposalAccepted", "paymentNotified",
-        "completed", "cancelled", "expired",
+        "subscriptionIssued", "inProgress", "completed", "cancelled", "expired",
     ]
     decline_reason: str | None = Field(default=None, max_length=500)
     proposal_id: str | None = None
@@ -160,6 +167,23 @@ class TimeSlotOptionSchema(BaseModel):
     day_of_week: int = Field(validation_alias=AliasChoices("day_of_week", "dayOfWeek"))  # 0=Mon...6=Sun
     start_time: str = Field(validation_alias=AliasChoices("start_time", "startTime"))  # HH:MM
     end_time: str = Field(validation_alias=AliasChoices("end_time", "endTime"))  # HH:MM
+
+
+class PreferredTimeSlotSchema(BaseModel):
+    """Student preferred time slot with priority order."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    priority: int = Field(ge=1, le=3)
+    date: str | None = None
+    day_of_week: int | None = Field(
+        default=None,
+        ge=0,
+        le=6,
+        validation_alias=AliasChoices("day_of_week", "dayOfWeek"),
+    )
+    start_time: str = Field(validation_alias=AliasChoices("start_time", "startTime"))
+    end_time: str = Field(validation_alias=AliasChoices("end_time", "endTime"))
 
 
 class TimeProposalCreate(BaseModel):

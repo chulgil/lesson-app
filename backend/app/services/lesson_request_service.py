@@ -87,6 +87,16 @@ class LessonRequestService:
         """Create a unified lesson request."""
         from app.models.schedule import LessonRequest
 
+        preferred_slots = [
+            slot.model_dump(mode="json") for slot in data.preferred_slots
+        ]
+        primary_slot = preferred_slots[0] if preferred_slots else None
+        preferred_day = data.preferred_day
+        preferred_time = data.preferred_time
+        if primary_slot:
+            preferred_day = preferred_day if preferred_day is not None else primary_slot.get("day_of_week")
+            preferred_time = preferred_time or primary_slot.get("start_time")
+
         # Auto-match price from teacher's price table
         suggested_price = await self._match_price(
             data.teacher_id, data.instrument, data.experience_level
@@ -101,9 +111,10 @@ class LessonRequestService:
             instrument=data.instrument,
             goal=data.goal,
             experience_level=data.experience_level,
-            preferred_day=data.preferred_day,
-            preferred_time=data.preferred_time,
+            preferred_day=preferred_day,
+            preferred_time=preferred_time,
             preferred_duration=data.preferred_duration,
+            preferred_slots=preferred_slots,
             is_returning_student=data.is_returning_student,
             suggested_price=suggested_price,
             # Legacy fields
@@ -121,6 +132,15 @@ class LessonRequestService:
             actor_type="student",
             actor_id=current_user.id,
             event_type="initialRequest",
+            suggested_slots=[
+                {
+                    "day_of_week": slot["day_of_week"],
+                    "start_time": slot["start_time"],
+                    "end_time": slot["end_time"],
+                }
+                for slot in preferred_slots
+                if slot.get("day_of_week") is not None
+            ],
             message=data.message,
         )
         await self.db.refresh(request)
@@ -180,6 +200,11 @@ class LessonRequestService:
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
+            if key == "preferred_slots" and value is not None:
+                value = [
+                    slot.model_dump(mode="json") if hasattr(slot, "model_dump") else slot
+                    for slot in value
+                ]
             setattr(request, key, value)
         await self.db.flush()
         await self.db.refresh(request)
@@ -215,7 +240,11 @@ class LessonRequestService:
             actor_id=current_user.id,
             event_type=self._event_type_for_status(data.status),
             message=data.decline_reason,
-            subscription_id=data.proposal_id if data.status == "proposalSent" else None,
+            subscription_id=(
+                data.proposal_id
+                if data.status in ("proposalSent", "subscriptionIssued")
+                else None
+            ),
         )
         await self.db.flush()
         await self.db.refresh(request)

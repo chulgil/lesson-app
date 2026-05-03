@@ -390,6 +390,116 @@ async def test_lesson_request_accepts_frontend_spec_keys_and_camel_case_actions(
 
 
 @pytest.mark.asyncio
+async def test_lesson_request_accepts_package_type_and_preferred_slots(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="package-teacher", role="teacher", name="회차권 선생님")
+    await create_test_user(
+        user_id="package-student",
+        role="student",
+        name="회차권 학생",
+        email="package-student@test.com",
+    )
+
+    response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("package-student", "student"),
+        json={
+            "teacherId": "package-teacher",
+            "type": "package",
+            "instrument": "violin",
+            "goal": "hobby",
+            "experience": "beginner",
+            "preferredSlots": [
+                {
+                    "priority": 1,
+                    "dayOfWeek": 2,
+                    "startTime": "15:00",
+                    "endTime": "16:00",
+                },
+                {
+                    "priority": 2,
+                    "dayOfWeek": 4,
+                    "startTime": "18:00",
+                    "endTime": "19:00",
+                },
+            ],
+            "preferredDuration": 60,
+        },
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["request_type"] == "package"
+    assert body["type"] == "package"
+    assert body["preferred_day"] == 2
+    assert body["preferred_time"] == "15:00"
+    assert body["preferred_slots"] == [
+        {
+            "priority": 1,
+            "date": None,
+            "day_of_week": 2,
+            "start_time": "15:00",
+            "end_time": "16:00",
+        },
+        {
+            "priority": 2,
+            "date": None,
+            "day_of_week": 4,
+            "start_time": "18:00",
+            "end_time": "19:00",
+        },
+    ]
+    assert body["events"][0]["suggested_slots"][0]["day_of_week"] == 2
+
+
+@pytest.mark.asyncio
+async def test_lesson_request_status_endpoint_accepts_subscription_issued(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="issued-teacher", role="teacher", name="발급 선생님")
+    await create_test_user(
+        user_id="issued-student",
+        role="student",
+        name="발급 학생",
+        email="issued-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("issued-student", "student"),
+        json={
+            "teacher_id": "issued-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    status_response = await client.patch(
+        f"/api/v1/schedule/lesson-requests/{request_id}/status",
+        headers=_headers("issued-teacher", "teacher"),
+        json={
+            "status": "subscriptionIssued",
+            "proposal_id": "subscription-001",
+        },
+    )
+
+    assert status_response.status_code == 200
+    body = status_response.json()
+    assert body["status"] == "subscriptionIssued"
+    assert body["proposal_id"] == "subscription-001"
+    assert body["events"][-1]["event_type"] == "subscriptionIssued"
+    assert body["events"][-1]["subscription_id"] == "subscription-001"
+
+
+@pytest.mark.asyncio
 async def test_lesson_request_expire_endpoint_expires_pending_and_negotiating_requests(
     client: AsyncClient,
     create_test_user,
