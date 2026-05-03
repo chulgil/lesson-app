@@ -44,173 +44,183 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     );
 
     return Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenPadding,
-                AppSpacing.space2,
-                AppSpacing.screenPadding,
-                0,
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: Row(
+            children: [
+              // Notebook × Score: 탭 타이틀 Playfair sectionTitle (§7.87-f).
+              Expanded(
+                child: Text(
+                  '내 연습',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: NotebookTypography.sectionTitle,
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Notebook × Score: 탭 타이틀 Playfair sectionTitle (§7.87-f).
-                  Text('내 연습', style: NotebookTypography.sectionTitle),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed:
-                            () => context.push(
-                              '${AppRoutes.repertoireHistory}?studentId=$studentId',
-                            ),
-                        icon: const Icon(Icons.history),
-                        tooltip: '레퍼토리 히스토리',
-                      ),
-                      FilledButton.icon(
-                        onPressed: () {
-                          context.push(
-                            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                          );
-                        },
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('레퍼토리 추가'),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.space4,
-                            vertical: AppSpacing.space2,
-                          ),
-                        ),
-                      ),
-                    ],
+              IconButton(
+                onPressed:
+                    () => context.push(
+                      '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                    ),
+                icon: const Icon(Icons.history),
+                tooltip: '레퍼토리 히스토리',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              ),
+              const SizedBox(width: AppSpacing.space1),
+              Flexible(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    context.push(
+                      '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                    );
+                  },
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text(
+                    '레퍼토리 추가',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-            ),
-
-            // Compact week strip (unified with teacher schedule)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenPadding,
-                AppSpacing.space2,
-                AppSpacing.screenPadding,
-                0,
-              ),
-              child: CompactWeekStrip(
-                selectedDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
-                markerDates: practicedDates,
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.space3),
-
-            // Date header with count and sort option
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: repertoiresAsync.when(
-                data: (repertoires) {
-                  // Calculate total section count for selected date
-                  final sectionCount = repertoires.fold<int>(
-                    0,
-                    (sum, rep) =>
-                        sum + rep.getSectionsForDate(_selectedDate).length,
-                  );
-                  return Row(
-                    children: [
-                      Text(
-                        _formatDate(_selectedDate),
-                        style: AppTypography.headingSmall.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                      if (_isToday()) ...[
-                        const SizedBox(width: AppSpacing.space2),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.paperAccentSoft,
-                          ),
-                          // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
-                          // italic (README §1.1 4계층, §7.127 Gaegu 회피).
-                          child: Text(
-                            '오늘',
-                            style: NotebookTypography.indicatorLabel,
-                          ),
-                        ),
-                      ],
-                      const Spacer(),
-                      // Section count
-                      Text(
-                        '$sectionCount개 섹션',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkTertiary,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.space3),
-                      // Sort dropdown
-                      _buildSortDropdown(),
-                    ],
-                  );
-                },
-                loading:
-                    () => Row(
-                      children: [
-                        Text(
-                          _formatDate(_selectedDate),
-                          style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
-                        const Spacer(),
-                        _buildSortDropdown(),
-                      ],
+                  style: FilledButton.styleFrom(
+                    minimumSize: Size(0, AppSpacing.buttonHeight),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                      vertical: AppSpacing.space2,
                     ),
-                error:
-                    (_, __) => Row(
-                      children: [
-                        Text(
-                          _formatDate(_selectedDate),
-                          style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
-                        const Spacer(),
-                        _buildSortDropdown(),
-                      ],
-                    ),
+                  ),
+                ),
               ),
-            ),
-
-            // Repertoire list
-            Expanded(
-              child: repertoiresAsync.when(
-                data: (repertoires) {
-                  if (repertoires.isEmpty) {
-                    return _buildEmptyState(studentId);
-                  }
-                  // Apply sorting
-                  final sortType = ref.watch(repertoireSortTypeProvider);
-                  final sortedRepertoires = repertoires.sortBy(sortType);
-                  return _buildRepertoireList(sortedRepertoires, studentId);
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
+
+        // Compact week strip (unified with teacher schedule)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: CompactWeekStrip(
+            selectedDate: _selectedDate,
+            onDateSelected: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+            },
+            markerDates: practicedDates,
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.space3),
+
+        // Date header with count and sort option
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
+          ),
+          child: repertoiresAsync.when(
+            data: (repertoires) {
+              // Calculate total section count for selected date
+              final sectionCount = repertoires.fold<int>(
+                0,
+                (sum, rep) =>
+                    sum + rep.getSectionsForDate(_selectedDate).length,
+              );
+              return Row(
+                children: [
+                  Text(
+                    _formatDate(_selectedDate),
+                    style: AppTypography.headingSmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  if (_isToday()) ...[
+                    const SizedBox(width: AppSpacing.space2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.paperAccentSoft,
+                      ),
+                      // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
+                      // italic (README §1.1 4계층, §7.127 Gaegu 회피).
+                      child: Text(
+                        '오늘',
+                        style: NotebookTypography.indicatorLabel,
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  // Section count
+                  Text(
+                    '$sectionCount개 섹션',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space3),
+                  // Sort dropdown
+                  _buildSortDropdown(),
+                ],
+              );
+            },
+            loading:
+                () => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
+                ),
+            error:
+                (_, __) => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
+                ),
+          ),
+        ),
+
+        // Repertoire list
+        Expanded(
+          child: repertoiresAsync.when(
+            data: (repertoires) {
+              if (repertoires.isEmpty) {
+                return _buildEmptyState(studentId);
+              }
+              // Apply sorting
+              final sortType = ref.watch(repertoireSortTypeProvider);
+              final sortedRepertoires = repertoires.sortBy(sortType);
+              return _buildRepertoireList(sortedRepertoires, studentId);
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+          ),
+        ),
+      ],
     );
   }
 

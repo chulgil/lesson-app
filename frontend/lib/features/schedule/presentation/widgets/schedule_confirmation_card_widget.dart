@@ -186,13 +186,17 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           children: [
             Icon(Icons.schedule, size: 18, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space2),
-            Text(
-              card.hasMultipleOptions
-                  ? '원하시는 시간을 선택해주세요'
-                  : card.cardType.suggestionText,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.inkSecondary),
+            Expanded(
+              child: Text(
+                card.hasMultipleOptions
+                    ? '원하시는 시간을 선택해주세요'
+                    : card.cardType.suggestionText,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.inkSecondary),
+              ),
             ),
           ],
         ),

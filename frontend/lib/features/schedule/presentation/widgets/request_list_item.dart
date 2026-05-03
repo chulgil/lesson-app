@@ -159,14 +159,22 @@ class RequestListItem extends StatelessWidget {
           color: AppColors.inkTertiary,
         ),
         const SizedBox(width: AppSpacing.space1),
-        Text(
-          firstSlot.displayLabel,
-          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
+        Expanded(
+          child: Text(
+            firstSlot.displayLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
         ),
         if (remaining > 0) ...[
           const SizedBox(width: AppSpacing.space1),
           Text(
             AppStrings.slotsRemaining(remaining),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
