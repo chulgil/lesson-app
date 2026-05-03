@@ -115,6 +115,9 @@ class TrialBookingsSection extends ConsumerWidget {
             onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.add, size: 18),
             label: const Text('체험레슨 신청'),
+            style: FilledButton.styleFrom(
+              minimumSize: Size(0, AppSpacing.buttonHeight),
+            ),
           ),
         ],
       ),

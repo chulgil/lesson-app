@@ -381,6 +381,9 @@ class StudentLessonsTab extends ConsumerWidget {
               onPressed: () => context.push(AppRoutes.teacherSearch),
               icon: const Icon(Icons.search, size: 18),
               label: const Text('선생님 찾기'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(0, AppSpacing.buttonHeight),
+              ),
             ),
           ],
         ),

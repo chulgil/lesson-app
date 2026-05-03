@@ -217,6 +217,7 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.edit, size: 16),
                     label: const Text(AppStrings.modify),
                     style: OutlinedButton.styleFrom(
+                      minimumSize: Size(0, AppSpacing.buttonHeight),
                       foregroundColor: AppColors.ink,
                       side: const BorderSide(color: AppColors.ink),
                       padding: const EdgeInsets.symmetric(
@@ -230,6 +231,7 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.swap_horiz, size: 16),
                     label: const Text('일정 변경'),
                     style: OutlinedButton.styleFrom(
+                      minimumSize: Size(0, AppSpacing.buttonHeight),
                       foregroundColor: AppColors.paperAccent,
                       side: const BorderSide(color: AppColors.paperAccent),
                       padding: const EdgeInsets.symmetric(
@@ -243,6 +245,7 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.close, size: 16),
                     label: const Text(AppStrings.cancel),
                     style: OutlinedButton.styleFrom(
+                      minimumSize: Size(0, AppSpacing.buttonHeight),
                       foregroundColor: AppColors.paperAccent,
                       side: const BorderSide(color: AppColors.paperAccent),
                       padding: const EdgeInsets.symmetric(
