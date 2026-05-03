@@ -49,6 +49,25 @@ async def get_teacher_settings(
     return await service.get_teacher_settings(current_user.id)
 
 
+@router.get(
+    "/teachers/{teacher_id}",
+    response_model=TeacherSettingsResponse,
+    summary="Get public teacher settings",
+)
+@router.get(
+    "/teacher/{teacher_id}",
+    response_model=TeacherSettingsResponse,
+    summary="Get public teacher settings",
+)
+async def get_public_teacher_settings(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> TeacherSettingsResponse:
+    service = SettingsService(db)
+    return await service.get_public_teacher_settings(teacher_id)
+
+
 @router.put(
     "/teacher",
     response_model=TeacherSettingsResponse,

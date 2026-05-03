@@ -43,6 +43,22 @@ async def get_availability(
     return await service.get_availability(current_user)
 
 
+@router.get(
+    "/availability/{teacher_id}",
+    response_model=AvailabilityResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get public teacher availability",
+)
+async def get_public_availability(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AvailabilityResponse:
+    """Return weekly availability for a target teacher."""
+    service = ScheduleService(db)
+    return await service.get_availability_by_teacher_id(teacher_id)
+
+
 @router.put(
     "/availability",
     response_model=AvailabilityResponse,

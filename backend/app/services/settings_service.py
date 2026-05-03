@@ -24,6 +24,7 @@ class SettingsService:
     async def get_teacher_settings(self, teacher_id: str) -> Any:
         from app.models.settings import TeacherSettings
 
+        teacher_id = await self._resolve_teacher_user_id(teacher_id)
         settings = await self.db.scalar(
             select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id)
         )
@@ -31,8 +32,12 @@ class SettingsService:
             settings = TeacherSettings(teacher_id=teacher_id)
             self.db.add(settings)
             await self.db.flush()
-            await self.db.refresh(settings)
+        await self.db.refresh(settings)
         return settings
+
+    async def get_public_teacher_settings(self, teacher_id: str) -> Any:
+        """Return settings for a target teacher, using defaults when unset."""
+        return await self.get_teacher_settings(teacher_id)
 
     async def update_teacher_settings(self, teacher_id: str, data: dict) -> Any:
         settings = await self.get_teacher_settings(teacher_id)
@@ -42,6 +47,15 @@ class SettingsService:
         await self.db.flush()
         await self.db.refresh(settings)
         return settings
+
+    async def _resolve_teacher_user_id(self, teacher_id: str) -> str:
+        """Accept either Teacher.id or User.id and return the owning User.id."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher:
+            return teacher.user_id
+        return teacher_id
 
     # -----------------------------------------------------------------------
     # Subscription Settings

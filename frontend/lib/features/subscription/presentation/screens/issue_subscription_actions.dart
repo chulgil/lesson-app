@@ -19,6 +19,9 @@ import '../../../settings/presentation/providers/teacher_settings_provider.dart'
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 
+UnifiedRequestStatus lessonRequestStatusForIssuedSubscription() =>
+    UnifiedRequestStatus.subscriptionIssued;
+
 mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     on ConsumerState<T> {
   String get primaryStudentId;
@@ -151,7 +154,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           await repo.update(
             request.copyWith(
               proposalId: subscription.id,
-              status: UnifiedRequestStatus.proposalSent,
+              status: lessonRequestStatusForIssuedSubscription(),
             ),
           );
         }
@@ -459,7 +462,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
               await repo.update(
                 req.copyWith(
                   proposalId: subscription.id,
-                  status: UnifiedRequestStatus.proposalSent,
+                  status: lessonRequestStatusForIssuedSubscription(),
                 ),
               );
             }

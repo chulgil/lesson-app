@@ -21,6 +21,7 @@ class TeacherSettingsResponse(BaseModel):
     min_booking_hours: int = 24
     lesson_price_table: dict | None = None
     trial_lesson_free: bool = False
+    booking_guidance_message: str | None = None
     created_at: _dt.datetime
     updated_at: _dt.datetime
 
@@ -34,6 +35,7 @@ class TeacherSettingsUpdate(BaseModel):
     min_booking_hours: int | None = None
     lesson_price_table: dict | None = None
     trial_lesson_free: bool | None = None
+    booking_guidance_message: str | None = None
 
 
 # ---------------------------------------------------------------------------

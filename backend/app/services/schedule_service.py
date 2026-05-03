@@ -50,23 +50,41 @@ class ScheduleService:
 
     async def get_availability(self, current_user: Any) -> AvailabilityResponse:
         """Return the teacher's weekly availability."""
+        return await self.get_availability_by_teacher_id(current_user.id)
+
+    async def get_availability_by_teacher_id(self, teacher_id: str) -> AvailabilityResponse:
+        """Return weekly availability for a target teacher id or profile id."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
         from app.schemas.schedule import DayAvailability, TimeSlotSchema
 
+        teacher_user_id = await self._resolve_teacher_user_id(teacher_id)
         avail_rows = await self.db.scalars(
-            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id == teacher_user_id)
         )
         day_list = []
+        weekly_schedules = []
         for avail in avail_rows.all():
             slots_rows = await self.db.scalars(
                 select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
-            time_slots = [TimeSlotSchema(start_time=s.start_time, end_time=s.end_time) for s in slots_rows.all()]
+            time_slots = []
+            for slot in slots_rows.all():
+                time_slots.append(TimeSlotSchema(start_time=slot.start_time, end_time=slot.end_time))
+                weekly_schedules.append(
+                    {
+                        "id": f"{avail.day_of_week}-{slot.start_time}-{slot.end_time}",
+                        "day_of_week": avail.day_of_week,
+                        "start_time": slot.start_time,
+                        "end_time": slot.end_time,
+                        "is_active": True,
+                    }
+                )
             day_list.append(DayAvailability(day_of_week=avail.day_of_week, time_slots=time_slots))
 
         return AvailabilityResponse(
-            teacher_id=current_user.id,
+            teacher_id=teacher_user_id,
             availabilities=day_list,
+            weekly_schedules=weekly_schedules,
         )
 
     async def set_availability(self, data: AvailabilityCreate, current_user: Any) -> AvailabilityResponse:

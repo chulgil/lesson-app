@@ -257,7 +257,17 @@ class UnifiedLessonRequestActions {
     int? selectedSlotIndex,
     String? message,
   }) async {
-    final result = await _repository.approve(requestId);
+    final request = await _repository.getById(requestId);
+    if (request == null) {
+      throw Exception('Request not found: $requestId');
+    }
+
+    final result = await _repository.update(
+      request.copyWith(
+        status: UnifiedRequestStatus.timeConfirmed,
+        confirmedAt: request.confirmedAt ?? DateTime.now(),
+      ),
+    );
 
     await _repository.addEvent(
       RequestEvent(
@@ -702,11 +712,16 @@ class UnifiedLessonRequestActions {
       id: 'sub_${now.microsecondsSinceEpoch}',
       studentId: request.studentId,
       membershipId: '',
-      type:
-          request.type == LessonRequestType.trial
-              ? SubscriptionType.trial
-              : SubscriptionType.monthly,
-      totalLessons: request.type == LessonRequestType.trial ? 1 : null,
+      type: switch (request.type) {
+        LessonRequestType.trial => SubscriptionType.trial,
+        LessonRequestType.package => SubscriptionType.package,
+        LessonRequestType.regular => SubscriptionType.monthly,
+      },
+      totalLessons: switch (request.type) {
+        LessonRequestType.trial => 1,
+        LessonRequestType.package => 4,
+        LessonRequestType.regular => null,
+      },
       lessonsPerMonth: request.type == LessonRequestType.regular ? 4 : null,
       usedLessons: 0,
       startDate: now,

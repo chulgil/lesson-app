@@ -23,15 +23,15 @@ class RemoteSettingsRepository implements SettingsRepository {
 
   @override
   Future<TeacherSettings> getTeacherSettingsById(String teacherId) async {
-    // For remote, we only have the current teacher's settings
-    return getTeacherSettings();
+    final response = await _apiClient.get(
+      '/settings/teacher/${Uri.encodeComponent(teacherId)}',
+    );
+    final data = response.data as Map<String, dynamic>;
+    return TeacherSettings.fromJson(data).copyWith(availableSlots: []);
   }
 
   Future<TeacherSettings> _updateSettings(Map<String, dynamic> updates) async {
-    final response = await _apiClient.put(
-      '/settings/teacher',
-      data: updates,
-    );
+    final response = await _apiClient.put('/settings/teacher', data: updates);
     final data = response.data as Map<String, dynamic>;
     return TeacherSettings.fromJson(data).copyWith(availableSlots: []);
   }
@@ -56,12 +56,10 @@ class RemoteSettingsRepository implements SettingsRepository {
   @override
   Future<TeacherSettings> removeCustomDuration(int duration) async {
     final current = await getTeacherSettings();
-    final updated = current.customLessonDurations
-        .where((d) => d != duration)
-        .toList();
-    final updatedDisabled = current.disabledDurations
-        .where((d) => d != duration)
-        .toList();
+    final updated =
+        current.customLessonDurations.where((d) => d != duration).toList();
+    final updatedDisabled =
+        current.disabledDurations.where((d) => d != duration).toList();
     return _updateSettings({
       'custom_lesson_durations': updated,
       'disabled_durations': updatedDisabled,
@@ -73,9 +71,8 @@ class RemoteSettingsRepository implements SettingsRepository {
     final current = await getTeacherSettings();
     List<int> newDisabled;
     if (isActive) {
-      newDisabled = current.disabledDurations
-          .where((d) => d != duration)
-          .toList();
+      newDisabled =
+          current.disabledDurations.where((d) => d != duration).toList();
     } else {
       newDisabled = [...current.disabledDurations, duration];
     }
@@ -122,7 +119,9 @@ class RemoteSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable) async {
+  Future<void> updatePriceTable(
+    Map<String, Map<String, int>> priceTable,
+  ) async {
     await _updateSettings({'lesson_price_table': priceTable});
   }
 }

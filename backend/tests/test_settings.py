@@ -39,6 +39,50 @@ async def test_update_teacher_settings(client: AsyncClient, auth_headers, create
     assert data["min_booking_hours"] == 24  # unchanged
 
 
+@pytest.mark.asyncio
+async def test_student_can_get_public_teacher_settings_by_teacher_id(
+    client: AsyncClient,
+    auth_headers,
+    student_auth_headers,
+    create_test_user,
+):
+    """Students need target teacher settings for request guidance and prices."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student-public-settings@test.com",
+    )
+
+    update = await client.put(
+        "/api/v1/settings/teacher",
+        headers=auth_headers,
+        json={
+            "instruments": ["바이올린"],
+            "booking_guidance_message": "오디션 준비는 가능한 시간대를 2개 이상 골라주세요.",
+            "lesson_price_table": {
+                "바이올린": {
+                    "beginner": 40000,
+                    "intermediate": 50000,
+                    "advanced": 70000,
+                }
+            },
+        },
+    )
+    assert update.status_code == 200
+
+    response = await client.get(
+        "/api/v1/settings/teacher/test-user-id",
+        headers=student_auth_headers,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["teacher_id"] == "test-user-id"
+    assert data["booking_guidance_message"] == "오디션 준비는 가능한 시간대를 2개 이상 골라주세요."
+    assert data["lesson_price_table"]["바이올린"]["beginner"] == 40000
+
+
 # ---------------------------------------------------------------------------
 # Subscription Settings
 # ---------------------------------------------------------------------------

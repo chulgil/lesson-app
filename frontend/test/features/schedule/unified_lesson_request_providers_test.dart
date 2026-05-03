@@ -13,6 +13,7 @@ import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_reque
 import 'package:lessonaza/features/schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/unified_lesson_request_providers.dart';
 import 'package:lessonaza/features/subscription/data/repositories/mock_subscription_repository.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 
 void main() {
@@ -254,6 +255,57 @@ void main() {
   });
 
   group('action creates RequestEvent', () {
+    test('approveRequest confirms selected student preferred slot', () async {
+      final requestRepository = MockUnifiedLessonRequestRepository();
+      final container = ProviderContainer(
+        overrides: [
+          unifiedLessonRequestRepositoryProvider.overrideWithValue(
+            requestRepository,
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final request = UnifiedLessonRequest(
+        id: 'approve-preferred-slot-001',
+        studentId: 'student_approve_001',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.regular,
+        instrument: '피아노',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        preferredSlots: [
+          PreferredTimeSlot(
+            priority: 1,
+            dayOfWeek: 2,
+            startTime: '15:00',
+            endTime: '16:00',
+          ),
+        ],
+        status: UnifiedRequestStatus.pending,
+        createdAt: DateTime(2026, 5, 3),
+      );
+      await requestRepository.create(request);
+
+      final result = await UnifiedLessonRequestActions(
+        container,
+      ).approveRequest(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        selectedSlotIndex: 0,
+      );
+
+      expect(result.status, UnifiedRequestStatus.timeConfirmed);
+      final stored = await requestRepository.getById(request.id);
+      expect(stored!.status, UnifiedRequestStatus.timeConfirmed);
+      final events = await requestRepository.getEventsByRequestId(request.id);
+      final approveEvent = events.lastWhere(
+        (event) => event.eventType == RequestEventType.approve,
+      );
+      expect(approveEvent.selectedSlotIndex, 0);
+    });
+
     test('approveRequest creates approve event', () async {
       // ulr_1 is pending
       final request = await repository.getById('ulr_1');
@@ -402,6 +454,61 @@ void main() {
 
       final updatedRequest = await requestRepository.getById(request.id);
       expect(updatedRequest!.status, UnifiedRequestStatus.subscriptionIssued);
+    });
+
+    test('creates package subscription for package request', () async {
+      final requestRepository = MockUnifiedLessonRequestRepository();
+      final subscriptionRepository = MockSubscriptionRepository();
+      final cardRepository = MockScheduleConfirmationCardRepository();
+      final relationRepository = MockTeacherStudentRelationRepository();
+      final container = ProviderContainer(
+        overrides: [
+          unifiedLessonRequestRepositoryProvider.overrideWithValue(
+            requestRepository,
+          ),
+          subscriptionRepositoryProvider.overrideWithValue(
+            subscriptionRepository,
+          ),
+          scheduleConfirmationCardRepositoryProvider.overrideWith(
+            (ref) => cardRepository,
+          ),
+          teacherStudentRelationRepositoryProvider.overrideWith(
+            (ref) => relationRepository,
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final request = UnifiedLessonRequest(
+        id: 'issue-package-request-001',
+        studentId: 'issue-package-student-001',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.package,
+        instrument: '피아노',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        preferredDuration: 50,
+        suggestedPrice: 240000,
+        status: UnifiedRequestStatus.paymentNotified,
+        createdAt: DateTime(2026, 5, 3),
+      );
+      await requestRepository.create(request);
+
+      await UnifiedLessonRequestActions(container).issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+      );
+
+      final subscriptions = await subscriptionRepository.getByStudentId(
+        request.studentId,
+      );
+      final createdSubscription = subscriptions.singleWhere(
+        (subscription) => subscription.studentId == request.studentId,
+      );
+      expect(createdSubscription.type, SubscriptionType.package);
+      expect(createdSubscription.totalLessons, isNotNull);
     });
   });
 }

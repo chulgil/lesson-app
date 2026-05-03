@@ -20,11 +20,11 @@ class RemoteTeacherAvailabilityRepository
   @override
   Future<TeacherAvailability?> getAvailability(String teacherId) async {
     try {
-      final response = await _apiClient.get('/schedule/availability');
-      if (response.data == null) return null;
-      return TeacherAvailability.fromJson(
-        response.data as Map<String, dynamic>,
+      final response = await _apiClient.get(
+        '/schedule/availability/${Uri.encodeComponent(teacherId)}',
       );
+      if (response.data == null) return null;
+      return _availabilityFromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       // Return null (empty state) for 404 or unimplemented endpoints
       if (e.response?.statusCode == 404 || e.response?.statusCode == 405) {
@@ -349,6 +349,79 @@ class RemoteTeacherAvailabilityRepository
       bookedByStudentName: json['booked_by_student_name'] as String?,
       lessonId: json['lesson_id'] as String?,
       isRecommended: json['is_recommended'] as bool? ?? false,
+    );
+  }
+
+  static TeacherAvailability _availabilityFromJson(Map<String, dynamic> json) {
+    if (json['id'] != null && json['created_at'] != null) {
+      return TeacherAvailability.fromJson(json);
+    }
+
+    final teacherId = json['teacher_id'] as String? ?? '';
+    final createdAt =
+        json['created_at'] == null
+            ? DateTime.now()
+            : DateTime.parse(json['created_at'] as String);
+    final schedules = <WeeklySchedule>[];
+
+    final weeklySchedules = json['weekly_schedules'] as List<dynamic>?;
+    if (weeklySchedules != null) {
+      for (var index = 0; index < weeklySchedules.length; index++) {
+        final schedule = weeklySchedules[index] as Map<String, dynamic>;
+        schedules.add(
+          WeeklySchedule(
+            id:
+                schedule['id'] as String? ??
+                '${teacherId}_${schedule['day_of_week']}_$index',
+            dayOfWeek: (schedule['day_of_week'] as num).toInt(),
+            startTime: schedule['start_time'] as String,
+            endTime: schedule['end_time'] as String,
+            createdAt:
+                schedule['created_at'] == null
+                    ? createdAt
+                    : DateTime.parse(schedule['created_at'] as String),
+          ),
+        );
+      }
+    } else {
+      final availabilities = json['availabilities'] as List<dynamic>? ?? [];
+      for (final dayAvailability in availabilities) {
+        final day = dayAvailability as Map<String, dynamic>;
+        final dayOfWeek = (day['day_of_week'] as num).toInt();
+        final timeSlots = day['time_slots'] as List<dynamic>? ?? [];
+
+        for (var index = 0; index < timeSlots.length; index++) {
+          final slot = timeSlots[index] as Map<String, dynamic>;
+          schedules.add(
+            WeeklySchedule(
+              id: '${teacherId}_${dayOfWeek}_$index',
+              dayOfWeek: dayOfWeek,
+              startTime: slot['start_time'] as String,
+              endTime: slot['end_time'] as String,
+              createdAt: createdAt,
+            ),
+          );
+        }
+      }
+    }
+
+    return TeacherAvailability(
+      id: json['id'] as String? ?? 'availability_$teacherId',
+      teacherId: teacherId,
+      slotDurationMinutes:
+          (json['slot_duration_minutes'] as num?)?.toInt() ?? 60,
+      weeklySchedules: schedules,
+      exceptions: const [],
+      autoGenerateWeeks: (json['auto_generate_weeks'] as num?)?.toInt() ?? 4,
+      createdAt: createdAt,
+      updatedAt:
+          json['updated_at'] == null
+              ? null
+              : DateTime.parse(json['updated_at'] as String),
+      slotStartInterval: (json['slot_start_interval'] as num?)?.toInt() ?? 30,
+      breakTimeBetweenLessons:
+          (json['break_time_between_lessons'] as num?)?.toInt() ?? 0,
+      minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 24,
     );
   }
 

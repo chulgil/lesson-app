@@ -30,6 +30,7 @@ class AvailabilityResponse(BaseModel):
 
     teacher_id: str
     availabilities: list[DayAvailability] = []
+    weekly_schedules: list[dict] = []
     # Settings (stored in TeacherSettings, returned for convenience)
     slot_duration_minutes: int = 30
     break_time_between_lessons: int = 10

@@ -23,6 +23,7 @@ class TeacherSettings(UUIDMixin, TimestampMixin, Base):
     lesson_price_table: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     # Trial lesson free toggle
     trial_lesson_free: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    booking_guidance_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
         Index("uk_teacher_settings", "teacher_id", unique=True),

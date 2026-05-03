@@ -216,7 +216,9 @@ class _UnifiedLessonRequestScreenState
   // -- Guidance message (Naver benchmark) --
 
   Widget _buildGuidanceMessage() {
-    final settingsAsync = ref.watch(teacherSettingsProvider);
+    final settingsAsync = ref.watch(
+      teacherSettingsByIdProvider(widget.params.teacherId),
+    );
     final message =
         settingsAsync.valueOrNull?.effectiveGuidanceMessage ??
         TeacherSettings.defaultGuidanceMessage;
@@ -701,7 +703,10 @@ class _UnifiedLessonRequestScreenState
 
   int? _lookupReferencePrice() {
     if (_selectedInstrument == null) return null;
-    final settings = ref.read(teacherSettingsProvider).valueOrNull;
+    final settings =
+        ref
+            .read(teacherSettingsByIdProvider(widget.params.teacherId))
+            .valueOrNull;
     if (settings == null) return null;
     return settings.getPrice(_selectedInstrument!, _selectedExperience.name);
   }
