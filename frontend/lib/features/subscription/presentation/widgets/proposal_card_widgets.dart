@@ -112,6 +112,9 @@ class ProposalHeaderCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space4),
           Text(
             template.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: AppTypography.headingMedium.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -183,17 +186,27 @@ class ProposalDetailsCard extends StatelessWidget {
 
   Widget _buildDetailRow(String label, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkSecondary,
+        Expanded(
+          child: Text(
+            label,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
         ),
-        Text(
-          value,
-          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        const SizedBox(width: AppSpacing.space3),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
@@ -218,6 +231,7 @@ class ProposalMessageCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(
                 Icons.chat_bubble_outline,
@@ -225,11 +239,15 @@ class ProposalMessageCard extends StatelessWidget {
                 color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space1),
-              Text(
-                AppStrings.proposalMessageCardLabel,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  AppStrings.proposalMessageCardLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -268,6 +286,7 @@ class ProposalDiscountCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(
                 Icons.local_offer,
@@ -275,69 +294,97 @@ class ProposalDiscountCard extends StatelessWidget {
                 color: AppColors.paperAccent,
               ),
               const SizedBox(width: AppSpacing.space1),
-              Text(
-                proposal.discountReason ??
-                    AppStrings.proposalDiscountReasonDefault,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  proposal.discountReason ??
+                      AppStrings.proposalDiscountReasonDefault,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppStrings.issueFormAmountSectionTitle,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkSecondary,
+              Expanded(
+                child: Text(
+                  AppStrings.issueFormAmountSectionTitle,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
               ),
-              Text(
-                template.formattedPrice,
-                style: AppTypography.bodySmall.copyWith(
-                  decoration: TextDecoration.lineThrough,
-                  color: AppColors.inkSecondary,
+              const SizedBox(width: AppSpacing.space3),
+              Flexible(
+                child: Text(
+                  template.formattedPrice,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: AppTypography.bodySmall.copyWith(
+                    decoration: TextDecoration.lineThrough,
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.space1),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppStrings.issueFormDiscountTitle,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkSecondary,
+              Expanded(
+                child: Text(
+                  AppStrings.issueFormDiscountTitle,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
               ),
-              Text(
-                '-${_formatPrice(proposal.discountAmount ?? 0)}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(width: AppSpacing.space3),
+              Flexible(
+                child: Text(
+                  '-${_formatPrice(proposal.discountAmount ?? 0)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
           const Divider(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppStrings.proposalDiscountFinalLabel,
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  AppStrings.proposalDiscountFinalLabel,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              Text(
-                _formatPrice(discountedPrice),
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(width: AppSpacing.space3),
+              Flexible(
+                child: Text(
+                  _formatPrice(discountedPrice),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: AppTypography.headingSmall.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -462,7 +509,13 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                           else
                             const SizedBox(width: AppSpacing.space4),
                           const SizedBox(width: AppSpacing.space2),
-                          Text('${account.bankName} ${account.accountNumber}'),
+                          Expanded(
+                            child: Text(
+                              '${account.bankName} ${account.accountNumber}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),

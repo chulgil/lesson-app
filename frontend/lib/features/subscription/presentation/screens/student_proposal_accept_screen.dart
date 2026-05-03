@@ -270,6 +270,8 @@ class _StudentProposalAcceptScreenState
           Expanded(
             child: Text(
               accountText,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w500,
               ),
