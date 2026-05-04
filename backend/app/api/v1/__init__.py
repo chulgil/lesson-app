@@ -15,6 +15,7 @@ from app.api.v1 import (
     request_events,
     schedule_changes,
     schedule_confirmations,
+    schedule_exceptions,
     locations,
     memberships,
     notifications,
@@ -76,4 +77,9 @@ api_router.include_router(
     schedule_confirmations.router,
     prefix="/schedule/confirmation-cards",
     tags=["schedule-confirmations"],
+)
+api_router.include_router(
+    schedule_exceptions.router,
+    prefix="/schedule-exceptions",
+    tags=["schedule-exceptions"],
 )

@@ -142,3 +142,16 @@ def test_lesson_request_status_to_event_mapping_uses_phase2_events() -> None:
     assert service._event_type_for_status("paymentNotified") == "paymentNotified"
     assert service._event_type_for_status("paymentConfirmed") == "paymentConfirmed"
     assert service._event_type_for_status("subscriptionIssued") == "subscriptionIssued"
+
+
+def test_request_event_indexes_support_subscription_session_chat_history() -> None:
+    """Subscription detail chat needs efficient per-session history lookup."""
+    from app.models.request_event import RequestEvent
+
+    index_columns = {index.name: [column.name for column in index.columns] for index in RequestEvent.__table__.indexes}
+
+    assert index_columns["idx_request_events_subscription_session_created"] == [
+        "subscription_id",
+        "session_number",
+        "created_at",
+    ]

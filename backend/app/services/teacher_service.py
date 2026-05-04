@@ -143,7 +143,7 @@ class TeacherService:
         if status:
             query = query.where(Student.status == status)
         if class_id:
-            query = query.where(Student.lesson_class_id == class_id)
+            query = query.where(Student.lesson_class_id == class_id)  # type: ignore[attr-defined]
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0

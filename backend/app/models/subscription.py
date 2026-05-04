@@ -145,6 +145,8 @@ class SubscriptionUsage(UUIDMixin, Base):
         nullable=False,
         default=UsageType.lesson,
     )
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    deducted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     __table_args__ = (
         Index("idx_usage_subscription", "subscription_id"),
@@ -166,9 +168,14 @@ class SubscriptionTemplate(UUIDMixin, TimestampMixin, Base):
     lessons_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     lessons_per_month: Mapped[int | None] = mapped_column(Integer, nullable=True)
     duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    lesson_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
+    validity_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
     amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reschedule_allowance: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_auto_proposal_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     __table_args__ = (
         Index("idx_template_teacher", "teacher_id"),
@@ -209,6 +216,10 @@ class SubscriptionProposal(UUIDMixin, Base):
     is_auto_proposal: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_app_transition: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     lesson_request_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    proposal_type: Mapped[str] = mapped_column(String(20), nullable=False, default="proposal")
+    is_renewal: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    previous_subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    renewal_initiator: Mapped[str | None] = mapped_column(String(20), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

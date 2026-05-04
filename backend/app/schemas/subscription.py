@@ -191,6 +191,7 @@ class SubscriptionProposalResponse(BaseModel):
     template_ids: list[str] | None = None
     recommended_template_id: str | None = None
     selected_template_id: str | None = None
+    lesson_request_id: str | None = None
     payment_status: str | None = None
     payment_notified_at: _dt.datetime | None = None
     confirmed_at: _dt.datetime | None = None
@@ -208,6 +209,7 @@ class SubscriptionProposalCreate(BaseModel):
     message: str | None = None
     template_ids: list[str] = []
     recommended_template_id: str | None = None
+    lesson_request_id: str | None = None
 
 
 class ProposalRespondRequest(BaseModel):

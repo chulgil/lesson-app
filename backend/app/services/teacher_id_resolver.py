@@ -36,6 +36,7 @@ async def try_resolve_teacher_id(db: AsyncSession, user_id: str) -> str | None:
     """Return the Teacher profile ID, or None if no profile exists."""
     from app.models.teacher import Teacher
 
-    return await db.scalar(
+    result: str | None = await db.scalar(
         select(Teacher.id).where(Teacher.user_id == user_id)
     )
+    return result

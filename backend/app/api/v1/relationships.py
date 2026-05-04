@@ -166,7 +166,8 @@ async def get_notification_settings(
 ) -> NotificationSettingResponse:
     """Return notification settings for a relationship target."""
     service = RelationshipService(db)
-    return await service.get_notification_settings(user_id, target_user_id, current_user)
+    result: NotificationSettingResponse = await service.get_notification_settings(user_id, target_user_id, current_user)
+    return result
 
 
 @router.put(
@@ -182,7 +183,8 @@ async def save_notification_settings(
 ) -> NotificationSettingResponse:
     """Create or update notification settings."""
     service = RelationshipService(db)
-    return await service.save_notification_settings(body.model_dump(exclude_none=True), current_user)
+    result: NotificationSettingResponse = await service.save_notification_settings(body.model_dump(exclude_none=True), current_user)
+    return result
 
 
 @router.delete(
@@ -213,7 +215,8 @@ async def invite_student(
 ) -> RelationshipResponse:
     """Send an invitation to connect with a student."""
     service = RelationshipService(db)
-    return await service.invite(body.student_id, body.method, current_user)
+    result: RelationshipResponse = await service.invite(body.student_id, body.method, current_user)
+    return result
 
 
 @router.post(
@@ -229,7 +232,8 @@ async def connect_with_teacher(
 ) -> RelationshipResponse:
     """Accept an invitation via invite code."""
     service = RelationshipService(db)
-    return await service.connect(body.invite_code, current_user)
+    result: RelationshipResponse = await service.connect(body.invite_code, current_user)
+    return result
 
 
 @router.get(
@@ -245,7 +249,8 @@ async def get_relationship(
 ) -> RelationshipResponse:
     """Return a single relationship by ID."""
     service = RelationshipService(db)
-    return await service.get_by_id(relationship_id, current_user)
+    result: RelationshipResponse = await service.get_by_id(relationship_id, current_user)
+    return result
 
 
 @router.get(
@@ -283,7 +288,7 @@ async def update_relationship_status(
 ) -> RelationshipResponse:
     """Change the status of a relationship (e.g. disconnect)."""
     service = RelationshipService(db)
-    return await service.update_status(
+    result: RelationshipResponse = await service.update_status(
         relationship_id, body.status, current_user,
         subscription_id=body.subscription_id,
         booking_id=body.booking_id,
@@ -294,6 +299,7 @@ async def update_relationship_status(
         can_comment=body.can_comment,
         can_suggest_assignments=body.can_suggest_assignments,
     )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -314,7 +320,8 @@ async def follow(
 ) -> FollowResponse:
     """Follow a teacher or other user."""
     service = RelationshipService(db)
-    return await service.follow(body.following_id, body.target_type, current_user)
+    result: FollowResponse = await service.follow(body.following_id, body.target_type, current_user)
+    return result
 
 
 @router.delete(

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
+from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
     ConfirmPaymentRequest,
     ProposalConfirmRequest,
@@ -200,6 +201,44 @@ async def add_usage(
     service = SubscriptionService(db)
     usage = await service.add_usage(subscription_id, body.model_dump(), current_user)
     return SubscriptionUsageResponse.model_validate(usage)
+
+
+@router.get(
+    "/{subscription_id}/events",
+    response_model=list[RequestEventResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get subscription schedule-change chat history",
+)
+async def get_subscription_events(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    session_number: int | None = None,
+) -> list[RequestEventResponse]:
+    """Return subscription event history, optionally scoped to one session."""
+    service = SubscriptionService(db)
+    return await service.get_events(
+        subscription_id,
+        current_user,
+        session_number=session_number,
+    )
+
+
+@router.post(
+    "/{subscription_id}/events",
+    response_model=RequestEventResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create subscription schedule-change chat event",
+)
+async def create_subscription_event(
+    subscription_id: str,
+    body: RequestEventCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RequestEventResponse:
+    """Create a schedule-change or message event for a subscription."""
+    service = SubscriptionService(db)
+    return await service.add_event(subscription_id, body, current_user)
 
 
 @router.patch(

@@ -95,7 +95,7 @@ class StudentService:
 
     async def update_status(self, student_id: str, new_status: str, current_user: Any) -> StudentResponse:
         """Update only the student's status field."""
-        from app.models.student import Student
+        from app.models.student import Student, StudentStatus
 
         valid_statuses = {"trial", "active", "paused", "inactive"}
         if new_status not in valid_statuses:
@@ -108,19 +108,19 @@ class StudentService:
         if student is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
 
-        student.status = new_status
+        student.status = StudentStatus(new_status)
         await self.db.flush()
         await self.db.refresh(student)
         return StudentResponse.model_validate(student)
 
     async def delete(self, student_id: str, current_user: Any) -> None:
         """Soft-delete a student."""
-        from app.models.student import Student
+        from app.models.student import Student, StudentStatus
 
         student = await self.db.get(Student, student_id)
         if student is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
-        student.status = "inactive"
+        student.status = StudentStatus.inactive
         await self.db.flush()
 
     async def get_stats(self, student_id: str, current_user: Any) -> StudentStatsResponse:

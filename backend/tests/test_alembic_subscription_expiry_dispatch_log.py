@@ -23,13 +23,11 @@ def test_dispatch_log_revision_chains_after_no_show_policy() -> None:
     assert rev.down_revision == "unify_no_show_policy"
 
 
-def test_subscription_alert_days_set_is_alembic_head() -> None:
-    """수강권 알림 일자 설정 migration 이 단일 head."""
+def test_single_alembic_head() -> None:
+    """단일 head 가 유지되는지 확인 (head 이름은 마이그레이션 추가 시 변동)."""
     script = _script()
     heads = list(script.get_heads())
-    assert heads == ["add_subscription_alert_days_set"], (
-        f"expected single head add_subscription_alert_days_set, got {heads}"
-    )
+    assert len(heads) == 1, f"expected single head, got {heads}"
 
 
 def test_recording_owner_file_key_chains_after_dispatch_log() -> None:

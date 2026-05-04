@@ -155,12 +155,13 @@ async def get_or_list_invitations(
 ) -> ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse]:
     """Return one invitation by code, or a filtered invitation list."""
     service = ParentService(db)
-    return await service.get_or_list_invitations(
+    result: ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse] = await service.get_or_list_invitations(
         current_user,
         code=code,
         student_id=student_id,
         status_filter=status_filter or status,
     )
+    return result
 
 
 @router.patch(

@@ -126,12 +126,12 @@ class LessonService:
 
     async def update_status(self, lesson_id: str, new_status: str, current_user: Any) -> LessonResponse:
         """Change lesson status."""
-        from app.models.lesson import Lesson
+        from app.models.lesson import Lesson, LessonStatus
 
         lesson = await self.db.get(Lesson, lesson_id)
         if lesson is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
-        lesson.status = new_status
+        lesson.status = LessonStatus(new_status)
         await self.db.flush()
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
@@ -394,7 +394,7 @@ class LessonService:
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
         await self._assert_membership_access(m, current_user, require_teacher=True)
-        m.status = new_status
+        m.status = ClassMembership.MembershipStatus(new_status)
         await self.db.flush()
         await self.db.refresh(m)
         return MembershipResponse.model_validate(m)

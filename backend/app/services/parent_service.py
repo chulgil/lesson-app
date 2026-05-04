@@ -167,7 +167,7 @@ class ParentService:
         if invitation is None and relation is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid invite code")
 
-        student_id = invitation.student_id if invitation is not None else relation.student_id
+        student_id = invitation.student_id if invitation is not None else relation.student_id  # type: ignore[union-attr]
         student = await self.db.get(Student, student_id)
         if student is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")

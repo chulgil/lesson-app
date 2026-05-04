@@ -33,9 +33,10 @@ async def create_schedule_change(
 ) -> LessonScheduleChangeResponse:
     """Create a new lesson schedule change request."""
     service = ScheduleExtService(db)
-    return await service.create_schedule_change(
+    result: LessonScheduleChangeResponse = await service.create_schedule_change(
         data=body.model_dump(), teacher_id=current_user.id
     )
+    return result
 
 
 @router.get(
@@ -73,8 +74,9 @@ async def respond_to_schedule_change(
 ) -> LessonScheduleChangeResponse:
     """Approve, reject, or propose alternative for a schedule change request."""
     service = ScheduleExtService(db)
-    return await service.respond_to_schedule_change(
+    result: LessonScheduleChangeResponse = await service.respond_to_schedule_change(
         change_id=change_id,
         action=body.action,
         response_message=body.response_message,
     )
+    return result

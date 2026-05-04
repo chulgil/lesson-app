@@ -81,7 +81,8 @@ class LessonRequestService:
         if instrument_prices is None:
             return None
 
-        return instrument_prices.get(experience_level)
+        matched_price: int | None = instrument_prices.get(experience_level)
+        return matched_price
 
     async def create(self, data: LessonRequestCreate, current_user: Any) -> LessonRequestResponse:
         """Create a unified lesson request."""
@@ -560,7 +561,7 @@ class LessonRequestService:
         response = LessonRequestResponse.model_validate(request)
         response.type = request.request_type
         response.experience = request.experience_level
-        response.events = [RequestEventResponse.model_validate(event) for event in events]
+        response.events = [RequestEventResponse.model_validate(event) for event in events]  # type: ignore[misc]
         return response
 
     async def _get_events(self, request_id: str) -> list[Any]:
@@ -613,9 +614,10 @@ class LessonRequestService:
     async def _can_access_request(self, request: Any, current_user: Any) -> bool:
         role = self._actor_type(current_user)
         if role == "student":
-            return request.student_id == current_user.id
+            result: bool = request.student_id == current_user.id
+            return result
         if role == "teacher":
-            return request.teacher_id in await self._teacher_identifiers(current_user.id)
+            return bool(request.teacher_id in await self._teacher_identifiers(current_user.id))
         return False
 
     async def _apply_access_filter(self, query: Any, current_user: Any) -> Any:

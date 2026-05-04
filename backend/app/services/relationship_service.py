@@ -56,7 +56,7 @@ class RelationshipService:
                 detail="Invalid or expired invite code",
             )
 
-        relation.status = "connected"
+        relation.status = "connected"  # type: ignore[assignment]
         await self.db.flush()
         await self.db.refresh(relation)
         return relation
@@ -79,7 +79,7 @@ class RelationshipService:
         result = await self.db.scalars(query.offset(offset).limit(size))
         items = result.all()
 
-        return PaginatedResponse.create(items=items, total=total, page=page, size=size)
+        return PaginatedResponse.create(items=list(items), total=total, page=page, size=size)
 
     async def get_by_id(self, relationship_id: str, current_user: Any) -> Any:
         """Return a single relationship by ID."""
@@ -105,7 +105,7 @@ class RelationshipService:
         """Change the status of a relationship with optional metadata."""
         from datetime import UTC, datetime
 
-        from app.models.relationship import TeacherStudentRelation
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
 
         relation = await self.db.get(TeacherStudentRelation, relationship_id)
         if relation is None:
@@ -113,7 +113,7 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Relationship not found",
             )
-        relation.status = new_status
+        relation.status = RelationStatus(new_status)
 
         # Update optional metadata
         if subscription_id:

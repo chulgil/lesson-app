@@ -184,7 +184,7 @@ class RecordingService:
                 candidate_student_ids = result.all()
                 accessible_student_ids.update(
                     await self._filter_students_with_practice_share_enabled(
-                        candidate_student_ids,
+                        list(candidate_student_ids),
                         current_user.id,
                     )
                 )
@@ -238,7 +238,7 @@ class RecordingService:
                 ParentVisibilitySettings.can_view_recordings == True,  # noqa: E712
             )
         )
-        return visible_result.all()
+        return list(visible_result.all())
 
     # ------------------------------------------------------------------
     # Storage helpers (Vultr Object Storage via boto3)
@@ -286,7 +286,7 @@ class RecordingService:
                 aws_access_key_id=settings.VULTR_STORAGE_ACCESS_KEY,
                 aws_secret_access_key=settings.VULTR_STORAGE_SECRET_KEY,
             ) as s3:
-                url = await s3.generate_presigned_url(
+                url: str = await s3.generate_presigned_url(
                     "get_object",
                     Params={"Bucket": settings.VULTR_STORAGE_BUCKET, "Key": file_key},
                     ExpiresIn=3600,

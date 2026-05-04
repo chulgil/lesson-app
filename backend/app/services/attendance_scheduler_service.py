@@ -64,11 +64,13 @@ class AttendanceSchedulerService:
 
         for lesson in lessons:
             try:
+                if not lesson.teacher_id:
+                    continue
                 await notification_service.create_and_send(
                     user_id=lesson.teacher_id,
                     notification_type="attendanceUnconfirmed",
                     title="출석 미확인",
-                    body=f"레슨 출석이 아직 확인되지 않았습니다",
+                    body="레슨 출석이 아직 확인되지 않았습니다",
                     priority=NotificationPriority.normal,
                     data={"lessonId": lesson.id},
                     action_url=f"/lessons/{lesson.id}",
@@ -110,6 +112,8 @@ class AttendanceSchedulerService:
                 lesson.status = LessonStatus.completed
                 await self.db.flush()
 
+                if not lesson.teacher_id:
+                    continue
                 # Notify teacher about auto-completion
                 await notification_service.create_and_send(
                     user_id=lesson.teacher_id,

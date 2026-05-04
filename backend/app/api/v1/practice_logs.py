@@ -30,8 +30,8 @@ async def list_practice_logs(
     student_id: str,
     year: int = Query(...),
     month: int = Query(...),
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> list[PracticeLogResponse]:
     service = PracticeLogService(db)
     return await service.get_logs(student_id, year=year, month=month)
@@ -45,8 +45,8 @@ async def list_practice_logs(
 async def get_practice_log_by_date(
     date: _dt.date,
     student_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse | None:
     service = PracticeLogService(db)
     return await service.get_log_by_date(student_id, date)
@@ -61,11 +61,12 @@ async def get_practice_log_by_date(
 async def create_practice_log(
     body: PracticeLogCreate,
     student_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    return await service.create_log(student_id, body.model_dump())
+    result: PracticeLogResponse = await service.create_log(student_id, body.model_dump())
+    return result
 
 
 @router.put(
@@ -76,11 +77,12 @@ async def create_practice_log(
 async def update_practice_log(
     log_id: str,
     body: PracticeLogUpdate,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    return await service.update_log(log_id, body.model_dump(exclude_none=True))
+    result: PracticeLogResponse = await service.update_log(log_id, body.model_dump(exclude_none=True))
+    return result
 
 
 @router.delete(
@@ -90,8 +92,8 @@ async def update_practice_log(
 )
 async def delete_practice_log(
     log_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> None:
     service = PracticeLogService(db)
     await service.delete_log(log_id)
@@ -105,11 +107,12 @@ async def delete_practice_log(
 async def toggle_task(
     log_id: str,
     task_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    return await service.toggle_task(log_id, task_id)
+    result: PracticeLogResponse = await service.toggle_task(log_id, task_id)
+    return result
 
 
 @router.get(
@@ -120,8 +123,8 @@ async def toggle_task(
 async def get_weekly_practice(
     student_id: str,
     week_start: _dt.date = Query(...),
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> list[bool]:
     service = PracticeLogService(db)
     return await service.get_weekly_practice(student_id, week_start)
@@ -136,8 +139,9 @@ async def get_monthly_stats(
     student_id: str,
     year: int = Query(...),
     month: int = Query(...),
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeStatsResponse:
     service = PracticeLogService(db)
-    return await service.get_monthly_stats(student_id, year, month)
+    data = await service.get_monthly_stats(student_id, year, month)
+    return PracticeStatsResponse.model_validate(data)

@@ -74,14 +74,14 @@ class InviteService:
 
     async def revoke_invite(self, invite_id: str, current_user: Any) -> Any:
         """Revoke an invite."""
-        from app.models.invite import Invite
+        from app.models.invite import Invite, InviteStatus
 
         invite = await self.db.get(Invite, invite_id)
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
         if invite.creator_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your invite")
-        invite.status = "revoked"
+        invite.status = InviteStatus.revoked
         await self.db.flush()
         await self.db.refresh(invite)
         return invite
@@ -162,7 +162,7 @@ class InviteService:
         current_user: Any,
     ) -> Any:
         """Accept or reject a connection request."""
-        from app.models.invite import Connection, ConnectionRequest
+        from app.models.invite import Connection, ConnectionRequest, ConnectionRequestStatus
 
         conn_req = await self.db.get(ConnectionRequest, request_id)
         if conn_req is None:
@@ -174,7 +174,7 @@ class InviteService:
         conn_req.responded_at = now
 
         if action == "accept":
-            conn_req.status = "accepted"
+            conn_req.status = ConnectionRequestStatus.accepted
             # Create connection
             teacher_id = conn_req.requester_id if conn_req.requester_role.value == "teacher" else conn_req.target_id
             student_id = conn_req.target_id if conn_req.requester_role.value == "teacher" else conn_req.requester_id
@@ -187,7 +187,7 @@ class InviteService:
             )
             self.db.add(connection)
         else:
-            conn_req.status = "rejected"
+            conn_req.status = ConnectionRequestStatus.rejected
             conn_req.rejection_reason = rejection_reason
 
         await self.db.flush()

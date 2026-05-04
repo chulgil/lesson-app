@@ -15,7 +15,7 @@ from app.core.i18n import LocaleMiddleware
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan: startup and shutdown hooks."""
     # Startup: import all models to register with Base.metadata
-    import app.models  # noqa: F401
+    import app.models  # type: ignore[assignment]  # noqa: F401
 
     # Plan C Phase 6a/6c — start APScheduler. Disabled when TESTING flag is set
     # so pytest doesn't spawn a background event loop.

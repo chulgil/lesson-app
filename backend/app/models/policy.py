@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -15,10 +15,18 @@ class MakeupStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class ConfirmationCardType(str, enum.Enum):
+    afterTrial = "afterTrial"
+    reEnrollment = "reEnrollment"
+    additionalInstrument = "additionalInstrument"
+
+
 class ConfirmationCardStatus(str, enum.Enum):
     pending = "pending"
     confirmed = "confirmed"
+    changedTime = "changedTime"
     rejected = "rejected"
+    dismissed = "dismissed"
     expired = "expired"
 
 
@@ -75,6 +83,13 @@ class ScheduleConfirmationCard(UUIDMixin, Base):
     student_id: Mapped[str] = mapped_column(String(36), nullable=False)
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    lesson_request_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    card_type: Mapped[ConfirmationCardType] = mapped_column(
+        Enum(ConfirmationCardType, native_enum=True),
+        nullable=False,
+        default=ConfirmationCardType.afterTrial,
+    )
+    instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[ConfirmationCardStatus] = mapped_column(
@@ -85,9 +100,11 @@ class ScheduleConfirmationCard(UUIDMixin, Base):
     proposed_day: Mapped[str | None] = mapped_column(String(10), nullable=True)
     proposed_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     proposed_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    proposed_slots: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     response_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    total_lessons: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

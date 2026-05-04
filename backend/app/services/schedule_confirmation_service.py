@@ -98,6 +98,10 @@ class ScheduleConfirmationService:
         card.response_message = data.response_message
         card.responded_at = now
 
+        # GAP-5: Create LessonBooking records when student confirms
+        if data.action == "confirmed" and card.subscription_id:
+            await self._create_bookings_for_subscription(card)
+
         await self.db.flush()
         await self.db.refresh(card)
         return ScheduleConfirmationCardResponse.model_validate(card)
@@ -105,6 +109,52 @@ class ScheduleConfirmationService:
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    async def _create_bookings_for_subscription(self, card: Any) -> None:
+        """GAP-5: Create LessonBooking records based on subscription type."""
+        import datetime as dt
+        from datetime import timedelta
+
+        from app.models.schedule import LessonBooking
+        from app.models.subscription import Subscription
+
+        sub = await self.db.get(Subscription, card.subscription_id)
+        if sub is None:
+            return
+
+        sub_type = sub.type.value if hasattr(sub.type, "value") else sub.type
+
+        if sub_type == "trial":
+            count = 1
+            lesson_type = "trial"
+        elif sub_type == "package":
+            count = 1  # Package: book first lesson only
+            lesson_type = "regular"
+        else:  # monthly / regular
+            count = sub.total_lessons or 4
+            lesson_type = "regular"
+
+        base_date = dt.date.today()
+        proposed_day = int(card.proposed_day) if card.proposed_day else base_date.weekday()
+
+        # Find next occurrence of proposed_day (0=Mon)
+        days_ahead = proposed_day - base_date.weekday()
+        if days_ahead <= 0:
+            days_ahead += 7
+        first_date = base_date + timedelta(days=days_ahead)
+
+        for i in range(count):
+            scheduled_date = first_date + timedelta(weeks=i)
+            booking = LessonBooking(
+                teacher_id=card.teacher_id,
+                student_id=card.student_id,
+                lesson_type=lesson_type,
+                scheduled_date=scheduled_date,
+                scheduled_time=card.proposed_time or "14:00",
+                duration=card.proposed_duration or 60,
+                status="confirmed",
+            )
+            self.db.add(booking)
 
     async def _get_card_for_user(self, card_id: str, current_user: Any) -> Any:
         from app.models.policy import ScheduleConfirmationCard
@@ -125,9 +175,11 @@ class ScheduleConfirmationService:
     def _can_access(self, card: Any, current_user: Any) -> bool:
         role = self._actor_type(current_user)
         if role == "teacher":
-            return card.teacher_id == current_user.id
+            result: bool = card.teacher_id == current_user.id
+            return result
         if role == "student":
-            return card.student_id == current_user.id
+            result2: bool = card.student_id == current_user.id
+            return result2
         return False
 
     def _apply_access_filter(self, query: Any, current_user: Any) -> Any:

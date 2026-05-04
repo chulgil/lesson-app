@@ -8,6 +8,8 @@ Frontend SSOT: `frontend/lib/features/schedule/domain/entities/request_event.dar
 Plan A Phase 1 (Issue #235, audit P0-2/P0-4).
 """
 
+# ruff: noqa: N815, UP042
+
 import enum
 
 from sqlalchemy import JSON, Enum, Index, Integer, String, Text
@@ -98,4 +100,10 @@ class RequestEvent(UUIDMixin, TimestampMixin, Base):
         Index("idx_request_events_request_id", "request_id"),
         Index("idx_request_events_event_type", "event_type"),
         Index("idx_request_events_request_created", "request_id", "created_at"),
+        Index(
+            "idx_request_events_subscription_session_created",
+            "subscription_id",
+            "session_number",
+            "created_at",
+        ),
     )

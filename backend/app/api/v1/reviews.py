@@ -52,7 +52,8 @@ async def get_review_summary(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TeacherReviewSummary:
     service = ReviewService(db)
-    return await service.get_review_summary(teacher_id)
+    data = await service.get_review_summary(teacher_id)
+    return TeacherReviewSummary.model_validate(data)
 
 
 @router.post(
@@ -67,7 +68,8 @@ async def create_review(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TeacherReviewResponse:
     service = ReviewService(db)
-    return await service.create_review(body.model_dump(), current_user)
+    result: TeacherReviewResponse = await service.create_review(body.model_dump(), current_user)
+    return result
 
 
 @router.put(
@@ -82,9 +84,10 @@ async def update_review(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TeacherReviewResponse:
     service = ReviewService(db)
-    return await service.update_review(
+    result: TeacherReviewResponse = await service.update_review(
         review_id, body.model_dump(exclude_none=True), current_user
     )
+    return result
 
 
 @router.delete(

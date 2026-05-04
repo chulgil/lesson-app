@@ -31,7 +31,8 @@ async def get_student_gamification(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> StudentGamificationResponse:
     service = GamificationService(db)
-    return await service.get_student_gamification(student_id)
+    data = await service.get_student_gamification(student_id)
+    return StudentGamificationResponse.model_validate(data)
 
 
 @router.post(
@@ -46,9 +47,10 @@ async def award_points(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> PointHistoryResponse:
     service = GamificationService(db)
-    return await service.award_points(
+    result: PointHistoryResponse = await service.award_points(
         student_id=body.student_id,
         points=body.points,
         point_type=body.type,
         description=body.description,
     )
+    return result

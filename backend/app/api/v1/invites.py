@@ -40,13 +40,14 @@ async def create_invite(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> InviteResponse:
     service = InviteService(db)
-    return await service.create_invite(
+    result: InviteResponse = await service.create_invite(
         is_single_use=body.is_single_use,
         max_uses=body.max_uses,
         note=body.note,
         expires_in_hours=body.expires_in_hours,
         current_user=current_user,
     )
+    return result
 
 
 @router.get(
@@ -79,7 +80,8 @@ async def revoke_invite(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> InviteResponse:
     service = InviteService(db)
-    return await service.revoke_invite(invite_id, current_user)
+    result: InviteResponse = await service.revoke_invite(invite_id, current_user)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +101,7 @@ async def create_connection_request(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> ConnectionRequestResponse:
     service = InviteService(db)
-    return await service.create_connection_request(
+    result: ConnectionRequestResponse = await service.create_connection_request(
         target_id=body.target_id,
         method=body.method,
         invite_id=body.invite_id,
@@ -107,6 +109,7 @@ async def create_connection_request(
         message=body.message,
         current_user=current_user,
     )
+    return result
 
 
 @router.get(
@@ -140,9 +143,10 @@ async def respond_to_request(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> ConnectionRequestResponse:
     service = InviteService(db)
-    return await service.respond_to_request(
+    result: ConnectionRequestResponse = await service.respond_to_request(
         request_id, body.action, body.rejection_reason, current_user
     )
+    return result
 
 
 # ---------------------------------------------------------------------------

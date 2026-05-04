@@ -20,7 +20,10 @@ from app.schemas.lesson_request import (
     LessonRequestUpdate,
     TimeProposalCreate,
 )
-from app.schemas.request_event import RequestEventCreate, RequestEventResponse
+from app.schemas.request_event import (
+    RequestEventCreate,
+    RequestEventResponse,  # router type hint; service returns lesson_request.RequestEventResponse (structurally compatible)
+)
 from app.services.lesson_request_service import LessonRequestService
 
 router = APIRouter()
@@ -129,7 +132,7 @@ async def list_lesson_request_events(
 ) -> list[RequestEventResponse]:
     """Return request events sorted by creation time."""
     service = LessonRequestService(db)
-    return await service.get_events(request_id, current_user)
+    return await service.get_events(request_id, current_user)  # type: ignore[return-value]
 
 
 @router.post(
@@ -146,7 +149,7 @@ async def add_lesson_request_event(
 ) -> RequestEventResponse:
     """Persist an event from the remote lesson request repository."""
     service = LessonRequestService(db)
-    return await service.add_event(request_id, body, current_user)
+    return await service.add_event(request_id, body, current_user)  # type: ignore[return-value]
 
 
 @router.put(

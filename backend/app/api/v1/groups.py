@@ -62,7 +62,8 @@ async def create_group_schedule(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> GroupClassScheduleResponse:
     service = ScheduleExtService(db)
-    return await service.create_group_schedule(body.model_dump())
+    result: GroupClassScheduleResponse = await service.create_group_schedule(body.model_dump())
+    return result
 
 
 @router.patch(
@@ -77,7 +78,8 @@ async def cancel_group_schedule(
     reason: str | None = None,
 ) -> GroupClassScheduleResponse:
     service = ScheduleExtService(db)
-    return await service.cancel_group_schedule(schedule_id, reason)
+    result: GroupClassScheduleResponse = await service.cancel_group_schedule(schedule_id, reason)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +122,8 @@ async def get_group_booking(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> GroupClassBookingResponse:
     service = ScheduleExtService(db)
-    return await service.get_booking_by_id(booking_id)
+    result: GroupClassBookingResponse = await service.get_booking_by_id(booking_id)
+    return result
 
 
 @router.post(
@@ -135,7 +138,8 @@ async def create_group_booking(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> GroupClassBookingResponse:
     service = ScheduleExtService(db)
-    return await service.create_group_booking(body.model_dump())
+    result: GroupClassBookingResponse = await service.create_group_booking(body.model_dump())
+    return result
 
 
 @router.patch(
@@ -150,7 +154,8 @@ async def cancel_group_booking(
     reason: str | None = None,
 ) -> GroupClassBookingResponse:
     service = ScheduleExtService(db)
-    return await service.cancel_group_booking(booking_id, reason)
+    result: GroupClassBookingResponse = await service.cancel_group_booking(booking_id, reason)
+    return result
 
 
 @router.patch(
@@ -165,7 +170,8 @@ async def mark_attendance(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> GroupClassBookingResponse:
     service = ScheduleExtService(db)
-    return await service.mark_attendance(booking_id, body.attended)
+    result: GroupClassBookingResponse = await service.mark_attendance(booking_id, body.attended)
+    return result
 
 
 @router.get(
@@ -235,7 +241,8 @@ async def deduct_subscription(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> GroupClassBookingResponse:
     service = ScheduleExtService(db)
-    return await service.deduct_subscription(booking_id)
+    result: GroupClassBookingResponse = await service.deduct_subscription(booking_id)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -255,7 +262,8 @@ async def create_no_show(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> NoShowRecordResponse:
     service = ScheduleExtService(db)
-    return await service.create_no_show_record(body.model_dump(), current_user.id)
+    result: NoShowRecordResponse = await service.create_no_show_record(body.model_dump(), current_user.id)
+    return result
 
 
 @router.get(

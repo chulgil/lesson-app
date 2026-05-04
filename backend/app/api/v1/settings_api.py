@@ -46,7 +46,8 @@ async def get_teacher_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeacherSettingsResponse:
     service = SettingsService(db)
-    return await service.get_teacher_settings(current_user.id)
+    result: TeacherSettingsResponse = await service.get_teacher_settings(current_user.id)
+    return result
 
 
 @router.get(
@@ -65,7 +66,8 @@ async def get_public_teacher_settings(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TeacherSettingsResponse:
     service = SettingsService(db)
-    return await service.get_public_teacher_settings(teacher_id)
+    result: TeacherSettingsResponse = await service.get_public_teacher_settings(teacher_id)
+    return result
 
 
 @router.put(
@@ -79,9 +81,10 @@ async def update_teacher_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeacherSettingsResponse:
     service = SettingsService(db)
-    return await service.update_teacher_settings(
+    result: TeacherSettingsResponse = await service.update_teacher_settings(
         current_user.id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +102,8 @@ async def get_subscription_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> SubscriptionSettingsResponse:
     service = SettingsService(db)
-    return await service.get_subscription_settings(current_user.id)
+    result: SubscriptionSettingsResponse = await service.get_subscription_settings(current_user.id)
+    return result
 
 
 @router.put(
@@ -113,9 +117,10 @@ async def update_subscription_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> SubscriptionSettingsResponse:
     service = SettingsService(db)
-    return await service.update_subscription_settings(
+    result: SubscriptionSettingsResponse = await service.update_subscription_settings(
         current_user.id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -133,7 +138,8 @@ async def get_proposal_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> ProposalSettingsResponse:
     service = SettingsService(db)
-    return await service.get_proposal_settings(current_user.id)
+    result: ProposalSettingsResponse = await service.get_proposal_settings(current_user.id)
+    return result
 
 
 @router.put(
@@ -147,9 +153,10 @@ async def update_proposal_settings(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> ProposalSettingsResponse:
     service = SettingsService(db)
-    return await service.update_proposal_settings(
+    result: ProposalSettingsResponse = await service.update_proposal_settings(
         current_user.id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +175,8 @@ async def get_notification_settings(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> NotificationSettingsResponse:
     service = SettingsService(db)
-    return await service.get_notification_settings(current_user.id, target_user_id)
+    result: NotificationSettingsResponse = await service.get_notification_settings(current_user.id, target_user_id)
+    return result
 
 
 @router.put(
@@ -183,9 +191,10 @@ async def update_notification_settings(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> NotificationSettingsResponse:
     service = SettingsService(db)
-    return await service.update_notification_settings(
+    result: NotificationSettingsResponse = await service.update_notification_settings(
         current_user.id, target_user_id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -218,9 +227,10 @@ async def create_feedback_preset(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> FeedbackPresetResponse:
     service = SettingsService(db)
-    return await service.create_feedback_preset(
+    result: FeedbackPresetResponse = await service.create_feedback_preset(
         current_user.id, body.text, body.sort_order
     )
+    return result
 
 
 @router.put(
@@ -235,9 +245,10 @@ async def update_feedback_preset(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> FeedbackPresetResponse:
     service = SettingsService(db)
-    return await service.update_feedback_preset(
+    result: FeedbackPresetResponse = await service.update_feedback_preset(
         preset_id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 @router.delete(
@@ -290,9 +301,10 @@ async def create_teaching_resource(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeachingResourceResponse:
     service = SettingsService(db)
-    return await service.create_teaching_resource(
+    result: TeachingResourceResponse = await service.create_teaching_resource(
         current_user.id, body.model_dump()
     )
+    return result
 
 
 @router.put(
@@ -307,9 +319,10 @@ async def update_teaching_resource(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeachingResourceResponse:
     service = SettingsService(db)
-    return await service.update_teaching_resource(
+    result: TeachingResourceResponse = await service.update_teaching_resource(
         resource_id, body.model_dump(exclude_none=True)
     )
+    return result
 
 
 @router.delete(

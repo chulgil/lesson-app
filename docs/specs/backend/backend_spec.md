@@ -74,12 +74,12 @@ FastAPI + PostgreSQL + Supabase Auth 기반 백엔드 API.
 
 ```
 app/
-├── api/v1/          # 27개 라우터 (엔드포인트 정의)
-├── services/        # 30개 서비스 (비즈니스 로직)
+├── api/v1/          # 31개 라우터 (252 엔드포인트)
+├── services/        # 31개 서비스 (비즈니스 로직)
 ├── models/          # 26개 모델 파일 (64+ 테이블)
 ├── schemas/         # 24개 스키마 파일 (Pydantic v2)
 ├── core/            # config, database, deps, security, i18n, storage
-├── jobs/            # 백그라운드 작업 (스케줄러 등)
+├── jobs/            # 백그라운드 작업 (APScheduler KST 00:05)
 ├── utils/           # 헬퍼 유틸리티
 └── main.py
 ```
@@ -94,13 +94,27 @@ app/
 
 ## 다음 단계
 
-1. [ ] 기존 schedule 라우터의 exception 스텁을 새 ScheduleException 모델로 연결
-2. [ ] Analytics 라우터 추가 (집계 쿼리)
-3. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환)
-4. [ ] Supabase Auth 실제 연동 테스트
-5. [ ] Redis 캐시 레이어 추가
-6. [ ] FCM Push Notification 연동
-7. [ ] Subscription Expiry Dispatcher 스케줄러 진입점 연결 (D-7/D-1 알림, 만료 30일 후 expired→past 자동 전환)
+### ~~우선순위 1: 레슨요청 → 수강권 통합 플로우 (GAP 6건)~~ ✅ 완료 (2026-05-04)
+
+> 상세: [lesson_request_to_subscription_integration.md](lesson_request_to_subscription_integration.md)
+> 테스트 6/6 PASS, 회귀 291/291 PASS
+
+### 완료 항목 (2026-05-04 재검증)
+
+| 항목 | 상태 | 비고 |
+|------|------|------|
+| ScheduleException API | ✅ 완료 | CRUD 4개 엔드포인트 노출 (`/schedule-exceptions`) |
+| mypy 파이프라인 | ✅ 연결 | 점진적 strict, 베이스라인 120 에러/30 파일 |
+| FCM Push Notification | ✅ 구현됨 | lazy init, 배포 시 `GOOGLE_APPLICATION_CREDENTIALS` 설정만 필요 |
+| Subscription Expiry Dispatcher | ✅ 구현+연결 | APScheduler 00:05 KST 매일 실행, advisory lock |
+| Auth (JWT + OAuth) | ✅ 완성 | 커스텀 JWT + Google/Kakao/Apple OAuth 2.0 |
+
+### 향후 항목
+
+1. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환) — 프론트엔드 작업
+2. [ ] mypy 에러 점진 해소 (120개 → 0) — 품질
+3. [ ] Analytics 라우터 추가 (집계 쿼리) — MVP 이후
+4. [ ] Redis 캐시 레이어 — 트래픽 증가 시
 
 ## 결제 경계 정책 (CRITICAL — 작업 전 필독)
 

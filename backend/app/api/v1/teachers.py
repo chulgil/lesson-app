@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
-from app.schemas.student import StudentResponse
+from app.schemas.student import StudentCreate, StudentResponse
 from app.schemas.teacher import TeacherDashboardResponse, TeacherResponse, TeacherUpdate
 from app.services.teacher_service import TeacherService
 

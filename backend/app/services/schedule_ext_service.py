@@ -97,12 +97,12 @@ class ScheduleExtService:
         return schedule
 
     async def cancel_group_schedule(self, schedule_id: str, reason: str | None) -> Any:
-        from app.models.schedule_ext import GroupClassSchedule
+        from app.models.schedule_ext import GroupClassSchedule, GroupScheduleStatus
 
         schedule = await self.db.get(GroupClassSchedule, schedule_id)
         if schedule is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
-        schedule.status = "cancelled"
+        schedule.status = GroupScheduleStatus.cancelled
         schedule.cancel_reason = reason
         await self.db.flush()
         await self.db.refresh(schedule)
@@ -113,7 +113,7 @@ class ScheduleExtService:
     # -----------------------------------------------------------------------
 
     async def create_group_booking(self, data: dict) -> Any:
-        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
 
         schedule = await self.db.get(GroupClassSchedule, data["schedule_id"])
         if schedule is None:
@@ -140,7 +140,7 @@ class ScheduleExtService:
             )
             schedule.current_bookings += 1
             if schedule.current_bookings >= schedule.max_capacity:
-                schedule.status = "full"
+                schedule.status = GroupScheduleStatus.full
 
         self.db.add(booking)
         await self.db.flush()
@@ -148,14 +148,14 @@ class ScheduleExtService:
         return booking
 
     async def cancel_group_booking(self, booking_id: str, reason: str | None) -> Any:
-        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
 
         booking = await self.db.get(GroupClassBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
 
         was_confirmed = booking.status == "confirmed"
-        booking.status = "cancelled"
+        booking.status = GroupBookingStatus.cancelled
         booking.cancel_reason = reason
         booking.cancelled_at = datetime.now(UTC)
 
@@ -164,7 +164,7 @@ class ScheduleExtService:
             if schedule:
                 schedule.current_bookings = max(0, schedule.current_bookings - 1)
                 if schedule.status == "full":
-                    schedule.status = "open"
+                    schedule.status = GroupScheduleStatus.open
                 # Auto-promote from waitlist
                 await self._promote_from_waitlist(booking.schedule_id)
 
@@ -173,7 +173,7 @@ class ScheduleExtService:
         return booking
 
     async def _promote_from_waitlist(self, schedule_id: str) -> None:
-        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule
 
         waitlist = await self.db.scalars(
             select(GroupClassBooking)
@@ -186,7 +186,7 @@ class ScheduleExtService:
         )
         first = waitlist.first()
         if first:
-            first.status = "confirmed"
+            first.status = GroupBookingStatus.confirmed
             first.waitlist_position = None
             first.promoted_at = datetime.now(UTC)
             schedule = await self.db.get(GroupClassSchedule, schedule_id)
@@ -195,12 +195,12 @@ class ScheduleExtService:
                 schedule.waitlist_count = max(0, schedule.waitlist_count - 1)
 
     async def mark_attendance(self, booking_id: str, attended: bool) -> Any:
-        from app.models.schedule_ext import GroupClassBooking
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
         booking = await self.db.get(GroupClassBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "attended" if attended else "noShow"
+        booking.status = GroupBookingStatus.attended if attended else GroupBookingStatus.noShow
         if attended:
             booking.attended_at = datetime.now(UTC)
         await self.db.flush()
@@ -265,7 +265,7 @@ class ScheduleExtService:
 
     async def promote_from_waitlist_public(self, schedule_id: str) -> Any | None:
         """Promote next waitlisted booking (public API)."""
-        from app.models.schedule_ext import GroupClassBooking
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
         waitlist = await self.db.scalars(
             select(GroupClassBooking)
@@ -279,7 +279,7 @@ class ScheduleExtService:
         first = waitlist.first()
         if first is None:
             return None
-        first.status = "confirmed"
+        first.status = GroupBookingStatus.confirmed
         first.waitlist_position = None
         first.promoted_at = datetime.now(UTC)
         await self.db.flush()
@@ -288,7 +288,7 @@ class ScheduleExtService:
 
     async def auto_cancel_waitlist(self, schedule_id: str) -> list[Any]:
         """Cancel all waitlisted bookings for a schedule."""
-        from app.models.schedule_ext import GroupClassBooking
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
         result = await self.db.scalars(
             select(GroupClassBooking).where(
@@ -298,7 +298,7 @@ class ScheduleExtService:
         )
         cancelled = []
         for booking in result.all():
-            booking.status = "cancelled"
+            booking.status = GroupBookingStatus.cancelled
             booking.cancel_reason = "auto_cancel_waitlist"
             booking.cancelled_at = datetime.now(UTC)
             cancelled.append(booking)
@@ -309,7 +309,7 @@ class ScheduleExtService:
 
     async def batch_mark_attendance(self, attendance_list: list[dict]) -> list[Any]:
         """Mark attendance for multiple bookings at once."""
-        from app.models.schedule_ext import GroupClassBooking
+        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
         results = []
         for item in attendance_list:
@@ -317,7 +317,7 @@ class ScheduleExtService:
             if booking is None:
                 continue
             attended = item.get("attended", True)
-            booking.status = "attended" if attended else "noShow"
+            booking.status = GroupBookingStatus.attended if attended else GroupBookingStatus.noShow
             if attended:
                 booking.attended_at = datetime.now(UTC)
             results.append(booking)
@@ -384,12 +384,12 @@ class ScheduleExtService:
     async def respond_to_schedule_change(
         self, change_id: str, action: str, response_message: str | None
     ) -> Any:
-        from app.models.schedule_ext import LessonScheduleChange
+        from app.models.schedule_ext import LessonScheduleChange, ScheduleChangeStatus
 
         change = await self.db.get(LessonScheduleChange, change_id)
         if change is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Change not found")
-        change.status = action
+        change.status = ScheduleChangeStatus(action)
         change.response_message = response_message
         change.processed_at = datetime.now(UTC)
         await self.db.flush()

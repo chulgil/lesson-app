@@ -44,7 +44,7 @@ class VultrStorageService:
         bucket = bucket or settings.VULTR_STORAGE_BUCKET
         async with self._session.client(**self._get_client_kwargs()) as s3:
             response = await s3.get_object(Bucket=bucket, Key=key)
-            data = await response["Body"].read()
+            data: bytes = await response["Body"].read()
         return data
 
     async def delete_file(self, key: str, bucket: str | None = None) -> None:
@@ -62,7 +62,7 @@ class VultrStorageService:
         """Generate a presigned URL for temporary access to a file."""
         bucket = bucket or settings.VULTR_STORAGE_BUCKET
         async with self._session.client(**self._get_client_kwargs()) as s3:
-            url = await s3.generate_presigned_url(
+            url: str = await s3.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": bucket, "Key": key},
                 ExpiresIn=expires_in,

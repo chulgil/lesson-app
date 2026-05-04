@@ -252,8 +252,9 @@ class ScheduleService:
             if exc.start_time is None:
                 whole_day_blocked = True
                 break
+            assert exc.start_time is not None  # checked above
             exc_start = _parse_time_to_minutes(exc.start_time)
-            exc_end = _parse_time_to_minutes(exc.end_time)
+            exc_end = _parse_time_to_minutes(exc.end_time or exc.start_time)
             blocked_ranges.append((exc_start, exc_end))
 
         # Generate slots from availability
@@ -426,7 +427,7 @@ class ScheduleService:
         await self._check_booking_overlap(
             teacher_id=data.teacher_id,
             scheduled_date=data.scheduled_date,
-            scheduled_time=data.scheduled_time,
+            scheduled_time=data.scheduled_time or "",
             duration=data.duration,
         )
 
@@ -457,53 +458,53 @@ class ScheduleService:
 
     async def approve_booking(self, booking_id: str, current_user: Any) -> BookingResponse:
         """Approve a pending booking."""
-        from app.models.schedule import LessonBooking
+        from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "confirmed"
+        booking.status = BookingStatus.confirmed
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
     async def reject_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
         """Reject a pending booking — Plan B (#238): rejected 제거, cancelled + decline_reason 사유."""
-        from app.models.schedule import LessonBooking
+        from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "cancelled"
-        booking.reason = reason
+        booking.status = BookingStatus.cancelled
+        booking.notes = reason
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
     async def cancel_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
         """Cancel a booking."""
-        from app.models.schedule import LessonBooking
+        from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
-        booking.status = "cancelled"
-        booking.reason = reason
+        booking.status = BookingStatus.cancelled
+        booking.notes = reason
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
 
     async def change_booking(self, booking_id: str, data: BookingChangeRequest, current_user: Any) -> BookingResponse:
         """Request a change to booking date/time."""
-        from app.models.schedule import LessonBooking
+        from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         booking.scheduled_date = data.new_date
         booking.scheduled_time = data.new_time
-        booking.status = "changeRequested"
-        booking.reason = data.reason
+        booking.status = BookingStatus.changeRequested
+        booking.notes = data.reason
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)

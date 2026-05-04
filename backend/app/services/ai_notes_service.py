@@ -99,7 +99,7 @@ class AiNotesService:
             id=lesson.id,
             lesson_id=lesson_id,
             feedback=lesson.feedback,
-            key_points=lesson.key_points or [],
+            key_points=list(lesson.key_points) if isinstance(lesson.key_points, list) else [],
             practice_tips=lesson.practice_tips,
             suggested_assignments=[],
             status="completed",
