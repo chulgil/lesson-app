@@ -10,6 +10,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../home/presentation/widgets/lesson_card.dart';
@@ -43,10 +44,12 @@ class ScheduleTab extends ConsumerWidget {
     // §7.X — list 모드는 CustomScrollView 로 헤더 collapse + WeekStrip sticky.
     // timeline/weeklyGrid 은 자체 스크롤이 있어 외부 collapse 적용 시 충돌
     // (weeklyGrid 은 ScrollController 보유) → 기존 Column 유지.
-    if (viewMode == ScheduleViewMode.list) {
-      return _buildCollapsibleListLayout(context, ref);
-    }
-    return _buildPinnedLayout(context, ref, viewMode);
+    return PaperScaffold(
+      child:
+          viewMode == ScheduleViewMode.list
+              ? _buildCollapsibleListLayout(context, ref)
+              : _buildPinnedLayout(context, ref, viewMode),
+    );
   }
 
   /// list 모드 전용 — Masthead/Programme/Toggle 은 스크롤시 사라지고,
@@ -179,46 +182,14 @@ class ScheduleTab extends ConsumerWidget {
     return Column(
       children: [
         _buildHeader(context, ref),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space2,
-            AppSpacing.screenPadding,
-            0,
-          ),
-          child: lessonsAsync.when(
-            data: (lessons) {
-              final lessonDates =
-                  lessons
-                      .map(
-                        (l) => DateTime(l.date.year, l.date.month, l.date.day),
-                      )
-                      .toSet();
-              return CompactWeekStrip(
-                selectedDate: selectedDate,
-                onDateSelected: (date) {
-                  ref.read(teacherSelectedDateProvider.notifier).state = date;
-                },
-                markerDates: lessonDates,
-              );
-            },
-            loading:
-                () => CompactWeekStrip(
-                  selectedDate: selectedDate,
-                  onDateSelected: (date) {
-                    ref.read(teacherSelectedDateProvider.notifier).state = date;
-                  },
-                ),
-            error:
-                (_, __) => CompactWeekStrip(
-                  selectedDate: selectedDate,
-                  onDateSelected: (date) {
-                    ref.read(teacherSelectedDateProvider.notifier).state = date;
-                  },
-                ),
-          ),
+        _buildModeDateHeader(
+          context: context,
+          ref: ref,
+          selectedDate: selectedDate,
+          sortType: sortType,
+          lessonsAsync: lessonsAsync,
         ),
-        const SizedBox(height: AppSpacing.space3),
+        const SizedBox(height: AppSpacing.space2),
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -259,7 +230,7 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  /// Sticky 영역 내부 — CompactWeekStrip + space + DateHeader.
+  /// Sticky 영역 내부 — CompactWeekStrip + DateHeader.
   /// 높이는 [_stickyHeaderHeight] 와 일치해야 함.
   Widget _buildStickyHeaderContent({
     required BuildContext context,
@@ -287,17 +258,17 @@ class ScheduleTab extends ConsumerWidget {
             markerDates: markerDates,
           ),
         ),
-        const SizedBox(height: AppSpacing.space3),
+        const SizedBox(height: AppSpacing.space2),
         _buildDateHeader(ref, selectedDate, lessonCount, sortType),
-        const SizedBox(height: AppSpacing.space3),
+        const SizedBox(height: AppSpacing.space2),
       ],
     );
   }
 
-  /// Sticky 영역 고정 높이 — space2(8) + CompactWeekStrip(약 103: 헤더 26 + space 4
-  /// + 데이 스트립 73) + space3(12) + DateHeader(약 30) + space3(12) ≈ 165 → 안전 여유 +3.
+  /// Sticky 영역 고정 높이 — space2(8) + CompactWeekStrip(약 99)
+  /// + space2(8) + DateHeader(약 29) + space2(8) ≈ 152.
   /// 위젯이 변경되면 layout test 가 회귀를 잡는다.
-  static const double _stickyHeaderHeight = 168.0;
+  static const double _stickyHeaderHeight = 152.0;
 
   Widget _buildViewContent({
     Key? key,
@@ -367,39 +338,52 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
+  String _volumeIssueString(DateTime now) {
+    final romanMonth = const [
+      'I', 'II', 'III', 'IV', 'V', 'VI',
+      'VII', 'VIII', 'IX', 'X', 'XI', 'XII',
+    ][now.month - 1];
+    return 'VOL. $romanMonth · NO. ${now.day}';
+  }
+
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final viewMode = ref.watch(scheduleViewModeProvider);
+    final now = DateTime.now();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space2,
+        AppSpacing.screenPadding,
+        AppSpacing.space1,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: AppSpacing.space2),
-          // ── Masthead: "SCHEDULE" eyebrow + 레슨 추가 IconButton ──
+          // ── Masthead: "SCHEDULE" eyebrow ──
           NotebookMasthead(
             eyebrow: 'SCHEDULE',
-            meta: _volumeIssueString(DateTime.now()),
+            meta: _volumeIssueString(now),
             trailing: IconButton(
               onPressed: () => _navigateToAddLesson(context, ref),
-              icon: const Icon(Icons.add),
+              icon: const Icon(
+                Icons.check_box_outlined,
+                color: AppColors.ink,
+                size: 22,
+              ),
               tooltip: AppStrings.addLessonTooltip,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-              style: IconButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-              ),
             ),
           ),
-          // ── Programme Title — "스케줄" Playfair ──
+          // ── Programme Title + View Mode Toggle ──
           Padding(
             padding: const EdgeInsets.only(top: 18, bottom: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Programme of Schedule',
+                  'Programme for Schedule',
                   style: NotebookTypography.mastheadLabel,
                 ),
                 const SizedBox(height: 4),
@@ -407,34 +391,83 @@ class ScheduleTab extends ConsumerWidget {
                   AppStrings.scheduleTabTitle,
                   style: NotebookTypography.masthead,
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  '${now.month}月 ${now.day}日',
+                  style: NotebookTypography.mastheadDate,
+                ),
                 const SizedBox(height: AppSpacing.space3),
                 const ThinRule(),
               ],
             ),
           ),
-          // ── View Mode Toggle Row — 독립 배치 ──
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.space2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _ViewModeToggle(
-                  currentMode: viewMode,
-                  onChanged: (mode) {
-                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
-                  },
-                ),
-              ],
-            ),
+          // ── View Mode Toggle ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _ViewModeToggle(
+                currentMode: viewMode,
+                onChanged: (mode) {
+                  ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                },
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  /// Notebook meta: "VOL. IV · NO. 23" 형식.
-  String _volumeIssueString(DateTime now) {
-    return 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}';
+  Widget _buildModeDateHeader({
+    required BuildContext context,
+    required WidgetRef ref,
+    required DateTime selectedDate,
+    required LessonSortType sortType,
+    required AsyncValue<List<Lesson>> lessonsAsync,
+  }) {
+    return lessonsAsync.when(
+      data: (lessons) {
+        final lessonDates =
+            lessons
+                .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
+                .toSet();
+        final lessonCount =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .length;
+        return _buildStickyHeaderContent(
+          context: context,
+          ref: ref,
+          selectedDate: selectedDate,
+          sortType: sortType,
+          lessonCount: lessonCount,
+          markerDates: lessonDates,
+        );
+      },
+      loading:
+          () => _buildStickyHeaderContent(
+            context: context,
+            ref: ref,
+            selectedDate: selectedDate,
+            sortType: sortType,
+            lessonCount: 0,
+            markerDates: const <DateTime>{},
+          ),
+      error:
+          (_, __) => _buildStickyHeaderContent(
+            context: context,
+            ref: ref,
+            selectedDate: selectedDate,
+            sortType: sortType,
+            lessonCount: 0,
+            markerDates: const <DateTime>{},
+          ),
+    );
   }
 
   Widget _buildDateHeader(
