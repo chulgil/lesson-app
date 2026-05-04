@@ -1,6 +1,7 @@
 # 용어 정의 (Glossary)
 
-> 최종 업데이트: 2026-03-07
+> 최종 업데이트: 2026-05-04
+> SSOT: `.harness/knowledge/glossary.md` — 이 파일은 동기화 대상 (사용자 열람용)
 
 lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
@@ -264,10 +265,46 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ---
 
-## 6. 용어 변경 이력
+## 7. 수강권 (Subscription)
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 수강권 | Subscription | 레슨 횟수/기간 권리 |
+| 수강권 제안 | Proposal | 선생님→학생 수강권 제안 |
+| 수강권 템플릿 | Template | 미리 설정한 수강권 상품 |
+| 입금 상태 | Payment Status | 외부 입금 확인 여부 (앱 내 결제 아님) |
+
+## 8. 스케줄 (Schedule)
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 레슨 요청 | Lesson Request | 학생→선생님 레슨 신청 |
+| 예약 | Booking | 확정된 레슨 일정 |
+| 가용시간 | Availability | 선생님 예약 가능 시간대 |
+| 스케줄 예외 | Schedule Exception | 휴무/휴가/추가 슬롯 |
+
+## 9. 연습 (Practice)
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 연습 로그 | Practice Log | 일별 연습 기록 |
+| 레퍼토리 | Repertoire | 연습 곡 목록 |
+| 녹음 | Recording | 연습 녹음 파일 |
+
+## 10. 알림 (Notification)
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 알림 | Notification | 인앱/푸시 알림 |
+| 만료 알림 설정 | Expiry Reminder Settings | D-14/D-7/D-1/D-0 토글 |
+
+---
+
+## 용어 변경 이력
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-05-04 | — | 수강권/스케줄/연습/알림 도메인 추가 | .harness glossary 동기화 |
 | 2026-01-30 | 맞팔 | 수강권 기반 관계 | 레슨 도메인에 맞는 용어로 변경 |
 | 2026-01-30 | 맞팔 (소식용) | 팔로우/소식 구독 | 기능 명확화 |
 | 2026-01-30 | 연결하기 버튼 | 자동 연결 | 제로 탭 UX 반영 |
@@ -278,7 +315,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 문서 | 설명 |
 |------|------|
+| [.harness/knowledge/glossary.md](../../.harness/knowledge/glossary.md) | **SSOT** — 전 도메인 용어 + FE-BE 클래스 매핑 |
 | [subscription_based_relationship.md](./lesson/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 상세 |
 | [invite_system_v2.md](./lesson/invite/invite_system_v2.md) | 초대/연결 시스템 |
-| [flow_with_app.md](./_archive/old/flow_with_app.md) | 앱 사용 플로우 (아카이브됨) |
 | [ux_guidelines.md](./design/ux_guidelines.md) | UX 가이드라인 |

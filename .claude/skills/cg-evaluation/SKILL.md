@@ -52,9 +52,9 @@ description: Phase 6 — 독립된 3-critic 평가 (code / test / e2e). Oracle P
 ```
 Stage 1 Mechanical Verification
 ===============================
-build : PASS (exit 0)
 lint  : PASS (0 violations)
 test  : PASS (12/12)
+build : PASS (exit 0)
 elapsed: 18s
 
 Stage 2 (LLM Critics) 진행 가능
