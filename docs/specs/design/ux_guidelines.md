@@ -55,6 +55,19 @@
 | `textDisabledLight` | #CCCCCC | 비활성 텍스트 |
 
 **허용되는 직접 색상**: `Colors.white`, `Colors.black`, `Colors.transparent`만 허용.
+
+#### `paperHighlight` (노란 형광펜) 사용 규칙
+
+> **텍스트 색상으로 사용 금지.** 노트에서 형광마커로 글자 위를 칠하는 용도로만 사용.
+
+| 용도 | 허용 | 예시 |
+|------|------|------|
+| 배경색 (형광마커) | O | `Container(color: AppColors.paperHighlight.withValues(alpha: 0.3))` |
+| 텍스트 색상 | **X** | ~~`Text(style: TextStyle(color: AppColors.paperHighlight))`~~ |
+| border 색상 | **X** | ~~`Border.all(color: AppColors.paperHighlight)`~~ |
+| 아이콘 색상 | **X** | ~~`Icon(color: AppColors.paperHighlight)`~~ |
+
+글자색은 반드시 `ink` / `inkSecondary` / `inkTertiary` / `paperAccent` / `paperOk` 중 하나 사용.
 **금지**: `Colors.grey`, `Colors.red`, `Colors.green`, `Color(0xFF...)` 등 직접 사용 금지.
 
 #### 색상 사용 결정 기준

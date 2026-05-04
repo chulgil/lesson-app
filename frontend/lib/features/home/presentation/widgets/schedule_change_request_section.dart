@@ -298,13 +298,16 @@ class _ScheduleChangeListItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Status stamp — Notebook 스타일 (1px 테두리)
+        // Status stamp — Notebook 스타일 (1px 테두리 + 형광마커 배경)
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space2,
             vertical: 2,
           ),
           decoration: BoxDecoration(
+            color: _isHighlighted
+                ? AppColors.paperHighlight.withValues(alpha: 0.3)
+                : null,
             border: Border.all(color: _statusColor, width: 1),
           ),
           child: Text(
@@ -363,6 +366,10 @@ class _ScheduleChangeListItem extends StatelessWidget {
     }
   }
 
+  bool get _isHighlighted =>
+      event.eventType == RequestEventType.scheduleChangeProposed ||
+      event.eventType == RequestEventType.scheduleChangeCountered;
+
   Color get _statusColor {
     switch (event.eventType) {
       case RequestEventType.scheduleChanged:
@@ -371,7 +378,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
         return AppColors.paperAccent;
       case RequestEventType.scheduleChangeProposed:
       case RequestEventType.scheduleChangeCountered:
-        return AppColors.paperHighlight;
+        return AppColors.ink;
       case RequestEventType.scheduleChangeAccepted:
         return AppColors.paperOk;
       default:
