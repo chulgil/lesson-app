@@ -85,11 +85,18 @@ class _SuggestAlternativeScreenState
 
   bool get _isAcceptMode => _selectedPreferredIndex != null;
 
+  DateTime? _dateForPreferredSlot(PreferredTimeSlot slot) {
+    if (slot.date != null) return slot.date;
+    final dayOfWeek = slot.dayOfWeek;
+    if (dayOfWeek == null) return null;
+    return _weekStart.add(Duration(days: dayOfWeek.clamp(0, 6)));
+  }
+
   /// Check if a preferred slot conflicts with existing lessons.
   /// Returns: null=no conflict, 'confirmed'=hard conflict, 'preview'=preview conflict
   String? _checkSlotConflict(PreferredTimeSlot slot, List<Lesson> lessons) {
-    if (slot.date == null) return null;
-    final slotDate = slot.date!;
+    final slotDate = _dateForPreferredSlot(slot);
+    if (slotDate == null) return null;
     final startParts = slot.startTime.split(':');
     final endParts = slot.endTime.split(':');
     final slotStart = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
@@ -120,12 +127,13 @@ class _SuggestAlternativeScreenState
       (s) => s.priority == _selectedPreferredIndex,
       orElse: () => sorted.first,
     );
-    if (selected.date == null) return null;
+    final selectedDate = _dateForPreferredSlot(selected);
+    if (selectedDate == null) return null;
 
     final startParts = selected.startTime.split(':');
     final endParts = selected.endTime.split(':');
     return PreferredTimeSlotHighlight(
-      date: selected.date!,
+      date: selectedDate,
       startMinutes: int.parse(startParts[0]) * 60 + int.parse(startParts[1]),
       endMinutes: int.parse(endParts[0]) * 60 + int.parse(endParts[1]),
     );
@@ -207,8 +215,13 @@ class _SuggestAlternativeScreenState
         AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
+        color: AppColors.paperDark,
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.inkQuaternary.withValues(alpha: 0.3),
+            width: 0.5,
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,8 +265,9 @@ class _SuggestAlternativeScreenState
                       _suggestedSlots = [];
                       _messageController.clear();
                       // Navigate calendar to the selected slot's week
-                      if (slot.date != null) {
-                        _weekStart = _getWeekStart(slot.date!);
+                      final selectedDate = _dateForPreferredSlot(slot);
+                      if (selectedDate != null) {
+                        _weekStart = _getWeekStart(selectedDate);
                       }
                     }
                   });
