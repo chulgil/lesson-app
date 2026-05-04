@@ -114,6 +114,19 @@ Q: 이 색상은 무엇을 의미하나?
 
 **`NotebookTypography.sectionLabel`(13px)**: 대시보드 섹션 타이틀("레슨요청 · 14" 등). 이전 11px에서 13px으로 상향. uppercase + letterSpacing으로 시인성 확보.
 
+#### 1.2.3 완료/취소 항목 디밍 규칙
+
+> 대시보드 리스트에서 "아직 해야 할 것"을 즉시 식별할 수 있어야 한다.
+
+| 상태 | 시각 처리 | 구현 |
+|------|----------|------|
+| 예정 (scheduled) | 정상 표시 (opacity 1.0) | 기본 |
+| 완료 (completed) | **opacity 0.45 + 취소선** | `Opacity(opacity: 0.45)` + `TextDecoration.lineThrough` |
+| 취소 (cancelled 계열) | **opacity 0.45 + 취소선** | 동일 |
+| 노쇼/결석 | 정상 + accent 색상 강조 | paperAccent 세로선 |
+
+**UX 근거**: 선생님의 시선은 "다음에 해야 할 것"에 집중해야 함. 완료/취소된 항목이 같은 시각 무게로 표시되면 스캔 비용 증가 → Hick's Law 위반.
+
 #### 1.2.1 NotebookTypography — 자필·악보 시그니처 (Notebook × Score)
 
 > 파일: `lib/core/theme/notebook_typography.dart`

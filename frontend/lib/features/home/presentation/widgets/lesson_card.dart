@@ -28,8 +28,17 @@ class LessonCard extends ConsumerWidget {
 
   const LessonCard({super.key, required this.lesson, required this.onTap});
 
+  bool get _isDimmed =>
+      lesson.displayStatus == LessonStatus.completed ||
+      lesson.displayStatus == LessonStatus.cancelled ||
+      lesson.displayStatus == LessonStatus.cancelledByStudentAdvance ||
+      lesson.displayStatus == LessonStatus.cancelledByTeacher ||
+      lesson.displayStatus == LessonStatus.cancelledMutual;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final dimAlpha = _isDimmed ? 0.45 : 1.0;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -41,40 +50,44 @@ class LessonCard extends ConsumerWidget {
               bottom: const BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.space3,
-              AppSpacing.space3,
-              AppSpacing.space2,
-              AppSpacing.space3,
-            ),
-            child: Row(
-              children: [
-                // Time column — Plex Mono (악보 템포 라벨)
-                SizedBox(
-                  width: 52,
-                  child: Text(
-                    lesson.startTime,
-                    style: GoogleFonts.ibmPlexMono(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.ink,
-                      letterSpacing: 0.5,
+          child: Opacity(
+            opacity: dimAlpha,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space3,
+                AppSpacing.space3,
+                AppSpacing.space2,
+                AppSpacing.space3,
+              ),
+              child: Row(
+                children: [
+                  // Time column — Plex Mono (악보 템포 라벨)
+                  SizedBox(
+                    width: 52,
+                    child: Text(
+                      lesson.startTime,
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                // Info section
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${lesson.studentName} · ${lesson.instrument}',
-                        style: NotebookTypography.pieceTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                  const SizedBox(width: AppSpacing.space3),
+                  // Info section
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${lesson.studentName} · ${lesson.instrument}',
+                          style: NotebookTypography.pieceTitle.copyWith(
+                            decoration: _isDimmed ? TextDecoration.lineThrough : null,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       _buildBadgesRow(ref),
                       if (lesson.pieces.isNotEmpty)
                         Padding(
@@ -111,6 +124,7 @@ class LessonCard extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),
