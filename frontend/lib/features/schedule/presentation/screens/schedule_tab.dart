@@ -348,7 +348,6 @@ class ScheduleTab extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final viewMode = ref.watch(scheduleViewModeProvider);
-    final now = DateTime.now();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -360,58 +359,33 @@ class ScheduleTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Masthead: "SCHEDULE" eyebrow ──
+          // ── SCHEDULE + 뷰 모드 토글(3개) + 추가 버튼 — 한 줄 ──
           NotebookMasthead(
             eyebrow: 'SCHEDULE',
-            meta: _volumeIssueString(now),
-            trailing: IconButton(
-              onPressed: () => _navigateToAddLesson(context, ref),
-              icon: const Icon(
-                Icons.check_box_outlined,
-                color: AppColors.ink,
-                size: 22,
-              ),
-              tooltip: AppStrings.addLessonTooltip,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            ),
-          ),
-          // ── Programme Title + View Mode Toggle ──
-          Padding(
-            padding: const EdgeInsets.only(top: 18, bottom: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            meta: '',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Programme for Schedule',
-                  style: NotebookTypography.mastheadLabel,
+                _ViewModeToggle(
+                  currentMode: viewMode,
+                  onChanged: (mode) {
+                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                  },
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  AppStrings.scheduleTabTitle,
-                  style: NotebookTypography.masthead,
+                const SizedBox(width: AppSpacing.space2),
+                IconButton(
+                  onPressed: () => _navigateToAddLesson(context, ref),
+                  icon: const Icon(
+                    Icons.check_box_outlined,
+                    color: AppColors.ink,
+                    size: 22,
+                  ),
+                  tooltip: AppStrings.addLessonTooltip,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  '${now.month}月 ${now.day}日',
-                  style: NotebookTypography.mastheadDate,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                const ThinRule(),
               ],
             ),
-          ),
-          // ── View Mode Toggle ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _ViewModeToggle(
-                currentMode: viewMode,
-                onChanged: (mode) {
-                  ref.read(scheduleViewModeProvider.notifier).setMode(mode);
-                },
-              ),
-            ],
           ),
         ],
       ),
