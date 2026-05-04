@@ -163,6 +163,8 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
     key_points: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     practice_tips: Mapped[str | None] = mapped_column(Text, nullable=True)
+    student_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     location_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     location_address: Mapped[str | None] = mapped_column(Text, nullable=True)
 
