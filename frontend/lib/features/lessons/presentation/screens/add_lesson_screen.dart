@@ -112,6 +112,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: Text(
           _isRecordMode
@@ -273,84 +274,6 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     );
   }
 
-  /// Build recent student quick-select chips (top 5 by recent lesson).
-  Widget _buildRecentStudentChips() {
-    final studentsAsync = ref.watch(studentsProvider);
-    final lessonsAsync = ref.watch(lessonsProvider);
-
-    final students = studentsAsync.valueOrNull ?? [];
-    final lessons = lessonsAsync.valueOrNull ?? [];
-
-    if (students.isEmpty) return const SizedBox.shrink();
-
-    // Sort students by most recent lesson date
-    final studentLastLesson = <String, DateTime>{};
-    for (final lesson in lessons) {
-      final existing = studentLastLesson[lesson.studentId];
-      if (existing == null || lesson.date.isAfter(existing)) {
-        studentLastLesson[lesson.studentId] = lesson.date;
-      }
-    }
-
-    final recentStudents = List<Student>.from(students)..sort((a, b) {
-      final aDate = studentLastLesson[a.id] ?? DateTime(2000);
-      final bDate = studentLastLesson[b.id] ?? DateTime(2000);
-      return bDate.compareTo(aDate);
-    });
-
-    final topStudents = recentStudents.take(5).toList();
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-      child: SizedBox(
-        height: 40,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: topStudents.length,
-          separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.space2),
-          itemBuilder: (context, index) {
-            final student = topStudents[index];
-            final isSelected = _selectedStudent?.id == student.id;
-            return ActionChip(
-              avatar: CircleAvatar(
-                radius: 12,
-                backgroundColor: student.profileColor.withValues(alpha: 0.3),
-                child: Text(
-                  student.initial,
-                  style: AppTypography.caption.copyWith(
-                    color: student.profileColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              label: Text(
-                student.name,
-                style: AppTypography.caption.copyWith(
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? AppColors.paper : null,
-                ),
-              ),
-              backgroundColor:
-                  isSelected
-                      ? student.profileColor
-                      : student.profileColor.withValues(alpha: 0.08),
-              side: BorderSide(
-                color: student.profileColor.withValues(
-                  alpha: isSelected ? 1 : 0.3,
-                ),
-              ),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onPressed: () {
-                setState(() => _selectedStudent = _studentToInfo(student));
-                _autoFillFromStudent(student);
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-
   bool _hasFormData() {
     return _selectedStudent != null ||
         _pieceController.text.isNotEmpty ||
@@ -424,7 +347,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 Expanded(
                   child: Text(
                     AppStrings.noActiveSubscriptionBanner,
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.ink,
+                    ),
                   ),
                 ),
               ],
