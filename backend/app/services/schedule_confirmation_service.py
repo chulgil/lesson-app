@@ -157,6 +157,7 @@ class ScheduleConfirmationService:
                 scheduled_date=scheduled_date,
                 scheduled_time=card.proposed_time or "14:00",
                 duration=card.proposed_duration or 60,
+                instrument=card.instrument,
                 status="confirmed",
             )
             self.db.add(booking)

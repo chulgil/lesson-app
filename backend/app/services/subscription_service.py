@@ -452,9 +452,15 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(proposal)
 
-        # GAP-1: Link LessonRequest ↔ Proposal bidirectionally
+        # GAP-1: Link LessonRequest ↔ Proposal bidirectionally + event log
         if data.lesson_request_id:
             await self._link_request_to_proposal(data.lesson_request_id, proposal.id)
+            await self._log_request_event(
+                data.lesson_request_id,
+                actor_type="teacher",
+                actor_id=proposal.teacher_id,
+                event_type="proposalSent",
+            )
 
         return SubscriptionProposalResponse.model_validate(proposal)
 
@@ -476,6 +482,13 @@ class SubscriptionService:
             # GAP-6: Sync LessonRequest status → paymentNotified
             if proposal.lesson_request_id:
                 await self._transition_request_status(proposal.lesson_request_id, "paymentNotified")
+                await self._log_request_event(
+                    proposal.lesson_request_id,
+                    actor_type="student",
+                    actor_id=proposal.student_id,
+                    event_type="paymentNotified",
+                    subscription_id=proposal.subscription_id,
+                )
         elif data.action == "reject":
             proposal.status = ProposalStatus.rejected
             proposal.rejection_reason = data.rejection_reason
@@ -566,9 +579,16 @@ class SubscriptionService:
                 lesson_request_id=proposal.lesson_request_id,
             )
 
-        # GAP-6: Transition LessonRequest → subscriptionIssued
+        # GAP-6: Transition LessonRequest → subscriptionIssued + event log
         if proposal.lesson_request_id:
             await self._transition_request_status(proposal.lesson_request_id, "subscriptionIssued")
+            await self._log_request_event(
+                proposal.lesson_request_id,
+                actor_type="teacher",
+                actor_id=proposal.teacher_id,
+                event_type="subscriptionIssued",
+                subscription_id=proposal.subscription_id,
+            )
 
         proposal.status = ProposalStatus.confirmed
         proposal.payment_status = ProposalPaymentStatus.completed
@@ -580,6 +600,30 @@ class SubscriptionService:
     # ------------------------------------------------------------------
     # Private helpers for the request→subscription integration
     # ------------------------------------------------------------------
+
+    async def _log_request_event(
+        self,
+        request_id: str,
+        *,
+        actor_type: str,
+        actor_id: str,
+        event_type: str,
+        subscription_id: str | None = None,
+        message: str | None = None,
+    ) -> None:
+        """Persist a RequestEvent for chat history tracking."""
+        from app.models.request_event import RequestEvent, RequestEventType
+
+        event = RequestEvent(
+            request_id=request_id,
+            actor_type=actor_type,
+            actor_id=actor_id,
+            event_type=RequestEventType(event_type),
+            subscription_id=subscription_id,
+            message=message,
+        )
+        self.db.add(event)
+        await self.db.flush()
 
     async def _link_request_to_proposal(self, lesson_request_id: str, proposal_id: str) -> None:
         """GAP-1: Set LessonRequest.proposal_id and transition to proposalSent."""
