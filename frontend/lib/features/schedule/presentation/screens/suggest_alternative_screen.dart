@@ -159,6 +159,9 @@ class _SuggestAlternativeScreenState
           AppStrings.counterPropose,
           style: NotebookTypography.appBarTitle,
         ),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
       ),
       body: Column(
         children: [
@@ -214,9 +217,8 @@ class _SuggestAlternativeScreenState
         AppSpacing.screenPadding,
         AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        border: const Border(
+      decoration: const BoxDecoration(
+        border: Border(
           bottom: BorderSide(color: AppColors.inkQuaternary),
         ),
       ),

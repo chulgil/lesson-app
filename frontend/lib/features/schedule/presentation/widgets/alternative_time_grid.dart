@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 import '../../../../core/utils/name_utils.dart';
 import '../../../lessons/domain/entities/lesson.dart';
@@ -125,6 +126,54 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
   int _lessonEndMinutes(Lesson lesson) =>
       _parseTimeMinutes(lesson.startTime) + lesson.duration;
 
+  double get _gridLabelFontSize =>
+      (AppTypography.captionXSmall.fontSize ?? 10) * 2;
+
+  Border _cellBorder({
+    Color? color,
+    bool includeTop = false,
+    bool includeLeft = false,
+  }) {
+    final side = BorderSide(
+      color: color ?? AppColors.inkQuaternary.withValues(alpha: 0.3),
+      width: 1,
+    );
+    return Border(
+      top: includeTop ? side : BorderSide.none,
+      left: includeLeft ? side : BorderSide.none,
+      right: side,
+      bottom: side,
+    );
+  }
+
+  Widget _buildCenteredGridLabel(
+    String label, {
+    required TextStyle style,
+    double verticalOffset = 0,
+  }) {
+    return Center(
+      child: Transform.translate(
+        offset: Offset(0, verticalOffset),
+        child: Text(
+          label,
+          style: style.copyWith(fontSize: _gridLabelFontSize, height: 1),
+          strutStyle: StrutStyle(
+            fontSize: _gridLabelFontSize,
+            height: 1,
+            forceStrutHeight: true,
+          ),
+          textHeightBehavior: const TextHeightBehavior(
+            applyHeightToFirstAscent: false,
+            applyHeightToLastDescent: false,
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     int startHour = 9;
@@ -230,6 +279,8 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                               slotMinutes: slotMinutes,
                               width: cellWidth,
                               height: cellHeight,
+                              includeTopBoundary: slotIndex == 0,
+                              includeLeftBoundary: dayIndex == 0,
                             );
                           }),
                         ],
@@ -250,6 +301,8 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     required int slotMinutes,
     required double width,
     required double height,
+    required bool includeTopBoundary,
+    required bool includeLeftBoundary,
   }) {
     final hour = slotMinutes ~/ 60;
     final minute = slotMinutes % 60;
@@ -262,8 +315,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       final isPreview = lesson.isPreview;
 
       // Check if this lesson cell overlaps with the highlighted preferred slot
-      final isOverlapWithHighlight =
-          isPreview && _isHighlightedSlot(date, slotMinutes);
+      final isOverlapWithHighlight = _isHighlightedSlot(date, slotMinutes);
+      final isHighlightStart = _isHighlightedSlotStart(date, slotMinutes);
+      final shouldShowLabel = isStart || isHighlightStart;
 
       // Warning color for preview + highlight overlap
       final Color bgColor;
@@ -280,7 +334,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         textColor = AppColors.inkTertiary;
       } else {
         bgColor = AppColors.scheduleMutedBackground;
-        accentColor = AppColors.scheduleMutedAccent;
+        accentColor = AppColors.inkTertiary;
         textColor = AppColors.inkSecondary;
       }
 
@@ -299,31 +353,35 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                     ? Border(
                       top:
                           isStart
-                              ? BorderSide(color: accentColor, width: 2)
+                              ? BorderSide(color: accentColor, width: 1)
                               : BorderSide.none,
                     )
                     : null,
           ),
           child:
-              isStart
-                  ? Padding(
-                    padding: const EdgeInsets.only(left: 2, top: 1),
-                    child: Text(
-                      hideStudentNames
-                          ? AppStrings.lessonPrivateLabel
-                          : NameUtils.givenName(lesson.studentName),
-                      style: AppTypography.captionXSmall.copyWith(
-                        fontWeight:
-                            isOverlapWithHighlight
-                                ? FontWeight.w600
-                                : isPreview
-                                ? FontWeight.w400
-                                : FontWeight.w500,
-                        color: textColor,
-                      ),
-                      overflow: TextOverflow.clip,
-                      maxLines: 1,
-                    ),
+              shouldShowLabel
+                  ? _buildCenteredGridLabel(
+                    isHighlightStart
+                        ? AppStrings.preferredSlotLabel
+                        : hideStudentNames
+                        ? AppStrings.lessonPrivateLabel
+                        : NameUtils.givenName(lesson.studentName),
+                    style:
+                        isHighlightStart
+                            ? AppTypography.captionXSmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.paperAccent,
+                            )
+                            : NotebookTypography.hand.copyWith(
+                              fontWeight:
+                                  isOverlapWithHighlight
+                                      ? FontWeight.w700
+                                      : isPreview
+                                      ? FontWeight.w400
+                                      : FontWeight.w700,
+                              color: textColor,
+                            ),
+                    verticalOffset: isHighlightStart ? 0 : 1,
                   )
                   : null,
         ),
@@ -338,34 +396,19 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         height: height,
         decoration: BoxDecoration(
           color: AppColors.paperOk.withValues(alpha: 0.15),
-          border: Border(
-            top:
-                isStart
-                    ? BorderSide(
-                      color: AppColors.paperOk.withValues(alpha: 0.6),
-                      width: 2,
-                    )
-                    : BorderSide.none,
-            left: BorderSide(
-              color: AppColors.paperOk.withValues(alpha: 0.3),
-              width: 1,
-            ),
-            right: BorderSide(
-              color: AppColors.paperOk.withValues(alpha: 0.3),
-              width: 1,
-            ),
+          border: _cellBorder(
+            color: AppColors.paperOk.withValues(alpha: 0.45),
+            includeTop: includeTopBoundary || isStart,
+            includeLeft: includeLeftBoundary,
           ),
         ),
         child:
             isStart
-                ? Padding(
-                  padding: const EdgeInsets.only(left: 2, top: 1),
-                  child: Text(
-                    AppStrings.preferredSlotLabel,
-                    style: AppTypography.captionXSmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.paperOk,
-                    ),
+                ? _buildCenteredGridLabel(
+                  AppStrings.preferredSlotLabel,
+                  style: AppTypography.captionXSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.paperOk,
                   ),
                 )
                 : null,
@@ -380,7 +423,11 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         height: height,
         decoration: BoxDecoration(
           color: AppColors.paperAccentSoft,
-          border: Border.all(color: AppColors.paperAccent, width: 1),
+          border: _cellBorder(
+            color: AppColors.paperAccent,
+            includeTop: includeTopBoundary,
+            includeLeft: includeLeftBoundary,
+          ),
         ),
         child: Center(
           child: Text(
@@ -419,9 +466,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         decoration: BoxDecoration(
           color:
               isPast ? AppColors.inkQuaternary.withValues(alpha: 0.15) : null,
-          border: Border.all(
-            color: AppColors.inkQuaternary.withValues(alpha: 0.3),
-            width: 1,
+          border: _cellBorder(
+            includeTop: includeTopBoundary,
+            includeLeft: includeLeftBoundary,
           ),
         ),
       ),
