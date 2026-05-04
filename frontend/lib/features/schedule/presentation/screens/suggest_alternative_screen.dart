@@ -216,11 +216,8 @@ class _SuggestAlternativeScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.inkQuaternary.withValues(alpha: 0.3),
-            width: 0.5,
-          ),
+        border: const Border(
+          bottom: BorderSide(color: AppColors.inkQuaternary),
         ),
       ),
       child: Column(
