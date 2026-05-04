@@ -9,7 +9,7 @@
 | `interview/` | 인터뷰 전사 (`{YYYY-MM-DD}-{feature}.md`) | Feature 별 |
 | `spec/` | 공식 스펙 (`{YYYY-MM-DD}-{feature}.md`) | Feature 별 |
 | `harness/` | 품질 계약 (`current.md`: 린팅/테스팅/아키텍처 규칙) | 프로젝트 전역 |
-| `knowledge/` | 재사용 가능한 기술 지식 스니펫 | 무기한 |
+| `knowledge/` | 재사용 가능한 기술 지식 + **`glossary.md` (유비쿼터스 언어 SSOT)** | 무기한 |
 | `journal/` | 개발 활동 일지 (`{YYYY-MM-DD}.md`) | 날짜별 |
 | `steer/` | Steer 메시지 inbox/processed | 일시적 |
 | `visuals/` | 아키텍처 다이어그램, UI 목업 | Feature 별 |

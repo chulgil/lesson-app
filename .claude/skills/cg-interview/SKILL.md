@@ -45,6 +45,11 @@ description: Phase 1 — 새 feature 에 대해 사용자를 인터뷰하여 요
 - 새 엔티티:
 - 기존 스키마 변경:
 
+## 도메인 용어 (Ubiquitous Language)
+- 이 feature 에서 새로 등장하는 용어:
+- 기존 glossary 와 충돌하는 용어:
+- FE-BE 명칭 (신규 엔티티는 반드시 동일 이름):
+
 ## 통합 포인트
 - 외부 API:
 - 내부 서비스:
@@ -68,6 +73,7 @@ description: Phase 1 — 새 feature 에 대해 사용자를 인터뷰하여 요
 2. **예/아니오가 아닌 개방형 질문** 선호
 3. **추정 대신 확인**: "사용자가 이걸 원할 것 같다" → "확인해주세요: ..."
 4. 기술 용어가 등장하면 `mcp__context7__` 로 공식 문서 확인 (인터뷰에 신뢰도 기록)
+5. **새 도메인 용어가 등장하면 `.harness/knowledge/glossary.md` 를 먼저 확인** — 기존 용어와 동의어이면 기존 용어 사용, 새 개념이면 glossary 에 후보로 기록
 
 ## Ambiguity Score (수치 게이트)
 
@@ -105,4 +111,5 @@ Ambiguity Score: 0.15 / 1.0 [PASS]
 ## 완료 조건
 
 - **Ambiguity Score ≤ 0.20**
+- **glossary diff 완료**: 신규 용어가 `.harness/knowledge/glossary.md` 에 반영됨
 - 사용자 명시적 승인
