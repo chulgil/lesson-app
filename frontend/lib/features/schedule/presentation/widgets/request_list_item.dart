@@ -109,7 +109,7 @@ class RequestListItem extends StatelessWidget {
         // Line 2: name · instrument · level
         Text(
           '$_displayName · ${request.instrument} · ${request.experience.label}',
-          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -130,7 +130,7 @@ class RequestListItem extends StatelessWidget {
 
     return Text(
       '$source · ${request.typeDisplayLabel}',
-      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+      style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -142,7 +142,7 @@ class RequestListItem extends StatelessWidget {
     if (slots.isEmpty) {
       return Text(
         AppStrings.noTimeSpecified,
-        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
       );
     }
 
@@ -164,7 +164,7 @@ class RequestListItem extends StatelessWidget {
             firstSlot.displayLabel,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
@@ -175,7 +175,7 @@ class RequestListItem extends StatelessWidget {
             AppStrings.slotsRemaining(remaining),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ],
@@ -202,7 +202,7 @@ class RequestListItem extends StatelessWidget {
           decoration: BoxDecoration(color: color.withValues(alpha: 0.12)),
           child: Text(
             label,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
               color: color,
             ),
@@ -211,7 +211,7 @@ class RequestListItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           formatRelativeTime(request.createdAt),
-          style: AppTypography.caption.copyWith(
+          style: AppTypography.bodySmall.copyWith(
             color: urgent ? AppColors.paperAccent : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),

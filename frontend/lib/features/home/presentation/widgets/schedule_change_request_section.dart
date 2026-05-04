@@ -70,10 +70,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                       onTap:
                           displayRequests[i].subscriptionId != null
                               ? () => context.push(
-                                AppRoutes.subscriptionDetail.replaceFirst(
-                                  ':id',
-                                  displayRequests[i].subscriptionId!,
-                                ),
+                                _subscriptionDetailRoute(displayRequests[i]),
                                 extra: {'viewerRole': 'teacher'},
                               )
                               : null,
@@ -151,7 +148,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
       padding: const EdgeInsets.only(left: AppSpacing.space2),
       child: Text(
         parts.join(' · '),
-        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }
@@ -187,6 +184,15 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
               : null,
     );
   }
+}
+
+String _subscriptionDetailRoute(RequestEvent event) {
+  final route = AppRoutes.subscriptionDetail.replaceFirst(
+    ':id',
+    event.subscriptionId!,
+  );
+  if (event.sessionNumber == null) return route;
+  return '$route?session=${event.sessionNumber}';
 }
 
 /// List item for schedule change requests — same layout as RequestListItem.
@@ -278,7 +284,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
         // Line 2: session + type
         Text(
           _descriptionText,
-          style: AppTypography.bodySmall.copyWith(
+          style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkSecondary,
           ),
           maxLines: 1,
@@ -303,7 +309,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
           ),
           child: Text(
             _statusLabel,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.bodySmall.copyWith(
               color: _statusColor,
               fontWeight: FontWeight.w600,
             ),
@@ -313,7 +319,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
         // Elapsed time
         Text(
           formatRelativeTime(event.createdAt),
-          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
