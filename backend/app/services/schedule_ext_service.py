@@ -113,7 +113,7 @@ class ScheduleExtService:
     # -----------------------------------------------------------------------
 
     async def create_group_booking(self, data: dict) -> Any:
-        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
+        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
 
         schedule = await self.db.get(GroupClassSchedule, data["schedule_id"])
         if schedule is None:

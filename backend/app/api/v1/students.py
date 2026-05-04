@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from app.core.deps import get_current_student, get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
-from app.schemas.common import PaginatedResponse, SuccessResponse
+from app.schemas.common import PaginatedResponse
 from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentSummaryResponse, StudentUpdate
 from app.services.student_service import StudentService
 

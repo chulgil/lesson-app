@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import date
 
-from sqlalchemy import Date, DateTime, Index, Integer, JSON, String, Text, func
+from sqlalchemy import Date, Index, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin

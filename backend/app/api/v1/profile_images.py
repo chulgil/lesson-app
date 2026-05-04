@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
-from app.schemas.common import SuccessResponse
 from app.schemas.profile_image import ProfileImageDeleteResponse, ProfileImageUploadResponse
 from app.services.profile_image_service import ProfileImageService
 
@@ -86,7 +85,6 @@ async def _update_profile_image(
 ) -> None:
     """Update profile_image_url in the appropriate table."""
     if entity_type == "teacher":
-        from sqlalchemy import select
         from app.models.user import User as UserModel
         user = await db.get(UserModel, current_user.id)
         if user:

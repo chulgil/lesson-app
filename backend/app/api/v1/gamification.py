@@ -11,7 +11,6 @@ from app.core.deps import get_current_teacher, get_current_user, get_db
 from app.models.user import User
 from app.schemas.gamification import (
     AwardPointsRequest,
-    BadgeResponse,
     PointHistoryResponse,
     StudentGamificationResponse,
 )

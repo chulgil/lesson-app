@@ -1,7 +1,6 @@
 import enum
-from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import Boolean, Enum, Index, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
