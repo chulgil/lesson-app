@@ -12,7 +12,7 @@ class StudentGroup {
   });
 
   String get title => lessonClass?.name ?? '미분류';
-  String get icon => lessonClass?.icon ?? '📋';
+  String get icon => lessonClass?.icon ?? '○';
   int get count => students.length;
   LessonClassType? get classType => lessonClass?.type;
 }

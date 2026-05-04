@@ -15,7 +15,7 @@ import '../providers/student_roster_summary_provider.dart';
 /// - 각 칸 탭 시 [onFilterSelected] 콜백으로 해당 카테고리 ID 전달
 /// - 카운트 0 → disabled (grey, non-clickable, 공간 유지)
 /// - Notebook × Score 각진 원칙 (BorderRadius.zero, strokeAlignInside)
-/// - 3색 semantic (paperAccent / paperHighlight / paperOk)
+/// - 단일색 ink (Notebook 통일성 — 색상 과다 사용 방지)
 enum RosterTriageCategory { expiring, unpaid, trial }
 
 class RosterTriageBanner extends ConsumerWidget {
@@ -48,7 +48,7 @@ class RosterTriageBanner extends ConsumerWidget {
           child: _TriageCard(
             label: '만료임박',
             count: summary.expiringCount,
-            accent: AppColors.paperAccent,
+            accent: AppColors.ink,
             onTap:
                 summary.expiringCount > 0
                     ? () => onFilterSelected(
@@ -63,7 +63,7 @@ class RosterTriageBanner extends ConsumerWidget {
           child: _TriageCard(
             label: '입금대기',
             count: summary.unpaidCount,
-            accent: AppColors.paperHighlight,
+            accent: AppColors.ink,
             onTap:
                 summary.unpaidCount > 0
                     ? () => onFilterSelected(
@@ -78,7 +78,7 @@ class RosterTriageBanner extends ConsumerWidget {
           child: _TriageCard(
             label: '체험중',
             count: summary.trialCount,
-            accent: AppColors.paperOk,
+            accent: AppColors.ink,
             onTap:
                 summary.trialCount > 0
                     ? () => onFilterSelected(
@@ -141,7 +141,7 @@ class _TriageCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: AppTypography.caption.copyWith(color: labelColor),
+              style: AppTypography.bodySmall.copyWith(color: labelColor),
             ),
           ],
         ),

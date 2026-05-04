@@ -431,7 +431,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: SafeArea(
               top: false,
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -463,6 +464,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     );
                   }),
                 ],
+              ),
               ),
             ),
           ),
