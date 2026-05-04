@@ -52,8 +52,19 @@ grep -rn "class [A-Z]" backend/app/models/*.py | \
 - `.harness/spec/` 작업 스펙은 Phase 6 PASS 후 `docs/specs/` 마스터에 머지
 - glossary는 양쪽 모두의 SSOT — 마스터 스펙과 작업 스펙 모두 glossary 용어를 사용
 
+## 두 glossary 파일 동기화
+
+| 파일 | 역할 | 수정 |
+|------|------|------|
+| `.harness/knowledge/glossary.md` | **SSOT** (전 도메인 + FE-BE 매핑) | 여기만 직접 수정 |
+| `docs/specs/glossary.md` | 사용자 열람용 (관계/역할/UX 용어) | SSOT에서 관련 섹션 복사 |
+
+- **동기화 시점**: `.harness/knowledge/glossary.md`에 신규 용어 추가 시, `docs/specs/glossary.md`의 해당 섹션도 같은 커밋에서 갱신
+- **방향**: `.harness/` → `docs/` (단방향). `docs/specs/glossary.md`를 직접 수정하지 말 것
+- **범위**: `docs/specs/glossary.md`는 관계/역할/UX 중심 (사용자 열람), `.harness/` 쪽은 FE-BE 매핑 포함 (개발자 전용)
+
 ## 금지
 
 - glossary에 없는 용어로 새 엔티티/enum 생성
 - FE-BE 클래스명을 다르게 만들기 (역사적 불일치 6건 외)
-- `docs/specs/glossary.md`를 직접 수정 — `.harness/knowledge/glossary.md`가 SSOT, docs 쪽은 동기화 대상
+- `docs/specs/glossary.md`를 `.harness/knowledge/glossary.md` 보다 먼저 수정

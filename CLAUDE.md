@@ -1,6 +1,6 @@
 # CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-04-28
+> 마지막 업데이트: 2026-05-04
 
 음악 레슨/연습 관리 앱 — Flutter 3.29.0, Riverpod, Go Router, Hive | Clean Architecture + Feature-based
 
@@ -8,13 +8,26 @@
 
 ```
 lesson-app/
-├── docs/                    # 요구사항, 스펙, 스키마, 아키텍처
-├── backend/                 # FastAPI (개발 예정)
+├── docs/                    # 요구사항, 스펙(영구 마스터), 스키마, 아키텍처
+├── .harness/                # cg-harness 7-Phase 워크플로우 (.harness/README.md 참조)
+├── backend/                 # FastAPI
 ├── frontend/lib/
 │   ├── core/                # 공통 (audio/, router/, widgets/, theme/, utils/)
 │   └── features/[domain]/   # 기능별 모듈
 └── frontend/ios/Runner/     # iOS 네이티브 (MetronomePlugin 등)
 ```
+
+### cg-harness (`.harness/`)
+
+새 feature는 7-Phase 워크플로우로 진행: `/new-feature` 또는 `/phase N`
+
+```
+Phase 0: brownfield-scan → Phase 1: interview → Phase 2: spec
+→ Phase 3: visuals → Phase 4: decomposition → Phase 5: execution → Phase 6: evaluation
+```
+
+- 스펙 체계: `docs/specs/` (영구 마스터) ↔ `.harness/spec/` (feature 작업 스펙 → Phase 6 후 마스터에 머지)
+- 유비쿼터스 언어: `.harness/knowledge/glossary.md` (SSOT)
 
 > **⚠️ 새 코드는 반드시 `features/[domain]/` 아래에 작성** → [상세 아키텍처](docs/architecture.md)
 
@@ -57,6 +70,7 @@ flutter analyze                                              # 분석
 | `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
 | `scenario-testing.md` | 백엔드 시나리오 테스트 규칙 |
 | `seed-data.md` | 백엔드 시드 데이터 자동 감지/실행 규칙 |
+| `glossary-sync.md` | 유비쿼터스 언어 강제 (glossary SSOT + FE-BE 명칭 일치) |
 
 ## 검증 에이전트 (`.claude/agents/`)
 

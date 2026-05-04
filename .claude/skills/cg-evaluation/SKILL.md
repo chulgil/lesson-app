@@ -37,9 +37,9 @@ description: Phase 6 — 독립된 3-critic 평가 (code / test / e2e). Oracle P
 
 | 순서 | 명령 | 실패 시 |
 |---|---|---|
-| 1 | `build` (예: `uv run python -m compileall -q src/`) | 즉시 중단. 빌드 오류 사용자 보고 |
-| 2 | `lint` (예: `uv run ruff check src tests`) | 즉시 중단. 린트 위반 목록 출력 |
-| 3 | `test` (예: `uv run pytest tests/ -x -q`) | 즉시 중단. 실패 테스트 요약 |
+| 1 | `lint` (예: `flutter analyze`, `ruff check`) | 즉시 중단. 린트 위반 목록 출력 |
+| 2 | `test` (예: `flutter test`, `pytest -x -q`) | 즉시 중단. 실패 테스트 요약 |
+| 3 | `build` (예: `flutter build`, `compileall`) | 즉시 중단. 빌드 오류 사용자 보고 |
 | 4 | 타임아웃: `timeout = 600` | 시간 초과 = 실패 처리 |
 
 모두 exit 0 → Stage 2 (Critic 1~3) 진행.

@@ -58,6 +58,7 @@ Refs: .harness/spec/{YYYY-MM-DD}-{feature}.md#J1
 
 - **surgical changes**: 요청된 것만 변경. 주변 리팩토링 금지.
 - **커밋 단위 = 검증 단위**: 커밋 전에 반드시 로컬 검증.
+- **glossary 일치**: 새 클래스명/변수명이 `.harness/knowledge/glossary.md` 의 영문명과 일치하는지 확인. 불일치 시 glossary 를 먼저 갱신 후 코드 작성.
 - **Journal 은 간결하게**: 무엇을 했고, 무슨 결정을 했는지 3-5줄.
 
 ## 경량 모드 — PGE (Plan-Generate-Evaluate)
