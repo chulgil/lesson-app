@@ -164,7 +164,7 @@ class _ScheduleWeeklyGridViewState
         7;
     const cellHeight = 28.0;
     final totalGridRows = endHour - startHour + 1;
-    final gridHeight = totalGridRows * cellHeight * 2;
+    final gridHeight = totalGridRows * cellHeight * 2 + 0.5;
 
     // No day headers here — CompactWeekStrip already shows days
 
@@ -266,8 +266,17 @@ class _ScheduleWeeklyGridViewState
       height: gridHeight,
       child: Stack(
         children: [
-          // Grid content
-          Column(children: gridRows),
+          // Grid content + bottom line
+          Column(
+            children: [
+              ...gridRows,
+              Container(
+                height: 0.5,
+                margin: EdgeInsets.only(left: _weeklyGridTimeColumnWidth),
+                color: AppColors.scheduleWeeklyGridLine,
+              ),
+            ],
+          ),
           // §7.123 — 휴가/휴무 라벨 칩 (컬럼 상단)
           ..._buildRestChips(restKinds, cellWidth),
           // Now indicator (red line on today's column)
