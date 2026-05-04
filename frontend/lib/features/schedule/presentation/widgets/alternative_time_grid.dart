@@ -340,8 +340,8 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
 
       return CustomPaint(
         painter:
-            (isPreview || isOverlapWithHighlight) && isStart
-                ? _DashedTopBorderPainter(color: accentColor, width: 2)
+            (isPreview || isOverlapWithHighlight)
+                ? _DashedLeftBorderPainter(color: accentColor, width: 2)
                 : null,
         child: Container(
           width: width,
@@ -351,10 +351,11 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
             border:
                 !isPreview && !isOverlapWithHighlight
                     ? Border(
-                      top:
-                          isStart
-                              ? BorderSide(color: accentColor, width: 1)
-                              : BorderSide.none,
+                      left: BorderSide(
+                        color: accentColor,
+                        width: 2,
+                        strokeAlign: BorderSide.strokeAlignInside,
+                      ),
                     )
                     : null,
           ),
@@ -551,11 +552,11 @@ class PreferredTimeSlotHighlight {
 }
 
 /// Dashed top border painter for preview lessons.
-class _DashedTopBorderPainter extends CustomPainter {
+class _DashedLeftBorderPainter extends CustomPainter {
   final Color color;
   final double width;
 
-  _DashedTopBorderPainter({required this.color, required this.width});
+  _DashedLeftBorderPainter({required this.color, required this.width});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -565,16 +566,16 @@ class _DashedTopBorderPainter extends CustomPainter {
           ..strokeWidth = width
           ..style = PaintingStyle.stroke;
 
-    const dashWidth = 4.0;
+    const dashHeight = 4.0;
     const dashGap = 3.0;
-    double startX = 0;
-    while (startX < size.width) {
+    double startY = 0;
+    while (startY < size.height) {
       canvas.drawLine(
-        Offset(startX, width / 2),
-        Offset((startX + dashWidth).clamp(0, size.width), width / 2),
+        Offset(width / 2, startY),
+        Offset(width / 2, (startY + dashHeight).clamp(0, size.height)),
         paint,
       );
-      startX += dashWidth + dashGap;
+      startY += dashHeight + dashGap;
     }
   }
 

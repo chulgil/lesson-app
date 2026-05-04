@@ -114,6 +114,29 @@ Q: 이 색상은 무엇을 의미하나?
 
 **`NotebookTypography.sectionLabel`(13px)**: 대시보드 섹션 타이틀("레슨요청 · 14" 등). 이전 11px에서 13px으로 상향. uppercase + letterSpacing으로 시인성 확보.
 
+#### 1.2.4 스케줄 그리드 셀 타이포 + 레이아웃 규칙
+
+> 주간 스케줄 그리드와 일정비교 캘린더 셀에 적용되는 통일 규칙.
+
+**셀 border 패턴 (SSOT)**:
+- 레슨 셀: **좌측 2px accent border** (악기별 색상). 상단 border 금지.
+- preview 레슨: **좌측 2px dashed accent border**
+- 이동 셀: **좌측 2px travel accent border**
+
+**셀 내부 텍스트 (Notebook × Score)**:
+| 내용 | 폰트 | 크기 | 무게 |
+|------|------|------|------|
+| 학생 이름 | `NotebookTypography.hand` (Gaegu) | 12px | w700 |
+| 이동 라벨 | `NotebookTypography.hand` (Gaegu) | 11px | w700 |
+| 휴무 라벨 | `NotebookTypography.hand` (Gaegu) | 11px | w700 |
+| 선호 시간 라벨 | `AppTypography.captionXSmall` | 9px | w700 |
+
+**UX 근거**: 스케줄 그리드의 학생 이름/이동/휴무는 선생님이 글씨를 적어넣은 듯한 노트 메타포. Gaegu(손글씨)로 통일하여 Notebook × Score 시그니처를 강화.
+
+**적용 범위**:
+- `schedule_weekly_grid_view.dart` — 선생님 홈 주간 스케줄
+- `alternative_time_grid.dart` — 일정비교(대안 시간 제안) 화면
+
 #### 1.2.3 완료/취소 항목 디밍 규칙
 
 > 대시보드 리스트에서 "아직 해야 할 것"을 즉시 식별할 수 있어야 한다.

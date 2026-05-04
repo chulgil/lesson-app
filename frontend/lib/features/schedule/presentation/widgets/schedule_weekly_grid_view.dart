@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -299,9 +300,11 @@ class _ScheduleWeeklyGridViewState
           child: Center(
             child: Text(
               label,
-              style: AppTypography.captionSmall.copyWith(
+              style: NotebookTypography.hand.copyWith(
+                fontSize: 11,
                 color: AppColors.inkSecondary,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w700,
+                height: 1.0,
               ),
             ),
           ),
@@ -384,10 +387,11 @@ class _ScheduleWeeklyGridViewState
           alignment: Alignment.center,
           child: Text(
             '이동',
-            style: TextStyle(
+            style: NotebookTypography.hand.copyWith(
               color: AppColors.scheduleTravelAccent,
-              fontSize: 8,
-              fontWeight: FontWeight.w500,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              height: 1.0,
             ),
             maxLines: 1,
           ),
@@ -524,9 +528,11 @@ class _ScheduleWeeklyGridViewState
         alignment: Alignment.center,
         child: Text(
           shortName,
-          style: AppTypography.captionSmall.copyWith(
+          style: NotebookTypography.hand.copyWith(
+            fontSize: 12,
             color: colors.accent,
-            fontWeight: lesson.isPreview ? FontWeight.w400 : FontWeight.w600,
+            fontWeight: lesson.isPreview ? FontWeight.w400 : FontWeight.w700,
+            height: 1.0,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -573,7 +579,7 @@ class _ScheduleWeeklyGridViewState
       ),
       child: Text(
         '이번 주: ${lessons.length}레슨 · 총 $timeStr',
-        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         textAlign: TextAlign.center,
       ),
     );
