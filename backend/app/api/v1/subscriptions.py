@@ -241,6 +241,22 @@ async def create_subscription_event(
     return await service.add_event(subscription_id, body, current_user)
 
 
+@router.post(
+    "/{subscription_id}/renew",
+    response_model=SubscriptionProposalResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create renewal proposal (teacher only)",
+)
+async def create_renewal_proposal(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionProposalResponse:
+    """Create a renewal proposal linked to the expiring/expired subscription."""
+    service = SubscriptionService(db)
+    return await service.create_renewal_proposal(subscription_id, current_user)
+
+
 @router.patch(
     "/{subscription_id}/confirm-payment",
     response_model=SubscriptionResponse,

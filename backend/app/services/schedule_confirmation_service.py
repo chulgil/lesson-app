@@ -28,6 +28,30 @@ class ScheduleConfirmationService:
         """Teacher creates a schedule confirmation card for a student."""
         from app.models.policy import ScheduleConfirmationCard
 
+        # Validate proposed time doesn't conflict with existing bookings
+        if data.proposed_day is not None and data.proposed_time is not None:
+            import datetime as dt
+            from datetime import timedelta
+
+            base_date = dt.date.today()
+            proposed_day = int(data.proposed_day)
+            days_ahead = proposed_day - base_date.weekday()
+            if days_ahead <= 0:
+                days_ahead += 7
+            next_date = base_date + timedelta(days=days_ahead)
+
+            conflict = await self._check_time_conflict(
+                teacher_id=current_user.id,
+                scheduled_date=next_date,
+                scheduled_time=data.proposed_time,
+                duration=data.proposed_duration or 60,
+            )
+            if conflict:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="해당 시간에 이미 예약이 있습니다",
+                )
+
         card = ScheduleConfirmationCard(
             student_id=data.student_id,
             teacher_id=current_user.id,
@@ -150,17 +174,65 @@ class ScheduleConfirmationService:
 
         for i in range(count):
             scheduled_date = first_date + timedelta(weeks=i)
+            scheduled_time = card.proposed_time or "14:00"
+            duration = card.proposed_duration or 60
+
+            # Skip this date if teacher already has a booking at this time
+            conflict = await self._check_time_conflict(
+                teacher_id=card.teacher_id,
+                scheduled_date=scheduled_date,
+                scheduled_time=scheduled_time,
+                duration=duration,
+            )
+            if conflict:
+                continue
+
             booking = LessonBooking(
                 teacher_id=card.teacher_id,
                 student_id=card.student_id,
                 lesson_type=lesson_type,
                 scheduled_date=scheduled_date,
-                scheduled_time=card.proposed_time or "14:00",
-                duration=card.proposed_duration or 60,
+                scheduled_time=scheduled_time,
+                duration=duration,
                 instrument=card.instrument,
                 status="confirmed",
             )
             self.db.add(booking)
+
+    async def _check_time_conflict(
+        self,
+        teacher_id: str,
+        scheduled_date: Any,
+        scheduled_time: str,
+        duration: int,
+    ) -> bool:
+        """Check if teacher has an existing booking at this date/time."""
+        from app.models.schedule import LessonBooking
+
+        existing = await self.db.scalars(
+            select(LessonBooking).where(
+                LessonBooking.teacher_id == teacher_id,
+                LessonBooking.scheduled_date == scheduled_date,
+                LessonBooking.status.not_in(["cancelled", "expired"]),
+            )
+        )
+
+        new_start = self._time_to_minutes(scheduled_time)
+        new_end = new_start + duration
+
+        for booking in existing.all():
+            existing_start = self._time_to_minutes(booking.scheduled_time)
+            existing_end = existing_start + (booking.duration or 60)
+            if new_start < existing_end and new_end > existing_start:
+                return True
+
+        return False
+
+    @staticmethod
+    def _time_to_minutes(time_str: str) -> int:
+        """Convert 'HH:MM' to minutes since midnight."""
+        parts = time_str.split(":")
+        return int(parts[0]) * 60 + int(parts[1])
 
     async def _get_card_for_user(self, card_id: str, current_user: Any) -> Any:
         from app.models.policy import ScheduleConfirmationCard

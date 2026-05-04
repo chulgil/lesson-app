@@ -404,6 +404,53 @@ class SubscriptionService:
     # Proposals
     # ------------------------------------------------------------------
 
+    async def create_renewal_proposal(
+        self,
+        previous_subscription_id: str,
+        current_user: Any,
+        *,
+        initiator: str = "teacher",
+    ) -> SubscriptionProposalResponse:
+        """Create a renewal proposal linked to the expiring/expired subscription."""
+        from datetime import timedelta
+
+        from app.models.subscription import Subscription, SubscriptionProposal, SubscriptionTemplate
+
+        sub = await self.db.get(Subscription, previous_subscription_id)
+        if sub is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Subscription not found",
+            )
+
+        tid = await resolve_teacher_id(self.db, current_user.id)
+
+        # Find a matching active template by teacher + subscription type
+        template = await self.db.scalar(
+            select(SubscriptionTemplate).where(
+                SubscriptionTemplate.teacher_id == tid,
+                SubscriptionTemplate.type == sub.type,
+                SubscriptionTemplate.is_active == True,  # noqa: E712
+            ).limit(1)
+        )
+
+        proposal = SubscriptionProposal(
+            teacher_id=tid,
+            student_id=sub.student_id,
+            recommended_template_id=template.id if template else None,
+            is_renewal=True,
+            previous_subscription_id=previous_subscription_id,
+            renewal_initiator=initiator,
+            proposal_type="renewal",
+            status="pending",
+            expires_at=datetime.now(UTC) + timedelta(days=7),
+        )
+        self.db.add(proposal)
+        await self.db.flush()
+        await self.db.refresh(proposal)
+
+        return SubscriptionProposalResponse.model_validate(proposal)
+
     async def get_all_proposals(
         self,
         *,
