@@ -111,6 +111,11 @@ class SubscriptionUsageResponse(BaseModel):
     subscription_id: str
     lesson_id: str | None = None
     type: str | None = None
+    used_at: _dt.datetime | None = None
+    teacher_name: str | None = None
+    instrument: str | None = None
+    note: str | None = None
+    deducted: bool = True
     created_at: _dt.datetime | None = None
 
 
@@ -119,6 +124,8 @@ class SubscriptionUsageCreate(BaseModel):
 
     lesson_id: str | None = None
     type: str = "lesson"
+    note: str | None = None
+    deducted: bool = True
 
 
 class ConfirmPaymentRequest(BaseModel):
@@ -148,10 +155,18 @@ class SubscriptionTemplateResponse(BaseModel):
     name: str
     type: str | None = None
     lessons_count: int | None = None
+    lessons_per_month: int | None = None
+    duration_months: int | None = None
+    lesson_duration_minutes: int = 60
+    validity_days: int | None = None
     amount: int | None = None
     description: str | None = None
+    display_order: int = 0
+    reschedule_allowance: int = 2
     is_active: bool = True
+    is_auto_proposal_enabled: bool = False
     created_at: _dt.datetime | None = None
+    updated_at: _dt.datetime | None = None
 
 
 class SubscriptionTemplateCreate(BaseModel):
@@ -160,8 +175,15 @@ class SubscriptionTemplateCreate(BaseModel):
     name: str
     type: str | None = None
     lessons_count: int | None = None
+    lessons_per_month: int | None = None
+    duration_months: int | None = None
+    lesson_duration_minutes: int = 60
+    validity_days: int | None = None
     amount: int | None = None
     description: str | None = None
+    display_order: int = 0
+    reschedule_allowance: int = 2
+    is_auto_proposal_enabled: bool = False
 
 
 class SubscriptionTemplateUpdate(BaseModel):
@@ -170,8 +192,15 @@ class SubscriptionTemplateUpdate(BaseModel):
     name: str | None = None
     type: str | None = None
     lessons_count: int | None = None
+    lessons_per_month: int | None = None
+    duration_months: int | None = None
+    lesson_duration_minutes: int | None = None
+    validity_days: int | None = None
     amount: int | None = None
     description: str | None = None
+    display_order: int | None = None
+    reschedule_allowance: int | None = None
+    is_auto_proposal_enabled: bool | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +226,14 @@ class SubscriptionProposalResponse(BaseModel):
     confirmed_at: _dt.datetime | None = None
     subscription_id: str | None = None
     rejection_reason: str | None = None
+    proposal_type: str = "proposal"
+    is_renewal: bool = False
+    previous_subscription_id: str | None = None
+    renewal_initiator: str | None = None
+    is_auto_proposal: bool = False
+    is_app_transition: bool = False
+    discount_amount: int | None = None
+    discount_reason: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 

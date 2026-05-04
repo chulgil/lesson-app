@@ -148,6 +148,8 @@ class LessonResponse(BaseModel):
     feedback: str | None = None
     key_points: list[str] | None = None
     practice_tips: str | None = None
+    student_note: str | None = None
+    subscription_id: str | None = None
     location_name: str | None = None
     location_address: str | None = None
     created_at: _dt.datetime | None = None
@@ -164,6 +166,7 @@ class LessonCreate(BaseModel):
     duration: int = 60
     pieces: list[LessonPieceCreate] = []
     location_name: str | None = None
+    subscription_id: str | None = None
 
 
 class LessonUpdate(BaseModel):
