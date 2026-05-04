@@ -80,6 +80,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 SliverToBoxAdapter(
                   child: RosterTriageBanner(
                     onFilterSelected: _onTriageFilterSelected,
+                    selectedCategory: _selectedTriageCategory,
                   ),
                 ),
               SliverToBoxAdapter(child: _buildSearchBar()),
@@ -181,6 +182,16 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       _isSelectionMode = false;
       _selectedStudentIds.clear();
     });
+  }
+
+  /// Maps current StudentFilter to RosterTriageCategory for banner highlight.
+  RosterTriageCategory? get _selectedTriageCategory {
+    return switch (_currentFilter) {
+      StudentFilter.expiring => RosterTriageCategory.expiring,
+      StudentFilter.unpaid => RosterTriageCategory.unpaid,
+      StudentFilter.trial => RosterTriageCategory.trial,
+      _ => null,
+    };
   }
 
   /// Triage 배너 칸 탭 → 동일 필터가 이미 선택돼 있으면 해제, 아니면 적용.
@@ -384,35 +395,17 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           ),
           const SizedBox(width: AppSpacing.space2),
 
-          // 필터 버튼 (연습상태) → 바텀시트
+          // 필터 버튼 (연습상태) → 바텀시트. 활성 시 색상 변경만 (점 인디케이터 제거).
           IconButton(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  Icons.tune,
-                  color:
-                      hasActiveFilter
-                          ? AppColors.paperAccent
-                          : AppColors.inkSecondary,
-                ),
-                if (hasActiveFilter)
-                  Positioned(
-                    top: -2,
-                    right: -2,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: AppColors.paperAccent,
-                        borderRadius: BorderRadius.zero,
-                      ),
-                    ),
-                  ),
-              ],
+            icon: Icon(
+              Icons.tune,
+              color:
+                  hasActiveFilter
+                      ? AppColors.paperAccent
+                      : AppColors.inkSecondary,
             ),
             onPressed: _showPracticeFilterSheet,
-            tooltip: '연습상태 필터',
+            tooltip: AppStrings.studentFilterTitle,
           ),
         ],
       ),

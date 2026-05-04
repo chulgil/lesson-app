@@ -139,9 +139,8 @@ class AppRouter {
       ...subscriptionRoutes,
     ],
     errorBuilder:
-        (context, state) =>
-            NotebookScreenScaffold(
-              body: Center(child: Text('Page not found: ${state.uri}')),
-            ),
+        (context, state) => NotebookScreenScaffold(
+          body: Center(child: Text('Page not found: ${state.uri}')),
+        ),
   );
 }

@@ -39,8 +39,7 @@
 | 카드 표면 | `NotebookCard` | `core/widgets/notebook/notebook_surfaces.dart` | 직접 `Card(` 금지, 각진 paper 카드, `surfaceTintColor: Colors.transparent` |
 
 금지:
-- `backgroundColor` 없는 일반 `Scaffold` (Material 기본 surface 의존)
-- schedule/subscription/student_home/profile/lessons/students/practice/auth/onboarding/invite/follow/search/gamification/parent_home 및 supporting teacher utility 화면(analytics/home/notifications/settings)에서 직접 `Scaffold(` 호출. 이 범위는 아키텍처 테스트로 `NotebookScreenScaffold`/`NotebookDetailScaffold` 사용을 강제한다.
+- production UI에서 직접 `Scaffold(` 호출. 허용 범위는 `NotebookScreenScaffold`/`NotebookDetailScaffold` 구현 파일 내부뿐이다.
 - 직접 `Card(` 호출 (`NotebookCard` 사용)
 - 직접 `AlertDialog(` 호출. 신규/수정 코드는 `NotebookAlertDialog` 또는 `showNotebookDialog`를 사용한다.
 - `showModalBottomSheet` 직접 호출. 신규/수정 코드는 `showNotebookBottomSheet` 또는 `showNotebookModalBottomSheet`를 사용한다.
