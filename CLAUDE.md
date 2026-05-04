@@ -59,18 +59,41 @@ flutter analyze                                              # 분석
 
 | 파일 | 내용 |
 |------|------|
-| `workflow.md` | 작업 순서, 스펙 우선 개발, 완료 체크리스트 |
+| **워크플로우** | |
+| `workflow.md` | 7-Phase 작업 순서, 스펙 우선 개발, 완료 체크리스트 |
 | `doc-sync.md` | 코드 변경 시 스펙 문서 동기화 매핑 (훅 + 규칙 이중 안전장치) |
-| `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
-| `tech-patterns.md` | 기술 에러 패턴 (Provider/Mock/iOS/CRUD/레이아웃) |
-| `design-principles.md` | 아키텍처 설계 원칙 (SSOT/완전성/데이터모델) |
-| `data-privacy.md` | 개인정보 접근 규칙 (보안 격리) |
+| `glossary-sync.md` | 유비쿼터스 언어 강제 (glossary SSOT + FE-BE 명칭 일치) |
 | `issue-workflow.md` | 이슈 생성·라벨·브랜치·커밋 워크플로우 |
+| `git-workflow-v2.md` | PR/커밋/브랜치 규칙 |
+| **코딩 원칙** | |
+| `golden-principles.md` | 12가지 핵심 원칙 (TDD/Immutability/Surgical/증거기반 등) |
+| `coding-style.md` | Immutability, 파일 크기, 에러 처리 |
+| `design-principles.md` | 아키텍처 설계 원칙 (SSOT/완전성/데이터모델) |
+| `domain-linter.md` | 도메인 린�� — 파일명/클래스명/임포트/폴더 규칙 |
+| `interaction.md` | 가정 명시, 결론 우선, 불확실성 표현 |
+| **검증** | |
+| `verification.md` | 증거 기반 완료 (Iron Law + Red-Green 검증) |
+| `rubric-evaluation.md` | 4기준 자가평�� (완성도/견고성/일관성/간결성) |
+| `adaptive-quality.md` | 작업 난이도별 검증 강도 (ultra/balanced/fast) |
+| **UI/UX** | |
+| `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
+| `frontend-verify.md` | Playwright 스크린샷 기반 회귀 검증 |
+| **기술 가이드** | |
+| `tech-patterns.md` | 기술 에러 패턴 (Provider/Mock/iOS/CRUD/레이아웃) |
 | `metronome-guide.md` | 메트로놈 커스텀 플러그인 개발 지침 |
 | `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
+| `date-calculation.md` | 날짜/시간 계산 (LLM 산�� 금지, 시스템 도구 사용) |
+| **보안/프라이버시** | |
+| `security.md` | 보안 체크리스트, 시크릿 관리 |
+| `data-privacy.md` | 개인정보 접근 규칙 (보안 격리) |
+| **백엔드** | |
 | `scenario-testing.md` | 백엔드 시나리오 테스트 규칙 |
 | `seed-data.md` | 백엔드 시드 데이터 자동 감지/실행 규칙 |
-| `glossary-sync.md` | 유비쿼터스 언어 강제 (glossary SSOT + FE-BE 명칭 일치) |
+| **하네스 운영** | |
+| `skill-loading.md` | 2단��� 스킬 로딩 (토큰 절약) |
+| `subagent-output.md` | 서브에이전트 결과 포맷 (200단어 제한) |
+| `lore-commit.md` | git trailer 의사결정 기록 (directive/constraint/rejected) |
+| `hash-anchored-edit.md` | xxhash 기반 정밀 편집 (긴 파일 안전 수정) |
 
 ## 검증 에이전트 (`.claude/agents/`)
 

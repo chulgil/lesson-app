@@ -86,7 +86,7 @@ git log --since="180 days ago" --until="90 days ago" --grep="^Lore-directive:"
 ## 자동화 후속 (Wave 4 후보)
 
 - `.claude/hooks/check-lore-inline.sh` — 신규 spec/doc 추가 시 인라인 `**Lore-directive**:` 패턴 경고 (phase-log.md 제외)
-- `.claude/scripts/lore-context.sh <path>` — 특정 파일 영향권의 Lore trailer 자동 조회
+- Lore trailer 조회: `git log --grep="^Lore-" -- <path>` (기존 `.claude/scripts/lore-context.sh`는 삭제됨)
 
 ## 책임 분배
 
