@@ -10,17 +10,15 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../../features/home/presentation/widgets/lesson_request_section.dart';
 import '../../../../features/home/presentation/widgets/time_context_banner.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../../gamification/presentation/widgets/gamification_header.dart';
-import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
-import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
-import '../widgets/dashboard/dashboard_widgets.dart';
+import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
+import '../widgets/student_lesson_progress_section.dart';
 import '../widgets/student_subscription_summary.dart';
 
 /// Student Dashboard Tab - main home tab showing overview
@@ -224,37 +222,6 @@ class StudentDashboardTab extends ConsumerWidget {
   }
 }
 
-/// Shows pending schedule confirmation cards if any exist.
-class _ScheduleConfirmationSection extends ConsumerWidget {
-  final String studentId;
-
-  const _ScheduleConfirmationSection({required this.studentId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cardsAsync = ref.watch(
-      pendingScheduleConfirmationCardsProvider(studentId),
-    );
-
-    return cardsAsync.when(
-      data: (cards) {
-        if (cards.isEmpty) return const SizedBox.shrink();
-
-        return Column(
-          children: [
-            for (final card in cards) ...[
-              ScheduleConfirmationCardWidget(card: card),
-              const SizedBox(height: AppSpacing.space3),
-            ],
-          ],
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-}
-
 /// 학생용 시간대 인식 배너 (TimeContextBanner 래퍼).
 ///
 /// 오늘 레슨(studentBookings) + 연습 스트릭을 기반으로 메시지 생성.
@@ -307,10 +274,9 @@ class _StudentTimeBanner extends ConsumerWidget {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
-/// 학생용 이벤트 그룹 (4개 배너 시각 통합).
+/// 학생용 이벤트 그룹.
 ///
-/// 레슨 요청 + 갱신 + 제안 + 확인 카드를 하나의 그룹으로.
-/// 데이터 통합 X, 시각적 묶음만.
+/// 레슨 신청부터 수강권 준비, 첫 스케줄 확인까지 하나의 진행함으로 묶는다.
 class _StudentEventsGroup extends StatelessWidget {
   final String studentId;
 
@@ -318,14 +284,6 @@ class _StudentEventsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LessonRequestSection(userId: studentId, viewerRole: 'student'),
-        SubscriptionRenewalBanner(studentId: studentId),
-        PendingProposalsBanner(studentId: studentId),
-        _ScheduleConfirmationSection(studentId: studentId),
-      ],
-    );
+    return StudentLessonProgressSection(studentId: studentId);
   }
 }
