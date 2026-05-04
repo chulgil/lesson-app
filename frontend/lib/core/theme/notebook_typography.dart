@@ -125,12 +125,12 @@ class NotebookTypography {
   );
 
   /// 섹션 라벨 — 업퍼케이스 sans.
-  /// 예: "STUDENT · INSTRUMENT"
+  /// 예: "레슨요청 · 14", "스케줄변경요청 · 5"
   static TextStyle get sectionLabel => const TextStyle(
-    fontSize: 11,
-    fontWeight: FontWeight.w500,
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
     color: AppColors.inkSecondary,
-    letterSpacing: 1.5,
+    letterSpacing: 1.0,
   );
 
   /// 손글씨 본문 — Gaegu.

@@ -152,7 +152,7 @@ class TeacherSubscriptionSection extends ConsumerWidget {
       padding: const EdgeInsets.only(left: AppSpacing.space2),
       child: Text(
         parts.join(' · '),
-        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }

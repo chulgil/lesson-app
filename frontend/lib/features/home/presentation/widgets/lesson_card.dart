@@ -177,7 +177,7 @@ class LessonCard extends ConsumerWidget {
         final isAcademy = lessonClass.type == LessonClassType.academy;
         contextBadge = Text(
           isAcademy ? lessonClass.name : AppStrings.individualLesson,
-          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );

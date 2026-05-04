@@ -110,7 +110,9 @@ Q: 이 색상은 무엇을 의미하나?
 | 상태 라벨 (칩, 뱃지) | `bodySmall` | 12px | "확인 대기", "승인 필요" |
 | 메타 라벨 (소속, 유형) | `bodySmall` | 12px | "개인레슨 · 체험" |
 
-**`caption`(11px) 사용 제한**: 카드/리스트 아이템 본문에는 사용 금지. 캘린더 셀, 그리드 라벨 등 공간 제약이 극심한 경우에만 허용.
+**`caption`(11px) 사용 제한**: 카드/리스트 아이템 본문에는 사용 금지. 캘린더 셀, 그리드 라벨, 아바타 이니셜 등 공간 제약이 극심한 경우에만 허용.
+
+**`NotebookTypography.sectionLabel`(13px)**: 대시보드 섹션 타이틀("레슨요청 · 14" 등). 이전 11px에서 13px으로 상향. uppercase + letterSpacing으로 시인성 확보.
 
 #### 1.2.1 NotebookTypography — 자필·악보 시그니처 (Notebook × Score)
 
