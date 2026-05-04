@@ -764,7 +764,7 @@ enum StudentFilter {
   poor('부족'),
   paused('휴강'),
   expiring('만료임박'),
-  unpaid('입금대기'),
+  unpaid('입금 확인 대기'),
   trial('체험'),
   archive('보관');
 
@@ -1054,7 +1054,7 @@ class _StudentCard extends ConsumerWidget {
                   border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
-                  '입금대기',
+                  '입금 확인 대기',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
@@ -1066,33 +1066,6 @@ class _StudentCard extends ConsumerWidget {
           );
         }
 
-        final hasExpiring = subscriptions.any((s) => s.isExpiringSoon);
-        if (hasExpiring) {
-          return SizedBox(
-            width: 56,
-            child: GestureDetector(
-              onTap:
-                  () => context.push(
-                    '${AppRoutes.issueSubscription}?studentId=$studentId',
-                  ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft,
-                  border: Border.all(color: AppColors.paperAccent),
-                ),
-                child: Text(
-                  '갱신',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.paperAccent,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          );
-        }
         return SizedBox(
           width: 56,
           child: StudentSubscriptionMiniBadge(studentId: studentId),
@@ -1160,8 +1133,8 @@ class _PracticeDots extends ConsumerWidget {
 /// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.3
 ///
 /// 3가지 모드:
-/// - normal  : 진행 bar + D-day + [갱신 제안][레슨 추가]
-/// - expiring: D-day 강조 색상 + [갱신 제안][레슨 추가]
+/// - normal  : 진행 bar + D-day + [레슨 추가]
+/// - expiring: D-day 강조 색상 + [레슨 추가]
 /// - archive : 진행 bar 숨김 + "YYYY-MM-DD 만료" 메타 + [재등록 제안]
 class _EnrollmentExtras extends ConsumerWidget {
   final String studentId;
@@ -1256,17 +1229,6 @@ class _EnrollmentExtras extends ConsumerWidget {
           children: [
             if (daysLeft != null) _DdayChip(daysLeft: daysLeft),
             const Spacer(),
-            _InlineCta(
-              label: AppStrings.studentRenewalProposal,
-              onTap: () {
-                UnifiedSubscriptionSheet.show(
-                  context,
-                  teacherId: ref.read(currentUserIdProvider),
-                  studentIds: [studentId],
-                );
-              },
-            ),
-            const SizedBox(width: AppSpacing.space2),
             _InlineCta(
               label: AppStrings.studentAddLesson,
               onTap: () {

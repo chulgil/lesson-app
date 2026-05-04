@@ -187,20 +187,6 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.space2),
-
-        // One-tap renewal button
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed:
-                () => context.push(
-                  '${AppRoutes.issueSubscription}?studentId=$studentId',
-                ),
-            icon: const Icon(Icons.autorenew, size: 18),
-            label: const Text(AppStrings.issueSubscriptionButton),
-          ),
-        ),
         const SizedBox(height: AppSpacing.space3),
 
         // Subscription cards
@@ -213,10 +199,6 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
               onTap:
                   () => context.push(
                     AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),
-                  ),
-              onRenewalTap:
-                  () => context.push(
-                    '${AppRoutes.issueSubscription}?studentId=$studentId',
                   ),
             ),
           ),

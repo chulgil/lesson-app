@@ -8,7 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../providers/student_roster_summary_provider.dart';
 
-/// 수강 관리 탭 triage 배너 — 만료임박 / 입금대기 / 체험 3칸.
+/// 수강 관리 탭 triage 배너 — 만료임박 / 미수금 / 체험 3칸.
 ///
 /// 선택된 카드에 형광펜(paperHighlight) 배경으로 시각 피드백 제공.
 enum RosterTriageCategory { expiring, unpaid, trial }

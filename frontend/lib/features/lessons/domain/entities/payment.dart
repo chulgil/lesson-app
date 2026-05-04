@@ -28,7 +28,7 @@ enum PaymentType {
 
 /// Payment status enum (V2: state-transition based flow)
 enum PaymentStatus {
-  pending,    // 청구됨 (입금 대기)
+  pending,    // 청구됨 (미수금)
   paid,       // 입금됨 (학생/학부모가 입금 기록)
   confirmed,  // 확인 완료 (선생님이 입금 확인)
   overdue,    // 연체 (마감일 초과)

@@ -432,23 +432,20 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   /// Show a confirmation dialog when a time conflict is detected.
   /// Returns true if the user chooses to proceed.
   Future<bool> _showConflictDialog(String conflictStudentName) async {
-    final result = await showDialog<bool>(
+    final result = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.timeConflictTitle),
-            content: Text(AppStrings.timeConflictMessage(conflictStudentName)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(AppStrings.continueAction),
-              ),
-            ],
-          ),
+      title: AppStrings.timeConflictTitle,
+      content: Text(AppStrings.timeConflictMessage(conflictStudentName)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.continueAction),
+        ),
+      ],
     );
     return result ?? false;
   }

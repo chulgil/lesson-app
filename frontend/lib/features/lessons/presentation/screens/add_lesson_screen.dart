@@ -366,59 +366,54 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   /// Show confirmation dialog when saving a lesson with a past date/time.
   /// Explains that past lessons are saved as "completed" with subscription deduction.
   Future<bool> _showPastDateConfirmDialog() async {
-    final result = await showDialog<bool>(
+    final result = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: Row(
-              children: [
-                Icon(Icons.history, color: AppColors.paperAccent, size: 24),
-                const SizedBox(width: AppSpacing.space2),
-                const Text(AppStrings.pastLessonRecordTitle),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+      titleWidget: Row(
+        children: [
+          Icon(Icons.history, color: AppColors.paperAccent, size: 24),
+          const SizedBox(width: AppSpacing.space2),
+          const Text(AppStrings.pastLessonRecordTitle),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(AppStrings.pastTimeMessage),
+          const SizedBox(height: AppSpacing.space3),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(color: AppColors.paperDark),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(AppStrings.pastTimeMessage),
-                const SizedBox(height: AppSpacing.space3),
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(color: AppColors.paperDark),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppStrings.recordLessonChecklistHeader,
-                        style: AppTypography.bodySmall.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.ink,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.space1),
-                      Text(
-                        AppStrings.recordLessonChecklistItems,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.ink,
-                        ),
-                      ),
-                    ],
+                Text(
+                  AppStrings.recordLessonChecklistHeader,
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
                   ),
+                ),
+                const SizedBox(height: AppSpacing.space1),
+                Text(
+                  AppStrings.recordLessonChecklistItems,
+                  style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(AppStrings.lessonRecordTitle),
-              ),
-            ],
           ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.lessonRecordTitle),
+        ),
+      ],
     );
     return result ?? false;
   }
@@ -467,23 +462,20 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   /// Show a confirmation dialog when a time conflict is detected.
   /// Returns true if the user chooses to proceed.
   Future<bool> _showConflictDialog(String conflictInfo) async {
-    final result = await showDialog<bool>(
+    final result = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.timeConflictTitle),
-            content: Text(AppStrings.conflictDialogContent(conflictInfo)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(AppStrings.continueAction),
-              ),
-            ],
-          ),
+      title: AppStrings.timeConflictTitle,
+      content: Text(AppStrings.conflictDialogContent(conflictInfo)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.continueAction),
+        ),
+      ],
     );
     return result ?? false;
   }
@@ -757,41 +749,38 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
   /// Show conflict dialog for recurring lessons with multiple days.
   Future<bool> _showRecurringConflictDialog(List<String> conflictDays) async {
-    final result = await showDialog<bool>(
+    final result = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.recurringConflictTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(AppStrings.recurringConflictHeader),
-                const SizedBox(height: AppSpacing.space2),
-                ...conflictDays.map(
-                  (d) => Padding(
-                    padding: const EdgeInsets.only(left: 8, bottom: 4),
-                    child: Text(
-                      '• $d',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space2),
-                const Text(AppStrings.continueProgressQuestion),
-              ],
+      title: AppStrings.recurringConflictTitle,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(AppStrings.recurringConflictHeader),
+          const SizedBox(height: AppSpacing.space2),
+          ...conflictDays.map(
+            (d) => Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 4),
+              child: Text(
+                '• $d',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(AppStrings.continueAction),
-              ),
-            ],
           ),
+          const SizedBox(height: AppSpacing.space2),
+          const Text(AppStrings.continueProgressQuestion),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.continueAction),
+        ),
+      ],
     );
     return result ?? false;
   }

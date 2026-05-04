@@ -267,6 +267,69 @@ void main() {
     );
   });
 
+  test('schedule and subscription confirmation dialogs use Notebook dialog API', () {
+    final targetFiles = [
+      File(
+        'lib/features/schedule/presentation/screens/booking_cancel_screen.dart',
+      ),
+      File(
+        'lib/features/schedule/presentation/screens/booking_reschedule_screen.dart',
+      ),
+      File(
+        'lib/features/schedule/presentation/screens/weekly_schedule_screen.dart',
+      ),
+      File(
+        'lib/features/subscription/presentation/widgets/unified_subscription_sheet.dart',
+      ),
+    ];
+
+    final directDialogUsages = <String>[];
+    for (final file in targetFiles) {
+      final normalizedPath = file.path.replaceAll('\\', '/');
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        if (RegExp(r'showDialog(?:<.*>)?\(').hasMatch(lines[i])) {
+          directDialogUsages.add('$normalizedPath:${i + 1}');
+        }
+      }
+    }
+
+    expect(
+      directDialogUsages,
+      isEmpty,
+      reason:
+          'Confirmation dialogs in schedule/subscription flows should enter through showNotebookDialog.',
+    );
+  });
+
+  test('lesson confirmation dialogs use Notebook dialog API', () {
+    final targetFiles = [
+      File('lib/features/lessons/presentation/screens/add_lesson_screen.dart'),
+      File('lib/features/lessons/presentation/screens/edit_lesson_screen.dart'),
+      File(
+        'lib/features/lessons/presentation/widgets/lesson_detail/lesson_notes_widgets.dart',
+      ),
+    ];
+
+    final directDialogUsages = <String>[];
+    for (final file in targetFiles) {
+      final normalizedPath = file.path.replaceAll('\\', '/');
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        if (RegExp(r'showDialog(?:<.*>)?\(').hasMatch(lines[i])) {
+          directDialogUsages.add('$normalizedPath:${i + 1}');
+        }
+      }
+    }
+
+    expect(
+      directDialogUsages,
+      isEmpty,
+      reason:
+          'Lesson confirmation dialogs should enter through showNotebookDialog.',
+    );
+  });
+
   test('student home sheet widgets use Notebook bottom sheet API', () {
     final targetFiles = [
       File(

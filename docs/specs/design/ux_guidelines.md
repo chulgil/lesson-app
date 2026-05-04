@@ -167,7 +167,7 @@ Q: 이 색상은 무엇을 의미하나?
 |------|------|------|
 | `hand` | Gaegu 16 | **사람의 액션 산출물 일체**: 선생님 피드백 입력/표시, 학생 메모 입력/표시, 연습노트 본문, 곡 메모, 연습 과제 제목·설명, 레퍼토리·곡명 입력, 일괄 피드백 입력/미리보기 — TextField input style 도 포함 (§7.129, §7.130) |
 | `handOk` | Gaegu 13 / paperOk | 자필 완료 마크 ("✓ 보잉 좋음") |
-| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "입금대기") |
+| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "미수금") |
 | `pieceTitle` | Playfair w700 | 곡 제목, 카드 헤더 |
 | `sectionTitle` | Playfair italic | 섹션 헤더 |
 | `roman` / `romanActive` | Playfair italic | 로마숫자 인덱스 |
@@ -259,7 +259,7 @@ Q: 이 색상은 무엇을 의미하나?
 
 **근거**: 토스 홈 패턴 — 사용자 인지 부하 감소. 5가지 알림 동시 표시는 과부하.
 
-**Top 1 결정 우선순위**: 입금 확인 대기 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
+**Top 1 결정 우선순위**: 미수금 확인 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
 
 ### 2.6 Progressive Disclosure (점진적 공개)
 
@@ -437,11 +437,13 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 
 | 모드 | 파라미터 | 용도 | 특징 |
 |------|---------|------|------|
-| 티켓 | `compact: true` | 리스트 아이템, 홈 배너 | 1~2줄 요약, 잉크 색 좌측 액센트 라인 |
+| 티켓 | `compact: true` | 리스트 아이템, 홈 배너 | 1줄 요약 (학생명·악기), 잉크 색 좌측 액센트 라인. 수강 기간 표시 없음 |
 | 상세 | `compact: false` | 수강권 상세 화면 | 프로그레스바 포함, 전체 메타 표시 |
 
 - compact 헤더 배경색 제거됨 — paper 배경만 사용 (Notebook 평면 원칙)
+- compact 모드에서 수강 기간(예: 2026.02~07) 표시 삭제됨 — `_formatCompactPeriod` 메서드 제거
 - 헤더 액센트 라인 및 프로그레스바 색상은 수강권 타입에 따라 3색 잉크 토큰 자동 매핑
+- 갱신 제안 수동 UI 삭제됨 — `onRenewalTap` 파라미터 제거. 갱신 제안은 `AutoProposalService`/`ProposalReminderService`/`SubscriptionRenewalService`가 자동 처리
 
 #### 6.1.3 잔여/만료 경고
 
@@ -520,3 +522,4 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 2026-04-16 | 긴급 알림 Top 1 정책, Progressive Disclosure 원칙, 스파크라인 가이드라인 추가 (§2.5~2.7) |
 | 2026-05-04 | **Notebook x Score 팔레트 마이그레이션 반영** — 레거시 토큰(primary/success/warning/error/info/surfaceLight/borderLight/textPrimaryLight 등) 제거, Notebook 팔레트(paper/ink/paperAccent/paperOk) 기준으로 전면 갱신. 카드·버튼·뱃지·칩·긴급도 색상 규칙 모두 현행 코드와 동기화. 버튼 BorderRadius.zero 시그니처 반영 |
 | 2026-05-04 | **수강권 3색 잉크 체계 추가** — `paperTrial`/`paperTrialSoft` 토큰, §6.1 수강권 카드 섹션에 3색 잉크 체계(trial=세피아, monthly=녹색, package=버밀리온) 및 `SubscriptionCard(compact)` 통합 문서화 |
+| 2026-05-05 | **"입금대기" → "미수금" 용어 변경** — 선생님 관점 능동적 표현으로 통일 (업계 표준). indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |

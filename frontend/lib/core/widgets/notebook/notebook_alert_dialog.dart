@@ -187,7 +187,8 @@ class NotebookAlertDialog extends StatelessWidget {
 /// Returns the dialog result (null if dismissed).
 Future<T?> showNotebookDialog<T>({
   required BuildContext context,
-  required String title,
+  String? title,
+  Widget? titleWidget,
   Widget? content,
   String? message,
   VoidCallback? onConfirm,
@@ -196,11 +197,16 @@ Future<T?> showNotebookDialog<T>({
   VoidCallback? onCancel,
   bool isDestructive = false,
   Color? confirmColor,
+  List<Widget>? actions,
   bool barrierDismissible = true,
 }) {
   assert(
     content != null || message != null,
     'Either content or message must be provided.',
+  );
+  assert(
+    title != null || titleWidget != null,
+    'Either title or titleWidget must be provided.',
   );
 
   return showDialog<T>(
@@ -209,6 +215,7 @@ Future<T?> showNotebookDialog<T>({
     builder:
         (_) => NotebookAlertDialog(
           title: title,
+          titleWidget: titleWidget,
           content: content ?? Text(message!),
           onConfirm: onConfirm ?? () => Navigator.of(context).pop(true),
           confirmLabel: confirmLabel,
@@ -216,6 +223,7 @@ Future<T?> showNotebookDialog<T>({
           onCancel: onCancel,
           isDestructive: isDestructive,
           confirmColor: confirmColor,
+          actions: actions,
         ),
   );
 }

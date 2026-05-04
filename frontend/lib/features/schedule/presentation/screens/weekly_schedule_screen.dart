@@ -456,24 +456,21 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }
 
   Future<void> _confirmDelete(WeeklySchedule schedule) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.deleteScheduleTitle,
-            content: Text(
-              AppStrings.deleteScheduleConfirm(
-                dayName: schedule.dayName,
-                startTime: schedule.startTime,
-                endTime: schedule.endTime,
-              ),
-            ),
-            cancelLabel: AppStrings.cancel,
-            onCancel: () => Navigator.of(context).pop(false),
-            confirmLabel: AppStrings.delete,
-            isDestructive: true,
-            onConfirm: () => Navigator.of(context).pop(true),
-          ),
+      title: AppStrings.deleteScheduleTitle,
+      content: Text(
+        AppStrings.deleteScheduleConfirm(
+          dayName: schedule.dayName,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+        ),
+      ),
+      cancelLabel: AppStrings.cancel,
+      onCancel: () => Navigator.of(context).pop(false),
+      confirmLabel: AppStrings.delete,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
     );
 
     if (confirmed == true && mounted) {

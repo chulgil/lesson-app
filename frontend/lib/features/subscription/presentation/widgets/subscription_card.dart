@@ -34,9 +34,6 @@ class SubscriptionCard extends StatelessWidget {
   /// Default: 7 (alert when 7 or fewer days remain).
   final int renewalAlertDays;
 
-  /// Callback when renewal button is tapped.
-  final VoidCallback? onRenewalTap;
-
   const SubscriptionCard({
     super.key,
     required this.subscription,
@@ -48,7 +45,6 @@ class SubscriptionCard extends StatelessWidget {
     this.personName,
     this.renewalAlertThreshold = 1,
     this.renewalAlertDays = 7,
-    this.onRenewalTap,
   });
 
   @override
@@ -210,19 +206,8 @@ class SubscriptionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (subscription.startDate != null &&
-                  subscription.endDate != null)
-                Text(
-                  _formatCompactPeriod(
-                    subscription.startDate!,
-                    subscription.endDate!,
-                  ),
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space2,
@@ -309,10 +294,6 @@ class SubscriptionCard extends StatelessWidget {
       return '$instrument $className';
     }
     return className ?? instrument ?? subscription.typeLabel;
-  }
-
-  String _formatCompactPeriod(DateTime start, DateTime end) {
-    return '${start.year}.${start.month.toString().padLeft(2, '0')}~${end.month.toString().padLeft(2, '0')}';
   }
 
   // ─── Full (detail) layout ─────────────────────────────────────

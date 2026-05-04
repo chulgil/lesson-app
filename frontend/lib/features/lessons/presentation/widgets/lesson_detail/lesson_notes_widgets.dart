@@ -659,48 +659,40 @@ class RecordingsEmptyState extends StatelessWidget {
 
 /// Show cancel lesson confirmation dialog
 Future<bool?> showCancelLessonConfirmation(BuildContext context) {
-  return showDialog<bool>(
+  return showNotebookDialog<bool>(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.actionLessonCancel),
-          content: const Text(AppStrings.cancelLessonConfirm),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(AppStrings.no),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(AppStrings.cancelRequestAction),
-            ),
-          ],
-        ),
+    title: AppStrings.actionLessonCancel,
+    content: const Text(AppStrings.cancelLessonConfirm),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context, false),
+        child: const Text(AppStrings.no),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, true),
+        child: const Text(AppStrings.cancelRequestAction),
+      ),
+    ],
   );
 }
 
 /// Show delete lesson confirmation dialog
 Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
-  return showDialog<bool>(
+  return showNotebookDialog<bool>(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.deleteLessonTitle),
-          content: const Text(AppStrings.deleteLessonConfirm),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(AppStrings.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.delete),
-            ),
-          ],
-        ),
+    title: AppStrings.deleteLessonTitle,
+    content: const Text(AppStrings.deleteLessonConfirm),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context, false),
+        child: const Text(AppStrings.cancel),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, true),
+        style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+        child: const Text(AppStrings.delete),
+      ),
+    ],
   );
 }
 
@@ -712,41 +704,38 @@ Future<String?> showEditPracticeTipDialog({
 }) async {
   final controller = TextEditingController(text: currentTip ?? '');
 
-  return showDialog<String?>(
+  return showNotebookDialog<String?>(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.editPracticeTipTitle),
-          content: TextField(
-            controller: controller,
-            maxLines: 4,
-            // 연습 팁 = 선생님 자필 → Tier 1 Gaegu hand
-            // (README §1.1.1, §7.129).
-            style: NotebookTypography.hand,
-            decoration: const InputDecoration(
-              hintText: AppStrings.editPracticeTipHint,
-              border: OutlineInputBorder(),
-            ),
+    title: AppStrings.editPracticeTipTitle,
+    content: TextField(
+      controller: controller,
+      maxLines: 4,
+      // 연습 팁 = 선생님 자필 → Tier 1 Gaegu hand
+      // (README §1.1.1, §7.129).
+      style: NotebookTypography.hand,
+      decoration: const InputDecoration(
+        hintText: AppStrings.editPracticeTipHint,
+        border: OutlineInputBorder(),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context, null),
+        child: const Text(AppStrings.cancel),
+      ),
+      if (hasTip)
+        TextButton(
+          onPressed: () => Navigator.pop(context, ''),
+          child: Text(
+            AppStrings.delete,
+            style: TextStyle(color: AppColors.paperAccent),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: const Text(AppStrings.cancel),
-            ),
-            if (hasTip)
-              TextButton(
-                onPressed: () => Navigator.pop(context, ''),
-                child: Text(
-                  AppStrings.delete,
-                  style: TextStyle(color: AppColors.paperAccent),
-                ),
-              ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text(AppStrings.save),
-            ),
-          ],
         ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, controller.text.trim()),
+        child: const Text(AppStrings.save),
+      ),
+    ],
   );
 }
 

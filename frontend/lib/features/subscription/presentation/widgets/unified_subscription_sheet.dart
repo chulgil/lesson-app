@@ -666,29 +666,26 @@ class _UnifiedSubscriptionSheetState
 
   Future<void> _showCustomLessonCountDialog() async {
     final controller = TextEditingController();
-    final result = await showDialog<int>(
+    final result = await showNotebookDialog<int>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.unifiedSubscriptionLessonCountDialogTitle,
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              autofocus: true,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                hintText: AppStrings.unifiedSubscriptionLessonCountHint,
-                suffixText: AppStrings.lessonsUnit,
-              ),
-            ),
-            cancelLabel: AppStrings.cancel,
-            onConfirm: () {
-              final value = int.tryParse(controller.text);
-              if (value != null && value > 0) {
-                Navigator.of(context).pop(value);
-              }
-            },
-          ),
+      title: AppStrings.unifiedSubscriptionLessonCountDialogTitle,
+      content: TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        autofocus: true,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          hintText: AppStrings.unifiedSubscriptionLessonCountHint,
+          suffixText: AppStrings.lessonsUnit,
+        ),
+      ),
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () {
+        final value = int.tryParse(controller.text);
+        if (value != null && value > 0) {
+          Navigator.of(context).pop(value);
+        }
+      },
     );
 
     controller.dispose();

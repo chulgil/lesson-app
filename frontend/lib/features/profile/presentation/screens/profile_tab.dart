@@ -581,7 +581,7 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('입금대기', unpaidValue),
+            _buildStatItem('입금 확인 대기', unpaidValue),
           ],
         ),
       ),

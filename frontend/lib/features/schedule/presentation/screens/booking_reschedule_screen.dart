@@ -470,40 +470,35 @@ class _BookingRescheduleScreenState
   Future<void> _handleReschedule(bool isLastChance) async {
     if (isLastChance) {
       // Show confirmation dialog for last chance
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showNotebookDialog<bool>(
         context: context,
-        builder:
-            (context) => NotebookAlertDialog(
-              title: AppStrings.bookingRescheduleLastChanceDialogTitle,
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.rescheduleUsageStatusWithColon(
-                      widget.totalReschedules - widget.remainingReschedules,
-                      widget.totalReschedules,
-                    ),
-                    style: AppTypography.bodyMedium,
-                  ),
-                  Text(
-                    AppStrings.rescheduleAfterChangeMarker(
-                      widget.totalReschedules,
-                    ),
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  const Text(AppStrings.rescheduleNoMoreAfter),
-                ],
+        title: AppStrings.bookingRescheduleLastChanceDialogTitle,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.rescheduleUsageStatusWithColon(
+                widget.totalReschedules - widget.remainingReschedules,
+                widget.totalReschedules,
               ),
-              cancelLabel: AppStrings.cancel,
-              onCancel: () => Navigator.pop(context, false),
-              confirmLabel: AppStrings.changeAction,
-              onConfirm: () => Navigator.pop(context, true),
+              style: AppTypography.bodyMedium,
             ),
+            Text(
+              AppStrings.rescheduleAfterChangeMarker(widget.totalReschedules),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            const Text(AppStrings.rescheduleNoMoreAfter),
+          ],
+        ),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(context, false),
+        confirmLabel: AppStrings.changeAction,
+        onConfirm: () => Navigator.pop(context, true),
       );
 
       if (confirmed != true) return;

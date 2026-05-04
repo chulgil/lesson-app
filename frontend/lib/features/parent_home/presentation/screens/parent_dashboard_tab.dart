@@ -784,10 +784,10 @@ class ParentDashboardTab extends ConsumerWidget {
                       color: AppColors.paperAccentSoft,
                       borderRadius: BorderRadius.zero,
                     ),
-                    // "입금대기" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
+                    // "미수금" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
                     // italic (README §1.1 4계층, §7.127 Gaegu 회피).
                     child: Text(
-                      '입금대기',
+                      '미수금',
                       style: NotebookTypography.indicatorLabel,
                     ),
                   ),
