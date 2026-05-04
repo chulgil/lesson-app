@@ -22,7 +22,7 @@ enum ChapterGuideVariant {
 /// Chapter-stage guide box: [title] chip + [situation] text in a row with icon.
 ///
 /// 레슨 신청·스케줄 변경 챕터의 상단 가이드 박스를 통일된 시그니처로 표현.
-/// 동일한 비주얼을 두 화면(`request_history_chat`, `schedule_change_slot_bottom_sheet`)에서 공유한다.
+/// 동일한 비주얼을 레슨 요청/스케줄 변경 흐름에서 공유한다.
 ///
 /// 기존 `_buildSystemGuide()` 패턴을 추출 (request_history_chat.dart §366-421).
 class ChapterGuideBox extends StatelessWidget {

@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -258,7 +259,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   style: NotebookTypography.mastheadLabel,
                 ),
                 const SizedBox(height: 4),
-                Text('수강 관리', style: NotebookTypography.masthead),
+                Text(
+                  AppStrings.studentRosterMasthead,
+                  style: NotebookTypography.masthead,
+                ),
                 const SizedBox(height: AppSpacing.space3),
                 const ThinRule(),
               ],
@@ -279,7 +283,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   context.push(AppRoutes.addStudentMethod);
                 },
                 icon: const Icon(Icons.person_add, size: 18),
-                label: const Text('학생 추가'),
+                label: const Text(AppStrings.studentAddLabel),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                   padding: const EdgeInsets.symmetric(
@@ -310,7 +314,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           ref.read(studentSearchQueryProvider.notifier).state = value;
         },
         decoration: InputDecoration(
-          hintText: '학생 이름 또는 악기로 검색',
+          hintText: AppStrings.studentSearchByNameOrInstrument,
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkTertiary,
           ),
@@ -401,9 +405,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                       height: 8,
                       decoration: BoxDecoration(
                         color: AppColors.paperAccent,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        borderRadius: BorderRadius.zero,
                       ),
                     ),
                   ),
@@ -419,9 +421,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
   /// 연습상태 필터 바텀시트 (전체/우수/보통/부족/휴강)
   Future<void> _showPracticeFilterSheet() async {
-    final selected = await showModalBottomSheet<StudentFilter>(
+    final selected = await showNotebookModalBottomSheet<StudentFilter>(
       context: context,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => Container(
             decoration: BoxDecoration(
@@ -433,38 +434,43 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               top: false,
               child: SingleChildScrollView(
                 child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
-                  // (§7.27). '필터' 는 정적 명사 헤더 — 연습/수강 상태 통합.
-                  Text('필터', style: NotebookTypography.appBarTitle),
-                  const SizedBox(height: AppSpacing.space3),
-                  ...StudentFilter.values.map((filter) {
-                    final isSelected = _currentFilter == filter;
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        isSelected
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_unchecked,
-                        color:
-                            isSelected
-                                ? AppColors.paperAccent
-                                : AppColors.inkTertiary,
-                      ),
-                      title: Text(
-                        filter.label,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
+                    // (§7.27). '필터' 는 정적 명사 헤더 — 연습/수강 상태 통합.
+                    Text(
+                      AppStrings.studentFilterTitle,
+                      style: NotebookTypography.appBarTitle,
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    ...StudentFilter.values.map((filter) {
+                      final isSelected = _currentFilter == filter;
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          isSelected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          color:
+                              isSelected
+                                  ? AppColors.paperAccent
+                                  : AppColors.inkTertiary,
                         ),
-                      ),
-                      onTap: () => Navigator.of(context).pop(filter),
-                    );
-                  }),
-                ],
-              ),
+                        title: Text(
+                          filter.label,
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                          ),
+                        ),
+                        onTap: () => Navigator.of(context).pop(filter),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
@@ -515,9 +521,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   void _showSortOptions() {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Column(
@@ -527,7 +532,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
                   // (§7.27). '정렬 기준' 은 정적 명사 헤더.
-                  child: Text('정렬 기준', style: NotebookTypography.appBarTitle),
+                  child: Text(
+                    AppStrings.studentSortTitle,
+                    style: NotebookTypography.appBarTitle,
+                  ),
                 ),
                 ...StudentSortOption.values.map((option) {
                   final isSelected = _sortOption == option;
@@ -648,16 +656,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           horizontal: AppSpacing.screenPadding,
           vertical: AppSpacing.space3,
         ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.ink.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
         child: SafeArea(
           top: false,
           child: Column(
@@ -679,7 +678,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     child: OutlinedButton.icon(
                       onPressed: hasSelection ? _onBulkCancel : null,
                       icon: const Icon(Icons.event_busy, size: 18),
-                      label: const Text('휴강 공지'),
+                      label: const Text(AppStrings.studentBulkCancelLabel),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeight,
@@ -692,7 +691,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     child: FilledButton.icon(
                       onPressed: hasSelection ? _onBulkMessage : null,
                       icon: const Icon(Icons.send, size: 18),
-                      label: const Text('메시지 보내기'),
+                      label: const Text(AppStrings.studentSendMessage),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeight,
@@ -898,13 +897,6 @@ class _StudentCard extends ConsumerWidget {
                 ? AppColors.paperAccentSoft
                 : Theme.of(context).colorScheme.surface,
         border: isSelected ? Border.all(color: AppColors.paperAccent) : null,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: InkWell(
         onTap:
@@ -1272,7 +1264,7 @@ class _EnrollmentExtras extends ConsumerWidget {
             if (daysLeft != null) _DdayChip(daysLeft: daysLeft),
             const Spacer(),
             _InlineCta(
-              label: '갱신 제안',
+              label: AppStrings.studentRenewalProposal,
               onTap: () {
                 UnifiedSubscriptionSheet.show(
                   context,
@@ -1283,7 +1275,7 @@ class _EnrollmentExtras extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.space2),
             _InlineCta(
-              label: '레슨 추가',
+              label: AppStrings.studentAddLesson,
               onTap: () {
                 context.push('${AppRoutes.addLesson}?studentId=$studentId');
               },
@@ -1313,7 +1305,7 @@ class _EnrollmentExtras extends ConsumerWidget {
         ),
         const Spacer(),
         _InlineCta(
-          label: '재등록 제안',
+          label: AppStrings.studentReregistrationProposal,
           onTap: () {
             final teacherId = ref.read(currentUserIdProvider);
             UnifiedSubscriptionSheet.show(

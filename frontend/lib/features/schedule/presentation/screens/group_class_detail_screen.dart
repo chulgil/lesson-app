@@ -2,6 +2,7 @@
 // Shows class info, booking status, and waitlist options
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -51,7 +52,7 @@ class _GroupClassDetailScreenState
       scheduleWaitlistCountProvider(widget.scheduleId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         titleSpacing: 0,
@@ -144,7 +145,7 @@ class _GroupClassDetailScreenState
             child: Center(
               child: Text(
                 _getInstrumentEmoji(),
-                style: const TextStyle(fontSize: 32),
+                style: AppTypography.displayLarge,
               ),
             ),
           ),
@@ -363,7 +364,7 @@ class _GroupClassDetailScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(booking.statusIcon, style: const TextStyle(fontSize: 24)),
+              Text(booking.statusIcon, style: AppTypography.headingLarge),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 booking.statusText,
@@ -612,34 +613,22 @@ class _GroupClassDetailScreenState
   }
 
   Future<void> _cancelBooking(GroupClassBooking booking) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              booking.isOnWaitlist
-                  ? AppStrings.waitlistCancelTitle
-                  : AppStrings.bookingCancelTitle,
-            ),
-            content: Text(
-              booking.isOnWaitlist
-                  ? AppStrings.cancelWaitlistConfirm
-                  : AppStrings.cancelBookingConfirm,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(AppStrings.no),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: Text(AppStrings.cancelRequestAction),
-              ),
-            ],
-          ),
+      title:
+          booking.isOnWaitlist
+              ? AppStrings.waitlistCancelTitle
+              : AppStrings.bookingCancelTitle,
+      content: Text(
+        booking.isOnWaitlist
+            ? AppStrings.cancelWaitlistConfirm
+            : AppStrings.cancelBookingConfirm,
+      ),
+      confirmLabel: AppStrings.cancelRequestAction,
+      cancelLabel: AppStrings.no,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed != true) return;

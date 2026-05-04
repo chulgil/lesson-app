@@ -149,7 +149,10 @@ class StudentDashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
-          Text('오늘의 연습', style: NotebookTypography.masthead),
+          Text(
+            AppStrings.studentHomeTodayPractice,
+            style: NotebookTypography.masthead,
+          ),
           const SizedBox(height: 6),
           Text(
             '${now.month}月 ${now.day}日  ·  ${AppStrings.studentHomeGreeting}',

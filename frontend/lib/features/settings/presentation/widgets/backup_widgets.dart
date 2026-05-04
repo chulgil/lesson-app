@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -37,10 +38,8 @@ class StatusCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft,
-                ),
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: const Icon(
                   Icons.storage,
                   color: AppColors.paperAccent,
@@ -81,7 +80,7 @@ class StatusCard extends StatelessWidget {
               Expanded(
                 child: StatItem(
                   icon: Icons.mic,
-                  label: '녹음 파일',
+                  label: AppStrings.settingsRecordingFiles,
                   value: '${state.recordingCount}개',
                 ),
               ),
@@ -89,7 +88,7 @@ class StatusCard extends StatelessWidget {
               Expanded(
                 child: StatItem(
                   icon: Icons.folder,
-                  label: '전체 용량',
+                  label: AppStrings.settingsTotalSize,
                   value: state.formattedSize,
                 ),
               ),
@@ -186,7 +185,6 @@ class ProgressCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           ClipRRect(
-            
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: AppColors.ink.withValues(alpha: 0.2),
@@ -221,7 +219,9 @@ class ErrorCard extends StatelessWidget {
           Expanded(
             child: Text(
               error,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.paperAccent),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.paperAccent,
+              ),
             ),
           ),
           IconButton(
@@ -286,26 +286,17 @@ class ActionsSection extends ConsumerWidget {
   }
 
   Future<void> _createBackup(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('백업 생성'),
-            content: const Text(
-              '모든 녹음과 데이터를 백업합니다.\n'
-              '백업 파일을 공유하거나 저장할 수 있습니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('백업 시작'),
-              ),
-            ],
-          ),
+      title: '백업 생성',
+      content: const Text(
+        '모든 녹음과 데이터를 백업합니다.\n'
+        '백업 파일을 공유하거나 저장할 수 있습니다.',
+      ),
+      confirmLabel: '백업 시작',
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -315,7 +306,7 @@ class ActionsSection extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('백업 생성에 실패했습니다. 다시 시도해주세요.'),
+              content: const Text(AppStrings.settingsBackupCreateFailed),
               backgroundColor: AppColors.paperAccent,
             ),
           );
@@ -325,27 +316,18 @@ class ActionsSection extends ConsumerWidget {
   }
 
   Future<void> _restoreBackup(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('백업 복원'),
-            content: const Text(
-              '백업 파일에서 데이터를 복원합니다.\n\n'
-              '이미 존재하는 녹음은 건너뜁니다.\n'
-              '새로운 녹음만 추가됩니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('파일 선택'),
-              ),
-            ],
-          ),
+      title: '백업 복원',
+      content: const Text(
+        '백업 파일에서 데이터를 복원합니다.\n\n'
+        '이미 존재하는 녹음은 건너뜁니다.\n'
+        '새로운 녹음만 추가됩니다.',
+      ),
+      confirmLabel: '파일 선택',
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -360,7 +342,7 @@ class ActionsSection extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('백업 복원에 실패했습니다. 다시 시도해주세요.'),
+              content: const Text(AppStrings.settingsBackupRestoreFailed),
               backgroundColor: AppColors.paperAccent,
             ),
           );
@@ -370,27 +352,20 @@ class ActionsSection extends ConsumerWidget {
   }
 
   void _showRestoreResult(BuildContext context, RestoreResult result) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(result.success ? '복원 완료' : '복원 실패'),
-            content:
-                result.success
-                    ? Text(
-                      '복원이 완료되었습니다.\n\n'
-                      '복원된 녹음: ${result.restoredRecordings}개\n'
-                      '건너뛴 녹음: ${result.skippedRecordings}개\n'
-                      '복원된 데이터: ${result.restoredBoxEntries}개',
-                    )
-                    : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.confirm),
-              ),
-            ],
-          ),
+      title: result.success ? '복원 완료' : '복원 실패',
+      content:
+          result.success
+              ? Text(
+                '복원이 완료되었습니다.\n\n'
+                '복원된 녹음: ${result.restoredRecordings}개\n'
+                '건너뛴 녹음: ${result.skippedRecordings}개\n'
+                '복원된 데이터: ${result.restoredBoxEntries}개',
+              )
+              : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
+      confirmLabel: AppStrings.confirm,
+      onConfirm: () => Navigator.pop(context),
     );
   }
 }
@@ -421,13 +396,12 @@ class ActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
                   color:
                       isDisabled
@@ -510,9 +484,7 @@ class BackupListSection extends ConsumerWidget {
             if (backups.isEmpty) {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space6),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark,
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: const Center(
                   child: Column(
                     children: [
@@ -583,9 +555,7 @@ class BackupItem extends ConsumerWidget {
         ),
         leading: Container(
           padding: const EdgeInsets.all(AppSpacing.space2),
-          decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft,
-          ),
+          decoration: BoxDecoration(color: AppColors.paperAccentSoft),
           child: const Icon(Icons.archive, color: AppColors.paperAccent),
         ),
         title: Text(
@@ -600,10 +570,7 @@ class BackupItem extends ConsumerWidget {
           style: const TextStyle(color: AppColors.inkSecondary),
         ),
         trailing: PopupMenuButton<String>(
-          icon: const Icon(
-            Icons.more_vert,
-            color: AppColors.inkSecondary,
-          ),
+          icon: const Icon(Icons.more_vert, color: AppColors.inkSecondary),
           onSelected: (value) async {
             if (value == 'restore') {
               await _restoreFromBackup(context, ref);
@@ -621,7 +588,7 @@ class BackupItem extends ConsumerWidget {
                     children: [
                       Icon(Icons.restore, size: 20),
                       SizedBox(width: AppSpacing.space2),
-                      Text('복원'),
+                      Text(AppStrings.settingsRestore),
                     ],
                   ),
                 ),
@@ -631,7 +598,7 @@ class BackupItem extends ConsumerWidget {
                     children: [
                       Icon(Icons.share, size: 20),
                       SizedBox(width: AppSpacing.space2),
-                      Text('공유'),
+                      Text(AppStrings.settingsShare),
                     ],
                   ),
                 ),
@@ -639,9 +606,16 @@ class BackupItem extends ConsumerWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, size: 20, color: AppColors.paperAccent),
+                      Icon(
+                        Icons.delete,
+                        size: 20,
+                        color: AppColors.paperAccent,
+                      ),
                       SizedBox(width: AppSpacing.space2),
-                      Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                      Text(
+                        AppStrings.delete,
+                        style: TextStyle(color: AppColors.paperAccent),
+                      ),
                     ],
                   ),
                 ),
@@ -652,26 +626,17 @@ class BackupItem extends ConsumerWidget {
   }
 
   Future<void> _restoreFromBackup(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('백업 복원'),
-            content: const Text(
-              '이 백업에서 데이터를 복원하시겠습니까?\n\n'
-              '이미 존재하는 녹음은 건너뜁니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('복원'),
-              ),
-            ],
-          ),
+      title: '백업 복원',
+      content: const Text(
+        '이 백업에서 데이터를 복원하시겠습니까?\n\n'
+        '이미 존재하는 녹음은 건너뜁니다.',
+      ),
+      confirmLabel: '복원',
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -686,27 +651,20 @@ class BackupItem extends ConsumerWidget {
   }
 
   void _showRestoreResult(BuildContext context, RestoreResult result) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(result.success ? '복원 완료' : '복원 실패'),
-            content:
-                result.success
-                    ? Text(
-                      '복원이 완료되었습니다.\n\n'
-                      '복원된 녹음: ${result.restoredRecordings}개\n'
-                      '건너뛴 녹음: ${result.skippedRecordings}개\n'
-                      '복원된 데이터: ${result.restoredBoxEntries}개',
-                    )
-                    : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.confirm),
-              ),
-            ],
-          ),
+      title: result.success ? '복원 완료' : '복원 실패',
+      content:
+          result.success
+              ? Text(
+                '복원이 완료되었습니다.\n\n'
+                '복원된 녹음: ${result.restoredRecordings}개\n'
+                '건너뛴 녹음: ${result.skippedRecordings}개\n'
+                '복원된 데이터: ${result.restoredBoxEntries}개',
+              )
+              : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
+      confirmLabel: AppStrings.confirm,
+      onConfirm: () => Navigator.pop(context),
     );
   }
 
@@ -721,26 +679,15 @@ class BackupItem extends ConsumerWidget {
   }
 
   Future<void> _deleteBackup(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('백업 삭제'),
-            content: const Text('이 백업을 삭제하시겠습니까?\n삭제된 백업은 복구할 수 없습니다.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: '백업 삭제',
+      content: const Text(AppStrings.settingsBackupDeleteConfirm),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -776,15 +723,17 @@ class OrphanRecordingsButton extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
-                
                 border: Border.all(
-                  color: hasOrphans ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      hasOrphans
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
                       color:
                           hasOrphans
@@ -793,7 +742,10 @@ class OrphanRecordingsButton extends ConsumerWidget {
                     ),
                     child: Icon(
                       hasOrphans ? Icons.link_off : Icons.link,
-                      color: hasOrphans ? AppColors.paperAccent : AppColors.paperAccent,
+                      color:
+                          hasOrphans
+                              ? AppColors.paperAccent
+                              : AppColors.paperAccent,
                       size: 24,
                     ),
                   ),
@@ -830,9 +782,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                         horizontal: 8,
                         vertical: 4,
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.paperAccent,
-                      ),
+                      decoration: BoxDecoration(color: AppColors.paperAccent),
                       child: Text(
                         '$count',
                         style: AppTypography.bodySmall.copyWith(
@@ -842,10 +792,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       ),
                     ),
                   const SizedBox(width: AppSpacing.space2),
-                  Icon(
-                    Icons.chevron_right,
-                    color: AppColors.inkSecondary,
-                  ),
+                  Icon(Icons.chevron_right, color: AppColors.inkSecondary),
                 ],
               ),
             ),

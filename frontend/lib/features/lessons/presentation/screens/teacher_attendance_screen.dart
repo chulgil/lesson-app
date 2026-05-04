@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -24,7 +25,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
     final overviewAsync = ref.watch(teacherAttendanceOverviewProvider);
     final studentNames = ref.watch(studentNameMapProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(title: const Text(AppStrings.attendanceTitle)),
       body: overviewAsync.when(
         data: (overview) => _buildContent(context, overview, studentNames),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -58,7 +59,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
             children: [
               // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
               // 패턴. Playfair appBarTitle 로 통일.
-              Text('알림 상세 설정', style: NotebookTypography.appBarTitle),
+              Text(
+                AppStrings.parentHomeNotificationDetailSettings,
+                style: NotebookTypography.appBarTitle,
+              ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close),
@@ -133,7 +137,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
           ),
           child: Row(
             children: [
-              Text(category.icon, style: const TextStyle(fontSize: 16)),
+              Text(category.icon, style: AppTypography.bodyLarge),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 category.label,

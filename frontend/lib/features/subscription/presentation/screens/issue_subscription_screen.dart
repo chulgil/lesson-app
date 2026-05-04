@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -209,7 +210,7 @@ class _IssueSubscriptionScreenState
       });
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(
           widget.isBatchMode

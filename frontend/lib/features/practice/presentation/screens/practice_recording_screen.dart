@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
@@ -82,7 +83,7 @@ class _PracticeRecordingScreenState
       });
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(widget.repertoireName),
         actions: [
@@ -91,7 +92,7 @@ class _PracticeRecordingScreenState
             TextButton.icon(
               onPressed: _shareWithTeacher,
               icon: const Icon(Icons.share),
-              label: const Text('공유'),
+              label: const Text(AppStrings.practiceShare),
             ),
         ],
       ),
@@ -197,9 +198,9 @@ class _PracticeRecordingScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('녹음 삭제'),
-            content: const Text('이 녹음을 삭제하시겠습니까?'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRecordingDeleteTitle),
+            content: const Text(AppStrings.practiceRecordingDeleteConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -238,9 +239,9 @@ class _PracticeRecordingScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('선생님께 공유'),
-            content: const Text('대표 녹음을 선생님께 공유하시겠습니까?'),
+          (dialogContext) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceShareToTeacherTitle),
+            content: const Text(AppStrings.practiceShareToTeacherConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
@@ -248,7 +249,7 @@ class _PracticeRecordingScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: const Text('공유'),
+                child: const Text(AppStrings.practiceShare),
               ),
             ],
           ),
@@ -263,9 +264,9 @@ class _PracticeRecordingScreenState
       );
       await notifier.shareWithTeacher();
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('선생님께 공유되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceSharedToTeacherSnack)),
+      );
     }
   }
 }
@@ -643,9 +644,11 @@ class _RecordingItem extends StatelessWidget {
     final file = File(filePath);
     if (!await file.exists()) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.practiceRecordingFileNotFound),
+          ),
+        );
       }
       return;
     }
@@ -658,7 +661,7 @@ class _RecordingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       elevation: recording.isRepresentative ? 2 : 0,
       color:
           recording.isRepresentative
@@ -739,7 +742,7 @@ class _RecordingItem extends StatelessWidget {
                       children: [
                         Icon(Icons.star_outline),
                         SizedBox(width: AppSpacing.space2),
-                        Text('대표로 선택'),
+                        Text(AppStrings.practiceSelectAsRepresentative),
                       ],
                     ),
                   ),
@@ -749,7 +752,7 @@ class _RecordingItem extends StatelessWidget {
                     children: [
                       Icon(Icons.share),
                       SizedBox(width: AppSpacing.space2),
-                      Text('외부 앱 공유'),
+                      Text(AppStrings.practiceShareExternal),
                     ],
                   ),
                 ),

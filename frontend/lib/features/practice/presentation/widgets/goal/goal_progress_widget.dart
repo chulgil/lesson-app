@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -26,13 +27,6 @@ class GoalProgressWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: goalStatusAsync.when(
         data: (status) => _buildContent(context, status),
@@ -74,7 +68,10 @@ class GoalProgressWidget extends ConsumerWidget {
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
               // 로 통일 (§7.17).
-              Text('오늘의 목표', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceGoalTodayTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
               const Spacer(),
               if (status.isDailyGoalAchieved)
                 Container(
@@ -84,7 +81,7 @@ class GoalProgressWidget extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperOk.withAlpha(25),
-                    ),
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -95,7 +92,7 @@ class GoalProgressWidget extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '달성!',
+                        AppStrings.practiceGoalAchievedBadge,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.paperOk,
                           fontWeight: FontWeight.w600,
@@ -113,7 +110,7 @@ class GoalProgressWidget extends ConsumerWidget {
                 ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                tooltip: '목표 설정',
+                tooltip: AppStrings.practiceGoalSettingsTooltip,
               ),
             ],
           ),
@@ -124,7 +121,7 @@ class GoalProgressWidget extends ConsumerWidget {
             _buildProgressBar(
               context,
               icon: Icons.timer,
-              label: '연습 시간',
+              label: AppStrings.practiceTimeLabel,
               current: status.todayProgress.practiceTimeText,
               target: status.goal!.dailyTimeText,
               progress: status.dailyTimeProgressPercent / 100,
@@ -139,7 +136,7 @@ class GoalProgressWidget extends ConsumerWidget {
             _buildProgressBar(
               context,
               icon: Icons.check_box,
-              label: '완료 섹션',
+              label: AppStrings.practiceCompletedSectionLabel,
               current: '${status.todayProgress.completedSectionCount}개',
               target: '${status.goal!.dailySectionCount}개',
               progress: status.dailySectionProgressPercent / 100,
@@ -161,7 +158,7 @@ class GoalProgressWidget extends ConsumerWidget {
                 Icon(Icons.date_range, color: AppColors.inkSecondary, size: 16),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
-                  '이번 주',
+                  AppStrings.practiceThisWeekLabel,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
@@ -179,7 +176,7 @@ class GoalProgressWidget extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '주간 목표 달성!',
+                        AppStrings.practiceWeeklyGoalAchievedBadge,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.amber,
                           fontWeight: FontWeight.w600,
@@ -197,7 +194,7 @@ class GoalProgressWidget extends ConsumerWidget {
                   Expanded(
                     child: _buildWeeklyStat(
                       icon: Icons.timer,
-                      label: '시간',
+                      label: AppStrings.practiceTimeShortLabel,
                       value: status.weeklyProgress.totalTimeText,
                       target: status.goal!.weeklyTimeText,
                       percent: status.weeklyTimeProgressPercent,
@@ -210,7 +207,7 @@ class GoalProgressWidget extends ConsumerWidget {
                   Expanded(
                     child: _buildWeeklyStat(
                       icon: Icons.calendar_today,
-                      label: '연습일',
+                      label: AppStrings.practiceDayLabel,
                       value: '${status.weeklyProgress.practiceDayCount}일',
                       target: '${status.goal!.weeklyDayCount}일',
                       percent: status.weeklyDayProgressPercent,
@@ -235,7 +232,7 @@ class GoalProgressWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withAlpha(25),
-                ),
+              ),
               child: Icon(
                 Icons.flag_outlined,
                 color: AppColors.paperAccent,
@@ -313,9 +310,7 @@ class GoalProgressWidget extends ConsumerWidget {
           children: [
             Container(
               height: 8,
-              decoration: BoxDecoration(
-                color: AppColors.paperDark,
-                ),
+              decoration: BoxDecoration(color: AppColors.paperDark),
             ),
             FractionallySizedBox(
               widthFactor: clampedProgress,
@@ -328,7 +323,7 @@ class GoalProgressWidget extends ConsumerWidget {
                             ? [AppColors.paperOk, AppColors.paperOk]
                             : [AppColors.paperAccent, AppColors.paperAccent],
                   ),
-                  ),
+                ),
               ),
             ),
           ],

@@ -419,6 +419,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     final request = widget.request;
     final status = request.status;
 
+    if (status == UnifiedRequestStatus.timeConfirmed &&
+        _turnState == _TurnState.theirTurn) {
+      return _buildTheirTurn();
+    }
+
     if (_isTeacher) {
       return _buildTeacherPhase2(request, status);
     }

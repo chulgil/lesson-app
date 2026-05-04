@@ -11,6 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/request_event.dart';
@@ -25,6 +26,73 @@ import '../widgets/request_profile_card.dart';
 import '../widgets/proposal_bottom_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
+
+List<RequestEvent> requestDetailVisibleEventsForCurrentPhase(
+  UnifiedLessonRequest request,
+  List<RequestEvent> events,
+) {
+  final phase = request.currentPhase;
+  if (phase == RequestPhase.request || phase == RequestPhase.terminal) {
+    return events;
+  }
+  return events
+      .where((event) => requestDetailEventBelongsToPhase(event, phase))
+      .toList();
+}
+
+bool requestDetailEventBelongsToPhase(RequestEvent event, RequestPhase phase) {
+  return switch (phase) {
+    RequestPhase.request => _requestPhaseEventTypes.contains(event.eventType),
+    RequestPhase.subscription =>
+      _requestPhaseDecisionEventTypes.contains(event.eventType) ||
+          _subscriptionPhaseEventTypes.contains(event.eventType),
+    RequestPhase.lessons => _lessonPhaseEventTypes.contains(event.eventType),
+    RequestPhase.completed => _completedPhaseEventTypes.contains(
+      event.eventType,
+    ),
+    RequestPhase.terminal => true,
+  };
+}
+
+const _requestPhaseEventTypes = {
+  RequestEventType.initialRequest,
+  RequestEventType.approve,
+  RequestEventType.reject,
+  RequestEventType.proposeAlternative,
+  RequestEventType.counterPropose,
+  RequestEventType.acceptAlternative,
+  RequestEventType.withdrawApproval,
+  RequestEventType.cancel,
+  RequestEventType.expire,
+  RequestEventType.proposalSent,
+  RequestEventType.proposalAccepted,
+  RequestEventType.paymentNotified,
+};
+
+const _requestPhaseDecisionEventTypes = {
+  RequestEventType.approve,
+  RequestEventType.acceptAlternative,
+  RequestEventType.withdrawApproval,
+};
+
+const _subscriptionPhaseEventTypes = {
+  RequestEventType.paymentRequested,
+  RequestEventType.paymentConfirmed,
+  RequestEventType.subscriptionIssued,
+};
+
+const _lessonPhaseEventTypes = {
+  RequestEventType.lessonCompleted,
+  RequestEventType.lessonCancelled,
+  RequestEventType.scheduleChanged,
+  RequestEventType.lessonNoteAdded,
+};
+
+const _completedPhaseEventTypes = {
+  RequestEventType.subscriptionRenewed,
+  RequestEventType.subscriptionCompleted,
+  RequestEventType.completed,
+};
 
 /// Detail screen for a single lesson request — chat-style layout.
 ///
@@ -110,13 +178,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
     return requestAsync.when(
       loading:
-          () => Scaffold(
+          () => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
-          (error, _) => Scaffold(
+          (error, _) => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: Center(
@@ -130,7 +198,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           ),
       data: (request) {
         if (request == null) {
-          return Scaffold(
+          return NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
             appBar: AppBar(),
             body: Center(
@@ -163,7 +231,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 ? studentName
                 : AppStrings.teacherDisplayName(teacherName);
 
-        return Scaffold(
+        return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
           appBar: _buildChatAppBar(context, request, opponentName, academyName),
           body: Column(
@@ -345,10 +413,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     String opponentName,
     String? academyName,
   ) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder: (ctx) {
         // Fetch student data for regular profile card
         final studentAsync = ref.watch(studentProvider(request.studentId));
@@ -1257,12 +1326,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
     List<RequestEvent> events,
   ) {
-    final phase = request.currentPhase;
-    // For request phase (Phase 1) or terminal, show all events
-    if (phase == RequestPhase.request || phase == RequestPhase.terminal) {
-      return events;
-    }
-    return _eventsForPhase(events, phase);
+    return requestDetailVisibleEventsForCurrentPhase(request, events);
   }
 
   /// Get events that belong to a specific phase.
@@ -1275,39 +1339,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   /// Check if an event belongs to a given phase.
   bool _eventBelongsToPhase(RequestEvent event, RequestPhase phase) {
-    return switch (phase) {
-      RequestPhase.request => const {
-        RequestEventType.initialRequest,
-        RequestEventType.approve,
-        RequestEventType.reject,
-        RequestEventType.proposeAlternative,
-        RequestEventType.counterPropose,
-        RequestEventType.acceptAlternative,
-        RequestEventType.withdrawApproval,
-        RequestEventType.cancel,
-        RequestEventType.expire,
-        RequestEventType.proposalSent,
-        RequestEventType.proposalAccepted,
-        RequestEventType.paymentNotified,
-      }.contains(event.eventType),
-      RequestPhase.subscription => const {
-        RequestEventType.paymentRequested,
-        RequestEventType.paymentConfirmed,
-        RequestEventType.subscriptionIssued,
-      }.contains(event.eventType),
-      RequestPhase.lessons => const {
-        RequestEventType.lessonCompleted,
-        RequestEventType.lessonCancelled,
-        RequestEventType.scheduleChanged,
-        RequestEventType.lessonNoteAdded,
-      }.contains(event.eventType),
-      RequestPhase.completed => const {
-        RequestEventType.subscriptionRenewed,
-        RequestEventType.subscriptionCompleted,
-        RequestEventType.completed,
-      }.contains(event.eventType),
-      RequestPhase.terminal => true,
-    };
+    return requestDetailEventBelongsToPhase(event, phase);
   }
 
   /// Whether a phase is fully completed (current phase is past it).
@@ -1373,36 +1405,25 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     showDialog(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            title: const Text(AppStrings.cancelRequestTitle),
+          (ctx) => NotebookAlertDialog(
+            title: AppStrings.cancelRequestTitle,
             content: const Text(AppStrings.cancelRequestMessage),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text(AppStrings.no),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  final actions = UnifiedLessonRequestActions(ref);
-                  actions.cancelRequest(
-                    request.id,
-                    viewerRole == 'teacher'
-                        ? request.teacherId
-                        : request.studentId,
-                    viewerRole == 'teacher'
-                        ? ProposerRole.teacher
-                        : ProposerRole.student,
-                    request.teacherId,
-                    request.studentId,
-                  );
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.cancelRequestAction),
-              ),
-            ],
+            cancelLabel: AppStrings.no,
+            confirmLabel: AppStrings.cancelRequestAction,
+            isDestructive: true,
+            onConfirm: () {
+              Navigator.of(ctx).pop();
+              final actions = UnifiedLessonRequestActions(ref);
+              actions.cancelRequest(
+                request.id,
+                viewerRole == 'teacher' ? request.teacherId : request.studentId,
+                viewerRole == 'teacher'
+                    ? ProposerRole.teacher
+                    : ProposerRole.student,
+                request.teacherId,
+                request.studentId,
+              );
+            },
           ),
     );
   }

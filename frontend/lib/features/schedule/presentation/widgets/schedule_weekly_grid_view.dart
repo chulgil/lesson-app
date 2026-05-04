@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,10 +29,10 @@ import '../utils/schedule_visual_helpers.dart';
 const double _weeklyGridTimeColumnWidth = 16;
 
 @visibleForTesting
-const double scheduleWeeklyGridLessonNameFontSize = 16;
+const double scheduleWeeklyGridLessonNameFontSize = 18;
 
 @visibleForTesting
-const double scheduleWeeklyGridUtilityLabelFontSize = 16;
+const double scheduleWeeklyGridUtilityLabelFontSize = 16.5;
 
 /// Weekly summary grid showing 7-day overview of lessons.
 /// Bird's eye view with instrument-colored cells, today highlight,
@@ -71,7 +72,7 @@ class _ScheduleWeeklyGridViewState
         return _buildGrid(lessons, availability);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('불러오기 실패: $e')),
+      error: (e, _) => Center(child: Text(AppStrings.scheduleLoadFailed('$e'))),
     );
   }
 
@@ -545,7 +546,10 @@ class _ScheduleWeeklyGridViewState
           shortName,
           style: NotebookTypography.hand.copyWith(
             fontSize: scheduleWeeklyGridLessonNameFontSize,
-            color: lesson.isPreview ? AppColors.inkTertiary : AppColors.inkSecondary,
+            color:
+                lesson.isPreview
+                    ? AppColors.inkTertiary
+                    : AppColors.inkSecondary,
             fontWeight: FontWeight.w700,
             height: 1.0,
           ),

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
@@ -73,9 +74,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
     final filter = ref.watch(teacherSearchFilterStateProvider);
     final currentTab = ref.watch(teacherSearchTabStateProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('선생님 찾기'),
+        title: const Text(AppStrings.searchFindTeacher),
         actions: [
           IconButton(
             icon: Badge(
@@ -375,10 +376,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
   }
 
   void _showFilterSheet(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const TeacherSearchFilterSheet(),
     );
   }

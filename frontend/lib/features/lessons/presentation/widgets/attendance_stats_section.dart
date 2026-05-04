@@ -45,16 +45,7 @@ class AttendanceStatsSection extends ConsumerWidget {
 
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          decoration: BoxDecoration(color: AppColors.paper),
           child: Column(
             children: [
               // Attendance rate circle
@@ -188,7 +179,10 @@ class AttendanceStatsSection extends ConsumerWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppSpacing.radiusSmall)),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.zero,
+          ),
         ),
         const SizedBox(width: AppSpacing.space2),
         Expanded(

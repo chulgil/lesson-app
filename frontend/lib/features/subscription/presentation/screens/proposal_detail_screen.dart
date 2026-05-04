@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -38,7 +39,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       subscriptionProposalProvider(widget.proposalId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.proposalCreateAppBarTitle),
         centerTitle: true,
@@ -557,56 +558,47 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           return;
         }
 
-        showModalBottomSheet(
+        showNotebookBottomSheet<void>(
           context: context,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           builder:
-              (context) => SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Notebook × Score: 모달 시트 상단 제목 블록은
-                      // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
-                      // 동적이지만 구조적 역할은 동일.
-                      Text(
-                        AppStrings.teacherContactSheetTitleFormat(profile.name),
-                        style: NotebookTypography.appBarTitle,
-                      ),
-                      const SizedBox(height: AppSpacing.space4),
-                      ListTile(
-                        leading: const CircleAvatar(
-                          backgroundColor: AppColors.paperOk,
-                          child: Icon(Icons.call, color: AppColors.paper),
-                        ),
-                        title: const Text(AppStrings.callTeacherAction),
-                        subtitle: Text(phoneNumber),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _launchPhone(phoneNumber);
-                        },
-                      ),
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: AppColors.ink,
-                          child: const Icon(
-                            Icons.message,
-                            color: AppColors.paper,
-                          ),
-                        ),
-                        title: const Text(AppStrings.messageTeacherAction),
-                        subtitle: Text(phoneNumber),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _launchSms(phoneNumber);
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.space4),
-                    ],
+              (context) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Notebook × Score: 모달 시트 상단 제목 블록은
+                  // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
+                  // 동적이지만 구조적 역할은 동일.
+                  Text(
+                    AppStrings.teacherContactSheetTitleFormat(profile.name),
+                    style: NotebookTypography.appBarTitle,
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.space4),
+                  ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: AppColors.paperOk,
+                      child: Icon(Icons.call, color: AppColors.paper),
+                    ),
+                    title: const Text(AppStrings.callTeacherAction),
+                    subtitle: Text(phoneNumber),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchPhone(phoneNumber);
+                    },
+                  ),
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.ink,
+                      child: const Icon(Icons.message, color: AppColors.paper),
+                    ),
+                    title: const Text(AppStrings.messageTeacherAction),
+                    subtitle: Text(phoneNumber),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchSms(phoneNumber);
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                ],
               ),
         );
       },
@@ -658,13 +650,6 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,

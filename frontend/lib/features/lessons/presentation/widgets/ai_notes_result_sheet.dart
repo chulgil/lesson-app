@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -126,7 +127,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                               height: 6,
                               decoration: BoxDecoration(
                                 color: AppColors.paperAccent,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                                borderRadius: BorderRadius.zero,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -160,7 +161,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                       _buildSectionHeader('과제 제안', Icons.assignment_outlined),
                       const SizedBox(height: AppSpacing.space2),
                       ...widget.result.suggestedAssignments.map(
-                        (a) => Card(
+                        (a) => NotebookCard(
                           margin: const EdgeInsets.only(
                             bottom: AppSpacing.space2,
                           ),

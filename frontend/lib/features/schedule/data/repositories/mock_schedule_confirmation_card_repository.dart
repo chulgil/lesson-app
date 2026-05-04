@@ -26,7 +26,7 @@ class MockScheduleConfirmationCardRepository
         teacherId: 'teacher_1',
         teacherName: '김지수',
         instrument: '플루트',
-        subscriptionId: 'sub_4',
+        subscriptionId: 'sub_trial_01',
         suggestedDay: 6, // Saturday
         suggestedTime: '15:00',
         lessonDuration: 60,
@@ -45,7 +45,7 @@ class MockScheduleConfirmationCardRepository
         teacherId: 'teacher_1',
         teacherName: '김지수',
         instrument: '바이올린',
-        subscriptionId: 'sub_1',
+        subscriptionId: 'sub_pkg_01',
         suggestedDay: 3, // Wednesday
         suggestedTime: '10:00',
         lessonDuration: 60,
@@ -64,7 +64,7 @@ class MockScheduleConfirmationCardRepository
         teacherId: 'teacher_1',
         teacherName: '김지수',
         instrument: '피아노',
-        subscriptionId: 'sub_11',
+        subscriptionId: 'sub_mon_03',
         suggestedDay: null,
         suggestedTime: null,
         lessonDuration: 45,
@@ -83,7 +83,7 @@ class MockScheduleConfirmationCardRepository
         teacherId: 'teacher_1',
         teacherName: '김지수',
         instrument: '피아노',
-        subscriptionId: 'sub_2',
+        subscriptionId: 'sub_mon_01',
         suggestedDay: 2, // Tuesday
         suggestedTime: '16:00',
         lessonDuration: 60,
@@ -103,7 +103,7 @@ class MockScheduleConfirmationCardRepository
         teacherId: 'teacher_1',
         teacherName: '김지수',
         instrument: '바이올린',
-        subscriptionId: 'sub_1_old',
+        subscriptionId: 'sub_exp_03',
         suggestedDay: 5, // Friday
         suggestedTime: '14:00',
         lessonDuration: 60,
@@ -118,12 +118,15 @@ class MockScheduleConfirmationCardRepository
 
   @override
   Future<List<ScheduleConfirmationCard>> getPendingCardsForStudent(
-      String studentId) async {
+    String studentId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 100));
     return _cards
-        .where((card) =>
-            card.studentId == studentId &&
-            card.status == ScheduleCardStatus.pending)
+        .where(
+          (card) =>
+              card.studentId == studentId &&
+              card.status == ScheduleCardStatus.pending,
+        )
         .toList();
   }
 
@@ -139,7 +142,8 @@ class MockScheduleConfirmationCardRepository
 
   @override
   Future<ScheduleConfirmationCard> createCard(
-      ScheduleConfirmationCard card) async {
+    ScheduleConfirmationCard card,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 100));
 
     final newCard = ScheduleConfirmationCard(
@@ -202,7 +206,8 @@ class MockScheduleConfirmationCardRepository
 
   @override
   Future<ScheduleConfirmationCard?> getCardBySubscriptionId(
-      String subscriptionId) async {
+    String subscriptionId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 50));
     try {
       return _cards.firstWhere((card) => card.subscriptionId == subscriptionId);

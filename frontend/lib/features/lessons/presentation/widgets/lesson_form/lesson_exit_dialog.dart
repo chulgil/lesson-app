@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -17,7 +18,7 @@ void showLessonExitConfirmation({
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.cancelWritingTitle),
           content: const Text(AppStrings.exitWithoutSavingConfirm),
           actions: [

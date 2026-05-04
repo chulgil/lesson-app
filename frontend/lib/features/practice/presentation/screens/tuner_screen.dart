@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -66,10 +68,10 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
   Widget build(BuildContext context) {
     final tunerState = ref.watch(tunerProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('튜너'),
+        title: const Text(AppStrings.tunerAppBarTitle),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -94,9 +96,10 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
                       final availableHeight = constraints.maxHeight;
 
                       // Use the smaller dimension
-                      final availableSize = availableWidth < availableHeight
-                          ? availableWidth
-                          : availableHeight;
+                      final availableSize =
+                          availableWidth < availableHeight
+                              ? availableWidth
+                              : availableHeight;
 
                       // Calculate scale factor (base size 400 for circle + indicators)
                       final scaleFactor = (availableSize / 450).clamp(0.5, 1.2);
@@ -125,7 +128,10 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
               bottom: 0,
               child: Container(
                 color: AppColors.paperDark,
-                padding: const EdgeInsets.only(top: AppSpacing.space4, bottom: AppSpacing.space8),
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.space4,
+                  bottom: AppSpacing.space8,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -141,7 +147,9 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
 
                     // Info bar
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.space8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space8,
+                      ),
                       child: TunerInfoBar(),
                     ),
                   ],
@@ -172,7 +180,8 @@ class CompactTunerWidget extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color: isListening ? AppColors.paperAccent : AppColors.inkQuaternary,
+            color:
+                isListening ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -180,14 +189,18 @@ class CompactTunerWidget extends ConsumerWidget {
           children: [
             Icon(
               isListening ? Icons.graphic_eq : Icons.mic_none,
-              color: isListening ? AppColors.paperAccent : AppColors.inkTertiary,
+              color:
+                  isListening ? AppColors.paperAccent : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               currentNote?.fullName ?? (isListening ? '감지 중...' : '튜너'),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isListening ? AppColors.paperAccent : AppColors.inkSecondary,
+                color:
+                    isListening
+                        ? AppColors.paperAccent
+                        : AppColors.inkSecondary,
               ),
             ),
             if (currentNote != null) ...[
@@ -195,7 +208,10 @@ class CompactTunerWidget extends ConsumerWidget {
               Text(
                 currentNote.centDisplayString,
                 style: AppTypography.bodySmall.copyWith(
-                  color: tunerState.isPerfect ? AppColors.paperOk : AppColors.paperAccent,
+                  color:
+                      tunerState.isPerfect
+                          ? AppColors.paperOk
+                          : AppColors.paperAccent,
                 ),
               ),
             ],

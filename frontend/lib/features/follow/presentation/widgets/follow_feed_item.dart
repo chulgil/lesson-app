@@ -31,9 +31,7 @@ class FollowFeedItem extends StatelessWidget {
                 radius: 18,
                 backgroundColor: AppColors.paperAccentSoft,
                 child: Text(
-                  post.authorName.isNotEmpty
-                      ? post.authorName[0]
-                      : '?',
+                  post.authorName.isNotEmpty ? post.authorName[0] : '?',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
@@ -66,7 +64,7 @@ class FollowFeedItem extends StatelessWidget {
           // Type badge + title
           Row(
             children: [
-              Text(post.typeEmoji, style: const TextStyle(fontSize: 16)),
+              Text(post.typeEmoji, style: AppTypography.bodyLarge),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 post.typeLabel,

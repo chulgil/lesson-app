@@ -1,3 +1,4 @@
+import '../../../../core/l10n/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -52,7 +53,7 @@ class RecordingFeedbackList extends _$RecordingFeedbackList {
         userId: studentId,
         type: NotificationType.recordingFeedbackReceived,
         priority: NotificationPriority.normal,
-        title: '선생님 피드백이 도착했어요',
+        title: AppStrings.practiceTeacherFeedbackArrived,
         body: body,
         createdAt: DateTime.now(),
         actionUrl: '/recordings/$recordingId',

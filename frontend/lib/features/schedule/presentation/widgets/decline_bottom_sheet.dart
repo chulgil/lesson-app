@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../screens/suggest_alternative_screen.dart';
 
 /// Result from the decline bottom sheet.
@@ -21,10 +22,11 @@ Future<DeclineResult?> showDeclineBottomSheet(
   required int durationMinutes,
   String? teacherId,
 }) {
-  return showModalBottomSheet<DeclineResult>(
+  return showNotebookBottomSheet<DeclineResult>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    showHandle: false,
     builder:
         (context) => _DeclineBottomSheet(
           durationMinutes: durationMinutes,

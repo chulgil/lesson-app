@@ -5,11 +5,12 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
-from app.schemas.common import PaginatedResponse
+from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
     ConfirmPaymentRequest,
@@ -31,6 +32,12 @@ from app.schemas.subscription import (
 from app.services.subscription_service import SubscriptionService
 
 router = APIRouter()
+
+
+class TemplateReorderRequest(BaseModel):
+    """Display order update payload from the Flutter template repository."""
+
+    ordered_ids: list[str]
 
 
 # ---------------------------------------------------------------------------
@@ -170,7 +177,7 @@ async def update_subscription_status(
 
 @router.get(
     "/{subscription_id}/usage",
-    response_model=list[SubscriptionUsageResponse],
+    response_model=PaginatedResponse[SubscriptionUsageResponse],
     status_code=status.HTTP_200_OK,
     summary="Get subscription usage history",
 )
@@ -178,11 +185,17 @@ async def get_usage_history(
     subscription_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-) -> list[SubscriptionUsageResponse]:
+) -> PaginatedResponse[SubscriptionUsageResponse]:
     """Return usage history for a subscription."""
     service = SubscriptionService(db)
     items = await service.get_usage_history(subscription_id, current_user)
-    return [SubscriptionUsageResponse.model_validate(u) for u in items]
+    responses = [SubscriptionUsageResponse.model_validate(u) for u in items]
+    return PaginatedResponse.create(
+        items=responses,
+        total=len(responses),
+        page=1,
+        size=len(responses) or 1,
+    )
 
 
 @router.post(
@@ -310,6 +323,53 @@ async def create_template(
     return await service.create_template(body, current_user)
 
 
+@router.get(
+    "-templates/{template_id}",
+    response_model=SubscriptionTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get template detail",
+)
+async def get_template(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionTemplateResponse:
+    """Return one subscription template."""
+    service = SubscriptionService(db)
+    return await service.get_template_by_id(template_id, current_user)
+
+
+@router.patch(
+    "-templates/reorder",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Reorder templates",
+)
+async def reorder_templates(
+    body: TemplateReorderRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    """Update template display order."""
+    service = SubscriptionService(db)
+    await service.reorder_templates(body.ordered_ids, current_user)
+
+
+@router.patch(
+    "-templates/{template_id}/toggle-active",
+    response_model=SubscriptionTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Toggle template active",
+)
+async def toggle_template_active(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionTemplateResponse:
+    """Toggle template active state."""
+    service = SubscriptionService(db)
+    return await service.toggle_template_active(template_id, current_user)
+
+
 @router.put(
     "-templates/{template_id}",
     response_model=SubscriptionTemplateResponse,
@@ -386,6 +446,38 @@ async def create_proposal(
     """Send a subscription proposal to a student."""
     service = SubscriptionService(db)
     return await service.create_proposal(body, current_user)
+
+
+@router.get(
+    "-proposals/{proposal_id}",
+    response_model=SubscriptionProposalResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get proposal detail",
+)
+async def get_proposal(
+    proposal_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SubscriptionProposalResponse:
+    """Return one subscription proposal."""
+    service = SubscriptionService(db)
+    return await service.get_proposal_by_id(proposal_id, current_user)
+
+
+@router.post(
+    "-proposals/expire",
+    response_model=SuccessResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Expire old proposals",
+)
+async def expire_old_proposals(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SuccessResponse:
+    """Mark stale proposals as expired."""
+    service = SubscriptionService(db)
+    count = await service.expire_old_proposals()
+    return SuccessResponse(message=f"Processed {count} expired proposals")
 
 
 @router.patch(

@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
@@ -78,7 +79,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   }
 
   Widget _buildLoadingState() {
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space3),
         child: Row(
@@ -109,7 +110,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   }
 
   Widget _buildFileMissingState(BuildContext context) {
-    return Card(
+    return NotebookCard(
       color: AppColors.paperAccentSoft,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space3),
@@ -194,8 +195,8 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
     showDialog(
       context: context,
       builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('녹음 기록 삭제'),
+          (dialogContext) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRecordingRecordDeleteTitle),
             content: const Text(
               '이 녹음 기록을 삭제하시겠습니까?\n'
               '(파일이 이미 없으므로 기록만 삭제됩니다)',
@@ -221,7 +222,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   }
 
   Widget _buildNormalState(BuildContext context) {
-    return Card(
+    return NotebookCard(
       child: InkWell(
         onTap: widget.onPlay,
         child: Padding(
@@ -317,7 +318,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             children: [
                               Icon(Icons.star_outline, size: 20),
                               SizedBox(width: AppSpacing.space2),
-                              Text('대표 녹음으로 설정'),
+                              Text(AppStrings.practiceSetRepresentative),
                             ],
                           ),
                         ),
@@ -327,7 +328,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                           children: [
                             Icon(Icons.share, size: 20),
                             SizedBox(width: AppSpacing.space2),
-                            Text('외부 앱 공유'),
+                            Text(AppStrings.practiceShareExternal),
                           ],
                         ),
                       ),
@@ -361,9 +362,11 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
     final file = File(filePath);
     if (!await file.exists()) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.practiceRecordingFileNotFound),
+          ),
+        );
       }
       return;
     }

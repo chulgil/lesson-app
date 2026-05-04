@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
@@ -483,9 +484,7 @@ class KeyPointsList extends StatelessWidget {
                     height: 6,
                     decoration: BoxDecoration(
                       color: AppColors.paperAccent,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -608,7 +607,7 @@ class RecordingStatusIndicator extends StatelessWidget {
             height: 12,
             decoration: BoxDecoration(
               color: AppColors.paperAccent,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -663,7 +662,7 @@ Future<bool?> showCancelLessonConfirmation(BuildContext context) {
   return showDialog<bool>(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.actionLessonCancel),
           content: const Text(AppStrings.cancelLessonConfirm),
           actions: [
@@ -685,7 +684,7 @@ Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
   return showDialog<bool>(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.deleteLessonTitle),
           content: const Text(AppStrings.deleteLessonConfirm),
           actions: [
@@ -716,7 +715,7 @@ Future<String?> showEditPracticeTipDialog({
   return showDialog<String?>(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.editPracticeTipTitle),
           content: TextField(
             controller: controller,

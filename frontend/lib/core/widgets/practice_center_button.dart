@@ -69,13 +69,6 @@ class _PracticeCenterButtonState extends State<PracticeCenterButton> {
           decoration: BoxDecoration(
             color: AppColors.paperAccentSoft,
             borderRadius: BorderRadius.zero,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.paperAccent.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: Center(
             child: SvgPicture.string(

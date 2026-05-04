@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Result from the payment guide bottom sheet.
 class PaymentGuideResult {
@@ -28,10 +29,11 @@ class PaymentGuideResult {
 /// Collects: subscription type, total lessons, amount, optional message.
 /// Returns [PaymentGuideResult] or null if cancelled.
 Future<PaymentGuideResult?> showPaymentGuideBottomSheet(BuildContext context) {
-  return showModalBottomSheet<PaymentGuideResult>(
+  return showNotebookBottomSheet<PaymentGuideResult>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    showHandle: false,
     builder: (context) => const _PaymentGuideSheet(),
   );
 }

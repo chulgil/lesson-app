@@ -9,6 +9,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 
 /// Reusable widget for displaying and editing practice count and time
@@ -37,7 +38,7 @@ class PracticeStatsEditor extends StatelessWidget {
           Expanded(
             child: _StatItem(
               icon: Icons.repeat,
-              label: '연습 횟수',
+              label: AppStrings.practiceCountLabel,
               value: '${section.practiceCount}회',
               onTap: () => _showCountEditor(context),
             ),
@@ -47,7 +48,7 @@ class PracticeStatsEditor extends StatelessWidget {
           Expanded(
             child: _StatItem(
               icon: Icons.timer,
-              label: '총 연습 시간',
+              label: AppStrings.practiceTotalTimeLabel,
               value: section.formattedTotalTime,
               onTap: () => _showTimeEditor(context),
             ),
@@ -58,7 +59,7 @@ class PracticeStatsEditor extends StatelessWidget {
   }
 
   void _showCountEditor(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder:
@@ -80,7 +81,7 @@ class PracticeStatsEditor extends StatelessWidget {
   }
 
   void _showTimeEditor(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder:
@@ -197,7 +198,10 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
           const SizedBox(height: AppSpacing.space4),
 
           // Notebook × Score: 바텀시트 커스텀 헤더는 Playfair appBarTitle 로 통일 (§7.27 패턴).
-          Text('연습 횟수 설정', style: NotebookTypography.appBarTitle),
+          Text(
+            AppStrings.practiceCountSettingTitle,
+            style: NotebookTypography.appBarTitle,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // Count selector
@@ -320,7 +324,10 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
           const SizedBox(height: AppSpacing.space4),
 
           // Notebook × Score: 바텀시트 커스텀 헤더는 Playfair appBarTitle 로 통일 (§7.27 패턴).
-          Text('총 연습 시간 설정', style: NotebookTypography.appBarTitle),
+          Text(
+            AppStrings.practiceTotalTimeSettingTitle,
+            style: NotebookTypography.appBarTitle,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // Time input

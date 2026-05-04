@@ -5,21 +5,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
+import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:lessonaza/features/lessons/domain/entities/lesson.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/lesson_crud_provider.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/schedule_tab.dart';
 import 'package:lessonaza/features/schedule/presentation/widgets/sticky_schedule_header_delegate.dart';
 
-/// P1-3 — schedule_tab 헤더 collapse + sticky WeekStrip 회귀 가드.
+/// P1-3 — schedule_tab compact header + sticky WeekStrip 회귀 가드.
 ///
 /// 목적:
-/// - list 모드: CustomScrollView 로 헤더가 스크롤되어 사라지고,
+/// - list 모드: compact toolbar 는 짧게 시작하고,
 ///   SliverPersistentHeader(pinned) 가 CompactWeekStrip + DateHeader 를 sticky 로 유지.
-///   시그니처 4대(NotebookMasthead / "Programme of Schedule" / "스케줄" 마스트헤드 / ThinRule)
-///   는 펼친 상태에서 모두 보존.
-/// - timeline/weeklyGrid 모드: 자체 ScrollController 와의 충돌을 피하기 위해
-///   기존 Column 레이아웃을 유지 — CustomScrollView 가 사용되지 않아야 한다.
+/// - 업무형 스케줄 화면에서는 장식성 Masthead/Programme 헤더를 제거해
+///   하위 스크롤 영역을 확보한다.
 /// - BoxConstraints / RenderBox 류 런타임 레이아웃 크래시가 없어야 한다.
 void main() {
   setUpAll(() {
@@ -63,17 +64,22 @@ void main() {
     },
   );
 
-  testWidgets(
-    'list 모드 — 시그니처 4대(Masthead/Programme/스케줄/ThinRule) 펼친 상태에서 모두 보존',
-    (tester) async {
-      await pumpScheduleTab(tester);
+  testWidgets('list 모드 — 홈/수강관리와 같은 paper 표면과 ThinRule 헤더를 노출', (tester) async {
+    await pumpScheduleTab(tester);
 
-      // Notebook × Score §1.2 정체성 — 펼친 상태에서 시그니처 보존.
-      expect(find.text('SCHEDULE'), findsOneWidget);
-      expect(find.text('Programme of Schedule'), findsOneWidget);
-      expect(find.text('스케줄'), findsOneWidget);
-    },
-  );
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is ColoredBox && widget.color == AppColors.paper,
+      ),
+      findsAtLeastNWidgets(1),
+    );
+    expect(find.text('Schedule'), findsOneWidget);
+    expect(find.text('스케줄'), findsOneWidget);
+    expect(find.byType(ThinRule), findsOneWidget);
+    expect(find.byTooltip(AppStrings.addLessonTooltip), findsOneWidget);
+    expect(find.text('Programme of Schedule'), findsNothing);
+    expect(find.text('SCHEDULE'), findsNothing);
+  });
 
   testWidgets('list 모드 — sticky delegate 가 고정 높이로 등록되어 layout 회귀 가드', (
     tester,
@@ -89,11 +95,11 @@ void main() {
 
     final header = tester.widget<SliverPersistentHeader>(delegateFinder);
     final delegate = header.delegate as StickyScheduleHeaderDelegate;
-    // CompactWeekStrip(약 80) + space3(12) + DateHeader(약 36) + space3(12).
+    // CompactWeekStrip(약 80) + DateHeader(약 36) + compact spacing.
     // 위젯이 변경되면 이 가드가 회귀를 잡는다.
     expect(delegate.minExtent, equals(delegate.maxExtent));
     expect(delegate.minExtent, greaterThan(80.0));
-    expect(delegate.minExtent, lessThan(200.0));
+    expect(delegate.minExtent, lessThan(160.0));
   });
 
   testWidgets(

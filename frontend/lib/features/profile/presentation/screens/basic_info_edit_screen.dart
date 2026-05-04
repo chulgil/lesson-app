@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -95,7 +97,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
     final action = await showImagePickerBottomSheet(
       context,
-      title: '프로필 사진',
+      title: AppStrings.profileBasicInfoPhotoTitle,
       showDelete: currentPath != null,
     );
     if (action == null || !mounted) return;
@@ -123,7 +125,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
     final action = await showImagePickerBottomSheet(
       context,
-      title: '배경 사진',
+      title: AppStrings.profileBasicInfoBackgroundTitle,
       showDelete: currentPath != null,
     );
     if (action == null || !mounted) return;
@@ -165,7 +167,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('저장되었습니다'),
+            content: Text(AppStrings.profileBasicInfoSaved),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -174,7 +176,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
+          const SnackBar(content: Text(AppStrings.profileSaveErrorRetry)),
         );
       }
     } finally {
@@ -196,9 +198,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
     return PopScope(
       canPop: !_isLoading,
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         appBar: AppBar(
-          title: const Text('기본 정보 수정'),
+          title: const Text(AppStrings.profileBasicInfoTitle),
           actions: [
             TextButton(
               onPressed: _isLoading ? null : _save,
@@ -248,7 +250,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _nameController,
-                decoration: _inputDecoration(hintText: '예: 홍길동'),
+                decoration: _inputDecoration(
+                  hintText: AppStrings.profileBasicInfoHintName,
+                ),
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -266,7 +270,8 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               TextFormField(
                 controller: _introductionController,
                 decoration: _inputDecoration(
-                  hintText: '선생님을 소개해주세요 (최소 $_minIntroductionLength자)',
+                  hintText:
+                      '${AppStrings.profileBasicInfoHintIntroduction} (최소 $_minIntroductionLength자)',
                 ),
                 maxLines: 6,
                 minLines: 4,
@@ -291,7 +296,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _teachingStyleController,
-                decoration: _inputDecoration(hintText: '레슨 방식과 철학을 설명해주세요'),
+                decoration: _inputDecoration(
+                  hintText: AppStrings.profileBasicInfoHintTeachingStyle,
+                ),
                 maxLines: 4,
                 minLines: 3,
                 textInputAction: TextInputAction.newline,
@@ -349,7 +356,11 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                     if (_selectedSpecialties.length >= _maxSpecialties) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('최대 $_maxSpecialties개까지 선택할 수 있습니다'),
+                          content: Text(
+                            AppStrings.profileBasicInfoMaxSelections(
+                              _maxSpecialties,
+                            ),
+                          ),
                           behavior: SnackBarBehavior.floating,
                           duration: const Duration(seconds: 2),
                         ),
@@ -388,7 +399,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         Expanded(
           child: TextFormField(
             controller: _areaController,
-            decoration: _inputDecoration(hintText: '예: 강남구, 서초구'),
+            decoration: _inputDecoration(
+              hintText: AppStrings.profileBasicInfoHintArea,
+            ),
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _addArea(),
           ),
@@ -413,7 +426,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     if (_lessonAreas.length >= _maxAreas) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('최대 $_maxAreas개까지 추가할 수 있습니다'),
+          content: Text(AppStrings.profileBasicInfoMaxAreas(_maxAreas)),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 2),
         ),
@@ -423,7 +436,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     if (_lessonAreas.contains(area)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('이미 추가된 지역입니다'),
+          content: Text(AppStrings.profileBasicInfoAreaDuplicate),
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 2),
         ),

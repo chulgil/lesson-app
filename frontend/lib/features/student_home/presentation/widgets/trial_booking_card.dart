@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 
@@ -229,7 +230,9 @@ class TrialBookingCard extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => _onRequestChange(context),
                     icon: const Icon(Icons.swap_horiz, size: 16),
-                    label: const Text('일정 변경'),
+                    label: const Text(
+                      AppStrings.studentHomeScheduleChangeLabel,
+                    ),
                     style: OutlinedButton.styleFrom(
                       minimumSize: Size(0, AppSpacing.buttonHeight),
                       foregroundColor: AppColors.paperAccent,
@@ -265,7 +268,7 @@ class TrialBookingCard extends ConsumerWidget {
               child: FilledButton.icon(
                 onPressed: () => _onRetry(context),
                 icon: const Icon(Icons.refresh, size: 16),
-                label: const Text('다른 시간으로 다시 신청'),
+                label: const Text(AppStrings.studentHomeRetryBooking),
               ),
             ),
           ],
@@ -291,33 +294,22 @@ class TrialBookingCard extends ConsumerWidget {
   void _onRequestChange(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('일정 변경 요청 기능 준비 중입니다'),
+        content: Text(AppStrings.studentHomeScheduleChangePreparing),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
   Future<void> _onCancel(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('체험레슨 취소'),
-            content: const Text('체험레슨 신청을 취소하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('아니오'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text('취소하기'),
-              ),
-            ],
-          ),
+      title: AppStrings.studentHomeTrialCancelTitle,
+      content: const Text(AppStrings.studentHomeTrialCancelConfirm),
+      confirmLabel: AppStrings.cancelRequestAction,
+      cancelLabel: '아니오',
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -328,7 +320,7 @@ class TrialBookingCard extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('체험레슨 신청이 취소되었습니다'),
+              content: Text(AppStrings.studentHomeTrialCancelSuccess),
               backgroundColor: AppColors.paperOk,
             ),
           );
@@ -337,7 +329,7 @@ class TrialBookingCard extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('취소 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
+              content: const Text(AppStrings.studentHomeTrialCancelError),
               backgroundColor: AppColors.paperAccent,
             ),
           );

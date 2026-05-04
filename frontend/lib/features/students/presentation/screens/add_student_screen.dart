@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../../features/students/presentation/providers/student_crud_provider.dart';
@@ -66,9 +67,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('학생 작성'),
+        title: const Text(AppStrings.studentFormTitle),
         leading: IconButton(
           onPressed:
               () => showExitConfirmation(
@@ -78,7 +79,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               ),
           icon: const Icon(Icons.close),
         ),
-        actions: [TextButton(onPressed: _saveStudent, child: const Text(AppStrings.save))],
+        actions: [
+          TextButton(
+            onPressed: _saveStudent,
+            child: const Text(AppStrings.save),
+          ),
+        ],
       ),
       body: Form(
         key: _formKey,
@@ -210,7 +216,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: _saveStudent,
-                  child: const Text('학생 추가'),
+                  child: const Text(AppStrings.studentAddLabel),
                 ),
               ),
 
@@ -244,7 +250,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     if (_selectedInstrument == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('악기를 선택해주세요'),
+          content: Text(AppStrings.studentSelectInstrument),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -333,25 +339,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       if (!mounted) return;
 
       // Ask about subscription
-      final issueSubscription = await showDialog<bool>(
+      final issueSubscription = await showNotebookDialog(
         context: context,
-        builder:
-            (ctx) => AlertDialog(
-              title: const Text('학생 추가 완료'),
-              content: Text(
-                '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('나중에'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  child: const Text('발급하기'),
-                ),
-              ],
-            ),
+        title: AppStrings.studentAddCompleteTitle,
+        message: '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
+        confirmLabel: '발급하기',
+        cancelLabel: '나중에',
       );
 
       if (!mounted) return;
@@ -367,7 +360,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('학생 추가에 실패했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.studentAddFailed),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),

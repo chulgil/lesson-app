@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -27,37 +28,28 @@ class HistorySummaryCard extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space3,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStatItem(
             icon: Icons.music_note,
             iconColor: AppColors.paperAccent,
-            label: '전체',
+            label: AppStrings.practiceTotalLabel,
             value: '$totalCount곡',
           ),
           _buildDivider(),
           _buildStatItem(
             icon: Icons.check_circle,
             iconColor: AppColors.paperOk,
-            label: '완료',
+            label: AppStrings.practiceCompletedLabel,
             value: '$completedCount',
           ),
           _buildDivider(),
           _buildStatItem(
             icon: Icons.edit_note,
             iconColor: AppColors.paperAccent,
-            label: '진행 중',
+            label: AppStrings.practiceInProgress,
             value: '$inProgressCount',
           ),
         ],
@@ -78,16 +70,12 @@ class HistorySummaryCard extends StatelessWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
-          style: AppTypography.headingSmall.copyWith(
-            color: AppColors.ink,
-          ),
+          style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );

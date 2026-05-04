@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/child_profile.dart';
 import '../screens/child_profile_form_screen.dart';
 import 'add_child_option.dart';
@@ -34,7 +36,7 @@ class ProfileChildrenSection extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '연결된 자녀',
+                AppStrings.parentHomeConnectedChildren,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
@@ -46,7 +48,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                       '${AppRoutes.childProfiles}?parentId=$parentId',
                     ),
                 icon: const Icon(Icons.settings, size: 16),
-                label: const Text('관리'),
+                label: const Text(AppStrings.parentHomeManage),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
@@ -60,13 +62,6 @@ class ProfileChildrenSection extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.paper,
               borderRadius: BorderRadius.zero,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: childProfilesAsync.when(
               loading:
@@ -77,7 +72,7 @@ class ProfileChildrenSection extends ConsumerWidget {
               error:
                   (_, __) => const Padding(
                     padding: EdgeInsets.all(AppSpacing.space4),
-                    child: Text('오류가 발생했습니다.'),
+                    child: Text(AppStrings.errorOccurred),
                   ),
               data:
                   (profiles) => Column(
@@ -94,7 +89,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                       ProfileMenuItemTile(
                         item: ProfileMenuItem(
                           icon: Icons.add_circle_outline,
-                          label: '자녀 추가하기',
+                          label: AppStrings.parentHomeAddChild,
                           labelColor: AppColors.paperAccent,
                           onTap: () => _showAddChildDialog(context),
                         ),
@@ -193,9 +188,8 @@ class ProfileChildrenSection extends ConsumerWidget {
   }
 
   void _showAddChildDialog(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => SafeArea(
             child: Padding(
@@ -205,7 +199,10 @@ class ProfileChildrenSection extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-                  Text('자녀 추가 방법', style: NotebookTypography.sectionTitle),
+                  Text(
+                    AppStrings.parentHomeAddChildMethod,
+                    style: NotebookTypography.sectionTitle,
+                  ),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     '자녀를 추가할 방법을 선택하세요',

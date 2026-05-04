@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,7 +21,7 @@ class PendingRequestsScreen extends ConsumerWidget {
     final userRole = ref.watch(currentInviteUserRoleProvider);
     final responderState = ref.watch(connectionRequestResponderProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text(AppStrings.pendingRequestsAppBarTitle),
@@ -74,7 +75,7 @@ class PendingRequestsScreen extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(
                 Icons.inbox_outlined,
@@ -155,30 +156,19 @@ class PendingRequestsScreen extends ConsumerWidget {
     WidgetRef ref,
     ConnectionRequest request,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.connectionRejectDialogTitle),
-            content: Text(
-              AppStrings.connectionRejectConfirmFormat(
-                request.requesterName ?? request.requesterRole.label,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.statusRejected),
-              ),
-            ],
-          ),
+      title: AppStrings.connectionRejectDialogTitle,
+      content: Text(
+        AppStrings.connectionRejectConfirmFormat(
+          request.requesterName ?? request.requesterRole.label,
+        ),
+      ),
+      confirmLabel: AppStrings.statusRejected,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -219,13 +209,6 @@ class _RequestCard extends StatelessWidget {
         color: AppColors.paper,
         borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

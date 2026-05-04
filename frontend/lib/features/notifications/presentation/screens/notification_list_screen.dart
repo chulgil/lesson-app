@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/notification.dart';
@@ -29,9 +31,9 @@ class NotificationListScreen extends ConsumerWidget {
 
     // §7.131: AppBar 는 전역 테마(Playfair appBarTitle)를 따르고,
     // 하단에 1px ThinRule 을 두어 매스트헤드 메타포 유지.
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('알림'),
+        title: const Text(AppStrings.notifications),
         backgroundColor: AppColors.paperDark,
         elevation: 0,
         bottom: const PreferredSize(

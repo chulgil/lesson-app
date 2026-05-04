@@ -10,6 +10,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_guide_box.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../providers/week_lessons_provider.dart';
 import 'alternative_time_grid.dart';
@@ -45,10 +46,11 @@ Future<ScheduleChangeSlotResult?> showScheduleChangeSlotBottomSheet(
   BuildContext context, {
   required ScheduleChangeSlotParams params,
 }) {
-  return showModalBottomSheet<ScheduleChangeSlotResult>(
+  return showNotebookBottomSheet<ScheduleChangeSlotResult>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    showHandle: false,
     builder: (_) => _ScheduleChangeSlotBottomSheet(params: params),
   );
 }

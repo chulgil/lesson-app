@@ -15,6 +15,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/parent_home/domain/entities/parent.dart';
@@ -57,7 +58,7 @@ class StudentDetailScreen extends ConsumerWidget {
             context,
             child: _buildEmptyMessage(
               icon: Icons.person_off,
-              message: '학생을 찾을 수 없습니다',
+              message: AppStrings.studentNotFound,
             ),
           );
         }
@@ -103,7 +104,7 @@ class StudentDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildShellScaffold(BuildContext context, {required Widget child}) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       body: SafeArea(
         child: Column(
@@ -158,7 +159,7 @@ class _StudentDetailContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         backgroundColor: AppColors.paper,
         body: SafeArea(
           bottom: false,
@@ -203,10 +204,8 @@ class _StudentDetailContent extends ConsumerWidget {
   }
 
   void _showMoreOptions(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(),
       builder:
           (context) => SafeArea(
             child: Column(
@@ -217,7 +216,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 _MoreOptionTile(
                   icon: Icons.edit_outlined,
-                  title: '학생 정보 수정',
+                  title: AppStrings.studentEditInfoTitle,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(
@@ -228,7 +227,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 const _MoreOptionDivider(),
                 _MoreOptionTile(
                   icon: Icons.phone_outlined,
-                  title: '전화하기',
+                  title: AppStrings.studentCallTitle,
                   enabled: student.phone != null && student.phone!.isNotEmpty,
                   hint:
                       student.phone == null || student.phone!.isEmpty
@@ -243,7 +242,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 ),
                 _MoreOptionTile(
                   icon: Icons.message_outlined,
-                  title: '메시지 보내기',
+                  title: AppStrings.studentSendMessage,
                   enabled: student.phone != null && student.phone!.isNotEmpty,
                   hint:
                       student.phone == null || student.phone!.isEmpty
@@ -258,7 +257,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 ),
                 _MoreOptionTile(
                   icon: Icons.history,
-                  title: '레슨 기록 보기',
+                  title: AppStrings.studentViewLessonHistory,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(
@@ -270,8 +269,8 @@ class _StudentDetailContent extends ConsumerWidget {
                 if (student.status == StudentStatus.trial)
                   _MoreOptionTile(
                     icon: Icons.upgrade,
-                    title: '정규 전환',
-                    hint: '체험 학생을 정규 학생으로',
+                    title: AppStrings.studentConvertRegular,
+                    hint: AppStrings.studentConvertRegularHint,
                     onTap:
                         () => _confirmStatusChange(
                           context,
@@ -284,8 +283,8 @@ class _StudentDetailContent extends ConsumerWidget {
                 if (student.status == StudentStatus.active)
                   _MoreOptionTile(
                     icon: Icons.pause_circle_outline,
-                    title: '휴강 설정',
-                    hint: '일시적으로 레슨을 중단',
+                    title: AppStrings.studentPauseTitle,
+                    hint: AppStrings.studentPauseHint,
                     onTap:
                         () => _confirmStatusChange(
                           context,
@@ -298,8 +297,8 @@ class _StudentDetailContent extends ConsumerWidget {
                 if (student.status == StudentStatus.paused)
                   _MoreOptionTile(
                     icon: Icons.play_circle_outline,
-                    title: '레슨 재개',
-                    hint: '휴강 해제하고 레슨 재개',
+                    title: AppStrings.studentResumeTitle,
+                    hint: AppStrings.studentResumeHint,
                     onTap:
                         () => _confirmStatusChange(
                           context,
@@ -311,8 +310,8 @@ class _StudentDetailContent extends ConsumerWidget {
                   ),
                 _MoreOptionTile(
                   icon: Icons.family_restroom,
-                  title: '학부모 초대',
-                  hint: '연결을 위한 초대 코드 생성',
+                  title: AppStrings.studentParentInviteLabel,
+                  hint: AppStrings.studentParentInviteHint,
                   onTap: () {
                     Navigator.pop(context);
                     _showInviteCodeDialog(context, student.name, ref);
@@ -321,7 +320,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 const _MoreOptionDivider(),
                 _MoreOptionTile(
                   icon: Icons.delete_outline,
-                  title: '학생 삭제',
+                  title: AppStrings.studentDeleteTitle,
                   isDestructive: true,
                   onTap: () async {
                     Navigator.pop(context);
@@ -338,7 +337,9 @@ class _StudentDetailContent extends ConsumerWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('학생 삭제에 실패했습니다. 다시 시도해주세요.'),
+                              content: const Text(
+                                AppStrings.studentDeleteFailed,
+                              ),
                               backgroundColor: AppColors.paperAccent,
                             ),
                           );
@@ -377,7 +378,7 @@ class _StudentDetailContent extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.studentStatusChangeFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -386,26 +387,14 @@ class _StudentDetailContent extends ConsumerWidget {
   }
 
   Future<bool?> _showDeleteConfirmation(BuildContext context) {
-    return showDialog<bool>(
+    return showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: AppColors.paper,
-            title: const Text('학생 삭제'),
-            content: Text(
-              '${student.name} 학생을 삭제하시겠습니까?\n\n관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.studentDeleteTitle,
+      message:
+          '${student.name} 학생을 삭제하시겠습니까?\n\n관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
     );
   }
 
@@ -414,24 +403,12 @@ class _StudentDetailContent extends ConsumerWidget {
     String title,
     String message,
   ) {
-    return showDialog<bool>(
+    return showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: AppColors.paper,
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.confirm),
-              ),
-            ],
-          ),
+      title: title,
+      message: message,
+      confirmLabel: AppStrings.confirm,
+      cancelLabel: AppStrings.cancel,
     );
   }
 
@@ -465,7 +442,7 @@ class _StudentDetailContent extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('초대 코드 생성에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.studentInviteCodeFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -478,9 +455,9 @@ class _StudentDetailContent extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             backgroundColor: AppColors.paper,
-            title: const Text('학부모 초대 코드'),
+            title: const Text(AppStrings.studentParentInviteCode),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -542,13 +519,13 @@ class _StudentDetailContent extends ConsumerWidget {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('초대 코드가 복사되었습니다'),
+                      content: Text(AppStrings.inviteCodeCopiedSnack),
                       duration: Duration(seconds: 2),
                     ),
                   );
                 },
                 icon: const Icon(Icons.copy, size: 18),
-                label: const Text('복사'),
+                label: const Text(AppStrings.studentCopyLabel),
               ),
               FilledButton.icon(
                 onPressed: () {
@@ -563,7 +540,7 @@ class _StudentDetailContent extends ConsumerWidget {
                   );
                 },
                 icon: const Icon(Icons.share, size: 18),
-                label: const Text('공유'),
+                label: const Text(AppStrings.studentShareLabel),
               ),
             ],
           ),

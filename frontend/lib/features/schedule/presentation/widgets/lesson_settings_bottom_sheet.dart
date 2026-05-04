@@ -59,7 +59,10 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                 const SizedBox(height: AppSpacing.space5),
 
                 // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-                Text('레슨 시간 설정', style: NotebookTypography.sectionTitle),
+                Text(
+                  AppStrings.scheduleLessonTimeSetting,
+                  style: NotebookTypography.sectionTitle,
+                ),
 
                 const SizedBox(height: AppSpacing.space2),
 

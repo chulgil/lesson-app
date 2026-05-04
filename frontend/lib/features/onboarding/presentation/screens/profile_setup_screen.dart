@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -86,7 +88,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.onboardingProfileSaveError),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -99,44 +101,38 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   Future<void> _selectProfileImage() async {
-    final source = await showModalBottomSheet<ImageSource>(
+    final source = await showNotebookBottomSheet<ImageSource>(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
-          (context) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.photo_library),
-                    title: const Text('갤러리에서 선택'),
-                    onTap: () => Navigator.pop(context, ImageSource.gallery),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.camera_alt),
-                    title: const Text('카메라로 촬영'),
-                    onTap: () => Navigator.pop(context, ImageSource.camera),
-                  ),
-                  if (_profileImage != null)
-                    ListTile(
-                      leading: Icon(
-                        Icons.delete_outline,
-                        color: AppColors.paperAccent,
-                      ),
-                      title: Text(
-                        '사진 삭제',
-                        style: TextStyle(color: AppColors.paperAccent),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() => _profileImage = null);
-                      },
-                    ),
-                ],
+          (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text(AppStrings.onboardingSelectFromGallery),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
-            ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text(AppStrings.onboardingTakePhoto),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              if (_profileImage != null)
+                ListTile(
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: AppColors.paperAccent,
+                  ),
+                  title: Text(
+                    '사진 삭제',
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() => _profileImage = null);
+                  },
+                ),
+            ],
           ),
     );
 
@@ -157,10 +153,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   void _showInstrumentSelector() {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => _InstrumentSelectorSheet(
             selectedInstruments: _selectedInstruments,
@@ -173,9 +168,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('프로필 설정'),
+        title: const Text(AppStrings.onboardingProfileSetup),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go(AppRoutes.teacherPhoneVerification),
@@ -196,7 +191,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Title — Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-f).
-                    Text('프로필 설정', style: NotebookTypography.sectionTitle),
+                    Text(
+                      AppStrings.onboardingProfileSetup,
+                      style: NotebookTypography.sectionTitle,
+                    ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       '학생들에게 보여질 기본 정보를 설정해주세요',
@@ -285,7 +283,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               color: AppColors.paper,
                             ),
                           )
-                          : Text('다음', style: AppTypography.button),
+                          : Text(
+                            AppStrings.onboardingNext,
+                            style: AppTypography.button,
+                          ),
                 ),
               ),
             ),
@@ -300,14 +301,22 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       children: [
         _ProgressStep(
           step: 1,
-          label: '휴대폰 인증',
+          label: AppStrings.onboardingPhoneVerification,
           isActive: false,
           isCompleted: true,
         ),
         _ProgressDivider(isActive: true),
-        _ProgressStep(step: 2, label: '프로필 설정', isActive: true),
+        _ProgressStep(
+          step: 2,
+          label: AppStrings.onboardingProfileSetup,
+          isActive: true,
+        ),
         _ProgressDivider(isActive: false),
-        _ProgressStep(step: 3, label: '튜토리얼', isActive: false),
+        _ProgressStep(
+          step: 3,
+          label: AppStrings.onboardingTutorial,
+          isActive: false,
+        ),
       ],
     );
   }
@@ -409,7 +418,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           focusNode: _nameFocus,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            hintText: '선생님 이름을 입력해주세요',
+            hintText: AppStrings.onboardingNameHint,
             border: OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.zero,
@@ -535,7 +544,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           maxLength: 500,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            hintText: '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)',
+            hintText: AppStrings.onboardingIntroHint,
             counterText: '',
             border: OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: OutlineInputBorder(
@@ -579,17 +588,23 @@ class _ProgressStep extends StatelessWidget {
                   isActive || isCompleted
                       ? AppColors.paperAccent
                       : AppColors.inkQuaternary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Center(
               child:
                   isCompleted
-                      ? const Icon(Icons.check, size: 16, color: AppColors.paper)
+                      ? const Icon(
+                        Icons.check,
+                        size: 16,
+                        color: AppColors.paper,
+                      )
                       : Text(
                         '$step',
                         style: AppTypography.bodySmall.copyWith(
                           color:
-                              isActive ? AppColors.paper : AppColors.inkTertiary,
+                              isActive
+                                  ? AppColors.paper
+                                  : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -667,7 +682,10 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Notebook × Score: 시트 헤더 Playfair sectionTitle (§7.87-f / §7.27).
-              Text('악기 선택', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.onboardingSelectInstrument,
+                style: NotebookTypography.sectionTitle,
+              ),
               TextButton(
                 onPressed: () {
                   widget.onSelectionChanged(_selected);

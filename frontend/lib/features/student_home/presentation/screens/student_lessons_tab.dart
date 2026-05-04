@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -187,14 +188,17 @@ class StudentLessonsTab extends ConsumerWidget {
       child: Row(
         children: [
           // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-          Text('스케줄', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.studentHomeScheduleTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
           const Spacer(),
           FilledButton.icon(
             onPressed: () {
               context.push(AppRoutes.selectTeacher);
             },
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('예약'),
+            label: const Text(AppStrings.studentHomeBookAction),
             style: FilledButton.styleFrom(
               minimumSize: Size(0, AppSpacing.buttonHeight),
               padding: const EdgeInsets.symmetric(
@@ -237,7 +241,10 @@ class StudentLessonsTab extends ConsumerWidget {
               decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
               // (README §1.1 4계층, §7.127 Gaegu 회피).
-              child: Text('오늘', style: NotebookTypography.indicatorLabel),
+              child: Text(
+                AppStrings.todayLabel,
+                style: NotebookTypography.indicatorLabel,
+              ),
             ),
           ],
           const Spacer(),
@@ -364,14 +371,14 @@ class StudentLessonsTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '예정된 레슨이 없습니다',
+              AppStrings.studentHomeNoUpcomingLesson,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '새로운 레슨을 예약해보세요',
+              AppStrings.studentHomeBookNewLesson,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -380,7 +387,7 @@ class StudentLessonsTab extends ConsumerWidget {
             OutlinedButton.icon(
               onPressed: () => context.push(AppRoutes.teacherSearch),
               icon: const Icon(Icons.search, size: 18),
-              label: const Text('선생님 찾기'),
+              label: const Text(AppStrings.studentHomeFindTeacher),
               style: OutlinedButton.styleFrom(
                 minimumSize: Size(0, AppSpacing.buttonHeight),
               ),

@@ -151,7 +151,10 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
 
                 // Active toggle
                 SwitchListTile(
-                  title: Text('활성화', style: AppTypography.bodyMedium),
+                  title: Text(
+                    AppStrings.scheduleActivate,
+                    style: AppTypography.bodyMedium,
+                  ),
                   subtitle: Text(
                     _isActive ? '학생들이 이 시간에 예약할 수 있습니다' : '이 스케줄은 비활성화 상태입니다',
                     style: AppTypography.bodySmall.copyWith(
@@ -275,7 +278,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
     if (endMinutes <= startMinutes) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('종료 시간은 시작 시간보다 늦어야 합니다'),
+          content: Text(AppStrings.scheduleEndTimeError),
           behavior: SnackBarBehavior.floating,
         ),
       );

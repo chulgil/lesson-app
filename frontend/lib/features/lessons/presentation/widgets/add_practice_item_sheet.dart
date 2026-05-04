@@ -321,9 +321,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSmall,
-                        ),
+                        borderRadius: BorderRadius.zero,
                         border: Border.all(
                           color:
                               isSelected
@@ -397,9 +395,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusSmall,
-                      ),
+                      borderRadius: BorderRadius.zero,
                       border: Border.all(
                         color:
                             _isCreatingNewRepertoire

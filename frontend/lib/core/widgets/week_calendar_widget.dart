@@ -157,13 +157,6 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.zero,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.paperAccent.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -198,7 +191,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                         Text(
                           _getHeaderText(),
                           style: AppTypography.headingMedium.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -208,7 +201,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                               ? Icons.keyboard_arrow_up
                               : Icons.keyboard_arrow_down,
                           size: 24,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.paper.withValues(alpha: 0.8),
                         ),
                       ],
                     ),
@@ -236,7 +229,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
             ),
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: AppColors.paper.withValues(alpha: 0.15),
               borderRadius: BorderRadius.zero,
             ),
             child: Column(
@@ -251,7 +244,9 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                                 child: Text(
                                   day,
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.7),
+                                    color: AppColors.paper.withValues(
+                                      alpha: 0.7,
+                                    ),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -281,12 +276,12 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: AppColors.paper.withValues(alpha: 0.15),
         borderRadius: BorderRadius.zero,
       ),
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(icon, color: Colors.white),
+        icon: Icon(icon, color: AppColors.paper),
         iconSize: 24,
         padding: const EdgeInsets.all(8),
         constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -300,7 +295,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.paper,
           borderRadius: BorderRadius.zero,
         ),
         child: Text(
@@ -381,14 +376,14 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
 
       if (isBookingMode) {
         // Booking mode: emphasize available dates
-        if (isPast) return Colors.white.withValues(alpha: 0.3);
-        if (isAvailable) return Colors.white;
-        return Colors.white.withValues(alpha: 0.35); // Unavailable future
+        if (isPast) return AppColors.paper.withValues(alpha: 0.3);
+        if (isAvailable) return AppColors.paper;
+        return AppColors.paper.withValues(alpha: 0.35); // Unavailable future
       }
 
       // Default behavior
-      if (isFuture) return Colors.white.withValues(alpha: 0.4);
-      return Colors.white;
+      if (isFuture) return AppColors.paper.withValues(alpha: 0.4);
+      return AppColors.paper;
     }
 
     return GestureDetector(
@@ -399,9 +394,9 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? Colors.white
+                  ? AppColors.paper
                   : isToday
-                  ? Colors.white.withValues(alpha: 0.25)
+                  ? AppColors.paper.withValues(alpha: 0.25)
                   : null,
           borderRadius: BorderRadius.zero,
         ),
@@ -428,7 +423,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                           ? AppColors.paperOk
                           : isBookingMode
                           ? AppColors.paperOk.withValues(alpha: 0.9)
-                          : Colors.white,
+                          : AppColors.paper,
                   shape: BoxShape.circle,
                 ),
               ),

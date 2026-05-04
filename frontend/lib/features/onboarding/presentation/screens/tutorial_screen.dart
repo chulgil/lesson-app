@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -81,7 +83,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   Widget build(BuildContext context) {
     final isLastPage = _currentPage == TutorialStepContent.allSteps.length - 1;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       body: SafeArea(
         child: Column(
           children: [
@@ -199,19 +201,23 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       children: [
         _ProgressStep(
           step: 1,
-          label: '휴대폰',
+          label: AppStrings.onboardingPhone,
           isActive: false,
           isCompleted: true,
         ),
         const SizedBox(width: AppSpacing.space1),
         _ProgressStep(
           step: 2,
-          label: '프로필',
+          label: AppStrings.onboardingProfile,
           isActive: false,
           isCompleted: true,
         ),
         const SizedBox(width: AppSpacing.space1),
-        _ProgressStep(step: 3, label: '튜토리얼', isActive: true),
+        _ProgressStep(
+          step: 3,
+          label: AppStrings.onboardingTutorial,
+          isActive: true,
+        ),
       ],
     );
   }
@@ -235,7 +241,7 @@ class _TutorialPage extends StatelessWidget {
             height: 200,
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(
               _getIconForStep(content.step),
@@ -330,7 +336,7 @@ class _ProgressStep extends StatelessWidget {
                 isActive || isCompleted
                     ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
           ),
           child: Center(
             child:
@@ -339,7 +345,8 @@ class _ProgressStep extends StatelessWidget {
                     : Text(
                       '$step',
                       style: AppTypography.caption.copyWith(
-                        color: isActive ? AppColors.paper : AppColors.inkTertiary,
+                        color:
+                            isActive ? AppColors.paper : AppColors.inkTertiary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -54,32 +54,26 @@ class ProfileMenuSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.paper,
               borderRadius: BorderRadius.zero,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Column(
-              children: items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isLast = index == items.length - 1;
+              children:
+                  items.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    final isLast = index == items.length - 1;
 
-                return Column(
-                  children: [
-                    ProfileMenuItemTile(item: item),
-                    if (!isLast)
-                      Divider(
-                        height: 1,
-                        indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                        color: AppColors.inkQuaternary,
-                      ),
-                  ],
-                );
-              }).toList(),
+                    return Column(
+                      children: [
+                        ProfileMenuItemTile(item: item),
+                        if (!isLast)
+                          Divider(
+                            height: 1,
+                            indent: AppSpacing.space4 + 24 + AppSpacing.space3,
+                            color: AppColors.inkQuaternary,
+                          ),
+                      ],
+                    );
+                  }).toList(),
             ),
           ),
         ],
@@ -131,10 +125,7 @@ class ProfileMenuItemTile extends StatelessWidget {
             ),
             if (item.trailing != null) item.trailing!,
             if (item.trailing == null)
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.inkTertiary,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

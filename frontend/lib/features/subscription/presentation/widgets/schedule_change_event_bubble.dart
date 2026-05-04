@@ -26,6 +26,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   final int? rescheduleCreditsUsed;
   final int? rescheduleCreditsRemaining;
 
+  /// Callback when the opponent's avatar is tapped.
+  final VoidCallback? onOpponentAvatarTap;
+
   const ScheduleChangeEventBubble({
     super.key,
     required this.event,
@@ -36,6 +39,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     this.bulkToSession,
     this.rescheduleCreditsUsed,
     this.rescheduleCreditsRemaining,
+    this.onOpponentAvatarTap,
   });
 
   @override
@@ -52,14 +56,17 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         children: [
           // Left: opponent avatar
           if (!isMyMessage) ...[
-            CircleAvatar(
-              radius: AppSpacing.avatarSmall / 2,
-              backgroundColor: AppColors.scheduleMutedBackground,
-              child: Text(
-                actorName.isNotEmpty ? actorName[0] : '?',
-                style: AppTypography.bodySmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.inkSecondary,
+            GestureDetector(
+              onTap: onOpponentAvatarTap,
+              child: CircleAvatar(
+                radius: AppSpacing.avatarSmall / 2,
+                backgroundColor: AppColors.scheduleMutedBackground,
+                child: Text(
+                  actorName.isNotEmpty ? actorName[0] : '?',
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.inkSecondary,
+                  ),
                 ),
               ),
             ),
@@ -74,20 +81,19 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                       ? CrossAxisAlignment.end
                       : CrossAxisAlignment.start,
               children: [
-                // Actor name (only for opponent bubbles)
-                if (!isMyMessage)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: AppSpacing.space1,
-                      bottom: AppSpacing.space1,
-                    ),
-                    child: Text(
-                      actorName,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: isMyMessage ? 0 : AppSpacing.space1,
+                    right: isMyMessage ? AppSpacing.space1 : 0,
+                    bottom: AppSpacing.space1,
+                  ),
+                  child: Text(
+                    actorName,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
                   ),
+                ),
 
                 // Bubble
                 Container(
@@ -136,9 +142,11 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   /// Display name for the event actor.
   String _actorName() {
     if (event.actorType == ProposerRole.teacher) {
-      return teacherName ?? AppStrings.teacher;
+      final name = teacherName;
+      return name == null ? AppStrings.teacher : '$name ${AppStrings.teacher}';
     }
-    return studentName ?? '';
+    final name = studentName;
+    return name == null ? AppStrings.student : '$name ${AppStrings.student}';
   }
 
   /// Main bubble content dispatched by event type.
@@ -150,6 +158,8 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       RequestEventType.scheduleChangeRejected => _buildRejectedContent(),
       // scheduleChanged is used as "requested" in this context
       RequestEventType.scheduleChanged => _buildRequestedContent(),
+      RequestEventType.lessonCancelled => _buildCancelledContent(),
+      RequestEventType.withdrawApproval => _buildWithdrawContent(),
       _ => _buildGenericContent(),
     };
   }
@@ -192,6 +202,81 @@ class ScheduleChangeEventBubble extends StatelessWidget {
             '${AppStrings.reasonPrefix}${event.message}',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+
+        if (event.suggestedSlots.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          _buildSlotCards(event.suggestedSlots),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCancelledContent() {
+    final sessionNum = event.sessionNumber ?? 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$sessionNum회차 레슨 취소를 요청했어요',
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        if (rescheduleCreditsUsed != null &&
+            rescheduleCreditsRemaining != null) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            AppStrings.cancelCreditWillBeUsed(rescheduleCreditsRemaining!),
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            AppStrings.cancelKeepsSessionAfterRequest(sessionNum),
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+        if (event.message != null && event.message!.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '${AppStrings.reasonPrefix}${event.message}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildWithdrawContent() {
+    final selectedSlotLabel = _resolveSelectedSlotLabel();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '결정을 변경했습니다',
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        if (selectedSlotLabel != null) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            selectedSlotLabel,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+              decoration: TextDecoration.lineThrough,
             ),
           ),
         ],
@@ -278,24 +363,12 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         // Confirmation line
         if (selectedSlotLabel != null && sessionNum > 0) ...[
           const SizedBox(height: AppSpacing.space2),
-          Row(
-            children: [
-              const Icon(
-                Icons.check_circle,
-                size: 16,
-                color: AppColors.paperOk,
-              ),
-              const SizedBox(width: AppSpacing.space1),
-              Expanded(
-                child: Text(
-                  AppStrings.sessionConfirmed(sessionNum, selectedSlotLabel),
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.paperOk,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            AppStrings.sessionConfirmed(sessionNum, selectedSlotLabel),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.paperOk,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ],

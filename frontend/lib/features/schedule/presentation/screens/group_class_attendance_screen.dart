@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -48,7 +49,7 @@ class _GroupClassAttendanceScreenState
       scheduleBookingsProvider(widget.scheduleId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: const Text(AppStrings.attendanceCheck),
@@ -134,7 +135,7 @@ class _GroupClassAttendanceScreenState
             height: 48,
             decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: const Center(
-              child: Text('🎻', style: TextStyle(fontSize: 24)),
+              child: Text('🎻', style: AppTypography.headingLarge),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -343,13 +344,6 @@ class _GroupClassAttendanceScreenState
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: const Border(top: BorderSide(color: AppColors.inkQuaternary)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: SizedBox(
         width: double.infinity,
@@ -428,8 +422,8 @@ class _GroupClassAttendanceScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.finishClass),
+          (context) => NotebookAlertDialog(
+            title: AppStrings.finishClass,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,16 +444,10 @@ class _GroupClassAttendanceScreenState
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.finishClass),
-              ),
-            ],
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.pop(context, false),
+            confirmLabel: AppStrings.finishClass,
+            onConfirm: () => Navigator.pop(context, true),
           ),
     );
 

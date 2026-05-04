@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -85,12 +86,15 @@ class PracticeSummarySection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentHomeWeeklyPractice,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton(
               onPressed: () {
                 context.push('${AppRoutes.practiceStats}?studentId=$studentId');
               },
-              child: const Text('상세 보기'),
+              child: const Text(AppStrings.studentHomePracticeSummaryDetail),
             ),
           ],
         ),
@@ -103,7 +107,7 @@ class PracticeSummarySection extends ConsumerWidget {
                 icon: Icons.local_fire_department,
                 iconColor: AppColors.paperAccent,
                 value: '$streakDays일',
-                label: '연속 연습',
+                label: AppStrings.studentHomePracticeStreak,
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -112,7 +116,7 @@ class PracticeSummarySection extends ConsumerWidget {
                 icon: Icons.timer_outlined,
                 iconColor: AppColors.ink,
                 value: weeklyTimeStr,
-                label: '이번 주 총',
+                label: AppStrings.studentHomePracticeWeeklyTotal,
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -121,7 +125,7 @@ class PracticeSummarySection extends ConsumerWidget {
                 icon: Icons.check_circle_outline,
                 iconColor: AppColors.paperOk,
                 value: '$goalPercent%',
-                label: '목표 달성',
+                label: AppStrings.studentHomePracticeGoalAchievement,
               ),
             ),
           ],

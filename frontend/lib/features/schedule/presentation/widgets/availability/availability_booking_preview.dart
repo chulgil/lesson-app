@@ -45,13 +45,6 @@ class AvailabilityBookingPreview extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +53,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
           // Time and duration
           Row(
             children: [
-              const Text('🎻', style: TextStyle(fontSize: 20)),
+              Text('🎻', style: AppTypography.headingMedium),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${selectedSlot.formattedTimeRange} (${selectedSlot.durationMinutes}분)',

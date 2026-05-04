@@ -74,8 +74,50 @@ class SettingsService:
             await self.db.refresh(settings)
         return settings
 
+    async def get_subscription_settings_by_teacher(self, teacher_id: str) -> Any:
+        from app.models.settings import SubscriptionSettings
+
+        settings = await self.db.scalar(
+            select(SubscriptionSettings).where(SubscriptionSettings.teacher_id == teacher_id)
+        )
+        if settings is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
+        return settings
+
+    async def get_subscription_settings_by_organization(self, organization_id: str) -> Any:
+        from app.models.settings import SubscriptionSettings
+
+        settings = await self.db.scalar(
+            select(SubscriptionSettings).where(SubscriptionSettings.organization_id == organization_id)
+        )
+        if settings is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
+        return settings
+
+    async def create_subscription_settings(self, data: dict) -> Any:
+        from app.models.settings import SubscriptionSettings
+
+        settings = SubscriptionSettings(**data)
+        self.db.add(settings)
+        await self.db.flush()
+        await self.db.refresh(settings)
+        return settings
+
     async def update_subscription_settings(self, teacher_id: str, data: dict) -> Any:
         settings = await self.get_subscription_settings(teacher_id)
+        for key, value in data.items():
+            if value is not None:
+                setattr(settings, key, value)
+        await self.db.flush()
+        await self.db.refresh(settings)
+        return settings
+
+    async def update_subscription_settings_by_id(self, settings_id: str, data: dict) -> Any:
+        from app.models.settings import SubscriptionSettings
+
+        settings = await self.db.get(SubscriptionSettings, settings_id)
+        if settings is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
         for key, value in data.items():
             if value is not None:
                 setattr(settings, key, value)
@@ -253,6 +295,14 @@ class SettingsService:
             select(TeachingResource).where(TeachingResource.id.in_(ids))
         )
         return list(result.all())
+
+    async def get_teaching_resource(self, resource_id: str, teacher_id: str) -> Any:
+        from app.models.settings import TeachingResource
+
+        resource = await self.db.get(TeachingResource, resource_id)
+        if resource is None or resource.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
+        return resource
 
     async def create_teaching_resource(self, teacher_id: str, data: dict) -> Any:
         from app.models.settings import TeachingResource

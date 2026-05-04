@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -36,9 +37,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
             : null;
     final repertoireName = repertoireAsync?.valueOrNull?.name;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('연습노트'),
+        title: const Text(AppStrings.practiceNoteTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -230,8 +231,8 @@ class PracticeNoteListScreen extends ConsumerWidget {
   Widget _buildEmpty(BuildContext context, WidgetRef ref) {
     return EmptyStateWidget(
       icon: Icons.edit_note,
-      title: '연습노트가 없습니다',
-      subtitle: '연습하면서 느낀 점을 기록해보세요',
+      title: AppStrings.practiceNoteEmptyTitle,
+      subtitle: AppStrings.practiceNoteEmptySubtitle,
       actionLabel: '노트 추가',
       actionIcon: Icons.add,
       onAction: () => _showAddDialog(context, ref),
@@ -279,9 +280,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
         .createNote(sectionId: sectionId, content: content);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('연습노트가 추가되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceNoteAddedSnack)),
+      );
     }
   }
 
@@ -297,9 +298,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
     await ref.read(practiceNoteCrudProvider.notifier).updateNote(updatedNote);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('연습노트가 수정되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceNoteUpdatedSnack)),
+      );
     }
   }
 
@@ -311,9 +312,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('노트 삭제'),
-            content: const Text('이 연습노트를 삭제할까요?'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceNoteDeleteTitle),
+            content: const Text(AppStrings.practiceNoteDeleteConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -327,7 +328,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
                       .deleteNote(note.id, sectionId);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('연습노트가 삭제되었습니다')),
+                      const SnackBar(
+                        content: Text(AppStrings.practiceNoteDeletedSnack),
+                      ),
                     );
                   }
                 },

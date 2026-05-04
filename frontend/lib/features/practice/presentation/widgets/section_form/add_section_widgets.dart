@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -32,7 +33,7 @@ class SectionHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
+          Text(icon, style: AppTypography.headingMedium.copyWith(height: 1)),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -139,7 +140,7 @@ class SettingSectionHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
+            Text(icon, style: AppTypography.headingMedium.copyWith(height: 1)),
             const SizedBox(width: AppSpacing.space2),
             // Notebook × Score: SettingSectionHeader helper 의 title 은 Playfair
             // sectionTitle 로 통일. 호출부 3곳(edit_repertoire_screen +
@@ -204,7 +205,10 @@ class RepeatCountSection extends StatelessWidget {
             ),
           ),
           items: [
-            const DropdownMenuItem(value: null, child: Text('없음')),
+            const DropdownMenuItem(
+              value: null,
+              child: Text(AppStrings.practiceNone),
+            ),
             ...List.generate(
               9,
               (index) => DropdownMenuItem(
@@ -239,7 +243,7 @@ class _RepeatCountHint extends StatelessWidget {
       decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
-          const Text('🐾', style: TextStyle(fontSize: 18)),
+          Text('🐾', style: AppTypography.headingSmall.copyWith(height: 1)),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -282,7 +286,7 @@ class TargetTimeSection extends StatelessWidget {
       children: [
         const SettingSectionHeader(
           icon: '⏱️',
-          title: '목표 연습시간',
+          title: AppStrings.practiceTargetTimeTitle,
           trailingLabel: '선택',
           description: '이 섹션의 목표 연습시간을 설정하세요',
         ),
@@ -299,7 +303,10 @@ class TargetTimeSection extends StatelessWidget {
             ),
           ),
           items: [
-            const DropdownMenuItem(value: null, child: Text('설정 안함')),
+            const DropdownMenuItem(
+              value: null,
+              child: Text(AppStrings.practiceNotSet),
+            ),
             ..._presetMinutes.map(
               (minutes) => DropdownMenuItem(
                 value: minutes,

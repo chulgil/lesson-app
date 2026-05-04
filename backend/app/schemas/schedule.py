@@ -2,7 +2,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, computed_field, model_validator
 
 # ---------------------------------------------------------------------------
 # Availability
@@ -83,9 +83,16 @@ class AvailabilityCreate(BaseModel):
 class SlotStatus(BaseModel):
     """A single bookable slot."""
 
+    id: str | None = None
+    teacher_id: str | None = None
+    date: _dt.date | None = None
     start_time: str
     end_time: str
+    duration_minutes: int | None = None
     status: str  # "available" | "booked"
+    booked_by_student_id: str | None = None
+    booked_by_student_name: str | None = None
+    lesson_id: str | None = None
     is_recommended: bool = False
 
 
@@ -201,13 +208,29 @@ class BookingResponse(BaseModel):
     updated_at: _dt.datetime | None = None
 
     # Frontend-compatible aliases (computed from backend fields)
+    @computed_field
     @property
     def lesson_date(self) -> _dt.date | None:
         return self.scheduled_date
 
+    @computed_field
     @property
     def start_time(self) -> str | None:
         return self.scheduled_time
+
+    @computed_field
+    @property
+    def duration_minutes(self) -> int | None:
+        return self.duration
+
+    @computed_field
+    @property
+    def end_time(self) -> str | None:
+        if not self.scheduled_time or self.duration is None:
+            return None
+        start = _dt.datetime.strptime(self.scheduled_time, "%H:%M")
+        end = start + _dt.timedelta(minutes=self.duration)
+        return end.strftime("%H:%M")
 
     def model_post_init(self, __context: object) -> None:
         """Map status values for frontend compatibility — Plan B (#238): SSOT 'confirmed'."""
@@ -222,6 +245,7 @@ class BookingCreate(BaseModel):
     """
 
     teacher_id: str
+    student_id: str | None = None
     lesson_type: str | None = None
 
     # Accept both naming conventions
@@ -229,6 +253,8 @@ class BookingCreate(BaseModel):
     scheduled_time: str | None = None
     lesson_date: _dt.date | None = None
     start_time: str | None = None
+    preferred_start_date: _dt.date | _dt.datetime | str | None = None
+    start_date: _dt.date | _dt.datetime | str | None = None
 
     duration: int = 60
     instrument: str | None = None
@@ -238,12 +264,51 @@ class BookingCreate(BaseModel):
     # Frontend-specific fields (stored in notes or ignored)
     student_name: str | None = None
     student_phone: str | None = None
+    student_email: str | None = None
     lesson_goal: str | None = None
     experience_level: str | None = None
+    message: str | None = None
+    schedule_type: str | None = None
+    lessons_per_week: int | None = None
     fee: int | None = None
 
     @model_validator(mode="after")
     def normalize_fields(self) -> "BookingCreate":
+        """Accept both frontend and backend field names."""
+        if self.lesson_date and not self.scheduled_date:
+            self.scheduled_date = self.lesson_date
+        if not self.scheduled_date:
+            source_date = self.preferred_start_date or self.start_date
+            if isinstance(source_date, _dt.datetime):
+                self.scheduled_date = source_date.date()
+            elif isinstance(source_date, _dt.date):
+                self.scheduled_date = source_date
+            elif isinstance(source_date, str):
+                self.scheduled_date = _dt.datetime.fromisoformat(source_date).date()
+        if self.start_time and not self.scheduled_time:
+            self.scheduled_time = self.start_time
+        if not self.scheduled_time:
+            self.scheduled_time = "00:00"
+        if self.message and not self.notes:
+            self.notes = self.message
+        return self
+
+
+class BookingUpdate(BaseModel):
+    """Update booking fields from the frontend booking repository."""
+
+    scheduled_date: _dt.date | None = None
+    scheduled_time: str | None = None
+    lesson_date: _dt.date | None = None
+    start_time: str | None = None
+    duration: int | None = None
+    instrument: str | None = None
+    location_id: str | None = None
+    notes: str | None = None
+    status: str | None = None
+
+    @model_validator(mode="after")
+    def normalize_fields(self) -> "BookingUpdate":
         """Accept both frontend and backend field names."""
         if self.lesson_date and not self.scheduled_date:
             self.scheduled_date = self.lesson_date

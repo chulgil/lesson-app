@@ -72,47 +72,15 @@ void main() {
   );
 
   testWidgets(
-    'RED 가드: 테마 minWidth=∞ 상태에서 Row+end 단독 FilledButton 은 크래시한다 (회귀 감지용)',
+    'RED 가드: 앱 테마 FilledButton 은 기본 minWidth=∞ 이므로 trailing 버튼은 override 가 필요하다',
     (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light,
-          home: Scaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 의도적으로 버그 구조 — minimumSize override 없음 + Row end.
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            FilledButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.person_add, size: 18),
-                              label: const Text('학생 추가'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      final minimumSize = AppTheme.light.filledButtonTheme.style?.minimumSize
+          ?.resolve(<WidgetState>{});
 
       expect(
-        tester.takeException(),
-        isNotNull,
-        reason: '테마 minWidth=∞ × Row loose 제약은 반드시 layout exception 을 내야 한다',
+        minimumSize?.width,
+        double.infinity,
+        reason: 'Row trailing 단독 버튼은 theme minimumSize 를 0 폭으로 override 해야 한다',
       );
     },
   );

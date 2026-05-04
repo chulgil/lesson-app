@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/lesson.dart';
 import 'lesson_confirmation_dialog.dart';
 
@@ -24,10 +25,9 @@ class AttendanceConfirmationSheet extends StatefulWidget {
     BuildContext context, {
     required Lesson lesson,
   }) {
-    return showModalBottomSheet<LessonConfirmationResult>(
+    return showNotebookModalBottomSheet<LessonConfirmationResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => AttendanceConfirmationSheet(lesson: lesson),
     );
   }

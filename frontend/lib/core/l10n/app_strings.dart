@@ -547,6 +547,12 @@ class AppStrings {
   static const chapterSubscription = '수강권 & 입금';
   static const chapterLessons = '레슨 진행';
 
+  // ── Profile Labels (프로필 시트 공통 라벨) ─────────────────
+
+  static const phoneLabel = '연락처';
+  static const parentPhoneLabel = '학부모';
+  static const levelLabel = '레벨';
+
   // ── Profile Menu ──────────────────────────────────────────
 
   /// 레슨 요청 관리 메뉴
@@ -561,10 +567,10 @@ class AppStrings {
   static const declineBottomSheetTitle = '이 시간에 레슨이 어렵습니다';
 
   /// 메시지 입력 힌트
-  static const messageHint = '학생에게 전달할 메시지';
+  static const messageHint = '전달할 메시지를 입력하세요';
 
   /// 수락 시 메시지 입력 힌트
-  static const acceptMessageHint = '학생에게 전할 메시지 (선택)';
+  static const acceptMessageHint = '전달할 메시지 (선택)';
 
   /// 거절 시 디폴트 메시지
   static const declineDefaultMessage = '현재 가능한 시간이 없어 이번에는 어렵습니다.';
@@ -578,7 +584,7 @@ class AppStrings {
   static const rejectBottomSheetTitle = '거절 메시지';
 
   /// 거절 바텀시트 안내
-  static const rejectBottomSheetGuide = '학생에게 전달할 거절 메시지를 입력해주세요.';
+  static const rejectBottomSheetGuide = '전달할 거절 메시지를 입력해주세요.';
 
   /// 거절 바텀시트 전송 버튼
   static const rejectSendAndClose = '메시지를 보낸 후 종료합니다';
@@ -851,6 +857,32 @@ class AppStrings {
   /// N회차 취소
   static String sessionCancelTitle(int n) => '$n회차 취소';
 
+  /// N회차 레슨 취소를 요청했어요
+  static String sessionLessonCancelRequested(int n) => '$n회차 레슨 취소를 요청했어요';
+
+  /// N회차 레슨이 취소되었습니다
+  static String sessionLessonCancelled(int n) => '$n회차 레슨이 취소되었습니다';
+
+  /// 변경/취소권 1회가 사용될 예정입니다. 잔여 N회
+  static String cancelCreditWillBeUsed(int remaining) =>
+      '변경/취소권 1회가 사용될 예정입니다. 잔여 $remaining회';
+
+  /// 변경/취소권 1회가 사용되었습니다. 잔여 N회
+  static String cancelCreditUsed(int remaining) =>
+      '변경/취소권 1회가 사용되었습니다. 잔여 $remaining회';
+
+  /// 취소 확정 후 다음 진행 회차 안내
+  static String cancelKeepsSessionAfterRequest(int n) =>
+      '확정되면 이번 일정만 건너뛰고, 다음 진행 레슨이 $n회차로 이어집니다.';
+
+  /// 취소 확정 후 회차 차감 없음 안내
+  static String cancelKeepsSubscriptionSession(int n) =>
+      '수강권 회차는 차감되지 않으며, 다음 진행 레슨이 $n회차입니다.';
+
+  /// 진행탭 취소 요약
+  static String cancelProgressSummary(int n) =>
+      '변경/취소권 1회 사용 예정 · 다음 진행 레슨은 $n회차';
+
   /// 변경 요청
   static const rescheduleRequest = '변경 요청';
 
@@ -966,7 +998,7 @@ class AppStrings {
   static String sessionCollapsedFuture(int n) => '$n회차 · 미정';
 
   /// Bottom input bar
-  static const subscriptionMessageHint = '학생에게 전달할 메시지를 입력하세요';
+  static const subscriptionMessageHint = '전달할 메시지를 입력하세요';
   static const subscriptionSendMessage = '메시지 전송';
   static const messageSentSuccess = '메시지를 전송했습니다';
   static const scheduleChangeButton = '일정 변경';
@@ -3785,8 +3817,8 @@ class AppStrings {
   static String proposalCreateMultiSelectInfoFormat(int count) =>
       '$count개 선택됨 — 학생이 하나를 선택합니다. ';
 
-  /// 학생에게 전달할 메시지를 입력하세요 (메시지 입력 hint)
-  static const proposalCreateMessageHint = '학생에게 전달할 메시지를 입력하세요';
+  /// 전달할 메시지를 입력하세요 (메시지 입력 hint)
+  static const proposalCreateMessageHint = '전달할 메시지를 입력하세요';
 
   /// 즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다 (즉시 발급 안내)
   static const proposalCreateImmediateIssueHelp =
@@ -5133,4 +5165,828 @@ class AppStrings {
   static const feedbackTemplateAppliedSnack = '템플릿을 적용했습니다';
   static const feedbackTemplateValidateTitle = '제목을 입력하세요';
   static const feedbackTemplateValidateBody = '본문을 입력하세요';
+
+  // ── Search ──
+  static const searchFilter = '필터';
+  static const searchFilterReset = '초기화';
+  static const searchFilterApply = '필터 적용';
+  static const searchCertifiedTeachersOnly = '자격증 인증 선생님만';
+  static const searchCertifiedTeachersSubtitle = '검증된 자격증을 보유한 선생님';
+  static const searchFindTeacher = '선생님 찾기';
+  static const searchLessonApply = '레슨 신청';
+  static const searchRestartLesson = '다시 시작하기';
+  static const searchTrialApply = '체험 신청';
+  static const searchAffiliatedTeachers = '소속 선생님';
+
+  // ── Invite / Connection ──
+  static const inviteHowToConnect = '연결 방법 알아보기';
+  static const inviteConnectWithTeacher = '선생님과 연결하는 방법';
+  static const inviteViewLessonSchedule = '레슨 일정 보기';
+  static const inviteSendMessage = '메시지 보내기';
+  static const inviteDisconnect = '연결 해제';
+  static const inviteReconnect = '다시 연결';
+  static const inviteConnectionRequest = '연결 요청';
+  static const inviteSendConnectionRequest = '연결 요청 보내기';
+  static const inviteConnectionFailed = '연결 요청에 실패했습니다';
+  static const inviteGoHome = '홈으로';
+  static const inviteLessonBooking = '레슨 예약';
+  static const inviteStudentList = '학생 목록';
+  static const inviteInviter = '초대한 사람';
+  static const inviteCode = '초대 코드';
+  static const inviteValidPeriod = '유효기간';
+  static const inviteMessageHint = '간단한 자기소개나 인사말을 작성해주세요';
+
+  // ── Onboarding ──
+  static const onboardingPhoneVerification = '휴대폰 인증';
+  static const onboardingProfileSetup = '프로필 설정';
+  static const onboardingTutorial = '튜토리얼';
+  static const onboardingPhone = '휴대폰';
+  static const onboardingProfile = '프로필';
+  static const onboardingProfileSaveError = '프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const onboardingProfileSaveFailure = '프로필 저장 실패. 다시 시도해주세요.';
+  static const onboardingSelectFromGallery = '갤러리에서 선택';
+  static const onboardingTakePhoto = '카메라로 촬영';
+  static const onboardingNext = '다음';
+  static const onboardingSelectInstrument = '악기 선택';
+  static const onboardingNameHint = '선생님 이름을 입력해주세요';
+  static const onboardingIntroHint = '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)';
+  static const onboardingStudentNameHint = '이름을 입력해주세요';
+
+  // ── Auth ──
+  static const authParentLogin = '학부모 로그인';
+  static const authSelectRole = '역할을 선택하세요';
+  static const authRoleSetupFailed = '역할 설정 실패. 다시 시도해주세요.';
+  static const authLoginFailed = '로그인 실패. 다시 시도해주세요.';
+  static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
+  static const authTermsAgreement = '서비스 이용 동의';
+  static const authTermsOfService = '서비스 이용약관 동의';
+  static const authPrivacyPolicy = '개인정보 수집·이용 동의';
+  static const authMarketingConsent = '마케팅 정보 수신 동의';
+  static const authKakaoContinue = '카카오로 계속하기';
+  static const authStudentRegister = '학생 등록';
+  static const authParentRegister = '학부모 등록';
+  static const authTeacherConnected = '선생님과 성공적으로 연결되었습니다!';
+  static const authChildConnected = '자녀가 성공적으로 연결되었습니다!';
+  static const authInviteCodeHint = '초대 코드 입력';
+  static const authDevTeacher = '선생님';
+  static const authDevStudent = '학생';
+  static const authDevParent = '학부모';
+
+  // ── Settings / Backup ──
+  static const settingsBackupCreateFailed = '백업 생성에 실패했습니다. 다시 시도해주세요.';
+  static const settingsBackupRestoreFailed = '백업 복원에 실패했습니다. 다시 시도해주세요.';
+  static const settingsRestore = '복원';
+  static const settingsShare = '공유';
+  static const settingsBackupDeleteConfirm =
+      '이 백업을 삭제하시겠습니까?\n삭제된 백업은 복구할 수 없습니다.';
+  static const settingsRecordingFiles = '녹음 파일';
+  static const settingsTotalSize = '전체 용량';
+
+  // ── Gamification ──
+  static const gamificationContinue = '계속하기';
+  static const gamificationChallenges = '도전 과제';
+  static const gamificationMyGrowth = '내 성장';
+  static const gamificationDataLoadFailed = '데이터를 불러올 수 없습니다';
+  static const gamificationEarnedBadges = '획득한 뱃지';
+  static const gamificationPointHistory = '포인트 히스토리';
+
+  // ── Follow ──
+  static const followFollowing = '팔로잉';
+  static const followFollow = '팔로우';
+  static const followTitle = '팔로우';
+  static const followUnfollowed = '팔로우가 취소되었습니다';
+  static const followFeedTitle = '소식';
+
+  // ─── Student Home ───
+  static const studentHomePracticeReminder = '연습 리마인더';
+  static const studentHomePracticeReminderDesc = '설정한 시간에 연습 알림을 받습니다';
+  static const studentHomeWeeklyPractice = '이번 주 연습';
+  static const studentHomeMySubscriptions = '내 수강권';
+  static const studentHomeViewAllSpaced = '전체 보기';
+  static const studentHomeTrialLesson = '체험레슨';
+  static const studentHomeScheduleChangeLabel = '일정 변경';
+  static const studentHomeRetryBooking = '다른 시간으로 다시 신청';
+  static const studentHomeScheduleChangePreparing = '일정 변경 요청 기능 준비 중입니다';
+  static const studentHomeTrialCancelTitle = '체험레슨 취소';
+  static const studentHomeTrialCancelConfirm = '체험레슨 신청을 취소하시겠습니까?';
+  static const studentHomeTrialCancelSuccess = '체험레슨 신청이 취소되었습니다';
+  static const studentHomeTrialCancelError = '취소 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const studentHomeLanguageSettings = '언어 설정';
+  static const studentHomeMyTrialLessons = '내 체험레슨';
+  static const studentHomeApply = '신청';
+  static const studentHomeAllTrialInScheduleTab =
+      '모든 체험 레슨은 스케줄 탭에서 확인할 수 있습니다';
+  static const studentHomeTrialBooking = '체험레슨 신청';
+  static const studentHomeStartNewLesson = '새로운 선생님과 레슨을 시작해보세요';
+  static const studentHomePracticeSummaryDetail = '상세 보기';
+  static const studentHomePracticeStreak = '연속 연습';
+  static const studentHomePracticeWeeklyTotal = '이번 주 총';
+  static const studentHomePracticeGoalAchievement = '목표 달성';
+  static const studentHomeRecentFeedback = '최근 피드백';
+  static const studentHomeFindTeacher = '선생님 찾기';
+  static const studentHomeNoUpcomingLesson = '예정된 레슨이 없습니다';
+  static const studentHomeBookLessonSuggestion = '선생님을 찾아 레슨을 예약해보세요';
+  static const studentHomeHelpTitle = '도움말';
+  static const studentHomeFaqTitle = '자주 묻는 질문';
+  static const studentHomeContactSupport = '문의하기';
+  static const studentHomeNeedHelp = '도움이 필요하신가요?';
+  static const studentHomeCannotOpenEmail = '이메일 앱을 열 수 없습니다';
+  static const studentHomeAppInfoTitle = '앱 정보';
+  static const studentHomeTermsOfService = '이용약관';
+  static const studentHomePrivacyPolicy = '개인정보처리방침';
+  static const studentHomeOpenSourceLicense = '오픈소스 라이선스';
+  static const studentHomeLogout = '로그아웃';
+  static const studentHomeLogoutConfirm = '정말 로그아웃 하시겠습니까?';
+  static const studentHomeParentInviteCodeTitle = '학부모 초대 코드';
+  static const studentHomeParentInviteMessage = '학부모님을 초대합니다';
+  static const studentHomeInviteCodeCopied = '초대 코드가 복사되었습니다';
+  static const studentHomeCopyAction = '복사';
+  static const studentHomeShareAction = '공유';
+  static const studentHomeProfileSaved = '프로필이 저장되었습니다';
+  static const studentHomeProfileSaveFailed = '저장에 실패했습니다. 다시 시도해주세요.';
+  static const studentHomeProfileEdit = '프로필 수정';
+  static const studentHomeProfilePhoto = '프로필 사진';
+  static const studentHomeNameHint = '이름을 입력하세요';
+  static const studentHomeEmailHint = '이메일을 입력하세요';
+  static const studentHomePhoneHint = '전화번호를 입력하세요';
+  static const studentHomeDeleteTeacher = '선생님 삭제';
+  static const studentHomeCancelWriting = '작성 취소';
+  static const studentHomeCancelWritingConfirm = '작성 중인 내용이 있습니다. 나가시겠습니까?';
+  static const studentHomeSaveFailedRetry = '저장 실패. 다시 시도해주세요.';
+  static const studentHomeDeleteTeacherConfirm =
+      '이 선생님을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.';
+  static const studentHomeTeacherDeleted = '선생님이 삭제되었습니다';
+  static const studentHomeDeleteFailedRetry = '삭제 실패. 다시 시도해주세요.';
+  static const studentHomeTodayPractice = '오늘의 연습';
+  static const studentHomeMyTeachers = '내 선생님';
+  static const studentHomeManualTeacherRegister = '선생님 직접 등록';
+  static const studentHomeEditAction = '편집';
+  static const studentHomeScheduleTitle = '스케줄';
+  static const studentHomeBookAction = '예약';
+  static const studentHomeDataLoadFailed = '데이터를 불러오는데 실패했습니다';
+  static const studentHomePracticeEmpty = '아직 연습 과제가 없습니다';
+  static const studentHomePracticeTeacherHint = '선생님이 과제를 등록하면 여기에 표시됩니다';
+  static const studentHomeConnectTeacher = '선생님 연결하기';
+  static const studentHomeConnectTeacherHint = '선생님을 검색하거나 초대 코드를 입력하세요';
+  static const studentHomeCompleteProfile = '프로필 완성하기';
+  static const studentHomeCompleteProfileHint = '온보딩에서 프로필이 설정되었습니다';
+  static const studentHomeCheckFirstLesson = '첫 레슨 확인하기';
+  static const studentHomeCheckFirstLessonHint = '선생님과 첫 레슨을 예약하세요';
+  static const studentHomeLessonProgressLabel = '레슨 진행';
+  static const studentHomeRenewalNeeded = '수강권 갱신이 필요해요';
+  static const studentHomeSubscriptionReady = '수강권이 준비됐어요';
+  static const studentHomeFirstLessonCheck = '첫 레슨 시간을 확인해주세요';
+  static const studentHomeNextLessonSchedule = '다음 레슨 일정에 맞춰 시작합니다';
+  static const studentHomeMenuProfileEdit = '프로필 수정';
+  static const studentHomeMenuMyTeachers = '내 선생님';
+  static const studentHomeMenuRepertoire = '레퍼토리';
+  static const studentHomeMenuPracticeHistory = '연습 기록 내역';
+  static const studentHomeMenuRecordings = '레슨 녹음 파일';
+  static const studentHomeMenuRecordingsSubtitle = '전체 녹음 관리';
+  static const studentHomeMenuParentInvite = '학부모 초대';
+  static const studentHomeMenuParentInviteSubtitle = '학부모님과 연결하기';
+  static const studentHomeMenuNotificationSettings = '알림 설정';
+  static const studentHomeMenuNotificationSubtitle = '카테고리별 알림 관리';
+  static const studentHomeMenuLanguage = '언어';
+  static const studentHomeMenuLanguageValue = '한국어';
+  static const studentHomeMenuRecordingBackup = '녹음 백업';
+  static const studentHomeTeacherNameHint = '선생님 이름을 입력하세요';
+  static const studentHomeLessonNoteHint = '레슨 관련 메모를 입력하세요';
+  static const studentHomeSearchTeacherHint = '선생님을 검색하여 레슨을 시작해보세요';
+  static const studentHomeManualTeacherSection = '직접 등록한 선생님';
+  static const studentHomeManualTeacherHint = '앱에 가입하지 않은 선생님을 직접 등록하세요';
+  static const studentHomeManualTeacherEmpty = '직접 등록한 선생님이 없습니다';
+  static const studentHomeDataLoadError = '데이터를 불러올 수 없습니다';
+  static const studentHomeBookNewLesson = '새로운 레슨을 예약해보세요';
+  static const studentHomeTeacherEditLabel = '선생님 편집';
+  static const studentHomeTeacherRegisterLabel = '선생님 등록';
+  static const studentHomeTeacherSaveLabel = '선생님 저장하기';
+  static const studentHomeTeacherRegisterAction = '선생님 등록하기';
+  static const studentHomeTeacherInfoUpdated = '선생님 정보가 수정되었습니다';
+  static const studentHomeTeacherRegistered = '선생님이 등록되었습니다';
+
+  // ── Parent Home ───────────────────────────────────────────
+
+  static const parentHomeProfile = '프로필';
+  static const parentHomeNotificationSettings = '알림 설정';
+  static const parentHomeDetailSettings = '상세 설정';
+  static const parentHomeNotificationDetailSettings = '알림 상세 설정';
+  static const parentHomeAssignmentNotification = '과제 알림';
+  static const parentHomeLessonNotification = '레슨 알림';
+  static const parentHomePracticeNotification = '연습 알림';
+  static const parentHomePaymentNotification = '입금 상태 알림';
+  static const parentHomeRequired = '필수';
+  static const parentHomeConnectedChildren = '연결된 자녀';
+  static const parentHomeManage = '관리';
+  static const parentHomeAddChildMethod = '자녀 추가 방법';
+  static const parentHomeAddChild = '자녀 추가하기';
+  static const parentHomeAddChildShort = '자녀 추가';
+  static const parentHomeChildManagement = '자녀 관리';
+  static const parentHomeChildSelect = '자녀 선택';
+  static const parentHomeNoChildren = '등록된 자녀가 없습니다';
+  static const parentHomeAssignmentStatus = '과제 현황';
+  static const parentHomePaymentSubscription = '입금·수강권';
+  static const parentHomeUpcomingLessons = '예정된 레슨';
+  static const parentHomePastLessons = '지난 레슨';
+  static const parentHomeLessonNote = '레슨 노트';
+  static const parentHomeViewDetail = '상세보기';
+  static const parentHomeRegularLesson = '정규 레슨';
+  static const parentHomeLessonScheduled = '예정';
+  static const parentHomeLessonCompleted = '완료';
+  static const parentHomeLessonCancelled = '취소';
+  static const parentHomeTodayPractice = '오늘의 연습';
+  static const parentHomeFindTeacher = '선생님 찾기';
+  static const parentHomeInviteCode = '초대코드 입력';
+  static const parentHomeWeeklyPractice = '이번 주 연습';
+  static const parentHomeConnect = '연결';
+  static const parentHomeChildDeleted = '자녀 프로필이 삭제되었습니다';
+  static const parentHomeDeleteError = '삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const parentHomeLogout = '로그아웃';
+  static const parentHomeLogoutConfirm = '정말 로그아웃 하시겠습니까?';
+  static const parentHomeWeeklyLesson = '이번주 레슨';
+  static const parentHomeAssignmentDone = '과제 완료';
+  static const parentHomePracticeStreak = '연습 스트릭';
+  static const parentHomePaymentGuideCheck = '입금 안내 확인';
+  static const parentHomeNextLesson = '다음 레슨';
+  static const parentHomeTodayPracticeLabel = '오늘 연습';
+  static const parentHomeChildNameHint = '자녀 이름 또는 별명 입력';
+  static const parentHomeInviteCodeHint = '선생님에게 받은 코드를 입력하세요';
+  static const parentHomeParentLabel = '학부모';
+  static const parentHomeTotal = '전체';
+  static const parentHomeInProgress = '진행중';
+
+  // ── Schedule (추가) ───────────────────────────────────────
+
+  static const scheduleRestoreSchedule = '이 스케줄로 복원';
+  static const scheduleMonthlyFee = '월 수강료';
+  static const scheduleRegisterRegularLesson = '정규레슨 등록하기';
+  static const scheduleSelectTime = '시간 선택하기';
+  static const scheduleDifferentTime = '다른 시간';
+  static const scheduleBookThisTime = '이 시간으로 예약';
+  static const scheduleConfirmError = '스케줄 확정 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const scheduleNoTeacherSchedule = '선생님의 스케줄 정보가 없습니다';
+  static const scheduleAlternativeProposal = '대안 시간 제안';
+  static const scheduleLessonTimeSetting = '레슨 시간 설정';
+  static const scheduleReject = '거절';
+  static const scheduleApprove = '승인';
+  static const scheduleTeacherProposal = '선생님의 제안';
+  static String scheduleLoadFailed(String error) => '불러오기 실패: $error';
+  static const scheduleSelect = '선택하기';
+  static const scheduleGuestInfo = '예약자 정보 입력';
+  static const scheduleBook = '예약하기';
+  static const scheduleGuestNameHint = '예약자 이름을 입력하세요';
+  static const scheduleMarkComplete = '완료 처리';
+  static const scheduleChangeSchedule = '일정 변경';
+  static String scheduleCompleteFailed(String error) => '완료 처리 실패: $error';
+  static String scheduleCancelFailed(String error) => '취소 실패: $error';
+  static const scheduleActivate = '활성화';
+  static const scheduleEndTimeError = '종료 시간은 시작 시간보다 늦어야 합니다';
+  static const scheduleApprovalError = '승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const scheduleProcessError = '처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const scheduleBackToStudentTime = '학생 희망 시간으로 돌아가기';
+  static const scheduleGoBack = '돌아가기';
+  static const scheduleCheckProposal = '수강권 제안 확인하기';
+  static const scheduleApply = '적용';
+  static const schedulePendingApproval = '승인 대기';
+  static const scheduleTrialLessonHint = '배우고 싶은 곡이나 궁금한 점을 적어주세요';
+  static const scheduleAvailable = '예약가능';
+  static const scheduleOpen = '가용';
+  static const scheduleMyBooking = '내 예약';
+  static const scheduleBooked = '예약됨';
+  static const scheduleHoliday = '휴무';
+  static const schedulePastTime = '지난 시간';
+
+  // ── Practice Domain (연습 도메인 한글 상수) ────────────────────────
+
+  // -- Metronome --
+  static const metronomeTimeSignaturePickerTitle = '박자표 선택';
+  static const metronomeSimpleTimeTitle = '단순 박자';
+  static const metronomeCompoundTimeTitle = '복합 박자';
+  static const metronomeSubdivisionPickerTitle = '서브디비전 선택';
+  static const metronomeBasicPatternTitle = '기본 패턴';
+  static const metronomeVariationTitle = '베리에이션 (쉼표 포함)';
+  static const metronomeOptionsTitle = '옵션';
+  static const metronomeVisualFlashLabel = '시각 플래시';
+  static const metronomeVibrationLabel = '진동';
+
+  // -- Goal --
+  static const practiceGoalTodayTitle = '오늘의 목표';
+  static const practiceGoalAchievedBadge = '달성!';
+  static const practiceGoalSettingsTooltip = '목표 설정';
+  static const practiceTimeLabel = '연습 시간';
+  static const practiceCompletedSectionLabel = '완료 섹션';
+  static const practiceThisWeekLabel = '이번 주';
+  static const practiceWeeklyGoalAchievedBadge = '주간 목표 달성!';
+  static const practiceTimeShortLabel = '시간';
+  static const practiceDayLabel = '연습일';
+  static const practiceCustomInputLabel = '직접 입력';
+  static const practiceTotalTimeLabel = '총 연습 시간';
+
+  // -- Goal Setting Screen --
+  static const practiceGoalSavedSnack = '연습 목표가 저장되었습니다';
+  static const practiceGoalSettingTitle = '연습 목표 설정';
+  static const practiceGoalSaveButton = '저장';
+  static const practiceGoalDailyTitle = '일일 목표';
+  static const practiceGoalDailySectionLabel = '완료 섹션 수';
+  static const practiceGoalWeeklyTitle = '주간 목표';
+  static const practiceGoalWeeklyTimeLabel = '총 연습 시간';
+  static const practiceGoalWeeklyDayLabel = '연습 일수';
+  static const practiceGoalResetTitle = '목표 초기화';
+  static const practiceGoalResetConfirm = '모든 목표 설정을 초기화할까요?';
+
+  // -- Section Management --
+  static const practiceRestore = '복원';
+  static const practicePermanentDelete = '영구 삭제';
+  static const practiceRepertoireRestoreTitle = '레퍼토리 복원';
+  static const practiceRepertoirePermanentDeleteTitle = '레퍼토리 영구 삭제';
+  static const practiceInProgress = '진행 중';
+
+  // -- Recording --
+  static const practiceRecordingFileNotFound = '녹음 파일을 찾을 수 없습니다';
+  static const practiceRecordingCompareTitle = '녹음 비교';
+  static const practiceSequentialPlayLabel = '순차 재생';
+  static const practiceParallelWaveLabel = '병렬 파형';
+  static const practicePeriodLabel = '기간';
+  static const practiceRecordingRecordDeleteTitle = '녹음 기록 삭제';
+  static const practiceSetRepresentative = '대표 녹음으로 설정';
+  static const practiceShareExternal = '외부 앱 공유';
+  static const practiceRecordingSaved = '녹음 저장됨';
+  static const practiceRestoreOriginal = '원본 복구';
+  static const practiceRecordingDeleteTitle = '녹음 삭제';
+  static const practiceRecordingDeleteConfirm = '이 녹음을 삭제하시겠습니까?';
+  static const practiceRecordingDeletedSnack = '녹음이 삭제되었습니다';
+  static const practiceShare = '공유';
+  static const practiceShareToTeacherTitle = '선생님께 공유';
+  static const practiceShareToTeacherConfirm = '대표 녹음을 선생님께 공유하시겠습니까?';
+  static const practiceSharedToTeacherSnack = '선생님께 공유되었습니다';
+  static const practiceSelectAsRepresentative = '대표로 선택';
+  static const practiceTeacherFeedbackArrived = '선생님 피드백이 도착했어요';
+
+  // -- Section Detail Screen --
+  static const practiceSectionNotFound = '섹션을 찾을 수 없습니다';
+  static const practiceErrorOccurred = '오류가 발생했습니다';
+  static const practicePracticeRecordTitle = '연습기록';
+  static const practiceRecordingTitle = '녹음';
+  static const practiceStatusChangeFailedRetry = '상태 변경에 실패했습니다. 다시 시도해주세요.';
+  static const practiceStatsUpdatedSnack = '연습 기록이 수정되었습니다';
+  static const practiceUpdateFailedRetry = '수정에 실패했습니다. 다시 시도해주세요.';
+  static const practiceSectionDeleteTitle = '섹션 삭제';
+  static const practiceSectionDeleteConfirm = '이 섹션과 모든 녹음을 삭제하시겠습니까?';
+
+  // -- Recording Mixin --
+  static const practiceRecordingMicPermissionRequired = '마이크 권한이 필요합니다';
+  static const practiceRecordingStartFailed = '녹음을 시작할 수 없습니다';
+  static const practiceRecordingTooShort = '녹음 시간이 너무 짧습니다 (최소 3초)';
+  static const practiceRecordingSaveFailed = '녹음 저장에 실패했습니다';
+  static const practiceOriginalRestoredSnack = '원본 파일이 복구되었습니다';
+  static const practiceRecordingSavedSnack = '녹음이 저장되었습니다';
+  static const practiceRecordingSaveFailedRetry = '녹음 저장에 실패했습니다. 다시 시도해주세요.';
+  static const practiceRepresentativeSetSnack = '대표 녹음으로 설정되었습니다';
+  static const practiceSettingFailedRetry = '설정에 실패했습니다. 다시 시도해주세요.';
+  static const practiceDeleteFailedRetry = '삭제에 실패했습니다. 다시 시도해주세요.';
+
+  // -- Practice Stats --
+  static const practiceCountLabel = '연습 횟수';
+  static const practiceRecordingCountLabel = '녹음';
+  static const practiceCountSettingTitle = '연습 횟수 설정';
+  static const practiceTotalTimeSettingTitle = '총 연습 시간 설정';
+
+  // -- Section Form --
+  static const practiceNone = '없음';
+  static const practiceTargetTimeTitle = '목표 연습시간';
+  static const practiceNotSet = '설정 안함';
+  static const practicePeriodSectionTitle = '연습 기간';
+  static const practiceStartDateLabel = '시작일';
+  static const practiceEndDateLabel = '종료일';
+
+  // -- Pitch Analysis --
+  static const practicePitchAnalysisTitle = '피치 분석';
+  static const practicePitchAccuracyLabel = '정확도';
+  static const practicePitchStabilityLabel = '안정성';
+  static const practicePitchAvgDeviationLabel = '평균 편차';
+  static const practicePitchRangeLabel = '음역';
+
+  // -- Stats --
+  static const practiceStatsSummaryTitle = '요약';
+  static const practiceCompletionRateLabel = '완료율';
+  static const practiceDailyAvgLabel = '일평균';
+  static const practiceCurrentStreakLabel = '현재 스트릭';
+  static const practiceMaxStreakLabel = '최대 스트릭';
+  static const practiceByRepertoireTitle = '레퍼토리별 연습';
+  static const practiceWeeklyTrendTitle = '주간 트렌드';
+  static const practiceDailyTimeChartTitle = '일별 연습 시간';
+  static const practiceTotalLabel = '전체';
+  static const practiceCompletedLabel = '완료';
+
+  // -- Practice Streak Card --
+  static const practiceRecordTodayLabel = '오늘 연습 기록하기';
+  static const practiceErrorOccurredShort = '오류 발생';
+
+  // -- Tuner --
+  static const tunerSettingsTitle = '튜너 설정';
+  static const tunerReferenceFrequencyTitle = '기준 주파수 (A4)';
+  static const tunerTransposeTitle = '조옮김 (관악기용)';
+  static const tunerDifficultyTitle = '판정 난이도';
+  static const tunerEnharmonicTitle = '이명동음 표시';
+  static const tunerClefTitle = '음자리표';
+  static const tunerShowComboTitle = '콤보 카운터 표시';
+  static const tunerVibrationFeedbackTitle = '진동 피드백';
+  static const tunerAppBarTitle = '튜너';
+
+  // -- Practice Notes --
+  static const practiceNoteHint = '연습하면서 느낀 점을 기록하세요...';
+  static const practiceNoteTitle = '연습노트';
+  static const practiceNoteEmptyTitle = '연습노트가 없습니다';
+  static const practiceNoteEmptySubtitle = '연습하면서 느낀 점을 기록해보세요';
+  static const practiceNoteAddedSnack = '연습노트가 추가되었습니다';
+  static const practiceNoteUpdatedSnack = '연습노트가 수정되었습니다';
+  static const practiceNoteDeleteTitle = '노트 삭제';
+  static const practiceNoteDeleteConfirm = '이 연습노트를 삭제할까요?';
+  static const practiceNoteDeletedSnack = '연습노트가 삭제되었습니다';
+
+  // -- Screens --
+  static const practiceArchiveTitle = '아카이브';
+  static const practiceRepertoireHistoryTitle = '레퍼토리 히스토리';
+  static const practiceSectionSearchHint = '레퍼토리 또는 섹션 검색...';
+  static const practiceEdit = '편집';
+  static const practiceMoveToArchive = '아카이브로 이동';
+  static const practiceErrorOccurredDot = '오류가 발생했습니다.';
+  static const practiceStatsTitle = '연습 통계';
+  static const practiceTotalCountLabel = '총 연습 횟수';
+  static const practiceTotalRecordingLabel = '총 녹음';
+  static const practiceSectionCountLabel = '섹션 수';
+  static const practiceSectionListTitle = '섹션 목록';
+  static const practiceAppBarTitle = '연습';
+  static const practiceRepertoireEmptyTitle = '아직 연습할 레퍼토리가 없습니다';
+  static const practiceRepertoireEmptySubtitle = '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요';
+  static const practiceSectionAddLabel = '섹션 추가';
+  static const practiceStatsAppBarTitle = '연습 통계';
+
+  // -- Section Edit/Add --
+  static const practiceStartMeasureGreaterError = '시작 마디가 끝 마디보다 클 수 없습니다';
+  static const practiceStartLineGreaterError = '시작 줄이 끝 줄보다 클 수 없습니다';
+  static const practiceSectionUpdateFailedRetry = '섹션 수정에 실패했습니다. 다시 시도해주세요.';
+  static const practiceSectionEditTitle = '섹션 수정';
+  static const practicePieceNameHint = '예: 1번, Allegro, Etude No.1';
+  static const practiceRangeTypeTitle = '범위 유형';
+  static const practiceRangeTypeFull = '전체';
+  static const practiceRangeTypeLine = '줄';
+  static const practiceRangeTypeMeasure = '마디';
+  static const practiceMeasureRangeTitle = '마디 범위 *';
+  static const practiceLineRangeTitle = '줄 범위 *';
+  static const practiceSectionAliasHint = '예: 도입부, 주제 A, 코다';
+  static const practiceSaveChanges = '변경사항 저장';
+  static const practiceSectionAddTitle = '섹션 추가';
+  static const practiceRepertoireAddTitle = '레퍼토리 추가';
+  static const practiceRepertoireNameHintSuzuki = '예: 스즈키 바이올린 1권';
+  static const practiceSaveButton = '저장하기';
+  static const practicePieceNameHintStar = '예: 작은 별 변주곡';
+  static const practiceRangeLabel = '구간';
+  static const practiceRepertoireAddFailedRetry = '레퍼토리 추가에 실패했습니다. 다시 시도해주세요.';
+  static const practiceSaveThenAddSection = '저장 후 섹션 추가하기';
+  static const practiceRepertoireDeleteTitle = '레퍼토리 삭제';
+
+  // -- Smart Recording --
+  static String practiceSmartTrimFront(String duration) => '앞 $duration 트림';
+  static String practiceSmartTrimEnd(String duration) => '뒤 $duration 트림';
+
+  // ── Profile Tab ──
+  static const profileSectionSubscriptionPayment = '수강권·입금';
+  static const profileSubscriptionTemplateLabel = '수강권 템플릿';
+  static const profileSubscriptionTemplateSubtitle = '수강권 종류 및 가격 설정';
+  static const profileOutstandingPaymentsLabel = '입금 확인 대기';
+  static const profileOutstandingPaymentsSubtitle = '입금 확인이 필요한 수강권';
+  static const profileBankAccountLabel = '입금 계좌';
+  static const profileBankAccountSubtitle = '수강료 입금받을 계좌 설정';
+  static const profileSectionAboutMe = '내 소개';
+  static const profileBasicInfoEditLabel = '기본 정보 수정';
+  static const profileBasicInfoEditSubtitle = '이름, 사진, 소개, 교수 스타일, 활동 지역';
+  static const profileInstrumentManagementLabel = '악기 관리';
+  static const profileInstrumentManagementSubtitle = '가르치는 악기 추가/관리';
+  static const profileCredentialsLabel = '학력·경력·자격증';
+  static const profileCredentialsSubtitle = '교육 배경 및 경력 사항';
+  static const profileSectionLessonOperation = '레슨 운영';
+  static const profileLessonTimeSettingsLabel = '레슨 시간 설정';
+  static const profileLessonTimeSettingsSubtitle = '시간 길이, 쉬는시간, 시작 간격';
+  static const profileAvailabilityLabel = '가용 시간 관리';
+  static const profileAvailabilitySubtitle = '주간 스케줄, 휴무, 예외 시간';
+  static const profileCancelPolicyLabel = '취소/노쇼 정책';
+  static const profileCancelPolicySubtitle = '변경 횟수, 취소 기한, 노쇼 처리';
+  static const profileRepertoireLabel = '레퍼토리 관리';
+  static const profileRepertoireSubtitle = '교재 및 곡 목록';
+  static const profileTipTemplateLabel = '연습 팁 템플릿';
+  static const profileTipTemplateSubtitle = '학생에게 보내는 짧은 연습 팁';
+  static const profileSectionSocial = '소셜';
+  static const profileFollowingLabel = '팔로잉';
+  static const profileFollowingSubtitle = '팔로우한 선생님·학원 관리';
+  static const profileNewsLabel = '소식';
+  static const profileNewsSubtitle = '팔로우한 선생님의 공지·이벤트';
+  static const profileSectionSettings = '설정';
+  static const profileNotificationLabel = '알림 설정';
+  static const profileRecordingLabel = '녹음 관리';
+  static const profileVisibilityLabel = '공개 설정';
+  static const profileVisibilitySubtitleLabel = '프로필 항목별 공개/비공개';
+  static const profileSectionSupport = '지원';
+  static const profileHelpLabel = '도움말';
+  static const profileAppInfoLabel = '앱 정보';
+  static const profileSectionAccount = '계정';
+  static const profileTermsLabel = '이용약관';
+  static const profilePrivacyPolicyLabel = '개인정보처리방침';
+  static const profileLogoutLabel = '로그아웃';
+  static const profileLogoutConfirm = '정말 로그아웃 하시겠습니까?';
+  static const profilePreviewCta = '내 프로필 미리보기';
+  static const profileShortcutAvailability = '가용시간';
+  static const profileShortcutOutstandingPayment = '입금대기';
+  static const profileShortcutSubscription = '수강권';
+
+  // ── Profile Preview ──
+  static const profilePreviewTitle = '프로필 미리보기';
+  static const profilePreviewNotFound = '프로필을 찾을 수 없습니다';
+  static const profilePreviewError = '오류가 발생했습니다';
+  static const profilePreviewSectionIntro = '소개';
+  static const profilePreviewSectionTeachingStyle = '교수 스타일';
+  static const profilePreviewSectionSpecialty = '전문 분야';
+  static const profilePreviewSectionEducation = '학력';
+  static const profilePreviewSectionCareer = '경력';
+  static const profilePreviewSectionCertificate = '자격증';
+  static const profilePreviewEditCta = '프로필 수정하기';
+  static const profilePreviewCopied = '프로필이 복사되었습니다';
+  static const profilePreviewExperienceYearsLabel = '경력';
+
+  // ── Profile Visibility ──
+  static const profileVisibilitySectionIntro = '소개';
+  static const profileVisibilitySectionFee = '레슨료';
+  static const profileVisibilitySectionCareerEdu = '경력 및 학력';
+  static const profileVisibilitySectionCertificate = '자격증';
+  static const profileVisibilitySectionContact = '연락처';
+
+  // ── Extended Profile (Credentials) ──
+  static const profileExtendedTitle = '학력·경력·자격증';
+  static const profileExtendedError = '오류가 발생했습니다.';
+  static const profileExtendedNotFound = '프로필을 찾을 수 없습니다';
+  static const profileEducationEmpty = '학력 정보가 없습니다';
+  static const profileEducationAdd = '학력 추가';
+  static const profileCareerEmpty = '경력 정보가 없습니다';
+  static const profileCareerAdd = '경력 추가';
+  static const profileCertificateEmpty = '등록된 자격증이 없습니다';
+  static const profileCertificateAdd = '자격증 추가';
+
+  // ── Education Edit ──
+  static const profileEducationEditTitle = '학력 수정';
+  static const profileEducationAddTitle = '학력 추가';
+  static const profileEducationDeleteTitle = '학력 삭제';
+  static const profileEducationDeleteConfirm = '이 학력 정보를 삭제하시겠습니까?';
+  static const profileEducationHintSchool = '예: 서울대학교';
+  static const profileEducationHintMajor = '예: 음악학과 바이올린 전공';
+  static const profileEducationHintGradYear = '예: 2020';
+  static const profileSaveErrorRetry = '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+  static const profileDeleteErrorRetry = '삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  // ── Career Edit ──
+  static const profileCareerEditTitle = '경력 수정';
+  static const profileCareerAddTitle = '경력 추가';
+  static const profileCareerDeleteTitle = '경력 삭제';
+  static const profileCareerDeleteConfirm = '이 경력 정보를 삭제하시겠습니까?';
+  static const profileCareerHintOrganization = '예: 서울시립교향악단';
+  static const profileCareerHintPosition = '예: 제1바이올린 단원';
+  static const profileCareerHintStartYear = '시작년도';
+  static const profileCareerHintEndYear = '종료년도';
+  static const profileCareerHintEndYearCurrent = '현재';
+  static const profileCareerCurrentlyWorking = '현재 재직 중';
+  static const profileCareerHintDescription = '담당 업무나 주요 활동 내용을 입력해주세요';
+
+  // ── Basic Info Edit ──
+  static const profileBasicInfoTitle = '기본 정보 수정';
+  static const profileBasicInfoSaved = '저장되었습니다';
+  static const profileBasicInfoPhotoTitle = '프로필 사진';
+  static const profileBasicInfoBackgroundTitle = '배경 사진';
+  static const profileBasicInfoHintName = '예: 홍길동';
+  static const profileBasicInfoHintIntroduction = '선생님을 소개해주세요';
+  static const profileBasicInfoHintTeachingStyle = '레슨 방식과 철학을 설명해주세요';
+  static const profileBasicInfoHintArea = '예: 강남구, 서초구';
+  static const profileBasicInfoAreaDuplicate = '이미 추가된 지역입니다';
+  static String profileBasicInfoMaxSelections(int max) =>
+      '최대 $max개까지 선택할 수 있습니다';
+  static String profileBasicInfoMaxAreas(int max) => '최대 $max개까지 추가할 수 있습니다';
+
+  // ── Bank Account Edit ──
+  static const profileBankAccountTitle = '입금 계좌';
+  static const profileBankAccountAddLabel = '계좌 추가';
+  static const profileBankAccountSetDefault = '기본 계좌로 설정';
+  static const profileBankAccountDeleteTitle = '계좌 삭제';
+  static const profileBankAccountAddFormTitle = '계좌 추가';
+  static const profileBankAccountBankNameLabel = '은행명 *';
+  static const profileBankAccountHintBankSelect = '은행 선택';
+  static const profileBankAccountHintBankName = '은행명 입력';
+  static const profileBankAccountNumberLabel = '계좌번호 *';
+  static const profileBankAccountHintNumber = '계좌번호를 입력하세요';
+  static const profileBankAccountHolderLabel = '예금주 *';
+  static const profileBankAccountHintHolder = '예금주명을 입력하세요';
+
+  // ── Instrument Management ──
+  static const profileInstrumentTitle = '악기 관리';
+  static const profileInstrumentError = '오류가 발생했습니다.';
+  static const profileInstrumentCurrentSection = '현재 가르치는 악기';
+  static const profileInstrumentAddSection = '악기 추가';
+  static const profileInstrumentHintCustom = '악기 이름 입력';
+  static const profileInstrumentDeleteTitle = '악기 삭제';
+
+  // ── Lesson Time Settings ──
+  static const profileLessonTimeTitle = '레슨 시간 설정';
+  static const profileLessonTimeError = '오류가 발생했습니다.';
+  static const profileLessonTimeOptionsSection = '레슨 시간 옵션';
+  static const profileBookingSettingsSection = '예약 설정';
+  static const profileBreakTimeTitle = '레슨 간 휴식 시간';
+  static const profileMinBookingTitle = '최소 예약 가능 시간';
+  static const profileBreakTimeNone = '없음';
+  static const profileOperatingHoursSection = '운영 시간대';
+  static const profileGuidanceMessageSection = '레슨 요청 안내';
+  static const profileTrialLessonSection = '체험레슨 설정';
+  static const profileTrialLessonFree = '체험레슨 무료';
+  static const profilePriceTableSection = '레슨 가격표';
+  static const profilePriceTableHint = '예: 50000';
+
+  // ── Lesson Time Settings Widgets ──
+  static const profileTimeSlotAdd = '시간대 추가';
+  static const profileTimeSlotEditTitle = '시간대 수정';
+  static const profileTimeSlotAddTitle = '시간대 추가';
+  static const profileTimeSlotEndTimeError = '종료 시간은 시작 시간 이후여야 합니다';
+  static const profileCustomDurationTitle = '커스텀 레슨 시간 추가';
+  static const profileDirectInput = '직접 입력';
+  static const profileDirectInputHint = '예: 50';
+  static const profileSliderSelect = '슬라이더로 선택';
+  static const profileDurationDeleteTitle = '레슨 시간 삭제';
+
+  // ── Extended Profile Dialogs ──
+  static const profileExperienceTitle = '교육 경력';
+  static const profileFeeSettingTitle = '레슨료 설정';
+  static const profileLessonTypeTitle = '레슨 방식';
+  static const profileLessonAreaTitle = '레슨 가능 지역';
+  static const profileLessonAreaHint = '예: 서울 강남구';
+  static const profileDeleteItemConfirm = '정보를 삭제하시겠습니까?';
+  static String profileDeleteItemTitle(String itemType) =>
+      '$itemType ${AppStrings.delete}';
+  static String profileDeleteItemMessage(String itemType) =>
+      '이 $itemType 정보를 삭제하시겠습니까?';
+
+  // ── Repertoire Management ──
+  static const profileRepertoireTitle = '레퍼토리 관리';
+  static const profileRepertoireError = '오류가 발생했습니다.';
+  static const profileRepertoireAddPiece = '곡 추가';
+  static const profileRepertoirePieceUpdated = '곡 정보가 수정되었습니다';
+  static const profileRepertoireSearchHint = '곡 제목 또는 작곡가 검색';
+  static const profileRepertoireDifficultyLabel = '난이도';
+  static const profileRepertoireComposerLabel = '작곡가';
+  static const profileRepertoireFilterReset = '필터 초기화';
+  static const profileRepertoireAssignStudent = '학생에게 할당';
+  static const profileRepertoirePieceEditTitle = '곡 수정';
+  static const profileRepertoirePieceAddTitle = '곡 추가';
+  static const profileRepertoireHintTitle = '예: 봄의 소리 왈츠';
+  static const profileRepertoireHintComposer = '예: J. Strauss II';
+  static const profileRepertoireHintOpus = '예: Op. 410';
+  static const profileRepertoireHintMovement = '예: 1악장';
+  static const profileRepertoireHintNotes = '특이사항이나 연습 포인트';
+  static const profileRepertoireDifficultySelect = '난이도 선택';
+  static const profileRepertoireDeselect = '선택 해제';
+  static const profileRepertoireComposerSelect = '작곡가 선택';
+  static const profileRepertoireNoComposers = '등록된 작곡가가 없습니다';
+  static const profileRepertoireOpusLabel = '작품번호';
+  static const profileRepertoireMovementLabel = '악장';
+  static const profileRepertoirePieceDeleteTitle = '곡 삭제';
+  static const profileRepertoireAssignTitle = '학생에게 곡 할당';
+  static const profileRepertoireNoStudents = '등록된 학생이 없습니다';
+
+  // ── Outstanding Payments ──
+  static const profileOutstandingTitle = '입금 확인 대기';
+  static const profileOutstandingError = '오류가 발생했습니다.';
+  static const profileOutstandingEmpty = '입금 확인 대기 항목이 없습니다';
+  static const profileOutstandingListTitle = '입금 확인 대기 목록';
+  static const profileOutstandingSendReminder = '알림 보내기';
+  static const profileOutstandingConfirmPayment = '입금 확인';
+  static const profileOutstandingPaymentConfirmed = '입금이 확인되었습니다';
+
+  // ── Tip Template Management ──
+  static const profileTipTemplateTitle = '템플릿 관리';
+  static const profileTipTemplateAdd = '템플릿 추가';
+  static const profileTipTemplateDeleted = '템플릿이 삭제되었습니다';
+  static const profileTipTemplateUndo = '실행취소';
+  static const profileTipTemplateDeleteTitle = '템플릿 삭제';
+  static const profileTipTemplateDeleteConfirm = '이 템플릿을 삭제하시겠습니까?';
+  static const profileTipTemplateAddDialogTitle = '새 템플릿 추가';
+  static const profileTipTemplateContentHint = '템플릿 내용을 입력하세요';
+  static const profileTipTemplateInstrumentHint = '예: 바이올린, 피아노';
+  static const profileTipTemplateContentRequired = '내용을 입력해주세요';
+  static const profileTipTemplateAdded = '템플릿이 추가되었습니다';
+  static const profileTipTemplateEditDialogTitle = '템플릿 수정';
+  static const profileTipTemplateUpdated = '템플릿이 수정되었습니다';
+
+  // ── Feedback Template Management (profile) ──
+  static const profileFeedbackTemplateAdd = '템플릿 추가';
+  static const profileFeedbackTemplateDeleteTitle = '템플릿 삭제';
+  static const profileFeedbackTemplateDeleteConfirm = '이 템플릿을 삭제하시겠습니까?';
+
+  // ── Teacher Onboarding ──
+  static const onboardingWelcomeTitle = '환영합니다!';
+  static const onboardingInviteStudentTitle = '학생 초대하기';
+  static const onboardingCreateLessonTitle = '레슨 일정 등록';
+  static const onboardingWriteFeedbackTitle = '레슨 노트 작성';
+  static const onboardingCompletedTitle = '준비 완료!';
+
+  // ── Students Feature (학생 관리) ──────────────────────────────────
+  static const studentFormTitle = '학생 작성';
+  static const studentAddLabel = '학생 추가';
+  static const studentEditTitle = '학생 수정';
+  static const studentNotFound = '학생을 찾을 수 없습니다';
+  static const studentAddFailed = '학생 추가에 실패했습니다. 다시 시도해주세요.';
+  static const studentDeleteFailed = '학생 삭제에 실패했습니다. 다시 시도해주세요.';
+  static const studentSaveFailed = '학생 정보 저장에 실패했습니다. 다시 시도해주세요.';
+  static const studentLoadError = '학생 정보를 불러올 수 없습니다';
+  static const studentSelectInstrument = '악기를 선택해주세요';
+  static const studentStatusChangeFailed = '상태 변경에 실패했습니다. 다시 시도해주세요.';
+  static const studentDeleteTitle = '학생 삭제';
+  static const studentInviteTitle = '학생 초대';
+  static const studentDirectRegister = '직접 등록';
+  static const studentParentInviteCode = '학부모 초대 코드';
+  static const studentInviteCodeFailed = '초대 코드 생성에 실패했습니다. 다시 시도해주세요.';
+  static const studentParentInviteLabel = '학부모 초대';
+  static const studentParentInviteHint = '연결을 위한 초대 코드 생성';
+  static const studentEditInfoTitle = '학생 정보 수정';
+  static const studentCallTitle = '전화하기';
+  static const studentViewLessonHistory = '레슨 기록 보기';
+  static const studentConvertRegular = '정규 전환';
+  static const studentConvertRegularHint = '체험 학생을 정규 학생으로';
+  static const studentPauseTitle = '휴강 설정';
+  static const studentPauseHint = '일시적으로 레슨을 중단';
+  static const studentResumeTitle = '레슨 재개';
+  static const studentResumeHint = '휴강 해제하고 레슨 재개';
+  static const studentCopyLabel = '복사';
+  static const studentShareLabel = '공유';
+  static const studentUpcomingLessons = '다가오는 레슨';
+  static const studentViewAll = '전체 보기';
+  static const studentLessonLoadError = '레슨 정보를 불러올 수 없습니다';
+  static const studentRecentLessons = '최근 레슨';
+  static const studentLessonHistoryError = '레슨 기록을 불러올 수 없습니다';
+  static const studentRosterMasthead = '수강 관리';
+  static const studentFilterTitle = '필터';
+  static const studentSortTitle = '정렬 기준';
+  static const studentBulkCancelLabel = '휴강 공지';
+  static const studentSendMessage = '메시지 보내기';
+  static const studentBulkMessageTitle = '일괄 메시지 보내기';
+  static const studentBulkMessageBodyHint = '메시지 내용을 입력하세요';
+  static const studentBulkMessageTitleHint = '예) 5월 연휴 일정 안내';
+  static const studentSubscriptionStatus = '수강권 현황';
+  static const studentSubscriptionIssue = '발급';
+  static const studentLessonNotes = '레슨 노트';
+  static const studentWeeklyPractice = '이번 주 연습';
+  static const studentPracticeLoadError = '연습 정보를 불러올 수 없습니다';
+  static const studentWeeklyPracticeSummary = '이번 주 연습 요약';
+  static const studentPracticeDaysLabel = '연습 일수';
+  static const studentTotalPracticeTime = '총 연습시간';
+  static const studentSharedRecordings = '공유 녹음';
+  static const studentWeeklyPracticeStatus = '주간 연습 현황';
+  static const studentSharedRecordingsSection = '공유된 녹음';
+  static const studentDetailStatsPreparing = '상세 통계 기능은 준비 중입니다';
+  static const studentDetailStatsButton = '상세 통계 보기';
+  static const studentStatTotalLessons = '총 레슨';
+  static const studentStatThisMonth = '이번 달';
+  static const studentStatWeeklyPractice = '주간 연습';
+  static const studentSearchByNameOrInstrument = '학생 이름 또는 악기로 검색';
+  static const studentRenewalProposal = '갱신 제안';
+  static const studentAddLesson = '레슨 추가';
+  static const studentReregistrationProposal = '재등록 제안';
+  static const studentTriageExpiring = '만료임박';
+  static const studentTriageUnpaid = '입금대기';
+  static const studentTriageTrial = '체험중';
+  static const studentBulkCancelConfirmTitle = '휴강 공지 발송';
+  static const studentBulkCancelReasonHint = '선생님 개인 사정으로 휴강합니다.';
+  static const studentBulkCancelNotificationTitle = '휴강 안내';
+  static const studentProfilePhotoTitle = '프로필 사진';
+  static const studentBackgroundPhotoTitle = '배경 사진';
+  static const studentAddCompleteTitle = '학생 추가 완료';
+  static const studentImageGallery = '갤러리에서 선택';
+  static const studentImageCamera = '카메라로 촬영';
+  static const studentExitConfirmMessage = '변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?';
+  static const studentAddressSearchComingSoon = '주소 검색 기능이 곧 추가됩니다';
+  static const studentAddressSearchLabel = '주소 검색';
+  static const studentPostalCodeLabel = '우편번호';
+  static const studentAddressLabel = '주소';
+  static const studentAddressHint = '주소를 입력해주세요 (예: 서울시 강남구 역삼동)';
+  static const studentAddressDetailLabel = '상세주소';
+  static const studentAddressDetailHint = '동/호수를 입력하세요 (선택)';
+  static const studentParentNameLabel = '보호자 이름';
+  static const studentParentNameHint = '보호자 이름을 입력하세요';
+  static const studentParentPhoneLabel = '보호자 연락처';
+  static const studentNameLabel = '이름';
+  static const studentNameHint = '학생 이름을 입력하세요';
+  static const studentPhoneLabel = '연락처';
+  static const studentEmailLabel = '이메일';
+  static const studentFrequencyOnceTitle = '주 1회';
+  static const studentFrequencyOnceSubtitle = '월 4회';
+  static const studentFrequencyTwiceTitle = '주 2회';
+  static const studentFrequencyTwiceSubtitle = '월 8회';
+  static const studentManageSubscription = '수강권 관리';
+  static const studentNotesLabel = '메모';
+  static const studentNotesHint = '레슨 시 참고할 내용 (악기 상태, 연습 환경, 특이사항 등)';
+  static const studentScheduleChange = '변경';
+  static const studentAddMethodQuestion = '어떤 방법으로 학생을 등록할까요?';
 }

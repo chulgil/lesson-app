@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -74,14 +75,14 @@ class NextLessonCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '예정된 레슨이 없습니다',
+                  AppStrings.studentHomeNoUpcomingLesson,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '선생님을 찾아 레슨을 예약해보세요',
+                  AppStrings.studentHomeBookLessonSuggestion,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -91,7 +92,7 @@ class NextLessonCard extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => context.push(AppRoutes.teacherSearch),
-            child: const Text('선생님 찾기'),
+            child: const Text(AppStrings.studentHomeFindTeacher),
           ),
         ],
       ),

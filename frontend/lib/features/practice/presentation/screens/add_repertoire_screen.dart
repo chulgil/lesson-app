@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -98,7 +100,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('레퍼토리 추가에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceRepertoireAddFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -153,8 +155,8 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('레퍼토리 추가')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.practiceRepertoireAddTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -168,7 +170,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 focusNode: _nameFocusNode,
                 decoration: const InputDecoration(
                   labelText: '레퍼토리 이름 *',
-                  hintText: '예: 스즈키 6권, 바흐 협주곡',
+                  hintText: AppStrings.editRepertoireNameHint,
                   prefixIcon: Icon(Icons.library_music),
                 ),
                 textInputAction: TextInputAction.next,
@@ -187,7 +189,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 controller: _descriptionController,
                 decoration: const InputDecoration(
                   labelText: '설명 (선택)',
-                  hintText: '예: Bach Violin Concerto in A minor',
+                  hintText: AppStrings.repertoireDescriptionHint,
                   prefixIcon: Icon(Icons.description),
                 ),
                 maxLines: 2,
@@ -243,7 +245,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                               color: AppColors.paper,
                             ),
                           )
-                          : const Text('레퍼토리 추가'),
+                          : const Text(AppStrings.practiceRepertoireAddTitle),
                 ),
               ),
 
@@ -256,7 +258,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                   onPressed:
                       _isLoading ? null : () => _submit(addSectionAfter: true),
                   icon: const Icon(Icons.playlist_add),
-                  label: const Text('저장 후 섹션 추가하기'),
+                  label: const Text(AppStrings.practiceSaveThenAddSection),
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),

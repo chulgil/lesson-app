@@ -4,11 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lessonaza/core/theme/notebook_typography.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 
@@ -25,8 +27,11 @@ void showExperienceDialog(
     builder:
         (context) => StatefulBuilder(
           builder:
-              (context, setState) => AlertDialog(
-                title: const Text('교육 경력'),
+              (context, setState) => NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileExperienceTitle),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -107,8 +112,11 @@ void showFeeDialog(
     builder:
         (context) => StatefulBuilder(
           builder:
-              (context, setState) => AlertDialog(
-                title: const Text('레슨료 설정'),
+              (context, setState) => NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileFeeSettingTitle),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,8 +228,11 @@ void showLessonTypesDialog(
     builder:
         (context) => StatefulBuilder(
           builder:
-              (context, setState) => AlertDialog(
-                title: const Text('레슨 방식'),
+              (context, setState) => NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileLessonTypeTitle),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children:
@@ -276,8 +287,11 @@ void showAreasDialog(
     builder:
         (context) => StatefulBuilder(
           builder:
-              (context, setState) => AlertDialog(
-                title: const Text('레슨 가능 지역'),
+              (context, setState) => NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileLessonAreaTitle),
                 content: SizedBox(
                   width: double.maxFinite,
                   child: Column(
@@ -289,7 +303,7 @@ void showAreasDialog(
                             child: TextField(
                               controller: controller,
                               decoration: const InputDecoration(
-                                hintText: '예: 서울 강남구',
+                                hintText: AppStrings.profileLessonAreaHint,
                                 isDense: true,
                               ),
                             ),
@@ -352,26 +366,17 @@ void showDeleteConfirmDialog(
   String itemType,
   VoidCallback onConfirm,
 ) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => AlertDialog(
-          title: Text('$itemType 삭제'),
-          content: Text('이 $itemType 정보를 삭제하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.cancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                onConfirm();
-                Navigator.pop(context);
-              },
-              child: const Text(AppStrings.delete),
-            ),
-          ],
-        ),
+    title: AppStrings.profileDeleteItemTitle(itemType),
+    content: Text(AppStrings.profileDeleteItemMessage(itemType)),
+    confirmLabel: AppStrings.delete,
+    cancelLabel: AppStrings.cancel,
+    isDestructive: true,
+    onConfirm: () {
+      onConfirm();
+      Navigator.pop(context);
+    },
   );
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -50,23 +51,14 @@ class RepertoireSearchAndFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Column(
         children: [
           // Search bar
           TextField(
             onChanged: onSearchChanged,
             decoration: const InputDecoration(
-              hintText: '곡 제목 또는 작곡가 검색',
+              hintText: AppStrings.profileRepertoireSearchHint,
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.symmetric(
@@ -85,7 +77,10 @@ class RepertoireSearchAndFilter extends StatelessWidget {
               children: [
                 // Difficulty filter
                 FilterChip(
-                  label: Text(selectedDifficulty ?? '난이도'),
+                  label: Text(
+                    selectedDifficulty ??
+                        AppStrings.profileRepertoireDifficultyLabel,
+                  ),
                   selected: selectedDifficulty != null,
                   onSelected: (_) => onDifficultyTap(),
                   avatar:
@@ -97,7 +92,10 @@ class RepertoireSearchAndFilter extends StatelessWidget {
 
                 // Composer filter
                 FilterChip(
-                  label: Text(selectedComposer ?? '작곡가'),
+                  label: Text(
+                    selectedComposer ??
+                        AppStrings.profileRepertoireComposerLabel,
+                  ),
                   selected: selectedComposer != null,
                   onSelected: (_) => onComposerTap(),
                   avatar:
@@ -109,7 +107,7 @@ class RepertoireSearchAndFilter extends StatelessWidget {
                 if (selectedDifficulty != null || selectedComposer != null) ...[
                   const SizedBox(width: AppSpacing.space2),
                   ActionChip(
-                    label: const Text('필터 초기화'),
+                    label: const Text(AppStrings.profileRepertoireFilterReset),
                     avatar: const Icon(Icons.clear, size: 16),
                     onPressed: onClearFilters,
                   ),
@@ -175,7 +173,7 @@ class PieceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: InkWell(
         onTap: onTap,
@@ -281,7 +279,7 @@ class PieceCard extends StatelessWidget {
                           children: [
                             Icon(Icons.person_add),
                             SizedBox(width: AppSpacing.space2),
-                            Text('학생에게 할당'),
+                            Text(AppStrings.profileRepertoireAssignStudent),
                           ],
                         ),
                       ),
@@ -366,8 +364,15 @@ class _PieceDialogState extends State<PieceDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.existingPiece != null;
 
-    return AlertDialog(
-      title: Text(isEditing ? '곡 수정' : '곡 추가'),
+    return NotebookAlertDialog(
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
+      titleTextStyle: NotebookTypography.pieceTitle,
+      title: Text(
+        isEditing
+            ? AppStrings.profileRepertoirePieceEditTitle
+            : AppStrings.profileRepertoirePieceAddTitle,
+      ),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -380,7 +385,7 @@ class _PieceDialogState extends State<PieceDialog> {
                 controller: _titleController,
                 decoration: const InputDecoration(
                   labelText: '곡 제목 *',
-                  hintText: '예: 봄의 소리 왈츠',
+                  hintText: AppStrings.profileRepertoireHintTitle,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -396,7 +401,7 @@ class _PieceDialogState extends State<PieceDialog> {
                 controller: _composerController,
                 decoration: const InputDecoration(
                   labelText: '작곡가',
-                  hintText: '예: J. Strauss II',
+                  hintText: AppStrings.profileRepertoireHintComposer,
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
@@ -406,7 +411,7 @@ class _PieceDialogState extends State<PieceDialog> {
                 controller: _opusController,
                 decoration: const InputDecoration(
                   labelText: '작품번호',
-                  hintText: '예: Op. 410',
+                  hintText: AppStrings.profileRepertoireHintOpus,
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
@@ -416,7 +421,7 @@ class _PieceDialogState extends State<PieceDialog> {
                 controller: _movementController,
                 decoration: const InputDecoration(
                   labelText: '악장',
-                  hintText: '예: 1악장',
+                  hintText: AppStrings.profileRepertoireHintMovement,
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -461,7 +466,7 @@ class _PieceDialogState extends State<PieceDialog> {
                 controller: _notesController,
                 decoration: const InputDecoration(
                   labelText: '메모',
-                  hintText: '특이사항이나 연습 포인트',
+                  hintText: AppStrings.profileRepertoireHintNotes,
                 ),
                 maxLines: 3,
               ),
@@ -522,7 +527,7 @@ void showDifficultyFilter({
 }) {
   final difficulties = ['초급', '초중급', '중급', '중상급', '상급'];
 
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     builder:
         (context) => SafeArea(
@@ -532,7 +537,10 @@ void showDifficultyFilter({
               ListTile(
                 // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
                 // (§7.27). '난이도 선택' 은 정적 명사 헤더.
-                title: Text('난이도 선택', style: NotebookTypography.appBarTitle),
+                title: Text(
+                  AppStrings.profileRepertoireDifficultySelect,
+                  style: NotebookTypography.appBarTitle,
+                ),
               ),
               const Divider(),
               ...difficulties.map(
@@ -551,7 +559,7 @@ void showDifficultyFilter({
               ),
               ListTile(
                 leading: const Icon(Icons.clear),
-                title: const Text('선택 해제'),
+                title: const Text(AppStrings.profileRepertoireDeselect),
                 onTap: () {
                   onSelected(null);
                   Navigator.pop(context);
@@ -570,7 +578,7 @@ void showComposerFilter({
   required String? selectedComposer,
   required ValueChanged<String?> onSelected,
 }) {
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     builder:
         (context) => SafeArea(
@@ -580,11 +588,16 @@ void showComposerFilter({
               ListTile(
                 // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
                 // (§7.27). '작곡가 선택' 은 정적 명사 헤더.
-                title: Text('작곡가 선택', style: NotebookTypography.appBarTitle),
+                title: Text(
+                  AppStrings.profileRepertoireComposerSelect,
+                  style: NotebookTypography.appBarTitle,
+                ),
               ),
               const Divider(),
               if (composers.isEmpty)
-                const ListTile(title: Text('등록된 작곡가가 없습니다'))
+                const ListTile(
+                  title: Text(AppStrings.profileRepertoireNoComposers),
+                )
               else
                 ...composers.map(
                   (composer) => ListTile(
@@ -598,7 +611,7 @@ void showComposerFilter({
                 ),
               ListTile(
                 leading: const Icon(Icons.clear),
-                title: const Text('선택 해제'),
+                title: const Text(AppStrings.profileRepertoireDeselect),
                 onTap: () {
                   onSelected(null);
                   Navigator.pop(context);
@@ -617,7 +630,7 @@ void showPieceDetails({
   required VoidCallback onEdit,
   required VoidCallback onAssign,
 }) {
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     builder:
@@ -654,11 +667,20 @@ void showPieceDetails({
 
                     // Details
                     if (piece.difficulty != null)
-                      _PieceDetailRow(label: '난이도', value: piece.difficulty!),
+                      _PieceDetailRow(
+                        label: AppStrings.profileRepertoireDifficultyLabel,
+                        value: piece.difficulty!,
+                      ),
                     if (piece.opus != null)
-                      _PieceDetailRow(label: '작품번호', value: piece.opus!),
+                      _PieceDetailRow(
+                        label: AppStrings.profileRepertoireOpusLabel,
+                        value: piece.opus!,
+                      ),
                     if (piece.movement != null)
-                      _PieceDetailRow(label: '악장', value: piece.movement!),
+                      _PieceDetailRow(
+                        label: AppStrings.profileRepertoireMovementLabel,
+                        value: piece.movement!,
+                      ),
                     if (piece.notes != null && piece.notes!.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.space4),
                       Text(
@@ -696,7 +718,9 @@ void showPieceDetails({
                               onAssign();
                             },
                             icon: const Icon(Icons.person_add),
-                            label: const Text('학생에게 할당'),
+                            label: const Text(
+                              AppStrings.profileRepertoireAssignStudent,
+                            ),
                           ),
                         ),
                       ],
@@ -739,26 +763,17 @@ void showDeletePieceConfirmation({
   required Piece piece,
   required VoidCallback onConfirm,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (dialogContext) => AlertDialog(
-          title: const Text('곡 삭제'),
-          content: Text('${piece.title}을(를) 삭제하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text(AppStrings.cancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                onConfirm();
-              },
-              child: const Text(AppStrings.delete),
-            ),
-          ],
-        ),
+    title: AppStrings.profileRepertoirePieceDeleteTitle,
+    content: Text('${piece.title}을(를) 삭제하시겠습니까?'),
+    confirmLabel: AppStrings.delete,
+    cancelLabel: AppStrings.cancel,
+    isDestructive: true,
+    onConfirm: () {
+      Navigator.pop(context);
+      onConfirm();
+    },
   );
 }
 
@@ -773,12 +788,15 @@ void showAssignToStudentDialog({
   showDialog(
     context: context,
     builder:
-        (dialogContext) => AlertDialog(
-          title: const Text('학생에게 곡 할당'),
+        (dialogContext) => NotebookAlertDialog(
+          backgroundColor: AppColors.paper,
+          shape: const RoundedRectangleBorder(),
+          titleTextStyle: NotebookTypography.pieceTitle,
+          title: const Text(AppStrings.profileRepertoireAssignTitle),
           content: studentsAsync.when(
             data: (students) {
               if (students.isEmpty) {
-                return const Text('등록된 학생이 없습니다');
+                return const Text(AppStrings.profileRepertoireNoStudents);
               }
               return SizedBox(
                 width: double.maxFinite,
@@ -809,7 +827,7 @@ void showAssignToStudentDialog({
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Text('오류가 발생했습니다.'),
+            error: (_, __) => const Text(AppStrings.profileRepertoireError),
           ),
           actions: [
             TextButton(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting subdivision.
@@ -15,9 +17,8 @@ class SubdivisionPicker extends StatefulWidget {
 
   /// Show the subdivision picker as a bottom sheet.
   static Future<Subdivision?> show(BuildContext context, Subdivision current) {
-    return showModalBottomSheet<Subdivision>(
+    return showNotebookModalBottomSheet<Subdivision>(
       context: context,
-      backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => SubdivisionPicker(current: current),
     );
@@ -56,7 +57,10 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
             Padding(
               padding: EdgeInsets.all(AppSpacing.space4),
               // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-              child: Text('서브디비전 선택', style: NotebookTypography.sectionTitle),
+              child: Text(
+                AppStrings.metronomeSubdivisionPickerTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ),
             // Scrollable content
             Flexible(
@@ -67,14 +71,14 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
                   children: [
                     // Basic subdivisions section
                     _buildSection(
-                      title: '기본 패턴',
+                      title: AppStrings.metronomeBasicPatternTitle,
                       subdivisions:
                           Subdivision.values.where((s) => s.isBasic).toList(),
                     ),
                     SizedBox(height: AppSpacing.space4),
                     // Variations section
                     _buildSection(
-                      title: '베리에이션 (쉼표 포함)',
+                      title: AppStrings.metronomeVariationTitle,
                       subdivisions:
                           Subdivision.values.where((s) => !s.isBasic).toList(),
                     ),
@@ -190,16 +194,6 @@ class _SubdivisionChip extends StatelessWidget {
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow:
-              isSelected
-                  ? [
-                    BoxShadow(
-                      color: AppColors.inkQuaternary,
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -207,8 +201,7 @@ class _SubdivisionChip extends StatelessWidget {
             // Visual pattern
             Text(
               subdivision.visualPattern,
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.paper : AppColors.ink,
                 letterSpacing: 1,

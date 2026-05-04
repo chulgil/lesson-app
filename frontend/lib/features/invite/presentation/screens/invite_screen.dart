@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     final inviteState = ref.watch(inviteCreatorProvider);
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(
@@ -180,13 +181,6 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       decoration: BoxDecoration(
         color: AppColors.paper,
         borderRadius: BorderRadius.zero,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         children: [

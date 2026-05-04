@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/like_stamp.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
@@ -340,10 +341,9 @@ class PracticeItemsSection extends ConsumerWidget {
   }
 
   void _showAddItemDialog(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) =>
               AddPracticeItemSheet(lessonId: lessonId, studentId: studentId),
@@ -355,10 +355,9 @@ class PracticeItemsSection extends ConsumerWidget {
     WidgetRef ref,
     PracticeItem item,
   ) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => EditPracticeItemSheet(
             item: item,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -24,7 +26,7 @@ class TeacherDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(teacherPublicProfileProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -48,7 +50,7 @@ class TeacherDetailScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space4),
                   TextButton(
                     onPressed: () => context.pop(),
-                    child: const Text('돌아가기'),
+                    child: const Text(AppStrings.goBack),
                   ),
                 ],
               ),
@@ -74,7 +76,7 @@ class TeacherDetailScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space4),
                   TextButton(
                     onPressed: () => context.pop(),
-                    child: const Text('돌아가기'),
+                    child: const Text(AppStrings.goBack),
                   ),
                 ],
               ),
@@ -346,9 +348,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                     height: 6,
                                     decoration: BoxDecoration(
                                       color: AppColors.paperAccent,
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusSmall,
-                                      ),
+                                      borderRadius: BorderRadius.zero,
                                     ),
                                   ),
                                   Expanded(
@@ -451,7 +451,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(Icons.send_outlined),
-                      label: const Text('레슨 신청'),
+                      label: const Text(AppStrings.searchLessonApply),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
                         foregroundColor: AppColors.paper,
@@ -463,7 +463,10 @@ class _TeacherDetailContent extends ConsumerWidget {
                     ),
                   ),
                 ],
+                // Notebook × Score: "Fine." 종지부
                 const SizedBox(height: AppSpacing.space6),
+                Center(child: Text('Fine.', style: NotebookTypography.fine)),
+                const SizedBox(height: AppSpacing.space8),
               ],
             ),
           ),
@@ -547,7 +550,7 @@ class _TeacherDetailContent extends ConsumerWidget {
               );
             },
             icon: const Icon(Icons.replay),
-            label: const Text('다시 시작하기'),
+            label: const Text(AppStrings.searchRestartLesson),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               foregroundColor: AppColors.paper,

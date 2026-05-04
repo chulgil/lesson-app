@@ -284,6 +284,38 @@ async def get_streak(
     return await service.get_streak(student_id, current_user)
 
 
+@router.put(
+    "/streak",
+    response_model=PracticeStreakResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update practice streak",
+)
+async def update_streak(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    student_id: str | None = None,
+) -> PracticeStreakResponse:
+    """Ensure the streak record exists and return it."""
+    service = PracticeService(db)
+    return await service.update_streak(student_id, current_user)
+
+
+@router.post(
+    "/streak/record",
+    response_model=PracticeStreakResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Record practice streak",
+)
+async def record_practice(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    student_id: str | None = None,
+) -> PracticeStreakResponse:
+    """Record today's practice and update streak counters."""
+    service = PracticeService(db)
+    return await service.record_practice(student_id, current_user)
+
+
 @router.get(
     "/stats",
     response_model=PracticeStatsResponse,

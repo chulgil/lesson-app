@@ -18,9 +18,7 @@ class DevSectionHeader extends StatelessWidget {
         Container(
           width: 4,
           height: 16,
-          decoration: BoxDecoration(
-            color: color,
-          ),
+          decoration: BoxDecoration(color: color),
         ),
         const SizedBox(width: AppSpacing.space2),
         Text(
@@ -70,7 +68,7 @@ class DevAccountCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
+            Text(emoji, style: AppTypography.headingMedium),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Column(

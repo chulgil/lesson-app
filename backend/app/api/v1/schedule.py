@@ -15,7 +15,6 @@ from app.schemas.schedule import (
     ScheduleExceptionCreate,
     ScheduleExceptionResponse,
     ScheduleExceptionUpdate,
-    SlotsResponse,
     WeeklyScheduleResponse,
 )
 from app.services.schedule_service import ScheduleService
@@ -75,6 +74,20 @@ async def set_availability(
     return await service.set_availability(body, current_user)
 
 
+@router.delete(
+    "/availability",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Clear teacher availability",
+)
+async def clear_availability(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    """Remove all weekly availability for the current teacher."""
+    service = ScheduleService(db)
+    await service.clear_availability(current_user)
+
+
 # ---------------------------------------------------------------------------
 # Weekly schedule & slots
 # ---------------------------------------------------------------------------
@@ -98,19 +111,36 @@ async def get_weekly_schedule(
 
 @router.get(
     "/slots",
-    response_model=SlotsResponse,
+    response_model=None,
     status_code=status.HTTP_200_OK,
     summary="Available booking slots",
 )
 async def get_available_slots(
     teacher_id: str,
-    date: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    date: str | None = None,
+    date_from: str | None = None,
+    date_to: str | None = None,
     duration: int = 60,
-) -> SlotsResponse:
-    """Return bookable time slots for a given teacher and date."""
+    limit: int | None = None,
+    available_only: bool = False,
+    student_id: str | None = None,
+):
+    """Return bookable slots or frontend-compatible availability shapes."""
+    del current_user, student_id
     service = ScheduleService(db)
+    if date is None and date_from is None:
+        return await service.get_frontend_time_slots(teacher_id=teacher_id)
+    if date_from is not None:
+        return await service.get_available_slots_range(
+            teacher_id=teacher_id,
+            date_from=date_from,
+            date_to=date_to,
+            duration=duration,
+            limit=limit,
+            available_only=available_only,
+        )
     return await service.get_available_slots(
         teacher_id=teacher_id,
         date=date,

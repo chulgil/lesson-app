@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -27,7 +28,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     final teacherId = ref.watch(currentUserIdProvider);
     final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.weeklyScheduleSetting)),
       body: availabilityAsync.when(
@@ -224,10 +225,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   Future<void> _showLessonSettingsDialog(
     TeacherAvailability availability,
   ) async {
-    final result = await showModalBottomSheet<Map<String, int>>(
+    final result = await showNotebookBottomSheet<Map<String, int>>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => LessonSettingsBottomSheet(
             currentLessonDuration: availability.slotDurationMinutes,
@@ -417,10 +417,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }
 
   Future<void> _showAddScheduleDialog({int? preselectedDay}) async {
-    final result = await showModalBottomSheet<WeeklySchedule>(
+    final result = await showNotebookBottomSheet<WeeklySchedule>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => ScheduleEditBottomSheet(preselectedDay: preselectedDay),
     );
@@ -434,10 +433,9 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }
 
   Future<void> _showEditScheduleDialog(WeeklySchedule schedule) async {
-    final result = await showModalBottomSheet<WeeklySchedule>(
+    final result = await showNotebookBottomSheet<WeeklySchedule>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => ScheduleEditBottomSheet(existingSchedule: schedule),
     );
 
@@ -461,8 +459,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.deleteScheduleTitle),
+          (context) => NotebookAlertDialog(
+            title: AppStrings.deleteScheduleTitle,
             content: Text(
               AppStrings.deleteScheduleConfirm(
                 dayName: schedule.dayName,
@@ -470,19 +468,11 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 endTime: schedule.endTime,
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.of(context).pop(false),
+            confirmLabel: AppStrings.delete,
+            isDestructive: true,
+            onConfirm: () => Navigator.of(context).pop(true),
           ),
     );
 

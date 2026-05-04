@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
 import '../../../../features/parent_home/presentation/providers/parent_crud_provider.dart';
 import 'notification_settings_sheet.dart';
@@ -30,7 +32,7 @@ class ProfileNotificationSection extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '알림 설정',
+                AppStrings.parentHomeNotificationSettings,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                   fontWeight: FontWeight.w600,
@@ -45,7 +47,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text('상세 설정'),
+                child: const Text(AppStrings.parentHomeDetailSettings),
               ),
             ],
           ),
@@ -54,13 +56,6 @@ class ProfileNotificationSection extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.paper,
               borderRadius: BorderRadius.zero,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: settingsAsync.when(
               loading:
@@ -71,7 +66,7 @@ class ProfileNotificationSection extends ConsumerWidget {
               error:
                   (_, __) => const Padding(
                     padding: EdgeInsets.all(AppSpacing.space4),
-                    child: Text('오류가 발생했습니다.'),
+                    child: Text(AppStrings.errorOccurred),
                   ),
               data: (settings) {
                 // Use default settings if none exist
@@ -86,7 +81,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                   children: [
                     _buildNotificationItem(
                       icon: Icons.assignment_outlined,
-                      label: '과제 알림',
+                      label: AppStrings.parentHomeAssignmentNotification,
                       subtitle: '새 과제 등록, 미완료 알림',
                       value: s.newAssignment || s.assignmentIncomplete,
                       onChanged:
@@ -100,7 +95,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildDivider(),
                     _buildNotificationItem(
                       icon: Icons.schedule,
-                      label: '레슨 알림',
+                      label: AppStrings.parentHomeLessonNotification,
                       subtitle: '일정 변경, 취소 알림',
                       value: s.lessonChange || s.lessonCancel,
                       onChanged:
@@ -114,7 +109,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildDivider(),
                     _buildNotificationItem(
                       icon: Icons.music_note,
-                      label: '연습 알림',
+                      label: AppStrings.parentHomePracticeNotification,
                       subtitle: '연습 완료, 스트릭 달성',
                       value: s.practiceComplete || s.streakAchievement,
                       onChanged:
@@ -128,7 +123,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildDivider(),
                     _buildNotificationItem(
                       icon: Icons.payment,
-                      label: '입금 상태 알림',
+                      label: AppStrings.parentHomePaymentNotification,
                       subtitle: '입금 안내, 입금 확인 (필수)',
                       value: true,
                       isRequired: true,
@@ -181,7 +176,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                           borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
-                          '필수',
+                          AppStrings.parentHomeRequired,
                           style: AppTypography.captionSmall.copyWith(
                             color: AppColors.paperAccent,
                             fontWeight: FontWeight.w600,
@@ -257,10 +252,9 @@ class ProfileNotificationSection extends ConsumerWidget {
     WidgetRef ref,
     String parentId,
   ) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.85,
@@ -274,7 +268,7 @@ class ProfileNotificationSection extends ConsumerWidget {
 
               return settingsAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                error: (_, __) => Center(child: Text(AppStrings.errorOccurred)),
                 data: (settings) {
                   final s =
                       settings ??

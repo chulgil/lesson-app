@@ -9,6 +9,7 @@ import '../config/environment.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'notebook/notebook_surfaces.dart';
 import 'recording_diagnostic_screen.dart';
 
 /// Get color for user role
@@ -51,18 +52,11 @@ class DebugRoleSwitcher extends ConsumerWidget {
             decoration: BoxDecoration(
               color: _getRoleColor(currentRole),
               borderRadius: BorderRadius.zero,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Text(
               '${currentRole.emoji} ${currentRole.label}',
               style: AppTypography.caption.copyWith(
-                color: Colors.white,
+                color: AppColors.paper,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -86,17 +80,10 @@ class DebugRoleSwitcher extends ConsumerWidget {
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: _getRoleColor(currentRole).withValues(alpha: 0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.swap_horiz,
-                color: Colors.white,
+                color: AppColors.paper,
                 size: 28,
               ),
             ),
@@ -182,7 +169,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
   }
 
   void _showDetailedOptions(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder: (context) => _DebugOptionsSheet(),
     );

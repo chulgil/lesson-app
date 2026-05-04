@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -66,7 +67,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     final isLastChance =
         !widget.isTeacherCancel && widget.remainingReschedules == 1;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.bookingCancelTitle)),
       body: SafeArea(
@@ -456,8 +457,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder:
-            (context) => AlertDialog(
-              title: const Text(AppStrings.bookingCancelLastChanceDialogTitle),
+            (context) => NotebookAlertDialog(
+              title: AppStrings.bookingCancelLastChanceDialogTitle,
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,16 +483,11 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                   const Text(AppStrings.rescheduleNoMoreAfter),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text(AppStrings.goBack),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text(AppStrings.cancelRequestAction),
-                ),
-              ],
+              cancelLabel: AppStrings.goBack,
+              onCancel: () => Navigator.pop(context, false),
+              confirmLabel: AppStrings.cancelRequestAction,
+              isDestructive: true,
+              onConfirm: () => Navigator.pop(context, true),
             ),
       );
 
@@ -566,9 +562,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   }
 
   void _showContactBottomSheet(String phone) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(),
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder:
           (context) => SafeArea(
             child: Padding(

@@ -1,7 +1,9 @@
 // Practice stats card widget
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -15,7 +17,7 @@ class PracticeStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
@@ -23,31 +25,23 @@ class PracticeStatsCard extends StatelessWidget {
             Expanded(
               child: _StatItem(
                 icon: Icons.repeat,
-                label: '연습 횟수',
+                label: AppStrings.practiceCountLabel,
                 value: '${section.practiceCount}회',
               ),
             ),
-            Container(
-              width: 1,
-              height: 40,
-              color: AppColors.inkQuaternary,
-            ),
+            Container(width: 1, height: 40, color: AppColors.inkQuaternary),
             Expanded(
               child: _StatItem(
                 icon: Icons.timer,
-                label: '총 연습 시간',
+                label: AppStrings.practiceTotalTimeLabel,
                 value: section.formattedTotalTime,
               ),
             ),
-            Container(
-              width: 1,
-              height: 40,
-              color: AppColors.inkQuaternary,
-            ),
+            Container(width: 1, height: 40, color: AppColors.inkQuaternary),
             Expanded(
               child: _StatItem(
                 icon: Icons.mic,
-                label: '녹음',
+                label: AppStrings.practiceRecordingCountLabel,
                 value: '${section.recordings.length}개',
               ),
             ),
@@ -84,9 +78,7 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -653,7 +654,10 @@ class RegularLessonSummary extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Notebook × Score: 카드 내 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-              Text('월 수강료', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.scheduleMonthlyFee,
+                style: NotebookTypography.sectionTitle,
+              ),
               Text(
                 formatFee(monthlyFee),
                 style: AppTypography.headingSmall.copyWith(
@@ -822,7 +826,7 @@ class RegularLessonSubmitButton extends StatelessWidget {
                     color: AppColors.paper,
                   ),
                 )
-                : const Text('정규레슨 등록하기'),
+                : const Text(AppStrings.scheduleRegisterRegularLesson),
       ),
     );
   }

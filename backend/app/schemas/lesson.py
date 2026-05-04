@@ -4,7 +4,6 @@ import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Lesson class (group / academy)
 # ---------------------------------------------------------------------------
@@ -63,6 +62,7 @@ class MembershipCreate(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int = 60
     notes: str | None = None
+    lesson_location_id: str | None = None
     travel_time_minutes: int | None = None
 
 
@@ -78,6 +78,7 @@ class MembershipUpdate(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int | None = None
     notes: str | None = None
+    lesson_location_id: str | None = None
     travel_time_minutes: int | None = None
 
 
@@ -98,6 +99,7 @@ class MembershipResponse(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int = 60
     notes: str | None = None
+    lesson_location_id: str | None = None
     travel_time_minutes: int | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None

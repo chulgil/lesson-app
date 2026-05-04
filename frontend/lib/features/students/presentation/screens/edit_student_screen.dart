@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
@@ -122,13 +123,13 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
     return studentAsync.when(
       loading:
-          () => Scaffold(
-            appBar: AppBar(title: const Text('학생 수정')),
+          () => NotebookScreenScaffold(
+            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
-          (error, _) => Scaffold(
-            appBar: AppBar(title: const Text('학생 수정')),
+          (error, _) => NotebookScreenScaffold(
+            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -155,9 +156,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           ),
       data: (student) {
         if (student == null) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('학생 수정')),
-            body: const Center(child: Text('학생을 찾을 수 없습니다')),
+          return NotebookScreenScaffold(
+            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
+            body: const Center(child: Text(AppStrings.studentNotFound)),
           );
         }
 
@@ -167,9 +168,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
         return PopScope(
           canPop: !_isSaving,
-          child: Scaffold(
+          child: NotebookScreenScaffold(
             appBar: AppBar(
-              title: const Text('학생 수정'),
+              title: const Text(AppStrings.studentEditTitle),
               leading: IconButton(
                 onPressed:
                     _isSaving
@@ -379,7 +380,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                                     color: AppColors.paper,
                                   ),
                                 )
-                                : const Text('변경사항 저장'),
+                                : const Text(AppStrings.saveChangesButton),
                       ),
                     ),
 
@@ -407,9 +408,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: AppColors.paperAccent,
-                          ),
+                          side: BorderSide(color: AppColors.paperAccent),
                         ),
                       ),
                     ),
@@ -451,7 +450,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
     final action = await showImagePickerBottomSheet(
       context,
-      title: '프로필 사진',
+      title: AppStrings.studentProfilePhotoTitle,
       showDelete: currentPath != null,
     );
     if (action == null || !mounted) return;
@@ -482,7 +481,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
     final action = await showImagePickerBottomSheet(
       context,
-      title: '배경 사진',
+      title: AppStrings.studentBackgroundPhotoTitle,
       showDelete: currentPath != null,
     );
     if (action == null || !mounted) return;
@@ -528,7 +527,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('학생 삭제에 실패했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.studentDeleteFailed),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),
@@ -542,7 +541,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     if (_selectedInstrument == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('악기를 선택해주세요'),
+          content: Text(AppStrings.studentSelectInstrument),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -630,7 +629,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('학생 정보 저장에 실패했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.studentSaveFailed),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),

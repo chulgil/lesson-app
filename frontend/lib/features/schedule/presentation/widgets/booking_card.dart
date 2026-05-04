@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -24,7 +26,7 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         side: BorderSide(color: AppColors.inkQuaternary),
@@ -180,7 +182,7 @@ class BookingCard extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: onReject,
                         icon: const Icon(Icons.close, size: 18),
-                        label: const Text('거절'),
+                        label: const Text(AppStrings.scheduleReject),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.paperAccent,
                           side: const BorderSide(color: AppColors.paperAccent),
@@ -192,7 +194,7 @@ class BookingCard extends StatelessWidget {
                       child: FilledButton.icon(
                         onPressed: onApprove,
                         icon: const Icon(Icons.check, size: 18),
-                        label: const Text('승인'),
+                        label: const Text(AppStrings.scheduleApprove),
                       ),
                     ),
                   ],

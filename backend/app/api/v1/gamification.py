@@ -9,7 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db
 from app.models.user import User
+from app.schemas.common import SuccessResponse
 from app.schemas.gamification import (
+    AwardBadgesRequest,
     AwardPointsRequest,
     PointHistoryResponse,
     StudentGamificationResponse,
@@ -53,3 +55,27 @@ async def award_points(
         description=body.description,
     )
     return result
+
+
+@router.post(
+    "/{student_id}/badges",
+    response_model=SuccessResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Award badges (teacher only)",
+)
+async def award_badges(
+    student_id: str,
+    body: AwardBadgesRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SuccessResponse:
+    service = GamificationService(db)
+    for badge in body.badges:
+        await service.award_badge(
+            student_id=student_id,
+            badge_name=badge.name,
+            badge_description=badge.description,
+            badge_icon=badge.icon,
+            rarity=badge.rarity,
+        )
+    return SuccessResponse(message="Badges awarded")

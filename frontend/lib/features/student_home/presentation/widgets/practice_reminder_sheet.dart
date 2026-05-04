@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/practice_reminder_provider.dart';
 
 /// Bottom sheet for configuring practice reminder time and days.
@@ -15,10 +17,11 @@ class PracticeReminderSheet extends ConsumerWidget {
   const PracticeReminderSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet(
+    return showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder: (_) => const PracticeReminderSheet(),
     );
   }
@@ -45,12 +48,15 @@ class PracticeReminderSheet extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space5),
 
               // Title — Notebook × Score: 시트 헤더는 Playfair sectionTitle (§7.87-f / §7.27).
-              Text('연습 리마인더', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.studentHomePracticeReminder,
+                style: NotebookTypography.sectionTitle,
+              ),
 
               const SizedBox(height: AppSpacing.space2),
 
               Text(
-                '설정한 시간에 연습 알림을 받습니다',
+                AppStrings.studentHomePracticeReminderDesc,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -27,7 +28,10 @@ class StudentNotesSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('레슨 노트', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentLessonNotes,
+              style: NotebookTypography.sectionTitle,
+            ),
             notesAsync.whenOrNull(
                   data:
                       (notes) =>
@@ -40,7 +44,7 @@ class StudentNotesSection extends ConsumerWidget {
                                         studentId,
                                       ),
                                     ),
-                                child: const Text('전체 보기'),
+                                child: const Text(AppStrings.studentViewAll),
                               )
                               : null,
                 ) ??

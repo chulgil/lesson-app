@@ -146,6 +146,21 @@ async def update_lesson(
     return await service.update(lesson_id, body, current_user)
 
 
+@router.delete(
+    "/{lesson_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a lesson",
+)
+async def delete_lesson(
+    lesson_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    """Delete a lesson."""
+    service = LessonService(db)
+    await service.delete(lesson_id, current_user)
+
+
 @router.patch(
     "/{lesson_id}/status",
     response_model=LessonResponse,
@@ -222,6 +237,28 @@ async def create_lesson_class(
     return await service.create_class(body, current_user)
 
 
+class ReorderRequest(BaseModel):
+    """List of ordered class IDs."""
+
+    ordered_ids: list[str]
+
+
+@router.put(
+    "-classes/reorder",
+    status_code=status.HTTP_200_OK,
+    summary="Reorder lesson classes",
+)
+async def reorder_lesson_classes(
+    body: ReorderRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> dict:
+    """Set the display order of lesson classes."""
+    service = LessonService(db)
+    await service.reorder_classes(body.ordered_ids, current_user)
+    return {"message": "Reorder successful"}
+
+
 @router.get(
     "-classes/{class_id}",
     response_model=LessonClassResponse,
@@ -284,27 +321,6 @@ async def restore_lesson_class(
     """Restore a previously archived lesson class."""
     service = LessonService(db)
     return await service.restore_class(class_id, current_user)
-
-
-class ReorderRequest(BaseModel):
-    """List of ordered class IDs."""
-    ordered_ids: list[str]
-
-
-@router.put(
-    "-classes/reorder",
-    status_code=status.HTTP_200_OK,
-    summary="Reorder lesson classes",
-)
-async def reorder_lesson_classes(
-    body: ReorderRequest,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
-) -> dict:
-    """Set the display order of lesson classes."""
-    service = LessonService(db)
-    await service.reorder_classes(body.ordered_ids, current_user)
-    return {"message": "Reorder successful"}
 
 
 # ---------------------------------------------------------------------------

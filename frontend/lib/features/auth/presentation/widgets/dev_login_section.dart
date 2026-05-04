@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -34,9 +35,7 @@ class DevLoginSection extends StatelessWidget {
               horizontal: AppSpacing.space3,
               vertical: AppSpacing.space1,
             ),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Text(
               'DEV MODE — 테스트 계정 선택',
               style: AppTypography.caption.copyWith(
@@ -49,7 +48,10 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Teacher accounts ──
-        DevSectionHeader(label: '선생님', color: AppColors.paperAccent),
+        DevSectionHeader(
+          label: AppStrings.authDevTeacher,
+          color: AppColors.paperAccent,
+        ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '👩‍🏫',
@@ -68,7 +70,10 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Student accounts ──
-        DevSectionHeader(label: '학생', color: AppColors.paperAccent),
+        DevSectionHeader(
+          label: AppStrings.authDevStudent,
+          color: AppColors.paperAccent,
+        ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '🎻',
@@ -115,7 +120,7 @@ class DevLoginSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // ── Parent accounts ──
-        DevSectionHeader(label: '학부모', color: AppColors.ink),
+        DevSectionHeader(label: AppStrings.authDevParent, color: AppColors.ink),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
           emoji: '👨‍👩‍👧',

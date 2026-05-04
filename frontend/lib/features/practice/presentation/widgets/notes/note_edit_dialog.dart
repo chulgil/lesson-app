@@ -107,7 +107,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
               // (README §1.1.1, §7.129 사용자 입력 정렬).
               style: NotebookTypography.hand,
               decoration: InputDecoration(
-                hintText: '연습하면서 느낀 점을 기록하세요...',
+                hintText: AppStrings.practiceNoteHint,
                 hintStyle: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkTertiary,
                 ),

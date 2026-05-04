@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -61,9 +62,13 @@ class _AddManualTeacherScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: Text(_isEditMode ? '선생님 편집' : '선생님 등록'),
+        title: Text(
+          _isEditMode
+              ? AppStrings.studentHomeTeacherEditLabel
+              : AppStrings.studentHomeTeacherRegisterLabel,
+        ),
         leading: IconButton(
           onPressed: () => _confirmExit(),
           icon: const Icon(Icons.close),
@@ -93,7 +98,9 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(hintText: '선생님 이름을 입력하세요'),
+                decoration: const InputDecoration(
+                  hintText: AppStrings.studentHomeTeacherNameHint,
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return '이름을 입력해주세요';
@@ -173,7 +180,9 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(hintText: '레슨 관련 메모를 입력하세요'),
+                decoration: const InputDecoration(
+                  hintText: AppStrings.studentHomeLessonNoteHint,
+                ),
                 maxLines: 3,
                 textInputAction: TextInputAction.done,
               ),
@@ -186,7 +195,11 @@ class _AddManualTeacherScreenState
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: _isSaving ? null : _save,
-                  child: Text(_isEditMode ? '선생님 저장하기' : '선생님 등록하기'),
+                  child: Text(
+                    _isEditMode
+                        ? AppStrings.studentHomeTeacherSaveLabel
+                        : AppStrings.studentHomeTeacherRegisterAction,
+                  ),
                 ),
               ),
 
@@ -201,7 +214,7 @@ class _AddManualTeacherScreenState
                       foregroundColor: AppColors.paperAccent,
                       side: const BorderSide(color: AppColors.paperAccent),
                     ),
-                    child: const Text('선생님 삭제'),
+                    child: const Text(AppStrings.studentHomeDeleteTeacher),
                   ),
                 ),
               ],
@@ -223,20 +236,20 @@ class _AddManualTeacherScreenState
     showDialog(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            title: const Text('작성 취소'),
-            content: const Text('작성 중인 내용이 있습니다. 나가시겠습니까?'),
+          (ctx) => NotebookAlertDialog(
+            title: const Text(AppStrings.studentHomeCancelWriting),
+            content: const Text(AppStrings.studentHomeCancelWritingConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('계속 작성'),
+                child: const Text(AppStrings.continueWriting),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   context.pop();
                 },
-                child: const Text('나가기'),
+                child: const Text(AppStrings.exitAction),
               ),
             ],
           ),
@@ -297,7 +310,11 @@ class _AddManualTeacherScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditMode ? '선생님 정보가 수정되었습니다' : '선생님이 등록되었습니다'),
+          content: Text(
+            _isEditMode
+                ? AppStrings.studentHomeTeacherInfoUpdated
+                : AppStrings.studentHomeTeacherRegistered,
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -308,7 +325,7 @@ class _AddManualTeacherScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('저장 실패. 다시 시도해주세요.'),
+          content: const Text(AppStrings.studentHomeSaveFailedRetry),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),
@@ -322,9 +339,9 @@ class _AddManualTeacherScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            title: const Text('선생님 삭제'),
-            content: const Text('이 선생님을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.'),
+          (ctx) => NotebookAlertDialog(
+            title: const Text(AppStrings.studentHomeDeleteTeacher),
+            content: const Text(AppStrings.studentHomeDeleteTeacherConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
@@ -354,7 +371,7 @@ class _AddManualTeacherScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('선생님이 삭제되었습니다'),
+          content: Text(AppStrings.studentHomeTeacherDeleted),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -365,7 +382,7 @@ class _AddManualTeacherScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('삭제 실패. 다시 시도해주세요.'),
+          content: const Text(AppStrings.studentHomeDeleteFailedRetry),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),

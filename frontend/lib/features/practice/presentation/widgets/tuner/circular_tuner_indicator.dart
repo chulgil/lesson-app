@@ -164,23 +164,15 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
     // Color logic: highlight on perfect pitch match (instant, no animation)
     Color backgroundColor;
     Color textColor;
-    List<BoxShadow>? boxShadow;
 
     if (_isTapped) {
       // Tapped: darker color (no border)
       backgroundColor = activeColor;
       textColor = AppColors.paper;
     } else if (isPerfectMatch) {
-      // Perfect pitch match: instant bright highlight with subtle glow
+      // Perfect pitch match: instant bright highlight
       backgroundColor = AppColors.tunerCentPerfect.withValues(alpha: 0.7);
       textColor = AppColors.paperOk;
-      boxShadow = [
-        BoxShadow(
-          color: AppColors.tunerCentPerfect.withValues(alpha: 0.5),
-          blurRadius: 8,
-          spreadRadius: 1,
-        ),
-      ];
     } else {
       // Normal style
       backgroundColor = baseColor.withValues(alpha: 0.3);
@@ -201,10 +193,7 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
             horizontal: horizontalPadding,
             vertical: verticalPadding,
           ),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            boxShadow: boxShadow,
-          ),
+          decoration: BoxDecoration(color: backgroundColor),
           child: Text(
             displayText,
             style: TextStyle(
@@ -350,7 +339,7 @@ class TunerInfoBar extends ConsumerWidget {
         children: [
           Text(
             freqText,
-            style: const TextStyle(
+            style: AppTypography.bodyMedium.copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,7 +54,7 @@ class MyBookingsScreen extends ConsumerWidget {
       ),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.myBookingsTitle)),
       body: SafeArea(

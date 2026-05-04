@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -113,12 +114,12 @@ class SmartRecordingResultDialog extends StatelessWidget {
     final hasMiddleSilence = middleSilenceCount > 0;
     final hasAnyTrimming = hasTrimming || hasMiddleSilence;
 
-    return AlertDialog(
+    return NotebookAlertDialog(
       title: const Row(
         children: [
           Icon(Icons.check_circle, color: AppColors.paperOk),
           SizedBox(width: AppSpacing.space2),
-          Text('녹음 저장됨'),
+          Text(AppStrings.practiceRecordingSaved),
         ],
       ),
       content: Column(
@@ -149,7 +150,11 @@ class SmartRecordingResultDialog extends StatelessWidget {
                     color: AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
-                  Text('앞 ${_formatDuration(trimmedStart)} 트림'),
+                  Text(
+                    AppStrings.practiceSmartTrimFront(
+                      _formatDuration(trimmedStart),
+                    ),
+                  ),
                 ],
               ),
             if (trimmedEnd > Duration.zero)
@@ -161,7 +166,11 @@ class SmartRecordingResultDialog extends StatelessWidget {
                     color: AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
-                  Text('뒤 ${_formatDuration(trimmedEnd)} 트림'),
+                  Text(
+                    AppStrings.practiceSmartTrimEnd(
+                      _formatDuration(trimmedEnd),
+                    ),
+                  ),
                 ],
               ),
             if (hasMiddleSilence)
@@ -188,7 +197,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
               Navigator.of(context).pop();
               onRestore?.call();
             },
-            child: const Text('원본 복구'),
+            child: const Text(AppStrings.practiceRestoreOriginal),
           ),
         TextButton(
           onPressed: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
@@ -19,7 +20,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
       data: (analytics) {
         if (analytics.totalMinutes == 0) return const SizedBox.shrink();
 
-        return Card(
+        return NotebookCard(
           margin: EdgeInsets.zero,
           elevation: 0,
           color: AppColors.paperDark,

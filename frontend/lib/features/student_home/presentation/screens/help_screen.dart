@@ -1,8 +1,10 @@
 // Help screen with FAQ accordion and support contact.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -56,14 +58,17 @@ class HelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('도움말')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.studentHomeHelpTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
           // FAQ header
           // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-          Text('자주 묻는 질문', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.studentHomeFaqTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // FAQ items
@@ -105,7 +110,7 @@ class HelpScreen extends StatelessWidget {
                 Icon(Icons.support_agent, size: 40, color: AppColors.ink),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '도움이 필요하신가요?',
+                  AppStrings.studentHomeNeedHelp,
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -121,7 +126,7 @@ class HelpScreen extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: () => _launchEmail(context),
                   icon: const Icon(Icons.email_outlined, size: 18),
-                  label: const Text('문의하기'),
+                  label: const Text(AppStrings.studentHomeContactSupport),
                 ),
               ],
             ),
@@ -136,9 +141,9 @@ class HelpScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('이메일 앱을 열 수 없습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.studentHomeCannotOpenEmail)),
+      );
     }
   }
 }

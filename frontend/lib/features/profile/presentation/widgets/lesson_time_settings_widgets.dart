@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -170,7 +171,7 @@ class DaySectionCard extends StatelessWidget {
     final dayName = _dayNames[dayOfWeek - 1];
     final hasSlots = slots.isNotEmpty;
 
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ExpansionTile(
         leading: Icon(
@@ -212,7 +213,7 @@ class DaySectionCard extends StatelessWidget {
             child: TextButton.icon(
               onPressed: onAddSlot,
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('시간대 추가'),
+              label: const Text(AppStrings.profileTimeSlotAdd),
             ),
           ),
         ],
@@ -342,8 +343,15 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.existingSlot != null;
 
-    return AlertDialog(
-      title: Text(isEditing ? '시간대 수정' : '시간대 추가'),
+    return NotebookAlertDialog(
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
+      titleTextStyle: NotebookTypography.pieceTitle,
+      title: Text(
+        isEditing
+            ? AppStrings.profileTimeSlotEditTitle
+            : AppStrings.profileTimeSlotAddTitle,
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,9 +467,9 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
     final endMinutes = _endTime.hour * 60 + _endTime.minute;
 
     if (endMinutes <= startMinutes) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('종료 시간은 시작 시간 이후여야 합니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.profileTimeSlotEndTimeError)),
+      );
       return;
     }
 
@@ -518,8 +526,11 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('커스텀 레슨 시간 추가'),
+    return NotebookAlertDialog(
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
+      titleTextStyle: NotebookTypography.pieceTitle,
+      title: const Text(AppStrings.profileCustomDurationTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -664,7 +675,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 });
               },
               icon: const Icon(Icons.edit, size: 16),
-              label: const Text('직접 입력'),
+              label: const Text(AppStrings.profileDirectInput),
             ),
           ] else ...[
             // Direct input field
@@ -674,7 +685,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               autofocus: true,
               decoration: InputDecoration(
                 labelText: '레슨 시간 (분)',
-                hintText: '예: 50',
+                hintText: AppStrings.profileDirectInputHint,
                 helperText:
                     '${LessonDurations.minDuration}~${LessonDurations.maxDuration}분',
                 border: const OutlineInputBorder(),
@@ -701,7 +712,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 });
               },
               icon: const Icon(Icons.tune, size: 16),
-              label: const Text('슬라이더로 선택'),
+              label: const Text(AppStrings.profileSliderSelect),
             ),
           ],
         ],
@@ -758,29 +769,17 @@ void showDeleteDurationDialog({
   required int duration,
   required VoidCallback onConfirm,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (dialogContext) => AlertDialog(
-          title: const Text('레슨 시간 삭제'),
-          content: Text('${LessonDurations.format(duration)}을(를) 삭제하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text(AppStrings.cancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                onConfirm();
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.delete),
-            ),
-          ],
-        ),
+    title: AppStrings.profileDurationDeleteTitle,
+    content: Text('${LessonDurations.format(duration)}을(를) 삭제하시겠습니까?'),
+    confirmLabel: AppStrings.delete,
+    cancelLabel: AppStrings.cancel,
+    isDestructive: true,
+    onConfirm: () {
+      Navigator.pop(context);
+      onConfirm();
+    },
   );
 }
 

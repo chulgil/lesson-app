@@ -31,22 +31,11 @@ class QuickToolButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.zero,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 28,
-              color: iconColor ?? AppColors.paperAccent,
-            ),
+            Icon(icon, size: 28, color: iconColor ?? AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space2),
             Text(
               label,

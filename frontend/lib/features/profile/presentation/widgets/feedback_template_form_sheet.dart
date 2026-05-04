@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../lessons/domain/entities/feedback_template.dart';
 import '../../../lessons/presentation/providers/feedback_template_providers.dart';
 
@@ -20,10 +21,9 @@ class FeedbackTemplateFormSheet extends ConsumerStatefulWidget {
     BuildContext context, {
     FeedbackTemplate? existing,
   }) {
-    return showModalBottomSheet<bool>(
+    return showNotebookModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => FeedbackTemplateFormSheet(existing: existing),
     );
   }

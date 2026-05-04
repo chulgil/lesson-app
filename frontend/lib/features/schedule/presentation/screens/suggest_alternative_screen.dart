@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../domain/entities/unified_lesson_request.dart';
@@ -152,7 +153,7 @@ class _SuggestAlternativeScreenState
       )),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: Text(
@@ -218,9 +219,7 @@ class _SuggestAlternativeScreenState
         AppSpacing.space2,
       ),
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.inkQuaternary),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,10 +536,11 @@ class _SuggestAlternativeScreenState
 
   /// Show reject bottom sheet with message input.
   Future<void> _showRejectBottomSheet() async {
-    final result = await showModalBottomSheet<String>(
+    final result = await showNotebookBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder: (context) => const _RejectBottomSheet(),
     );
 

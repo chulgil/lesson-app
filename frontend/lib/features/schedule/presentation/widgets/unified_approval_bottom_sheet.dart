@@ -340,7 +340,7 @@ class _UnifiedApprovalBottomSheetState
             });
           },
           icon: const Icon(Icons.arrow_back, size: 16),
-          label: const Text('학생 희망 시간으로 돌아가기'),
+          label: const Text(AppStrings.scheduleBackToStudentTime),
           style: TextButton.styleFrom(foregroundColor: AppColors.inkSecondary),
         ),
       ],

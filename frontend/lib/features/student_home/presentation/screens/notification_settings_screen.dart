@@ -1,6 +1,7 @@
 // Notification settings screen with per-category toggle switches.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -21,7 +22,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final role = ref.watch(currentUserRoleProvider);
     final isTeacher = role == UserRole.teacher;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.notificationSettingsAppBarTitle),
       ),

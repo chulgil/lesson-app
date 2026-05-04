@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -97,7 +98,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
   Widget build(BuildContext context) {
     final isLastPage = _currentPage == _pages.length - 1;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       body: SafeArea(
         child: Column(
           children: [
@@ -232,7 +233,7 @@ class _StudentTutorialPage extends StatelessWidget {
             height: 200,
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(data.icon, size: 80, color: AppColors.paperAccent),
           ),

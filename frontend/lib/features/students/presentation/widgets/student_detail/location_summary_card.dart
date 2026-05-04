@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../../domain/entities/lesson_location.dart';
 import '../../providers/location_providers.dart';
@@ -26,7 +28,7 @@ class LocationSummaryCard extends ConsumerWidget {
     final locationAsync =
         locationId != null ? ref.watch(locationProvider(locationId)) : null;
 
-    return Card(
+    return NotebookCard(
       margin: EdgeInsets.zero,
       elevation: 0,
       color: AppColors.paperDark,
@@ -87,7 +89,10 @@ class LocationSummaryCard extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text(location.icon, style: const TextStyle(fontSize: 14)),
+            Text(
+              location.icon,
+              style: AppTypography.bodyMedium.copyWith(height: 1),
+            ),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -124,9 +129,7 @@ class LocationSummaryCard extends ConsumerWidget {
   Widget _buildTravelChip(BuildContext context, int travelTime) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccentSoft
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

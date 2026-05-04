@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/recording_feedback.dart';
 import '../../domain/entities/student_practice_overview.dart';
 import '../providers/recording_feedback_provider.dart';
@@ -31,10 +32,9 @@ class TeacherFeedbackSheet extends ConsumerStatefulWidget {
     required String studentId,
     required String teacherId,
   }) {
-    return showModalBottomSheet(
+    return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (_) => TeacherFeedbackSheet(
             recording: recording,

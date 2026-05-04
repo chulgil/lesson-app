@@ -1,6 +1,7 @@
 // Screen for editing an existing lesson with real data.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -96,13 +97,13 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return NotebookScreenScaffold(
         appBar: AppBar(title: const Text(AppStrings.editLessonTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.editLessonTitle),
         leading: IconButton(
@@ -434,7 +435,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: const Text(AppStrings.timeConflictTitle),
             content: Text(AppStrings.timeConflictMessage(conflictStudentName)),
             actions: [

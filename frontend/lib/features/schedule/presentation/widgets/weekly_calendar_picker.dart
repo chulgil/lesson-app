@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -202,7 +203,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     if (availability == null) {
       return const SizedBox(
         height: 200,
-        child: Center(child: Text('선생님의 스케줄 정보가 없습니다')),
+        child: Center(child: Text(AppStrings.scheduleNoTeacherSchedule)),
       );
     }
 
@@ -445,7 +446,10 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
           final slot = slots[i];
           final label = _slotDisplayLabel(slot);
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+            padding: const EdgeInsets.symmetric(
+              vertical: 2,
+              horizontal: AppSpacing.space1,
+            ),
             child: Row(
               children: [
                 Text(
@@ -471,7 +475,10 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
 
         // Empty slot placeholder
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+          padding: const EdgeInsets.symmetric(
+            vertical: 2,
+            horizontal: AppSpacing.space1,
+          ),
           child: Row(
             children: [
               Text(

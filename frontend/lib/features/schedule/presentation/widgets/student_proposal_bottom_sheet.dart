@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 
@@ -21,10 +22,9 @@ Future<void> showStudentProposalBottomSheet(
   required TimeProposal teacherProposal,
   required VoidCallback onComplete,
 }) {
-  return showModalBottomSheet(
+  return showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
     builder:
         (context) => DraggableScrollableSheet(
           initialChildSize: 0.55,
@@ -81,7 +81,10 @@ class _StudentProposalBottomSheetState
               const SizedBox(height: AppSpacing.space4),
 
               // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-              Text('선생님의 제안', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.scheduleTeacherProposal,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space3),
 
               // Teacher message

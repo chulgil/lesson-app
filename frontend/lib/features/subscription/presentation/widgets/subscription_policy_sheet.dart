@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/lesson_policy.dart';
@@ -27,9 +28,8 @@ class SubscriptionPolicySheet extends ConsumerWidget {
     BuildContext context, {
     required Subscription subscription,
   }) {
-    return showModalBottomSheet<void>(
+    return showNotebookModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder:
           (ctx) => DraggableScrollableSheet(

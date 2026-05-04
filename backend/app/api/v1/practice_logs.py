@@ -8,8 +8,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_user, get_db
+from app.core.deps import get_current_user, get_db, get_pagination
 from app.models.user import User
+from app.schemas.common import PaginatedResponse
 from app.schemas.practice_log import (
     PracticeLogCreate,
     PracticeLogResponse,
@@ -23,18 +24,33 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_model=list[PracticeLogResponse],
+    response_model=PaginatedResponse[PracticeLogResponse],
+    summary="List practice logs",
+)
+@router.get(
+    "",
+    response_model=PaginatedResponse[PracticeLogResponse],
     summary="List practice logs for a month",
 )
 async def list_practice_logs(
     student_id: str,
-    year: int = Query(...),
-    month: int = Query(...),
+    year: int | None = Query(None),
+    month: int | None = Query(None),
+    date: _dt.date | None = Query(None),
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
-) -> list[PracticeLogResponse]:
+    pagination: Annotated[dict, Depends(get_pagination)] = None,  # type: ignore[assignment]
+) -> PaginatedResponse[PracticeLogResponse]:
     service = PracticeLogService(db)
-    return await service.get_logs(student_id, year=year, month=month)
+    logs = await service.get_logs(student_id, year=year, month=month, log_date=date)
+    start = pagination["offset"]
+    end = start + pagination["size"]
+    return PaginatedResponse.create(
+        items=[PracticeLogResponse.model_validate(log) for log in logs[start:end]],
+        total=len(logs),
+        page=pagination["page"],
+        size=pagination["size"],
+    )
 
 
 @router.get(
@@ -52,20 +68,53 @@ async def get_practice_log_by_date(
     return await service.get_log_by_date(student_id, date)
 
 
-@router.post(
-    "/",
-    response_model=PracticeLogResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Create practice log",
+@router.get(
+    "/weekly",
+    response_model=list[bool],
+    summary="Get weekly practice status",
 )
-async def create_practice_log(
-    body: PracticeLogCreate,
+async def get_weekly_practice(
     student_id: str,
+    week_start: _dt.date | None = Query(None),
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+) -> list[bool]:
+    service = PracticeLogService(db)
+    if week_start is None:
+        today = _dt.date.today()
+        week_start = today - _dt.timedelta(days=today.weekday())
+    return await service.get_weekly_practice(student_id, week_start)
+
+
+@router.get(
+    "/stats",
+    response_model=PracticeStatsResponse,
+    summary="Get monthly practice stats",
+)
+async def get_monthly_stats(
+    student_id: str,
+    year: int = Query(...),
+    month: int = Query(...),
+    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
+    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+) -> PracticeStatsResponse:
+    service = PracticeLogService(db)
+    data = await service.get_monthly_stats(student_id, year, month)
+    return PracticeStatsResponse.model_validate(data)
+
+
+@router.get(
+    "/{log_id}",
+    response_model=PracticeLogResponse,
+    summary="Get practice log by ID",
+)
+async def get_practice_log_by_id(
+    log_id: str,
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    result: PracticeLogResponse = await service.create_log(student_id, body.model_dump())
+    result: PracticeLogResponse = await service.get_log_by_id(log_id)
     return result
 
 
@@ -115,33 +164,33 @@ async def toggle_task(
     return result
 
 
-@router.get(
-    "/weekly",
-    response_model=list[bool],
-    summary="Get weekly practice status",
+@router.post(
+    "/",
+    response_model=PracticeLogResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create practice log",
 )
-async def get_weekly_practice(
-    student_id: str,
-    week_start: _dt.date = Query(...),
+@router.post(
+    "",
+    response_model=PracticeLogResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create practice log",
+)
+async def create_practice_log(
+    body: PracticeLogCreate,
+    student_id: str | None = None,
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
-) -> list[bool]:
+) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    return await service.get_weekly_practice(student_id, week_start)
+    target_student_id = student_id or body.student_id
+    if target_student_id is None:
+        from fastapi import HTTPException
 
-
-@router.get(
-    "/stats",
-    response_model=PracticeStatsResponse,
-    summary="Get monthly practice stats",
-)
-async def get_monthly_stats(
-    student_id: str,
-    year: int = Query(...),
-    month: int = Query(...),
-    db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
-    current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
-) -> PracticeStatsResponse:
-    service = PracticeLogService(db)
-    data = await service.get_monthly_stats(student_id, year, month)
-    return PracticeStatsResponse.model_validate(data)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="student_id is required",
+        )
+    data = body.model_dump(exclude={"student_id"})
+    result: PracticeLogResponse = await service.create_log(target_student_id, data)
+    return result

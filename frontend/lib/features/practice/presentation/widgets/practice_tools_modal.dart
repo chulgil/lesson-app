@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/practice/presentation/providers/metronome_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
@@ -18,10 +19,9 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
   final int initialTab;
 
   static Future<void> show(BuildContext context, {int initialTab = 0}) {
-    return showModalBottomSheet<void>(
+    return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => PracticeToolsModal(initialTab: initialTab),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -8,10 +9,7 @@ import '../../../../../core/theme/app_typography.dart';
 class AvailabilityLegend extends StatelessWidget {
   final bool showBookedByMe;
 
-  const AvailabilityLegend({
-    super.key,
-    this.showBookedByMe = false,
-  });
+  const AvailabilityLegend({super.key, this.showBookedByMe = false});
 
   @override
   Widget build(BuildContext context) {
@@ -21,26 +19,17 @@ class AvailabilityLegend extends StatelessWidget {
       children: [
         _LegendItem(
           icon: '🟢',
-          label: showBookedByMe ? '예약가능' : '가용',
+          label:
+              showBookedByMe
+                  ? AppStrings.scheduleAvailable
+                  : AppStrings.scheduleOpen,
         ),
         if (showBookedByMe)
-          const _LegendItem(
-            icon: '🔵',
-            label: '내 예약',
-          )
+          const _LegendItem(icon: '🔵', label: AppStrings.scheduleMyBooking)
         else
-          const _LegendItem(
-            icon: '🔵',
-            label: '예약됨',
-          ),
-        const _LegendItem(
-          icon: '⛔',
-          label: '휴무',
-        ),
-        const _LegendItem(
-          icon: '⏹️',
-          label: '지난 시간',
-        ),
+          const _LegendItem(icon: '🔵', label: AppStrings.scheduleBooked),
+        const _LegendItem(icon: '⛔', label: AppStrings.scheduleHoliday),
+        const _LegendItem(icon: '⏹️', label: AppStrings.schedulePastTime),
       ],
     );
   }
@@ -50,26 +39,18 @@ class _LegendItem extends StatelessWidget {
   final String icon;
   final String label;
 
-  const _LegendItem({
-    required this.icon,
-    required this.label,
-  });
+  const _LegendItem({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          icon,
-          style: const TextStyle(fontSize: 14),
-        ),
+        Text(icon, style: AppTypography.bodyMedium),
         const SizedBox(width: AppSpacing.space1),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
         ),
       ],
     );

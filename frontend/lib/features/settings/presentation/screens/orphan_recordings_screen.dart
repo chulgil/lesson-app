@@ -3,6 +3,7 @@
 // Allows users to reassign orphaned recordings to existing sections or delete them.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -24,7 +25,7 @@ class OrphanRecordingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final diagnosticAsync = ref.watch(orphanedRecordingsWithDiagnosticProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text(AppStrings.allRecordingsOrphanedSection),
@@ -121,7 +122,7 @@ class _DiagnosticCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       elevation: 0,
       color: AppColors.paperAccentSoft,
       shape: RoundedRectangleBorder(
@@ -332,26 +333,15 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
   }
 
   Future<void> _confirmDelete() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.allRecordingsDeleteDialogTitle),
-            content: const Text(AppStrings.allRecordingsDeleteDialogContent),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.allRecordingsDeleteDialogTitle,
+      content: const Text(AppStrings.allRecordingsDeleteDialogContent),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && mounted) {

@@ -40,16 +40,7 @@ class _MetronomeControllerBarState
       behavior: HitTestBehavior.opaque,
       child: Container(
         height: 106,
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
+        decoration: const BoxDecoration(color: AppColors.paper),
         child: SafeArea(
           top: false,
           child: Padding(

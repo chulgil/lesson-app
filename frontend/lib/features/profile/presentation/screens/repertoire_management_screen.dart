@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,9 +30,9 @@ class _RepertoireManagementScreenState
     final piecesAsync = ref.watch(piecesNotifierProvider);
     final searchQuery = ref.watch(pieceSearchQueryProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('레퍼토리 관리'),
+        title: const Text(AppStrings.profileRepertoireTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -78,7 +79,7 @@ class _RepertoireManagementScreenState
                           color: AppColors.paperAccent,
                         ),
                         const SizedBox(height: AppSpacing.space4),
-                        const Text('오류가 발생했습니다.'),
+                        const Text(AppStrings.profileRepertoireError),
                         const SizedBox(height: AppSpacing.space4),
                         FilledButton(
                           onPressed:
@@ -98,7 +99,7 @@ class _RepertoireManagementScreenState
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddPieceDialog,
         icon: const Icon(Icons.add),
-        label: const Text('곡 추가'),
+        label: const Text(AppStrings.profileRepertoireAddPiece),
       ),
     );
   }
@@ -223,9 +224,11 @@ class _RepertoireManagementScreenState
                   .read(piecesNotifierProvider.notifier)
                   .updatePiece(updatedPiece);
               if (!mounted) return;
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('곡 정보가 수정되었습니다')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(AppStrings.profileRepertoirePieceUpdated),
+                ),
+              );
             },
           ),
     );

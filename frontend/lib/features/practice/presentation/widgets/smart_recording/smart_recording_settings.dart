@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -14,7 +15,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(smartRecordingSettingsNotifierProvider);
 
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(

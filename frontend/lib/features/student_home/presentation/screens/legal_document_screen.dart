@@ -1,6 +1,7 @@
 // Legal document viewer screen for terms of service and privacy policy.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -19,7 +20,7 @@ class LegalDocumentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(title: Text(title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),

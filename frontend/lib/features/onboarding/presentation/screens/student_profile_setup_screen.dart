@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 
@@ -98,7 +100,7 @@ class _StudentProfileSetupScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('프로필 저장 실패. 다시 시도해주세요.'),
+          content: const Text(AppStrings.onboardingProfileSaveFailure),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),
@@ -111,11 +113,8 @@ class _StudentProfileSetupScreenState
   }
 
   void _showInstrumentSelector() {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
       builder:
           (context) => _InstrumentSelectorSheet(
             instruments: _instruments,
@@ -129,9 +128,9 @@ class _StudentProfileSetupScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('프로필 설정'),
+        title: const Text(AppStrings.onboardingProfileSetup),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go(AppRoutes.studentInviteCode),
@@ -154,7 +153,10 @@ class _StudentProfileSetupScreenState
                       const SizedBox(height: AppSpacing.space6),
 
                       // Title — Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-f).
-                      Text('프로필 설정', style: NotebookTypography.sectionTitle),
+                      Text(
+                        AppStrings.onboardingProfileSetup,
+                        style: NotebookTypography.sectionTitle,
+                      ),
                       const SizedBox(height: AppSpacing.space2),
                       Text(
                         '기본 정보를 설정해주세요',
@@ -202,7 +204,10 @@ class _StudentProfileSetupScreenState
                               color: AppColors.paper,
                             ),
                           )
-                          : Text('다음', style: AppTypography.button),
+                          : Text(
+                            AppStrings.onboardingNext,
+                            style: AppTypography.button,
+                          ),
                 ),
               ),
             ),
@@ -215,9 +220,17 @@ class _StudentProfileSetupScreenState
   Widget _buildProgressIndicator() {
     return Row(
       children: [
-        _ProgressStep(step: 1, label: '프로필', isActive: true),
+        _ProgressStep(
+          step: 1,
+          label: AppStrings.onboardingProfile,
+          isActive: true,
+        ),
         _ProgressDivider(isActive: false),
-        _ProgressStep(step: 2, label: '튜토리얼', isActive: false),
+        _ProgressStep(
+          step: 2,
+          label: AppStrings.onboardingTutorial,
+          isActive: false,
+        ),
       ],
     );
   }
@@ -250,7 +263,7 @@ class _StudentProfileSetupScreenState
             return null;
           },
           decoration: InputDecoration(
-            hintText: '이름을 입력해주세요',
+            hintText: AppStrings.onboardingStudentNameHint,
             border: const OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.inkQuaternary),
@@ -354,7 +367,7 @@ class _ProgressStep extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Center(
               child: Text(
@@ -419,7 +432,10 @@ class _InstrumentSelectorSheet extends StatelessWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Header — Notebook × Score: 시트 헤더 Playfair sectionTitle (§7.87-f / §7.27).
-          Text('악기 선택', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.onboardingSelectInstrument,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // Choice chips grid

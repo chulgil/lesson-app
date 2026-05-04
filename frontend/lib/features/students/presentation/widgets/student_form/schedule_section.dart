@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -70,7 +71,7 @@ class ScheduleSection extends StatelessWidget {
                         isSelected
                             ? AppColors.paperAccent
                             : AppColors.paperDark,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Center(
                     child: Text(
@@ -232,7 +233,7 @@ class _DayTimeRow extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Center(
               child: Text(
@@ -256,7 +257,7 @@ class _DayTimeRow extends StatelessWidget {
           TextButton.icon(
             onPressed: onTimeTap,
             icon: const Icon(Icons.access_time, size: 16),
-            label: const Text('변경'),
+            label: const Text(AppStrings.studentScheduleChange),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space2,

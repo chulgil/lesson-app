@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -43,7 +44,7 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
     // For connected child, show limited parent view (no lessons/assignments editing)
     // For parent mode, show full parent view
     return DebugWrapper(
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         body: IndexedStack(
           index: _currentIndex,
           children: _buildTabs(activeProfile),

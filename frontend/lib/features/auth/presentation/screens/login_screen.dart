@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/config/environment.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -32,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       body: PaperScaffold(
         child: SafeArea(
           child: SingleChildScrollView(
@@ -287,7 +289,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('로그인 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.authLoginFailed),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -374,7 +376,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!EnvironmentConfig.useMockData) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.'),
+          content: Text(AppStrings.authKakaoNotReady),
           behavior: SnackBarBehavior.floating,
         ),
       );

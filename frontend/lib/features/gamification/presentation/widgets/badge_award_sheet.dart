@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Result returned when a badge is awarded.
 typedef BadgeAwardResult = ({String badgeId, String? message});
@@ -55,10 +56,9 @@ class BadgeAwardSheet extends StatefulWidget {
 
   /// Show as a modal bottom sheet and return the result.
   static Future<BadgeAwardResult?> show(BuildContext context) {
-    return showModalBottomSheet<BadgeAwardResult>(
+    return showNotebookModalBottomSheet<BadgeAwardResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => const BadgeAwardSheet(),
     );
   }
@@ -197,10 +197,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.zero,
-            color:
-                isSelected
-                    ? AppColors.paperAccentSoft
-                    : null,
+            color: isSelected ? AppColors.paperAccentSoft : null,
           ),
           child: Row(
             children: [
@@ -213,7 +210,7 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                       isSelected
                           ? AppColors.paperAccentSoft
                           : AppColors.paperDark,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Icon(
                   badge.icon,

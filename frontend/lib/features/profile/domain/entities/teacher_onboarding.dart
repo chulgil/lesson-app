@@ -1,3 +1,5 @@
+import '../../../../core/l10n/app_strings.dart';
+
 // Teacher onboarding domain entity
 // Moved from lib/features/profile/domain/entities/teacher_onboarding.dart for Clean Architecture
 
@@ -275,31 +277,31 @@ class TutorialStepContent {
   static const List<TutorialStepContent> allSteps = [
     TutorialStepContent(
       step: TutorialStep.welcome,
-      title: '환영합니다!',
+      title: AppStrings.onboardingWelcomeTitle,
       description: '레슨앱에서 학생을 관리하고\n효과적인 레슨을 진행해보세요',
       imageAsset: 'assets/images/onboarding/welcome.png',
     ),
     TutorialStepContent(
       step: TutorialStep.inviteStudent,
-      title: '학생 초대하기',
+      title: AppStrings.onboardingInviteStudentTitle,
       description: 'QR 코드나 링크를 통해\n학생을 쉽게 초대할 수 있어요',
       imageAsset: 'assets/images/onboarding/invite.png',
     ),
     TutorialStepContent(
       step: TutorialStep.createLesson,
-      title: '레슨 일정 등록',
+      title: AppStrings.onboardingCreateLessonTitle,
       description: '캘린더에서 간편하게\n레슨 일정을 관리하세요',
       imageAsset: 'assets/images/onboarding/calendar.png',
     ),
     TutorialStepContent(
       step: TutorialStep.writeFeedback,
-      title: '레슨 노트 작성',
+      title: AppStrings.onboardingWriteFeedbackTitle,
       description: '레슨 후 피드백을 남기고\n학생의 성장을 기록하세요',
       imageAsset: 'assets/images/onboarding/feedback.png',
     ),
     TutorialStepContent(
       step: TutorialStep.completed,
-      title: '준비 완료!',
+      title: AppStrings.onboardingCompletedTitle,
       description: '이제 레슨앱을 시작할\n모든 준비가 되었어요',
       imageAsset: 'assets/images/onboarding/complete.png',
     ),

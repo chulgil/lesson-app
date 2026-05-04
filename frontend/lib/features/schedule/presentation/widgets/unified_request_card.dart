@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -34,13 +35,12 @@ class UnifiedRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      shape: RoundedRectangleBorder(
-      ),
+      shape: RoundedRectangleBorder(),
       elevation: 0,
       color: AppColors.paper,
       child: InkWell(
@@ -113,9 +113,7 @@ class UnifiedRequestCard extends StatelessWidget {
               horizontal: AppSpacing.space2,
               vertical: AppSpacing.space1,
             ),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Text(
               '복귀',
               style: AppTypography.caption.copyWith(
@@ -206,9 +204,7 @@ class UnifiedRequestCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Text(
         request.message!,
         style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
@@ -279,9 +275,7 @@ class UnifiedRequestCard extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space2),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
             child: Text(
               latestProposal.message!,
               style: AppTypography.bodySmall.copyWith(
@@ -334,7 +328,7 @@ class UnifiedRequestCard extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onProposeAlternatives,
               icon: const Icon(Icons.edit_calendar, size: 16),
-              label: const Text('대안 시간 제안'),
+              label: const Text(AppStrings.scheduleAlternativeProposal),
             ),
           ),
         ],
@@ -350,9 +344,7 @@ class UnifiedRequestCard extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-          ),
+          decoration: BoxDecoration(color: AppColors.paperDark),
           child: Row(
             children: [
               Icon(Icons.check_circle, size: 18, color: AppColors.paperOk),
@@ -453,9 +445,7 @@ class UnifiedRequestCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-      ),
+      decoration: BoxDecoration(color: bgColor),
       child: Text(
         request.teacherActionLabel,
         style: AppTypography.caption.copyWith(

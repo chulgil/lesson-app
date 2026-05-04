@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/booking/repositories/booking_repository.dart';
-import '../../../subscription/subscription_facade.dart';
+import '../../../subscription/presentation/providers/subscription_lifecycle_service_providers.dart';
 import 'booking_repository_provider.dart';
 
 // Export repository provider
@@ -21,8 +21,10 @@ final allBookingsProvider = FutureProvider<List<LessonBooking>>((ref) async {
 });
 
 /// Single booking provider
-final bookingProvider =
-    FutureProvider.family<LessonBooking?, String>((ref, bookingId) async {
+final bookingProvider = FutureProvider.family<LessonBooking?, String>((
+  ref,
+  bookingId,
+) async {
   final repository = ref.watch(bookingRepositoryProvider);
   return repository.getBookingById(bookingId);
 });
@@ -30,34 +32,39 @@ final bookingProvider =
 /// Bookings by teacher provider
 final teacherBookingsProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getBookingsByTeacher(teacherId);
-});
+      final repository = ref.watch(bookingRepositoryProvider);
+      return repository.getBookingsByTeacher(teacherId);
+    });
 
 /// Bookings by student provider
 final studentBookingsProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, studentId) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getBookingsByStudent(studentId);
-});
+      final repository = ref.watch(bookingRepositoryProvider);
+      return repository.getBookingsByStudent(studentId);
+    });
 
 /// Bookings by status provider
-final bookingsByStatusProvider = FutureProvider.family<List<LessonBooking>,
-    BookingStatus>((ref, status) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getBookingsByStatus(status);
-});
+final bookingsByStatusProvider =
+    FutureProvider.family<List<LessonBooking>, BookingStatus>((
+      ref,
+      status,
+    ) async {
+      final repository = ref.watch(bookingRepositoryProvider);
+      return repository.getBookingsByStatus(status);
+    });
 
 /// Pending bookings for teacher provider
 final pendingBookingsProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getPendingBookings(teacherId);
-});
+      final repository = ref.watch(bookingRepositoryProvider);
+      return repository.getPendingBookings(teacherId);
+    });
 
 /// Pending bookings count provider (for badge)
-final pendingBookingsCountProvider =
-    FutureProvider.family<int, String>((ref, teacherId) async {
+final pendingBookingsCountProvider = FutureProvider.family<int, String>((
+  ref,
+  teacherId,
+) async {
   final repository = ref.watch(bookingRepositoryProvider);
   final bookings = await repository.getPendingBookings(teacherId);
   return bookings.length;
@@ -66,40 +73,37 @@ final pendingBookingsCountProvider =
 /// Upcoming bookings provider (confirmed, future dates)
 final upcomingBookingsProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  final bookings = await repository.getBookingsByTeacher(teacherId);
-  return bookings
-      .where((b) => b.isUpcoming && b.status == BookingStatus.confirmed)
-      .toList()
-    ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
-});
+      final repository = ref.watch(bookingRepositoryProvider);
+      final bookings = await repository.getBookingsByTeacher(teacherId);
+      return bookings
+          .where((b) => b.isUpcoming && b.status == BookingStatus.confirmed)
+          .toList()
+        ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
+    });
 
 /// Teacher availability provider
 final teacherAvailabilityProvider =
     FutureProvider.family<List<TimeSlot>, String>((ref, teacherId) async {
-  final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getTeacherAvailability(teacherId);
-});
+      final repository = ref.watch(bookingRepositoryProvider);
+      return repository.getTeacherAvailability(teacherId);
+    });
 
 /// Available dates provider
-final availableDatesProvider = FutureProvider.family<List<DateTime>,
-    ({String teacherId, DateTime from, DateTime to})>((ref, params) async {
+final availableDatesProvider = FutureProvider.family<
+  List<DateTime>,
+  ({String teacherId, DateTime from, DateTime to})
+>((ref, params) async {
   final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getAvailableDates(
-    params.teacherId,
-    params.from,
-    params.to,
-  );
+  return repository.getAvailableDates(params.teacherId, params.from, params.to);
 });
 
 /// Available time slots for booking (by date)
-final bookingAvailableTimeSlotsProvider = FutureProvider.family<List<TimeSlot>,
-    ({String teacherId, DateTime date})>((ref, params) async {
+final bookingAvailableTimeSlotsProvider = FutureProvider.family<
+  List<TimeSlot>,
+  ({String teacherId, DateTime date})
+>((ref, params) async {
   final repository = ref.watch(bookingRepositoryProvider);
-  return repository.getAvailableTimeSlotsForDate(
-    params.teacherId,
-    params.date,
-  );
+  return repository.getAvailableTimeSlotsForDate(params.teacherId, params.date);
 });
 
 // =============================================================================
@@ -321,8 +325,8 @@ class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
 
 final bookingsNotifierProvider =
     AsyncNotifierProvider<BookingsNotifier, List<LessonBooking>>(
-  BookingsNotifier.new,
-);
+      BookingsNotifier.new,
+    );
 
 // =============================================================================
 // Selected State Providers
@@ -335,8 +339,9 @@ final selectedBookingDateProvider = StateProvider<DateTime?>((ref) => null);
 final selectedBookingTimeSlotProvider = StateProvider<TimeSlot?>((ref) => null);
 
 /// Selected schedule type for regular lesson
-final selectedScheduleTypeProvider =
-    StateProvider<ScheduleType>((ref) => ScheduleType.fixed);
+final selectedScheduleTypeProvider = StateProvider<ScheduleType>(
+  (ref) => ScheduleType.fixed,
+);
 
 /// Trial lesson request form state
 class TrialLessonFormState {
@@ -395,5 +400,6 @@ class TrialLessonFormState {
   }
 }
 
-final trialLessonFormProvider =
-    StateProvider<TrialLessonFormState>((ref) => const TrialLessonFormState());
+final trialLessonFormProvider = StateProvider<TrialLessonFormState>(
+  (ref) => const TrialLessonFormState(),
+);

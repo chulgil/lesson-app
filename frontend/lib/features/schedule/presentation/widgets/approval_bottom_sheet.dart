@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -372,7 +373,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.scheduleApprovalError),
           backgroundColor: AppColors.paperAccent,
         ),
       );
@@ -420,7 +421,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
+          content: const Text(AppStrings.scheduleProcessError),
           backgroundColor: AppColors.paperAccent,
         ),
       );

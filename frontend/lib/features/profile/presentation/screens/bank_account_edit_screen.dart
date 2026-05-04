@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,18 +22,18 @@ class BankAccountEditScreen extends ConsumerWidget {
     final profile = profileState.valueOrNull;
     final accounts = profile?.bankAccounts ?? [];
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('입금 계좌'),
+        title: const Text(AppStrings.profileBankAccountTitle),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddAccountSheet(context, ref, accounts),
         icon: const Icon(Icons.add),
-        label: const Text('계좌 추가'),
+        label: const Text(AppStrings.profileBankAccountAddLabel),
       ),
       body:
           accounts.isEmpty
@@ -143,25 +144,15 @@ class BankAccountEditScreen extends ConsumerWidget {
     List<BankAccount> accounts,
     BankAccount target,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('계좌 삭제'),
-            content: Text(
-              '${target.bankName} ${target.accountNumber}을 삭제하시겠습니까?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.profileBankAccountDeleteTitle,
+      content: Text('${target.bankName} ${target.accountNumber}을 삭제하시겠습니까?'),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true) {
@@ -177,7 +168,7 @@ class BankAccountEditScreen extends ConsumerWidget {
     WidgetRef ref,
     List<BankAccount> existingAccounts,
   ) async {
-    final result = await showModalBottomSheet<BankAccount>(
+    final result = await showNotebookModalBottomSheet<BankAccount>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -215,7 +206,7 @@ class _BankAccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         side:
@@ -304,7 +295,7 @@ class _BankAccountCard extends StatelessWidget {
                     foregroundColor: AppColors.paperAccent,
                     side: BorderSide(color: AppColors.paperAccent),
                   ),
-                  child: const Text('기본 계좌로 설정'),
+                  child: const Text(AppStrings.profileBankAccountSetDefault),
                 ),
               ),
             ],
@@ -424,10 +415,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   }
 
   void _showConsentContent(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(),
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.5,
@@ -495,7 +485,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('계좌 추가', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.profileBankAccountAddFormTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space4),
 
             // Consent checkbox
@@ -545,9 +538,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       horizontal: 6,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccentSoft,
-                    ),
+                    decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
                       '필수',
                       style: AppTypography.caption.copyWith(
@@ -573,7 +564,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             const SizedBox(height: AppSpacing.space4),
 
             // Bank name (dropdown + text input)
-            Text('은행명 *', style: AppTypography.buttonSmall),
+            Text(
+              AppStrings.profileBankAccountBankNameLabel,
+              style: AppTypography.buttonSmall,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,7 +579,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     initialValue: _selectedDropdownValue,
                     isExpanded: true,
                     decoration: InputDecoration(
-                      hintText: '은행 선택',
+                      hintText: AppStrings.profileBankAccountHintBankSelect,
                       hintStyle: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkTertiary,
                       ),
@@ -623,7 +617,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                   child: TextFormField(
                     controller: _bankNameController,
                     decoration: const InputDecoration(
-                      hintText: '은행명 입력',
+                      hintText: AppStrings.profileBankAccountHintBankName,
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColors.inkQuaternary),
                       ),
@@ -641,7 +635,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             const SizedBox(height: AppSpacing.space4),
 
             // Account number
-            Text('계좌번호 *', style: AppTypography.buttonSmall),
+            Text(
+              AppStrings.profileBankAccountNumberLabel,
+              style: AppTypography.buttonSmall,
+            ),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _accountNumberController,
@@ -650,7 +647,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9\-]')),
               ],
               decoration: const InputDecoration(
-                hintText: '계좌번호를 입력하세요',
+                hintText: AppStrings.profileBankAccountHintNumber,
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
@@ -669,12 +666,15 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             const SizedBox(height: AppSpacing.space4),
 
             // Account holder
-            Text('예금주 *', style: AppTypography.buttonSmall),
+            Text(
+              AppStrings.profileBankAccountHolderLabel,
+              style: AppTypography.buttonSmall,
+            ),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _accountHolderController,
               decoration: const InputDecoration(
-                hintText: '예금주명을 입력하세요',
+                hintText: AppStrings.profileBankAccountHintHolder,
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),

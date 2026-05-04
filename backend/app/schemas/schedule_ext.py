@@ -1,9 +1,9 @@
 """Extended schedule schemas (exceptions, group schedules, no-show, changes)."""
 
 import datetime as _dt
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, model_validator
 
 # ---------------------------------------------------------------------------
 # Schedule Exceptions
@@ -105,7 +105,19 @@ class AttendanceMarkRequest(BaseModel):
 
 
 class BatchAttendanceRequest(BaseModel):
-    bookings: list[dict]  # [{booking_id: str, attended: bool}]
+    bookings: list[dict[str, Any]] = []  # [{booking_id: str, attended: bool}]
+    attendance: list[dict[str, Any]] | None = None
+
+    @model_validator(mode="after")
+    def normalize_frontend_payload(self) -> "BatchAttendanceRequest":
+        """Accept frontend key 'attendance' as the batch list."""
+        if self.attendance is not None and not self.bookings:
+            self.bookings = self.attendance
+        return self
+
+
+class GroupBookingActionRequest(BaseModel):
+    schedule_id: str
 
 
 # ---------------------------------------------------------------------------

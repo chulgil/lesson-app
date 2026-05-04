@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,7 @@ class InviteHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final myInvites = ref.watch(myInvitesProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text(AppStrings.inviteHistoryTooltip),
@@ -73,7 +74,7 @@ class InviteHistoryScreen extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(
                 Icons.history,
@@ -184,26 +185,13 @@ class InviteHistoryScreen extends ConsumerWidget {
     WidgetRef ref,
     Invite invite,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.inviteRevokeDialogTitle),
-            content: const Text(AppStrings.inviteRevokeDialogContent),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.inviteRevokeDialogNo),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.cancelRequestAction),
-              ),
-            ],
-          ),
+      title: AppStrings.inviteRevokeDialogTitle,
+      message: AppStrings.inviteRevokeDialogContent,
+      confirmLabel: AppStrings.cancelRequestAction,
+      cancelLabel: AppStrings.inviteRevokeDialogNo,
+      isDestructive: true,
     );
 
     if (confirmed == true && context.mounted) {

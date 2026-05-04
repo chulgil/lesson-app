@@ -77,7 +77,7 @@ async def test_list_practice_logs_by_month(client: AsyncClient, auth_headers, cr
     )
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 2
+    assert len(data["items"]) == 2
 
 
 @pytest.mark.asyncio

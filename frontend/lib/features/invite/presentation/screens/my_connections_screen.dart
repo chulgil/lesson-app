@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -21,7 +22,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     final connections = ref.watch(myConnectionsProvider);
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(userRole == InviteUserRole.teacher ? '내 학생' : '내 선생님'),
@@ -89,7 +90,7 @@ class MyConnectionsScreen extends ConsumerWidget {
               height: 100,
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                borderRadius: BorderRadius.zero,
               ),
               child: Icon(
                 Icons.people_outline,
@@ -122,7 +123,7 @@ class MyConnectionsScreen extends ConsumerWidget {
             OutlinedButton.icon(
               onPressed: () => _showHelpSheet(context),
               icon: const Icon(Icons.help_outline),
-              label: const Text('연결 방법 알아보기'),
+              label: const Text(AppStrings.inviteHowToConnect),
             ),
           ],
         ),
@@ -131,11 +132,8 @@ class MyConnectionsScreen extends ConsumerWidget {
   }
 
   void _showHelpSheet(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
       builder:
           (context) => Padding(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -146,7 +144,10 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space6),
                 // Notebook × Score: BottomSheetHandle + 상단 제목 조합은
                 // §7.27 패턴. Playfair appBarTitle 로 통일.
-                Text('선생님과 연결하는 방법', style: NotebookTypography.appBarTitle),
+                Text(
+                  AppStrings.inviteConnectWithTeacher,
+                  style: NotebookTypography.appBarTitle,
+                ),
                 const SizedBox(height: AppSpacing.space4),
                 _HelpItem(
                   icon: Icons.dialpad,
@@ -287,11 +288,8 @@ class MyConnectionsScreen extends ConsumerWidget {
             ? connection.studentName
             : connection.teacherName;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
       builder:
           (context) => Padding(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -332,7 +330,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                     Icons.calendar_today,
                     color: AppColors.paperAccent,
                   ),
-                  title: const Text('레슨 일정 보기'),
+                  title: const Text(AppStrings.inviteViewLessonSchedule),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.pop(context);
@@ -341,7 +339,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.message, color: AppColors.ink),
-                  title: const Text('메시지 보내기'),
+                  title: const Text(AppStrings.inviteSendMessage),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.pop(context);
@@ -350,7 +348,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.link_off, color: AppColors.paperAccent),
-                  title: const Text('연결 해제'),
+                  title: const Text(AppStrings.inviteDisconnect),
                   onTap: () {
                     Navigator.pop(context);
                     _handleDeactivate(context, ref, connection, otherName);
@@ -369,26 +367,15 @@ class MyConnectionsScreen extends ConsumerWidget {
     Connection connection,
     String otherName,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('연결 해제'),
-            content: Text('$otherName님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text('연결 해제'),
-              ),
-            ],
-          ),
+      title: '연결 해제',
+      content: Text('$otherName님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.'),
+      confirmLabel: '연결 해제',
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true && context.mounted) {
@@ -608,7 +595,7 @@ class _ConnectionCard extends StatelessWidget {
                     horizontal: AppSpacing.space3,
                   ),
                 ),
-                child: const Text('다시 연결'),
+                child: const Text(AppStrings.inviteReconnect),
               ),
           ],
         ),

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import '../widgets/approval_bottom_sheet.dart';
@@ -22,9 +23,9 @@ class PendingBookingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingBookings = ref.watch(pendingBookingsProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text('승인 대기')),
+      appBar: AppBar(title: const Text(AppStrings.schedulePendingApproval)),
       body: pendingBookings.when(
         data: (bookings) {
           if (bookings.isEmpty) {
@@ -63,7 +64,10 @@ class PendingBookingsScreen extends ConsumerWidget {
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  Text('오류가 발생했습니다', style: AppTypography.bodyMedium),
+                  Text(
+                    AppStrings.errorOccurred,
+                    style: AppTypography.bodyMedium,
+                  ),
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
                     onPressed:
@@ -112,10 +116,9 @@ class PendingBookingsScreen extends ConsumerWidget {
     WidgetRef ref,
     LessonBooking booking,
   ) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.85,

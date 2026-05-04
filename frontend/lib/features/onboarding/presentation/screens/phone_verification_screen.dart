@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -172,9 +174,9 @@ class _PhoneVerificationScreenState
           _handleBack();
         }
       },
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         appBar: AppBar(
-          title: const Text('휴대폰 인증'),
+          title: const Text(AppStrings.onboardingPhoneVerification),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: _handleBack,
@@ -268,11 +270,23 @@ class _PhoneVerificationScreenState
   Widget _buildProgressIndicator() {
     return Row(
       children: [
-        _ProgressStep(step: 1, label: '휴대폰 인증', isActive: true),
+        _ProgressStep(
+          step: 1,
+          label: AppStrings.onboardingPhoneVerification,
+          isActive: true,
+        ),
         _ProgressDivider(isActive: false),
-        _ProgressStep(step: 2, label: '프로필 설정', isActive: false),
+        _ProgressStep(
+          step: 2,
+          label: AppStrings.onboardingProfileSetup,
+          isActive: false,
+        ),
         _ProgressDivider(isActive: false),
-        _ProgressStep(step: 3, label: '튜토리얼', isActive: false),
+        _ProgressStep(
+          step: 3,
+          label: AppStrings.onboardingTutorial,
+          isActive: false,
+        ),
       ],
     );
   }
@@ -431,7 +445,7 @@ class _ProgressStep extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Center(
               child: Text(

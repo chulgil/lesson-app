@@ -1,3 +1,4 @@
+import '../../../../core/l10n/app_strings.dart';
 import '../../../lessons/domain/entities/entities.dart';
 import '../../../lessons/domain/repositories/lesson_repository.dart';
 import '../../../notifications/domain/entities/notification.dart';
@@ -148,7 +149,7 @@ class BulkTeacherActionService {
       userId: studentId,
       type: NotificationType.lessonCancelled,
       priority: NotificationPriority.high,
-      title: '휴강 안내',
+      title: AppStrings.studentBulkCancelNotificationTitle,
       body: bodyBuffer.toString(),
       createdAt: DateTime.now(),
       data: {

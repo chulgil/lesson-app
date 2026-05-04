@@ -37,7 +37,10 @@ class StudentLessonCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
+          context.push(
+            AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+            extra: {'viewerRole': 'student'},
+          );
         },
         child: Column(
           children: [

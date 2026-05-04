@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -62,7 +63,7 @@ class RequestCompletionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: const Text(AppStrings.requestSubmittedTitle),
@@ -116,16 +117,7 @@ class RequestCompletionScreen extends StatelessWidget {
   Widget _buildStepGuide() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -249,16 +241,7 @@ class RequestCompletionScreen extends StatelessWidget {
   Widget _buildRequestSummary() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

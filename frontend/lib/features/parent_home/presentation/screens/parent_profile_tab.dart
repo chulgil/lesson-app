@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,8 +29,11 @@ class ParentProfileTab extends ConsumerWidget {
       notificationSettingsNotifierProvider(parentId),
     );
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('프로필'), centerTitle: true),
+    return NotebookScreenScaffold(
+      appBar: AppBar(
+        title: const Text(AppStrings.parentHomeProfile),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -137,26 +141,17 @@ class ParentProfileTab extends ConsumerWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
-    showDialog(
+    showNotebookDialog<void>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('로그아웃'),
-            content: const Text('정말 로그아웃 하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.login);
-                },
-                child: const Text('로그아웃'),
-              ),
-            ],
-          ),
+      title: '로그아웃',
+      content: const Text(AppStrings.parentHomeLogoutConfirm),
+      confirmLabel: '로그아웃',
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () {
+        Navigator.pop(context);
+        context.go(AppRoutes.login);
+      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -105,9 +106,9 @@ class _PracticeGoalSettingScreenState
     await ref.read(practiceGoalCrudProvider.notifier).saveGoal(goal);
 
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('연습 목표가 저장되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceGoalSavedSnack)),
+      );
       context.pop();
     }
   }
@@ -120,14 +121,17 @@ class _PracticeGoalSettingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('연습 목표 설정'),
+        title: const Text(AppStrings.practiceGoalSettingTitle),
         actions: [
           if (_hasChanges && _hasAnyGoal)
             TextButton(
               onPressed: _saveGoal,
-              child: Text('저장', style: TextStyle(color: AppColors.paperAccent)),
+              child: Text(
+                AppStrings.practiceGoalSaveButton,
+                style: TextStyle(color: AppColors.paperAccent),
+              ),
             ),
         ],
       ),
@@ -168,11 +172,14 @@ class _PracticeGoalSettingScreenState
                     const SizedBox(height: AppSpacing.space6),
 
                     // Daily goals section
-                    _buildSectionHeader(icon: Icons.today, title: '일일 목표'),
+                    _buildSectionHeader(
+                      icon: Icons.today,
+                      title: AppStrings.practiceGoalDailyTitle,
+                    ),
                     const SizedBox(height: AppSpacing.space3),
 
                     GoalSettingChips(
-                      label: '연습 시간',
+                      label: AppStrings.practiceTimeLabel,
                       icon: Icons.timer,
                       options: const [15, 30, 45, 60],
                       unit: '분',
@@ -182,7 +189,7 @@ class _PracticeGoalSettingScreenState
                     const SizedBox(height: AppSpacing.space3),
 
                     GoalSettingChips(
-                      label: '완료 섹션 수',
+                      label: AppStrings.practiceGoalDailySectionLabel,
                       icon: Icons.check_box,
                       options: const [1, 2, 3, 5],
                       unit: '개',
@@ -192,11 +199,14 @@ class _PracticeGoalSettingScreenState
                     const SizedBox(height: AppSpacing.space6),
 
                     // Weekly goals section
-                    _buildSectionHeader(icon: Icons.date_range, title: '주간 목표'),
+                    _buildSectionHeader(
+                      icon: Icons.date_range,
+                      title: AppStrings.practiceGoalWeeklyTitle,
+                    ),
                     const SizedBox(height: AppSpacing.space3),
 
                     GoalSettingChips(
-                      label: '총 연습 시간',
+                      label: AppStrings.practiceGoalWeeklyTimeLabel,
                       icon: Icons.timer,
                       options: const [60, 120, 180, 300],
                       unit: '분',
@@ -206,7 +216,7 @@ class _PracticeGoalSettingScreenState
                     const SizedBox(height: AppSpacing.space3),
 
                     GoalSettingChips(
-                      label: '연습 일수',
+                      label: AppStrings.practiceGoalWeeklyDayLabel,
                       icon: Icons.calendar_today,
                       options: const [3, 4, 5, 7],
                       unit: '일',
@@ -346,9 +356,7 @@ class _PracticeGoalSettingScreenState
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Text(
         text,
         style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500),
@@ -366,32 +374,23 @@ class _PracticeGoalSettingScreenState
   }
 
   void _showResetConfirmation() {
-    showDialog(
+    showNotebookDialog<void>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('목표 초기화'),
-            content: const Text('모든 목표 설정을 초기화할까요?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _dailyTimeMinutes = null;
-                    _dailySectionCount = null;
-                    _weeklyTimeMinutes = null;
-                    _weeklyDayCount = null;
-                    _hasChanges = true;
-                  });
-                },
-                child: const Text('초기화'),
-              ),
-            ],
-          ),
+      title: AppStrings.practiceGoalResetTitle,
+      content: const Text(AppStrings.practiceGoalResetConfirm),
+      confirmLabel: '초기화',
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () {
+        Navigator.pop(context);
+        setState(() {
+          _dailyTimeMinutes = null;
+          _dailySectionCount = null;
+          _weeklyTimeMinutes = null;
+          _weeklyDayCount = null;
+          _hasChanges = true;
+        });
+      },
     );
   }
 }

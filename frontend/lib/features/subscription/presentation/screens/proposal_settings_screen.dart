@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -59,7 +60,7 @@ class _ProposalSettingsScreenState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return NotebookScreenScaffold(
         appBar: AppBar(
           title: const Text(AppStrings.proposalSettingsAppBarTitle),
         ),
@@ -67,7 +68,7 @@ class _ProposalSettingsScreenState
       );
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.proposalSettingsAppBarTitle),
         centerTitle: true,
@@ -336,9 +337,9 @@ class _ProposalSettingsScreenState
                                           const SizedBox(
                                             width: AppSpacing.space1,
                                           ),
-                                          const Text(
+                                          Text(
                                             '⭐',
-                                            style: TextStyle(fontSize: 12),
+                                            style: AppTypography.bodySmall,
                                           ),
                                         ],
                                       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,11 +32,13 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     final activeChild = ref.watch(activeChildProfileProvider);
 
     if (activeChild == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const NotebookScreenScaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return DebugWrapper(
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         backgroundColor: AppColors.paperDark,
         appBar: AppBar(
           backgroundColor: AppColors.paperDark,
@@ -156,7 +159,10 @@ class UnconnectedChildDashboard extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
-        Text('오늘의 연습', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.parentHomeTodayPractice,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -235,7 +241,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _showFindTeacherDialog(context),
                   icon: const Icon(Icons.search, size: 18),
-                  label: const Text('선생님 찾기'),
+                  label: const Text(AppStrings.parentHomeFindTeacher),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.paperAccent,
                     side: const BorderSide(color: AppColors.paperAccent),
@@ -250,7 +256,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _enterInviteCode(context),
                   icon: const Icon(Icons.qr_code, size: 18),
-                  label: const Text('초대코드 입력'),
+                  label: const Text(AppStrings.parentHomeInviteCode),
                   // §7.132: foregroundColor white → paper.
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
@@ -276,12 +282,15 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
-            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.parentHomeWeeklyPractice,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton(
               onPressed: () {
                 // TODO: Navigate to practice history
               },
-              child: const Text('전체보기'),
+              child: const Text(AppStrings.viewAll),
             ),
           ],
         ),
@@ -386,11 +395,11 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('초대코드 입력'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.parentHomeInviteCode),
             content: const TextField(
               decoration: InputDecoration(
-                hintText: '선생님에게 받은 코드를 입력하세요',
+                hintText: AppStrings.parentHomeInviteCodeHint,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -404,7 +413,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   // TODO: Process invite code
                   Navigator.pop(context);
                 },
-                child: const Text('연결'),
+                child: const Text(AppStrings.parentHomeConnect),
               ),
             ],
           ),
@@ -436,13 +445,6 @@ class _FeatureCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.paper,
           borderRadius: BorderRadius.zero,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

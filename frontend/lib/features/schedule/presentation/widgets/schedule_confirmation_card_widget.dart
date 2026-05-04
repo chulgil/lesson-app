@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,7 +34,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
     final notifierState = ref.watch(scheduleConfirmationCardNotifierProvider);
     final isLoading = notifierState.isLoading;
 
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
@@ -237,13 +238,13 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         children: [
           if (isRecommended)
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Icon(Icons.star, color: AppColors.paperAccent, size: 16),
             )
           else
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: AppColors.inkTertiary.withValues(alpha: 0.15),
               ),
@@ -337,7 +338,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           onPressed:
               isLoading ? null : () => _onSelectDifferentTime(context, ref),
           icon: const Icon(Icons.access_time, size: 18),
-          label: const Text('시간 선택하기'),
+          label: const Text(AppStrings.scheduleSelectTime),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.ink,
             foregroundColor: AppColors.paper,
@@ -361,7 +362,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               side: BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(),
             ),
-            child: const Text('다른 시간'),
+            child: const Text(AppStrings.scheduleDifferentTime),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -380,7 +381,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                       ),
                     )
                     : const Icon(Icons.check, size: 18),
-            label: const Text('이 시간으로 예약'),
+            label: const Text(AppStrings.scheduleBookThisTime),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.paperOk,
               foregroundColor: AppColors.paper,
@@ -443,7 +444,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('스케줄 확정 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.scheduleConfirmError),
             backgroundColor: AppColors.paperAccent,
           ),
         );

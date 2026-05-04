@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import 'student_form_helpers.dart';
 
@@ -22,8 +23,8 @@ class ParentInfoFields extends StatelessWidget {
         TextFormField(
           controller: parentNameController,
           decoration: studentInputDecoration(
-            label: '보호자 이름',
-            hint: '보호자 이름을 입력하세요',
+            label: AppStrings.studentParentNameLabel,
+            hint: AppStrings.studentParentNameHint,
             prefixIcon: Icons.family_restroom,
           ),
           textInputAction: TextInputAction.next,
@@ -34,7 +35,7 @@ class ParentInfoFields extends StatelessWidget {
         TextFormField(
           controller: parentPhoneController,
           decoration: studentInputDecoration(
-            label: '보호자 연락처',
+            label: AppStrings.studentParentPhoneLabel,
             hint: '010-0000-0000',
             prefixIcon: Icons.phone_outlined,
           ),

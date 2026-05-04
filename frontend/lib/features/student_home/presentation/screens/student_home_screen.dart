@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -6,6 +7,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
+import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/practice_center_button.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import 'student_dashboard_tab.dart';
@@ -71,16 +73,18 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return DebugWrapper(
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         body: SafeArea(
-          child: IndexedStack(
-            index: _currentIndex,
-            children: const [
-              StudentDashboardTab(),
-              StudentLessonsTab(),
-              StudentPracticeTab(),
-              StudentProfileTab(),
-            ],
+          child: PaperScaffold(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: const [
+                StudentDashboardTab(),
+                StudentLessonsTab(),
+                StudentPracticeTab(),
+                StudentProfileTab(),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: _buildBottomNavigationWithCenterButton(),

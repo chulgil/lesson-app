@@ -38,7 +38,7 @@ class AvailabilityBlock extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_statusIcon, style: const TextStyle(fontSize: 16)),
+              Text(_statusIcon, style: AppTypography.bodyLarge),
               if (status == AvailabilitySlotStatus.booked &&
                   bookedByName != null)
                 Padding(

@@ -3,7 +3,6 @@
 import pytest
 from httpx import AsyncClient
 
-
 # ---------------------------------------------------------------------------
 # Invites
 # ---------------------------------------------------------------------------
@@ -80,6 +79,34 @@ async def test_create_invite_unauthenticated(client: AsyncClient):
     assert response.status_code == 401
 
 
+@pytest.mark.asyncio
+async def test_get_invite_by_id_and_code_for_frontend_confirm_screen(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """RemoteInviteRepository needs direct invite lookup for scanned/shared codes."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    create_resp = await client.post("/api/v1/invites/", headers=auth_headers, json={})
+    invite = create_resp.json()
+
+    by_id = await client.get(f"/api/v1/invites/{invite['id']}", headers=student_auth_headers)
+    assert by_id.status_code == 200
+    assert by_id.json()["id"] == invite["id"]
+
+    by_code = await client.get(
+        f"/api/v1/invites/code/{invite['invite_code']}",
+        headers=student_auth_headers,
+    )
+    assert by_code.status_code == 200
+    assert by_code.json()["id"] == invite["id"]
+
+
 # ---------------------------------------------------------------------------
 # Connection Requests
 # ---------------------------------------------------------------------------
@@ -88,7 +115,7 @@ async def test_create_invite_unauthenticated(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_connection_request(client: AsyncClient, auth_headers, student_auth_headers, create_test_user):
     """POST /invites/connection-requests should create a request."""
-    teacher = await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(user_id="test-student-id", role="student", email="student@test.com", name="Student")
 
     # Student creates connection request to teacher
@@ -177,6 +204,90 @@ async def test_reject_connection_request(client: AsyncClient, auth_headers, stud
     assert response.json()["rejection_reason"] == "Not my student"
 
 
+@pytest.mark.asyncio
+async def test_invite_code_request_tracks_usage_and_single_use_status(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """Student invite-code onboarding should consume single-use invites."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    create_resp = await client.post(
+        "/api/v1/invites/",
+        headers=auth_headers,
+        json={"is_single_use": True},
+    )
+    invite = create_resp.json()
+
+    response = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={
+            "target_id": "",
+            "method": "inviteCode",
+            "invite_code": invite["invite_code"],
+        },
+    )
+    assert response.status_code == 201
+    assert response.json()["target_id"] == "test-user-id"
+
+    refreshed = await client.get(f"/api/v1/invites/{invite['id']}", headers=auth_headers)
+    assert refreshed.json()["use_count"] == 1
+    assert refreshed.json()["status"] == "used"
+
+    second = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={
+            "target_id": "",
+            "method": "inviteCode",
+            "invite_code": invite["invite_code"],
+        },
+    )
+    assert second.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_sent_connection_requests_and_cancel_contract(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """Frontend sent-requests view and cancel action require backend support."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    create_resp = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={"target_id": "test-user-id", "method": "inAppSearch"},
+    )
+    request_id = create_resp.json()["id"]
+
+    sent = await client.get("/api/v1/invites/connection-requests/sent", headers=student_auth_headers)
+    assert sent.status_code == 200
+    assert sent.json()["total"] == 1
+    assert sent.json()["items"][0]["id"] == request_id
+
+    cancel = await client.patch(
+        f"/api/v1/invites/connection-requests/{request_id}/cancel",
+        headers=student_auth_headers,
+    )
+    assert cancel.status_code == 200
+    assert cancel.json()["status"] == "cancelled"
+
+    pending = await client.get("/api/v1/invites/connection-requests/pending", headers=auth_headers)
+    assert pending.json()["total"] == 0
+
+
 # ---------------------------------------------------------------------------
 # Connections
 # ---------------------------------------------------------------------------
@@ -223,3 +334,50 @@ async def test_deactivate_connection(client: AsyncClient, auth_headers, student_
     # Verify it's gone from active list
     after = await client.get("/api/v1/invites/connections", headers=auth_headers)
     assert after.json()["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_inactive_connections_can_be_listed_and_reactivated(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """My connections screen has inactive and reconnect flows."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    cr = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={"target_id": "test-user-id", "method": "inAppSearch"},
+    )
+    await client.patch(
+        f"/api/v1/invites/connection-requests/{cr.json()['id']}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    conn_resp = await client.get("/api/v1/invites/connections", headers=auth_headers)
+    conn_id = conn_resp.json()["items"][0]["id"]
+    await client.delete(f"/api/v1/invites/connections/{conn_id}", headers=auth_headers)
+
+    inactive = await client.get(
+        "/api/v1/invites/connections",
+        headers=auth_headers,
+        params={"include_inactive": True},
+    )
+    assert inactive.status_code == 200
+    assert inactive.json()["total"] == 1
+    assert inactive.json()["items"][0]["is_active"] is False
+
+    reactivated = await client.patch(
+        f"/api/v1/invites/connections/{conn_id}/reactivate",
+        headers=auth_headers,
+    )
+    assert reactivated.status_code == 200
+    assert reactivated.json()["is_active"] is True
+
+    active = await client.get("/api/v1/invites/connections", headers=auth_headers)
+    assert active.json()["total"] == 1

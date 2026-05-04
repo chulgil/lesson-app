@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -44,7 +45,10 @@ class DailyBarChart extends StatelessWidget {
               Icon(Icons.bar_chart, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('일별 연습 시간', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceDailyTimeChartTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),

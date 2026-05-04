@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/follow_target_type.dart';
@@ -26,18 +27,16 @@ class FollowButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isFollowingAsync = ref.watch(
-      isFollowingProvider(
-        followerId: followerId,
-        followingId: followingId,
-      ),
+      isFollowingProvider(followerId: followerId, followingId: followingId),
     );
 
     return isFollowingAsync.when(
-      loading: () => const SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
+      loading:
+          () => const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
       error: (_, __) => const SizedBox.shrink(),
       data: (isFollowing) {
         if (compact) {
@@ -57,7 +56,7 @@ class FollowButton extends ConsumerWidget {
       return OutlinedButton.icon(
         onPressed: () => _toggleFollow(context, ref, isFollowing),
         icon: const Icon(Icons.check, size: 16),
-        label: const Text('팔로잉'),
+        label: const Text(AppStrings.followFollowing),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.paperAccent,
           side: BorderSide(color: AppColors.paperAccent),
@@ -72,7 +71,7 @@ class FollowButton extends ConsumerWidget {
     return FilledButton.icon(
       onPressed: () => _toggleFollow(context, ref, isFollowing),
       icon: const Icon(Icons.add, size: 16),
-      label: const Text('팔로우'),
+      label: const Text(AppStrings.followFollow),
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.paperAccent,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

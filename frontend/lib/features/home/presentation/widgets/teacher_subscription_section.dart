@@ -13,7 +13,7 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/domain/entities/subscription.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
-import '../../../subscription/presentation/widgets/subscription_ticket_card.dart';
+import '../../../subscription/presentation/widgets/subscription_card.dart';
 
 /// Home dashboard section showing teacher's issued subscriptions.
 ///
@@ -179,7 +179,7 @@ class _SubscriptionCardWithName extends StatelessWidget {
     return membershipAsync.when(
       data: (membership) {
         if (membership == null) {
-          return SubscriptionTicketCard(
+          return SubscriptionCard(compact: true,
             subscription: subscription,
             onTap: onTap,
           );
@@ -192,7 +192,7 @@ class _SubscriptionCardWithName extends StatelessWidget {
 
         return lessonClassAsync.when(
           data:
-              (lessonClass) => SubscriptionTicketCard(
+              (lessonClass) => SubscriptionCard(compact: true,
                 subscription: subscription,
                 className: lessonClass?.name,
                 instrument: membership.instrument,
@@ -200,13 +200,13 @@ class _SubscriptionCardWithName extends StatelessWidget {
                 onTap: onTap,
               ),
           loading:
-              () => SubscriptionTicketCard(
+              () => SubscriptionCard(compact: true,
                 subscription: subscription,
                 instrument: membership.instrument,
                 onTap: onTap,
               ),
           error:
-              (_, __) => SubscriptionTicketCard(
+              (_, __) => SubscriptionCard(compact: true,
                 subscription: subscription,
                 instrument: membership.instrument,
                 onTap: onTap,
@@ -215,10 +215,10 @@ class _SubscriptionCardWithName extends StatelessWidget {
       },
       loading:
           () =>
-              SubscriptionTicketCard(subscription: subscription, onTap: onTap),
+              SubscriptionCard(compact: true,subscription: subscription, onTap: onTap),
       error:
           (_, __) =>
-              SubscriptionTicketCard(subscription: subscription, onTap: onTap),
+              SubscriptionCard(compact: true,subscription: subscription, onTap: onTap),
     );
   }
 }

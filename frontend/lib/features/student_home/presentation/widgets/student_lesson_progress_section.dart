@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -30,7 +31,10 @@ class StudentLessonProgressSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NotebookSectionHeader(label: '레슨 진행 · ${sortedItems.length}'),
+            NotebookSectionHeader(
+              label:
+                  '${AppStrings.studentHomeLessonProgressLabel} · ${sortedItems.length}',
+            ),
             const SizedBox(height: AppSpacing.space1),
             _ProgressStats(items: sortedItems),
             const SizedBox(height: AppSpacing.space2),

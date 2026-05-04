@@ -3,7 +3,7 @@
 import datetime as _dt
 from typing import Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, computed_field
 
 
 class LessonRequestCreate(BaseModel):
@@ -112,6 +112,36 @@ class LessonRequestResponse(BaseModel):
     created_at: _dt.datetime | None = None
     events: list["RequestEventResponse"] = Field(default_factory=list)
 
+    @computed_field
+    @property
+    def proposals(self) -> list[dict]:
+        """Frontend TimeProposal list derived from stored time_proposals."""
+        normalized: list[dict] = []
+        for proposal_index, raw_proposal in enumerate(self.time_proposals or []):
+            if not isinstance(raw_proposal, dict):
+                continue
+            proposal_id = raw_proposal.get("id") or f"{self.id}-proposal-{proposal_index}"
+            slots = []
+            for slot_index, raw_slot in enumerate(raw_proposal.get("slots") or []):
+                if not isinstance(raw_slot, dict):
+                    continue
+                slot_id = raw_slot.get("id") or f"{proposal_id}-slot-{slot_index}"
+                slots.append(
+                    {
+                        **raw_slot,
+                        "id": slot_id,
+                        "is_selected": raw_slot.get("is_selected", False),
+                    }
+                )
+            normalized.append(
+                {
+                    **raw_proposal,
+                    "id": proposal_id,
+                    "slots": slots,
+                }
+            )
+        return normalized
+
 
 class RequestEventResponse(BaseModel):
     """Chat-history event for a lesson request."""
@@ -132,6 +162,9 @@ class RequestEventResponse(BaseModel):
     proposed_time: str | None = None
     subscription_id: str | None = None
     session_number: int | None = None
+    change_credit_used: int | None = None
+    change_credit_remaining_after: int | None = None
+    keeps_session_number: bool | None = None
 
 
 class LessonRequestCalendarItem(BaseModel):

@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
@@ -557,8 +558,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
   void _showLessonActions(Lesson lesson) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder:
           (ctx) => SafeArea(
             child: Column(
@@ -569,7 +572,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                     Icons.check_circle,
                     color: AppColors.paperOk,
                   ),
-                  title: const Text('완료 처리'),
+                  title: const Text(AppStrings.scheduleMarkComplete),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     _completeLesson(lesson);
@@ -580,7 +583,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                     Icons.edit_calendar,
                     color: AppColors.ink,
                   ),
-                  title: const Text('일정 변경'),
+                  title: const Text(AppStrings.scheduleChangeSchedule),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     context.push(
@@ -611,9 +614,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('완료 처리 실패: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.scheduleCompleteFailed('$e'))),
+        );
       }
     }
   }
@@ -623,9 +626,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('취소 실패: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.scheduleCancelFailed('$e'))),
+        );
       }
     }
   }

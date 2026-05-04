@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -230,7 +232,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
     final section = _sections[sectionIndex];
     final initialValue = isStart ? section.startMeasure : section.endMeasure;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => RangePickerSheet(
@@ -258,7 +260,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
     final section = _sections[sectionIndex];
     final initialValue = isStart ? section.startLine : section.endLine;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => RangePickerSheet(
@@ -284,8 +286,8 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('레퍼토리 추가')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.practiceRepertoireAddTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -298,7 +300,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 controller: _repertoireNameController,
                 decoration: const InputDecoration(
                   labelText: '레퍼토리 이름 *',
-                  hintText: '예: 스즈키 바이올린 1권',
+                  hintText: AppStrings.practiceRepertoireNameHintSuzuki,
                   prefixIcon: Icon(Icons.library_music),
                 ),
                 textInputAction: TextInputAction.next,
@@ -332,7 +334,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 controller: _descriptionController,
                 decoration: const InputDecoration(
                   labelText: '설명 (선택)',
-                  hintText: '예: Bach Violin Concerto in A minor',
+                  hintText: AppStrings.repertoireDescriptionHint,
                   prefixIcon: Icon(Icons.description_outlined),
                 ),
                 maxLines: 1,
@@ -370,7 +372,10 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                   const SizedBox(width: AppSpacing.space2),
                   // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
                   // 로 통일 (§7.17).
-                  Text('섹션 목록', style: NotebookTypography.sectionTitle),
+                  Text(
+                    AppStrings.practiceSectionListTitle,
+                    style: NotebookTypography.sectionTitle,
+                  ),
                 ],
               ),
 
@@ -387,7 +392,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 child: TextButton.icon(
                   onPressed: _addSection,
                   icon: const Icon(Icons.add),
-                  label: const Text('섹션 추가'),
+                  label: const Text(AppStrings.practiceSectionAddLabel),
                 ),
               ),
 
@@ -408,7 +413,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                               color: AppColors.paper,
                             ),
                           )
-                          : const Text('저장하기'),
+                          : const Text(AppStrings.practiceSaveButton),
                 ),
               ),
 
@@ -423,7 +428,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   Widget _buildSectionCard(int index) {
     final section = _sections[index];
 
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -456,7 +461,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               controller: section.pieceNameController,
               decoration: const InputDecoration(
                 labelText: '곡명 *',
-                hintText: '예: 작은 별 변주곡',
+                hintText: AppStrings.practicePieceNameHintStar,
                 prefixIcon: Icon(Icons.music_note),
               ),
               textInputAction: TextInputAction.next,
@@ -500,22 +505,31 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     return Row(
       children: [
-        Text('구간', style: AppTypography.bodyMedium),
+        Text(AppStrings.practiceRangeLabel, style: AppTypography.bodyMedium),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: SegmentedButton<SectionRangeType>(
             segments: const [
               ButtonSegment(
                 value: SectionRangeType.full,
-                label: Text('전체', style: AppTypography.bodySmall),
+                label: Text(
+                  AppStrings.practiceRangeTypeFull,
+                  style: AppTypography.bodySmall,
+                ),
               ),
               ButtonSegment(
                 value: SectionRangeType.line,
-                label: Text('줄', style: AppTypography.bodySmall),
+                label: Text(
+                  AppStrings.practiceRangeTypeLine,
+                  style: AppTypography.bodySmall,
+                ),
               ),
               ButtonSegment(
                 value: SectionRangeType.measure,
-                label: Text('마디', style: AppTypography.bodySmall),
+                label: Text(
+                  AppStrings.practiceRangeTypeMeasure,
+                  style: AppTypography.bodySmall,
+                ),
               ),
             ],
             selected: {section.rangeType},

@@ -93,10 +93,27 @@ class SubscriptionService:
             membership_id=data.membership_id or "",
             type=data.type or "monthly",
             total_lessons=data.total_lessons,
+            used_lessons=data.used_lessons,
             amount=data.amount or 0,
             start_date=data.start_date,
+            end_date=data.end_date,
+            status=data.status or "active",
+            lessons_per_month=data.lessons_per_month,
+            bonus_count=data.bonus_count,
+            billing_type=data.billing_type,
+            billing_day=data.billing_day,
+            fifth_week_policy=data.fifth_week_policy,
+            bonus_reason=data.bonus_reason,
+            total_reschedule_allowance=data.total_reschedule_allowance,
+            used_reschedule_count=data.used_reschedule_count,
             payment_confirmed=data.payment_confirmed,
             payment_method=data.payment_method,
+            paid_at=data.paid_at,
+            payment_confirmed_at=data.payment_confirmed_at,
+            discount_amount=data.discount_amount,
+            discount_reason=data.discount_reason,
+            original_amount=data.original_amount,
+            reschedule_deadline_hours=data.reschedule_deadline_hours,
         )
         self.db.add(sub)
         await self.db.flush()
@@ -149,6 +166,10 @@ class SubscriptionService:
             subscription_id=subscription_id,
             lesson_id=data.lesson_id,
             type=data.type,
+            teacher_name=data.teacher_name,
+            instrument=data.instrument,
+            note=data.note,
+            deducted=data.deducted,
         )
         self.db.add(usage)
 
@@ -212,6 +233,10 @@ class SubscriptionService:
             subscription_id=subscription_id,
             lesson_id=data.get("lesson_id"),
             type=data.get("type", "lesson"),
+            teacher_name=data.get("teacher_name"),
+            instrument=data.get("instrument"),
+            note=data.get("note"),
+            deducted=data.get("deducted", True),
         )
         self.db.add(usage)
         await self.db.flush()
@@ -356,7 +381,7 @@ class SubscriptionService:
         template = SubscriptionTemplate(
             teacher_id=tid,
             name=data.name,
-            type=data.type,
+            type=data.type or "package",
             lessons_count=data.lessons_count,
             lessons_per_month=data.lessons_per_month,
             duration_months=data.duration_months,
@@ -373,6 +398,15 @@ class SubscriptionService:
         await self.db.refresh(template)
         return SubscriptionTemplateResponse.model_validate(template)
 
+    async def get_template_by_id(self, template_id: str, current_user: Any) -> SubscriptionTemplateResponse:
+        """Return one template by ID."""
+        from app.models.subscription import SubscriptionTemplate
+
+        template = await self.db.get(SubscriptionTemplate, template_id)
+        if template is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        return SubscriptionTemplateResponse.model_validate(template)
+
     async def update_template(
         self, template_id: str, data: SubscriptionTemplateUpdate, current_user: Any
     ) -> SubscriptionTemplateResponse:
@@ -384,6 +418,8 @@ class SubscriptionService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
 
         update_data = data.model_dump(exclude_unset=True)
+        update_data.pop("owner_id", None)
+        update_data.pop("owner_type", None)
         for key, value in update_data.items():
             setattr(template, key, value)
         await self.db.flush()
@@ -398,6 +434,28 @@ class SubscriptionService:
         if template is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
         template.is_active = False
+        await self.db.flush()
+
+    async def toggle_template_active(self, template_id: str, current_user: Any) -> SubscriptionTemplateResponse:
+        """Toggle a template active flag."""
+        from app.models.subscription import SubscriptionTemplate
+
+        template = await self.db.get(SubscriptionTemplate, template_id)
+        if template is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        template.is_active = not template.is_active
+        await self.db.flush()
+        await self.db.refresh(template)
+        return SubscriptionTemplateResponse.model_validate(template)
+
+    async def reorder_templates(self, ordered_ids: list[str], current_user: Any) -> None:
+        """Persist template display order for the current teacher."""
+        from app.models.subscription import SubscriptionTemplate
+
+        for index, template_id in enumerate(ordered_ids):
+            template = await self.db.get(SubscriptionTemplate, template_id)
+            if template is not None:
+                template.display_order = index
         await self.db.flush()
 
     # ------------------------------------------------------------------
@@ -477,6 +535,15 @@ class SubscriptionService:
         items = [SubscriptionProposalResponse.model_validate(p) for p in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
+    async def get_proposal_by_id(self, proposal_id: str, current_user: Any) -> SubscriptionProposalResponse:
+        """Return one proposal by ID."""
+        from app.models.subscription import SubscriptionProposal
+
+        proposal = await self.db.get(SubscriptionProposal, proposal_id)
+        if proposal is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
+        return SubscriptionProposalResponse.model_validate(proposal)
+
     async def create_proposal(
         self, data: SubscriptionProposalCreate, current_user: Any
     ) -> SubscriptionProposalResponse:
@@ -489,9 +556,20 @@ class SubscriptionService:
         proposal = SubscriptionProposal(
             teacher_id=tid,
             student_id=data.student_id,
+            template_id=data.template_id,
             message=data.message,
+            template_ids=data.template_ids,
             recommended_template_id=data.recommended_template_id,
             lesson_request_id=data.lesson_request_id,
+            academy_id=data.academy_id,
+            discount_amount=data.discount_amount,
+            discount_reason=data.discount_reason,
+            proposal_type=data.proposal_type,
+            is_renewal=data.is_renewal,
+            previous_subscription_id=data.previous_subscription_id,
+            renewal_initiator=data.renewal_initiator,
+            is_auto_proposal=data.is_auto_proposal,
+            is_app_transition=data.is_app_transition,
             status="pending",
             expires_at=datetime.now(UTC) + timedelta(days=7),
         )
@@ -514,6 +592,23 @@ class SubscriptionService:
 
         return SubscriptionProposalResponse.model_validate(proposal)
 
+    async def expire_old_proposals(self) -> int:
+        """Mark expired pending proposals as expired."""
+        from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+        now = datetime.now(UTC)
+        result = await self.db.scalars(
+            select(SubscriptionProposal).where(
+                SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
+                SubscriptionProposal.expires_at < now,
+            )
+        )
+        proposals = list(result.all())
+        for proposal in proposals:
+            proposal.status = ProposalStatus.expired
+        await self.db.flush()
+        return len(proposals)
+
     async def respond_to_proposal(
         self, proposal_id: str, data: ProposalRespondRequest, current_user: Any
     ) -> SubscriptionProposalResponse:
@@ -524,7 +619,7 @@ class SubscriptionService:
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
-        if data.action in ("notify_payment", "accept"):
+        if data.action in ("notify_payment", "accept", "select_template"):
             proposal.status = ProposalStatus.paymentNotified
             proposal.payment_notified_at = datetime.now(UTC)
             proposal.selected_template_id = data.selected_template_id
@@ -542,6 +637,8 @@ class SubscriptionService:
         elif data.action == "reject":
             proposal.status = ProposalStatus.rejected
             proposal.rejection_reason = data.rejection_reason
+        elif data.action == "cancel":
+            proposal.status = ProposalStatus.cancelled
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid action")
 
@@ -837,9 +934,7 @@ class SubscriptionService:
         lesson_request_id: str | None,
     ) -> None:
         """GAP-4: Auto-create a ScheduleConfirmationCard after subscription issuance."""
-        from app.models.policy import ScheduleConfirmationCard
-
-        from app.models.policy import ConfirmationCardType
+        from app.models.policy import ConfirmationCardType, ScheduleConfirmationCard
 
         proposed_day: str | None = None
         proposed_time: str | None = None

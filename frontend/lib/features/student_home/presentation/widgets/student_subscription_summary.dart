@@ -65,9 +65,15 @@ class StudentSubscriptionSummary extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('내 수강권', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentHomeMySubscriptions,
+              style: NotebookTypography.sectionTitle,
+            ),
             if (onViewAll != null)
-              TextButton(onPressed: onViewAll, child: const Text('전체 보기')),
+              TextButton(
+                onPressed: onViewAll,
+                child: const Text(AppStrings.studentHomeViewAllSpaced),
+              ),
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -92,6 +98,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
                             ':id',
                             subscription.id,
                           ),
+                          extra: {'viewerRole': 'student'},
                         );
                       }
                       : null,

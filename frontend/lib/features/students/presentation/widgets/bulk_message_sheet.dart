@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/l10n/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/bulk_teacher_action_providers.dart';
 
@@ -19,10 +22,9 @@ class BulkMessageSheet extends ConsumerStatefulWidget {
     BuildContext context, {
     required List<String> studentIds,
   }) {
-    return showModalBottomSheet<bool>(
+    return showNotebookModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => BulkMessageSheet(studentIds: studentIds),
     );
   }
@@ -93,7 +95,10 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
-              Text('일괄 메시지 보내기', style: AppTypography.headingSmall),
+              Text(
+                AppStrings.studentBulkMessageTitle,
+                style: AppTypography.headingSmall,
+              ),
               const SizedBox(height: AppSpacing.space1),
               Text(
                 '${widget.studentIds.length}명에게 알림으로 전송됩니다',
@@ -107,7 +112,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 maxLength: 40,
                 decoration: const InputDecoration(
                   labelText: '제목',
-                  hintText: '예) 5월 연휴 일정 안내',
+                  hintText: AppStrings.studentBulkMessageTitleHint,
                   border: OutlineInputBorder(),
                 ),
                 enabled: !_submitting,
@@ -120,7 +125,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 maxLength: 300,
                 decoration: const InputDecoration(
                   labelText: '내용',
-                  hintText: '메시지 내용을 입력하세요',
+                  hintText: AppStrings.studentBulkMessageBodyHint,
                   border: OutlineInputBorder(),
                 ),
                 enabled: !_submitting,

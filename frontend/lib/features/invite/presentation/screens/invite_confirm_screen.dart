@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,10 +41,10 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     final inviteCreatorRole = widget.invite.creatorRole;
     final isValidConnection = currentUserRole != inviteCreatorRole;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        title: const Text('연결 요청'),
+        title: const Text(AppStrings.inviteConnectionRequest),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -71,7 +72,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             height: 80,
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(
               Icons.warning_amber_rounded,
@@ -99,7 +100,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space6),
           ElevatedButton(
             onPressed: () => context.pop(),
-            child: const Text('돌아가기'),
+            child: const Text(AppStrings.goBack),
           ),
         ],
       ),
@@ -121,7 +122,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             height: 100,
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.link, size: 48, color: AppColors.paperOk),
           ),
@@ -162,19 +163,19 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               children: [
                 _buildInfoRow(
                   icon: Icons.person,
-                  label: '초대한 사람',
+                  label: AppStrings.inviteInviter,
                   value: creatorRoleLabel,
                 ),
                 const Divider(height: AppSpacing.space4),
                 _buildInfoRow(
                   icon: Icons.confirmation_number,
-                  label: '초대 코드',
+                  label: AppStrings.inviteCode,
                   value: widget.invite.inviteCode,
                 ),
                 const Divider(height: AppSpacing.space4),
                 _buildInfoRow(
                   icon: Icons.access_time,
-                  label: '유효기간',
+                  label: AppStrings.inviteValidPeriod,
                   value: widget.invite.formattedExpiry,
                 ),
               ],
@@ -208,7 +209,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   maxLines: 3,
                   maxLength: 200,
                   decoration: InputDecoration(
-                    hintText: '간단한 자기소개나 인사말을 작성해주세요',
+                    hintText: AppStrings.inviteMessageHint,
                     hintStyle: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -244,9 +245,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space4,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
               child:
                   _isLoading
@@ -258,7 +257,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           color: AppColors.paper,
                         ),
                       )
-                      : const Text('연결 요청 보내기'),
+                      : const Text(AppStrings.inviteSendConnectionRequest),
             ),
           ),
 
@@ -332,7 +331,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('연결 요청에 실패했습니다'),
+              content: const Text(AppStrings.inviteConnectionFailed),
               backgroundColor: AppColors.paperAccent,
             ),
           );
@@ -368,10 +367,8 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       context: context,
       barrierDismissible: false,
       builder:
-          (dialogContext) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+          (dialogContext) => NotebookAlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -381,7 +378,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     color: AppColors.ink.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Icon(Icons.link, size: 48, color: AppColors.ink),
                 ),
@@ -440,10 +437,8 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       context: context,
       barrierDismissible: false,
       builder:
-          (dialogContext) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+          (dialogContext) => NotebookAlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -453,7 +448,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     color: AppColors.paperOk.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Icon(
                     Icons.check_circle,
@@ -521,7 +516,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.inkSecondary,
                         ),
-                        child: const Text('홈으로'),
+                        child: const Text(AppStrings.inviteGoHome),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -550,7 +545,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           backgroundColor: AppColors.paperAccent,
                           foregroundColor: AppColors.paper,
                         ),
-                        child: const Text('레슨 예약'),
+                        child: const Text(AppStrings.inviteLessonBooking),
                       ),
                     ),
                   ],
@@ -568,7 +563,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.inkSecondary,
                         ),
-                        child: const Text('홈으로'),
+                        child: const Text(AppStrings.inviteGoHome),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -584,7 +579,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                           backgroundColor: AppColors.paperAccent,
                           foregroundColor: AppColors.paper,
                         ),
-                        child: const Text('학생 목록'),
+                        child: const Text(AppStrings.inviteStudentList),
                       ),
                     ),
                   ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -17,9 +19,9 @@ class ExtendedProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(teacherExtendedProfileProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('학력·경력·자격증'),
+        title: const Text(AppStrings.profileExtendedTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -27,10 +29,14 @@ class ExtendedProfileScreen extends ConsumerWidget {
       ),
       body: profileState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error:
+            (_, __) =>
+                const Center(child: Text(AppStrings.profileExtendedError)),
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('프로필을 찾을 수 없습니다'));
+            return const Center(
+              child: Text(AppStrings.profileExtendedNotFound),
+            );
           }
           return _CredentialsContent(profile: profile);
         },
@@ -70,6 +76,10 @@ class _CredentialsContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           _buildCertificateSection(context),
 
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+
           SizedBox(
             height:
                 AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32,
@@ -93,7 +103,7 @@ class _CredentialsContent extends StatelessWidget {
         if (educations.isEmpty)
           ProfileEmptyCard(
             icon: Icons.school_outlined,
-            message: '학력 정보가 없습니다',
+            message: AppStrings.profileEducationEmpty,
             buttonText: '학력 추가',
             onTap: () => context.push(AppRoutes.educationEdit),
           )
@@ -110,7 +120,7 @@ class _CredentialsContent extends StatelessWidget {
           }),
           const SizedBox(height: AppSpacing.space3),
           ProfileAddButton(
-            label: '학력 추가',
+            label: AppStrings.profileEducationAdd,
             onTap: () => context.push(AppRoutes.educationEdit),
           ),
         ],
@@ -126,7 +136,7 @@ class _CredentialsContent extends StatelessWidget {
         if (careers.isEmpty)
           ProfileEmptyCard(
             icon: Icons.work_outline,
-            message: '경력 정보가 없습니다',
+            message: AppStrings.profileCareerEmpty,
             buttonText: '경력 추가',
             onTap: () => context.push(AppRoutes.careerEdit),
           )
@@ -143,7 +153,7 @@ class _CredentialsContent extends StatelessWidget {
           }),
           const SizedBox(height: AppSpacing.space3),
           ProfileAddButton(
-            label: '경력 추가',
+            label: AppStrings.profileCareerAdd,
             onTap: () => context.push(AppRoutes.careerEdit),
           ),
         ],
@@ -159,7 +169,7 @@ class _CredentialsContent extends StatelessWidget {
         if (certificates.isEmpty)
           ProfileEmptyCard(
             icon: Icons.verified_outlined,
-            message: '등록된 자격증이 없습니다',
+            message: AppStrings.profileCertificateEmpty,
             buttonText: '자격증 추가',
             onTap: () => context.push(AppRoutes.certificateEdit),
           )
@@ -174,7 +184,7 @@ class _CredentialsContent extends StatelessWidget {
           }),
           const SizedBox(height: AppSpacing.space3),
           ProfileAddButton(
-            label: '자격증 추가',
+            label: AppStrings.profileCertificateAdd,
             onTap: () => context.push(AppRoutes.certificateEdit),
           ),
         ],

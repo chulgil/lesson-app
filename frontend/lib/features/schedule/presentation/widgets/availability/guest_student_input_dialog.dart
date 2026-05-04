@@ -6,6 +6,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Guest student information collected before booking
 class GuestStudentInfo {
@@ -22,10 +23,11 @@ class GuestStudentInputDialog extends StatefulWidget {
 
   /// Show the dialog and return guest student info, or null if cancelled
   static Future<GuestStudentInfo?> show(BuildContext context) async {
-    return showModalBottomSheet<GuestStudentInfo>(
+    return showNotebookBottomSheet<GuestStudentInfo>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder: (context) => const GuestStudentInputDialog(),
     );
   }
@@ -91,7 +93,10 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                   const SizedBox(height: AppSpacing.space5),
 
                   // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-                  Text('예약자 정보 입력', style: NotebookTypography.sectionTitle),
+                  Text(
+                    AppStrings.scheduleGuestInfo,
+                    style: NotebookTypography.sectionTitle,
+                  ),
 
                   const SizedBox(height: AppSpacing.space2),
 
@@ -110,7 +115,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                   TextFormField(
                     controller: _nameController,
                     decoration: _inputDecoration(
-                      hintText: '예약자 이름을 입력하세요',
+                      hintText: AppStrings.scheduleGuestNameHint,
                       prefixIcon: Icons.person_outline,
                     ),
                     textInputAction: TextInputAction.next,
@@ -210,7 +215,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                           height: AppSpacing.buttonHeight,
                           child: FilledButton(
                             onPressed: _submit,
-                            child: const Text('예약하기'),
+                            child: const Text(AppStrings.scheduleBook),
                           ),
                         ),
                       ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -43,7 +44,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('마이크 권한이 필요합니다'),
+              content: Text(AppStrings.practiceRecordingMicPermissionRequired),
               backgroundColor: AppColors.paperAccent,
             ),
           );
@@ -73,7 +74,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('녹음을 시작할 수 없습니다'),
+            content: Text(AppStrings.practiceRecordingStartFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -163,7 +164,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
+          content: Text(AppStrings.practiceRecordingTooShort),
           backgroundColor: AppColors.paperAccent,
         ),
       );
@@ -189,7 +190,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('녹음 저장에 실패했습니다'),
+            content: Text(AppStrings.practiceRecordingSaveFailed),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -290,7 +291,9 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('원본 파일이 복구되었습니다'),
+                          content: Text(
+                            AppStrings.practiceOriginalRestoredSnack,
+                          ),
                           backgroundColor: AppColors.paperOk,
                         ),
                       );
@@ -301,7 +304,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('녹음이 저장되었습니다'),
+            content: Text(AppStrings.practiceRecordingSavedSnack),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -310,7 +313,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('녹음 저장에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceRecordingSaveFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -334,7 +337,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('대표 녹음으로 설정되었습니다'),
+            content: Text(AppStrings.practiceRepresentativeSetSnack),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -343,7 +346,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('설정에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceSettingFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -355,9 +358,9 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('녹음 삭제'),
-            content: const Text('이 녹음을 삭제하시겠습니까?'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRecordingDeleteTitle),
+            content: const Text(AppStrings.practiceRecordingDeleteConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -380,15 +383,17 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       ref.invalidate(sectionProvider(sectionId));
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음이 삭제되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.practiceRecordingDeletedSnack),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceDeleteFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );

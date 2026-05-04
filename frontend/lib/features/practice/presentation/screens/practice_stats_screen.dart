@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -42,9 +43,9 @@ class _PracticeStatsScreenState extends ConsumerState<PracticeStatsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('연습 통계'),
+        title: const Text(AppStrings.practiceStatsAppBarTitle),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [Tab(text: '주간'), Tab(text: '월간')],
@@ -130,7 +131,9 @@ class _WeeklyReportTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           Text(
             '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.paperAccent,
+            ),
           ),
           const SizedBox(height: AppSpacing.space3),
           TextButton(
@@ -212,7 +215,9 @@ class _MonthlyReportTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           Text(
             '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.paperAccent,
+            ),
           ),
           const SizedBox(height: AppSpacing.space3),
           TextButton(
@@ -268,10 +273,7 @@ class _DateNavigator extends StatelessWidget {
             onPressed: onNext,
             icon: Icon(
               Icons.chevron_right,
-              color:
-                  onNext != null
-                      ? AppColors.ink
-                      : AppColors.inkTertiary,
+              color: onNext != null ? AppColors.ink : AppColors.inkTertiary,
             ),
             tooltip: '다음',
           ),

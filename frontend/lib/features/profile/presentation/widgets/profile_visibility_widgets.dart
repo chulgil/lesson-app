@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 
 /// Labels for visibility options
@@ -435,9 +437,7 @@ class BadgeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccentSoft,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -462,10 +462,9 @@ void showProfilePreviewSheet({
   required TeacherProfile profile,
   required ProfileVisibilitySettings settings,
 }) {
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
     builder:
         (context) => DraggableScrollableSheet(
           initialChildSize: 0.85,
@@ -613,7 +612,7 @@ class ProfilePreviewContent extends StatelessWidget {
 
         // Introduction
         PreviewSection(
-          title: '소개',
+          title: AppStrings.profileVisibilitySectionIntro,
           isVisible: true,
           child: Text(profile.introduction, style: AppTypography.bodyMedium),
         ),
@@ -621,7 +620,7 @@ class ProfilePreviewContent extends StatelessWidget {
         // Fee
         if (profile.feeRange != null)
           PreviewSection(
-            title: '레슨료',
+            title: AppStrings.profileVisibilitySectionFee,
             isVisible: settings.feeVisibility == ProfileVisibility.public,
             child: Text(
               profile.feeRange!.formatted,
@@ -633,7 +632,7 @@ class ProfilePreviewContent extends StatelessWidget {
         if ((profile.career != null && profile.career!.isNotEmpty) ||
             (profile.education != null && profile.education!.isNotEmpty))
           PreviewSection(
-            title: '경력 및 학력',
+            title: AppStrings.profileVisibilitySectionCareerEdu,
             isVisible: settings.careerVisibility == ProfileVisibility.public,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -665,7 +664,7 @@ class ProfilePreviewContent extends StatelessWidget {
         // Certificates
         if (profile.verification.certificates.isNotEmpty)
           PreviewSection(
-            title: '자격증',
+            title: AppStrings.profileVisibilitySectionCertificate,
             isVisible:
                 settings.certificateVisibility == ProfileVisibility.public,
             child: Column(
@@ -702,7 +701,7 @@ class ProfilePreviewContent extends StatelessWidget {
 
         // Contact
         PreviewSection(
-          title: '연락처',
+          title: AppStrings.profileVisibilitySectionContact,
           isVisible: settings.contactVisibility == ProfileVisibility.public,
           child: Text(
             profile.verification.phoneNumber ?? '등록된 연락처 없음',

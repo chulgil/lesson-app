@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting time signature.
@@ -18,9 +20,8 @@ class TimeSignaturePicker extends StatelessWidget {
     BuildContext context,
     TimeSignature current,
   ) {
-    return showModalBottomSheet<TimeSignature>(
+    return showNotebookModalBottomSheet<TimeSignature>(
       context: context,
-      backgroundColor: Colors.transparent,
       builder: (context) => TimeSignaturePicker(current: current),
     );
   }
@@ -47,12 +48,15 @@ class TimeSignaturePicker extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(AppSpacing.space4),
               // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-              child: Text('박자표 선택', style: NotebookTypography.sectionTitle),
+              child: Text(
+                AppStrings.metronomeTimeSignaturePickerTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ),
             // Simple time signatures section
             _buildSection(
               context,
-              title: '단순 박자',
+              title: AppStrings.metronomeSimpleTimeTitle,
               description: '일반적인 박자표',
               signatures: simpleSignatures,
             ),
@@ -60,7 +64,7 @@ class TimeSignaturePicker extends StatelessWidget {
             // Compound time signatures section
             _buildSection(
               context,
-              title: '복합 박자',
+              title: AppStrings.metronomeCompoundTimeTitle,
               description: '3박 단위로 나눠지는 박자 (♩. 기준)',
               signatures: compoundSignatures,
             ),
@@ -145,16 +149,6 @@ class _TimeSignatureCard extends StatelessWidget {
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow:
-              isSelected
-                  ? [
-                    BoxShadow(
-                      color: AppColors.inkQuaternary,
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

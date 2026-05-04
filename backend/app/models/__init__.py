@@ -12,6 +12,7 @@ from app.models.lesson import (  # noqa: F401
     LessonPiece,
     LessonRecording,
 )
+from app.models.manual_teacher import ManualTeacher  # noqa: F401
 from app.models.notification import Notification  # noqa: F401
 from app.models.parent import (  # noqa: F401
     Parent,
@@ -22,6 +23,7 @@ from app.models.parent import (  # noqa: F401
 )
 from app.models.payment import Payment, TuitionSettings  # noqa: F401
 from app.models.policy import LessonPolicy, MakeupLesson, ScheduleConfirmationCard  # noqa: F401
+from app.models.post import TeacherPost  # noqa: F401
 from app.models.practice import (  # noqa: F401
     DailyPracticeStatus,
     PracticeGoal,

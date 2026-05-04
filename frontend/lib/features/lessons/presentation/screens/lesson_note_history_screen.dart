@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,7 +41,7 @@ class _LessonNoteHistoryScreenState
   Widget build(BuildContext context) {
     final notesAsync = ref.watch(studentLessonNotesProvider(widget.studentId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(AppStrings.lessonNotesTitle),
         leading: IconButton(

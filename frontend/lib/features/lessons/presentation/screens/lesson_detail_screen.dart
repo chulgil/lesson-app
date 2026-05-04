@@ -11,11 +11,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../../subscription/presentation/providers/subscription_lifecycle_service_providers.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 
@@ -75,8 +77,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  Scaffold _buildNotFoundScaffold() {
-    return Scaffold(
+  Widget _buildNotFoundScaffold() {
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -101,8 +103,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  Scaffold _buildLoadingScaffold() {
-    return Scaffold(
+  Widget _buildLoadingScaffold() {
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -113,8 +115,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  Scaffold _buildErrorScaffold() {
-    return Scaffold(
+  Widget _buildErrorScaffold() {
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -175,7 +177,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           await _flushPendingFeedback();
         }
       },
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         appBar: _buildAppBar(lesson),
         body: RefreshIndicator(
           onRefresh: () async {
@@ -291,23 +293,12 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         }
       }
     } else if (value == 'complete') {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showNotebookDialog(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text(AppStrings.lessonCompleteTitle),
-              content: const Text(AppStrings.lessonCompleteConfirm),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text(AppStrings.cancel),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text(AppStrings.completeAction),
-                ),
-              ],
-            ),
+        title: AppStrings.lessonCompleteTitle,
+        message: AppStrings.lessonCompleteConfirm,
+        confirmLabel: AppStrings.completeAction,
+        cancelLabel: AppStrings.cancel,
       );
       if (confirmed == true) {
         try {
@@ -492,6 +483,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             isTeacher: widget.isTeacher,
             onEdit: () => _showEditPracticeTipDialog(lesson),
           ),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
         ],
       ),
     );
@@ -632,19 +628,27 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   Widget _buildAssignmentsTab(Lesson lesson) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: PracticeItemsSection(
-        lessonId: lesson.id,
-        studentId: lesson.studentId,
-        isTeacher: widget.isTeacher,
+      child: Column(
+        children: [
+          PracticeItemsSection(
+            lessonId: lesson.id,
+            studentId: lesson.studentId,
+            isTeacher: widget.isTeacher,
+          ),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
+        ],
       ),
     );
   }
 
   void _showAddKeyPointDialog(Lesson lesson) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => AddTipBottomSheet(
             title: AppStrings.addKeyPointTitle,
@@ -656,10 +660,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   void _showAddPracticeTipDialog(Lesson lesson) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => AddTipBottomSheet(
             title: AppStrings.addPracticeTipTitle,

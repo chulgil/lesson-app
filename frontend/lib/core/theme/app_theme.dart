@@ -32,7 +32,7 @@ class AppTheme {
       ),
 
       // Scaffold
-      scaffoldBackgroundColor: AppColors.paperDark,
+      scaffoldBackgroundColor: AppColors.paper,
 
       // AppBar — Notebook × Score: Playfair Display 타이틀로 4대 시그니처(Playfair) 를 상단에 통일.
       appBarTheme: AppBarTheme(
@@ -63,7 +63,7 @@ class AppTheme {
         backgroundColor: AppColors.paper,
         modalBackgroundColor: AppColors.paper,
         surfaceTintColor: Colors.transparent,
-        modalBarrierColor: Colors.black54,
+        modalBarrierColor: AppColors.inkScrim,
         elevation: 0,
         modalElevation: 0,
         dragHandleColor: AppColors.inkQuaternary,
@@ -543,7 +543,7 @@ class AppTheme {
         backgroundColor: AppColors.surfaceDark,
         modalBackgroundColor: AppColors.surfaceDark,
         surfaceTintColor: Colors.transparent,
-        modalBarrierColor: Colors.black87,
+        modalBarrierColor: AppColors.inkScrimStrong,
         elevation: 0,
         modalElevation: 0,
         dragHandleColor: AppColors.borderDark,

@@ -52,7 +52,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
           Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '데이터를 불러오는데 실패했습니다',
+            AppStrings.studentHomeDataLoadFailed,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -90,9 +90,15 @@ class WeeklyPracticeWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-              Text('이번 주 연습', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.studentHomeWeeklyPractice,
+                style: NotebookTypography.sectionTitle,
+              ),
               if (onViewAll != null)
-                TextButton(onPressed: onViewAll, child: const Text('전체보기')),
+                TextButton(
+                  onPressed: onViewAll,
+                  child: const Text(AppStrings.viewAll),
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -174,7 +180,10 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showHeader) ...[
-          Text('이번 주 연습', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.studentHomeWeeklyPractice,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
         ],
         Container(
@@ -190,14 +199,14 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '아직 연습 과제가 없습니다',
+                  AppStrings.studentHomePracticeEmpty,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '선생님이 과제를 등록하면 여기에 표시됩니다',
+                  AppStrings.studentHomePracticeTeacherHint,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),
@@ -220,7 +229,10 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(priority.emoji, style: const TextStyle(fontSize: 12)),
+          Text(
+            priority.emoji,
+            style: AppTypography.bodySmall.copyWith(height: 1),
+          ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             '$count',

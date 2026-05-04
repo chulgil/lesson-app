@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,7 +41,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       subscriptionProposalProvider(widget.proposalId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         titleSpacing: 0,
         title: Text(
@@ -421,13 +422,6 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,

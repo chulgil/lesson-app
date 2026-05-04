@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,7 +14,7 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/subscription_ticket_card.dart';
+import '../widgets/subscription_card.dart';
 
 /// Teacher's full subscription list with status filter tabs.
 class TeacherSubscriptionListScreen extends ConsumerStatefulWidget {
@@ -54,17 +55,19 @@ class _TeacherSubscriptionListScreenState
       teacherStudentSubscriptionsProvider(teacherId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(AppStrings.issuedSubscriptions),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           tabs: subscriptionsAsync.when(
-            data: (subs) => _tabs.map((tab) {
-              final count = _filterByTab(subs, tab).length;
-              return Tab(text: '${tab.label} ($count)');
-            }).toList(),
+            data:
+                (subs) =>
+                    _tabs.map((tab) {
+                      final count = _filterByTab(subs, tab).length;
+                      return Tab(text: '${tab.label} ($count)');
+                    }).toList(),
             loading: () => _tabs.map((tab) => Tab(text: tab.label)).toList(),
             error: (_, __) => _tabs.map((tab) => Tab(text: tab.label)).toList(),
           ),
@@ -74,23 +77,26 @@ class _TeacherSubscriptionListScreenState
         ),
       ),
       body: subscriptionsAsync.when(
-        data: (subscriptions) => TabBarView(
-          controller: _tabController,
-          children: _tabs.map((tab) {
-            final filtered = _filterByTab(subscriptions, tab);
-            if (filtered.isEmpty) return _buildEmptyState(tab.label);
-            return _buildList(filtered);
-          }).toList(),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text(
-            AppStrings.errorOccurred,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
+        data:
+            (subscriptions) => TabBarView(
+              controller: _tabController,
+              children:
+                  _tabs.map((tab) {
+                    final filtered = _filterByTab(subscriptions, tab);
+                    if (filtered.isEmpty) return _buildEmptyState(tab.label);
+                    return _buildList(filtered);
+                  }).toList(),
             ),
-          ),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error:
+            (error, _) => Center(
+              child: Text(
+                AppStrings.errorOccurred,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ),
       ),
     );
   }
@@ -98,13 +104,20 @@ class _TeacherSubscriptionListScreenState
   List<Subscription> _filterByTab(List<Subscription> all, _TabConfig tab) {
     if (tab.status == null) {
       return all
-          .where((s) =>
-              s.status == SubscriptionStatus.active ||
-              s.status == SubscriptionStatus.expiringSoon)
+          .where(
+            (s) =>
+                s.status == SubscriptionStatus.active ||
+                s.status == SubscriptionStatus.expiringSoon,
+          )
           .toList();
     }
     if (tab.status == SubscriptionStatus.expiringSoon) {
-      return all.where((s) => s.status == SubscriptionStatus.expiringSoon || s.isExpiringSoon).toList();
+      return all
+          .where(
+            (s) =>
+                s.status == SubscriptionStatus.expiringSoon || s.isExpiringSoon,
+          )
+          .toList();
     }
     return all.where((s) => s.status == tab.status).toList();
   }
@@ -117,41 +130,58 @@ class _TeacherSubscriptionListScreenState
       itemCount: subscriptions.length,
       itemBuilder: (context, index) {
         final subscription = subscriptions[index];
-        final membershipAsync = ref.watch(membershipProvider(subscription.membershipId));
+        final membershipAsync = ref.watch(
+          membershipProvider(subscription.membershipId),
+        );
 
         return membershipAsync.when(
           data: (membership) {
             final instrument = membership?.instrument;
-            final lessonClassAsync = membership != null
-                ? ref.watch(lessonClassProvider(membership.lessonClassId))
-                : null;
+            final lessonClassAsync =
+                membership != null
+                    ? ref.watch(lessonClassProvider(membership.lessonClassId))
+                    : null;
             final studentName = studentNames[subscription.studentId];
 
-            return SubscriptionTicketCard(
+            return SubscriptionCard(compact: true,
               subscription: subscription,
               className: lessonClassAsync?.valueOrNull?.name,
               instrument: instrument,
               personName: studentName,
-              onTap: () => context.push(
-                AppRoutes.subscriptionDetail.replaceFirst(':id', subscription.id),
-                extra: {'viewerRole': 'teacher'},
-              ),
+              onTap:
+                  () => context.push(
+                    AppRoutes.subscriptionDetail.replaceFirst(
+                      ':id',
+                      subscription.id,
+                    ),
+                    extra: {'viewerRole': 'teacher'},
+                  ),
             );
           },
-          loading: () => SubscriptionTicketCard(
-            subscription: subscription,
-            onTap: () => context.push(
-              AppRoutes.subscriptionDetail.replaceFirst(':id', subscription.id),
-              extra: {'viewerRole': 'teacher'},
-            ),
-          ),
-          error: (_, __) => SubscriptionTicketCard(
-            subscription: subscription,
-            onTap: () => context.push(
-              AppRoutes.subscriptionDetail.replaceFirst(':id', subscription.id),
-              extra: {'viewerRole': 'teacher'},
-            ),
-          ),
+          loading:
+              () => SubscriptionCard(compact: true,
+                subscription: subscription,
+                onTap:
+                    () => context.push(
+                      AppRoutes.subscriptionDetail.replaceFirst(
+                        ':id',
+                        subscription.id,
+                      ),
+                      extra: {'viewerRole': 'teacher'},
+                    ),
+              ),
+          error:
+              (_, __) => SubscriptionCard(compact: true,
+                subscription: subscription,
+                onTap:
+                    () => context.push(
+                      AppRoutes.subscriptionDetail.replaceFirst(
+                        ':id',
+                        subscription.id,
+                      ),
+                      extra: {'viewerRole': 'teacher'},
+                    ),
+              ),
         );
       },
     );

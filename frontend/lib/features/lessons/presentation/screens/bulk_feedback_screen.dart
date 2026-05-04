@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,7 +47,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
   Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(_stepTitle),
         centerTitle: true,

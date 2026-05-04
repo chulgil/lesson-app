@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,7 +64,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       activeTeacherTemplatesProvider(widget.teacherId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.proposalCreateAppBarTitle),
         centerTitle: true,

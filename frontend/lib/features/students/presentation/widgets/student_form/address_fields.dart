@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -32,7 +33,7 @@ class AddressFields extends StatelessWidget {
               child: TextFormField(
                 controller: postalCodeController,
                 decoration: studentInputDecoration(
-                  label: '우편번호',
+                  label: AppStrings.studentPostalCodeLabel,
                   hint: '00000',
                   prefixIcon: Icons.markunread_mailbox_outlined,
                 ),
@@ -49,13 +50,15 @@ class AddressFields extends StatelessWidget {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('주소 검색 기능이 곧 추가됩니다'),
+                        content: Text(
+                          AppStrings.studentAddressSearchComingSoon,
+                        ),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },
                   icon: const Icon(Icons.search, size: AppSpacing.iconSM),
-                  label: const Text('주소 검색'),
+                  label: const Text(AppStrings.studentAddressSearchLabel),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.paperAccent,
                     side: const BorderSide(color: AppColors.paperAccent),
@@ -72,8 +75,8 @@ class AddressFields extends StatelessWidget {
         TextFormField(
           controller: addressController,
           decoration: studentInputDecoration(
-            label: '주소',
-            hint: '주소를 입력해주세요 (예: 서울시 강남구 역삼동)',
+            label: AppStrings.studentAddressLabel,
+            hint: AppStrings.studentAddressHint,
             prefixIcon: Icons.location_on_outlined,
           ),
           textInputAction: TextInputAction.next,
@@ -84,8 +87,8 @@ class AddressFields extends StatelessWidget {
         TextFormField(
           controller: addressDetailController,
           decoration: studentInputDecoration(
-            label: '상세주소',
-            hint: '동/호수를 입력하세요 (선택)',
+            label: AppStrings.studentAddressDetailLabel,
+            hint: AppStrings.studentAddressDetailHint,
             prefixIcon: Icons.apartment_outlined,
           ),
           textInputAction: TextInputAction.done,

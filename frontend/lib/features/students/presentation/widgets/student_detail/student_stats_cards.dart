@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -20,21 +21,21 @@ class StudentStatsCards extends StatelessWidget {
         Expanded(
           child: StudentStatCard(
             value: '${student.totalLessons}',
-            label: '총 레슨',
+            label: AppStrings.studentStatTotalLessons,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: StudentStatCard(
             value: '${student.monthlyLessons}',
-            label: '이번 달',
+            label: AppStrings.studentStatThisMonth,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: StudentStatCard(
             value: '${student.practiceRate}일',
-            label: '주간 연습',
+            label: AppStrings.studentStatWeeklyPractice,
           ),
         ),
       ],
@@ -47,11 +48,7 @@ class StudentStatCard extends StatelessWidget {
   final String value;
   final String label;
 
-  const StudentStatCard({
-    super.key,
-    required this.value,
-    required this.label,
-  });
+  const StudentStatCard({super.key, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +65,7 @@ class StudentStatCard extends StatelessWidget {
         children: [
           Text(
             value,
-            style: AppTypography.headingMedium.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(

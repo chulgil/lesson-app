@@ -1,29 +1,28 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../entities/subscription.dart';
-import '../entities/subscription_proposal.dart';
-import '../../presentation/providers/subscription_providers.dart';
-import 'subscription_renewal_service.dart';
 
-part 'subscription_expiry_monitor.g.dart';
-
-@riverpod
-SubscriptionExpiryMonitor subscriptionExpiryMonitor(Ref ref) {
-  return SubscriptionExpiryMonitor(ref);
-}
+typedef LoadExpiringSubscriptions = Future<List<Subscription>> Function();
+typedef TriggerSubscriptionRenewal = void Function(Subscription subscription);
 
 /// Monitors subscription expiry and generates in-app notifications.
 ///
 /// Like an automated reminder system that checks all active subscriptions
 /// and creates alerts when they're about to expire or have already expired.
 class SubscriptionExpiryMonitor {
-  final Ref _ref;
+  final LoadExpiringSubscriptions _loadExpiringSoonSubscriptions;
+  final LoadExpiringSubscriptions _loadExpiredSubscriptions;
+  final TriggerSubscriptionRenewal _triggerSubscriptionRenewal;
 
-  SubscriptionExpiryMonitor(this._ref);
+  const SubscriptionExpiryMonitor({
+    required LoadExpiringSubscriptions loadExpiringSoonSubscriptions,
+    required LoadExpiringSubscriptions loadExpiredSubscriptions,
+    required TriggerSubscriptionRenewal triggerSubscriptionRenewal,
+  }) : _loadExpiringSoonSubscriptions = loadExpiringSoonSubscriptions,
+       _loadExpiredSubscriptions = loadExpiredSubscriptions,
+       _triggerSubscriptionRenewal = triggerSubscriptionRenewal;
 
   /// Check all subscriptions and return notifications that should be shown.
   /// Called on app startup and periodically.
@@ -31,10 +30,8 @@ class SubscriptionExpiryMonitor {
     final alerts = <AppNotification>[];
 
     try {
-      final expiringSoon = await _ref.read(
-        expiringSoonSubscriptionsProvider.future,
-      );
-      final expired = await _ref.read(expiredSubscriptionsProvider.future);
+      final expiringSoon = await _loadExpiringSoonSubscriptions();
+      final expired = await _loadExpiredSubscriptions();
 
       // Generate alerts for expiring soon subscriptions
       for (final sub in expiringSoon) {
@@ -117,15 +114,7 @@ class SubscriptionExpiryMonitor {
   /// Best-effort: failures are silently logged (renewal is an enhancement, not critical).
   void _triggerRenewal(Subscription sub) {
     try {
-      final renewalService = _ref.read(subscriptionRenewalServiceProvider);
-      // TODO: resolve teacherId from membership/class relationship
-      // For now, this is a placeholder — actual teacherId resolution
-      // requires membership → lessonClass → teacherId lookup
-      renewalService.triggerOnSubscriptionLow(
-        subscription: sub,
-        teacherId: '', // Will be resolved in Phase 2
-        initiator: RenewalInitiator.system,
-      );
+      _triggerSubscriptionRenewal(sub);
     } catch (e) {
       debugPrint('[ExpiryMonitor] Renewal trigger failed: $e');
     }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -35,9 +36,7 @@ class LevelUpDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space6),
         child: Column(
@@ -51,19 +50,9 @@ class LevelUpDialog extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.paperAccent,
-                    AppColors.paperAccent,
-                  ],
+                  colors: [AppColors.paperAccent, AppColors.paperAccent],
                 ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.paperAccent,
-                    blurRadius: 20,
-                    spreadRadius: 4,
-                  ),
-                ],
+                borderRadius: BorderRadius.zero,
               ),
               alignment: Alignment.center,
               child: Text(
@@ -125,7 +114,7 @@ class LevelUpDialog extends StatelessWidget {
               width: double.infinity,
               child: FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('계속하기'),
+                child: const Text(AppStrings.gamificationContinue),
               ),
             ),
           ],

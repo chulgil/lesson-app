@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/config/environment.dart';
@@ -73,24 +74,24 @@ class ProfileTab extends ConsumerWidget {
 
           // 💳 수강권·입금 (상단 이동 — 자주 쓰는 것 먼저)
           _buildMenuSection(
-            title: '수강권·입금',
+            title: AppStrings.profileSectionSubscriptionPayment,
             items: [
               _MenuItem(
                 icon: Icons.card_membership,
-                label: '수강권 템플릿',
-                subtitle: '수강권 종류 및 가격 설정',
+                label: AppStrings.profileSubscriptionTemplateLabel,
+                subtitle: AppStrings.profileSubscriptionTemplateSubtitle,
                 onTap: () => context.push(AppRoutes.subscriptionTemplates),
               ),
               _MenuItem(
                 icon: Icons.warning_amber_outlined,
-                label: '입금 확인 대기',
-                subtitle: '입금 확인이 필요한 수강권',
+                label: AppStrings.profileOutstandingPaymentsLabel,
+                subtitle: AppStrings.profileOutstandingPaymentsSubtitle,
                 onTap: () => context.push(AppRoutes.outstandingPayments),
               ),
               _MenuItem(
                 icon: Icons.account_balance_outlined,
-                label: '입금 계좌',
-                subtitle: '수강료 입금받을 계좌 설정',
+                label: AppStrings.profileBankAccountLabel,
+                subtitle: AppStrings.profileBankAccountSubtitle,
                 onTap: () => context.push(AppRoutes.bankAccountEdit),
               ),
             ],
@@ -100,24 +101,24 @@ class ProfileTab extends ConsumerWidget {
 
           // 내 소개
           _buildMenuSection(
-            title: '내 소개',
+            title: AppStrings.profileSectionAboutMe,
             items: [
               _MenuItem(
                 icon: Icons.person_outline,
-                label: '기본 정보 수정',
-                subtitle: '이름, 사진, 소개, 교수 스타일, 활동 지역',
+                label: AppStrings.profileBasicInfoEditLabel,
+                subtitle: AppStrings.profileBasicInfoEditSubtitle,
                 onTap: () => context.push(AppRoutes.basicInfoEdit),
               ),
               _MenuItem(
                 icon: Icons.music_note,
-                label: '악기 관리',
-                subtitle: '가르치는 악기 추가/관리',
+                label: AppStrings.profileInstrumentManagementLabel,
+                subtitle: AppStrings.profileInstrumentManagementSubtitle,
                 onTap: () => context.push(AppRoutes.instrumentManagement),
               ),
               _MenuItem(
                 icon: Icons.school_outlined,
-                label: '학력·경력·자격증',
-                subtitle: '교육 배경 및 경력 사항',
+                label: AppStrings.profileCredentialsLabel,
+                subtitle: AppStrings.profileCredentialsSubtitle,
                 onTap: () => context.push(AppRoutes.extendedProfile),
               ),
             ],
@@ -127,7 +128,7 @@ class ProfileTab extends ConsumerWidget {
 
           // 레슨 운영
           _buildMenuSection(
-            title: '레슨 운영',
+            title: AppStrings.profileSectionLessonOperation,
             items: [
               _MenuItem(
                 icon: Icons.assignment,
@@ -140,20 +141,20 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.access_time,
-                label: '레슨 시간 설정',
-                subtitle: '시간 길이, 쉬는시간, 시작 간격',
+                label: AppStrings.profileLessonTimeSettingsLabel,
+                subtitle: AppStrings.profileLessonTimeSettingsSubtitle,
                 onTap: () => context.push(AppRoutes.lessonTimeSettings),
               ),
               _MenuItem(
                 icon: Icons.calendar_month,
-                label: '가용 시간 관리',
-                subtitle: '주간 스케줄, 휴무, 예외 시간',
+                label: AppStrings.profileAvailabilityLabel,
+                subtitle: AppStrings.profileAvailabilitySubtitle,
                 onTap: () => context.push(AppRoutes.teacherAvailability),
               ),
               _MenuItem(
                 icon: Icons.shield_outlined,
-                label: '취소/노쇼 정책',
-                subtitle: '변경 횟수, 취소 기한, 노쇼 처리',
+                label: AppStrings.profileCancelPolicyLabel,
+                subtitle: AppStrings.profileCancelPolicySubtitle,
                 onTap:
                     () => context.push(
                       '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
@@ -161,8 +162,8 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.library_music,
-                label: '레퍼토리 관리',
-                subtitle: '교재 및 곡 목록',
+                label: AppStrings.profileRepertoireLabel,
+                subtitle: AppStrings.profileRepertoireSubtitle,
                 onTap: () => context.push(AppRoutes.repertoireManagement),
               ),
               _MenuItem(
@@ -173,8 +174,8 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.tips_and_updates_outlined,
-                label: '연습 팁 템플릿',
-                subtitle: '학생에게 보내는 짧은 연습 팁',
+                label: AppStrings.profileTipTemplateLabel,
+                subtitle: AppStrings.profileTipTemplateSubtitle,
                 onTap: () => context.push(AppRoutes.tipTemplateManagement),
               ),
             ],
@@ -184,18 +185,18 @@ class ProfileTab extends ConsumerWidget {
 
           // 소셜
           _buildMenuSection(
-            title: '소셜',
+            title: AppStrings.profileSectionSocial,
             items: [
               _MenuItem(
                 icon: Icons.people_outline,
-                label: '팔로잉',
-                subtitle: '팔로우한 선생님·학원 관리',
+                label: AppStrings.profileFollowingLabel,
+                subtitle: AppStrings.profileFollowingSubtitle,
                 onTap: () => context.push(AppRoutes.followList),
               ),
               _MenuItem(
                 icon: Icons.article_outlined,
-                label: '소식',
-                subtitle: '팔로우한 선생님의 공지·이벤트',
+                label: AppStrings.profileNewsLabel,
+                subtitle: AppStrings.profileNewsSubtitle,
                 onTap: () => context.push(AppRoutes.followFeed),
               ),
             ],
@@ -205,22 +206,22 @@ class ProfileTab extends ConsumerWidget {
 
           // 설정
           _buildMenuSection(
-            title: '설정',
+            title: AppStrings.profileSectionSettings,
             items: [
               _MenuItem(
                 icon: Icons.notifications_outlined,
-                label: '알림 설정',
+                label: AppStrings.profileNotificationLabel,
                 onTap: () => context.push(AppRoutes.notificationSettings),
               ),
               _MenuItem(
                 icon: Icons.mic_outlined,
-                label: '녹음 관리',
+                label: AppStrings.profileRecordingLabel,
                 onTap: () => context.push(AppRoutes.allRecordings),
               ),
               _MenuItem(
                 icon: Icons.lock_outlined,
-                label: '공개 설정',
-                subtitle: '프로필 항목별 공개/비공개',
+                label: AppStrings.profileVisibilityLabel,
+                subtitle: AppStrings.profileVisibilitySubtitleLabel,
                 onTap: () => context.push(AppRoutes.profileVisibility),
               ),
             ],
@@ -230,16 +231,16 @@ class ProfileTab extends ConsumerWidget {
 
           // 지원
           _buildMenuSection(
-            title: '지원',
+            title: AppStrings.profileSectionSupport,
             items: [
               _MenuItem(
                 icon: Icons.help_outline,
-                label: '도움말',
+                label: AppStrings.profileHelpLabel,
                 onTap: () => context.push(AppRoutes.help),
               ),
               _MenuItem(
                 icon: Icons.info_outline,
-                label: '앱 정보',
+                label: AppStrings.profileAppInfoLabel,
                 trailing: Text(
                   'v${EnvironmentConfig.appVersion}',
                   style: AppTypography.bodyMedium.copyWith(
@@ -255,21 +256,21 @@ class ProfileTab extends ConsumerWidget {
 
           // 계정
           _buildMenuSection(
-            title: '계정',
+            title: AppStrings.profileSectionAccount,
             items: [
               _MenuItem(
                 icon: Icons.description_outlined,
-                label: '이용약관',
+                label: AppStrings.profileTermsLabel,
                 onTap: () => context.push(AppRoutes.termsOfService),
               ),
               _MenuItem(
                 icon: Icons.privacy_tip_outlined,
-                label: '개인정보처리방침',
+                label: AppStrings.profilePrivacyPolicyLabel,
                 onTap: () => context.push(AppRoutes.privacyPolicy),
               ),
               _MenuItem(
                 icon: Icons.logout,
-                label: '로그아웃',
+                label: AppStrings.profileLogoutLabel,
                 labelColor: AppColors.paperAccent,
                 onTap: () => _showLogoutDialog(context, ref),
               ),
@@ -383,7 +384,7 @@ class ProfileTab extends ConsumerWidget {
         child: OutlinedButton.icon(
           onPressed: () => context.push(AppRoutes.profilePreview),
           icon: const Icon(Icons.visibility_outlined, size: 18),
-          label: const Text('내 프로필 미리보기'),
+          label: const Text(AppStrings.profilePreviewCta),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: AppColors.paperAccent),
             foregroundColor: AppColors.paperAccent,
@@ -513,7 +514,7 @@ class ProfileTab extends ConsumerWidget {
           Expanded(
             child: _ShortcutCard(
               icon: Icons.calendar_month,
-              label: '가용시간',
+              label: AppStrings.profileShortcutAvailability,
               onTap: () => context.push(AppRoutes.teacherAvailability),
             ),
           ),
@@ -521,7 +522,7 @@ class ProfileTab extends ConsumerWidget {
           Expanded(
             child: _ShortcutCard(
               icon: Icons.warning_amber_outlined,
-              label: '입금대기',
+              label: AppStrings.profileShortcutOutstandingPayment,
               onTap: () => context.push(AppRoutes.outstandingPayments),
             ),
           ),
@@ -529,7 +530,7 @@ class ProfileTab extends ConsumerWidget {
           Expanded(
             child: _ShortcutCard(
               icon: Icons.card_membership,
-              label: '수강권',
+              label: AppStrings.profileShortcutSubscription,
               onTap: () => context.push(AppRoutes.subscriptionTemplates),
             ),
           ),
@@ -633,16 +634,7 @@ class ProfileTab extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Container(
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.ink.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            decoration: const BoxDecoration(color: AppColors.paper),
             child: Column(
               children:
                   items.asMap().entries.map((entry) {
@@ -715,26 +707,17 @@ class ProfileTab extends ConsumerWidget {
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('로그아웃'),
-            content: const Text('정말 로그아웃 하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.pop(dialogContext);
-                  await ref.read(authNotifierProvider.notifier).logout();
-                },
-                child: const Text('로그아웃'),
-              ),
-            ],
-          ),
+      title: AppStrings.profileLogoutLabel,
+      content: const Text(AppStrings.profileLogoutConfirm),
+      confirmLabel: AppStrings.profileLogoutLabel,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () async {
+        Navigator.pop(context);
+        await ref.read(authNotifierProvider.notifier).logout();
+      },
     );
   }
 }

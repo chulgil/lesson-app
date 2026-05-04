@@ -124,6 +124,16 @@ class LessonService:
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
 
+    async def delete(self, lesson_id: str, current_user: Any) -> None:
+        """Delete a lesson."""
+        from app.models.lesson import Lesson
+
+        lesson = await self.db.get(Lesson, lesson_id)
+        if lesson is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        await self.db.delete(lesson)
+        await self.db.flush()
+
     async def update_status(self, lesson_id: str, new_status: str, current_user: Any) -> LessonResponse:
         """Change lesson status."""
         from app.models.lesson import Lesson, LessonStatus
@@ -394,6 +404,7 @@ class LessonService:
             lessons_per_week=data.lessons_per_week or 1,
             lesson_day=data.lesson_day,
             lesson_time=data.lesson_time,
+            lesson_location_id=data.lesson_location_id,
             travel_time_minutes=data.travel_time_minutes,
         )
         self.db.add(membership)

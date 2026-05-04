@@ -1,6 +1,6 @@
 # 챗 화면 상태별 가이드 메시지 스펙
 
-> 마지막 업데이트: 2026-04-28
+> 마지막 업데이트: 2026-05-04
 
 ## 설계 원칙
 
@@ -45,6 +45,14 @@
 | cancelled | 취소 | 이 레슨 요청이 취소되었습니다 | - |
 | expired | 기간만료 | 응답 기간이 지나 자동 종료되었습니다 | - |
 
+### 레슨요청 수락 직후 공통 액션 규칙
+
+- `approve` 또는 `acceptAlternative`를 보낸 사람은 상태가 `timeConfirmed`로 전환되더라도 하단 액션 박스에서 즉시 수강권/결제 CTA를 보지 않는다.
+- 수락한 사람의 하단 액션 박스는 레슨요청/스케줄 변경 UI와 동일하게 `상대방님의 응답을 기다리고 있습니다` + `결정 변경`을 표시한다.
+- 상대방은 다음 단계 CTA를 본다. 스케줄이 확정된 뒤에는 `수강권 안내/수락 → 학생 입금 알림 → 선생님 입금 확인 → 수강권 발급` 순서로 진행한다.
+- `결정 변경` 후에는 `withdrawApproval` 이벤트를 남기고, 이전에 선택했던 시간은 히스토리에서 취소선으로 표시한다.
+- 위 규칙은 선생님이 학생 요청을 수락한 경우와 학생이 선생님 대안을 수락한 경우 모두 동일하게 적용한다.
+
 ## 학생 시점 전체 매트릭스
 
 | 상태 | 리스트 라벨 | 상단 가이드 | 하단 액션 |
@@ -78,3 +86,36 @@
 | subscriptionIssued | 수강권이 발행되었습니다 | 시스템 |
 | cancel | 요청을 취소했습니다 | 학생/선생님 |
 | expire | 요청이 만료되었습니다 | 시스템 |
+
+## 수강권 스케줄 변경 채팅 계약
+
+수강권 상세의 스케줄 변경/취소 히스토리는 레슨요청 채팅과 동일한 말풍선 문법을 사용한다.
+
+| 이벤트 | 말풍선 텍스트/구조 | 하단 액션 상태 |
+|--------|------------------|---------------|
+| scheduleChanged | `N회차 시간 변경을 요청합니다` + 1/2/3순위 각진 일정 카드 + 사유 | 상대 viewer: `일정을 탭하여 선택하세요` + `일정 비교` + `수락`; 내 viewer: `응답을 기다리고 있습니다` + `결정 변경` |
+| scheduleChangeProposed | `N회차 일정 변경을 제안했습니다` + 1/2/3순위 각진 일정 카드 | 상대 viewer: 후보 선택/수락; 내 viewer: 응답 대기/결정 변경 |
+| scheduleChangeAccepted | 선택한 일정 확정 텍스트. 성공 아이콘/별도 완료 카드 금지 | 내 viewer: 응답 대기/결정 변경 |
+| scheduleChangeRejected | 거절 텍스트 + 사유 | 완료 |
+| withdrawApproval | `결정을 변경했습니다` + 이전 선택 일정 취소선 | 다시 선택 또는 새 결정 가능 |
+| lessonCancelled | `N회차 레슨 취소를 요청했어요` + `변경/취소권 1회가 사용될 예정입니다. 잔여 M회` + `다음 진행 레슨이 N회차로 이어집니다` + 사유 | 상대 viewer: 확인 필요 |
+
+규칙:
+- 모든 사용자 이벤트는 viewer 기준 말풍선으로 렌더한다. 내 이벤트는 오른쪽, 상대 이벤트는 왼쪽이다.
+- 일정 후보/확정 일정은 말풍선 내부의 각진 일정 카드나 동일 포맷 텍스트로 표시한다.
+- 수락/거절/결정 변경/취소는 별도 성공/경고 박스가 아니라 같은 말풍선 안의 텍스트로 표현한다.
+- `scheduleChangeAccepted`와 `withdrawApproval`은 `suggestedSlots`와 `selectedSlotIndex`를 보존해야 한다.
+- 학생/선생님 UI 구조는 같지만 액션 권한은 viewerRole로 분리한다.
+
+## Mock 경계 데이터 기준
+
+개발/QA mock 데이터는 아래 경계를 최소 1건씩 포함해야 한다.
+
+- 요청 단계: `pending`, `approved`, `negotiating`, `timeConfirmed`, `withdrawApproval`, `rejected`, `cancelled`, `expired`
+- 결제/수강권 단계: `proposalSent`, `proposalAccepted`, `paymentNotified`, `subscriptionIssued`
+- 레슨 단계: `inProgress`, `completed`
+- 표준 결제 이벤트 순서: `proposalSent → proposalAccepted → paymentNotified → subscriptionIssued`
+- `subscriptionIssued` 이후에만 수강권 상세/레슨 진행 화면으로 넘어가는 mock을 둔다.
+- 스케줄 변경 mock은 목록 provider와 상세 회차 provider가 같은 이벤트를 반환해야 한다.
+- 스케줄 변경 mock은 각 단계별 경계 테스트를 위해 단일 변경 요청, 전체 변경 요청, 선생님 제안, 수락 완료, 취소 요청, 결정 변경을 각각 포함한다.
+- mock 이벤트의 `subscriptionId`, `actorId`, `sessionNumber`는 실제 mock 수강권과 일치해야 한다.

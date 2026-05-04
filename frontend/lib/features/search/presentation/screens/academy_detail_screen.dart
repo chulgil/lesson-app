@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -23,7 +25,7 @@ class AcademyDetailScreen extends ConsumerWidget {
     final academyAsync = ref.watch(academyInfoProvider(organizationId));
     final teachersAsync = ref.watch(academyTeachersProvider(organizationId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       body: academyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -67,8 +69,17 @@ class AcademyDetailScreen extends ConsumerWidget {
                     ),
                 data: (teachers) => _buildTeacherList(context, ref, teachers),
               ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: AppSpacing.space6),
+              // Notebook × Score: "Fine." 종지부
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppSpacing.space6),
+                    Center(
+                      child: Text('Fine.', style: NotebookTypography.fine),
+                    ),
+                    const SizedBox(height: AppSpacing.space8),
+                  ],
+                ),
               ),
             ],
           );
@@ -91,7 +102,10 @@ class AcademyDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          TextButton(onPressed: () => context.pop(), child: const Text('돌아가기')),
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text(AppStrings.goBack),
+          ),
         ],
       ),
     );
@@ -117,10 +131,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                AppColors.paperAccent,
-                AppColors.paperAccent,
-              ],
+              colors: [AppColors.paperAccent, AppColors.paperAccent],
             ),
           ),
           child: SafeArea(
@@ -158,16 +169,7 @@ class AcademyDetailScreen extends ConsumerWidget {
   Widget _buildAcademyInfoCard(AcademyInfo academy) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -246,16 +248,17 @@ class AcademyDetailScreen extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
         // (§7.17). '소속 선생님' 은 정적 그룹 헤더.
-        Text('소속 선생님', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.searchAffiliatedTeachers,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space2,
             vertical: 2,
           ),
-          decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft,
-          ),
+          decoration: BoxDecoration(color: AppColors.paperAccentSoft),
           child: Text(
             '${academy.teacherCount}명',
             style: AppTypography.bodySmall.copyWith(
@@ -343,16 +346,7 @@ class _AcademyTeacherCard extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: InkWell(
         onTap: onProfileTap,
         child: Padding(
@@ -422,7 +416,7 @@ class _AcademyTeacherCard extends StatelessWidget {
                   ),
                   shape: const RoundedRectangleBorder(),
                 ),
-                child: const Text('체험 신청'),
+                child: const Text(AppStrings.searchTrialApply),
               ),
             ],
           ),

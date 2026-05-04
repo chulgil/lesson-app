@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -111,7 +112,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: Text(
@@ -368,7 +369,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: Row(
               children: [
                 Icon(Icons.history, color: AppColors.paperAccent, size: 24),
@@ -469,7 +470,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: const Text(AppStrings.timeConflictTitle),
             content: Text(AppStrings.conflictDialogContent(conflictInfo)),
             actions: [
@@ -759,7 +760,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: const Text(AppStrings.recurringConflictTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,

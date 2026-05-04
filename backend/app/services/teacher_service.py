@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import String, func, select
+from sqlalchemy import String, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -70,6 +70,7 @@ class TeacherService:
     ) -> PaginatedResponse[TeacherResponse]:
         """List / search teachers with pagination."""
         from app.models.teacher import Teacher
+        from app.models.user import User
 
         query = select(Teacher)
 
@@ -79,13 +80,20 @@ class TeacherService:
         if area:
             query = query.where(Teacher.lesson_areas.cast(String).ilike(f"%{area}%"))
         if q:
-            query = query.where(Teacher.introduction.ilike(f"%{q}%"))
+            query = query.join(User, User.id == Teacher.user_id).where(
+                or_(
+                    User.name.ilike(f"%{q}%"),
+                    Teacher.introduction.ilike(f"%{q}%"),
+                    Teacher.instruments.cast(String).ilike(f"%{q}%"),
+                    Teacher.lesson_areas.cast(String).ilike(f"%{q}%"),
+                )
+            )
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.offset(offset).limit(size))
-        items = [TeacherResponse.model_validate(t) for t in result.all()]
+        items = [await self._enrich_response(t) for t in result.all()]
 
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -125,6 +133,18 @@ class TeacherService:
         await self.db.flush()
         await self.db.refresh(teacher)
         return await self._enrich_response(teacher)
+
+    async def upsert_for_user(self, user_id: str, data: TeacherUpdate, current_user: Any) -> TeacherResponse:
+        """Create or update the teacher profile owned by a user."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
+        if teacher is None:
+            teacher = Teacher(user_id=user_id, instruments=[])
+            self.db.add(teacher)
+            await self.db.flush()
+
+        return await self.update(teacher.id, data, current_user)
 
     async def get_students(
         self,
@@ -189,7 +209,7 @@ class TeacherService:
         )
         from app.schemas.lesson import LessonResponse
 
-        upcoming = [LessonResponse.model_validate(l) for l in upcoming_result.all()]
+        upcoming = [LessonResponse.model_validate(lesson) for lesson in upcoming_result.all()]
 
         return TeacherDashboardResponse(
             total_students=total_students,

@@ -1,6 +1,6 @@
 # UX Guidelines
 
-> 최종 수정: 2026-03-07
+> 최종 수정: 2026-05-04
 > 목적: Claude가 UI 구현 시 참고하는 디자인 시스템 + UX 원칙
 
 ---
@@ -8,53 +8,47 @@
 ## 1. 디자인 토큰 (Design Tokens)
 
 > **절대 규칙**: 모든 색상/타이포/간격은 공통 클래스만 사용. 하드코딩 금지.
+> Notebook x Score 적용 화면은 `docs/specs/design/notebook/README.md`를 색상·표면 SSOT로 우선한다.
 
 ### 1.1 색상 시스템 (AppColors)
 
 > 파일: `lib/core/theme/app_colors.dart`
+> **Notebook x Score 마이그레이션 완료 (2026-05)**: 레거시 브랜드/시맨틱/서피스/텍스트 토큰(`primary`, `success`, `surfaceLight`, `textPrimaryLight` 등)은 코드에서 완전 제거됨. 현재 앱 전체가 아래 Notebook 팔레트를 사용.
 
-**브랜드 색상** — 앱 아이덴티티
+**Notebook 표면 (Surface)** — 종이 계열
 
 | 토큰 | HEX | 용도 |
 |------|-----|------|
-| `primary` | #6B5B95 | CTA, 선택 상태, 링크, 아이콘 |
-| `primaryLight` | #9A8BC4 | 아바타 배경, 연한 강조 |
-| `primaryDark` | #4A3D6E | 그라디언트 끝, 진한 강조 |
-| `secondary` | #F4A460 | 보조 강조, 추천(⭐), 그룹레슨 |
-| `secondaryLight` | #F7C490 | 보조 연한 배경 |
+| `paper` | #F2ECDD | 전체 배경, 카드/시트 배경 (크림색 종이) |
+| `paperDark` | #E8DFC7 | 강조 영역, 칩 배경, scaffold 배경 (주간 그리드 등) |
 
-**시맨틱 색상** — 의미 기반 (상태 표현용)
+**Notebook 잉크 (Text/Icon)** — ink 알파 계층
+
+| 토큰 | HEX / Alpha | 용도 |
+|------|-------------|------|
+| `ink` | #14161C (100%) | 제목, 본문, 아이콘 (딥 블루-블랙) |
+| `inkSecondary` | #14161C (75%) | 부제목, 보조 아이콘 |
+| `inkTertiary` | #14161C (55%) | 힌트, 비활성 라벨 |
+| `inkQuaternary` | #14161C (25%) | 비활성 텍스트, 테두리, 구분선 |
+| `inkScrim` | #14161C (54%) | 모달 배리어 |
+| `paperPencil` | #14161C (60%) | 손글씨 (Gaegu 폰트용) |
+
+**Notebook 액센트 (Semantic)** — 2색 체계
 
 | 토큰 | HEX | 의미 | 사용 예 |
 |------|-----|------|---------|
-| `success` | #2E8B57 | 완료/정상 | 체크 아이콘, 완료 상태 |
-| `successLight` | #E8F5E9 | 완료 배경 | 성공 토스트 배경 |
-| `warning` | #F4A460 | 경고/주의 | 잔여 횟수 적음, 임박 |
-| `warningLight` | #FFF3E0 | 경고 배경 | 경고 카드 배경 |
-| `error` | #DC143C | 오류/삭제/긴급 | 입금 기한 초과, 삭제 버튼, 결석 |
-| `errorLight` | #FFEBEE | 오류 배경 | 에러 카드 배경 |
-| `info` | #4A90D9 | 정보/안내 | 내 예약, 안내 텍스트 |
-| `infoLight` | #E3F2FD | 정보 배경 | 정보 카드 배경 |
+| `paperAccent` | #9B1B12 | 핵심 액션, CTA, 오류/긴급 | 버튼, 입금 기한 초과, 삭제, 결석 |
+| `paperAccentSoft` | #9B1B12 (12%) | 액센트 배경 | 선택 상태 배경, 칩 선택 |
+| `paperOk` | #3F5D2F | 완료/정상, 정기권 잉크 | 체크 마크, 완료 상태 (녹색 펜), 정기권 카드 액센트 |
+| `paperTrial` | #C4923A | 체험레슨 잉크 | 체험레슨 카드 액센트 (세피아 앰버) |
+| `paperTrialSoft` | #C4923A (12%) | 체험레슨 배경 | 체험레슨 카드 배경 |
+| `paperHighlight` | #F7D755 | 형광펜 (배경색 전용) | 텍스트 하이라이트 마커 |
 
-**서피스 색상** — 라이트 모드
+> **레거시 토큰 참고**: `primary`/`secondary`/`success`/`warning`/`error`/`info` 및 `*Light` 변형, `surfaceLight`/`borderLight`/`textPrimaryLight` 등은 모두 제거됨. 코드에 잔존하지 않으며, 신규 사용 금지. Notebook 팔레트의 `paperAccent`가 CTA + 오류/긴급을 통합하고, `paperOk`가 완료/정상을 담당.
 
-| 토큰 | HEX | 용도 |
-|------|-----|------|
-| `backgroundLight` | #FFFAF5 | 전체 배경 (웜톤) |
-| `surfaceLight` | #FFFFFF | 카드/시트 배경 |
-| `surfaceSecondaryLight` | #F5F0EB | 비활성 배경, 칩 배경 |
-| `borderLight` | #E5E0DB | 테두리, 구분선 |
+**직접 색상 원칙**: UI 표면과 텍스트에는 `AppColors` 토큰만 사용한다. 순백/순검정도 직접 쓰지 않고 `AppColors.paper`, `AppColors.ink`, `AppColors.inkScrim` 계열로 표현한다.
 
-**텍스트 색상** — 라이트 모드
-
-| 토큰 | HEX | 용도 |
-|------|-----|------|
-| `textPrimaryLight` | #1A1A1A | 제목, 본문 |
-| `textSecondaryLight` | #666666 | 부제목, 아이콘 |
-| `textTertiaryLight` | #999999 | 힌트, 비활성 라벨 |
-| `textDisabledLight` | #CCCCCC | 비활성 텍스트 |
-
-**허용되는 직접 색상**: `Colors.white`, `Colors.black`, `Colors.transparent`만 허용.
+**예외**: `Colors.transparent`는 route layer, overlay 제거, 선택 상태의 빈 배경처럼 실제 투명도가 의미인 경우 허용한다. 카메라, 이미지 cropper, waveform canvas처럼 외부 미디어 대비가 주 표면인 영역은 Notebook README §1.2.0 예외를 따른다.
 
 #### `paperHighlight` (노란 형광펜) 사용 규칙
 
@@ -68,20 +62,21 @@
 | 아이콘 색상 | **X** | ~~`Icon(color: AppColors.paperHighlight)`~~ |
 
 글자색은 반드시 `ink` / `inkSecondary` / `inkTertiary` / `paperAccent` / `paperOk` 중 하나 사용.
-**금지**: `Colors.grey`, `Colors.red`, `Colors.green`, `Color(0xFF...)` 등 직접 사용 금지.
+**금지**: `Colors.white`, `Colors.black`, `Colors.grey`, `Colors.red`, `Colors.green`, `Color(0xFF...)` 등 직접 색상 사용 금지.
 
 #### 색상 사용 결정 기준
 
 ```
 Q: 이 색상은 무엇을 의미하나?
-├─ 브랜드/앱 아이덴티티 → primary / secondary
-├─ 성공/완료 → success
-├─ 경고/주의 → warning
-├─ 오류/삭제/긴급 → error
-├─ 정보/안내 → info
-├─ 배경/서피스 → backgroundLight / surfaceLight
-├─ 텍스트 → textPrimary/Secondary/TertiaryLight
-└─ 테두리/구분선 → borderLight
+├─ 핵심 액션 / CTA / 오류 / 긴급 → paperAccent
+├─ 성공 / 완료 → paperOk
+├─ 배경 / 카드 표면 → paper (기본) / paperDark (강조 영역)
+├─ 텍스트 → ink / inkSecondary / inkTertiary
+├─ 비활성 텍스트 / 테두리 / 구분선 → inkQuaternary
+├─ 선택 배경 / 액센트 배경 → paperAccentSoft
+├─ 체험레슨 액센트 → paperTrial / paperTrialSoft
+├─ 형광 강조 (배경색 전용) → paperHighlight
+└─ 손글씨 텍스트 → paperPencil (+ Gaegu 폰트)
 ```
 
 #### 새 색상이 필요한 경우
@@ -207,6 +202,8 @@ Q: 이 색상은 무엇을 의미하나?
 | 입력 높이 | `inputHeight` | 48 |
 | 라운딩 | `radiusSmall/Medium/Large/XLarge` | 4/8/12/16 |
 
+> **§7.117 각진 시그니처**: Notebook x Score 적용 후 테마 기본값은 `BorderRadius.zero`. Card/Button/Dialog/BottomSheet/Input/SnackBar 모두 직각. `radiusSmall` 등은 아바타, 프로그레스바 등 일부 특수 컴포넌트에서만 사용.
+
 **금지**: `EdgeInsets.all(16)` 대신 `EdgeInsets.all(AppSpacing.space4)` 사용.
 
 ---
@@ -235,7 +232,7 @@ Q: 이 색상은 무엇을 의미하나?
 ### 2.3 정보 우선순위
 
 ```
-1순위: 긴급 (error 색상) — 입금 기한 초과 D+, 승인 대기
+1순위: 긴급 (paperAccent) — 입금 기한 초과 D+, 승인 대기
 2순위: 오늘 — 당일 레슨/과제
 3순위: 트렌드 — 스트릭, 주간 연습, 월간 레슨
 4순위: 도구 — 메트로놈, 튜너, 녹음
@@ -245,10 +242,10 @@ Q: 이 색상은 무엇을 의미하나?
 
 | 긴급도 | 색상 토큰 | 표시 |
 |--------|----------|------|
-| 긴급 (기한 초과) | `error` | D+3 (빨강) |
-| 경고 (7일 이내) | `warning` | D-5 (주황) |
-| 주의 (임박) | `secondary` | 2회 남음 |
-| 정상 | `textSecondaryLight` | 기본 표시 |
+| 긴급 (기한 초과) | `paperAccent` | D+3 (Vermillion) |
+| 경고 (7일 이내) | `paperAccent` | D-5 (Vermillion — 2색 체계로 경고/긴급 통합) |
+| 주의 (임박) | `inkSecondary` | 2회 남음 |
+| 정상 | `inkTertiary` | 기본 표시 |
 
 ### 2.5 긴급 알림 Top 1 정책 (2026-04-16)
 
@@ -334,47 +331,44 @@ Q: 이 색상은 무엇을 의미하나?
 
 **카드 스타일 코드**:
 ```dart
-Container(
-  decoration: BoxDecoration(
-    color: AppColors.surfaceLight,
-    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.05),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
-      ),
-    ],
+NotebookCard(
+  child: Padding(
+    padding: const EdgeInsets.all(AppSpacing.cardPadding),
+    child: ...
   ),
-  // ...
 )
 ```
 
+Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림자나 elevation을 추가하지 않고, 구분이 필요하면 `AppColors.inkQuaternary` 1px border 또는 `ThinRule`을 사용한다.
+
 ### 3.3 버튼 패턴
 
-| 용도 | 위젯 | 스타일 |
+| 용도 | 위젯 | 스타일 (테마 기본값) |
 |------|------|--------|
-| 주요 액션 (CTA) | `FilledButton` | `backgroundColor: AppColors.primary` |
-| 보조 액션 | `OutlinedButton` | `side: BorderSide(color: AppColors.primary)` |
-| 위험 액션 | `FilledButton` | `backgroundColor: AppColors.error` |
-| 텍스트 액션 | `TextButton` | `foregroundColor: AppColors.primary` |
+| 주요 액션 (CTA) | `FilledButton` | `backgroundColor: paperAccent`, `foregroundColor: paper` |
+| 보조 액션 | `OutlinedButton` | `side: BorderSide(color: ink)`, `foregroundColor: ink` |
+| 위험 액션 | `FilledButton` | `backgroundColor: paperAccent` (CTA와 동일 — 2색 체계) |
+| 텍스트 액션 | `TextButton` | `foregroundColor: ink` |
+| Elevated 버튼 | `ElevatedButton` | `backgroundColor: ink`, `foregroundColor: paper` |
+
+> 모든 버튼은 `BorderRadius.zero` (§7.117 각진 시그니처). `radiusMedium`/`radiusLarge` 등 둥근 모서리 금지.
 
 ### 3.4 상태 뱃지 색상
 
 | 상태 | 배경 | 텍스트 |
 |------|------|--------|
-| 활성/수강중 | `primary.withAlpha(25)` | `primary` |
-| 완료 | `successLight` | `success` |
-| 경고/만료임박 | `warningLight` | `warning` |
-| 오류/입금 기한 초과 | `errorLight` | `error` |
-| 비활성 | `surfaceSecondaryLight` | `textTertiaryLight` |
+| 활성/수강중 | `paperAccentSoft` | `paperAccent` |
+| 완료 | `paperOk` (alpha 적용) | `paperOk` |
+| 경고/만료임박/긴급 | `paperAccentSoft` | `paperAccent` |
+| 오류/입금 기한 초과 | `paperAccentSoft` | `paperAccent` |
+| 비활성 | `paperDark` | `inkTertiary` |
 
 ### 3.5 선택자 칩 스타일
 
 | 상태 | 배경 | 테두리 | 텍스트 |
 |------|------|--------|--------|
-| 비선택 | `surfaceLight` | `borderLight` | `textPrimaryLight` |
-| 선택됨 | `primary(alpha:0.15)` | `primary` | `primary` (bold) |
+| 비선택 | `paperDark` | `inkQuaternary` | `ink` |
+| 선택됨 | `paperAccentSoft` | `paperAccent` | `paperAccent` (bold) |
 
 ### 3.6 피드백 패턴
 
@@ -425,43 +419,62 @@ Container(
 
 ### 6.1 수강권 카드
 
-```
-┌─────────────────────────────────────┐
-│ 바이올린수강권                [활성] │
-│ 5/8회 남음                          │
-│ ██████░░░░                          │  ← 프로그레스바
-│ 만료: 3/31   변경: 1/2회            │
-└─────────────────────────────────────┘
-```
+#### 6.1.1 3색 잉크 체계 (Notebook × Score 만년필 잉크 메타포)
 
-**잔여 경고**: ≤25% `warning` | ≤2회 `warning` | =1회 `error`
-**만료 경고**: ≤7일 `warning` | ≤3일 `error`
+수강권 타입별로 만년필 잉크 색을 달리하여 종이 위 수강 기록의 성격을 한눈에 식별한다.
+
+| 수강권 타입 | 토큰 | HEX | 잉크 이름 | 감성 |
+|------------|------|-----|----------|------|
+| 체험레슨 (trial) | `paperTrial` | `#C4923A` | 세피아 앰버 | 호기심 · 첫 만남 |
+| 정기권 (monthly) | `paperOk` | `#3F5D2F` | 녹색 펜 | 안정 · 꾸준 |
+| 회차권 (package) | `paperAccent` | `#9B1B12` | 버밀리온 | 매회 출석 체크 |
+
+> 상세 토큰 정의: `docs/specs/design/notebook/README.md` §2.1
+
+#### 6.1.2 SubscriptionCard 통합
+
+`SubscriptionTicketCard`는 삭제되었다. `SubscriptionCard` 하나가 두 모드를 제공한다.
+
+| 모드 | 파라미터 | 용도 | 특징 |
+|------|---------|------|------|
+| 티켓 | `compact: true` | 리스트 아이템, 홈 배너 | 1~2줄 요약, 잉크 색 좌측 액센트 라인 |
+| 상세 | `compact: false` | 수강권 상세 화면 | 프로그레스바 포함, 전체 메타 표시 |
+
+- compact 헤더 배경색 제거됨 — paper 배경만 사용 (Notebook 평면 원칙)
+- 헤더 액센트 라인 및 프로그레스바 색상은 수강권 타입에 따라 3색 잉크 토큰 자동 매핑
+
+#### 6.1.3 잔여/만료 경고
+
+**잔여 경고**: ≤25% `paperAccent` | ≤2회 `paperAccent` | =1회 `paperAccent` (강조)
+**만료 경고**: ≤7일 `paperAccent` | ≤3일 `paperAccent` (강조)
 
 ### 6.2 레슨 유형 구분
 
 | 유형 | 아이콘 | 색상 |
 |------|--------|------|
-| 개인 레슨 | Icons.music_note | `primary` |
-| 그룹 레슨 | Icons.groups | `secondary` |
+| 개인 레슨 | Icons.music_note | `ink` |
+| 그룹 레슨 | Icons.groups | `inkSecondary` |
 
 ### 6.3 예약 슬롯 색상
 
+> 스케줄 슬롯은 도메인 특수 색상(`slotAvailable` 등)을 사용. `app_colors.dart` 참조.
+
 | 상태 | 색상 토큰 |
 |------|----------|
-| 예약 가능 | `success` |
-| 내 예약 | `info` |
-| 거의 만석 | `warning` |
-| 만석 | `secondary` |
-| 예약 불가 | `textTertiaryLight` |
+| 예약 가능 | `slotAvailable` |
+| 내 예약 | `slotMyBooking` |
+| 거의 만석 | `slotAlmostFull` |
+| 만석 | `paperAccent` |
+| 예약 불가 | `slotUnavailable` |
 
 ### 6.4 레슨 상태 색상
 
 | 상태 | 색상 토큰 |
 |------|----------|
-| 예정 | `primary` |
-| 완료 | `success` |
-| 취소 | `textTertiaryLight` |
-| 결석 | `error` |
+| 예정 | `ink` |
+| 완료 | `paperOk` |
+| 취소 | `inkTertiary` |
+| 결석 | `paperAccent` |
 
 ---
 
@@ -505,3 +518,5 @@ Container(
 | 2026-02-02 | 리스트 카드 디자인 패턴 추가 |
 | 2026-03-07 | **v3 전면 개편** — 디자인 토큰 중심 재구성, AppColors/Typography/Spacing 통합 가이드, 불필요한 중복 제거, Claude 체크리스트 간소화 |
 | 2026-04-16 | 긴급 알림 Top 1 정책, Progressive Disclosure 원칙, 스파크라인 가이드라인 추가 (§2.5~2.7) |
+| 2026-05-04 | **Notebook x Score 팔레트 마이그레이션 반영** — 레거시 토큰(primary/success/warning/error/info/surfaceLight/borderLight/textPrimaryLight 등) 제거, Notebook 팔레트(paper/ink/paperAccent/paperOk) 기준으로 전면 갱신. 카드·버튼·뱃지·칩·긴급도 색상 규칙 모두 현행 코드와 동기화. 버튼 BorderRadius.zero 시그니처 반영 |
+| 2026-05-04 | **수강권 3색 잉크 체계 추가** — `paperTrial`/`paperTrialSoft` 토큰, §6.1 수강권 카드 섹션에 3색 잉크 체계(trial=세피아, monthly=녹색, package=버밀리온) 및 `SubscriptionCard(compact)` 통합 문서화 |

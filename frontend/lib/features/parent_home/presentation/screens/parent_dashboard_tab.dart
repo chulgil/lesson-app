@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/child_profile.dart';
@@ -52,7 +54,7 @@ class ParentDashboardTab extends ConsumerWidget {
         bottom: false,
         child: childrenAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+          error: (_, __) => Center(child: Text(AppStrings.errorOccurred)),
           data: (profiles) {
             if (profiles.isEmpty) {
               return _buildEmptyState(context, parentId);
@@ -252,7 +254,10 @@ class ParentDashboardTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.parentHomeNoChildren,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '자녀를 추가하여 레슨 일정과\n연습 현황을 관리해보세요',
@@ -267,7 +272,7 @@ class ParentDashboardTab extends ConsumerWidget {
                 context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
               },
               icon: const Icon(Icons.add),
-              label: const Text('자녀 추가하기'),
+              label: const Text(AppStrings.parentHomeAddChild),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
                 foregroundColor: AppColors.paper,
@@ -290,9 +295,8 @@ class ParentDashboardTab extends ConsumerWidget {
   ) {
     final selectedChildId = ref.read(selectedChildIdProvider);
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (sheetContext) => Consumer(
             builder: (context, sheetRef, _) {
@@ -310,7 +314,10 @@ class ParentDashboardTab extends ConsumerWidget {
                       margin: EdgeInsets.only(bottom: AppSpacing.space4),
                     ),
                     // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-                    Text('자녀 선택', style: NotebookTypography.sectionTitle),
+                    Text(
+                      AppStrings.parentHomeChildSelect,
+                      style: NotebookTypography.sectionTitle,
+                    ),
                     const SizedBox(height: AppSpacing.space4),
                     // Child list from provider
                     profilesAsync.when(
@@ -322,7 +329,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       error:
                           (_, __) => const Padding(
                             padding: EdgeInsets.all(AppSpacing.space4),
-                            child: Text('오류가 발생했습니다.'),
+                            child: Text(AppStrings.errorOccurred),
                           ),
                       data: (profiles) {
                         if (profiles.isEmpty) {
@@ -337,7 +344,7 @@ class ParentDashboardTab extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: AppSpacing.space2),
                                 Text(
-                                  '등록된 자녀가 없습니다',
+                                  AppStrings.parentHomeNoChildren,
                                   style: AppTypography.bodyMedium.copyWith(
                                     color: AppColors.inkSecondary,
                                   ),
@@ -398,7 +405,7 @@ class ParentDashboardTab extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('자녀 추가'),
+                      label: const Text(AppStrings.parentHomeAddChildShort),
                     ),
                     const SizedBox(height: AppSpacing.space4),
                   ],
@@ -534,7 +541,7 @@ class ParentDashboardTab extends ConsumerWidget {
         Expanded(
           child: StatCard(
             icon: Icons.calendar_today,
-            label: '이번주 레슨',
+            label: AppStrings.parentHomeWeeklyLesson,
             value: '1회',
             color: AppColors.paperAccent,
           ),
@@ -543,7 +550,7 @@ class ParentDashboardTab extends ConsumerWidget {
         Expanded(
           child: StatCard(
             icon: Icons.assignment_turned_in,
-            label: '과제 완료',
+            label: AppStrings.parentHomeAssignmentDone,
             value: '4/5',
             color: AppColors.paperOk,
           ),
@@ -552,7 +559,7 @@ class ParentDashboardTab extends ConsumerWidget {
         Expanded(
           child: StatCard(
             icon: Icons.local_fire_department,
-            label: '연습 스트릭',
+            label: AppStrings.parentHomePracticeStreak,
             value: '12일',
             color: AppColors.paperAccent,
           ),
@@ -593,7 +600,7 @@ class ParentDashboardTab extends ConsumerWidget {
             ],
           ),
         ),
-        title: const Text('정규 레슨'),
+        title: const Text(AppStrings.parentHomeRegularLesson),
         subtitle: Text(
           '오후 2:00 - 3:00 • 김선생님',
           style: AppTypography.bodySmall.copyWith(
@@ -706,7 +713,10 @@ class ParentDashboardTab extends ConsumerWidget {
       romanIndex: 2,
       title: '과제 현황',
       icon: Icons.assignment,
-      trailing: TextButton(onPressed: () {}, child: const Text('전체보기')),
+      trailing: TextButton(
+        onPressed: () {},
+        child: const Text(AppStrings.viewAll),
+      ),
       child: Column(
         children: const [
           AssignmentItem(
@@ -788,7 +798,10 @@ class ParentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           SizedBox(
             width: double.infinity,
-            child: FilledButton(onPressed: () {}, child: const Text('입금 안내 확인')),
+            child: FilledButton(
+              onPressed: () {},
+              child: const Text(AppStrings.parentHomePaymentGuideCheck),
+            ),
           ),
         ],
       ),

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -52,7 +53,10 @@ class MonthGroupHeader extends StatelessWidget {
                   decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   // "진행 중" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
                   // (README §1.1 4계층, §7.127 Gaegu 회피).
-                  child: Text('진행 중', style: NotebookTypography.indicatorLabel),
+                  child: Text(
+                    AppStrings.practiceInProgress,
+                    style: NotebookTypography.indicatorLabel,
+                  ),
                 ),
               ],
             ],

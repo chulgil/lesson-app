@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +29,7 @@ class _QuickFeedbackStudentListState
   Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(title: const Text(AppStrings.sendFeedbackTitle)),
       body: lessonsAsync.when(
         data: (lessons) => _buildBody(lessons),

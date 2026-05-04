@@ -144,7 +144,7 @@ class MembershipInfoCard extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     isAcademy ? '🏫' : '👤',
-                    style: const TextStyle(fontSize: 24),
+                    style: AppTypography.headingLarge,
                   ),
                 ),
               );

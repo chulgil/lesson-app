@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -55,29 +56,33 @@ class LevelAndTuitionSection extends StatelessWidget {
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: StudentLevel.values.map((level) {
-              final isSelected = selectedLevel == level;
-              return ChoiceChip(
-                label: Text(level.label),
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) {
-                    onLevelChanged(level);
-                  }
-                },
-                backgroundColor: AppColors.paper,
-                selectedColor: AppColors.paperAccentSoft,
-                checkmarkColor: AppColors.paperAccent,
-                side: BorderSide(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-                ),
-                labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.ink,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-              );
-            }).toList(),
+            children:
+                StudentLevel.values.map((level) {
+                  final isSelected = selectedLevel == level;
+                  return ChoiceChip(
+                    label: Text(level.label),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        onLevelChanged(level);
+                      }
+                    },
+                    backgroundColor: AppColors.paper,
+                    selectedColor: AppColors.paperAccentSoft,
+                    checkmarkColor: AppColors.paperAccent,
+                    side: BorderSide(
+                      color:
+                          isSelected
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
+                    ),
+                    labelStyle: AppTypography.bodySmall.copyWith(
+                      color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  );
+                }).toList(),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -126,34 +131,29 @@ class LevelAndTuitionSection extends StatelessWidget {
                       decoration: InputDecoration(
                         suffixText: '원',
                         filled: isLinked,
-                        fillColor: isLinked
-                            ? AppColors.paperDark
-                            : null,
+                        fillColor: isLinked ? AppColors.paperDark : null,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.space3,
                           vertical: AppSpacing.space2,
                         ),
-                        border: OutlineInputBorder(
-                        ),
+                        border: OutlineInputBorder(),
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: AppColors.inkQuaternary),
+                          borderSide: const BorderSide(
+                            color: AppColors.inkQuaternary,
+                          ),
                         ),
                         disabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: AppColors.inkQuaternary),
+                          borderSide: const BorderSide(
+                            color: AppColors.inkQuaternary,
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       textAlign: TextAlign.end,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: isLinked
-                            ? AppColors.inkTertiary
-                            : null,
+                        color: isLinked ? AppColors.inkTertiary : null,
                       ),
                       onChanged: (_) => onFeeChanged(),
                     ),
@@ -185,11 +185,10 @@ class LevelAndTuitionSection extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onManageSubscription,
                 icon: const Icon(Icons.confirmation_number_outlined, size: 18),
-                label: const Text('수강권 관리'),
+                label: const Text(AppStrings.studentManageSubscription),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.ink,
-                  side: BorderSide(
-                      color: AppColors.ink.withValues(alpha: 0.4)),
+                  side: BorderSide(color: AppColors.ink.withValues(alpha: 0.4)),
                 ),
               ),
             ),
@@ -219,8 +218,8 @@ class LevelAndTuitionSection extends StatelessWidget {
               Expanded(
                 child: FrequencyOption(
                   value: 1,
-                  title: '주 1회',
-                  subtitle: '월 4회',
+                  title: AppStrings.studentFrequencyOnceTitle,
+                  subtitle: AppStrings.studentFrequencyOnceSubtitle,
                   isSelected: lessonsPerWeek == 1,
                   onTap: () => onFrequencyChanged(1),
                 ),
@@ -229,8 +228,8 @@ class LevelAndTuitionSection extends StatelessWidget {
               Expanded(
                 child: FrequencyOption(
                   value: 2,
-                  title: '주 2회',
-                  subtitle: '월 8회',
+                  title: AppStrings.studentFrequencyTwiceTitle,
+                  subtitle: AppStrings.studentFrequencyTwiceSubtitle,
                   isSelected: lessonsPerWeek == 2,
                   onTap: () => onFrequencyChanged(2),
                 ),
@@ -245,7 +244,7 @@ class LevelAndTuitionSection extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: (isLinked ? AppColors.ink : AppColors.paperAccent)
-                  .withValues(alpha: 0.08)
+                  .withValues(alpha: 0.08),
             ),
             child: Row(
               children: [

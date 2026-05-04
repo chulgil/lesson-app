@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../schedule/presentation/screens/schedule_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 import '../../../students/presentation/screens/students_tab.dart';
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return DebugWrapper(
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         body: SafeArea(
           child: IndexedStack(
             index: _currentIndex,

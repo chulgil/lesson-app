@@ -4,6 +4,7 @@ enum StudentLessonProgressKind {
   payment,
   subscriptionReady,
   scheduleConfirmation,
+  scheduleChange,
   renewal,
 }
 

@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/tip_template_providers.dart';
 
@@ -467,7 +468,7 @@ class _TipTemplateBottomSheetState
       builder:
           (context) => StatefulBuilder(
             builder: (context, setDialogState) {
-              return AlertDialog(
+              return NotebookAlertDialog(
                 title: const Text(AppStrings.addNewTemplateTitle),
                 content: SingleChildScrollView(
                   child: Column(
@@ -555,10 +556,9 @@ Future<void> showTipTemplateBottomSheet({
   TipCategory? initialCategory,
   required Function(String content) onSelect,
 }) {
-  return showModalBottomSheet(
+  return showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
     builder:
         (context) => TipTemplateBottomSheet(
           instrument: instrument,

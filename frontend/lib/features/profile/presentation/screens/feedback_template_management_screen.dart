@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,7 +43,7 @@ class _FeedbackTemplateManagementScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -69,7 +70,7 @@ class _FeedbackTemplateManagementScreenState
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => FeedbackTemplateFormSheet.show(context),
         icon: const Icon(Icons.add),
-        label: const Text('템플릿 추가'),
+        label: const Text(AppStrings.profileFeedbackTemplateAdd),
       ),
     );
   }
@@ -165,7 +166,7 @@ class _FeedbackTemplateManagementScreenState
           ),
         );
       },
-      child: Card(
+      child: NotebookCard(
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap:
@@ -224,9 +225,7 @@ class _FeedbackTemplateManagementScreenState
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.paperAccentSoft,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusSmall,
-                                  ),
+                                  borderRadius: BorderRadius.zero,
                                 ),
                                 child: Text(
                                   '#$t',
@@ -262,23 +261,15 @@ class _FeedbackTemplateManagementScreenState
   }
 
   Future<bool?> _confirmDelete() {
-    return showDialog<bool>(
+    return showNotebookDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('템플릿 삭제'),
-            content: const Text('이 템플릿을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.profileFeedbackTemplateDeleteTitle,
+      content: const Text(AppStrings.profileFeedbackTemplateDeleteConfirm),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
   }
 }

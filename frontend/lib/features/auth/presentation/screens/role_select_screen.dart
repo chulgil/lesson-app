@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -43,7 +45,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('역할 설정 실패. 다시 시도해주세요.'),
+            content: const Text(AppStrings.authRoleSetupFailed),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -59,7 +61,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
     final authState = ref.watch(authNotifierProvider);
     final userName = authState is AuthNeedsRole ? authState.name : '';
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),

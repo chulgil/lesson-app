@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../data/services/ai_notes_service.dart';
 import '../../domain/entities/lesson.dart';
 import '../providers/ai_notes_provider.dart';
@@ -46,10 +47,7 @@ class AiNotesButton extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColors.paperAccentSoft,
-            AppColors.paperAccentSoft,
-          ],
+          colors: [AppColors.paperAccentSoft, AppColors.paperAccentSoft],
         ),
         border: Border.all(color: AppColors.paperAccentSoft),
       ),
@@ -58,10 +56,8 @@ class AiNotesButton extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-              ),
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: const Icon(
                 Icons.auto_awesome,
                 color: AppColors.paperAccent,
@@ -221,10 +217,9 @@ class AiNotesButton extends ConsumerWidget {
   }
 
   void _showResults(BuildContext context, AiNoteResult result) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => AiNotesResultSheet(result: result),
     );
   }

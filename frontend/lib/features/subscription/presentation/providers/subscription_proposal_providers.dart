@@ -9,6 +9,7 @@ import '../../data/repositories/remote_subscription_proposal_repository.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/repositories/subscription_proposal_repository.dart';
 import '../../domain/services/proposal_reminder_service.dart';
+import '../../../notifications/domain/services/notification_scheduler_service.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
 
 part 'subscription_proposal_providers.g.dart';
@@ -26,6 +27,20 @@ final subscriptionProposalRepositoryProvider =
         remote: (api) => RemoteSubscriptionProposalRepository(api),
       ),
     );
+
+final proposalReminderServiceProvider = Provider<ProposalReminderService>((
+  ref,
+) {
+  final schedulerService = ref.read(notificationSchedulerServiceProvider);
+  return ProposalReminderService(
+    scheduleNotification: schedulerService.scheduleNotification,
+    cancelNotificationsByProposalId:
+        schedulerService.cancelNotificationsByProposalId,
+    loadProposal:
+        (proposalId) =>
+            ref.read(subscriptionProposalProvider(proposalId).future),
+  );
+});
 
 // ============================================================
 // Teacher Proposals

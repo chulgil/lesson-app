@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
@@ -23,7 +24,7 @@ class TeacherSearchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final publicProfile = TeacherPublicProfile.fromProfile(teacher);
 
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         // Highlight previous teacher with a subtle border
@@ -150,9 +151,7 @@ class TeacherSearchCard extends StatelessWidget {
   Widget _buildAcademyBadge(String organizationName) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccentSoft,
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

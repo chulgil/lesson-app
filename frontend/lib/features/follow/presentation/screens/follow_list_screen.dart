@@ -1,6 +1,7 @@
 // Follow list screen with tabs for all/teachers/academies.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -23,9 +24,9 @@ class FollowListScreen extends ConsumerWidget {
 
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
+      child: NotebookScreenScaffold(
         appBar: AppBar(
-          title: const Text('팔로우'),
+          title: const Text(AppStrings.followTitle),
           bottom: TabBar(
             labelColor: AppColors.paperAccent,
             unselectedLabelColor: AppColors.inkSecondary,
@@ -62,7 +63,7 @@ class _FollowTab extends ConsumerWidget {
 
     return followsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+      error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
       data: (follows) {
         if (follows.isEmpty) {
           return EmptyStateWidget(
@@ -100,23 +101,15 @@ class _FollowTab extends ConsumerWidget {
     WidgetRef ref,
     Follow follow,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('팔로우 취소'),
-            content: Text('${follow.followingId}의 팔로우를 취소하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('팔로우 취소', style: TextStyle(color: AppColors.paperAccent)),
-              ),
-            ],
-          ),
+      title: '팔로우 취소',
+      content: Text('${follow.followingId}의 팔로우를 취소하시겠습니까?'),
+      confirmLabel: '팔로우 취소',
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true) {
@@ -126,9 +119,9 @@ class _FollowTab extends ConsumerWidget {
       ref.invalidate(followedTeachersProvider);
       ref.invalidate(followedAcademiesProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('팔로우가 취소되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.followUnfollowed)),
+        );
       }
     }
   }

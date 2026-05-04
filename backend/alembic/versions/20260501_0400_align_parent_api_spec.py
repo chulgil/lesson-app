@@ -8,6 +8,7 @@ Create Date: 2026-05-01 04:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
@@ -20,6 +21,12 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     relation_status = sa.Enum("pending", "active", "inactive", name="parentchildrelationstatus")
     invitation_source = sa.Enum("student", "teacher", name="parentinvitationsource")
+    invitation_source_column = postgresql.ENUM(
+        "student",
+        "teacher",
+        name="parentinvitationsource",
+        create_type=False,
+    )
     relation_status.create(op.get_bind(), checkfirst=True)
     invitation_source.create(op.get_bind(), checkfirst=True)
 
@@ -47,7 +54,7 @@ def upgrade() -> None:
         "parent_invitations",
         sa.Column("student_id", sa.String(length=36), nullable=False),
         sa.Column("teacher_id", sa.String(length=36), nullable=True),
-        sa.Column("source", invitation_source, nullable=False),
+        sa.Column("source", invitation_source_column, nullable=False),
         sa.Column("parent_phone", sa.String(length=20), nullable=False),
         sa.Column("parent_email", sa.String(length=255), nullable=True),
         sa.Column("invitation_code", sa.String(length=20), nullable=False),

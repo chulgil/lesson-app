@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -18,8 +19,8 @@ class RepertoireArchiveScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final archivedAsync = ref.watch(archivedRepertoiresProvider(studentId));
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('아카이브')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.practiceArchiveTitle)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -29,7 +30,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.ink.withValues(alpha: 0.1),
-              ),
+            ),
             child: Row(
               children: [
                 Icon(Icons.info_outline, color: AppColors.ink, size: 20),
@@ -57,9 +58,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         Icon(
                           Icons.inventory_2_outlined,
                           size: 64,
-                          color: AppColors.inkSecondary.withValues(
-                            alpha: 0.5,
-                          ),
+                          color: AppColors.inkSecondary.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: AppSpacing.space4),
                         Text(

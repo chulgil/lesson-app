@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/feedback_template.dart';
 import '../providers/feedback_template_providers.dart';
 
@@ -18,10 +19,9 @@ class FeedbackTemplatePickerSheet extends ConsumerStatefulWidget {
   const FeedbackTemplatePickerSheet({super.key});
 
   static Future<FeedbackTemplate?> show(BuildContext context) {
-    return showModalBottomSheet<FeedbackTemplate>(
+    return showNotebookModalBottomSheet<FeedbackTemplate>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => const FeedbackTemplatePickerSheet(),
     );
   }
@@ -257,7 +257,7 @@ class _FeedbackTemplatePickerSheetState
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(color: AppColors.inkQuaternary),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          borderRadius: BorderRadius.zero,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +279,7 @@ class _FeedbackTemplatePickerSheetState
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccentSoft,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Text(
                     template.category.label,

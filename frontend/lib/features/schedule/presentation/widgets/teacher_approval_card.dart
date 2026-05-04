@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -49,7 +50,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
     final booking = widget.booking;
     final options = booking.sortedScheduleOptions;
 
-    return Card(
+    return NotebookCard(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         side: BorderSide(color: AppColors.inkQuaternary),
@@ -357,7 +358,7 @@ class TeacherApprovalListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         side: BorderSide(color: AppColors.inkQuaternary),

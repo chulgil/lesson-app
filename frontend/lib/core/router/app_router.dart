@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../auth/auth_state.dart';
 import '../config/environment.dart';
+import '../widgets/notebook/notebook_surfaces.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import 'app_routes.dart';
@@ -111,7 +112,7 @@ class AppRouter {
         ...subscriptionRoutes,
       ],
       errorBuilder:
-          (context, state) => Scaffold(
+          (context, state) => NotebookScreenScaffold(
             body: Center(child: Text('Page not found: ${state.uri}')),
           ),
     );
@@ -139,6 +140,8 @@ class AppRouter {
     ],
     errorBuilder:
         (context, state) =>
-            Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
+            NotebookScreenScaffold(
+              body: Center(child: Text('Page not found: ${state.uri}')),
+            ),
   );
 }

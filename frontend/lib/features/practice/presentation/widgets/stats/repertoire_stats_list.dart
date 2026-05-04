@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -46,7 +47,10 @@ class RepertoireStatsList extends StatelessWidget {
               Icon(Icons.library_music, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('레퍼토리별 연습', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceByRepertoireTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -71,9 +75,7 @@ class RepertoireStatsList extends StatelessWidget {
   Widget _buildRepertoireItem(RepertoireStats stat) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -98,7 +100,7 @@ class RepertoireStatsList extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.paperAccent.withAlpha(20),
-                  ),
+                ),
                 child: Text(
                   stat.practiceTimeText,
                   style: AppTypography.caption.copyWith(
@@ -119,9 +121,7 @@ class RepertoireStatsList extends StatelessWidget {
                   children: [
                     Container(
                       height: 6,
-                      decoration: BoxDecoration(
-                        color: AppColors.inkQuaternary,
-                        ),
+                      decoration: BoxDecoration(color: AppColors.inkQuaternary),
                     ),
                     FractionallySizedBox(
                       widthFactor: stat.completionRate.clamp(0.0, 1.0),
@@ -134,7 +134,7 @@ class RepertoireStatsList extends StatelessWidget {
                               AppColors.paperAccent,
                             ],
                           ),
-                          ),
+                        ),
                       ),
                     ),
                   ],

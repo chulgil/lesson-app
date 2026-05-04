@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db, get_pagination
@@ -69,6 +69,21 @@ async def list_invites(
     )
 
 
+@router.get(
+    "/code/{invite_code}",
+    response_model=InviteResponse,
+    summary="Get invite by code",
+)
+async def get_invite_by_code(
+    invite_code: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> InviteResponse:
+    service = InviteService(db)
+    result: InviteResponse = await service.get_invite_by_code(invite_code)
+    return result
+
+
 @router.patch(
     "/{invite_id}/revoke",
     response_model=InviteResponse,
@@ -113,6 +128,25 @@ async def create_connection_request(
 
 
 @router.get(
+    "/connection-requests/sent",
+    response_model=PaginatedResponse[ConnectionRequestResponse],
+    summary="List sent connection requests",
+)
+async def list_sent_requests(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+) -> PaginatedResponse[ConnectionRequestResponse]:
+    service = InviteService(db)
+    return await service.get_sent_requests(
+        user_id=current_user.id,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+    )
+
+
+@router.get(
     "/connection-requests/pending",
     response_model=PaginatedResponse[ConnectionRequestResponse],
     summary="List pending connection requests",
@@ -149,6 +183,21 @@ async def respond_to_request(
     return result
 
 
+@router.patch(
+    "/connection-requests/{request_id}/cancel",
+    response_model=ConnectionRequestResponse,
+    summary="Cancel a sent connection request",
+)
+async def cancel_request(
+    request_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ConnectionRequestResponse:
+    service = InviteService(db)
+    result: ConnectionRequestResponse = await service.cancel_request(request_id, current_user)
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Connections
 # ---------------------------------------------------------------------------
@@ -163,6 +212,7 @@ async def list_connections(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
     pagination: Annotated[dict, Depends(get_pagination)],
+    include_inactive: bool = Query(False),
 ) -> PaginatedResponse[ConnectionResponse]:
     service = InviteService(db)
     return await service.get_connections(
@@ -170,7 +220,23 @@ async def list_connections(
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
+        include_inactive=include_inactive,
     )
+
+
+@router.patch(
+    "/connections/{connection_id}/reactivate",
+    response_model=ConnectionResponse,
+    summary="Reactivate connection",
+)
+async def reactivate_connection(
+    connection_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ConnectionResponse:
+    service = InviteService(db)
+    result: ConnectionResponse = await service.reactivate_connection(connection_id, current_user)
+    return result
 
 
 @router.delete(
@@ -185,3 +251,18 @@ async def deactivate_connection(
 ) -> None:
     service = InviteService(db)
     await service.deactivate_connection(connection_id, current_user)
+
+
+@router.get(
+    "/{invite_id}",
+    response_model=InviteResponse,
+    summary="Get invite by ID",
+)
+async def get_invite(
+    invite_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> InviteResponse:
+    service = InviteService(db)
+    result: InviteResponse = await service.get_invite(invite_id)
+    return result

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -125,7 +126,7 @@ class _ChildProfileFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.errorOccurredRetryAgain),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -143,7 +144,7 @@ class _ChildProfileFormScreenState
     final minYear = currentYear - 18; // Max 18 years old
     final maxYear = currentYear - 3; // Min 3 years old
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(isEditing ? '자녀 정보 수정' : '자녀 추가'),
         centerTitle: true,
@@ -230,7 +231,7 @@ class _ChildProfileFormScreenState
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                hintText: '자녀 이름 또는 별명 입력',
+                hintText: AppStrings.parentHomeChildNameHint,
                 filled: true,
                 fillColor: AppColors.paper,
                 border: OutlineInputBorder(
@@ -450,33 +451,20 @@ class _ChildProfileFormScreenState
     );
   }
 
-  void _showDeleteConfirmation() {
-    showDialog(
+  Future<void> _showDeleteConfirmation() async {
+    final confirmed = await showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('자녀 프로필 삭제'),
-            content: Text(
-              "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await _deleteProfile();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: '자녀 프로필 삭제',
+      message:
+          "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      await _deleteProfile();
+    }
   }
 
   Future<void> _deleteProfile() async {
@@ -492,7 +480,7 @@ class _ChildProfileFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('자녀 프로필이 삭제되었습니다'),
+            content: Text(AppStrings.parentHomeChildDeleted),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -502,7 +490,7 @@ class _ChildProfileFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('삭제 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.parentHomeDeleteError),
             backgroundColor: AppColors.paperAccent,
           ),
         );

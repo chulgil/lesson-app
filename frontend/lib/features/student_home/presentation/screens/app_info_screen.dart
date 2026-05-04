@@ -1,8 +1,10 @@
 // App info screen showing version, licenses, and legal links.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -15,8 +17,8 @@ class AppInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('앱 정보')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.studentHomeAppInfoTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
@@ -63,7 +65,7 @@ class AppInfoScreen extends StatelessWidget {
                 _buildMenuItem(
                   context,
                   icon: Icons.description_outlined,
-                  title: '이용약관',
+                  title: AppStrings.studentHomeTermsOfService,
                   onTap: () => context.push(AppRoutes.termsOfService),
                 ),
                 Divider(
@@ -74,7 +76,7 @@ class AppInfoScreen extends StatelessWidget {
                 _buildMenuItem(
                   context,
                   icon: Icons.privacy_tip_outlined,
-                  title: '개인정보처리방침',
+                  title: AppStrings.studentHomePrivacyPolicy,
                   onTap: () => context.push(AppRoutes.privacyPolicy),
                 ),
                 Divider(
@@ -85,7 +87,7 @@ class AppInfoScreen extends StatelessWidget {
                 _buildMenuItem(
                   context,
                   icon: Icons.source_outlined,
-                  title: '오픈소스 라이선스',
+                  title: AppStrings.studentHomeOpenSourceLicense,
                   onTap:
                       () => showLicensePage(
                         context: context,

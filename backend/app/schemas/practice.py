@@ -5,7 +5,6 @@ import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Practice section
 # ---------------------------------------------------------------------------
@@ -163,9 +162,12 @@ class PracticeStreakResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    id: str = ""
+    student_id: str = ""
     current_streak: int = 0
     longest_streak: int = 0
     last_practice_date: _dt.date | None = None
+    updated_at: _dt.datetime | None = None
 
 
 class DailyStat(BaseModel):

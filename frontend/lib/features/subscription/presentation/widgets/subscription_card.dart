@@ -8,12 +8,23 @@ import '../../domain/entities/subscription.dart';
 import '../utils/subscription_status_colors.dart';
 
 /// Card widget displaying subscription information.
+///
+/// When [compact] is true, renders a concert ticket-style layout
+/// with instrument-colored header, dashed tear line, and compact stats.
+/// When false (default), renders the full detail card with progress bar,
+/// detail section, and warnings.
 class SubscriptionCard extends StatelessWidget {
   final Subscription subscription;
   final String? className;
   final String? instrument;
   final VoidCallback? onTap;
   final bool showDetails;
+
+  /// When true, renders a compact ticket-style card.
+  final bool compact;
+
+  /// Person name displayed in compact mode (student or teacher name).
+  final String? personName;
 
   /// Threshold for renewal alert (remaining lessons).
   /// Default: 1 (alert when 1 or fewer lessons remain).
@@ -33,6 +44,8 @@ class SubscriptionCard extends StatelessWidget {
     this.instrument,
     this.onTap,
     this.showDetails = true,
+    this.compact = false,
+    this.personName,
     this.renewalAlertThreshold = 1,
     this.renewalAlertDays = 7,
     this.onRenewalTap,
@@ -40,6 +53,271 @@ class SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (compact) return _buildCompact();
+    return _buildFull();
+  }
+
+  // ─── Compact (ticket-style) layout ────────────────────────────
+
+  Widget _buildCompact() {
+    final accentColor = _subscriptionTypeColor;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Opacity(
+        opacity: SubscriptionStatusColors.getCardOpacity(subscription),
+        child: Container(
+          margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
+            vertical: AppSpacing.space2,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.paper,
+            border: Border.all(color: AppColors.inkQuaternary),
+          ),
+          child: Column(
+            children: [
+              _buildCompactHeader(accentColor),
+              _buildCompactTearLine(accentColor),
+              _buildCompactStats(accentColor),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactHeader(Color accentColor) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.15),
+            ),
+            child: Icon(_compactInstrumentIcon, size: 24, color: accentColor),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _compactDisplayTitle,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: accentColor,
+                  ),
+                ),
+                if (personName != null)
+                  Text(
+                    personName!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: accentColor.withValues(alpha: 0.7),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          _buildCompactStatusBadge(accentColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactTearLine(Color accentColor) {
+    return SizedBox(
+      height: 20,
+      child: Stack(
+        children: [
+          Positioned(
+            left: -10,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 20,
+              decoration: const BoxDecoration(color: AppColors.paper),
+            ),
+          ),
+          Positioned(
+            right: -10,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 20,
+              decoration: const BoxDecoration(color: AppColors.paper),
+            ),
+          ),
+          Center(
+            child: CustomPaint(
+              size: const Size(double.infinity, 1),
+              painter: _DashedLinePainter(
+                color: accentColor.withValues(alpha: 0.3),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactStats(Color accentColor) {
+    final remaining = subscription.remainingLessons ?? 0;
+    final total = subscription.totalLessonsForDisplay ?? 0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        AppSpacing.space2,
+        AppSpacing.space4,
+        AppSpacing.space4,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                subscription.typeLabel,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              Text(
+                '$remaining/$total${AppStrings.remainingCountSuffix}',
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: SubscriptionStatusColors.getSummaryTextColor(
+                    subscription,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          ClipRRect(
+            child: LinearProgressIndicator(
+              value: total > 0 ? (total - remaining) / total : 0,
+              minHeight: 6,
+              backgroundColor: AppColors.inkQuaternary,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                SubscriptionStatusColors.getProgressColor(subscription),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (subscription.startDate != null &&
+                  subscription.endDate != null)
+                Text(
+                  _formatCompactPeriod(
+                    subscription.startDate!,
+                    subscription.endDate!,
+                  ),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space2,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      subscription.canReschedule
+                          ? accentColor.withValues(alpha: 0.1)
+                          : AppColors.inkQuaternary.withValues(alpha: 0.5),
+                ),
+                child: Text(
+                  '${AppStrings.rescheduleLabel} ${subscription.remainingReschedule}${AppStrings.countSuffix}',
+                  style: AppTypography.caption.copyWith(
+                    color:
+                        subscription.canReschedule
+                            ? accentColor
+                            : AppColors.inkTertiary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactStatusBadge(Color accentColor) {
+    final isActive = subscription.status == SubscriptionStatus.active;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
+      ),
+      decoration: BoxDecoration(
+        color:
+            isActive
+                ? accentColor.withValues(alpha: 0.15)
+                : SubscriptionStatusColors.getBadgeBackground(subscription),
+      ),
+      child: Text(
+        SubscriptionStatusColors.getLabel(subscription),
+        style: AppTypography.caption.copyWith(
+          color:
+              isActive
+                  ? accentColor
+                  : SubscriptionStatusColors.getColor(subscription),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  IconData get _compactInstrumentIcon {
+    switch (subscription.type) {
+      case SubscriptionType.trial:
+        return Icons.star_outline;
+      case SubscriptionType.monthly:
+        return Icons.calendar_month;
+      case SubscriptionType.package:
+        return Icons.confirmation_number_outlined;
+    }
+  }
+
+  /// Subscription type color — 3색 잉크 체계:
+  /// trial = paperTrial (세피아 앰버 — 호기심, 첫 만남)
+  /// monthly = paperOk (녹색 펜 — 안정, 꾸준한 일상)
+  /// package = paperAccent (버밀리온 — 매회 출석 체크)
+  Color get _subscriptionTypeColor {
+    switch (subscription.type) {
+      case SubscriptionType.trial:
+        return AppColors.paperTrial;
+      case SubscriptionType.monthly:
+        return AppColors.paperOk;
+      case SubscriptionType.package:
+        return AppColors.paperAccent;
+    }
+  }
+
+  String get _compactDisplayTitle {
+    if (instrument != null && className != null) {
+      return '$instrument $className';
+    }
+    return className ?? instrument ?? subscription.typeLabel;
+  }
+
+  String _formatCompactPeriod(DateTime start, DateTime end) {
+    return '${start.year}.${start.month.toString().padLeft(2, '0')}~${end.month.toString().padLeft(2, '0')}';
+  }
+
+  // ─── Full (detail) layout ─────────────────────────────────────
+
+  Widget _buildFull() {
     return GestureDetector(
       onTap: onTap,
       child: Opacity(
@@ -159,11 +437,11 @@ class SubscriptionCard extends StatelessWidget {
     switch (subscription.type) {
       case SubscriptionType.trial:
         icon = Icons.star_outline;
-        color = AppColors.paperAccent;
+        color = AppColors.paperTrial;
         break;
       case SubscriptionType.monthly:
         icon = Icons.calendar_month;
-        color = AppColors.paperAccent;
+        color = AppColors.paperOk;
         break;
       case SubscriptionType.package:
         icon = Icons.confirmation_number_outlined;
@@ -528,4 +806,35 @@ class SubscriptionCard extends StatelessWidget {
       ),
     ];
   }
+}
+
+/// Custom painter for dashed line (tear effect) used in compact mode.
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+
+  _DashedLinePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1;
+
+    const dashWidth = 6.0;
+    const dashSpace = 4.0;
+    double startX = 20;
+
+    while (startX < size.width - 20) {
+      canvas.drawLine(
+        Offset(startX, size.height / 2),
+        Offset(startX + dashWidth, size.height / 2),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

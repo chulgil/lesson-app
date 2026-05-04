@@ -1,8 +1,8 @@
 # Notebook × Score Design System
 
-> Last updated: 2026-04-21
+> Last updated: 2026-05-05
 > 컨셉: **괘선 종이의 아날로그 손맛 + 클래식 악보의 엄격한 타이포그래피**
-> 상태: 선생님 홈화면 Phase 1 + Phase 2 완료 (공통 위젯 + 홈 섹션 + 대시보드 서브위젯 리스타일)
+> 상태: 전 도메인 Notebook × Score 적용 완료 (Phase 1~9). 테마 레이어 전역 통일 + BoxShadow 전수 제거 + BorderRadius 포화
 > 레퍼런스: `design-plan/hybrid/`
 
 ---
@@ -72,16 +72,60 @@
 
 §1.1 4대 + 다음 2 구조 시그니처 = 감사 점수 분모. `home_screens_audit.md` 와 SSOT 정렬.
 
-| # | 시그니처 | 분류 | 규칙 |
-|---|---------|------|------|
-| 1 | Playfair italic 헤더 | 정체성 (§1.1 #1) | `NotebookTypography.masthead/mastheadLabel/pieceTitle` |
-| 2 | 로마숫자 인덱스 | 정체성 (§1.1 #2) | `NotebookTypography.roman/romanActive` + `romanOf()` |
-| 3 | Vermillion 액센트 | 정체성 (§1.1 #3) | `AppColors.paperAccent` foreground/border |
-| 4 | Gaegu 손글씨 | 정체성 (§1.1 #4) | `NotebookTypography.hand/handEmphasis/handOk` |
-| 5 | **NotebookMasthead 스캐폴드** | 구조 | 모든 화면·탭의 진입 헤더 — `AppBar` 사용 금지 |
-| 6 | **"Fine." 페이지 종지부** | 구조 | 스크롤 종료 영역의 italic 마커 (`NotebookTypography.fine`) |
+| # | 시그니처 | 분류 | 규칙 | 현황 (2026-05-04) |
+|---|---------|------|------|------|
+| 1 | Playfair italic 헤더 | 정체성 (§1.1 #1) | `NotebookTypography.masthead/mastheadLabel/pieceTitle` | 전 화면 적용 |
+| 2 | 로마숫자 인덱스 | 정체성 (§1.1 #2) | `NotebookTypography.roman/romanActive` + `romanOf()` | 전 화면 적용 |
+| 3 | Vermillion 액센트 | 정체성 (§1.1 #3) | `AppColors.paperAccent` foreground/border | 전 화면 적용 |
+| 4 | Gaegu 손글씨 | 정체성 (§1.1 #4) | `NotebookTypography.hand/handEmphasis/handOk` | 31개 파일 52건 적용 |
+| 5 | **NotebookMasthead 스캐폴드** | 구조 | 원칙적으로 모든 화면·탭의 진입 헤더 — `AppBar` 사용 금지. 단, 반복 업무 화면은 §1.2.1 Compact Work Header 예외 가능 | 전 화면 적용 |
+| 6 | **"Fine." 페이지 종지부** | 구조 | 스크롤 종료 영역의 italic 마커 (`NotebookTypography.fine`) | 대시보드 3종 + 상세 화면 8개 포함 11개 화면 파일 적용 |
 
 `ThinRule` 위젯은 `NotebookMasthead` 와 `NotebookSectionHeader` 의 부속 — 시그니처가 아닌 구성요소.
+
+#### 1.2.0 Surface Wrapper SSOT
+
+화면, 상세, 다이얼로그, 바텀시트의 표면은 공통 래퍼로만 시작한다. 개별 화면이 직접 Material 기본 `Scaffold`/`AlertDialog`/sheet surface를 설계하면 `paper` 배경, 각진 원칙, Playfair 타이틀이 다시 분기된다.
+
+| 표면 | 공통 래퍼 | 파일 | 계약 |
+|------|------|------|------|
+| 일반 화면 | `NotebookScreenScaffold` | `core/widgets/notebook/notebook_surfaces.dart` | `backgroundColor: AppColors.paper` |
+| 상세 화면 | `NotebookDetailScaffold` | `core/widgets/notebook/notebook_surfaces.dart` | paper 배경 + `titleSpacing: 0` + `NotebookTypography.appBarTitle` |
+| 다이얼로그 | `NotebookAlertDialog` / `showNotebookDialog` | `core/widgets/notebook/notebook_surfaces.dart` | paper 배경 + `surfaceTintColor: Colors.transparent` + 각진 ink 테두리 + `dialogTitle`. 확인/삭제/입력/선택 다이얼로그 모두 이 표면을 사용 |
+| 일반 바텀시트 | `showNotebookBottomSheet` / `NotebookBottomSheet` | `core/widgets/notebook/notebook_surfaces.dart` | transparent route + paper 배경 + `BorderRadius.zero` + `BottomSheetHandle` + SafeArea |
+| 커스텀/드래그 바텀시트 route | `showNotebookModalBottomSheet` | `core/widgets/notebook/notebook_surfaces.dart` | transparent route + 각진 route shape. child가 `DraggableScrollableSheet` 또는 자체 paper frame을 소유 |
+| 카드 표면 | `NotebookCard` | `core/widgets/notebook/notebook_surfaces.dart` | 직접 `Card(` 금지. 각진 paper 카드 + `surfaceTintColor: Colors.transparent` |
+
+신규 코드 금지:
+- `backgroundColor` 없는 일반 `Scaffold`
+- schedule/subscription/student_home/profile/lessons/students/practice/auth/onboarding/invite/follow/search/gamification/parent_home 및 supporting teacher utility 화면(analytics/home/notifications/settings)에서 직접 `Scaffold(` 호출. 해당 흐름은 아키텍처 테스트로 `NotebookScreenScaffold`/`NotebookDetailScaffold` 사용을 강제한다.
+- 직접 `Card(` 호출. 반복 카드/진단 카드/선택 카드도 `NotebookCard`를 사용한다.
+- 직접 `AlertDialog(` 호출. 신규/수정 코드는 `NotebookAlertDialog` 또는 `showNotebookDialog`를 사용한다.
+- `showModalBottomSheet` 직접 호출. 신규/수정 코드는 `showNotebookBottomSheet` 또는 `showNotebookModalBottomSheet`를 사용한다.
+- `Colors.white`/Material surface에 의존하는 popup/sheet
+
+예외:
+- 카메라, 녹음 파형, 튜너 등 실제 미디어/캔버스가 주 표면인 화면
+- 이미지 크롭러 등 외부 플러그인이 자체 대비를 요구하는 표면
+- `showNotebookModalBottomSheet` 내부 child가 자체 frame을 소유하는 드래그형 시트. 이 경우 child 내부 첫 표면은 반드시 `AppColors.paper`/`paperDark` 계열이어야 한다.
+
+#### 1.2.1 Compact Work Header 예외
+
+스케줄 탭처럼 하루에도 여러 번 확인·수정하는 반복 업무 화면은 대형
+`NotebookMasthead`/Programme Title 을 강제하지 않는다. 이 경우 시그니처보다
+작업 가능 높이와 조작 효율을 우선한다.
+
+예외 조건:
+- 화면의 핵심 과업이 목록/시간표를 반복 확인하고 즉시 조작하는 업무일 것
+- 상단은 56~72px 수준의 compact toolbar 로 제한할 것
+- toolbar 안에 화면명, 주요 보기 전환, 주요 생성 액션을 함께 배치할 것
+- 날짜/필터/정렬 조작은 별도 대형 설명 블록이 아니라 sticky 또는 compact control row 로 배치할 것
+- `NotebookTypography`, Vermillion accent, ink line 등 나머지 Notebook × Score 언어는 유지할 것
+
+현재 적용 화면:
+- `schedule/presentation/screens/schedule_tab.dart`: 선생님 스케줄 탭. 대형
+  `SCHEDULE` eyebrow/`Programme of Schedule` 헤더 제거, `스케줄 + 보기 전환 + 추가`
+  compact toolbar 와 `CompactWeekStrip + 날짜/정렬` 조작 영역으로 대체.
 
 **점수 임계값**:
 
@@ -96,15 +140,16 @@
 
 시그니처가 "이 앱이 Notebook × Score 인가" 의 정체성 측정이라면, 메타 원칙은 **인지 부하 절제**의 측정. 두 원칙은 신규 화면 추가 시 시그니처와 동등하게 강제.
 
-#### 1.3.1 각진 (BorderRadius.zero) — §7.118 포화
+#### 1.3.1 각진 (BorderRadius.zero) — §7.118 포화 (2026-05-04 확인)
 
-`app_theme.dart` 테마 레이어 + 인라인 override 모두 `BorderRadius.zero`. **3 예외에만** `BorderRadius.circular` 허용:
+`app_theme.dart` 테마 레이어 + 인라인 override 모두 `BorderRadius.zero`. 전체 코드베이스에서 `BorderRadius.circular` 잔여 **2건만** (포화 상태):
 
-| 예외 | 사유 |
-|------|------|
-| 애니메이션 캐릭터 (고양이·이모지) | 곡률은 감정 표현 |
-| 드래그 핸들 pill (`height / 2`) | "끌어올리기" 어포던스 |
-| 변수 표현식 기반 원형 오브젝트 | 정적 상수가 아님 |
+| 예외 | 파일 | 사유 |
+|------|------|------|
+| 튜너 고양이 캐릭터 | `tuner_cat_widgets.dart` | 곡률은 감정 표현 (캐릭터 예외) |
+| 드래그 핸들 pill (`height / 2`) | `bottom_sheet_handle.dart` | "끌어올리기" 어포던스 |
+
+> 이전 3 예외 중 "변수 표현식 기반 원형 오브젝트" 는 정리 완료. `like_stamp.dart`·`feedback_template_form_sheet.dart` 에 미세 잔류(stamp pill·indicator 2px)가 있으나 시그니처 영역 외 미미한 수준.
 
 신규 위젯에 `BorderRadius.circular(radiusMedium)` 등 정적 상수 사용 = 위반.
 
@@ -119,6 +164,29 @@
 | 주간 zebra (제거됨) | — | — (둘 다 변별 안 함 = 평탄) |
 
 신규 시각 인코딩 도입 시 "변별 채널은 한 곳" 원칙으로 검토. 구체 위반 패턴: zebra 격색상, 모든 행 다른 좌측 보더 색상, 카드 배경에 채도 + 좌측 보더 + 우측 칩 동시 강조.
+
+#### 1.3.3 채팅 히스토리 말풍선 일관성 — §7.69c
+
+레슨요청 상세와 수강권 스케줄 조절 상세는 모두 `RequestEvent`를 시간순으로 읽는 히스토리다. 같은 도메인 사건을 다루므로 채팅 문법도 동일해야 한다.
+
+| 레이어 | 규칙 |
+|------|------|
+| 이벤트 컨테이너 | 모든 사용자 이벤트는 둥근 말풍선으로 표시 |
+| 정렬 | viewer 기준. 내 이벤트 오른쪽, 상대 이벤트 왼쪽 |
+| 말풍선 색 | 내 이벤트 `paperAccentSoft`, 상대 이벤트 `paperDark` |
+| 스케줄 데이터 | 말풍선 내부의 각진 사각형 카드로만 표시 |
+| 상태 이벤트 | 수락/거절/응답대기/결정변경/취소는 별도 성공 박스가 아니라 같은 말풍선 안의 텍스트 이벤트 |
+
+금지:
+- 화면별로 말풍선 유무를 다르게 적용
+- 수락 이벤트만 `paperOk` 체크 아이콘 Row로 강조
+- 같은 히스토리 안에서 둥근 말풍선과 각진 말풍선 혼용
+- 스케줄 후보 카드가 말풍선 밖으로 독립되어 보이는 구성
+
+허용:
+- 말풍선 내부 일정 후보/현재 일정 카드의 각진 사각형
+- 결정 변경 이벤트의 이전 일정 취소선
+- 상대 메시지의 아바타/발신자 라벨
 
 ---
 
@@ -138,6 +206,20 @@
 | `paperAccentSoft` | `rgba(155,27,18,0.12)` | 액센트 배경 |
 | `paperOk` | `#3F5D2F` | 완료 (녹색 펜) |
 | `paperHighlight` | `#F7D755` | 형광펜 |
+| `paperTrial` | `#C4923A` | **세피아 앰버** — 체험레슨 전용 잉크 |
+| `paperTrialSoft` | `rgba(196,146,58,0.12)` | 체험레슨 배경 (12% alpha) |
+
+### 2.1 수강권 3색 잉크 체계 (만년필 잉크 메타포)
+
+수강권 타입별로 "만년필 잉크 색"을 달리하여 종이 위에 적힌 수강 기록의 성격을 한눈에 식별한다.
+
+| 수강권 타입 | 토큰 | HEX | 잉크 이름 | 감성 |
+|------------|------|-----|----------|------|
+| 체험레슨 (trial) | `paperTrial` | `#C4923A` | 세피아 앰버 | 호기심 · 첫 만남 |
+| 정기권 (monthly) | `paperOk` | `#3F5D2F` | 녹색 펜 | 안정 · 꾸준 |
+| 회차권 (package) | `paperAccent` | `#9B1B12` | 버밀리온 | 매회 출석 체크 |
+
+`SubscriptionCard` 헤더 액센트 라인과 프로그레스바 색상이 이 3색에 매핑된다.
 
 Flutter 구현: `lib/core/theme/app_colors.dart`의 Notebook 섹션.
 
@@ -281,8 +363,12 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 |------|------|-------|
 | `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 3 — **완료** |
 | `PencilUnderline` / `PencilBox` / `PencilCircle` | 손그림 프리미티브 3종 (CustomPainter) | Phase 3 — **완료** |
-| 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 — 완료 |
-| 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 — 완료 |
+| 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 — **완료** |
+| 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 — **완료** |
+| 전 화면 scaffoldBackgroundColor 통일 | `app_theme.dart` `scaffoldBackgroundColor: AppColors.paper` 전역 적용 | Phase 7~9 — **완료** |
+| BoxShadow 전수 제거 | 126+건 → 0건 (`BoxShadow` 잔재 없음) | Phase 7~9 — **완료** |
+| BorderRadius.circular 포화 | 38건 → 2건 예외(tuner_cat + drag handle)만 잔류 | Phase 7~9 — **완료** |
+| fontSize/EdgeInsets 토큰 통일 | `AppTypography`·`AppSpacing` 토큰으로 전수 치환 | Phase 7~9 — **완료** |
 
 ---
 
@@ -398,6 +484,11 @@ Text(
 | `PencilUnderline` | `notebook/pencil_primitives.dart` | 곡선 밑줄 CustomPainter. 강조용 |
 | `PencilBox` | `notebook/pencil_primitives.dart` | 손그림 체크박스 |
 | `PencilCircle` | `notebook/pencil_primitives.dart` | 활성/선택 표시 외곽 링 + 중앙 점 |
+| `NotebookAlertDialog` | `notebook/notebook_alert_dialog.dart` | paper 배경 + 각진 ink 테두리 + `dialogTitle`. 커스텀 actions/content 허용, 표면 스타일 재정의 금지. §1.2.0 Surface Wrapper |
+| `NotebookBottomSheet` | `notebook/notebook_bottom_sheet.dart` | paper 배경 + `BorderRadius.zero` + `BottomSheetHandle` + SafeArea. §1.2.0 Surface Wrapper |
+| `NotebookScreenScaffold` | `notebook/notebook_screen_scaffold.dart` | `backgroundColor: AppColors.paper`. 일반 화면 공통 래퍼. §1.2.0 Surface Wrapper |
+| `NotebookDetailScaffold` | `notebook/notebook_detail_scaffold.dart` | paper 배경 + `titleSpacing: 0` + `NotebookTypography.appBarTitle`. 상세 화면 래퍼. §1.2.0 Surface Wrapper |
+| `NotebookCard` | `notebook/notebook_surfaces.dart` | 각진 paper 카드 + `surfaceTintColor: transparent`. 직접 `Card(` 금지. §1.2.0 Surface Wrapper |
 
 #### 6.7.2 core/widgets/ — 도메인 중립 공통 위젯
 
@@ -436,8 +527,27 @@ Text(
 | `RequestHistoryChat` | `schedule/...request_history_chat.dart` | 챗 형식 요청 히스토리 + 가이드 메시지 (§7.25) |
 | `RequestProfileCard` | `schedule/...request_profile_card.dart` | 요청자 프로필 카드 |
 | `WeeklyCalendarPicker` | `schedule/...weekly_calendar_picker.dart` | 주간 단위 날짜 픽커 |
-| `AlternativeTimeGrid` | `schedule/...alternative_time_grid.dart` | 대체 시간 제안 그리드 |
+| `AlternativeTimeGrid` | `schedule/...alternative_time_grid.dart` | 대체 시간 제안 그리드. §6.7.4.1 시각 규칙 필수 |
 | `ScheduleVisualHelpers` | `schedule/...utils/schedule_visual_helpers.dart` | `weeklyColumnBackground` + `isTeacherRestDay` 순수 함수 (§7.122 단순화) |
+
+##### 6.7.4.1 `AlternativeTimeGrid` 일정비교 그리드 시각 규칙 (2026-05-04)
+
+레슨요청과 스케쥴변경의 일정비교 상세화면은 같은 `AlternativeTimeGrid`를 사용한다. 그리드는 “종이 위에 적은 주간 시간표” 메타포를 유지하되, 선택·비교 행동은 즉시 읽혀야 한다.
+
+| 요소 | 규칙 | 사유 |
+|---|---|---|
+| 기존 레슨 셀의 학생명 | `NotebookTypography.hand` 기반 Gaegu 손글씨, `captionXSmall * 2`, `FontWeight.w700`, 셀 중앙 정렬 | 학생명은 실제 사람/레슨 맥락의 주석이므로 Notebook × Score의 손글씨 계층에 해당. 작은 시간표 안에서도 읽혀야 함 |
+| 학생명 세로 정렬 | `Center` + `StrutStyle(forceStrutHeight: true)` + 필요 시 1px 이하 시각 보정 | Gaegu 폰트 메트릭은 산세리프와 달라 기계적 center만으로는 위로 떠 보일 수 있음 |
+| 선택한 희망일정 라벨 | 선택 시작 셀에 `희망` 표시. 기존 레슨과 겹치더라도 선택 포커스가 우선되어 `희망`을 표시 | 사용자가 카드에서 선택한 희망일정 위치를 그리드에서 즉시 확인해야 함 |
+| 희망일정 포커스 | 희망일정 카드 선택 시 해당 주로 이동하고, 그리드가 선택 시간대로 자동 스크롤. `date`가 없는 주간 반복 슬롯은 현재 표시 주의 `dayOfWeek` 날짜로 해석해 동일하게 표시 | 레슨요청/스케쥴변경 비교 모두 동일한 상호작용. 스케쥴변경 이벤트는 API/Mock에서 요일+시간만 전달되는 케이스가 있음 |
+| 내부 그리드 라인 | 인접 셀이 동시에 같은 경계선을 그리지 않도록 한쪽 방향 보더만 사용. 외곽선은 1px, 내부선도 1px | `Border.all` 반복 적용 시 내부선이 2px처럼 보여 악보 오선의 얇은 선 질감과 충돌 |
+
+금지:
+- 학생명에 `captionXSmall` 그대로 사용
+- 학생명을 좌상단 padding으로 배치
+- 내부 셀마다 `Border.all`을 반복 적용해 이중선처럼 보이게 하는 구현
+- 희망일정 선택 후 `희망` 라벨 또는 자동 스크롤 포커스가 누락되는 구현
+- `PreferredTimeSlot.date == null`인 주간 슬롯을 포커스 불가 상태로 방치하는 구현
 
 #### 6.7.5 features/practice/ + features/students/ — 학생/연습
 
@@ -447,11 +557,17 @@ Text(
 | `BulkCancelScreen` | `students/...bulk_cancel_screen.dart` | 휴강 일괄 공지 (Sliver + 컴팩트 버튼 minimumSize override) |
 | `BulkMessageSheet` | `students/...bulk_message_sheet.dart` | 일괄 메시지 시트 (DraggableSheet + 키보드 인셋) |
 
+#### 6.7.5a features/subscription/ — 수강권 도메인
+
+| 컴포넌트 | 파일 | 1-라인 스펙 |
+|---|---|---|
+| `SubscriptionCard` | `subscription/...subscription_card.dart` | 수강권 카드 — 3색 잉크 체계 (trial=`paperTrial`, monthly=`paperOk`, package=`paperAccent`). `compact: true` 티켓 스타일 (리스트/홈), `compact: false` 상세 카드 (프로그레스바 포함). compact 헤더 배경색 제거 (paper 배경만). `SubscriptionTicketCard` 삭제됨 — 이 위젯으로 통합. §2.1 3색 잉크 체계 참조 |
+
 #### 6.7.6 핵심 토큰 진원지
 
 | 토큰 그룹 | 파일 | 사용 규칙 |
 |---|---|---|
-| `AppColors` | `core/theme/app_colors.dart` | `paper`·`paperAccent`·`paperHighlight`·`ink`·`scheduleMutedBackground` 등. 하드코딩 `Color(0x...)` 금지 |
+| `AppColors` | `core/theme/app_colors.dart` | `paper`·`paperAccent`·`paperOk`·`paperTrial`·`paperTrialSoft`·`paperHighlight`·`ink`·`scheduleMutedBackground` 등. 하드코딩 `Color(0x...)` 금지 |
 | `AppTypography` | `core/theme/app_typography.dart` | `bodyLarge`·`bodyMedium`·`titleLarge` 등. `fontSize: N` 직접 사용 금지 |
 | `NotebookTypography` | `core/theme/notebook_typography.dart` | `masthead`·`pieceTitle`·`roman`·`romanActive`·`hand`·`handEmphasis`·`handOk`. Playfair/Gaegu/Roman 시그니처 진원지 |
 | `AppSpacing` | `core/theme/app_spacing.dart` | `space1~8`·`buttonHeight`·`buttonHeightSmall`. `EdgeInsets.all(N)` 금지 |
@@ -499,6 +615,14 @@ Text(
 | **§7.102~§7.109** | **4대 시그니처 SSOT 감사 포화** (Gaegu · Roman · Vermillion · display* · marginalia) | [phase-log §7.102~§7.109](./phase-log.md#7102--11-4-gaegu-손글씨-서명-최초-전수-감사-2026-04-24) |
 | **§7.110~§7.118** | **각진 원칙 (BorderRadius.zero) 확장 + 테마 레이어 포화** | [phase-log §7.118](./phase-log.md#7118--테마-레이어-전수-각진-포화-app_themedart--인라인-override-2026-04-24) |
 | **§7.120~§7.123** | **평탄화 + 4단 우선순위** (주간/일간 그리드 · 휴가·휴무·추가오픈·근무시간) | [phase-log §7.122~§7.123](./phase-log.md#7122--주간-그리드-컬럼-배경-단순화-4단--2단-2026-04-27) |
+| **2026-05-04** | **전 화면 scaffoldBackgroundColor 통일** — `app_theme.dart` `scaffoldBackgroundColor: AppColors.paper` 전역 적용 | — |
+| **2026-05-04** | **BoxShadow 전수 제거** — 126+건 → 0건. 종이 평면 잉크 원칙 완성 | — |
+| **2026-05-04** | **BorderRadius.circular 포화** — 38건 → 2건 예외(tuner_cat + drag handle)만 잔류 | §1.3.1 |
+| **2026-05-04** | **fontSize/EdgeInsets 토큰 통일** — `AppTypography`·`AppSpacing` 전수 치환 | — |
+| **2026-05-04** | **SubscriptionCard 통합 재설계** — `SubscriptionTicketCard` 삭제, `SubscriptionCard(compact)` 로 통합. 3색 잉크 체계 도입 (trial=`paperTrial` 세피아, monthly=`paperOk` 녹색, package=`paperAccent` 버밀리온). §2.1 참조 | — |
+| **2026-05-04** | **"Fine." 종지부 상세 화면 확산** — 대시보드 3종 + 상세 화면 8개 포함 11개 화면 파일 적용 | §1.2 #6 |
+| **2026-05-04** | **detail_screen_template.md Notebook 토큰 SSOT 갱신** | — |
+| **2026-05-04** | **공통 래퍼 4종 도입** — NotebookAlertDialog · NotebookBottomSheet · NotebookScreenScaffold · NotebookDetailScaffold | §1.2.0, §6.7.1 |
 
 > **참조 규칙**: 본 README 의 다른 섹션(§1.1·§8 등)에서 `§7.X` 앵커로 가리키는 모든 항목은 phase-log.md 에 보존됨. 시점별 정의(예: "당시 4대 시그니처") 도 그대로 유지.
 
@@ -512,6 +636,7 @@ Text(
 5. **감사 시그니처 6대 필수 (§1.2)**: 정체성 4 (Playfair · 로마숫자 · Vermillion · Gaegu) + 구조 2 (NotebookMasthead · "Fine.") = 감사 점수 분모. **정체성 4 중 1 누락 = 점수 무관 BLOCK**. 구조 2 누락은 FLAG 단계.
 6. **메타 원칙 2종 (§1.3)**: 모든 화면은 (a) 각진 — `BorderRadius.zero` 기본, 3 예외(캐릭터·handle·변수표현식)에만 `BorderRadius.circular` 허용, (b) 평탄화 — 변별 채널은 헤더 OR 본문 둘 중 한 곳에서만. 두 원칙은 신규 화면 추가 시 시그니처와 동등 강제. 상세: §1.3.1 / §1.3.2.
 7. **각진 원칙 구현 출처 (§7.112 · §7.113 · §7.114 · §7.115 · §7.118)**: app_theme 테마 레이어 전체가 `BorderRadius.zero` (§7.118, 2026-04-24 포화). 바텀시트 상단도 각진 (10x Vision). `radiusSmall/Medium/Large/XLarge` 를 Notebook × Score 사용자 정의 컨테이너에 사용 금지. **BoxShadow 도 동반 제거** (§7.115) — 종이는 평면 잉크이지 떠있는 material 이 아님.
+8. **테마 레이어 전역 적용 (2026-05-04)**: `app_theme.dart` 에서 `scaffoldBackgroundColor: AppColors.paper`, `dialogTheme`, `bottomSheetTheme`, `cardTheme` 으로 전역 통일. 개별 위젯에서 테마 오버라이드 금지 (paper 배경, zero radius, flat elevation). 표면 계약은 §1.2.0 Surface Wrapper SSOT 를 따르며, 직접 `Scaffold(backgroundColor:)` / `Card(` / `AlertDialog(` 를 호출하지 않는다.
 
 ---
 

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/domain/services/notification_scheduler_service.dart';
 import '../entities/subscription_proposal.dart';
-import '../../presentation/providers/subscription_proposal_providers.dart';
 
-part 'proposal_reminder_service.g.dart';
+typedef ScheduleProposalReminderNotification =
+    Future<void> Function(AppNotification notification);
+typedef CancelProposalReminderNotifications =
+    Future<void> Function(String proposalId);
+typedef LoadProposalForReminder =
+    Future<SubscriptionProposal?> Function(String proposalId);
 
 /// Service for scheduling and managing proposal reminder notifications.
 ///
@@ -16,18 +18,20 @@ part 'proposal_reminder_service.g.dart';
 /// - 24h reminder: Gentle reminder about pending proposal
 /// - 48h reminder: Follow-up reminder
 /// - 72h reminder: Golden time ending warning (if applicable)
-@riverpod
-ProposalReminderService proposalReminderService(
-  ProposalReminderServiceRef ref,
-) {
-  return ProposalReminderService(ref);
-}
-
 class ProposalReminderService {
-  final ProposalReminderServiceRef _ref;
+  final ScheduleProposalReminderNotification _scheduleNotification;
+  final CancelProposalReminderNotifications _cancelNotificationsByProposalId;
+  final LoadProposalForReminder _loadProposal;
   static const _uuid = Uuid();
 
-  ProposalReminderService(this._ref);
+  const ProposalReminderService({
+    required ScheduleProposalReminderNotification scheduleNotification,
+    required CancelProposalReminderNotifications
+    cancelNotificationsByProposalId,
+    required LoadProposalForReminder loadProposal,
+  }) : _scheduleNotification = scheduleNotification,
+       _cancelNotificationsByProposalId = cancelNotificationsByProposalId,
+       _loadProposal = loadProposal;
 
   /// Schedule all reminders for a new proposal.
   ///
@@ -43,8 +47,6 @@ class ProposalReminderService {
     );
 
     final now = DateTime.now();
-    final schedulerService = _ref.read(notificationSchedulerServiceProvider);
-
     // Check if there's a discount (golden time)
     final hasDiscount = (proposal.discountAmount ?? 0) > 0;
 
@@ -56,7 +58,7 @@ class ProposalReminderService {
       title: AppStrings.proposalReminder24hTitle,
       body: AppStrings.proposalReminder24hBody,
     );
-    await schedulerService.scheduleNotification(reminder24h);
+    await _scheduleNotification(reminder24h);
 
     // 48h reminder
     final reminder48h = _createReminderNotification(
@@ -66,7 +68,7 @@ class ProposalReminderService {
       title: AppStrings.proposalReminder48hTitle,
       body: AppStrings.proposalReminder48hBody,
     );
-    await schedulerService.scheduleNotification(reminder48h);
+    await _scheduleNotification(reminder48h);
 
     // 72h reminder (golden time warning)
     final reminder72h = _createReminderNotification(
@@ -82,7 +84,7 @@ class ProposalReminderService {
               ? AppStrings.proposalReminder72hBodyDiscount
               : AppStrings.proposalReminder72hBodyNoDiscount,
     );
-    await schedulerService.scheduleNotification(reminder72h);
+    await _scheduleNotification(reminder72h);
 
     debugPrint(
       '[ProposalReminderService] Scheduled 3 reminders for proposal: ${proposal.id}',
@@ -100,10 +102,8 @@ class ProposalReminderService {
       '[ProposalReminderService] Cancelling reminders for proposal: $proposalId',
     );
 
-    final schedulerService = _ref.read(notificationSchedulerServiceProvider);
-
     // Cancel all reminder types for this proposal
-    await schedulerService.cancelNotificationsByProposalId(proposalId);
+    await _cancelNotificationsByProposalId(proposalId);
 
     debugPrint(
       '[ProposalReminderService] Cancelled all reminders for proposal: $proposalId',
@@ -115,9 +115,7 @@ class ProposalReminderService {
   /// Returns true if reminder should be sent, false if proposal is no longer pending.
   Future<bool> shouldSendReminder(String proposalId) async {
     try {
-      final proposal = await _ref.read(
-        subscriptionProposalProvider(proposalId).future,
-      );
+      final proposal = await _loadProposal(proposalId);
 
       if (proposal == null) {
         debugPrint('[ProposalReminderService] Proposal not found: $proposalId');

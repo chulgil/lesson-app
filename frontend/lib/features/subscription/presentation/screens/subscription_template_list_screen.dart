@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,7 +24,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final templatesAsync = ref.watch(teacherTemplatesProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.templateListAppBarTitle),
         backgroundColor: AppColors.paperDark,
@@ -146,10 +147,9 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   }
 
   void _showAddTemplateDialog(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => _TemplateFormSheet(
             teacherId: teacherId,
@@ -176,10 +176,9 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     WidgetRef ref,
     SubscriptionTemplate template,
   ) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => _TemplateFormSheet(
             teacherId: teacherId,
@@ -210,29 +209,20 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.templateDeleteDialogTitle),
+          (context) => NotebookAlertDialog(
+            title: AppStrings.templateDeleteDialogTitle,
             content: Text(
               AppStrings.templateDeleteConfirmFormat(template.name),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await ref
-                      .read(subscriptionTemplateNotifierProvider.notifier)
-                      .deleteTemplate(template);
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
+            cancelLabel: AppStrings.cancel,
+            confirmLabel: AppStrings.delete,
+            isDestructive: true,
+            onConfirm: () async {
+              Navigator.pop(context);
+              await ref
+                  .read(subscriptionTemplateNotifierProvider.notifier)
+                  .deleteTemplate(template);
+            },
           ),
     );
   }
@@ -254,7 +244,7 @@ class _TemplateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(

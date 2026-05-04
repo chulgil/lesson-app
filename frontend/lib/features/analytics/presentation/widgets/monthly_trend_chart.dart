@@ -136,7 +136,7 @@ class _TrendChartPainter extends CustomPainter {
     // Dots
     for (final point in points) {
       canvas.drawCircle(point, 4, Paint()..color = lineColor);
-      canvas.drawCircle(point, 2.5, Paint()..color = Colors.white);
+      canvas.drawCircle(point, 2.5, Paint()..color = AppColors.paper);
     }
 
     // Value labels

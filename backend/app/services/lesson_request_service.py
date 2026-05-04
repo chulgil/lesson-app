@@ -179,19 +179,40 @@ class LessonRequestService:
             )
 
         await self._get_request_for_user(request_id, current_user)
+        suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
+        schedule_change_type = data.schedule_change_type
+        proposed_day_of_week = data.proposed_day_of_week
+        proposed_time = data.proposed_time
+
+        if data.event_type.value in {"scheduleChangeAccepted", "withdrawApproval"} and not suggested_slots:
+            source = await self._latest_schedule_change_source_event(
+                request_id=request_id,
+                subscription_id=data.subscription_id,
+                session_number=data.session_number,
+            )
+            if source is not None:
+                suggested_slots = list(source.suggested_slots or [])
+                schedule_change_type = schedule_change_type or source.schedule_change_type
+                if proposed_day_of_week is None:
+                    proposed_day_of_week = source.proposed_day_of_week
+                proposed_time = proposed_time or source.proposed_time
+
         event = RequestEvent(
             request_id=request_id,
             actor_type=data.actor_type,
             actor_id=data.actor_id,
             event_type=data.event_type,
-            suggested_slots=[slot.model_dump() for slot in data.suggested_slots],
+            suggested_slots=suggested_slots,
             selected_slot_index=data.selected_slot_index,
             message=data.message,
-            schedule_change_type=data.schedule_change_type,
-            proposed_day_of_week=data.proposed_day_of_week,
-            proposed_time=data.proposed_time,
+            schedule_change_type=schedule_change_type,
+            proposed_day_of_week=proposed_day_of_week,
+            proposed_time=proposed_time,
             subscription_id=data.subscription_id,
             session_number=data.session_number,
+            change_credit_used=data.change_credit_used,
+            change_credit_remaining_after=data.change_credit_remaining_after,
+            keeps_session_number=data.keeps_session_number,
         )
         self.db.add(event)
         await self.db.flush()
@@ -223,7 +244,8 @@ class LessonRequestService:
         request = await self._get_request_for_user(request_id, current_user)
 
         now = datetime.now(UTC)
-        request.status = data.status
+        canonical_status = self._canonical_request_status(data.status)
+        request.status = canonical_status
         request.status_updated_at = now
 
         if data.decline_reason:
@@ -232,12 +254,12 @@ class LessonRequestService:
             request.proposal_id = data.proposal_id
 
         # Set timestamp based on status transition
-        if data.status == "approved" or data.status == "timeConfirmed":
+        if canonical_status == "timeConfirmed":
             request.confirmed_at = now
-        elif data.status == "pending":
+        elif canonical_status == "pending":
             # Withdraw approval — reset confirmed_at
             request.confirmed_at = None
-        elif data.status == "cancelled":
+        elif canonical_status == "cancelled":
             request.cancelled_at = now
 
         await self._add_event(
@@ -248,7 +270,7 @@ class LessonRequestService:
             message=data.decline_reason,
             subscription_id=(
                 data.proposal_id
-                if data.status in ("proposalSent", "subscriptionIssued")
+                if canonical_status in ("proposalSent", "subscriptionIssued")
                 else None
             ),
         )
@@ -515,6 +537,40 @@ class LessonRequestService:
                 current_user,
             )
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported action")
+
+    async def _latest_schedule_change_source_event(
+        self,
+        *,
+        request_id: str,
+        subscription_id: str | None,
+        session_number: int | None,
+    ) -> Any | None:
+        """Find the latest schedule-change proposal/request whose slots must be replayed."""
+        from app.models.request_event import RequestEvent, RequestEventType
+
+        query = select(RequestEvent).where(
+            RequestEvent.request_id == request_id,
+            RequestEvent.event_type.in_(
+                [
+                    RequestEventType.scheduleChanged,
+                    RequestEventType.scheduleChangeProposed,
+                    RequestEventType.scheduleChangeCountered,
+                ]
+            ),
+        )
+        if subscription_id is not None:
+            query = query.where(RequestEvent.subscription_id == subscription_id)
+        if session_number is not None:
+            query = query.where(RequestEvent.session_number == session_number)
+
+        result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc()))
+        return result.first()
+
+    def _canonical_request_status(self, request_status: str) -> str:
+        """Normalize legacy status names to the current UnifiedRequestStatus SSOT."""
+        if request_status == "approved":
+            return "timeConfirmed"
+        return request_status
 
     async def get_calendar(self, current_user: Any) -> LessonRequestCalendarResponse:
         """Return preferred-day counts for lesson requests visible to the user."""

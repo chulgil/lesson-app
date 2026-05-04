@@ -1,6 +1,7 @@
 // Section info card widget
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -27,7 +28,7 @@ class SectionInfoCard extends StatelessWidget {
     final rangeText =
         section.rangeType != SectionRangeType.full ? section.rangeText : null;
 
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(

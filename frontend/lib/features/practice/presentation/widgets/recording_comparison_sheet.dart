@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../providers/recording_comparison_provider.dart';
 import 'waveform/zoomable_waveform.dart';
@@ -19,10 +21,9 @@ void showRecordingComparisonSheet(
   BuildContext context,
   List<PracticeRecording> recordings,
 ) {
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
     builder:
         (context) => DraggableScrollableSheet(
           initialChildSize: 0.75,
@@ -207,7 +208,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           Icon(Icons.compare_arrows, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           // Notebook × Score: 바텀시트 헤더 Playfair 승격 (§7.27).
-          Text('녹음 비교', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.practiceRecordingCompareTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.close),
@@ -387,7 +391,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
         Expanded(
           child: _buildModeChip(
             icon: Icons.swap_vert,
-            label: '순차 재생',
+            label: AppStrings.practiceSequentialPlayLabel,
             isSelected: !_parallelMode,
             onTap: () {
               _stopAll();
@@ -399,7 +403,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
         Expanded(
           child: _buildModeChip(
             icon: Icons.vertical_split,
-            label: '병렬 파형',
+            label: AppStrings.practiceParallelWaveLabel,
             isSelected: _parallelMode,
             onTap: () {
               _stopAll();
@@ -749,7 +753,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           ],
           _buildSummaryRow(
             icon: Icons.timer_outlined,
-            label: '시간',
+            label: AppStrings.practiceTimeShortLabel,
             value:
                 '${comparison.recordingA.formattedDuration} → ${comparison.recordingB.formattedDuration}',
             delta:
@@ -759,7 +763,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           const SizedBox(height: AppSpacing.space2),
           _buildSummaryRow(
             icon: Icons.calendar_today,
-            label: '기간',
+            label: AppStrings.practicePeriodLabel,
             value: '${comparison.daysBetween}일',
             delta: null,
             isPositive: null,

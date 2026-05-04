@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,7 +63,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
             ? AppStrings.student
             : AppStrings.teacher;
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text(AppStrings.inviteCodeAppBarTitle),
@@ -85,7 +86,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                 height: 80,
                 decoration: BoxDecoration(
                   color: AppColors.paperAccentSoft,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  borderRadius: BorderRadius.zero,
                 ),
                 child: Icon(
                   Icons.dialpad,

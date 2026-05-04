@@ -1,26 +1,42 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import '../../../../core/l10n/app_strings.dart';
 import '../entities/proposal_settings.dart';
 import '../entities/subscription_proposal.dart';
 import '../entities/subscription_template.dart';
-import '../../presentation/providers/proposal_settings_providers.dart';
-import '../../presentation/providers/subscription_proposal_providers.dart';
-import '../../presentation/providers/subscription_template_providers.dart';
 
-part 'auto_proposal_service.g.dart';
+typedef LoadProposalSettings =
+    Future<ProposalSettings> Function(String teacherId);
+typedef LoadActiveProposal =
+    Future<SubscriptionProposal?> Function(String teacherId, String studentId);
+typedef LoadAutoProposalTemplates =
+    Future<List<SubscriptionTemplate>> Function(String teacherId);
+typedef CreateAutoProposal =
+    Future<SubscriptionProposal> Function({
+      required String teacherId,
+      required String studentId,
+      required List<String> templateIds,
+      String? recommendedTemplateId,
+      required String message,
+      int? discountAmount,
+      String? discountReason,
+      required bool isAutoProposal,
+    });
 
 /// Service for automatically creating subscription proposals after trial lessons.
-@riverpod
-AutoProposalService autoProposalService(AutoProposalServiceRef ref) {
-  return AutoProposalService(ref);
-}
-
 class AutoProposalService {
-  final Ref _ref;
+  final LoadProposalSettings _loadSettings;
+  final LoadActiveProposal _loadActiveProposal;
+  final LoadAutoProposalTemplates _loadAutoProposalTemplates;
+  final CreateAutoProposal _createAutoProposal;
 
-  AutoProposalService(this._ref);
+  const AutoProposalService({
+    required LoadProposalSettings loadSettings,
+    required LoadActiveProposal loadActiveProposal,
+    required LoadAutoProposalTemplates loadAutoProposalTemplates,
+    required CreateAutoProposal createAutoProposal,
+  }) : _loadSettings = loadSettings,
+       _loadActiveProposal = loadActiveProposal,
+       _loadAutoProposalTemplates = loadAutoProposalTemplates,
+       _createAutoProposal = createAutoProposal;
 
   /// Trigger auto-proposal after trial lesson completion.
   ///
@@ -34,18 +50,14 @@ class AutoProposalService {
     required DateTime trialCompletedAt,
   }) async {
     // 1. Check if auto-proposal is enabled
-    final settings = await _ref.read(
-      teacherProposalSettingsProvider(teacherId).future,
-    );
+    final settings = await _loadSettings(teacherId);
 
     if (!settings.autoProposalEnabled) {
       return null;
     }
 
     // 2. Check if there's already an active proposal for this student
-    final existingProposal = await _ref.read(
-      activeProposalBetweenProvider(teacherId, studentId).future,
-    );
+    final existingProposal = await _loadActiveProposal(teacherId, studentId);
 
     if (existingProposal != null) {
       // Already has an active proposal
@@ -54,9 +66,7 @@ class AutoProposalService {
 
     // 3. Get auto-proposal enabled templates only
     // 🆕 isAutoProposalEnabled = true인 템플릿만 가져옴
-    final templates = await _ref.read(
-      autoProposalTemplatesProvider(teacherId).future,
-    );
+    final templates = await _loadAutoProposalTemplates(teacherId);
 
     if (templates.isEmpty) {
       // 자동 제안 대상 템플릿이 없음
@@ -105,9 +115,7 @@ class AutoProposalService {
     }
 
     // 6. Create the proposal
-    final notifier = _ref.read(subscriptionProposalNotifierProvider.notifier);
-
-    final proposal = await notifier.createMultiChoiceProposal(
+    final proposal = await _createAutoProposal(
       teacherId: teacherId,
       studentId: studentId,
       templateIds: proposalTemplates.map((t) => t.id).toList(),

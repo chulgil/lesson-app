@@ -10,6 +10,7 @@ import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+import 'schedule_change_event_bubble.dart';
 
 /// Scrollable chat-style list showing per-session schedule change events.
 ///
@@ -20,12 +21,20 @@ class SubscriptionDetailChatList extends ConsumerStatefulWidget {
   final Subscription subscription;
   final int selectedSession;
   final String? instrument;
+  final String viewerRole;
+  final String? studentName;
+  final String? teacherName;
+  final VoidCallback? onOpponentAvatarTap;
 
   const SubscriptionDetailChatList({
     super.key,
     required this.subscription,
     required this.selectedSession,
     this.instrument,
+    this.viewerRole = 'student',
+    this.studentName,
+    this.teacherName,
+    this.onOpponentAvatarTap,
   });
 
   @override
@@ -99,9 +108,14 @@ class _SubscriptionDetailChatListState
         usages.where((u) => u.usageType == UsageType.normal).toList();
     final completedCount = completedUsages.length;
 
-    // Show only up to the current (next scheduled) session.
-    // Future undetermined sessions are hidden.
-    final visibleCount = (completedCount + 1).clamp(1, total);
+    // Show the current session, but keep a deep-linked schedule-change session
+    // visible so list → detail navigation never opens on an empty history row.
+    final nextSession = completedCount + 1;
+    final requestedSession =
+        widget.selectedSession > nextSession
+            ? widget.selectedSession
+            : nextSession;
+    final visibleCount = requestedSession.clamp(1, total);
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
@@ -127,6 +141,10 @@ class _SubscriptionDetailChatListState
           isExpanded: isExpanded,
           usage: usage,
           instrument: widget.instrument,
+          viewerRole: widget.viewerRole,
+          studentName: widget.studentName,
+          teacherName: widget.teacherName,
+          onOpponentAvatarTap: widget.onOpponentAvatarTap,
           onToggle: () {
             setState(() {
               if (_expandedSessions.contains(sessionNumber)) {
@@ -169,7 +187,11 @@ class _SessionSection extends ConsumerWidget {
   final bool isExpanded;
   final SubscriptionUsage? usage;
   final String? instrument;
+  final String viewerRole;
+  final String? studentName;
+  final String? teacherName;
   final VoidCallback onToggle;
+  final VoidCallback? onOpponentAvatarTap;
 
   const _SessionSection({
     super.key,
@@ -180,7 +202,11 @@ class _SessionSection extends ConsumerWidget {
     required this.isExpanded,
     this.usage,
     this.instrument,
+    required this.viewerRole,
+    this.studentName,
+    this.teacherName,
     required this.onToggle,
+    this.onOpponentAvatarTap,
   });
 
   @override
@@ -325,100 +351,22 @@ class _SessionSection extends ConsumerWidget {
     return Column(
       children:
           events.map<Widget>((event) {
-            final isTeacher = event.actorType.name == 'teacher';
+            final remainingCredits =
+                subscription.totalRescheduleAllowance -
+                subscription.usedRescheduleCount -
+                1;
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: Align(
-                alignment:
-                    isTeacher ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color:
-                        isTeacher
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paperDark,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(AppSpacing.radiusLarge),
-                      topRight: const Radius.circular(AppSpacing.radiusLarge),
-                      bottomLeft: Radius.circular(
-                        isTeacher ? AppSpacing.radiusLarge : 4,
-                      ),
-                      bottomRight: Radius.circular(
-                        isTeacher ? 4 : AppSpacing.radiusLarge,
-                      ),
-                    ),
-                  ),
-                  child: _buildBubbleContent(event),
-                ),
-              ),
+            return ScheduleChangeEventBubble(
+              event: event,
+              viewerRole: viewerRole,
+              studentName: studentName,
+              teacherName: teacherName,
+              rescheduleCreditsUsed: 1,
+              rescheduleCreditsRemaining:
+                  remainingCredits < 0 ? null : remainingCredits,
+              onOpponentAvatarTap: onOpponentAvatarTap,
             );
           }).toList(),
-    );
-  }
-
-  /// Build bubble content: for schedule change events, show type label + slots.
-  Widget _buildBubbleContent(RequestEvent event) {
-    final isScheduleChange =
-        event.eventType == RequestEventType.scheduleChangeProposed ||
-        event.eventType == RequestEventType.scheduleChangeCountered;
-
-    if (!isScheduleChange) {
-      return Text(
-        event.message ?? event.chatDisplayMessage,
-        style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
-      );
-    }
-
-    // Schedule change: show change type label + proposed slots
-    final isBulk = event.scheduleChangeType == ScheduleChangeType.bulkChange;
-    final changeLabel =
-        isBulk
-            ? AppStrings.chatBulkScheduleChange
-            : AppStrings.chatSingleScheduleChange;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Change type label (bold, primary color)
-        Text(
-          changeLabel,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.paperAccent,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        // Proposed slots — matches RequestHistoryChat pattern: "1순위 슬롯라벨"
-        if (event.suggestedSlots.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.space2),
-          ...event.suggestedSlots
-              .take(3)
-              .toList()
-              .asMap()
-              .entries
-              .map(
-                (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    '${AppStrings.slotPriority(entry.key + 1)} ${isBulk ? '${AppStrings.everyWeek} ' : ''}${entry.value.displayLabel}',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ),
-              ),
-        ],
-        // Optional message
-        if (event.message != null && event.message!.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            event.message!,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
-          ),
-        ],
-      ],
     );
   }
 }

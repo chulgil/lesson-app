@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -58,12 +59,15 @@ class _TeacherSearchFilterSheetState
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Notebook × Score: 바텀시트 커스텀 헤더 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
-                      Text('필터', style: NotebookTypography.appBarTitle),
+                      Text(
+                        AppStrings.searchFilter,
+                        style: NotebookTypography.appBarTitle,
+                      ),
                       TextButton(
                         onPressed: () {
                           setState(() => _filter = TeacherSearchFilter.empty);
                         },
-                        child: const Text('초기화'),
+                        child: const Text(AppStrings.searchFilterReset),
                       ),
                     ],
                   ),
@@ -82,7 +86,7 @@ class _TeacherSearchFilterSheetState
                       const SizedBox(height: AppSpacing.space2),
                       instrumentsAsync.when(
                         loading: () => const CircularProgressIndicator(),
-                        error: (_, __) => const Text('오류가 발생했습니다.'),
+                        error: (_, __) => const Text(AppStrings.errorOccurred),
                         data:
                             (instruments) => _buildChipSelection(
                               instruments,
@@ -105,7 +109,7 @@ class _TeacherSearchFilterSheetState
                       const SizedBox(height: AppSpacing.space2),
                       areasAsync.when(
                         loading: () => const CircularProgressIndicator(),
-                        error: (_, __) => const Text('오류가 발생했습니다.'),
+                        error: (_, __) => const Text(AppStrings.errorOccurred),
                         data:
                             (areas) => _buildChipSelection(
                               areas,
@@ -138,8 +142,12 @@ class _TeacherSearchFilterSheetState
 
                       // Certificate
                       SwitchListTile(
-                        title: const Text('자격증 인증 선생님만'),
-                        subtitle: const Text('검증된 자격증을 보유한 선생님'),
+                        title: const Text(
+                          AppStrings.searchCertifiedTeachersOnly,
+                        ),
+                        subtitle: const Text(
+                          AppStrings.searchCertifiedTeachersSubtitle,
+                        ),
                         value: _filter.hasVerifiedCertificate ?? false,
                         onChanged: (value) {
                           setState(() {
@@ -157,16 +165,7 @@ class _TeacherSearchFilterSheetState
                 // Apply button
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.paper,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.ink.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paper),
                   child: SafeArea(
                     child: SizedBox(
                       width: double.infinity,
@@ -191,7 +190,7 @@ class _TeacherSearchFilterSheetState
                           foregroundColor: AppColors.paper,
                           shape: const RoundedRectangleBorder(),
                         ),
-                        child: const Text('필터 적용'),
+                        child: const Text(AppStrings.searchFilterApply),
                       ),
                     ),
                   ),

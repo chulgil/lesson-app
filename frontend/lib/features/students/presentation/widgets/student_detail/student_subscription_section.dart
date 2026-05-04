@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
-import '../../../../subscription/presentation/widgets/subscription_ticket_card.dart';
+import '../../../../subscription/presentation/widgets/subscription_card.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../providers/lesson_class_providers.dart';
 import '../../providers/membership_providers.dart';
@@ -43,7 +44,10 @@ class StudentSubscriptionSection extends ConsumerWidget {
           children: [
             // Notebook × Score: 수강권 현황은 Info 탭의 핵심 섹션 —
             // Playfair sectionTitle 로 승격 (§7.17 헤더 일관성).
-            Text('수강권 현황', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentSubscriptionStatus,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton.icon(
               onPressed: () {
                 final query =
@@ -53,7 +57,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
                 context.push('${AppRoutes.issueSubscription}$query');
               },
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('발급'),
+              label: const Text(AppStrings.studentSubscriptionIssue),
             ),
           ],
         ),
@@ -134,7 +138,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
             );
             final className = lessonClassAsync.valueOrNull?.name;
 
-            return SubscriptionTicketCard(
+            return SubscriptionCard(compact: true,
               subscription: subscription,
               className: className,
               instrument: membership.instrument,
@@ -238,7 +242,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
                 vertical: AppSpacing.space2,
               ),
             ),
-            child: const Text('발급'),
+            child: const Text(AppStrings.studentSubscriptionIssue),
           ),
         ],
       ),
@@ -248,9 +252,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
   Widget _buildLoadingState() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: const Center(child: CircularProgressIndicator()),
     );
   }
@@ -284,9 +286,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
   Widget _buildErrorState() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),

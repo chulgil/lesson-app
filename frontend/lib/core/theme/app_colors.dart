@@ -137,14 +137,18 @@ class AppColors {
   static const inkSecondary = Color(0xBF14161C); // 75% alpha
   static const inkTertiary = Color(0x8C14161C); // 55% alpha
   static const inkQuaternary = Color(0x4014161C); // 25% alpha
+  static const inkScrim = Color(0x8A14161C); // 54% alpha, modal barrier
+  static const inkScrimStrong = Color(0xDE14161C); // 87% alpha, dark barrier
   static const paperPencil = Color(0x9914161C); // 60% alpha (손글씨)
   @Deprecated(
     'docs/specs/design/notebook/README.md §3 사유로 제거된 토큰 (왼쪽 붉은 여백선). '
     '신규 사용 금지. 강조 색이 필요하면 paperAccent 를 사용.',
   )
   static const paperMargin = Color(0xFFA83E3A);
-  static const paperAccent = Color(0xFF9B1B12); // 핵심 액션
+  static const paperAccent = Color(0xFF9B1B12); // 핵심 액션 (회차권 — 빨간 펜 출석 체크)
   static const paperAccentSoft = Color(0x1F9B1B12); // 12% alpha
-  static const paperOk = Color(0xFF3F5D2F); // 완료 (녹색 펜)
+  static const paperOk = Color(0xFF3F5D2F); // 완료 / 정기권 (녹색 펜 — 안정·꾸준)
+  static const paperTrial = Color(0xFFC4923A); // 체험레슨 (세피아 앰버 — 빈티지 잉크 톤)
+  static const paperTrialSoft = Color(0x1FC4923A); // 12% alpha
   static const paperHighlight = Color(0xFFF7D755); // 형광펜
 }

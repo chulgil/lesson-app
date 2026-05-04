@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -9,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 
@@ -44,7 +46,10 @@ class ParentLessonsTab extends ConsumerWidget {
 
               // Upcoming lessons
               // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('예정된 레슨', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.parentHomeUpcomingLessons,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space3),
 
               _LessonCard(
@@ -85,7 +90,10 @@ class ParentLessonsTab extends ConsumerWidget {
 
               // Past lessons
               // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('지난 레슨', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.parentHomePastLessons,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space3),
 
               _LessonCard(
@@ -142,10 +150,9 @@ class ParentLessonsTab extends ConsumerWidget {
   }
 
   void _showLessonNoteSheet(BuildContext context, String lessonId) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder:
           (context) => DraggableScrollableSheet(
             initialChildSize: 0.7,
@@ -169,7 +176,10 @@ class ParentLessonsTab extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Notebook × Score: 바텀시트 섹션 헤더 (§7.17/§7.27) — Playfair sectionTitle.
-                          Text('레슨 노트', style: NotebookTypography.sectionTitle),
+                          Text(
+                            AppStrings.parentHomeLessonNote,
+                            style: NotebookTypography.sectionTitle,
+                          ),
                           TextButton.icon(
                             onPressed: () {
                               Navigator.pop(context);
@@ -181,7 +191,7 @@ class ParentLessonsTab extends ConsumerWidget {
                               );
                             },
                             icon: const Icon(Icons.open_in_new, size: 16),
-                            label: const Text('상세보기'),
+                            label: const Text(AppStrings.parentHomeViewDetail),
                           ),
                         ],
                       ),
@@ -426,13 +436,6 @@ class ParentLessonsTab extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         borderRadius: BorderRadius.zero,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         children: [
@@ -620,17 +623,17 @@ class _LessonCard extends StatelessWidget {
       case LessonStatus.confirmed:
         bgColor = AppColors.paperDark;
         textColor = AppColors.paperOk;
-        label = '예정';
+        label = AppStrings.parentHomeLessonScheduled;
         break;
       case LessonStatus.completed:
         bgColor = AppColors.paperDark;
         textColor = AppColors.inkSecondary;
-        label = '완료';
+        label = AppStrings.parentHomeLessonCompleted;
         break;
       case LessonStatus.cancelled:
         bgColor = AppColors.paperAccentSoft;
         textColor = AppColors.paperAccent;
-        label = '취소';
+        label = AppStrings.parentHomeLessonCancelled;
         break;
     }
 

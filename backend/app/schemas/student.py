@@ -2,8 +2,9 @@
 
 
 import datetime as _dt
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, computed_field, model_validator
 
 
 class StudentResponse(BaseModel):
@@ -47,6 +48,12 @@ class StudentResponse(BaseModel):
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
+    @computed_field
+    @property
+    def manual_age_group(self) -> str | None:
+        """Frontend field name for manually selected age group."""
+        return self.age_group
+
 
 class StudentCreate(BaseModel):
     """Payload to create a new student."""
@@ -54,6 +61,7 @@ class StudentCreate(BaseModel):
     name: str
     instrument: str | None = None
     level: str = "beginner"
+    status: str | None = None
     phone: str | None = None
     parent_phone: str | None = None
     parent_name: str | None = None
@@ -65,9 +73,28 @@ class StudentCreate(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int = 60
     profile_image_url: str | None = None
+    background_image_url: str | None = None
     birth_date: _dt.date | None = None
-    age_group: str | None = None
+    age_group: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("age_group", "manual_age_group"),
+    )
+    connection_status: str | None = None
+    practice_level: str | None = None
+    break_reason: str | None = None
+    expected_return_date: _dt.date | None = None
+    postal_code: str | None = None
+    address: str | None = None
+    address_detail: str | None = None
+    district: str | None = None
     notes: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_frontend_aliases(cls, values: Any) -> Any:
+        if isinstance(values, dict) and values.get("manual_age_group") is not None:
+            values = {**values, "age_group": values["manual_age_group"]}
+        return values
 
 
 class StudentUpdate(BaseModel):
@@ -88,14 +115,29 @@ class StudentUpdate(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int | None = None
     profile_image_url: str | None = None
+    background_image_url: str | None = None
     birth_date: _dt.date | None = None
-    age_group: str | None = None
+    age_group: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("age_group", "manual_age_group"),
+    )
     connection_status: str | None = None
     practice_level: str | None = None
     break_reason: str | None = None
     expected_return_date: _dt.date | None = None
+    postal_code: str | None = None
+    address: str | None = None
+    address_detail: str | None = None
+    district: str | None = None
     notes: str | None = None
     is_active: bool | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_frontend_aliases(cls, values: Any) -> Any:
+        if isinstance(values, dict) and values.get("manual_age_group") is not None:
+            values = {**values, "age_group": values["manual_age_group"]}
+        return values
 
 
 class StudentStatsResponse(BaseModel):

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,7 +26,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
     final expiredAsync = ref.watch(expiredSubscriptionsProvider);
     final studentsAsync = ref.watch(studentsProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         backgroundColor: AppColors.paperDark,

@@ -52,11 +52,11 @@ class StarburstPainter extends CustomPainter {
       if (i < 2) {
         return Colors.transparent; // T: 0-1 (2 beams = 25%)
       } else if (i < 6) {
-        return Colors.white.withValues(
+        return AppColors.paper.withValues(
           alpha: opacity,
         ); // W: 2-5 (4 beams = 50%)
       } else {
-        return Colors.yellow.withValues(
+        return AppColors.paperHighlight.withValues(
           alpha: opacity,
         ); // Y: 6-7 (2 beams = 25%)
       }
@@ -82,11 +82,11 @@ class StarburstPainter extends CustomPainter {
       colors = List.generate(beamCount, (i) {
         if (isTransparentPosition(i)) {
           // Transparent becomes yellow gradually
-          return Colors.yellow.withValues(alpha: overallOpacity * t);
+          return AppColors.paperHighlight.withValues(alpha: overallOpacity * t);
         } else if (isWhitePosition(i)) {
-          return Colors.white.withValues(alpha: overallOpacity);
+          return AppColors.paper.withValues(alpha: overallOpacity);
         } else {
-          return Colors.yellow.withValues(alpha: overallOpacity);
+          return AppColors.paperHighlight.withValues(alpha: overallOpacity);
         }
       });
     } else {
@@ -96,12 +96,12 @@ class StarburstPainter extends CustomPainter {
         if (isWhitePosition(i)) {
           // Blend from white to yellow
           return Color.lerp(
-            Colors.white,
-            Colors.yellow,
+            AppColors.paper,
+            AppColors.paperHighlight,
             t,
           )!.withValues(alpha: overallOpacity);
         } else {
-          return Colors.yellow.withValues(alpha: overallOpacity);
+          return AppColors.paperHighlight.withValues(alpha: overallOpacity);
         }
       });
     }
@@ -110,7 +110,7 @@ class StarburstPainter extends CustomPainter {
     if (colorProgress >= 0.98) {
       final paint =
           Paint()
-            ..color = Colors.yellow.withValues(alpha: overallOpacity)
+            ..color = AppColors.paperHighlight.withValues(alpha: overallOpacity)
             ..style = PaintingStyle.fill;
       canvas.drawCircle(center, radius, paint);
       return;
@@ -237,7 +237,7 @@ class CatFacePainter extends CustomPainter {
     final radius = size.height * 0.4;
 
     // Face: white × vermillion 20% blend, matching metronome cat face (Notebook × Score).
-    final faceColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.2)!;
+    final faceColor = Color.lerp(AppColors.paper, AppColors.paperAccent, 0.2)!;
     final featureColor = AppColors.paperAccent;
 
     final facePaint =

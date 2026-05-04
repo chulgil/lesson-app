@@ -108,8 +108,10 @@ async def test_request_event_schedule_change_type_2_values(
 
 
 @pytest.mark.asyncio
-async def test_request_event_15_columns_layout(db_session: AsyncSession) -> None:
-    """RequestEvent 는 frontend Hive RequestEvent (14 fields) + DB id 1 = 15 컬럼."""
+async def test_request_event_columns_include_schedule_change_credit_snapshot(
+    db_session: AsyncSession,
+) -> None:
+    """Schedule-change events keep credit/session snapshots required by the UX spec."""
     from app.models.request_event import RequestEvent
 
     columns = {c.name for c in RequestEvent.__table__.columns}
@@ -127,6 +129,9 @@ async def test_request_event_15_columns_layout(db_session: AsyncSession) -> None
         "proposed_time",
         "subscription_id",
         "session_number",
+        "change_credit_used",
+        "change_credit_remaining_after",
+        "keeps_session_number",
         "created_at",
         "updated_at",  # TimestampMixin (백엔드 표준)
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -21,8 +22,8 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
     final teacherId = ref.watch(currentUserIdProvider);
     final unpaidAsync = ref.watch(unpaidSubscriptionsProvider(teacherId));
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('입금 확인 대기')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.profileOutstandingTitle)),
       body: unpaidAsync.when(
         data: (unpaidList) {
           if (unpaidList.isEmpty) {
@@ -31,7 +32,9 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           return _buildContent(context, ref, unpaidList, teacherId);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error:
+            (_, __) =>
+                const Center(child: Text(AppStrings.profileOutstandingError)),
       ),
     );
   }
@@ -44,7 +47,10 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           Icon(Icons.check_circle_outline, size: 64, color: AppColors.paperOk),
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-          Text('입금 확인 대기 항목이 없습니다', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.profileOutstandingEmpty,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '모든 수강권의 입금 상태가 정리되었습니다',
@@ -80,7 +86,10 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: Text('입금 확인 대기 목록', style: NotebookTypography.sectionTitle),
+            child: Text(
+              AppStrings.profileOutstandingListTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
           ),
           const SizedBox(height: AppSpacing.space3),
 
@@ -101,10 +110,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space5),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppColors.paperAccent,
-              AppColors.paperAccent,
-            ],
+            colors: [AppColors.paperAccent, AppColors.paperAccent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -120,7 +126,9 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space2),
             Text(
               formatWonWithComma(totalAmount),
-              style: AppTypography.displayMedium.copyWith(color: AppColors.paper),
+              style: AppTypography.displayMedium.copyWith(
+                color: AppColors.paper,
+              ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
@@ -163,13 +171,6 @@ class _UnpaidCard extends ConsumerWidget {
                     ? AppColors.paperAccent
                     : AppColors.inkQuaternary,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -234,7 +235,9 @@ class _UnpaidCard extends ConsumerWidget {
                     child: OutlinedButton.icon(
                       onPressed: () => _sendReminder(context, ref),
                       icon: const Icon(Icons.notifications_outlined, size: 18),
-                      label: const Text('알림 보내기'),
+                      label: const Text(
+                        AppStrings.profileOutstandingSendReminder,
+                      ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.inkSecondary,
                         side: BorderSide(color: AppColors.inkQuaternary),
@@ -246,7 +249,9 @@ class _UnpaidCard extends ConsumerWidget {
                     child: FilledButton.icon(
                       onPressed: () => _confirmPayment(context, ref),
                       icon: const Icon(Icons.check, size: 18),
-                      label: const Text('입금 확인'),
+                      label: const Text(
+                        AppStrings.profileOutstandingConfirmPayment,
+                      ),
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.paperOk,
                       ),
@@ -342,48 +347,31 @@ class _UnpaidCard extends ConsumerWidget {
   }
 
   void _confirmPayment(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('입금 확인'),
-            content: Text(
-              '${formatWonWithComma(subscription.amount)} 입금을 확인하시겠습니까?',
+      title: AppStrings.profileOutstandingConfirmPayment,
+      content: Text('${formatWonWithComma(subscription.amount)} 입금을 확인하시겠습니까?'),
+      confirmLabel: AppStrings.confirm,
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () async {
+        Navigator.pop(context);
+        await ref
+            .read(subscriptionNotifierProvider(subscription.studentId).notifier)
+            .confirmPayment(subscription.id);
+
+        // Invalidate unpaid providers
+        final teacherId = ref.read(currentUserIdProvider);
+        ref.invalidate(unpaidSubscriptionsProvider(teacherId));
+        ref.invalidate(unpaidSummaryProvider(teacherId));
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.profileOutstandingPaymentConfirmed),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.pop(dialogContext);
-                  await ref
-                      .read(
-                        subscriptionNotifierProvider(
-                          subscription.studentId,
-                        ).notifier,
-                      )
-                      .confirmPayment(subscription.id);
-
-                  // Invalidate unpaid providers
-                  final teacherId = ref.read(currentUserIdProvider);
-                  ref.invalidate(unpaidSubscriptionsProvider(teacherId));
-                  ref.invalidate(unpaidSummaryProvider(teacherId));
-
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('입금이 확인되었습니다')),
-                    );
-                  }
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperOk,
-                ),
-                child: const Text(AppStrings.confirm),
-              ),
-            ],
-          ),
+          );
+        }
+      },
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../settings/presentation/providers/teacher_settings_provider.dart';
@@ -20,9 +21,9 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('레슨 시간 설정'),
+        title: const Text(AppStrings.profileLessonTimeTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -42,7 +43,7 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  const Text('오류가 발생했습니다.'),
+                  const Text(AppStrings.profileLessonTimeError),
                   const SizedBox(height: AppSpacing.space4),
                   FilledButton(
                     onPressed:
@@ -113,7 +114,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LessonTimeSettingsSectionTitle(
-          title: '레슨 시간 옵션',
+          title: AppStrings.profileLessonTimeOptionsSection,
           onAddPressed:
               () => showAddCustomDurationDialog(
                 context: context,
@@ -222,7 +223,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-        Text('예약 설정', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.profileBookingSettingsSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '레슨 예약 관련 설정을 지정하세요',
@@ -239,7 +243,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               // Break time setting
               _BookingSettingItem(
                 icon: Icons.coffee_outlined,
-                title: '레슨 간 휴식 시간',
+                title: AppStrings.profileBreakTimeTitle,
                 subtitle: '${settings.breakTimeBetweenLessons}분',
                 onTap: () => _showBreakTimeDialog(context, ref),
               ),
@@ -247,7 +251,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               // Minimum booking hours setting
               _BookingSettingItem(
                 icon: Icons.schedule_outlined,
-                title: '최소 예약 가능 시간',
+                title: AppStrings.profileMinBookingTitle,
                 subtitle: '${settings.minBookingHours}시간 전',
                 onTap: () => _showMinBookingHoursDialog(context, ref),
               ),
@@ -262,7 +266,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     final options = [0, 5, 10, 15, 20, 30];
     final current = settings.breakTimeBetweenLessons;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => SafeArea(
@@ -271,7 +275,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               children: [
                 const SizedBox(height: AppSpacing.space4),
                 // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-                Text('레슨 간 휴식 시간', style: NotebookTypography.sectionTitle),
+                Text(
+                  AppStrings.profileBreakTimeTitle,
+                  style: NotebookTypography.sectionTitle,
+                ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '레슨과 레슨 사이의 휴식 시간을 설정합니다',
@@ -291,7 +298,11 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                               ? AppColors.paperAccent
                               : AppColors.inkTertiary,
                     ),
-                    title: Text(minutes == 0 ? '없음' : '$minutes분'),
+                    title: Text(
+                      minutes == 0
+                          ? AppStrings.profileBreakTimeNone
+                          : '$minutes분',
+                    ),
                     onTap: () {
                       ref
                           .read(teacherSettingsNotifierProvider.notifier)
@@ -311,7 +322,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     final options = [1, 2, 3, 6, 12, 24, 48, 72];
     final current = settings.minBookingHours;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => SafeArea(
@@ -320,7 +331,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               children: [
                 const SizedBox(height: AppSpacing.space4),
                 // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-                Text('최소 예약 가능 시간', style: NotebookTypography.sectionTitle),
+                Text(
+                  AppStrings.profileMinBookingTitle,
+                  style: NotebookTypography.sectionTitle,
+                ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
@@ -385,7 +399,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LessonTimeSettingsSectionTitle(
-          title: '운영 시간대',
+          title: AppStrings.profileOperatingHoursSection,
           onAddPressed:
               () => showAddTimeSlotDialog(
                 context: context,
@@ -459,7 +473,9 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LessonTimeSettingsSectionTitle(title: '레슨 요청 안내'),
+        LessonTimeSettingsSectionTitle(
+          title: AppStrings.profileGuidanceMessageSection,
+        ),
         const SizedBox(height: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -519,12 +535,14 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LessonTimeSettingsSectionTitle(title: '체험레슨 설정'),
+        LessonTimeSettingsSectionTitle(
+          title: AppStrings.profileTrialLessonSection,
+        ),
         const SizedBox(height: AppSpacing.space2),
         Container(
           decoration: BoxDecoration(color: AppColors.paperDark),
           child: SwitchListTile(
-            title: const Text('체험레슨 무료'),
+            title: const Text(AppStrings.profileTrialLessonFree),
             subtitle: Text(
               settings.trialLessonFree
                   ? '시간 확정 시 바로 예약 완료'
@@ -558,7 +576,9 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LessonTimeSettingsSectionTitle(title: '레슨 가격표'),
+          LessonTimeSettingsSectionTitle(
+            title: AppStrings.profilePriceTableSection,
+          ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '악기를 먼저 설정하면 가격표를 입력할 수 있습니다.',
@@ -573,7 +593,9 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LessonTimeSettingsSectionTitle(title: '레슨 가격표'),
+        LessonTimeSettingsSectionTitle(
+          title: AppStrings.profilePriceTableSection,
+        ),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '악기별 레벨에 따른 1회 레슨 가격을 설정하세요.',
@@ -701,7 +723,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     final result = await showDialog<int?>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
+            backgroundColor: AppColors.paper,
+            shape: const RoundedRectangleBorder(),
+            titleTextStyle: NotebookTypography.pieceTitle,
             title: Text('$instrument $levelLabel 가격'),
             content: TextField(
               controller: controller,
@@ -709,7 +734,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '1회 레슨 가격 (원)',
-                hintText: '예: 50000',
+                hintText: AppStrings.profilePriceTableHint,
               ),
               autofocus: true,
             ),

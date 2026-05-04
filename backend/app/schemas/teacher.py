@@ -8,7 +8,6 @@ from pydantic import BaseModel, ConfigDict
 from app.schemas.lesson import LessonResponse
 from app.schemas.user import UserResponse
 
-
 # ---------------------------------------------------------------------------
 # Nested schemas for teacher sub-entities
 # ---------------------------------------------------------------------------
@@ -124,6 +123,7 @@ class TeacherUpdate(BaseModel):
     teaching_style: str | None = None
     specialties: list[str] | None = None
     portfolio_video_urls: list[str] | None = None
+    background_image: str | None = None
 
     # Banking info
     bank_name: str | None = None

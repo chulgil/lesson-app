@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../../features/practice/domain/entities/metronome_settings.dart';
 import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
 import 'cat_beat_indicator.dart';
@@ -21,10 +23,9 @@ class MetronomeFullScreenModal extends ConsumerStatefulWidget {
   const MetronomeFullScreenModal({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const MetronomeFullScreenModal(),
     );
   }
@@ -656,17 +657,17 @@ class _ToggleOptions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '옵션',
+          AppStrings.metronomeOptionsTitle,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         _ToggleRow(
-          label: '시각 플래시',
+          label: AppStrings.metronomeVisualFlashLabel,
           value: visualFlash,
           onChanged: onVisualFlashChanged,
         ),
         _ToggleRow(
-          label: '진동',
+          label: AppStrings.metronomeVibrationLabel,
           value: vibration,
           onChanged: onVibrationChanged,
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,9 +25,9 @@ class PracticeRepertoireScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('연습'),
+        title: const Text(AppStrings.practiceAppBarTitle),
         actions: [
           // Archive button
           IconButton(
@@ -66,7 +67,10 @@ class PracticeRepertoireScreen extends ConsumerWidget {
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  Text(
+                    AppStrings.practiceErrorOccurred,
+                    style: AppTypography.bodyLarge,
+                  ),
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
                     onPressed:
@@ -85,8 +89,8 @@ class PracticeRepertoireScreen extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context) {
     return EmptyStateWidget(
       icon: Icons.library_music_outlined,
-      title: '아직 연습할 레퍼토리가 없습니다',
-      subtitle: '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요',
+      title: AppStrings.practiceRepertoireEmptyTitle,
+      subtitle: AppStrings.practiceRepertoireEmptySubtitle,
       actionLabel: '레퍼토리 추가',
       actionIcon: Icons.add,
       onAction:
@@ -118,7 +122,7 @@ class _RepertoireCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +202,7 @@ class _RepertoireCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.inventory_2_outlined, size: 20),
                               SizedBox(width: AppSpacing.space2),
-                              Text('아카이브'),
+                              Text(AppStrings.practiceArchiveTitle),
                             ],
                           ),
                         ),
@@ -251,7 +255,7 @@ class _RepertoireCard extends ConsumerWidget {
                             '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
                           ),
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('섹션 추가'),
+                      label: const Text(AppStrings.practiceSectionAddLabel),
                     ),
                   ],
                 ),
@@ -313,8 +317,8 @@ class _RepertoireCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('아카이브'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceArchiveTitle),
             content: Text(
               '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.',
             ),
@@ -336,7 +340,7 @@ class _RepertoireCard extends ConsumerWidget {
                     );
                   }
                 },
-                child: const Text('아카이브'),
+                child: const Text(AppStrings.practiceArchiveTitle),
               ),
             ],
           ),
@@ -347,8 +351,8 @@ class _RepertoireCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('레퍼토리 삭제'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRepertoireDeleteTitle),
             content: Text(
               '\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.',
             ),
@@ -563,7 +567,10 @@ class _PawStampRow extends StatelessWidget {
               opacity: isCompleted ? 1.0 : 0.3,
               child: Text(
                 '🐾',
-                style: TextStyle(fontSize: totalCount <= 5 ? 16 : 12),
+                style:
+                    totalCount <= 5
+                        ? AppTypography.bodyLarge.copyWith(height: 1)
+                        : AppTypography.bodySmall.copyWith(height: 1),
               ),
             ),
           );

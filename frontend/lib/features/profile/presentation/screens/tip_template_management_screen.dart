@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,13 +42,13 @@ class _TipTemplateManagementScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('템플릿 관리'),
+        title: const Text(AppStrings.profileTipTemplateTitle),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -68,7 +69,7 @@ class _TipTemplateManagementScreenState
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddTemplateDialog,
         icon: const Icon(Icons.add),
-        label: const Text('템플릿 추가'),
+        label: const Text(AppStrings.profileTipTemplateAdd),
       ),
     );
   }
@@ -179,9 +180,9 @@ class _TipTemplateManagementScreenState
             .deleteTemplate(template.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('템플릿이 삭제되었습니다'),
+            content: const Text(AppStrings.profileTipTemplateDeleted),
             action: SnackBarAction(
-              label: '실행취소',
+              label: AppStrings.profileTipTemplateUndo,
               onPressed: () {
                 ref
                     .read(tipTemplatesNotifierProvider.notifier)
@@ -195,7 +196,7 @@ class _TipTemplateManagementScreenState
           ),
         );
       },
-      child: Card(
+      child: NotebookCard(
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap: () => _showEditTemplateDialog(template),
@@ -303,23 +304,15 @@ class _TipTemplateManagementScreenState
   }
 
   Future<bool?> _showDeleteConfirmation(TipTemplate template) {
-    return showDialog<bool>(
+    return showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('템플릿 삭제'),
-            content: const Text('이 템플릿을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.profileTipTemplateDeleteTitle,
+      content: const Text(AppStrings.profileTipTemplateDeleteConfirm),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
   }
 
@@ -333,8 +326,11 @@ class _TipTemplateManagementScreenState
       builder:
           (context) => StatefulBuilder(
             builder: (context, setDialogState) {
-              return AlertDialog(
-                title: const Text('새 템플릿 추가'),
+              return NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileTipTemplateAddDialogTitle),
                 content: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -344,7 +340,7 @@ class _TipTemplateManagementScreenState
                         controller: contentController,
                         maxLines: 4,
                         decoration: const InputDecoration(
-                          hintText: '템플릿 내용을 입력하세요',
+                          hintText: AppStrings.profileTipTemplateContentHint,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -380,7 +376,7 @@ class _TipTemplateManagementScreenState
                         controller: instrumentController,
                         decoration: const InputDecoration(
                           labelText: '악기 (선택)',
-                          hintText: '예: 바이올린, 피아노',
+                          hintText: AppStrings.profileTipTemplateInstrumentHint,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -396,7 +392,11 @@ class _TipTemplateManagementScreenState
                     onPressed: () async {
                       if (contentController.text.trim().isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('내용을 입력해주세요')),
+                          const SnackBar(
+                            content: Text(
+                              AppStrings.profileTipTemplateContentRequired,
+                            ),
+                          ),
                         );
                         return;
                       }
@@ -415,7 +415,9 @@ class _TipTemplateManagementScreenState
                       if (context.mounted) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('템플릿이 추가되었습니다')),
+                          const SnackBar(
+                            content: Text(AppStrings.profileTipTemplateAdded),
+                          ),
                         );
                       }
                     },
@@ -440,8 +442,11 @@ class _TipTemplateManagementScreenState
       builder:
           (context) => StatefulBuilder(
             builder: (context, setDialogState) {
-              return AlertDialog(
-                title: const Text('템플릿 수정'),
+              return NotebookAlertDialog(
+                backgroundColor: AppColors.paper,
+                shape: const RoundedRectangleBorder(),
+                titleTextStyle: NotebookTypography.pieceTitle,
+                title: const Text(AppStrings.profileTipTemplateEditDialogTitle),
                 content: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -451,7 +456,7 @@ class _TipTemplateManagementScreenState
                         controller: contentController,
                         maxLines: 4,
                         decoration: const InputDecoration(
-                          hintText: '템플릿 내용을 입력하세요',
+                          hintText: AppStrings.profileTipTemplateContentHint,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -487,7 +492,7 @@ class _TipTemplateManagementScreenState
                         controller: instrumentController,
                         decoration: const InputDecoration(
                           labelText: '악기 (선택)',
-                          hintText: '예: 바이올린, 피아노',
+                          hintText: AppStrings.profileTipTemplateInstrumentHint,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -503,7 +508,11 @@ class _TipTemplateManagementScreenState
                     onPressed: () async {
                       if (contentController.text.trim().isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('내용을 입력해주세요')),
+                          const SnackBar(
+                            content: Text(
+                              AppStrings.profileTipTemplateContentRequired,
+                            ),
+                          ),
                         );
                         return;
                       }
@@ -524,7 +533,9 @@ class _TipTemplateManagementScreenState
                       if (context.mounted) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('템플릿이 수정되었습니다')),
+                          const SnackBar(
+                            content: Text(AppStrings.profileTipTemplateUpdated),
+                          ),
                         );
                       }
                     },

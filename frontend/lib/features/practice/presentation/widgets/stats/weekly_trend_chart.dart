@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -43,7 +44,10 @@ class WeeklyTrendChart extends StatelessWidget {
               Icon(Icons.trending_up, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('주간 트렌드', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceWeeklyTrendTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -160,7 +164,7 @@ class _TrendLinePainter extends CustomPainter {
       // Draw dots
       for (final point in points) {
         canvas.drawCircle(point, 6, dotPaint);
-        canvas.drawCircle(point, 4, Paint()..color = Colors.white);
+        canvas.drawCircle(point, 4, Paint()..color = AppColors.paper);
       }
     }
   }

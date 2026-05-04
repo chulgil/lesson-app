@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -73,7 +74,7 @@ class _BookingRescheduleScreenState
       ),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.bookingRescheduleTitle)),
       body: SafeArea(
@@ -302,7 +303,7 @@ class _BookingRescheduleScreenState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (slot.isRecommended && !isSelected) ...[
-                      const Text('⭐', style: TextStyle(fontSize: 12)),
+                      Text('⭐', style: AppTypography.bodySmall),
                       const SizedBox(width: AppSpacing.space1),
                     ],
                     Text(
@@ -390,16 +391,7 @@ class _BookingRescheduleScreenState
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: AppColors.paper),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -481,10 +473,8 @@ class _BookingRescheduleScreenState
       final confirmed = await showDialog<bool>(
         context: context,
         builder:
-            (context) => AlertDialog(
-              title: const Text(
-                AppStrings.bookingRescheduleLastChanceDialogTitle,
-              ),
+            (context) => NotebookAlertDialog(
+              title: AppStrings.bookingRescheduleLastChanceDialogTitle,
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,16 +499,10 @@ class _BookingRescheduleScreenState
                   const Text(AppStrings.rescheduleNoMoreAfter),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text(AppStrings.cancel),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text(AppStrings.changeAction),
-                ),
-              ],
+              cancelLabel: AppStrings.cancel,
+              onCancel: () => Navigator.pop(context, false),
+              confirmLabel: AppStrings.changeAction,
+              onConfirm: () => Navigator.pop(context, true),
             ),
       );
 

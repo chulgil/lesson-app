@@ -13,6 +13,7 @@ from app.schemas.common import PaginatedResponse
 from app.schemas.schedule_ext import (
     AttendanceMarkRequest,
     BatchAttendanceRequest,
+    GroupBookingActionRequest,
     GroupClassBookingCreate,
     GroupClassBookingResponse,
     GroupClassScheduleCreate,
@@ -89,25 +90,33 @@ async def cancel_group_schedule(
 
 @router.get(
     "/bookings",
-    response_model=list[GroupClassBookingResponse],
+    response_model=PaginatedResponse[GroupClassBookingResponse],
     summary="List group bookings with filters",
 )
 async def list_group_bookings(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
     schedule_id: str | None = None,
     student_id: str | None = None,
     booking_status: str | None = Query(None, alias="status"),
     active: str | None = None,
     upcoming: str | None = None,
-) -> list[GroupClassBookingResponse]:
+) -> PaginatedResponse[GroupClassBookingResponse]:
     service = ScheduleExtService(db)
-    return await service.list_bookings(
+    bookings = await service.list_bookings(
         schedule_id=schedule_id,
         student_id=student_id,
         status=booking_status,
         active=active == "true" if active else None,
         upcoming=upcoming == "true" if upcoming else None,
+    )
+    items = [GroupClassBookingResponse.model_validate(booking) for booking in bookings]
+    return PaginatedResponse.create(
+        items=items,
+        total=len(items),
+        page=pagination["page"],
+        size=pagination["size"],
     )
 
 
@@ -196,10 +205,12 @@ async def list_schedule_bookings(
 async def promote_from_waitlist(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
-    schedule_id: str = Query(...),
+    body: GroupBookingActionRequest | None = None,
+    schedule_id: str | None = Query(None),
 ) -> GroupClassBookingResponse | None:
     service = ScheduleExtService(db)
-    return await service.promote_from_waitlist_public(schedule_id)
+    target_schedule_id = body.schedule_id if body is not None else schedule_id
+    return await service.promote_from_waitlist_public(target_schedule_id or "")
 
 
 @router.post(
@@ -210,10 +221,12 @@ async def promote_from_waitlist(
 async def auto_cancel_waitlist(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
-    schedule_id: str = Query(...),
+    body: GroupBookingActionRequest | None = None,
+    schedule_id: str | None = Query(None),
 ) -> list[GroupClassBookingResponse]:
     service = ScheduleExtService(db)
-    return await service.auto_cancel_waitlist(schedule_id)
+    target_schedule_id = body.schedule_id if body is not None else schedule_id
+    return await service.auto_cancel_waitlist(target_schedule_id or "")
 
 
 @router.post(

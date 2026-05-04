@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/schedule_confirmation_card.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/schedule_confirmation_card_providers.dart';
@@ -84,6 +85,90 @@ void main() {
 
     expect(items, isEmpty);
   });
+
+  test('student schedule change request becomes waiting item', () async {
+    final container = _container(
+      subscriptions: [
+        Subscription(
+          id: 'sub_1',
+          studentId: studentId,
+          membershipId: 'membership_1',
+          type: SubscriptionType.package,
+          totalLessons: 8,
+          amount: 480000,
+          status: SubscriptionStatus.active,
+          createdAt: DateTime(2026, 4, 1),
+        ),
+      ],
+      scheduleChangeEvents: [
+        RequestEvent(
+          id: 'schedule_change_1',
+          requestId: '',
+          actorType: ProposerRole.student,
+          actorId: studentId,
+          eventType: RequestEventType.scheduleChanged,
+          message: '학교 일정 때문에 시간 변경을 요청했어요',
+          createdAt: DateTime(2026, 5, 4, 10),
+          subscriptionId: 'sub_1',
+          sessionNumber: 3,
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final items = await container.read(
+      studentLessonProgressProvider(studentId).future,
+    );
+
+    expect(items, hasLength(1));
+    expect(items.first.kind, StudentLessonProgressKind.scheduleChange);
+    expect(items.first.priority, StudentLessonProgressPriority.waiting);
+    expect(items.first.title, '스케줄 변경을 요청했어요');
+    expect(items.first.subtitle, '학교 일정 때문에 시간 변경을 요청했어요');
+    expect(items.first.statusLabel, '대기');
+  });
+
+  test('teacher schedule change proposal becomes action item', () async {
+    final container = _container(
+      subscriptions: [
+        Subscription(
+          id: 'sub_1',
+          studentId: studentId,
+          membershipId: 'membership_1',
+          type: SubscriptionType.monthly,
+          lessonsPerMonth: 4,
+          amount: 280000,
+          status: SubscriptionStatus.active,
+          createdAt: DateTime(2026, 4, 1),
+        ),
+      ],
+      scheduleChangeEvents: [
+        RequestEvent(
+          id: 'schedule_change_2',
+          requestId: '',
+          actorType: ProposerRole.teacher,
+          actorId: 'teacher_1',
+          eventType: RequestEventType.scheduleChangeProposed,
+          message: '아래 시간 중 선택해주세요',
+          createdAt: DateTime(2026, 5, 4, 11),
+          subscriptionId: 'sub_1',
+          sessionNumber: 5,
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final items = await container.read(
+      studentLessonProgressProvider(studentId).future,
+    );
+
+    expect(items, hasLength(1));
+    expect(items.first.kind, StudentLessonProgressKind.scheduleChange);
+    expect(items.first.priority, StudentLessonProgressPriority.actionRequired);
+    expect(items.first.title, '선생님이 변경 시간을 제안했어요');
+    expect(items.first.subtitle, '아래 시간 중 선택해주세요');
+    expect(items.first.statusLabel, '확인 필요');
+  });
 }
 
 ProviderContainer _container({
@@ -92,6 +177,7 @@ ProviderContainer _container({
   SubscriptionProposal? renewalProposal,
   List<Subscription> subscriptions = const [],
   List<ScheduleConfirmationCard> scheduleCards = const [],
+  List<RequestEvent> scheduleChangeEvents = const [],
 }) {
   const studentId = 'student_1';
   return ProviderContainer(
@@ -111,6 +197,9 @@ ProviderContainer _container({
       pendingScheduleConfirmationCardsProvider(
         studentId,
       ).overrideWith((ref) async => scheduleCards),
+      pendingScheduleChangeRequestsProvider(
+        studentId,
+      ).overrideWith((ref) async => scheduleChangeEvents),
     ],
   );
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -36,7 +38,7 @@ class _StudentInviteCodeScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -63,14 +65,22 @@ class _StudentInviteCodeScreenState
                         decoration: BoxDecoration(
                           color: AppColors.paperAccentSoft,
                         ),
-                        child: const Center(
-                          child: Text('🎵', style: TextStyle(fontSize: 40)),
+                        child: Center(
+                          child: Text(
+                            '🎵',
+                            style: AppTypography.displayLarge.copyWith(
+                              fontSize: 40,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space4),
 
                       // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
-                      Text('학생 등록', style: NotebookTypography.sectionTitle),
+                      Text(
+                        AppStrings.authStudentRegister,
+                        style: NotebookTypography.sectionTitle,
+                      ),
                       const SizedBox(height: AppSpacing.space2),
 
                       // Description
@@ -94,7 +104,7 @@ class _StudentInviteCodeScreenState
                             letterSpacing: 4,
                           ),
                           decoration: InputDecoration(
-                            hintText: '초대 코드 입력',
+                            hintText: AppStrings.authInviteCodeHint,
                             hintStyle: AppTypography.bodyLarge.copyWith(
                               color: AppColors.inkTertiary,
                             ),
@@ -287,7 +297,7 @@ class _StudentInviteCodeScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('선생님과 성공적으로 연결되었습니다!'),
+            content: const Text(AppStrings.authTeacherConnected),
             backgroundColor: AppColors.paperOk,
             behavior: SnackBarBehavior.floating,
           ),

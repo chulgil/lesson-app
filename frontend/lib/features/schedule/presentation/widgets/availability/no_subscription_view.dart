@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -152,7 +153,7 @@ class NoSubscriptionView extends ConsumerWidget {
           child: OutlinedButton.icon(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.arrow_back),
-            label: const Text('돌아가기'),
+            label: const Text(AppStrings.scheduleGoBack),
           ),
         ),
       ],
@@ -194,7 +195,7 @@ class NoSubscriptionView extends ConsumerWidget {
               );
             },
             icon: const Icon(Icons.card_membership),
-            label: const Text('수강권 제안 확인하기'),
+            label: const Text(AppStrings.scheduleCheckProposal),
           ),
         ),
       ],

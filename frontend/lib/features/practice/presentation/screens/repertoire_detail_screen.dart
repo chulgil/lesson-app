@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,7 +40,7 @@ class _RepertoireDetailScreenState
   Widget build(BuildContext context) {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         titleSpacing: 0,
         title: Text(
@@ -61,7 +62,7 @@ class _RepertoireDetailScreenState
                       children: [
                         Icon(Icons.edit_outlined),
                         SizedBox(width: AppSpacing.space2),
-                        Text('편집'),
+                        Text(AppStrings.practiceEdit),
                       ],
                     ),
                   ),
@@ -71,7 +72,7 @@ class _RepertoireDetailScreenState
                       children: [
                         Icon(Icons.inventory_2_outlined),
                         SizedBox(width: AppSpacing.space2),
-                        Text('아카이브로 이동'),
+                        Text(AppStrings.practiceMoveToArchive),
                       ],
                     ),
                   ),
@@ -82,12 +83,14 @@ class _RepertoireDetailScreenState
       body: repertoireAsync.when(
         data: (repertoire) {
           if (repertoire == null) {
-            return const Center(child: Text('레퍼토리를 찾을 수 없습니다'));
+            return const Center(child: Text(AppStrings.repertoireNotFound));
           }
           return _buildContent(repertoire);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error:
+            (_, __) =>
+                const Center(child: Text(AppStrings.practiceErrorOccurredDot)),
       ),
     );
   }
@@ -142,6 +145,11 @@ class _RepertoireDetailScreenState
 
           // Sections List
           _buildSectionsSection(repertoire),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
         ],
       ),
     );
@@ -152,14 +160,17 @@ class _RepertoireDetailScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-        Text('연습 통계', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.practiceStatsTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
                 icon: Icons.repeat,
-                label: '총 연습 횟수',
+                label: AppStrings.practiceTotalCountLabel,
                 value: '${stats.totalPracticeCount}회',
                 color: AppColors.paperAccent,
               ),
@@ -168,7 +179,7 @@ class _RepertoireDetailScreenState
             Expanded(
               child: _buildStatCard(
                 icon: Icons.timer,
-                label: '총 연습 시간',
+                label: AppStrings.practiceTotalTimeLabel,
                 value: _formatDuration(stats.totalPracticeSeconds),
                 color: AppColors.ink,
               ),
@@ -181,7 +192,7 @@ class _RepertoireDetailScreenState
             Expanded(
               child: _buildStatCard(
                 icon: Icons.mic,
-                label: '총 녹음',
+                label: AppStrings.practiceTotalRecordingLabel,
                 value: '${stats.totalRecordings}개',
                 color: AppColors.paperOk,
               ),
@@ -190,7 +201,7 @@ class _RepertoireDetailScreenState
             Expanded(
               child: _buildStatCard(
                 icon: Icons.library_music,
-                label: '섹션 수',
+                label: AppStrings.practiceSectionCountLabel,
                 value: '${stats.sectionCount}개',
                 color: AppColors.paperAccent,
               ),
@@ -244,7 +255,10 @@ class _RepertoireDetailScreenState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-            Text('섹션 목록', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.practiceSectionListTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton.icon(
               onPressed: () {
                 context.push(
@@ -392,8 +406,8 @@ class _RepertoireDetailScreenState
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('아카이브'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceArchiveTitle),
             content: Text(
               '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.',
             ),
@@ -415,7 +429,7 @@ class _RepertoireDetailScreenState
                   );
                   context.pop(); // Go back to repertoire list
                 },
-                child: const Text('아카이브'),
+                child: const Text(AppStrings.archiveButton),
               ),
             ],
           ),

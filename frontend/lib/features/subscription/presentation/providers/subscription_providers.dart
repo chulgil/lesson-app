@@ -326,6 +326,197 @@ Future<bool> canBookLesson(
 /// Will be replaced with API calls when backend is ready.
 final _subscriptionSessionEventStore = <String, List<RequestEvent>>{};
 
+String _sessionEventKey(String subscriptionId, int sessionNumber) =>
+    '$subscriptionId:$sessionNumber';
+
+List<RequestEvent> _mockScheduleChangeEvents() {
+  final now = DateTime.now();
+  return [
+    RequestEvent(
+      id: 'sce_mock_1',
+      requestId: 'sub_pkg_01',
+      actorType: ProposerRole.student,
+      actorId: 'student_1',
+      eventType: RequestEventType.scheduleChanged,
+      message: '개인 일정이 변경되어 6회차 시간 변경을 요청합니다',
+      suggestedSlots: [
+        TimeSlotOption(
+          id: 'sce_mock_1_slot_1',
+          dayOfWeek: 1,
+          startTime: '18:00',
+          endTime: '19:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_1_slot_2',
+          dayOfWeek: 3,
+          startTime: '19:00',
+          endTime: '20:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_1_slot_3',
+          dayOfWeek: 5,
+          startTime: '11:00',
+          endTime: '12:00',
+        ),
+      ],
+      createdAt: now.subtract(const Duration(hours: 2)),
+      scheduleChangeType: ScheduleChangeType.singleLesson,
+      subscriptionId: 'sub_pkg_01',
+      sessionNumber: 6,
+    ),
+    RequestEvent(
+      id: 'sce_mock_2',
+      requestId: 'sub_pkg_02',
+      actorType: ProposerRole.student,
+      actorId: 'student_3',
+      eventType: RequestEventType.lessonCancelled,
+      message: '3회차 레슨 취소를 요청합니다. 취소/변경권 1회를 사용합니다.',
+      createdAt: now.subtract(const Duration(minutes: 30)),
+      subscriptionId: 'sub_pkg_02',
+      sessionNumber: 3,
+    ),
+    RequestEvent(
+      id: 'sce_mock_3',
+      requestId: 'sub_mon_01',
+      actorType: ProposerRole.student,
+      actorId: 'student_2',
+      eventType: RequestEventType.scheduleChanged,
+      message: '학교 시간표가 바뀌어서 앞으로 모든 레슨을 아래 시간으로 변경 요청합니다',
+      suggestedSlots: [
+        TimeSlotOption(
+          id: 'sce_mock_3_slot_1',
+          dayOfWeek: 0,
+          startTime: '18:00',
+          endTime: '19:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_3_slot_2',
+          dayOfWeek: 2,
+          startTime: '17:00',
+          endTime: '18:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_3_slot_3',
+          dayOfWeek: 4,
+          startTime: '20:00',
+          endTime: '21:00',
+        ),
+      ],
+      createdAt: now.subtract(const Duration(days: 1)),
+      scheduleChangeType: ScheduleChangeType.bulkChange,
+      proposedDayOfWeek: 0,
+      proposedTime: '18:00',
+      subscriptionId: 'sub_mon_01',
+      sessionNumber: 4,
+    ),
+    RequestEvent(
+      id: 'sce_mock_4',
+      requestId: 'sub_mon_02',
+      actorType: ProposerRole.teacher,
+      actorId: 'teacher_1',
+      eventType: RequestEventType.scheduleChangeProposed,
+      message: '4회차 시간 변경안입니다. 가능한 시간을 선택해주세요.',
+      suggestedSlots: [
+        TimeSlotOption(
+          id: 'sce_mock_4_slot_1',
+          dayOfWeek: 4,
+          startTime: '16:00',
+          endTime: '17:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_4_slot_2',
+          dayOfWeek: 5,
+          startTime: '11:00',
+          endTime: '12:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_4_slot_3',
+          dayOfWeek: 6,
+          startTime: '15:00',
+          endTime: '16:00',
+        ),
+      ],
+      createdAt: now.subtract(const Duration(hours: 5)),
+      scheduleChangeType: ScheduleChangeType.singleLesson,
+      subscriptionId: 'sub_mon_02',
+      sessionNumber: 4,
+    ),
+    RequestEvent(
+      id: 'sce_mock_5',
+      requestId: 'sub_mon_03',
+      actorType: ProposerRole.student,
+      actorId: 'student_11',
+      eventType: RequestEventType.scheduleChangeAccepted,
+      message: '2회차는 1순위 시간으로 확정합니다',
+      suggestedSlots: [
+        TimeSlotOption(
+          id: 'sce_mock_5_slot_1',
+          dayOfWeek: 1,
+          startTime: '14:00',
+          endTime: '15:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_5_slot_2',
+          dayOfWeek: 3,
+          startTime: '18:00',
+          endTime: '19:00',
+        ),
+        TimeSlotOption(
+          id: 'sce_mock_5_slot_3',
+          dayOfWeek: 5,
+          startTime: '10:00',
+          endTime: '11:00',
+        ),
+      ],
+      selectedSlotIndex: 0,
+      createdAt: now.subtract(const Duration(days: 2)),
+      scheduleChangeType: ScheduleChangeType.singleLesson,
+      subscriptionId: 'sub_mon_03',
+      sessionNumber: 2,
+    ),
+  ];
+}
+
+List<RequestEvent> _dedupeAndSortEvents(Iterable<RequestEvent> events) {
+  final byId = <String, RequestEvent>{};
+  for (final event in events) {
+    byId[event.id] = event;
+  }
+  return byId.values.toList()
+    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+}
+
+void resetMockSubscriptionSessionEventsForTesting() {
+  _subscriptionSessionEventStore.clear();
+}
+
+final subscriptionSessionEventActionsProvider =
+    Provider<SubscriptionSessionEventActions>(
+      (ref) => SubscriptionSessionEventActions(ref),
+    );
+
+class SubscriptionSessionEventActions {
+  const SubscriptionSessionEventActions(this._ref);
+
+  final dynamic _ref;
+
+  Future<void> addSessionEvent({
+    required String subscriptionId,
+    required int sessionNumber,
+    required RequestEvent event,
+    String? affectedTeacherId,
+    String? affectedStudentId,
+  }) async {
+    addSubscriptionSessionEvent(_ref, subscriptionId, sessionNumber, event);
+    if (affectedTeacherId != null) {
+      _ref.invalidate(pendingScheduleChangeRequestsProvider(affectedTeacherId));
+    }
+    if (affectedStudentId != null) {
+      _ref.invalidate(pendingScheduleChangeRequestsProvider(affectedStudentId));
+    }
+  }
+}
+
 /// Add an event to a subscription session and invalidate the provider.
 void addSubscriptionSessionEvent(
   dynamic ref,
@@ -333,7 +524,7 @@ void addSubscriptionSessionEvent(
   int sessionNumber,
   RequestEvent event,
 ) {
-  final key = '$subscriptionId:$sessionNumber';
+  final key = _sessionEventKey(subscriptionId, sessionNumber);
   _subscriptionSessionEventStore.putIfAbsent(key, () => []).add(event);
 
   // Invalidate provider to trigger UI refresh
@@ -352,8 +543,14 @@ Future<List<RequestEvent>> subscriptionSessionEvents(
   required String subscriptionId,
   required int sessionNumber,
 }) async {
-  final key = '$subscriptionId:$sessionNumber';
-  return _subscriptionSessionEventStore[key] ?? [];
+  final key = _sessionEventKey(subscriptionId, sessionNumber);
+  final seededEvents = _mockScheduleChangeEvents().where(
+    (event) =>
+        event.subscriptionId == subscriptionId &&
+        event.sessionNumber == sessionNumber,
+  );
+  final storedEvents = _subscriptionSessionEventStore[key] ?? const [];
+  return _dedupeAndSortEvents([...seededEvents, ...storedEvents]);
 }
 
 /// Get pending schedule change requests for badge count.
@@ -362,69 +559,11 @@ Future<List<RequestEvent>> pendingScheduleChangeRequests(
   PendingScheduleChangeRequestsRef ref,
   String teacherId,
 ) async {
-  // Mock data for UI verification — replace with actual API query later
-  final now = DateTime.now();
-  return [
-    // 시간 변경 요청 (학생 → 선생님)
-    RequestEvent(
-      id: 'sce_mock_1',
-      requestId: '',
-      actorType: ProposerRole.student,
-      actorId: 'student_1',
-      eventType: RequestEventType.scheduleChanged,
-      message: '개인 일정이 변경되어 시간 변경을 요청합니다',
-      createdAt: now.subtract(const Duration(hours: 2)),
-      subscriptionId: 'sub_pkg_01',
-      sessionNumber: 6,
-    ),
-    // 취소 요청
-    RequestEvent(
-      id: 'sce_mock_2',
-      requestId: '',
-      actorType: ProposerRole.student,
-      actorId: 'student_3',
-      eventType: RequestEventType.lessonCancelled,
-      message: '컨디션이 좋지 않아 취소 요청드립니다',
-      createdAt: now.subtract(const Duration(minutes: 30)),
-      subscriptionId: 'sub_pkg_02',
-      sessionNumber: 3,
-    ),
-    // 전체 스케줄 변경 요청
-    RequestEvent(
-      id: 'sce_mock_3',
-      requestId: '',
-      actorType: ProposerRole.student,
-      actorId: 'student_1',
-      eventType: RequestEventType.scheduleChanged,
-      message: '학교 시간표가 바뀌어서 전체 변경 부탁드립니다',
-      createdAt: now.subtract(const Duration(days: 1)),
-      subscriptionId: 'sub_mon_01',
-      sessionNumber: 4,
-      scheduleChangeType: ScheduleChangeType.bulkChange,
-    ),
-    // 시간 변경 제안 완료 (선생님이 이미 응답)
-    RequestEvent(
-      id: 'sce_mock_4',
-      requestId: '',
-      actorType: ProposerRole.teacher,
-      actorId: 'teacher_1',
-      eventType: RequestEventType.scheduleChangeProposed,
-      message: '아래 시간 중 선택해주세요',
-      createdAt: now.subtract(const Duration(hours: 5)),
-      subscriptionId: 'sub_mon_02',
-      sessionNumber: 5,
-    ),
-    // 수락 완료
-    RequestEvent(
-      id: 'sce_mock_5',
-      requestId: '',
-      actorType: ProposerRole.student,
-      actorId: 'student_5',
-      eventType: RequestEventType.scheduleChangeAccepted,
-      message: '1순위 시간으로 확정합니다',
-      createdAt: now.subtract(const Duration(days: 2)),
-      subscriptionId: 'sub_mon_03',
-      sessionNumber: 2,
-    ),
-  ];
+  final storedEvents = _subscriptionSessionEventStore.values.expand(
+    (events) => events,
+  );
+  return _dedupeAndSortEvents([
+    ..._mockScheduleChangeEvents(),
+    ...storedEvents,
+  ]).reversed.toList();
 }

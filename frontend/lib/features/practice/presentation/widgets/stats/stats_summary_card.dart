@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -19,13 +20,6 @@ class StatsSummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +29,10 @@ class StatsSummaryCard extends StatelessWidget {
               Icon(Icons.insights, color: AppColors.paperAccent, size: 20),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text('요약', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceStatsSummaryTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -46,7 +43,7 @@ class StatsSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.timer,
-                  label: '연습 시간',
+                  label: AppStrings.practiceTimeLabel,
                   value: report.totalTimeText,
                   color: AppColors.paperAccent,
                 ),
@@ -55,7 +52,7 @@ class StatsSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.calendar_today,
-                  label: '연습일',
+                  label: AppStrings.practiceDayLabel,
                   value: '${report.practiceDayCount}일',
                   color: AppColors.paperOk,
                 ),
@@ -64,7 +61,7 @@ class StatsSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.check_circle,
-                  label: '완료율',
+                  label: AppStrings.practiceCompletionRateLabel,
                   value: '${report.completionPercent}%',
                   color: AppColors.paperAccent,
                 ),
@@ -81,14 +78,14 @@ class StatsSummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildMiniStat(
-                    label: '일평균',
+                    label: AppStrings.practiceDailyAvgLabel,
                     value: report.avgDailyTimeText,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: _buildMiniStat(
-                    label: '현재 스트릭',
+                    label: AppStrings.practiceCurrentStreakLabel,
                     value: '${report.currentStreak}일',
                     icon: Icons.local_fire_department,
                     iconColor: AppColors.paperAccent,
@@ -97,7 +94,7 @@ class StatsSummaryCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: _buildMiniStat(
-                    label: '최대 스트릭',
+                    label: AppStrings.practiceMaxStreakLabel,
                     value: '${report.maxStreak}일',
                     icon: Icons.emoji_events,
                     iconColor: AppColors.amber,
@@ -119,9 +116,7 @@ class StatsSummaryCard extends StatelessWidget {
   }) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: color.withAlpha(15),
-        ),
+      decoration: BoxDecoration(color: color.withAlpha(15)),
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),

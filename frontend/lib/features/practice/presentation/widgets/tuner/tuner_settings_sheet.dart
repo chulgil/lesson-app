@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
@@ -15,10 +17,9 @@ class TunerSettingsSheet extends ConsumerWidget {
   const TunerSettingsSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet(
+    return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) => const TunerSettingsSheet(),
     );
   }
@@ -49,7 +50,10 @@ class TunerSettingsSheet extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.space4),
               // Notebook × Score: BottomSheetHandle + 상단 제목 조합은 §7.27
               // 패턴. Playfair appBarTitle 로 통일 (이미 w700).
-              child: Text('튜너 설정', style: NotebookTypography.appBarTitle),
+              child: Text(
+                AppStrings.tunerSettingsTitle,
+                style: NotebookTypography.appBarTitle,
+              ),
             ),
 
             const Divider(height: 1),
@@ -163,7 +167,10 @@ class _ReferenceFrequencySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 튜너 설정 섹션 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
-        Text('기준 주파수 (A4)', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.tunerReferenceFrequencyTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '오케스트라나 앙상블에 맞춰 조절하세요',
@@ -257,7 +264,10 @@ class _TranspositionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 튜너 설정 섹션 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
-        Text('조옮김 (관악기용)', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.tunerTransposeTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '악보 기준 음을 실음으로 변환합니다',
@@ -322,7 +332,10 @@ class _DifficultySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 튜너 설정 섹션 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
-        Text('판정 난이도', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.tunerDifficultyTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           'Perfect/Good 판정 기준을 조절합니다',
@@ -390,7 +403,10 @@ class _EnharmonicSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 튜너 설정 섹션 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
-        Text('이명동음 표시', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.tunerEnharmonicTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '반음 표기 방식을 선택합니다',
@@ -447,7 +463,7 @@ class _ClefSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 튜너 설정 섹션 §7.17 승격 + bodyLarge+w600 평행 패턴 §7.104.
-        Text('음자리표', style: NotebookTypography.sectionTitle),
+        Text(AppStrings.tunerClefTitle, style: NotebookTypography.sectionTitle),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '오선지 표기 방식을 선택합니다',
@@ -548,7 +564,7 @@ class _ToggleSection extends StatelessWidget {
     return Column(
       children: [
         SwitchListTile(
-          title: const Text('콤보 카운터 표시'),
+          title: const Text(AppStrings.tunerShowComboTitle),
           subtitle: const Text('Perfect 연속 달성 시 콤보 표시'),
           value: showCombo,
           onChanged: (_) => onShowComboChanged(),
@@ -556,7 +572,7 @@ class _ToggleSection extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
         ),
         SwitchListTile(
-          title: const Text('진동 피드백'),
+          title: const Text(AppStrings.tunerVibrationFeedbackTitle),
           subtitle: const Text('Perfect 튜닝 시 진동'),
           value: vibrationFeedback,
           onChanged: (_) => onVibrationChanged(),

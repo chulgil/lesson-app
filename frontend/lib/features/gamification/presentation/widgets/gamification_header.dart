@@ -51,7 +51,7 @@ class GamificationHeader extends ConsumerWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: AppColors.paper.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   alignment: Alignment.center,
                   child: Text(

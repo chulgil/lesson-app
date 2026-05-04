@@ -3,9 +3,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -113,17 +115,19 @@ class _StudentProfileEditScreenState
       await ref.read(studentsNotifierProvider.notifier).updateStudent(updated);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('프로필이 저장되었습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.studentHomeProfileSaved)),
+        );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.studentHomeProfileSaveFailed),
+          ),
+        );
       }
     }
   }
@@ -131,15 +135,15 @@ class _StudentProfileEditScreenState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('프로필 수정')),
+      return NotebookScreenScaffold(
+        appBar: AppBar(title: const Text(AppStrings.studentHomeProfileEdit)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('프로필 수정'),
+        title: const Text(AppStrings.studentHomeProfileEdit),
         actions: [
           TextButton(
             onPressed: _hasChanges && !_isSaving ? _onSave : null,
@@ -176,7 +180,7 @@ class _StudentProfileEditScreenState
           const SizedBox(height: AppSpacing.space2),
           _buildTextField(
             controller: _nameController,
-            hintText: '이름을 입력하세요',
+            hintText: AppStrings.studentHomeNameHint,
             onChanged: (_) => _onFieldChanged(),
           ),
 
@@ -194,7 +198,7 @@ class _StudentProfileEditScreenState
           const SizedBox(height: AppSpacing.space2),
           _buildTextField(
             controller: _emailController,
-            hintText: '이메일을 입력하세요',
+            hintText: AppStrings.studentHomeEmailHint,
             keyboardType: TextInputType.emailAddress,
             onChanged: (_) => _onFieldChanged(),
           ),
@@ -206,7 +210,7 @@ class _StudentProfileEditScreenState
           const SizedBox(height: AppSpacing.space2),
           _buildTextField(
             controller: _phoneController,
-            hintText: '전화번호를 입력하세요',
+            hintText: AppStrings.studentHomePhoneHint,
             keyboardType: TextInputType.phone,
             onChanged: (_) => _onFieldChanged(),
           ),
@@ -356,7 +360,7 @@ class _StudentProfileEditScreenState
           child: GestureDetector(
             onTap: () => _onTapProfileImage(),
             child: Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: const BoxDecoration(color: AppColors.ink),
               child: const Icon(
                 Icons.camera_alt,
@@ -382,7 +386,7 @@ class _StudentProfileEditScreenState
 
     final action = await showImagePickerBottomSheet(
       context,
-      title: '프로필 사진',
+      title: AppStrings.studentHomeProfilePhoto,
       showDelete: currentPath != null,
     );
 

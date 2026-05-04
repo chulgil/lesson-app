@@ -214,7 +214,7 @@ class _TimeChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (slot.isRecommended && !isSelected) ...[
-              const Text('⭐', style: TextStyle(fontSize: 12)),
+              Text('⭐', style: AppTypography.bodySmall),
               const SizedBox(width: AppSpacing.space1),
             ],
             Text(

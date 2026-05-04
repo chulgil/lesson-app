@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -43,11 +44,14 @@ class TrialBookingsSection extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-                Text('내 체험레슨', style: NotebookTypography.sectionTitle),
+                Text(
+                  AppStrings.studentHomeMyTrialLessons,
+                  style: NotebookTypography.sectionTitle,
+                ),
                 TextButton.icon(
                   onPressed: () => context.push(AppRoutes.teacherSearch),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('신청'),
+                  label: const Text(AppStrings.studentHomeApply),
                 ),
               ],
             ),
@@ -70,7 +74,9 @@ class TrialBookingsSection extends ConsumerWidget {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('모든 체험 레슨은 스케줄 탭에서 확인할 수 있습니다'),
+                        content: Text(
+                          AppStrings.studentHomeAllTrialInScheduleTab,
+                        ),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -105,7 +111,7 @@ class TrialBookingsSection extends ConsumerWidget {
           Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '새로운 선생님과 레슨을 시작해보세요',
+            AppStrings.studentHomeStartNewLesson,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -114,7 +120,7 @@ class TrialBookingsSection extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('체험레슨 신청'),
+            label: const Text(AppStrings.studentHomeTrialBooking),
             style: FilledButton.styleFrom(
               minimumSize: Size(0, AppSpacing.buttonHeight),
             ),

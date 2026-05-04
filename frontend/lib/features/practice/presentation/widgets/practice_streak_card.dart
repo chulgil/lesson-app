@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -40,15 +41,6 @@ class PracticeStreakCard extends ConsumerWidget {
             end: Alignment.bottomRight,
             colors: _getGradientColors(streak.streakLevel),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: _getGradientColors(
-                streak.streakLevel,
-              ).first.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +57,10 @@ class PracticeStreakCard extends ConsumerWidget {
                   ),
                 ),
                 if (streak.fireEmoji.isNotEmpty)
-                  Text(streak.fireEmoji, style: const TextStyle(fontSize: 24)),
+                  Text(
+                    streak.fireEmoji,
+                    style: AppTypography.headingLarge.copyWith(height: 1),
+                  ),
               ],
             ),
 
@@ -248,7 +243,10 @@ class PracticeStreakBadge extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (streak.fireEmoji.isNotEmpty) ...[
-                Text(streak.fireEmoji, style: const TextStyle(fontSize: 12)),
+                Text(
+                  streak.fireEmoji,
+                  style: AppTypography.bodySmall.copyWith(height: 1),
+                ),
                 const SizedBox(width: 2),
               ],
               Text(
@@ -339,7 +337,7 @@ class RecordPracticeButton extends ConsumerWidget {
             onRecorded?.call();
           },
           icon: const Icon(Icons.music_note),
-          label: const Text('오늘 연습 기록하기'),
+          label: const Text(AppStrings.practiceRecordTodayLabel),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space4,
@@ -349,7 +347,7 @@ class RecordPracticeButton extends ConsumerWidget {
         );
       },
       loading: () => const CircularProgressIndicator(),
-      error: (_, __) => const Text('오류 발생'),
+      error: (_, __) => const Text(AppStrings.practiceErrorOccurredShort),
     );
   }
 }

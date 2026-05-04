@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/assignment_summary_provider.dart';
 
 /// Full assignment dashboard with all students' weekly progress.
@@ -20,7 +21,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(weeklyAssignmentSummaryProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),

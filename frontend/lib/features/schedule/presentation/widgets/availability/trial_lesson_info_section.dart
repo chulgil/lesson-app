@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -128,7 +129,7 @@ class TrialLessonInfoSection extends StatelessWidget {
           maxLines: 3,
           maxLength: 200,
           decoration: InputDecoration(
-            hintText: '배우고 싶은 곡이나 궁금한 점을 적어주세요',
+            hintText: AppStrings.scheduleTrialLessonHint,
             hintStyle: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),

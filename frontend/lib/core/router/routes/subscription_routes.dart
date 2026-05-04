@@ -1,6 +1,9 @@
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/widgets.dart';
 
 import '../app_routes.dart';
+import '../../../features/auth/presentation/providers/user_role_provider.dart';
 import '../../../features/subscription/presentation/screens/expiring_subscriptions_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_list_screen.dart';
 import '../../../features/subscription/presentation/screens/teacher_subscription_list_screen.dart';
@@ -22,7 +25,9 @@ List<RouteBase> subscriptionRoutes = [
     path: AppRoutes.subscriptionTemplates,
     builder: (context, state) {
       final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
-      return SubscriptionTemplateListScreen(teacherId: teacherId);
+      return _TeacherOnlySubscriptionRoute(
+        child: SubscriptionTemplateListScreen(teacherId: teacherId),
+      );
     },
   ),
   GoRoute(
@@ -35,19 +40,27 @@ List<RouteBase> subscriptionRoutes = [
   // Teacher subscription list route must come before detail route
   GoRoute(
     path: AppRoutes.teacherSubscriptions,
-    builder: (context, state) => const TeacherSubscriptionListScreen(),
+    builder:
+        (context, state) => const _TeacherOnlySubscriptionRoute(
+          child: TeacherSubscriptionListScreen(),
+        ),
   ),
   // Expiring subscriptions route must come before detail route
   GoRoute(
     path: AppRoutes.expiringSubscriptions,
-    builder: (context, state) => const ExpiringSubscriptionsScreen(),
+    builder:
+        (context, state) => const _TeacherOnlySubscriptionRoute(
+          child: ExpiringSubscriptionsScreen(),
+        ),
   ),
   // Schedule change requests route
   GoRoute(
     path: AppRoutes.scheduleChangeRequests,
     builder: (context, state) {
       final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
-      return ScheduleChangeRequestListScreen(teacherId: teacherId);
+      return _TeacherOnlySubscriptionRoute(
+        child: ScheduleChangeRequestListScreen(teacherId: teacherId),
+      );
     },
   ),
   // Issue route must come before detail route
@@ -87,12 +100,14 @@ List<RouteBase> subscriptionRoutes = [
         lessonRequestIds = [];
       }
 
-      return IssueSubscriptionScreen(
-        studentIds: studentIds,
-        membershipId: membershipId,
-        templateId: templateId,
-        lessonRequestId: lessonRequestId,
-        lessonRequestIds: lessonRequestIds,
+      return _TeacherOnlySubscriptionRoute(
+        child: IssueSubscriptionScreen(
+          studentIds: studentIds,
+          membershipId: membershipId,
+          templateId: templateId,
+          lessonRequestId: lessonRequestId,
+          lessonRequestIds: lessonRequestIds,
+        ),
       );
     },
   ),
@@ -130,9 +145,13 @@ List<RouteBase> subscriptionRoutes = [
       final id = state.pathParameters['id']!;
       final extra = state.extra as Map<String, dynamic>?;
       final viewerRole = extra?['viewerRole'] as String? ?? 'student';
+      final initialSession = int.tryParse(
+        state.uri.queryParameters['session'] ?? '',
+      );
       return SubscriptionDetailScreen(
         subscriptionId: id,
         viewerRole: viewerRole,
+        initialSelectedSession: initialSession,
       );
     },
   ),
@@ -153,3 +172,23 @@ List<RouteBase> subscriptionRoutes = [
     },
   ),
 ];
+
+/// Prevents student/parent viewers from opening teacher-owned subscription
+/// operations through stale links, direct URLs, or incorrectly wired CTAs.
+class _TeacherOnlySubscriptionRoute extends ConsumerWidget {
+  final Widget child;
+
+  const _TeacherOnlySubscriptionRoute({required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final role = ref.watch(currentUserRoleProvider);
+    if (role != UserRole.teacher) {
+      return SubscriptionListScreen(
+        studentId: ref.watch(currentUserIdProvider),
+      );
+    }
+
+    return child;
+  }
+}

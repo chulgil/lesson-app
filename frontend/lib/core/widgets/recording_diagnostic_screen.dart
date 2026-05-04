@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -93,10 +94,12 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   @override
   Widget build(BuildContext context) {
     if (!kDebugMode) {
-      return const Scaffold(body: Center(child: Text('Debug mode only')));
+      return const NotebookScreenScaffold(
+        body: Center(child: Text('Debug mode only')),
+      );
     }
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text('녹음 파일 진단'),
         actions: [
@@ -132,7 +135,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   }
 
   Widget _buildSummaryCard() {
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
@@ -249,28 +252,17 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   }
 
   Future<void> _deleteAllOrphanedFiles() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('고아 파일 전체 삭제'),
-            content: Text(
-              '${_orphanedFiles.length}개의 고아 파일을 모두 삭제하시겠습니까?\n\n이 파일들은 DB에 기록이 없어 복구할 수 없습니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                child: const Text('전체 삭제'),
-              ),
-            ],
-          ),
+      title: '고아 파일 전체 삭제',
+      content: Text(
+        '${_orphanedFiles.length}개의 고아 파일을 모두 삭제하시겠습니까?\n\n이 파일들은 DB에 기록이 없어 복구할 수 없습니다.',
+      ),
+      confirmLabel: '전체 삭제',
+      cancelLabel: '취소',
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed != true) return;
@@ -305,7 +297,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
   }
 
   Widget _buildOrphanedFilesSection() {
-    return Card(
+    return NotebookCard(
       color:
           _orphanedFiles.isNotEmpty
               ? AppColors.paperAccent.withValues(alpha: 0.05)
@@ -401,7 +393,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
       children: [
         // Unmatched entries (priority)
         if (unmatchedEntries.isNotEmpty) ...[
-          Card(
+          NotebookCard(
             color: AppColors.paperAccent.withValues(alpha: 0.05),
             child: ExpansionTile(
               initiallyExpanded: true,
@@ -429,7 +421,7 @@ class _RecordingDiagnosticScreenState extends State<RecordingDiagnosticScreen> {
         ],
 
         // Matched entries
-        Card(
+        NotebookCard(
           child: ExpansionTile(
             title: Text(
               '파일 존재 (${matchedEntries.length}개)',

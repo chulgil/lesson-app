@@ -35,6 +35,7 @@ class PracticeLogResponse(BaseModel):
 class PracticeLogCreate(BaseModel):
     """Create a practice log."""
 
+    student_id: str | None = None
     date: _dt.date
     total_minutes: int = 0
     tasks: list[PracticeTaskSchema] = []

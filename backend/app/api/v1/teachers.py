@@ -43,81 +43,6 @@ async def list_teachers(
     )
 
 
-@router.get(
-    "/{teacher_id}",
-    response_model=TeacherResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Get teacher detail",
-)
-async def get_teacher(
-    teacher_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
-) -> TeacherResponse:
-    """Return a single teacher profile by ID."""
-    service = TeacherService(db)
-    return await service.get_by_id(teacher_id)
-
-
-@router.put(
-    "/{teacher_id}",
-    response_model=TeacherResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Update teacher profile (owner only)",
-)
-async def update_teacher(
-    teacher_id: str,
-    body: TeacherUpdate,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
-) -> TeacherResponse:
-    """Update teacher profile fields. Only the owner can modify."""
-    service = TeacherService(db)
-    return await service.update(teacher_id, body, current_user)
-
-
-@router.get(
-    "/{teacher_id}/students",
-    response_model=PaginatedResponse[StudentResponse],
-    status_code=status.HTTP_200_OK,
-    summary="List students for a teacher",
-)
-async def get_teacher_students(
-    teacher_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
-    pagination: Annotated[dict, Depends(get_pagination)],
-    student_status: Annotated[str | None, Query(alias="status")] = None,
-    class_id: str | None = None,
-) -> PaginatedResponse[StudentResponse]:
-    """Return students linked to a teacher."""
-    service = TeacherService(db)
-    return await service.get_students(
-        teacher_id,
-        page=pagination["page"],
-        size=pagination["size"],
-        offset=pagination["offset"],
-        status=student_status,
-        class_id=class_id,
-    )
-
-
-@router.get(
-    "/{teacher_id}/dashboard",
-    response_model=TeacherDashboardResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Get teacher dashboard data",
-)
-async def get_teacher_dashboard(
-    teacher_id: str,
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
-) -> TeacherDashboardResponse:
-    """Return aggregated dashboard data for the teacher."""
-    service = TeacherService(db)
-    return await service.get_dashboard(teacher_id, current_user)
-
-
 # ---------------------------------------------------------------------------
 # /teachers/me/* — Teacher-specific endpoints (선생님 전용)
 # ---------------------------------------------------------------------------
@@ -209,4 +134,79 @@ async def update_my_profile(
 ) -> TeacherResponse:
     """Update the authenticated teacher's profile."""
     service = TeacherService(db)
-    return await service.update(current_user.id, body, current_user)
+    return await service.upsert_for_user(current_user.id, body, current_user)
+
+
+@router.get(
+    "/{teacher_id}",
+    response_model=TeacherResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get teacher detail",
+)
+async def get_teacher(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> TeacherResponse:
+    """Return a single teacher profile by ID."""
+    service = TeacherService(db)
+    return await service.get_by_id(teacher_id)
+
+
+@router.put(
+    "/{teacher_id}",
+    response_model=TeacherResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update teacher profile (owner only)",
+)
+async def update_teacher(
+    teacher_id: str,
+    body: TeacherUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherResponse:
+    """Update teacher profile fields. Only the owner can modify."""
+    service = TeacherService(db)
+    return await service.update(teacher_id, body, current_user)
+
+
+@router.get(
+    "/{teacher_id}/students",
+    response_model=PaginatedResponse[StudentResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List students for a teacher",
+)
+async def get_teacher_students(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+    student_status: Annotated[str | None, Query(alias="status")] = None,
+    class_id: str | None = None,
+) -> PaginatedResponse[StudentResponse]:
+    """Return students linked to a teacher."""
+    service = TeacherService(db)
+    return await service.get_students(
+        teacher_id,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+        status=student_status,
+        class_id=class_id,
+    )
+
+
+@router.get(
+    "/{teacher_id}/dashboard",
+    response_model=TeacherDashboardResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get teacher dashboard data",
+)
+async def get_teacher_dashboard(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherDashboardResponse:
+    """Return aggregated dashboard data for the teacher."""
+    service = TeacherService(db)
+    return await service.get_dashboard(teacher_id, current_user)

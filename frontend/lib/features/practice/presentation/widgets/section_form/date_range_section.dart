@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -64,14 +65,17 @@ class DateRangeSection extends StatelessWidget {
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
               // 로 통일 (§7.17).
-              Text('연습 기간', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practicePeriodSectionTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
 
           // Start Date
           DateRow(
-            label: '시작일',
+            label: AppStrings.practiceStartDateLabel,
             date: startDate,
             placeholder: startDatePlaceholder,
             onTap: onStartDateTap,
@@ -81,7 +85,7 @@ class DateRangeSection extends StatelessWidget {
 
           // End Date
           DateRow(
-            label: '종료일',
+            label: AppStrings.practiceEndDateLabel,
             date: endDate,
             placeholder: endDatePlaceholder,
             onTap: onEndDateTap,

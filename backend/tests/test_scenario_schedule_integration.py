@@ -20,7 +20,6 @@ import pytest
 from tests.scenarios.assertions import assert_status, assert_total
 from tests.scenarios.helpers import StudentActions, TeacherActions
 
-
 # ─────────────────────────────────────────────────────────────────────────
 # 1. Trial lesson full lifecycle
 # ─────────────────────────────────────────────────────────────────────────
@@ -81,7 +80,7 @@ async def test_trial_lesson_full_lifecycle(
     assert_total(requests, 1)
 
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
     # ── Phase 5: 학생 등록 + 체험레슨 생성 ───────────────────
     sid = await teacher.create_student(
@@ -224,7 +223,7 @@ async def test_regular_lesson_time_negotiation(
         monthly_fee=240000, lessons_per_week=1, lesson_duration=60,
     )
 
-    tmpl_id = await teacher.create_template(
+    await teacher.create_template(
         "피아노 월정액", lessons_count=4, amount=240000
     )
 
@@ -308,7 +307,7 @@ async def test_rejection_and_rerequest(
 
     # ── Phase 4: 승인 ────────────────────────────────────────
     approved = await teacher.approve_lesson_request(request_id2)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
     # ── Phase 5: 선생님 요청 목록 확인 (2건) ──────────────────
     all_requests = await teacher.list_lesson_requests("test-user-id")
@@ -443,7 +442,7 @@ async def test_withdraw_approval_and_redecide(
     )
 
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
     assert approved["confirmed_at"] is not None
 
     # ── Phase 2: 승인 철회 ────────────────────────────────────
@@ -502,11 +501,11 @@ async def test_accept_preferred_slot_from_schedule(
     # ── Phase 2: 선생님이 학생 선호 슬롯을 바로 승인 ──────────
     # (프론트엔드에서는 SuggestAlternativeScreen에서 선호 슬롯 탭 → 수락)
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
     # ── Phase 3: 확인 ────────────────────────────────────────
     req = await student.get_lesson_request(request_id)
-    assert_status(req, "approved")
+    assert_status(req, "timeConfirmed")
     assert req["confirmed_at"] is not None
 
 

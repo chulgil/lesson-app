@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -55,7 +56,7 @@ class _AllLessonRequestsScreenState
     final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: Text(

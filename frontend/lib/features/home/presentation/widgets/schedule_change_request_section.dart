@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 
@@ -230,18 +231,19 @@ class _ScheduleChangeListItem extends StatelessWidget {
     );
   }
 
+  /// Avatar — unified with RequestListItem (paperAccentSoft bg + paperAccent text)
   Widget _buildAvatar() {
     final initial = studentName.isNotEmpty ? studentName[0] : '?';
     final isUrgent = DateTime.now().difference(event.createdAt).inHours >= 24;
 
     final avatar = CircleAvatar(
       radius: AppSpacing.avatarSmall / 2,
-      backgroundColor: AppColors.paperDark,
+      backgroundColor: AppColors.paperAccentSoft,
       child: Text(
         initial,
         style: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w700,
-          color: _statusColor,
+          color: AppColors.paperAccent,
         ),
       ),
     );
@@ -260,7 +262,6 @@ class _ScheduleChangeListItem extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               color: AppColors.paperAccent,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               border: Border.all(color: AppColors.paper, width: 1.5),
             ),
           ),
@@ -269,24 +270,23 @@ class _ScheduleChangeListItem extends StatelessWidget {
     );
   }
 
+  /// Info column — unified with RequestListItem (2 lines)
   Widget _buildInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Line 1: student name
+        // Line 1: student name (bodyMedium, w600)
         Text(
           studentName,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
-        // Line 2: session + type
+        const SizedBox(height: AppSpacing.space1),
+        // Line 2: session + type (caption, inkTertiary)
         Text(
           _descriptionText,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkSecondary,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -294,35 +294,45 @@ class _ScheduleChangeListItem extends StatelessWidget {
     );
   }
 
+  /// Right column — unified with RequestListItem:
+  /// 2색 체계 (paperAccent = 내 차례 / inkTertiary = 대기·종료)
   Widget _buildRightColumn() {
+    final isCompleted =
+        event.eventType == RequestEventType.scheduleChangeAccepted ||
+        event.eventType == RequestEventType.scheduleChangeRejected;
+    final isMyTurn = !isCompleted && event.actorType != ProposerRole.teacher;
+
+    final color = isMyTurn ? AppColors.paperAccent : AppColors.inkTertiary;
+    final label =
+        isCompleted
+            ? AppStrings.statusCompleted
+            : isMyTurn
+            ? AppStrings.actionRequired
+            : AppStrings.responseWaiting;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Status stamp — Notebook 스타일 (1px 테두리 + 형광마커 배경)
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space2,
-            vertical: 2,
+            vertical: AppSpacing.space1,
           ),
           decoration: BoxDecoration(
-            color: _isHighlighted
-                ? AppColors.paperHighlight.withValues(alpha: 0.3)
-                : null,
-            border: Border.all(color: _statusColor, width: 1),
+            border: Border.all(color: color, width: 1),
           ),
           child: Text(
-            _statusLabel,
-            style: AppTypography.bodySmall.copyWith(
-              color: _statusColor,
+            label,
+            style: AppTypography.caption.copyWith(
+              color: color,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.space1),
-        // Elapsed time
         Text(
           formatRelativeTime(event.createdAt),
-          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
       ],
     );
@@ -348,41 +358,6 @@ class _ScheduleChangeListItem extends StatelessWidget {
         return '$sessionText ${AppStrings.tabCompleted}';
       default:
         return '$sessionText ${AppStrings.sessionChangeRequest}';
-    }
-  }
-
-  String get _statusLabel {
-    switch (event.eventType) {
-      case RequestEventType.scheduleChanged:
-      case RequestEventType.lessonCancelled:
-        return AppStrings.tabPending;
-      case RequestEventType.scheduleChangeProposed:
-      case RequestEventType.scheduleChangeCountered:
-        return AppStrings.rescheduleRequest;
-      case RequestEventType.scheduleChangeAccepted:
-        return AppStrings.tabCompleted;
-      default:
-        return AppStrings.tabPending;
-    }
-  }
-
-  bool get _isHighlighted =>
-      event.eventType == RequestEventType.scheduleChangeProposed ||
-      event.eventType == RequestEventType.scheduleChangeCountered;
-
-  Color get _statusColor {
-    switch (event.eventType) {
-      case RequestEventType.scheduleChanged:
-        return AppColors.ink;
-      case RequestEventType.lessonCancelled:
-        return AppColors.paperAccent;
-      case RequestEventType.scheduleChangeProposed:
-      case RequestEventType.scheduleChangeCountered:
-        return AppColors.ink;
-      case RequestEventType.scheduleChangeAccepted:
-        return AppColors.paperOk;
-      default:
-        return AppColors.ink;
     }
   }
 }

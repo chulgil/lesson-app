@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -15,6 +16,7 @@ from app.schemas.schedule import (
     BookingChangeRequest,
     BookingCreate,
     BookingResponse,
+    BookingUpdate,
     MakeupBookingCreate,
     ScheduleExceptionCreate,
     ScheduleExceptionResponse,
@@ -124,6 +126,24 @@ class ScheduleService:
         await self.db.flush()
         return await self.get_availability(current_user)
 
+    async def clear_availability(self, current_user: Any) -> None:
+        """Remove all weekly availability rows for the current teacher."""
+        from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
+
+        existing = await self.db.scalars(
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
+        )
+        for availability in existing.all():
+            child_slots = await self.db.scalars(
+                select(AvailabilityTimeSlot).where(
+                    AvailabilityTimeSlot.availability_id == availability.id
+                )
+            )
+            for slot in child_slots.all():
+                await self.db.delete(slot)
+            await self.db.delete(availability)
+        await self.db.flush()
+
     async def get_weekly_schedule(self, current_user: Any, *, week_start: str | None = None) -> WeeklyScheduleResponse:
         """Return the merged weekly schedule (availability + bookings)."""
         from datetime import date as date_type
@@ -194,6 +214,23 @@ class ScheduleService:
             return teacher.user_id
         # Otherwise assume it's already a User.id
         return teacher_id
+
+    async def get_frontend_time_slots(self, *, teacher_id: str) -> list[dict[str, Any]]:
+        """Return weekly availability as RemoteBookingRepository TimeSlot JSON."""
+        availability = await self.get_availability_by_teacher_id(teacher_id)
+        slots: list[dict[str, Any]] = []
+        for schedule in availability.weekly_schedules:
+            day_of_week = int(schedule["day_of_week"])
+            slots.append(
+                {
+                    "id": schedule["id"],
+                    "day_of_week": day_of_week + 1,
+                    "start_time": schedule["start_time"],
+                    "end_time": schedule["end_time"],
+                    "is_active": schedule.get("is_active", True),
+                }
+            )
+        return slots
 
     async def get_available_slots(self, *, teacher_id: str, date: str, duration: int = 60) -> SlotsResponse:
         """Compute available booking slots for a date."""
@@ -284,14 +321,59 @@ class ScheduleService:
 
                 slots.append(
                     SlotStatus(
+                        id=f"{user_id}-{d.isoformat()}-{slot_time}",
+                        teacher_id=user_id,
+                        date=d,
                         start_time=slot_time,
                         end_time=slot_end_time,
+                        duration_minutes=duration,
                         status=slot_status,
                     )
                 )
                 current += 30  # 30-minute interval
 
         return SlotsResponse(date=d, slots=slots)
+
+    async def get_available_slots_range(
+        self,
+        *,
+        teacher_id: str,
+        date_from: str,
+        date_to: str | None = None,
+        duration: int = 60,
+        limit: int | None = None,
+        available_only: bool = False,
+    ) -> dict[str, Any]:
+        """Return slots and dates for frontend range queries."""
+        from datetime import date as date_type
+
+        start = date_type.fromisoformat(date_from)
+        end = date_type.fromisoformat(date_to) if date_to else start + timedelta(days=27)
+        if end < start:
+            end = start
+
+        dates: list[str] = []
+        slots: list[dict[str, Any]] = []
+        current = start
+        while current <= end:
+            day_slots = await self.get_available_slots(
+                teacher_id=teacher_id,
+                date=current.isoformat(),
+                duration=duration,
+            )
+            serialized_slots = [slot.model_dump(mode="json") for slot in day_slots.slots]
+            if available_only:
+                date_has_slots = any(slot["status"] == "available" for slot in serialized_slots)
+            else:
+                date_has_slots = bool(serialized_slots)
+            if date_has_slots:
+                dates.append(current.isoformat())
+            slots.extend(serialized_slots)
+            if limit is not None and len(dates) >= limit:
+                break
+            current += timedelta(days=1)
+
+        return {"dates": dates, "slots": slots}
 
     # ------------------------------------------------------------------
     # Schedule exceptions
@@ -433,7 +515,7 @@ class ScheduleService:
 
         booking = LessonBooking(
             teacher_id=data.teacher_id,
-            student_id=current_user.id,
+            student_id=data.student_id or current_user.id,
             lesson_type=data.lesson_type,
             scheduled_date=data.scheduled_date,
             scheduled_time=data.scheduled_time,
@@ -455,6 +537,36 @@ class ScheduleService:
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         return BookingResponse.model_validate(booking)
+
+    async def update_booking(self, booking_id: str, data: BookingUpdate, current_user: Any) -> BookingResponse:
+        """Update a booking."""
+        from app.models.schedule import BookingStatus, LessonBooking
+
+        booking = await self.db.get(LessonBooking, booking_id)
+        if booking is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+
+        update_data = data.model_dump(exclude_unset=True)
+        update_data.pop("lesson_date", None)
+        update_data.pop("start_time", None)
+        for key, value in update_data.items():
+            if key == "status" and value is not None:
+                setattr(booking, key, BookingStatus(value))
+            elif value is not None:
+                setattr(booking, key, value)
+        await self.db.flush()
+        await self.db.refresh(booking)
+        return BookingResponse.model_validate(booking)
+
+    async def delete_booking(self, booking_id: str, current_user: Any) -> None:
+        """Delete a booking."""
+        from app.models.schedule import LessonBooking
+
+        booking = await self.db.get(LessonBooking, booking_id)
+        if booking is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self.db.delete(booking)
+        await self.db.flush()
 
     async def approve_booking(self, booking_id: str, current_user: Any) -> BookingResponse:
         """Approve a pending booking."""

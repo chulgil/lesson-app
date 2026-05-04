@@ -1,19 +1,26 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../entities/subscription.dart';
 import '../entities/subscription_proposal.dart';
-import '../../presentation/providers/subscription_proposal_providers.dart';
-import '../../presentation/providers/subscription_template_providers.dart';
+import '../entities/subscription_template.dart';
 
-part 'subscription_renewal_service.g.dart';
-
-@riverpod
-SubscriptionRenewalService subscriptionRenewalService(Ref ref) {
-  return SubscriptionRenewalService(ref);
-}
+typedef LoadActiveRenewalProposal =
+    Future<SubscriptionProposal?> Function(String teacherId, String studentId);
+typedef LoadRenewalTemplates =
+    Future<List<SubscriptionTemplate>> Function(String teacherId);
+typedef CreateRenewalProposal =
+    Future<SubscriptionProposal> Function({
+      required String teacherId,
+      required String studentId,
+      required List<String> templateIds,
+      String? recommendedTemplateId,
+      required String message,
+      required bool isAutoProposal,
+      required bool isRenewal,
+      required String previousSubscriptionId,
+      required RenewalInitiator renewalInitiator,
+    });
 
 /// Service that creates renewal proposals when subscriptions are running low.
 ///
@@ -21,9 +28,17 @@ SubscriptionRenewalService subscriptionRenewalService(Ref ref) {
 /// when your current membership is about to expire — pre-filled with your
 /// existing plan details so you just need to confirm.
 class SubscriptionRenewalService {
-  final Ref _ref;
+  final LoadActiveRenewalProposal _loadActiveProposal;
+  final LoadRenewalTemplates _loadRenewalTemplates;
+  final CreateRenewalProposal _createRenewalProposal;
 
-  SubscriptionRenewalService(this._ref);
+  const SubscriptionRenewalService({
+    required LoadActiveRenewalProposal loadActiveProposal,
+    required LoadRenewalTemplates loadRenewalTemplates,
+    required CreateRenewalProposal createRenewalProposal,
+  }) : _loadActiveProposal = loadActiveProposal,
+       _loadRenewalTemplates = loadRenewalTemplates,
+       _createRenewalProposal = createRenewalProposal;
 
   /// Trigger renewal proposal for a subscription that is running low.
   ///
@@ -38,8 +53,9 @@ class SubscriptionRenewalService {
   }) async {
     try {
       // 1. Check if there's already an active proposal for this student
-      final existingProposal = await _ref.read(
-        activeProposalBetweenProvider(teacherId, subscription.studentId).future,
+      final existingProposal = await _loadActiveProposal(
+        teacherId,
+        subscription.studentId,
       );
 
       if (existingProposal != null) {
@@ -50,9 +66,7 @@ class SubscriptionRenewalService {
       }
 
       // 2. Get auto-proposal templates for renewal
-      final templates = await _ref.read(
-        autoProposalTemplatesProvider(teacherId).future,
-      );
+      final templates = await _loadRenewalTemplates(teacherId);
 
       if (templates.isEmpty) {
         debugPrint('[RenewalService] No auto-proposal templates available');
@@ -63,9 +77,7 @@ class SubscriptionRenewalService {
       final proposalTemplates = templates;
 
       // 4. Create renewal proposal
-      final notifier = _ref.read(subscriptionProposalNotifierProvider.notifier);
-
-      final proposal = await notifier.createMultiChoiceProposal(
+      final proposal = await _createRenewalProposal(
         teacherId: teacherId,
         studentId: subscription.studentId,
         templateIds: proposalTemplates.map((t) => t.id).toList(),

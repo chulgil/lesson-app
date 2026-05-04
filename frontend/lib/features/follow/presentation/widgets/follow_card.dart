@@ -28,16 +28,7 @@ class FollowCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Row(
         children: [
           // Avatar
@@ -81,7 +72,7 @@ class FollowCard extends StatelessWidget {
                         color:
                             isTeacher
                                 ? AppColors.paperAccentSoft
-                                : AppColors.paperAccentSoft
+                                : AppColors.paperAccentSoft,
                       ),
                       child: Text(
                         follow.targetType.displayName,

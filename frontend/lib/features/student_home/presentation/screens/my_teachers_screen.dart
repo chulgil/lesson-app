@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,8 +26,8 @@ class MyTeachersScreen extends ConsumerWidget {
     final relationsAsync = ref.watch(studentRelationshipsProvider(studentId));
     final manualTeachersAsync = ref.watch(manualTeacherNotifierProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('내 선생님')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.studentHomeMyTeachers)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -111,7 +112,7 @@ class MyTeachersScreen extends ConsumerWidget {
               (e, _) => Padding(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 child: Text(
-                  '데이터를 불러올 수 없습니다',
+                  AppStrings.studentHomeDataLoadError,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -142,7 +143,7 @@ class MyTeachersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '선생님을 검색하여 레슨을 시작해보세요',
+            AppStrings.studentHomeSearchTeacherHint,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -151,7 +152,7 @@ class MyTeachersScreen extends ConsumerWidget {
           FilledButton.icon(
             onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.search, size: 18),
-            label: const Text('선생님 찾기'),
+            label: const Text(AppStrings.studentHomeFindTeacher),
           ),
         ],
       ),
@@ -173,7 +174,7 @@ class MyTeachersScreen extends ConsumerWidget {
               // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
               // (§7.17). '직접 등록한 선생님' 은 정적 그룹 헤더.,
               child: Text(
-                '직접 등록한 선생님',
+                AppStrings.studentHomeManualTeacherSection,
                 style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.ink,
                 ),
@@ -183,7 +184,7 @@ class MyTeachersScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '앱에 가입하지 않은 선생님을 직접 등록하세요',
+          AppStrings.studentHomeManualTeacherHint,
           style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -216,7 +217,7 @@ class MyTeachersScreen extends ConsumerWidget {
               (e, _) => Padding(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 child: Text(
-                  '데이터를 불러올 수 없습니다',
+                  AppStrings.studentHomeDataLoadError,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -244,7 +245,7 @@ class MyTeachersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '직접 등록한 선생님이 없습니다',
+            AppStrings.studentHomeManualTeacherEmpty,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -262,7 +263,7 @@ class MyTeachersScreen extends ConsumerWidget {
       child: OutlinedButton.icon(
         onPressed: () => context.push(AppRoutes.addManualTeacher),
         icon: const Icon(Icons.add, size: 18),
-        label: const Text('선생님 직접 등록'),
+        label: const Text(AppStrings.studentHomeManualTeacherRegister),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
           side: BorderSide(color: AppColors.inkQuaternary),
@@ -591,7 +592,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.edit_outlined, size: 18),
                               SizedBox(width: AppSpacing.space2),
-                              Text('편집'),
+                              Text(AppStrings.studentHomeEditAction),
                             ],
                           ),
                         ),
@@ -633,8 +634,8 @@ class _ManualTeacherCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            title: const Text('선생님 삭제'),
+          (ctx) => NotebookAlertDialog(
+            title: const Text(AppStrings.studentHomeDeleteTeacher),
             content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
             actions: [
               TextButton(
@@ -660,7 +661,9 @@ class _ManualTeacherCard extends ConsumerWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('삭제 실패. 다시 시도해주세요.'),
+                          content: const Text(
+                            AppStrings.studentHomeDeleteFailedRetry,
+                          ),
                           backgroundColor: AppColors.paperAccent,
                         ),
                       );

@@ -53,16 +53,6 @@ class SelectableTemplateCard extends StatelessWidget {
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow:
-              isSelected
-                  ? [
-                    BoxShadow(
-                      color: AppColors.paperAccentSoft,
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                  : null,
         ),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 200),

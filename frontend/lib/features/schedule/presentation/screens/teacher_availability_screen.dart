@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/lesson_settings_bottom_sheet.dart';
@@ -41,7 +42,7 @@ class _TeacherAvailabilityScreenState
       teacherAvailabilityProvider(widget.teacherId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.teacherAvailabilityTitle)),
       body: availabilityAsync.when(
@@ -658,10 +659,9 @@ class _TeacherAvailabilityScreenState
     int? preselectedDay,
     WeeklySchedule? existing,
   }) async {
-    final result = await showModalBottomSheet<WeeklySchedule>(
+    final result = await showNotebookBottomSheet<WeeklySchedule>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => ScheduleEditBottomSheet(
             preselectedDay: preselectedDay,
@@ -689,10 +689,9 @@ class _TeacherAvailabilityScreenState
   }
 
   Future<void> _showLessonSettingsDialog(TeacherAvailability avail) async {
-    final result = await showModalBottomSheet<Map<String, int>>(
+    final result = await showNotebookBottomSheet<Map<String, int>>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => LessonSettingsBottomSheet(
             currentLessonDuration: avail.slotDurationMinutes,
@@ -713,29 +712,21 @@ class _TeacherAvailabilityScreenState
   }
 
   Future<void> _confirmDeleteSchedule(WeeklySchedule schedule) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.deleteScheduleTitle),
-            content: Text(
-              AppStrings.deleteScheduleConfirm(
-                dayName: schedule.dayName,
-                startTime: schedule.startTime,
-                endTime: schedule.endTime,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.deleteScheduleTitle,
+      content: Text(
+        AppStrings.deleteScheduleConfirm(
+          dayName: schedule.dayName,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+        ),
+      ),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
     );
 
     if (confirmed == true && mounted) {

@@ -75,14 +75,17 @@ class _WeeklySummaryCard extends StatelessWidget {
         children: [
           // Notebook × Score: 탭 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
           // (line 140 의 value 는 stat value — §7.30 제외.)
-          Text('이번 주 연습 요약', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.studentWeeklyPracticeSummary,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children: [
               Expanded(
                 child: _SummaryItem(
                   icon: Icons.calendar_today_outlined,
-                  label: '연습 일수',
+                  label: AppStrings.studentPracticeDaysLabel,
                   value:
                       '${overview.practiceDaysThisWeek}/${overview.totalDaysInWeek}일',
                   color: _practiceRateColor(overview.practiceRate),
@@ -91,7 +94,7 @@ class _WeeklySummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryItem(
                   icon: Icons.timer_outlined,
-                  label: '총 연습시간',
+                  label: AppStrings.studentTotalPracticeTime,
                   value: overview.formattedTotalTime,
                   color: AppColors.paperAccent,
                 ),
@@ -99,7 +102,7 @@ class _WeeklySummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryItem(
                   icon: Icons.mic_outlined,
-                  label: '공유 녹음',
+                  label: AppStrings.studentSharedRecordings,
                   value: '${overview.sharedRecordings.length}개',
                   color: AppColors.ink,
                 ),
@@ -172,7 +175,10 @@ class _WeeklyPracticeGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-          Text('주간 연습 현황', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.studentWeeklyPracticeStatus,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children:
@@ -249,9 +255,7 @@ class _DayColumn extends StatelessWidget {
               child: Container(
                 height: barHeight,
                 width: 14, // 고정 막대 너비 (seconds-level readability),
-                decoration: BoxDecoration(
-                  color: barColor
-                ),
+                decoration: BoxDecoration(color: barColor),
               ),
             ),
           ),
@@ -263,11 +267,7 @@ class _DayColumn extends StatelessWidget {
               vertical: 2,
             ),
             decoration:
-                isToday
-                    ? BoxDecoration(
-                      color: AppColors.paperAccent
-                    )
-                    : null,
+                isToday ? BoxDecoration(color: AppColors.paperAccent) : null,
             child: Text(
               dayLabel,
               style: AppTypography.caption.copyWith(
@@ -308,7 +308,10 @@ class _SharedRecordingsSection extends StatelessWidget {
               const Icon(Icons.mic_outlined, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-              Text('공유된 녹음', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.studentSharedRecordingsSection,
+                style: NotebookTypography.sectionTitle,
+              ),
               const Spacer(),
               Text(
                 '${recordings.length}개',
@@ -439,7 +442,7 @@ class _TileLeading extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft.withValues(alpha: 0.2)
+            color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
           ),
           child: const Icon(
             Icons.chat_bubble_outline,
@@ -485,13 +488,13 @@ class _DetailStatsButton extends StatelessWidget {
         // TODO: Navigate to practice statistics detail screen
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('상세 통계 기능은 준비 중입니다'),
+            content: Text(AppStrings.studentDetailStatsPreparing),
             duration: Duration(seconds: 2),
           ),
         );
       },
       icon: const Icon(Icons.bar_chart_outlined, size: 18),
-      label: const Text('상세 통계 보기'),
+      label: const Text(AppStrings.studentDetailStatsButton),
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.paperAccent,
         side: const BorderSide(color: AppColors.inkQuaternary),

@@ -129,8 +129,11 @@ async def get_locale(request: Request) -> str:
 async def get_pagination(
     page: Annotated[int, Query(ge=1)] = 1,
     size: Annotated[int, Query(ge=1, le=100)] = 20,
+    per_page: Annotated[int | None, Query(ge=1, le=100)] = None,
 ) -> dict[str, int]:
     """Return pagination offset/limit dict."""
+    if per_page is not None:
+        size = per_page
     return {"page": page, "size": size, "offset": (page - 1) * size}
 
 

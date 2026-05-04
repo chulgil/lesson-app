@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -26,7 +27,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Empty state icon
-        const Text('😢', style: TextStyle(fontSize: 48)),
+        Text('😢', style: AppTypography.displayLarge.copyWith(fontSize: 48)),
 
         const SizedBox(height: AppSpacing.space3),
 
@@ -172,7 +173,7 @@ class _SuggestionCard extends StatelessWidget {
                       vertical: AppSpacing.space2,
                     ),
                   ),
-                  child: const Text('선택하기'),
+                  child: const Text(AppStrings.scheduleSelect),
                 ),
               ],
             ),

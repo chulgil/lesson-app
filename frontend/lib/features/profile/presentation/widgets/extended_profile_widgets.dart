@@ -136,16 +136,13 @@ class ProfileInfoCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color:
-                isEmpty
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
+            color: isEmpty ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.zero,
@@ -203,7 +200,7 @@ class EducationCard extends ConsumerWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.paperOk.withValues(alpha: 0.1),
             ),
@@ -281,10 +278,8 @@ class CareerCard extends ConsumerWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-            ),
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -396,7 +391,7 @@ class CertificateCard extends ConsumerWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: statusColor.withValues(alpha: 0.1),
             ),

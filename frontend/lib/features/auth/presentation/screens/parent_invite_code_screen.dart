@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -34,7 +36,7 @@ class _ParentInviteCodeScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -61,17 +63,22 @@ class _ParentInviteCodeScreenState
                         decoration: BoxDecoration(
                           color: AppColors.ink.withValues(alpha: 0.1),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             '👨‍👩‍👧',
-                            style: TextStyle(fontSize: 40),
+                            style: AppTypography.displayLarge.copyWith(
+                              fontSize: 40,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space4),
 
                       // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
-                      Text('학부모 등록', style: NotebookTypography.sectionTitle),
+                      Text(
+                        AppStrings.authParentRegister,
+                        style: NotebookTypography.sectionTitle,
+                      ),
                       const SizedBox(height: AppSpacing.space2),
 
                       // Description
@@ -95,25 +102,22 @@ class _ParentInviteCodeScreenState
                             letterSpacing: 4,
                           ),
                           decoration: InputDecoration(
-                            hintText: '초대 코드 입력',
+                            hintText: AppStrings.authInviteCodeHint,
                             hintStyle: AppTypography.bodyLarge.copyWith(
                               color: AppColors.inkTertiary,
                             ),
                             filled: true,
                             fillColor: AppColors.paperDark,
                             border: OutlineInputBorder(
-                              
                               borderSide: BorderSide.none,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              
                               borderSide: BorderSide(
                                 color: AppColors.ink,
                                 width: 2,
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
-                              
                               borderSide: BorderSide(
                                 color: AppColors.paperAccent,
                                 width: 2,
@@ -161,9 +165,7 @@ class _ParentInviteCodeScreenState
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ink,
                             foregroundColor: AppColors.paper,
-                            shape: RoundedRectangleBorder(
-                              
-                            ),
+                            shape: RoundedRectangleBorder(),
                           ),
                           child:
                               _isLoading
@@ -268,7 +270,7 @@ class _ParentInviteCodeScreenState
           // Show success and navigate to parent home
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('자녀가 성공적으로 연결되었습니다!'),
+              content: const Text(AppStrings.authChildConnected),
               backgroundColor: AppColors.paperOk,
               behavior: SnackBarBehavior.floating,
             ),

@@ -21,7 +21,7 @@ class RelationshipService:
 
     async def invite(self, student_id: str, method: str, current_user: Any) -> Any:
         """Create an invitation to connect with a student."""
-        from app.models.relationship import TeacherStudentRelation
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
 
         tid = await resolve_teacher_id(self.db, current_user.id)
         invite_code = secrets.token_urlsafe(6).upper()[:6]
@@ -30,7 +30,7 @@ class RelationshipService:
             teacher_id=tid,
             student_id=student_id,
             invite_code=invite_code,
-            status="pending",
+            status=RelationStatus.trialBooked,
         )
         self.db.add(relation)
         await self.db.flush()
@@ -47,7 +47,7 @@ class RelationshipService:
         relation = await self.db.scalar(
             select(TeacherStudentRelation).where(
                 TeacherStudentRelation.invite_code == invite_code,
-                TeacherStudentRelation.status == "pending",
+                TeacherStudentRelation.status == "trialBooked",
             )
         )
         if relation is None:
@@ -56,7 +56,7 @@ class RelationshipService:
                 detail="Invalid or expired invite code",
             )
 
-        relation.status = "connected"  # type: ignore[assignment]
+        relation.status = "active"  # type: ignore[assignment]
         await self.db.flush()
         await self.db.refresh(relation)
         return relation
@@ -94,9 +94,9 @@ class RelationshipService:
         return relation
 
     async def update_status(
-        self, relationship_id: str, new_status: str, current_user: Any,
+        self, relationship_id: str, new_status: str | None, current_user: Any,
         *, subscription_id: str | None = None, booking_id: str | None = None,
-        last_lesson_day: str | None = None, last_lesson_time: str | None = None,
+        last_lesson_day: int | None = None, last_lesson_time: str | None = None,
         last_lesson_duration: int | None = None,
         can_view_practice: bool | None = None,
         can_comment: bool | None = None,
@@ -113,7 +113,8 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Relationship not found",
             )
-        relation.status = RelationStatus(new_status)
+        if new_status is not None:
+            relation.status = RelationStatus(new_status)
 
         # Update optional metadata
         if subscription_id:
@@ -121,7 +122,7 @@ class RelationshipService:
         if booking_id:
             relation.trial_booking_id = booking_id
         if last_lesson_day:
-            relation.last_lesson_day = last_lesson_day
+            relation.last_lesson_day = str(last_lesson_day)
             relation.last_lesson_time = last_lesson_time
             relation.last_lesson_duration = last_lesson_duration
             relation.schedule_recorded_at = datetime.now(UTC)
@@ -199,6 +200,35 @@ class RelationshipService:
             target_type=target_type,
         )
         self.db.add(follow)
+        await self.db.flush()
+        await self.db.refresh(follow)
+        return follow
+
+    async def get_all_follows(
+        self, *, user: Any, page: int, size: int, offset: int
+    ) -> PaginatedResponse:
+        """List follows involving the current user."""
+        from app.models.relationship import Follow
+
+        query = select(Follow).where(
+            (Follow.follower_id == user.id) | (Follow.following_id == user.id)
+        )
+        count_query = select(func.count()).select_from(query.subquery())
+        total = await self.db.scalar(count_query) or 0
+        result = await self.db.scalars(query.offset(offset).limit(size))
+        return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
+
+    async def update_follow(self, follow_id: str, data: dict[str, Any], current_user: Any) -> Any:
+        """Update follow preferences."""
+        from app.models.relationship import Follow
+
+        follow = await self.db.get(Follow, follow_id)
+        if follow is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Follow not found")
+        if follow.follower_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update another user's follow")
+        if "notification_enabled" in data:
+            follow.notification_enabled = data["notification_enabled"]
         await self.db.flush()
         await self.db.refresh(follow)
         return follow

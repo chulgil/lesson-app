@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
@@ -74,9 +76,7 @@ class _ProfileDropdown extends ConsumerWidget {
 
     return PopupMenuButton<_ProfileOption>(
       offset: const Offset(0, 40),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       onSelected: (option) => _handleProfileSwitch(ref, option),
       itemBuilder: (context) => _buildMenuItems(userProfile, availableProfiles),
       child: Container(
@@ -129,7 +129,7 @@ class _ProfileDropdown extends ConsumerWidget {
         _buildProfileItem(
           option: _ProfileOption(
             type: ProfileType.parent,
-            label: '학부모',
+            label: AppStrings.parentHomeParentLabel,
             icon: ProfileType.parent.icon,
             color: ProfileType.parent.color,
           ),
@@ -359,11 +359,8 @@ class ProfileSwitcherCompact extends ConsumerWidget {
   }
 
   void _showProfileBottomSheet(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
       builder: (context) => const ProfileSwitcherBottomSheet(),
     );
   }
@@ -398,7 +395,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             // Parent option
             if (availableProfiles.contains(ProfileType.parent))
               _ProfileTile(
-                label: '학부모',
+                label: AppStrings.parentHomeParentLabel,
                 subtitle: '자녀 관리',
                 icon: ProfileType.parent.icon,
                 color: ProfileType.parent.color,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,9 +34,9 @@ class _InstrumentManagementScreenState
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('악기 관리'),
+        title: const Text(AppStrings.profileInstrumentTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -55,7 +56,7 @@ class _InstrumentManagementScreenState
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  const Text('오류가 발생했습니다.'),
+                  const Text(AppStrings.profileInstrumentError),
                   const SizedBox(height: AppSpacing.space4),
                   FilledButton(
                     onPressed:
@@ -95,7 +96,10 @@ class _InstrumentManagementScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-        Text('현재 가르치는 악기', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.profileInstrumentCurrentSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '악기를 탭하면 삭제할 수 있습니다',
@@ -149,7 +153,7 @@ class _InstrumentManagementScreenState
     required String instrument,
     required int index,
   }) {
-    return Card(
+    return NotebookCard(
       key: key,
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
@@ -192,7 +196,10 @@ class _InstrumentManagementScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-        Text('악기 추가', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.profileInstrumentAddSection,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space4),
 
         // Preset instruments grid
@@ -237,7 +244,7 @@ class _InstrumentManagementScreenState
               child: TextField(
                 controller: _customInstrumentController,
                 decoration: const InputDecoration(
-                  hintText: '악기 이름 입력',
+                  hintText: AppStrings.profileInstrumentHintCustom,
                   border: OutlineInputBorder(
                     borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
@@ -317,26 +324,17 @@ class _InstrumentManagementScreenState
   }
 
   void _showDeleteConfirmation(String instrument) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('악기 삭제'),
-            content: Text('$instrument을(를) 목록에서 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _removeInstrument(instrument);
-                },
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.profileInstrumentDeleteTitle,
+      content: Text('$instrument을(를) 목록에서 삭제하시겠습니까?'),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () {
+        Navigator.pop(context);
+        _removeInstrument(instrument);
+      },
     );
   }
 

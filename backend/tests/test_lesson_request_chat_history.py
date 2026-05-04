@@ -321,6 +321,86 @@ async def test_lesson_request_events_endpoint_persists_remote_repository_events(
 
 
 @pytest.mark.asyncio
+async def test_schedule_change_accept_event_preserves_source_slots_for_history(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """Accepted/withdrawn schedule-change events must replay the chosen slot label."""
+    await create_test_user(user_id="change-teacher", role="teacher", name="변경 선생님")
+    await create_test_user(
+        user_id="change-student",
+        role="student",
+        name="변경 학생",
+        email="change-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("change-student", "student"),
+        json={
+            "teacher_id": "change-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    proposal = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("change-teacher", "teacher"),
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "change-teacher",
+            "event_type": "scheduleChangeProposed",
+            "schedule_change_type": "singleLesson",
+            "subscription_id": "sub-change-001",
+            "session_number": 4,
+            "suggested_slots": [
+                {
+                    "id": "slot-a",
+                    "day_of_week": 1,
+                    "start_time": "10:00",
+                    "end_time": "11:00",
+                },
+                {
+                    "id": "slot-b",
+                    "day_of_week": 3,
+                    "start_time": "14:00",
+                    "end_time": "15:00",
+                },
+            ],
+        },
+    )
+    assert proposal.status_code == 201
+
+    accepted = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("change-student", "student"),
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "change-student",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": "sub-change-001",
+            "session_number": 4,
+            "selected_slot_index": 1,
+        },
+    )
+    assert accepted.status_code == 201
+    body = accepted.json()
+    assert body["event_type"] == "scheduleChangeAccepted"
+    assert body["schedule_change_type"] == "singleLesson"
+    assert body["suggested_slots"][1]["id"] == "slot-b"
+    assert body["suggested_slots"][1]["day_of_week"] == 3
+    assert body["selected_slot_index"] == 1
+
+
+@pytest.mark.asyncio
 async def test_lesson_request_accepts_frontend_spec_keys_and_camel_case_actions(
     client: AsyncClient,
     create_test_user,

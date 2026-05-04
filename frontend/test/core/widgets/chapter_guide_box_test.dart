@@ -8,7 +8,7 @@ import 'package:lessonaza/core/widgets/chapter_guide_box.dart';
 /// title chip + situation 텍스트를 렌더한다는 점을 확인.
 ///
 /// 추출 배경: `_buildSystemGuide()` (request_history_chat.dart) 와
-/// 신설 ScheduleChangeSlotBottomSheet 상단 가이드를 같은 시그니처로 통일.
+/// 스케줄 변경/일정 비교 흐름의 상단 가이드를 같은 시그니처로 통일.
 void main() {
   Widget wrap(Widget child, {double width = 360}) {
     return MaterialApp(

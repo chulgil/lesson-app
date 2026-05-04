@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,7 +15,7 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/subscription_ticket_card.dart';
+import '../widgets/subscription_card.dart';
 
 /// Screen showing list of student's subscriptions.
 class SubscriptionListScreen extends ConsumerWidget {
@@ -34,7 +35,7 @@ class SubscriptionListScreen extends ConsumerWidget {
       studentSubscriptionsProvider(effectiveStudentId),
     );
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.subscriptionListAppBarTitle),
         centerTitle: true,
@@ -240,7 +241,7 @@ class SubscriptionListScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.space2),
               ...requests.map(
-                (r) => Card(
+                (r) => NotebookCard(
                   child: ListTile(
                     leading: Icon(Icons.schedule, color: AppColors.paperAccent),
                     title: Text(
@@ -413,21 +414,21 @@ class _SubscriptionCardWithClass extends StatelessWidget {
 
     return lessonClassAsync.when(
       data:
-          (lessonClass) => SubscriptionTicketCard(
+          (lessonClass) => SubscriptionCard(compact: true,
             subscription: subscription,
             className: lessonClass?.name ?? AppStrings.individualLesson,
             instrument: membership.instrument,
             onTap: onTap,
           ),
       loading:
-          () => SubscriptionTicketCard(
+          () => SubscriptionCard(compact: true,
             subscription: subscription,
             className: '...',
             instrument: membership.instrument,
             onTap: onTap,
           ),
       error:
-          (_, __) => SubscriptionTicketCard(
+          (_, __) => SubscriptionCard(compact: true,
             subscription: subscription,
             className: AppStrings.lessonClassErrorFallback,
             instrument: membership.instrument,

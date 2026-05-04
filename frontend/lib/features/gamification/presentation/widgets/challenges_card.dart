@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -46,10 +47,13 @@ class ChallengesCard extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  const Text('🏆', style: TextStyle(fontSize: 20)),
+                  Text('🏆', style: AppTypography.headingMedium),
                   const SizedBox(width: AppSpacing.space2),
                   // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-                  Text('도전 과제', style: NotebookTypography.sectionTitle),
+                  Text(
+                    AppStrings.gamificationChallenges,
+                    style: NotebookTypography.sectionTitle,
+                  ),
                   const Spacer(),
                   if (challenges.length > maxVisible && onViewAll != null)
                     TextButton(
@@ -96,7 +100,7 @@ class _ChallengeItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(challenge.type.icon, style: const TextStyle(fontSize: 16)),
+              Text(challenge.type.icon, style: AppTypography.bodyLarge),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(

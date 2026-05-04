@@ -16,6 +16,7 @@ from app.schemas.schedule import (
     BookingCreate,
     BookingRejectRequest,
     BookingResponse,
+    BookingUpdate,
     MakeupBookingCreate,
 )
 from app.services.schedule_service import ScheduleService
@@ -115,6 +116,38 @@ async def get_booking(
     """Return a single booking."""
     service = ScheduleService(db)
     return await service.get_booking_by_id(booking_id, current_user)
+
+
+@router.put(
+    "/{booking_id}",
+    response_model=BookingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update booking",
+)
+async def update_booking(
+    booking_id: str,
+    body: BookingUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> BookingResponse:
+    """Update a booking."""
+    service = ScheduleService(db)
+    return await service.update_booking(booking_id, body, current_user)
+
+
+@router.delete(
+    "/{booking_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete booking",
+)
+async def delete_booking(
+    booking_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete a booking."""
+    service = ScheduleService(db)
+    await service.delete_booking(booking_id, current_user)
 
 
 @router.patch(

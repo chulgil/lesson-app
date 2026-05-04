@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -46,7 +47,7 @@ class RosterTriageBanner extends ConsumerWidget {
       children: [
         Expanded(
           child: _TriageCard(
-            label: '만료임박',
+            label: AppStrings.studentTriageExpiring,
             count: summary.expiringCount,
             accent: AppColors.ink,
             onTap:
@@ -61,7 +62,7 @@ class RosterTriageBanner extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: _TriageCard(
-            label: '입금대기',
+            label: AppStrings.studentTriageUnpaid,
             count: summary.unpaidCount,
             accent: AppColors.ink,
             onTap:
@@ -76,7 +77,7 @@ class RosterTriageBanner extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: _TriageCard(
-            label: '체험중',
+            label: AppStrings.studentTriageTrial,
             count: summary.trialCount,
             accent: AppColors.ink,
             onTap:

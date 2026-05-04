@@ -84,7 +84,9 @@ tests/
 | U-08 | 만료 후 제안 불가 | U-07 후 → propose-alternatives → 400 | 만료 상태에서 추가 제안 차단 |
 | U-09 | 가격표 자동 매칭 | `PUT /settings/teacher(lesson_price_table)` → `POST /lesson-requests(violin/beginner)` → suggested_price=40000 | 악기×레벨 매칭, 미등록 악기=null |
 | U-10 | 체험 무료 토글 | `PUT /settings/teacher(trial_lesson_free=true)` → `GET` → true → `PUT(false)` → `GET` → false | 영속성 확인 |
-| U-11 | 시간 확정→수강권 발급 | 신청 → 협상 → timeConfirmed → `POST /proposals` → `PATCH respond(accept)` → `PATCH confirm` → `PATCH status(completed)` | 전체 E2E 플로우 |
+| U-11 | 시간 확정→수강권 발급 | 신청 → 협상 → timeConfirmed → `POST /proposals` → `PATCH respond(accept)` → 학생 `PATCH payment-notify` → 선생님 `PATCH confirm-payment` → `POST /subscriptions` → `PATCH status(subscriptionIssued)` | 스케줄 확정 후 학생 결제 알림, 선생님 입금 확인 뒤 수강권 발급 |
+| U-12 | 수락 후 결정 변경 | 신청 → 선생님 `approve` 또는 학생 `accept-alternative` → 수락자 화면 `응답 대기+결정 변경` → `withdrawApproval` → 재제안/재수락 | 선생님/학생 동일 프로세스, 이전 선택 시간 취소선 표시 |
+| U-13 | Mock 경계 데이터 | seed mock 조회 → 모든 `UnifiedRequestStatus` 1건 이상 → proposal/payment/subscription 이벤트 순서 확인 | pending/approved/negotiating/timeConfirmed/proposalSent/proposalAccepted/paymentNotified/subscriptionIssued/inProgress/completed/rejected/cancelled/expired 전체 포함 |
 
 ### 스케줄 연동 E2E 시나리오 (`test_scenario_schedule_integration.py`)
 

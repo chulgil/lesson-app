@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import 'student_form_helpers.dart';
 
@@ -24,8 +25,8 @@ class BasicInfoFields extends StatelessWidget {
         TextFormField(
           controller: nameController,
           decoration: studentInputDecoration(
-            label: '이름',
-            hint: '학생 이름을 입력하세요',
+            label: AppStrings.studentNameLabel,
+            hint: AppStrings.studentNameHint,
             prefixIcon: Icons.person_outline,
             isRequired: true,
           ),
@@ -43,7 +44,7 @@ class BasicInfoFields extends StatelessWidget {
         TextFormField(
           controller: phoneController,
           decoration: studentInputDecoration(
-            label: '연락처',
+            label: AppStrings.studentPhoneLabel,
             hint: '010-0000-0000',
             prefixIcon: Icons.phone_outlined,
           ),
@@ -56,7 +57,7 @@ class BasicInfoFields extends StatelessWidget {
         TextFormField(
           controller: emailController,
           decoration: studentInputDecoration(
-            label: '이메일',
+            label: AppStrings.studentEmailLabel,
             hint: 'email@example.com',
             prefixIcon: Icons.email_outlined,
           ),

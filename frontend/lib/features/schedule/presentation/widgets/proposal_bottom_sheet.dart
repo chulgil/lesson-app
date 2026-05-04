@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../../profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
@@ -41,10 +42,11 @@ Future<ProposalResult?> showProposalBottomSheet(
   BuildContext context, {
   required String teacherId,
 }) {
-  return showModalBottomSheet<ProposalResult>(
+  return showNotebookBottomSheet<ProposalResult>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    showHandle: false,
     builder: (context) => _ProposalSheet(teacherId: teacherId),
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -70,8 +71,8 @@ class StudentGettingStartedCard extends ConsumerWidget {
           // Step 1: Connect with teacher
           _StepItem(
             step: 1,
-            title: '선생님 연결하기',
-            subtitle: '선생님을 검색하거나 초대 코드를 입력하세요',
+            title: AppStrings.studentHomeConnectTeacher,
+            subtitle: AppStrings.studentHomeConnectTeacherHint,
             isCompleted: hasConnections,
             onTap:
                 hasConnections
@@ -84,8 +85,8 @@ class StudentGettingStartedCard extends ConsumerWidget {
           // Step 2: Complete profile
           _StepItem(
             step: 2,
-            title: '프로필 완성하기',
-            subtitle: '온보딩에서 프로필이 설정되었습니다',
+            title: AppStrings.studentHomeCompleteProfile,
+            subtitle: AppStrings.studentHomeCompleteProfileHint,
             isCompleted: hasProfile,
             onTap: null,
           ),
@@ -95,8 +96,8 @@ class StudentGettingStartedCard extends ConsumerWidget {
           // Step 3: Check first lesson
           _StepItem(
             step: 3,
-            title: '첫 레슨 확인하기',
-            subtitle: '선생님과 첫 레슨을 예약하세요',
+            title: AppStrings.studentHomeCheckFirstLesson,
+            subtitle: AppStrings.studentHomeCheckFirstLessonHint,
             isCompleted: hasLessons,
             onTap: hasLessons ? null : () => context.push(AppRoutes.myBookings),
           ),

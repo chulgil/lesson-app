@@ -369,7 +369,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
             widget.onMultipleToggle?.call(_selectedTimes.toList());
             setState(() => _selectedTimes.clear());
           },
-          child: const Text('적용'),
+          child: const Text(AppStrings.scheduleApply),
         ),
       ],
     );

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/add_section_widgets.dart';
@@ -213,7 +215,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   void _showMeasurePicker({required bool isStart}) {
     final initialValue = isStart ? _startMeasure : _endMeasure;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => RangePickerSheet(
@@ -240,7 +242,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   void _showLinePicker({required bool isStart}) {
     final initialValue = isStart ? _startLine : _endLine;
 
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       builder:
           (context) => RangePickerSheet(
@@ -275,14 +277,14 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('섹션 추가')),
+      return NotebookScreenScaffold(
+        appBar: AppBar(title: const Text(AppStrings.practiceSectionAddTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('섹션 추가')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.practiceSectionAddTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -341,7 +343,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 focusNode: _pieceNameFocusNode,
                 decoration: const InputDecoration(
                   labelText: '곡/연습곡 이름 *',
-                  hintText: '예: 1번, Allegro, Etude No.1',
+                  hintText: AppStrings.practicePieceNameHint,
                   prefixIcon: Icon(Icons.music_note),
                 ),
                 textInputAction: TextInputAction.next,
@@ -401,7 +403,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                               color: AppColors.paper,
                             ),
                           )
-                          : const Text('섹션 추가'),
+                          : const Text(AppStrings.practiceSectionAddTitle),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -418,23 +420,26 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       children: [
         // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
         // 로 통일 (§7.17).
-        Text('범위 유형', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.practiceRangeTypeTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space2),
         SegmentedButton<SectionRangeType>(
           segments: const [
             ButtonSegment(
               value: SectionRangeType.full,
-              label: Text('전체'),
+              label: Text(AppStrings.practiceRangeTypeFull),
               icon: Icon(Icons.select_all),
             ),
             ButtonSegment(
               value: SectionRangeType.line,
-              label: Text('줄'),
+              label: Text(AppStrings.practiceRangeTypeLine),
               icon: Icon(Icons.format_line_spacing),
             ),
             ButtonSegment(
               value: SectionRangeType.measure,
-              label: Text('마디'),
+              label: Text(AppStrings.practiceRangeTypeMeasure),
               icon: Icon(Icons.straighten),
             ),
           ],
@@ -461,7 +466,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         // Notebook × Score: 폼 섹션 라벨은 Playfair sectionTitle
         // 로 통일. ternary 는 라벨 텍스트만 분기 (§7.17).
         Text(
-          isMeasure ? '마디 범위 *' : '줄 범위 *',
+          isMeasure
+              ? AppStrings.practiceMeasureRangeTitle
+              : AppStrings.practiceLineRangeTitle,
           style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space1),
@@ -498,7 +505,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
           controller: _sectionNameController,
           decoration: InputDecoration(
             labelText: '섹션 별칭 (선택)',
-            hintText: '예: 도입부, 주제 A, 코다',
+            hintText: AppStrings.practiceSectionAliasHint,
             helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
             prefixIcon: const Icon(Icons.label_outline),
           ),

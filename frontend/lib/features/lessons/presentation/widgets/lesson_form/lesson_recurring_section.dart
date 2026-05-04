@@ -84,7 +84,7 @@ class LessonRecurringSection extends StatelessWidget {
                           isSelected
                               ? AppColors.paperAccent
                               : AppColors.paperDark,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.zero,
                     ),
                     child: Center(
                       child: Text(
@@ -107,9 +107,7 @@ class LessonRecurringSection extends StatelessWidget {
             const SizedBox(height: AppSpacing.space3),
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               child: Row(
                 children: [
                   Icon(

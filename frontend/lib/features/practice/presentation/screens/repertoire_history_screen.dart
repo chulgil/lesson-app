@@ -1,6 +1,7 @@
 // Repertoire history timeline screen
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -22,8 +23,10 @@ class RepertoireHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final timelineAsync = ref.watch(repertoireTimelineProvider(studentId));
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('레퍼토리 히스토리')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(
+        title: const Text(AppStrings.practiceRepertoireHistoryTitle),
+      ),
       body: timelineAsync.when(
         data: (timeline) {
           if (timeline.totalCount == 0) {
@@ -104,7 +107,9 @@ class RepertoireHistoryScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           Text(
             '오류가 발생했습니다',
-            style: AppTypography.bodyLarge.copyWith(color: AppColors.paperAccent),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.paperAccent,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           TextButton(

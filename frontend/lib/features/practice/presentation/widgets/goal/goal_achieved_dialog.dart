@@ -57,7 +57,10 @@ class GoalAchievedDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Celebration emoji
-            Text(isWeekly ? '🏆' : '🎉', style: const TextStyle(fontSize: 48)),
+            Text(
+              isWeekly ? '🏆' : '🎉',
+              style: AppTypography.displayLarge.copyWith(fontSize: 48),
+            ),
             const SizedBox(height: AppSpacing.space3),
 
             // Notebook × Score: 다이얼로그 헤드라인 (§7.89 3축 center+emoji+단일 헤드라인).
@@ -93,7 +96,10 @@ class GoalAchievedDialog extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔥', style: TextStyle(fontSize: 20)),
+                    Text(
+                      '🔥',
+                      style: AppTypography.headingMedium.copyWith(height: 1),
+                    ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '$streakDays일 연속 스트릭!',
@@ -130,7 +136,10 @@ class GoalAchievedDialog extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('🎖️', style: TextStyle(fontSize: 24)),
+                        Text(
+                          '🎖️',
+                          style: AppTypography.headingLarge.copyWith(height: 1),
+                        ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
                           '"$newBadge"',
@@ -173,7 +182,7 @@ class GoalAchievedDialog extends StatelessWidget {
           if (goal.dailyTimeMinutes != null)
             _buildAchievementRow(
               icon: Icons.timer,
-              label: '연습 시간',
+              label: AppStrings.practiceTimeLabel,
               value: status.todayProgress.practiceTimeText,
               target: goal.dailyTimeText,
             ),
@@ -182,7 +191,7 @@ class GoalAchievedDialog extends StatelessWidget {
           if (goal.dailySectionCount != null)
             _buildAchievementRow(
               icon: Icons.check_box,
-              label: '완료 섹션',
+              label: AppStrings.practiceCompletedSectionLabel,
               value: '${status.todayProgress.completedSectionCount}개',
               target: '${goal.dailySectionCount}개',
             ),
@@ -202,7 +211,7 @@ class GoalAchievedDialog extends StatelessWidget {
           if (goal.weeklyTimeMinutes != null)
             _buildAchievementRow(
               icon: Icons.timer,
-              label: '총 연습 시간',
+              label: AppStrings.practiceTotalTimeLabel,
               value: status.weeklyProgress.totalTimeText,
               target: goal.weeklyTimeText,
             ),
@@ -211,7 +220,7 @@ class GoalAchievedDialog extends StatelessWidget {
           if (goal.weeklyDayCount != null)
             _buildAchievementRow(
               icon: Icons.calendar_today,
-              label: '연습일',
+              label: AppStrings.practiceDayLabel,
               value: '${status.weeklyProgress.practiceDayCount}일',
               target: '${goal.weeklyDayCount}일',
             ),

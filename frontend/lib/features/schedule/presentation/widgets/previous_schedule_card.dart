@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
@@ -35,7 +37,7 @@ class PreviousScheduleCard extends ConsumerWidget {
       data: (schedule) {
         if (schedule == null) return const SizedBox.shrink();
 
-        return Card(
+        return NotebookCard(
           margin: const EdgeInsets.symmetric(
             horizontal: AppSpacing.screenPadding,
             vertical: AppSpacing.space2,
@@ -121,7 +123,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                     onPressed:
                         onRestore != null ? () => onRestore!(schedule) : null,
                     icon: const Icon(Icons.restore, size: 18),
-                    label: const Text('이 스케줄로 복원'),
+                    label: const Text(AppStrings.scheduleRestoreSchedule),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.ink,
                       foregroundColor: AppColors.paper,

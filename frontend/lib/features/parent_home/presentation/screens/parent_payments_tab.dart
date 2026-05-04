@@ -9,13 +9,14 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/domain/entities/subscription.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
-import '../../../subscription/presentation/widgets/subscription_ticket_card.dart';
+import '../../../subscription/presentation/widgets/subscription_card.dart';
 import '../../domain/entities/child_profile.dart';
 import '../providers/child_profile_provider.dart';
 import 'parent_dashboard_tab.dart';
@@ -23,7 +24,7 @@ import 'parent_dashboard_tab.dart';
 /// Parent's per-child subscription / deposit status view.
 ///
 /// Lists subscriptions of the currently selected child, grouped by status.
-/// Reuses [SubscriptionTicketCard] — this tab is a parent-scoped read view,
+/// Reuses [SubscriptionCard] (compact mode) — this tab is a parent-scoped read view,
 /// not a separate data model.
 class ParentPaymentsTab extends ConsumerWidget {
   const ParentPaymentsTab({super.key});
@@ -34,9 +35,9 @@ class ParentPaymentsTab extends ConsumerWidget {
     final selectedProfile = ref.watch(selectedChildProfileProvider);
     final childrenAsync = ref.watch(childProfilesProvider(parentId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('입금·수강권'),
+        title: const Text(AppStrings.parentHomePaymentSubscription),
         centerTitle: true,
         actions: [
           IconButton(
@@ -48,7 +49,7 @@ class ParentPaymentsTab extends ConsumerWidget {
       ),
       body: childrenAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (_, __) => Center(child: Text(AppStrings.errorOccurred)),
         data: (profiles) {
           if (profiles.isEmpty) {
             return const _EmptyChildrenState();
@@ -65,10 +66,9 @@ class ParentPaymentsTab extends ConsumerWidget {
     WidgetRef ref,
     String parentId,
   ) {
-    showModalBottomSheet<void>(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (_) {
         final childrenAsync = ref.read(childProfilesProvider(parentId));
         return childrenAsync.when(
@@ -240,7 +240,8 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
     );
     return lessonClassAsync.when(
       data:
-          (lessonClass) => SubscriptionTicketCard(
+          (lessonClass) => SubscriptionCard(
+            compact: true,
             subscription: subscription,
             className: lessonClass?.name ?? '개인레슨',
             instrument: membership.instrument,
@@ -248,7 +249,8 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
             onTap: onTap,
           ),
       loading:
-          () => SubscriptionTicketCard(
+          () => SubscriptionCard(
+            compact: true,
             subscription: subscription,
             className: '...',
             instrument: membership.instrument,
@@ -256,7 +258,8 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
             onTap: onTap,
           ),
       error:
-          (_, __) => SubscriptionTicketCard(
+          (_, __) => SubscriptionCard(
+            compact: true,
             subscription: subscription,
             className: '레슨',
             instrument: membership.instrument,
@@ -444,7 +447,10 @@ class _ChildSelectorSheet extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.screenPadding),
                   // Notebook × Score: 바텀시트 커스텀 헤더는 Playfair appBarTitle 로 통일 (§7.27 패턴).
-                  child: Text('자녀 선택', style: NotebookTypography.appBarTitle),
+                  child: Text(
+                    AppStrings.parentHomeChildSelect,
+                    style: NotebookTypography.appBarTitle,
+                  ),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -502,7 +508,10 @@ class _EmptyChildrenState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space3),
             // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.parentHomeNoChildren,
+              style: NotebookTypography.sectionTitle,
+            ),
           ],
         ),
       ),
@@ -600,7 +609,10 @@ class _ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             // Notebook × Score: 에러 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text('오류가 발생했습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.errorOccurred,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               message,

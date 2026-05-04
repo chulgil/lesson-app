@@ -92,6 +92,14 @@ enum RequestEventType {
 }
 ```
 
+`lessonCancelled` 표시 규칙:
+- `sessionNumber`는 필수 표시값이다. 채팅/진행탭/목록/알림 요약에서 회차가 빠지면 안 된다.
+- 학생 요청 상태: `N회차 레슨 취소를 요청했어요`.
+- 취소 확정 상태: `N회차 레슨이 취소되었습니다`.
+- 사전 취소는 이번 일정만 건너뛰고 수강권 회차는 유지한다. 다음 실제 진행 레슨은 같은 `N회차`로 이어진다.
+- 학생 사유의 취소는 변경/취소권 1회 사용을 명시한다. 요청 상태는 `사용될 예정`, 확정 상태는 `사용되었습니다`로 구분한다.
+- `RequestEvent`에는 이벤트 발생 시점의 권리 사용 스냅샷을 저장한다: `changeCreditUsed`, `changeCreditRemainingAfter`, `keepsSessionNumber`. 현재 수강권의 잔여값을 히스토리에 그대로 재계산하면 과거 메시지가 바뀌므로 금지한다.
+
 ## Status Extension
 
 ```dart

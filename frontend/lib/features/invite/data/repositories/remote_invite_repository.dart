@@ -19,27 +19,30 @@ class RemoteInviteRepository implements InviteRepository {
     Duration validity = const Duration(days: 7),
     String? note,
   }) async {
-    final response = await _apiClient.post('/invites/', data: {
-      'is_single_use': isSingleUse,
-      if (maxUses != null) 'max_uses': maxUses,
-      'expires_in_hours': validity.inHours,
-      if (note != null) 'note': note,
-    });
+    final response = await _apiClient.post(
+      '/invites/',
+      data: {
+        'is_single_use': isSingleUse,
+        if (maxUses != null) 'max_uses': maxUses,
+        'expires_in_hours': validity.inHours,
+        if (note != null) 'note': note,
+      },
+    );
     return _inviteFromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<Invite?> getInviteById(String id) async {
-    // Backend doesn't have GET /invites/{id} — use list and filter
-    final invites = await getInvitesByCreator('');
-    return invites.where((i) => i.id == id).firstOrNull;
+    final response = await _apiClient.get('/invites/$id');
+    return _inviteFromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<Invite?> getInviteByCode(String code) async {
-    // Backend doesn't have GET by code — use list and filter client-side
-    final invites = await getInvitesByCreator('');
-    return invites.where((i) => i.inviteCode == code).firstOrNull;
+    final response = await _apiClient.get(
+      '/invites/code/${code.toUpperCase()}',
+    );
+    return _inviteFromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -113,9 +116,12 @@ class RemoteInviteRepository implements InviteRepository {
 
   @override
   Future<List<ConnectionRequest>> getSentRequestsByUser(String userId) async {
-    // Backend only has pending incoming — return empty for now
-    // TODO: Add GET /invites/connection-requests/sent endpoint
-    return [];
+    final response = await _apiClient.get('/invites/connection-requests/sent');
+    final data = response.data as Map<String, dynamic>;
+    final items = data['items'] as List<dynamic>;
+    return items
+        .map((e) => _requestFromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -153,11 +159,7 @@ class RemoteInviteRepository implements InviteRepository {
 
   @override
   Future<void> cancelConnectionRequest(String requestId) async {
-    // Backend doesn't support cancel — use reject as workaround
-    await _apiClient.patch(
-      '/invites/connection-requests/$requestId/respond',
-      data: {'action': 'reject', 'rejection_reason': 'Cancelled by requester'},
-    );
+    await _apiClient.patch('/invites/connection-requests/$requestId/cancel');
   }
 
   // ===== Connection Management =====
@@ -185,9 +187,7 @@ class RemoteInviteRepository implements InviteRepository {
   ) async {
     final connections = await getConnectionsByUser('');
     return connections
-        .where(
-          (c) => c.teacherId == teacherId && c.studentId == studentId,
-        )
+        .where((c) => c.teacherId == teacherId && c.studentId == studentId)
         .firstOrNull;
   }
 
@@ -198,8 +198,7 @@ class RemoteInviteRepository implements InviteRepository {
 
   @override
   Future<void> reactivateConnection(String connectionId) async {
-    // Backend doesn't have reactivate — no-op for now
-    // TODO: Add PATCH /invites/connections/{id}/reactivate endpoint
+    await _apiClient.patch('/invites/connections/$connectionId/reactivate');
   }
 
   @override
@@ -215,7 +214,16 @@ class RemoteInviteRepository implements InviteRepository {
 
   @override
   Future<List<Connection>> getInactiveConnectionsByUser(String userId) async {
-    final connections = await getConnectionsByUser('');
+    final response = await _apiClient.get(
+      '/invites/connections',
+      queryParameters: {'include_inactive': true},
+    );
+    final data = response.data as Map<String, dynamic>;
+    final items = data['items'] as List<dynamic>;
+    final connections =
+        items
+            .map((e) => _connectionFromJson(e as Map<String, dynamic>))
+            .toList();
     return connections.where((c) => !c.isActive).toList();
   }
 
@@ -273,9 +281,10 @@ class RemoteInviteRepository implements InviteRepository {
         (e) => e.name == json['status'],
         orElse: () => ConnectionRequestStatus.pending,
       ),
-      respondedAt: json['responded_at'] != null
-          ? DateTime.parse(json['responded_at'] as String)
-          : null,
+      respondedAt:
+          json['responded_at'] != null
+              ? DateTime.parse(json['responded_at'] as String)
+              : null,
       rejectionReason: json['rejection_reason'] as String?,
       expiresAt: DateTime.parse(json['expires_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -294,9 +303,10 @@ class RemoteInviteRepository implements InviteRepository {
       connectionRequestId: json['connection_request_id'] as String?,
       connectedAt: DateTime.parse(json['connected_at'] as String),
       isActive: json['is_active'] as bool? ?? true,
-      deactivatedAt: json['deactivated_at'] != null
-          ? DateTime.parse(json['deactivated_at'] as String)
-          : null,
+      deactivatedAt:
+          json['deactivated_at'] != null
+              ? DateTime.parse(json['deactivated_at'] as String)
+              : null,
     );
   }
 }

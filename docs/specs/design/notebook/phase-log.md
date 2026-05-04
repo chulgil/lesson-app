@@ -2144,6 +2144,56 @@ flutter analyze <17 files>
 
 **은유**: 선생님의 책상 위 다섯 개 서랍은 각기 다른 용도(오늘·학생·학부모·관리·일정)를 담고 있었지만, 네 개는 같은 공방의 손잡이를 달고 마지막 하나만 혼자 다른 양철 손잡이로 달려 있었다 — 같은 공방이라는 약속이 5번째 서랍에서 깨지면 **책상 전체가 조립물처럼 보인다**. 오늘 마지막 서랍의 손잡이도 공방의 것으로 교체되었다. 이제 서랍을 여닫을 때마다 "이 책상은 **한 장인의 작품**" 이라는 감각이 손끝에 전달된다. 다섯 서랍 공방 균일화 완결 — 다음 단계는 **서랍 안의 폴더들**(상세 화면들) 차례.
 
+### 7.69a schedule_tab Compact Work Header 예외 — 반복 업무 화면의 작업 높이 우선
+
+**트리거**: 사용자 점검에서 선생님 스케줄 화면의 헤더가 화면 상단 약 1/3을
+차지해 하위 스크롤 영역이 너무 작다는 UX 문제가 확인됨. 스케줄 탭은
+브랜드 진입 화면이 아니라 하루 여러 번 확인·수정하는 반복 업무 화면이므로
+대형 `NotebookMasthead`/Programme Title 보다 실제 시간표 가시 영역이 우선.
+
+**변경 파일**:
+
+| 파일 | 영역 | 변경 |
+|---|---|---|
+| `schedule/presentation/screens/schedule_tab.dart` | `_buildHeader()` | `SCHEDULE` eyebrow + `Programme of Schedule` + 대형 "스케줄" 제거. `스케줄` 제목, 3-segment view toggle, 레슨 추가 IconButton 을 한 줄 compact toolbar 로 통합 |
+| `schedule/presentation/screens/schedule_tab.dart` | sticky header | `CompactWeekStrip + DateHeader` spacing 축소. 고정 높이 168 → 152 |
+| `schedule_views_ux_spec.md` | 공통 헤더 | Compact Work Header 규칙 추가 |
+| `notebook/README.md` | §1.2 | 반복 업무 화면의 Compact Work Header 예외 추가 |
+
+**새 규칙**:
+
+1. 스케줄 탭은 `NotebookMasthead` 감사 시그니처의 예외 화면이다.
+2. 화면명·보기 전환·추가 액션은 한 줄 compact toolbar 에 배치한다.
+3. 날짜 선택과 날짜별 요약/정렬은 `CompactWeekStrip + 날짜/정렬 1줄`로 유지한다.
+4. 감성 헤더보다 일정 리스트/타임라인/주간 그리드의 작업 가능 높이를 우선한다.
+
+**검증**:
+
+- `schedule_tab_layout_test.dart`: `Programme of Schedule`/`SCHEDULE` 미노출,
+  add tooltip 노출, sticky height `<160` 회귀 가드.
+
+---
+
+### 7.69b schedule/student shell paper surface 보정 — 탭 간 배경 통일
+
+**트리거**: 사용자 점검에서 홈, 스케줄, 수강관리, 프로필, 학생 화면의 기본
+바탕색이 화면별로 달라 보여 Notebook × Score 일관성이 깨진다는 문제가 확인됨.
+
+**결정**: 전역 `scaffoldBackgroundColor` 는 상세 화면과 그리드 대비를 위해
+`paperDark` 로 유지하되, 선생님/학생 홈의 탭 셸은 `PaperScaffold`
+(`AppColors.paper`) 로 감싼다. 탭 내부 개별 카드나 강조 영역은 `paperDark`,
+`paperAccentSoft` 등을 사용할 수 있지만 화면의 첫 번째 바탕은 홈과 동일한
+크림 종이여야 한다.
+
+| 파일 | 변경 |
+|---|---|
+| `features/home/presentation/screens/home_screen.dart` | `SafeArea` 내부 `IndexedStack` 을 `PaperScaffold` 로 감싸 홈/스케줄/수강관리/프로필 탭 기본 바탕 통일 |
+| `features/student_home/presentation/screens/student_home_screen.dart` | 학생 홈/스케줄/연습/프로필 탭 셸도 동일하게 `PaperScaffold` 로 감싸 역할 간 배경 일관성 확보 |
+| `features/schedule/presentation/screens/schedule_tab.dart` | 단독 렌더 시에도 paper 표면 유지, 상단 `Schedule` Playfair 제목 + `ThinRule` 하단 바 추가 |
+
+**UX 원칙**: 화면별 배경색은 상태 표현이 아니라 구조 표현이다. 주요 탭은 같은
+종이 위에서 시작하고, 차이는 카드·칩·그리드 같은 내부 컴포넌트에서만 만든다.
+
 ---
 
 ### 7.70 subscription/screens 폼·모달·앱바 제목 Playfair 통일 — subscription/ 도메인 §7.17/§7.27 배치 #2
@@ -5436,3 +5486,65 @@ static const scheduleColumnBackground = Color(0xFFF8F2E5);
 **Lore-rejected**: foregroundColor: Colors.white 를 paperAccent 의 contrast 자동 계산으로 분기 — 일괄 paper 토큰이 SSOT. 분기 로직은 사용자가 토큰 추적 불가능하게 만듦 (§7.132 1-point accent 원칙 위반).
 
 **검증**: `flutter analyze` (전체) → No issues found! (15.0s). 비즈니스 로직 무변경. W1 + W1.5 + W2 + W3 누적 ~218 파일 / ~250건 정렬 — Notebook × Score 4 변환 규칙이 모든 features/ 도메인에 동질화 완료.
+
+#### §7.69b Lesson cancellation session copy and mock boundary (2026-05-04)
+
+- `lessonCancelled` copy must include `sessionNumber` wherever it is rendered: chat bubble, student progress item, list/card summary, and notification summary.
+- Student-authored cancellation before teacher response uses `N회차 레슨 취소를 요청했어요`; confirmed cancellation uses `N회차 레슨이 취소되었습니다`.
+- Schedule-change mock events must keep `sessionNumber` within the linked subscription boundary. A monthly 4-lesson subscription cannot carry a 5th-session change/cancel event; use a 5+ lesson subscription for that boundary case.
+
+#### §7.69c Cancel vs reschedule meaning copy (2026-05-04)
+
+- `일정 변경` = 대체 일정을 지금 조율한다.
+- `이번 일정 취소` = 이번 일정만 건너뛰고 대체 일정은 나중에 정한다.
+- 학생 사유의 두 액션은 같은 변경/취소권을 1회 사용한다.
+- 사전 취소는 수강권 회차를 차감하지 않는다. `N회차` 일정 취소 후 다음 실제 진행 레슨은 다시 `N회차`.
+- Cancellation chat copy must show all three outcomes together: permission use, no subscription deduction, and same-session continuation.
+
+#### §7.69d Chat history speech-bubble visual contract (2026-05-04)
+
+**전제**: 사용자 검수에서 레슨요청 상세와 스케줄 조절 상세의 채팅 폼이 화면마다 다르게 보이는 문제가 반복 확인됨. 스케줄 조절 상세는 각진 상태 박스, 레슨요청은 말풍선, 수락 이벤트는 별도 성공 Row처럼 섞여 같은 프로세스가 다른 의미처럼 읽히는 문제가 있었다.
+
+**확정 규칙**:
+- 모든 사용자 히스토리 이벤트는 말풍선으로 표시한다: 요청, 제안, 수락, 거절, 취소, 결정 변경, 일반 메시지.
+- 말풍선 정렬과 색상은 viewer 기준이다. 내 이벤트는 오른쪽 `paperAccentSoft`, 상대 이벤트는 왼쪽 `paperDark`.
+- 일정 후보/현재 일정/확정 일정만 말풍선 내부의 각진 사각형 카드로 표시한다.
+- 수락/거절/응답대기/결정변경/취소는 별도 성공/경고 카드가 아니라 같은 말풍선 안의 텍스트 이벤트다.
+- 결정 변경(`withdrawApproval`)은 이전 선택 일정에 취소선을 표시한다.
+
+**금지 패턴**:
+- 스케줄 조절 화면만 말풍선을 생략하고 각진 박스로 렌더
+- 수락 이벤트만 `paperOk` 체크 아이콘 Row로 렌더
+- 같은 히스토리 안에서 둥근 말풍선과 각진 말풍선을 혼합
+- 레슨요청과 스케줄 조절의 동일 프로세스를 다른 시각 문법으로 표시
+
+**적용/문서**:
+- `docs/specs/design/detail_screen_template.md#채팅-히스토리-시각-문법`
+- `docs/specs/design/notebook/README.md#133-채팅-히스토리-말풍선-일관성--769c`
+- `docs/specs/subscription/subscription_schedule_change_ux_spec.md#26-일정-변경-말풍선-구조`
+- `.harness/spec/2026-05-04-chat-message-visual-contract.md`
+
+#### §7.69e Surface wrapper SSOT (2026-05-04)
+
+**전제**: 전체 화면/상세 화면/팝업/바텀시트의 배경, 모서리, 타이포그래피가 화면별로 다시 분기되는 문제가 확인됨. `detail_screen_template.md`가 `surfaceLight`, `primary`, `white`, `radiusMedium` 같은 레거시 표현을 포함해 Notebook × Score README와 충돌했다.
+
+**확정 규칙**:
+- 일반 화면은 `NotebookScreenScaffold`로 시작한다.
+- 상세 화면은 `NotebookDetailScaffold`로 시작한다.
+- 다이얼로그는 `NotebookAlertDialog`로 시작한다.
+- 바텀시트 내부 content는 `NotebookBottomSheetShell`로 시작한다.
+
+#### §7.69f P2 card/color contract (2026-05-04)
+
+P2 디자인 일관성 정리:
+- production UI에서 직접 `Card(`를 호출하지 않는다. 모든 카드 표면은 `NotebookCard`를 사용한다.
+- raw `Colors.white`/`Colors.yellow`/`Colors.black*`는 Notebook 팔레트 토큰으로 이식한다.
+- 예외는 카메라, 녹음 파형, 이미지 크롭러처럼 실제 미디어/플러그인 대비가 표면 계약보다 우선인 영역으로 제한한다.
+- 계약 테스트: `test/architecture/notebook_design_contract_test.dart`.
+- 직접 `Scaffold`/`AlertDialog`/sheet content를 설계하는 경우는 카메라, 파형, 튜너 같은 미디어/캔버스 표면 예외만 허용한다.
+
+**적용/문서**:
+- `frontend/lib/core/widgets/notebook/notebook_surfaces.dart`
+- `frontend/test/core/widgets/notebook/notebook_surfaces_test.dart`
+- `docs/specs/design/detail_screen_template.md`
+- `docs/specs/design/notebook/README.md#120-surface-wrapper-ssot`

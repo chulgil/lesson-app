@@ -53,3 +53,21 @@ class AwardPointsRequest(BaseModel):
     points: int
     type: str  # practiceComplete, streakBonus, etc.
     description: str
+
+
+class BadgeAwardItem(BaseModel):
+    """Frontend practice badge payload."""
+
+    id: str | None = None
+    name: str
+    description: str
+    icon: str
+    rarity: str
+    earned_at: _dt.datetime | None = None
+    is_earned: bool = True
+
+
+class AwardBadgesRequest(BaseModel):
+    """Award multiple badges to a student."""
+
+    badges: list[BadgeAwardItem]

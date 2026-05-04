@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Screen for selecting student registration method
 class AddStudentMethodScreen extends StatelessWidget {
@@ -13,9 +15,9 @@ class AddStudentMethodScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('학생 추가'),
+        title: const Text(AppStrings.studentAddLabel),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -29,7 +31,7 @@ class AddStudentMethodScreen extends StatelessWidget {
             children: [
               const SizedBox(height: AppSpacing.space4),
               Text(
-                '어떤 방법으로 학생을 등록할까요?',
+                AppStrings.studentAddMethodQuestion,
                 // Notebook × Score §7.17: 화면 레벨 질문 타이틀 = Playfair sectionTitle.
                 style: NotebookTypography.sectionTitle,
               ),
@@ -38,7 +40,7 @@ class AddStudentMethodScreen extends StatelessWidget {
               // Invite card (recommended)
               _MethodCard(
                 icon: Icons.mail_outline,
-                title: '학생 초대',
+                title: AppStrings.studentInviteTitle,
                 badge: '권장',
                 description: '학생에게 초대 링크를 보내면\n학생 정보가 자동으로 등록됩니다.',
                 buttonText: '초대하기',
@@ -53,7 +55,7 @@ class AddStudentMethodScreen extends StatelessWidget {
               // Direct registration card
               _MethodCard(
                 icon: Icons.edit_note,
-                title: '직접 등록',
+                title: AppStrings.studentDirectRegister,
                 description: '학생 정보를 직접 입력하여\n관리할 수 있습니다.',
                 buttonText: '작성하기',
                 isPrimary: false,

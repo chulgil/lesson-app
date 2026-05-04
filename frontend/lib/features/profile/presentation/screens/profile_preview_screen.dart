@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -19,9 +21,9 @@ class ProfilePreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('프로필 미리보기'),
+        title: const Text(AppStrings.profilePreviewTitle),
         actions: [
           profileAsync.whenOrNull(
                 data:
@@ -42,12 +44,14 @@ class ProfilePreviewScreen extends ConsumerWidget {
       body: profileAsync.when(
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('프로필을 찾을 수 없습니다'));
+            return const Center(child: Text(AppStrings.profilePreviewNotFound));
           }
           return _buildPreview(context, profile);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다')),
+        error:
+            (_, __) =>
+                const Center(child: Text(AppStrings.profilePreviewError)),
       ),
     );
   }
@@ -63,7 +67,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           // Introduction section
           if (profile.introduction.isNotEmpty)
             _buildSection(
-              title: '소개',
+              title: AppStrings.profilePreviewSectionIntro,
               child: Text(
                 profile.introduction,
                 style: AppTypography.bodyMedium.copyWith(
@@ -80,7 +84,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           if (profile.teachingStyle != null &&
               profile.teachingStyle!.isNotEmpty)
             _buildSection(
-              title: '교수 스타일',
+              title: AppStrings.profilePreviewSectionTeachingStyle,
               child: Text(
                 profile.teachingStyle!,
                 style: AppTypography.bodyMedium.copyWith(
@@ -93,7 +97,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           // Specialties chips
           if (profile.specialties != null && profile.specialties!.isNotEmpty)
             _buildSection(
-              title: '전문 분야',
+              title: AppStrings.profilePreviewSectionSpecialty,
               child: Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space2,
@@ -108,9 +112,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                         backgroundColor: AppColors.paperAccent.withValues(
                           alpha: 0.08,
                         ),
-                        side: BorderSide(
-                          color: AppColors.paperAccentSoft,
-                        ),
+                        side: BorderSide(color: AppColors.paperAccentSoft),
                         shape: const RoundedRectangleBorder(),
                       );
                     }).toList(),
@@ -120,7 +122,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           // Education list
           if (profile.education != null && profile.education!.isNotEmpty)
             _buildSection(
-              title: '학력',
+              title: AppStrings.profilePreviewSectionEducation,
               child: Column(
                 children:
                     profile.education!.map((edu) {
@@ -137,7 +139,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           // Career list
           if (profile.career != null && profile.career!.isNotEmpty)
             _buildSection(
-              title: '경력',
+              title: AppStrings.profilePreviewSectionCareer,
               child: Column(
                 children:
                     profile.career!.map((c) {
@@ -158,7 +160,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
           // Certificates list
           if (profile.verification.certificates.isNotEmpty)
             _buildSection(
-              title: '자격증',
+              title: AppStrings.profilePreviewSectionCertificate,
               child: Column(
                 children:
                     profile.verification.certificates
@@ -185,7 +187,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   context.push(AppRoutes.extendedProfile);
                 },
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('프로필 수정하기'),
+                label: const Text(AppStrings.profilePreviewEditCta),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.paperAccent,
                   side: const BorderSide(color: AppColors.paperAccent),
@@ -245,7 +247,9 @@ class ProfilePreviewScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space4),
               Text(
                 profile.name,
-                style: AppTypography.headingLarge.copyWith(color: AppColors.paper),
+                style: AppTypography.headingLarge.copyWith(
+                  color: AppColors.paper,
+                ),
               ),
               if (profile.instruments.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space2),
@@ -278,7 +282,8 @@ class ProfilePreviewScreen extends ConsumerWidget {
       chips.add(
         _InfoChipData(
           icon: Icons.work_outline,
-          label: '경력 ${profile.experienceYears}년',
+          label:
+              '${AppStrings.profilePreviewExperienceYearsLabel} ${profile.experienceYears}년',
         ),
       );
     }
@@ -393,7 +398,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('프로필이 복사되었습니다'),
+        content: Text(AppStrings.profilePreviewCopied),
         behavior: SnackBarBehavior.floating,
       ),
     );

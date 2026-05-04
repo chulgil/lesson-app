@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -102,23 +103,12 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
   }
 
   Future<void> _archive() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.archiveButton),
-            content: const Text(AppStrings.archiveRepertoireConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.archiveButton),
-              ),
-            ],
-          ),
+      title: AppStrings.archiveButton,
+      message: AppStrings.archiveRepertoireConfirm,
+      confirmLabel: AppStrings.archiveButton,
+      cancelLabel: AppStrings.cancel,
     );
 
     if (confirmed != true) return;
@@ -164,23 +154,13 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
   }
 
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.deleteRepertoireTitle),
-            content: const Text(AppStrings.deleteRepertoireConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.deleteRepertoireTitle,
+      message: AppStrings.deleteRepertoireConfirm,
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
     );
 
     if (confirmed != true) return;
@@ -256,7 +236,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
   Widget build(BuildContext context) {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(title: const Text(AppStrings.editRepertoireAppBarTitle)),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

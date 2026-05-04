@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -17,7 +18,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space2,
@@ -53,7 +54,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                             children: [
                               Icon(Icons.restore, color: AppColors.paperAccent),
                               const SizedBox(width: AppSpacing.space2),
-                              const Text('복원'),
+                              const Text(AppStrings.practiceRestore),
                             ],
                           ),
                         ),
@@ -130,8 +131,8 @@ class ArchiveRepertoireTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('레퍼토리 복원'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRepertoireRestoreTitle),
             content: Text(
               '"${repertoire.name}"을(를) 복원할까요?\n\n복원된 레퍼토리는 활성 목록에 다시 표시됩니다.',
             ),
@@ -152,7 +153,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                     );
                   }
                 },
-                child: const Text('복원'),
+                child: const Text(AppStrings.practiceRestore),
               ),
             ],
           ),
@@ -163,12 +164,12 @@ class ArchiveRepertoireTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: Row(
               children: [
                 Icon(Icons.warning, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
-                const Text('레퍼토리 영구 삭제'),
+                const Text(AppStrings.practiceRepertoirePermanentDeleteTitle),
               ],
             ),
             content: Column(
@@ -179,9 +180,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccentSoft,
-                    ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Row(
                     children: [
                       Icon(
@@ -223,7 +222,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                     );
                   }
                 },
-                child: const Text('영구 삭제'),
+                child: const Text(AppStrings.practicePermanentDelete),
               ),
             ],
           ),
@@ -244,9 +243,7 @@ class _InfoChip extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        ),
+      decoration: BoxDecoration(color: AppColors.paperDark),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

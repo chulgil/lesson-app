@@ -47,6 +47,7 @@ class SubscriptionSettingsResponse(BaseModel):
 
     id: str
     teacher_id: str | None = None
+    organization_id: str | None = None
     renewal_alert_threshold: int
     renewal_alert_days: int
     renewal_alert_days_set: list[int] = [14, 7, 1, 0]
@@ -57,6 +58,8 @@ class SubscriptionSettingsResponse(BaseModel):
 
 
 class SubscriptionSettingsUpdate(BaseModel):
+    teacher_id: str | None = None
+    organization_id: str | None = None
     renewal_alert_threshold: int | None = None
     renewal_alert_days: int | None = None
     renewal_alert_days_set: list[int] | None = None

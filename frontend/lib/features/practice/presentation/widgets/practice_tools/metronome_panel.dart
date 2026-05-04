@@ -629,16 +629,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: Text(
         message,
         textAlign: TextAlign.center,

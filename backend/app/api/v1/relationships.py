@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field, field_serializer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
@@ -38,12 +38,12 @@ class ConnectRequest(BaseModel):
 class RelationshipStatusUpdate(BaseModel):
     """Change relationship status with optional metadata."""
 
-    status: str
+    status: str | None = None
     # Optional fields for subscription/booking tracking
     subscription_id: str | None = None
     booking_id: str | None = None
     # Optional fields for schedule recording
-    last_lesson_day: str | None = None
+    last_lesson_day: int | None = None
     last_lesson_time: str | None = None
     last_lesson_duration: int | None = None
     # Practice visibility permissions
@@ -88,7 +88,7 @@ class RelationshipResponse(BaseModel):
     can_suggest_assignments: bool = True
 
     # Schedule restoration
-    last_lesson_day: str | None = None
+    last_lesson_day: int | None = None
     last_lesson_time: str | None = None
     last_lesson_duration: int | None = None
     schedule_recorded_at: datetime | None = None
@@ -98,6 +98,27 @@ class RelationshipResponse(BaseModel):
     termination_reason: str | None = None
 
     created_at: datetime | None = None
+
+    @field_serializer("status")
+    def serialize_status(self, value: str | None) -> str | None:
+        """Return only statuses understood by the Flutter relationship enum."""
+        raw = getattr(value, "value", value)
+        return {
+            "pending": "trialBooked",
+            "connected": "active",
+            "inactive": "past",
+            "disconnected": "past",
+        }.get(raw, raw)
+
+    @computed_field
+    @property
+    def updated_at(self) -> datetime | None:
+        return self.schedule_recorded_at or self.created_at
+
+    @computed_field
+    @property
+    def last_schedule_recorded_at(self) -> datetime | None:
+        return self.schedule_recorded_at
 
 
 class NotificationSettingResponse(BaseModel):
@@ -144,7 +165,14 @@ class FollowResponse(BaseModel):
     follower_id: str
     following_id: str
     target_type: str | None = None
+    notification_enabled: bool = True
     created_at: datetime | None = None
+
+
+class FollowUpdate(BaseModel):
+    """Update follow preferences."""
+
+    notification_enabled: bool | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +211,9 @@ async def save_notification_settings(
 ) -> NotificationSettingResponse:
     """Create or update notification settings."""
     service = RelationshipService(db)
-    result: NotificationSettingResponse = await service.save_notification_settings(body.model_dump(exclude_none=True), current_user)
+    result: NotificationSettingResponse = await service.save_notification_settings(
+        body.model_dump(exclude_none=True), current_user
+    )
     return result
 
 
@@ -321,6 +351,45 @@ async def follow(
     """Follow a teacher or other user."""
     service = RelationshipService(db)
     result: FollowResponse = await service.follow(body.following_id, body.target_type, current_user)
+    return result
+
+
+@router.get(
+    "/follows",
+    response_model=PaginatedResponse[FollowResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List follows",
+)
+async def list_follows(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+) -> PaginatedResponse[FollowResponse]:
+    """List follows for the current user."""
+    service = RelationshipService(db)
+    return await service.get_all_follows(
+        user=current_user,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+    )
+
+
+@router.patch(
+    "/follows/{follow_id}",
+    response_model=FollowResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update follow preferences",
+)
+async def update_follow(
+    follow_id: str,
+    body: FollowUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> FollowResponse:
+    """Update follow notification settings."""
+    service = RelationshipService(db)
+    result: FollowResponse = await service.update_follow(follow_id, body.model_dump(exclude_none=True), current_user)
     return result
 
 

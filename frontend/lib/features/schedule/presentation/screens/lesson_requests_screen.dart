@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,7 +24,7 @@ class LessonRequestsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final requestsAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
         title: requestsAsync.when(

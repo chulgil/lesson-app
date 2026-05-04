@@ -32,7 +32,7 @@ void main() {
     });
 
     test('message hint exists in AppStrings', () {
-      expect(AppStrings.messageHint, isNotEmpty);
+      expect(AppStrings.messageHint, '전달할 메시지를 입력하세요');
     });
 
     test('default messages are different', () {

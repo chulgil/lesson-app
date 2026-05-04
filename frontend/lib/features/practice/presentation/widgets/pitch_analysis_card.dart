@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,11 +43,17 @@ class PitchAnalysisCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Text('🎯', style: TextStyle(fontSize: 20)),
+              Text(
+                '🎯',
+                style: AppTypography.headingMedium.copyWith(height: 1),
+              ),
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle
               // 로 통일 (§7.17).
-              Text('피치 분석', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practicePitchAnalysisTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
               const Spacer(),
               // Grade badge
               Container(
@@ -72,7 +79,7 @@ class PitchAnalysisCard extends ConsumerWidget {
 
           // In-tune percentage bar
           _buildMetricBar(
-            label: '정확도',
+            label: AppStrings.practicePitchAccuracyLabel,
             value: '${metrics.inTunePercent.round()}%',
             progress: metrics.inTunePercent / 100,
             color: gradeColor,
@@ -82,7 +89,7 @@ class PitchAnalysisCard extends ConsumerWidget {
 
           // Stability bar
           _buildMetricBar(
-            label: '안정성',
+            label: AppStrings.practicePitchStabilityLabel,
             value: '${(metrics.stabilityScore * 100).round()}%',
             progress: metrics.stabilityScore,
             color: AppColors.ink,
@@ -95,13 +102,13 @@ class PitchAnalysisCard extends ConsumerWidget {
             children: [
               _buildDetailChip(
                 icon: Icons.straighten,
-                label: '평균 편차',
+                label: AppStrings.practicePitchAvgDeviationLabel,
                 value: '${metrics.averageCentDeviation.round()} cents',
               ),
               const SizedBox(width: AppSpacing.space2),
               _buildDetailChip(
                 icon: Icons.music_note,
-                label: '음역',
+                label: AppStrings.practicePitchRangeLabel,
                 value:
                     '${metrics.frequencyMin.round()}-${metrics.frequencyMax.round()} Hz',
               ),

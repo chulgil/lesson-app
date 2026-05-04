@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -151,7 +152,7 @@ void showCancelLessonDialog({
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.actionLessonCancel),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -217,7 +218,7 @@ void showDeleteLessonDialog({
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.deleteLessonTitle),
           content: const Text(AppStrings.deleteLessonNoRestoreConfirm),
           actions: [
@@ -254,7 +255,7 @@ void showEditLessonExitConfirmation({
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
+        (context) => NotebookAlertDialog(
           title: const Text(AppStrings.cancelChangesTitle),
           content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
           actions: [

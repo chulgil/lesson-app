@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Skip reason input dialog for proposal rejection.
 /// Manages its own TextEditingController lifecycle to prevent
@@ -30,8 +32,8 @@ class _SkipReasonDialogState extends State<SkipReasonDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text(AppStrings.skipProposalTitle),
+    return NotebookAlertDialog(
+      title: AppStrings.skipProposalTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,16 +51,10 @@ class _SkipReasonDialogState extends State<SkipReasonDialog> {
           ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, null),
-          child: const Text(AppStrings.cancel),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: const Text(AppStrings.skipProposalAction),
-        ),
-      ],
+      cancelLabel: AppStrings.cancel,
+      onCancel: () => Navigator.pop(context, null),
+      confirmLabel: AppStrings.skipProposalAction,
+      onConfirm: () => Navigator.pop(context, _controller.text),
     );
   }
 }

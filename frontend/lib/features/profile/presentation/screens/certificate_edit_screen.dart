@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -78,26 +79,23 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   }
 
   Future<void> _pickImage() async {
-    final source = await showModalBottomSheet<ImageSource>(
+    final source = await showNotebookBottomSheet<ImageSource>(
       context: context,
-      shape: const RoundedRectangleBorder(),
       builder:
-          (context) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text(AppStrings.imageSourceCamera),
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text(AppStrings.imageSourceGallery),
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-              ],
-            ),
+          (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text(AppStrings.imageSourceCamera),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text(AppStrings.imageSourceGallery),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+            ],
           ),
     );
 
@@ -204,26 +202,15 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   Future<void> _delete() async {
     if (!_isEdit) return;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.certificateDeleteDialogTitle),
-            content: const Text(AppStrings.certificateDeleteConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.certificateDeleteDialogTitle,
+      content: const Text(AppStrings.certificateDeleteConfirm),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true) {
@@ -250,7 +237,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         title: Text(
           _isEdit
@@ -520,7 +507,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ),
               decoration: BoxDecoration(
                 // Notebook × Score: 이미지 썸네일 위 '탭하여 변경' 배지 — Material
-                // Colors.black54 대신 ink 55% alpha 토큰 사용 (§7.47 grey 이식 패턴).
+                // AppColors.inkScrim 대신 ink 55% alpha 토큰 사용 (§7.47 grey 이식 패턴).
                 color: AppColors.inkTertiary,
                 borderRadius: BorderRadius.zero,
               ),

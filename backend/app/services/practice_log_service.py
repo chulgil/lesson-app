@@ -17,22 +17,28 @@ class PracticeLogService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def get_logs(self, student_id: str, *, year: int, month: int) -> list[Any]:
-        """Get practice logs for a month."""
+    async def get_logs(
+        self,
+        student_id: str,
+        *,
+        year: int | None = None,
+        month: int | None = None,
+        log_date: date | None = None,
+    ) -> list[Any]:
+        """Get practice logs with optional date/month filters."""
         from app.models.practice_log import PracticeLog
 
-        start = date(year, month, 1)
-        _, last_day = calendar.monthrange(year, month)
-        end = date(year, month, last_day)
+        query = select(PracticeLog).where(PracticeLog.student_id == student_id)
+        if log_date is not None:
+            query = query.where(PracticeLog.date == log_date)
+        elif year is not None and month is not None:
+            start = date(year, month, 1)
+            _, last_day = calendar.monthrange(year, month)
+            end = date(year, month, last_day)
+            query = query.where(PracticeLog.date >= start, PracticeLog.date <= end)
 
         result = await self.db.scalars(
-            select(PracticeLog)
-            .where(
-                PracticeLog.student_id == student_id,
-                PracticeLog.date >= start,
-                PracticeLog.date <= end,
-            )
-            .order_by(PracticeLog.date)
+            query.order_by(PracticeLog.date)
         )
         return list(result.all())
 
@@ -46,6 +52,15 @@ class PracticeLogService:
                 PracticeLog.date == log_date,
             )
         )
+
+    async def get_log_by_id(self, log_id: str) -> Any:
+        """Get practice log by ID."""
+        from app.models.practice_log import PracticeLog
+
+        log = await self.db.get(PracticeLog, log_id)
+        if log is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
+        return log
 
     async def create_log(self, student_id: str, data: dict) -> Any:
         """Create a practice log."""

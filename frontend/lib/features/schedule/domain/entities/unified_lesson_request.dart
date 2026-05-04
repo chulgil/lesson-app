@@ -621,121 +621,60 @@ class UnifiedLessonRequest extends HiveObject {
     return false;
   }
 
-  /// Action-oriented chip label for teacher's list view.
-  /// Shows what teacher should do next instead of just status.
+  /// Unified 3-label chip for teacher's list view.
+  /// Matches ScheduleChangeRequestStatus pattern:
+  ///   확인 필요 (my turn) / 응답 대기 (their turn) / 완료 (terminal)
   String get teacherActionLabel {
-    switch (status) {
-      case UnifiedRequestStatus.pending:
-        return AppStrings.actionRequired; // 확인 필요
-      case UnifiedRequestStatus.approved:
-      case UnifiedRequestStatus.negotiating:
-        return isTeacherTurn
-            ? AppStrings
-                .responseRequired // 응답 필요
-            : AppStrings.responseWaiting; // 응답 대기
-      case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.proposalNeeded; // 제안 작성
-      case UnifiedRequestStatus.proposalSent:
-        return AppStrings.teacherWaitingAccept;
-      case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.teacherWaitingPayment;
-      case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.teacherVerifyPayment;
-      case UnifiedRequestStatus.completed:
-        return AppStrings.statusCompleted;
-      case UnifiedRequestStatus.rejected:
-        return AppStrings.statusRejected;
-      case UnifiedRequestStatus.cancelled:
-        return AppStrings.statusCancelled;
-      case UnifiedRequestStatus.expired:
-        return AppStrings.statusExpiredFull;
-      case UnifiedRequestStatus.subscriptionIssued:
-        return AppStrings.statusSubscriptionIssued;
-      case UnifiedRequestStatus.inProgress:
-        return AppStrings.statusInProgress;
-    }
+    if (status.isTerminal) return AppStrings.statusCompleted;
+    if (_isTeacherActionRequired) return AppStrings.actionRequired;
+    return AppStrings.responseWaiting;
   }
 
-  /// Action-oriented chip label for student's list view.
-  /// Shows what student should do next or current status from student's perspective.
+  /// Unified 3-label chip for student's list view.
   String get studentActionLabel {
+    if (status.isTerminal) return AppStrings.statusCompleted;
+    if (_isStudentActionRequired) return AppStrings.actionRequired;
+    return AppStrings.responseWaiting;
+  }
+
+  /// Whether teacher needs to act now.
+  bool get _isTeacherActionRequired {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return AppStrings.studentRequestSent; // 요청 전송됨
+      case UnifiedRequestStatus.timeConfirmed:
+      case UnifiedRequestStatus.paymentNotified:
+      case UnifiedRequestStatus.inProgress:
+        return true;
       case UnifiedRequestStatus.approved:
       case UnifiedRequestStatus.negotiating:
-        return isTeacherTurn
-            ? AppStrings
-                .studentResponseWaiting // 선생님 응답 대기
-            : AppStrings.studentResponseRequired; // 응답 필요
-      case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.studentWaitingProposal; // 수강권 대기
-      case UnifiedRequestStatus.proposalSent:
-        return AppStrings.studentProposalArrived; // 수강권 도착
-      case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.studentPaymentRequired;
-      case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.studentPaymentWaiting; // 입금 확인 중
-      case UnifiedRequestStatus.completed:
-        return AppStrings.statusCompleted;
-      case UnifiedRequestStatus.rejected:
-        return AppStrings.statusRejected;
-      case UnifiedRequestStatus.cancelled:
-        return AppStrings.statusCancelled;
-      case UnifiedRequestStatus.expired:
-        return AppStrings.statusExpiredFull;
-      case UnifiedRequestStatus.subscriptionIssued:
-        return AppStrings.statusSubscriptionIssued;
-      case UnifiedRequestStatus.inProgress:
-        return AppStrings.statusInProgress;
+        return isTeacherTurn;
+      default:
+        return false;
     }
   }
 
-  /// Color key for student action chip.
-  /// Color key: 'action' (내 차례), 'wait' (대기/종료)
-  String get studentActionColorKey {
+  /// Whether student needs to act now.
+  bool get _isStudentActionRequired {
     switch (status) {
       case UnifiedRequestStatus.proposalSent:
       case UnifiedRequestStatus.proposalAccepted:
       case UnifiedRequestStatus.inProgress:
-        return 'action';
-      case UnifiedRequestStatus.negotiating:
-        return isTeacherTurn ? 'wait' : 'action';
-      case UnifiedRequestStatus.pending:
+        return true;
       case UnifiedRequestStatus.approved:
-      case UnifiedRequestStatus.timeConfirmed:
-      case UnifiedRequestStatus.paymentNotified:
-      case UnifiedRequestStatus.subscriptionIssued:
-      case UnifiedRequestStatus.completed:
-      case UnifiedRequestStatus.rejected:
-      case UnifiedRequestStatus.cancelled:
-      case UnifiedRequestStatus.expired:
-        return 'wait';
+      case UnifiedRequestStatus.negotiating:
+        return !isTeacherTurn;
+      default:
+        return false;
     }
   }
 
-  /// Color key for action chip: 'action', 'wait', 'success', 'error', 'warning'.
-  /// Color key: 'action' (내 차례), 'wait' (대기/종료)
-  String get teacherActionColorKey {
-    switch (status) {
-      case UnifiedRequestStatus.pending:
-      case UnifiedRequestStatus.timeConfirmed:
-      case UnifiedRequestStatus.paymentNotified:
-      case UnifiedRequestStatus.inProgress:
-        return 'action';
-      case UnifiedRequestStatus.negotiating:
-        return isTeacherTurn ? 'action' : 'wait';
-      case UnifiedRequestStatus.approved:
-      case UnifiedRequestStatus.proposalSent:
-      case UnifiedRequestStatus.proposalAccepted:
-      case UnifiedRequestStatus.subscriptionIssued:
-      case UnifiedRequestStatus.completed:
-      case UnifiedRequestStatus.rejected:
-      case UnifiedRequestStatus.cancelled:
-      case UnifiedRequestStatus.expired:
-        return 'wait';
-    }
-  }
+  /// Color key: 'action' (paperAccent) or 'wait' (inkTertiary).
+  String get studentActionColorKey =>
+      _isStudentActionRequired ? 'action' : 'wait';
+
+  /// Color key: 'action' (paperAccent) or 'wait' (inkTertiary).
+  String get teacherActionColorKey =>
+      _isTeacherActionRequired ? 'action' : 'wait';
 
   /// Type display label (재수강 > 정규 priority).
   String get typeDisplayLabel {

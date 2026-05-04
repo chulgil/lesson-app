@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -29,7 +30,10 @@ class StudentPracticeSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('이번 주 연습', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentWeeklyPractice,
+              style: NotebookTypography.sectionTitle,
+            ),
             weeklyPracticeAsync.when(
               data:
                   (practiced) => Text(
@@ -77,7 +81,7 @@ class StudentPracticeSection extends ConsumerWidget {
                                 isPracticed
                                     ? AppColors.paperOk.withValues(alpha: 0.15)
                                     : AppColors.paperDark,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                            borderRadius: BorderRadius.zero,
                             border:
                                 isPracticed
                                     ? Border.all(
@@ -108,10 +112,8 @@ class StudentPracticeSection extends ConsumerWidget {
           error:
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft,
-                ),
-                child: const Text('연습 정보를 불러올 수 없습니다'),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+                child: const Text(AppStrings.studentPracticeLoadError),
               ),
         ),
 

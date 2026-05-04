@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -12,6 +13,7 @@ import '../../../../features/practice/presentation/providers/recording_provider.
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_trimmer_service.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import 'recording_waveform.dart' show ABLoop, ZoomableWaveformProgressBar;
 
 /// Playback speed options.
@@ -49,10 +51,9 @@ class RecordingPlayerSheet extends ConsumerStatefulWidget {
     required String repertoireId,
     required String studentId,
   }) {
-    return showModalBottomSheet(
+    return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (context) => RecordingPlayerSheet(
             recording: recording,
@@ -491,9 +492,11 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     final file = File(widget.recording.localPath);
     if (!await file.exists()) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.practiceRecordingFileNotFound),
+          ),
+        );
       }
       return;
     }

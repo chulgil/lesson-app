@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -31,10 +32,11 @@ Future<RescheduleResult?> showRescheduleBottomSheet(
   required DateTime currentLessonDateTime,
   required int sessionNumber,
 }) {
-  return showModalBottomSheet<RescheduleResult>(
+  return showNotebookBottomSheet<RescheduleResult>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    showHandle: false,
     builder:
         (context) => _RescheduleBottomSheet(
           subscription: subscription,

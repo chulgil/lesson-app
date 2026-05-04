@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -59,7 +60,7 @@ class BookingConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return NotebookAlertDialog(
       shape: RoundedRectangleBorder(),
       // Notebook × Score: AlertDialog title 은 전역 dialogTheme.titleTextStyle
       // (NotebookTypography.dialogTitle) 을 상속. 인라인 style 오버라이드 제거 (§7.41 cleanup 패턴).

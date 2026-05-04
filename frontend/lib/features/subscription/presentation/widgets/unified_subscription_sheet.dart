@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
@@ -43,10 +44,11 @@ class UnifiedSubscriptionSheet extends ConsumerStatefulWidget {
     required List<String> studentIds,
     String? studentName,
   }) async {
-    await showModalBottomSheet(
+    await showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder:
           (_) => UnifiedSubscriptionSheet(
             teacherId: teacherId,
@@ -667,11 +669,8 @@ class _UnifiedSubscriptionSheetState
     final result = await showDialog<int>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            // Notebook × Score: 전역 dialogTheme(titleTextStyle=dialogTitle) 적용을 위해 style 오버라이드 제거.
-            title: const Text(
-              AppStrings.unifiedSubscriptionLessonCountDialogTitle,
-            ),
+          (context) => NotebookAlertDialog(
+            title: AppStrings.unifiedSubscriptionLessonCountDialogTitle,
             content: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
@@ -682,21 +681,13 @@ class _UnifiedSubscriptionSheetState
                 suffixText: AppStrings.lessonsUnit,
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  final value = int.tryParse(controller.text);
-                  if (value != null && value > 0) {
-                    Navigator.of(context).pop(value);
-                  }
-                },
-                child: const Text(AppStrings.confirm),
-              ),
-            ],
+            cancelLabel: AppStrings.cancel,
+            onConfirm: () {
+              final value = int.tryParse(controller.text);
+              if (value != null && value > 0) {
+                Navigator.of(context).pop(value);
+              }
+            },
           ),
     );
 

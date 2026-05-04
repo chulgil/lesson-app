@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -77,7 +78,10 @@ class AssignmentItem extends StatelessWidget {
               ),
               // "필수" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard italic
               // (README §1.1 4계층, §7.127 Gaegu 회피).
-              child: Text('필수', style: NotebookTypography.indicatorLabel),
+              child: Text(
+                AppStrings.parentHomeRequired,
+                style: NotebookTypography.indicatorLabel,
+              ),
             ),
         ],
       ),

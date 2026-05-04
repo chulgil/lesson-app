@@ -25,18 +25,32 @@
 | 타임라인 (일간) | ▤ | CompactWeekStrip | 시간축 타임라인 | 하루 일정 상세 확인 |
 | 주간 그리드 | ⊞ | CompactWeekStrip | 7일 그리드 | 주간 전체 조감 |
 
-### 공통 헤더
+### 공통 표면/헤더 — Paper Work Header (2026-05-04 갱신)
+
+선생님 스케줄 탭은 반복 확인·수정 업무 화면이므로 장식성 `NotebookMasthead`
+와 `Programme of Schedule` 대형 헤더를 사용하지 않는다. 다만 홈/수강관리와
+같은 Notebook × Score 표면 언어는 유지해야 하므로, 탭 셸은 `PaperScaffold`
+(`AppColors.paper`) 를 기본 바탕으로 사용하고 상단에는 Playfair 영문 타이틀
+`Schedule` + `ThinRule` 하단 바를 둔다. 진입 첫 화면부터 실제 일정 영역을
+최대한 확보하되, 탭 간 배경색이 달라 보이지 않게 한다.
 
 모든 뷰에서 동일:
-- 좌측: "스케줄" 제목
-- 우측: 3-segment 뷰 토글 + 레슨 추가(+) 버튼
+- 기본 화면 바탕: 홈/수강관리/프로필/학생 홈 모두 `PaperScaffold` 기반 `AppColors.paper`
+- 상단 헤더: 중앙 `Schedule` (`NotebookTypography.masthead`) + `ThinRule`
+- 하단 compact toolbar: 좌측 "스케줄", 우측 3-segment 뷰 토글 + 레슨 추가(+) 버튼
+- 하단 날짜 조작 영역: `CompactWeekStrip` + 선택 날짜/레슨 수/정렬 1줄
+- 리스트 모드: 날짜 조작 영역은 `SliverPersistentHeader(pinned)` 로 고정
+- 타임라인/주간 그리드: 같은 날짜 조작 영역을 콘텐츠 상단에 배치하고, 실제 시간표 영역을 `Expanded` 로 확보
+- 금지: `SCHEDULE` eyebrow, `Programme of Schedule`, 대형 `NotebookMasthead`, 별도 중앙 토글 Row, 화면별 임의 배경색
 
 ### 캘린더 분리
 
-- **리스트 모드**: `WeekCalendarWidget` — 터치로 주 탐색, 헤더 탭으로 월간 확장
+- **리스트 모드**: `CompactWeekStrip` — 터치로 주 탐색, sticky 날짜 조작 유지
 - **타임라인/주간**: `CompactWeekStrip` — 컴팩트한 요일 스트립
 
-> 이유: 리스트 모드는 월간 개요가 필요 (다른 뷰에서는 월간 확인 불가). 타임라인/주간은 콘텐츠 영역이 넓어야 하므로 컴팩트 스트립 사용.
+> 이유: 선생님 스케줄은 장식적 진입보다 반복 조작 효율이 중요하다. 월간 확장
+> 헤더보다 주간 이동·오늘 이동·정렬·보기 전환이 더 자주 쓰이므로 세 모드 모두
+> compact 조작 체계로 통일한다.
 
 ---
 
@@ -218,5 +232,7 @@ scaffold 가 paperDark (#E8DFC7) 이라 그리드 본문은 paper (#F2ECDD) 자�
 | 2026-04-27 | §7.123 Mode A+ — 2톤 팔레트 분리. 평일 컬럼은 `scheduleColumnBackground` (#F8F2E5, 종이보다 살짝 밝음). regular(토/일 등 정기 휴무) 는 평일과 동일 처리. vacation/holiday(선생님 명시 휴일) 만 회색 강조. additionalSlot override 도 휴일 컬럼 위로 한정 |
 | 2026-04-27 | §7.123 Mode A++ — 컬럼 톤을 `paper` (#F2ECDD) 로 정렬 (scaffold paperDark 위 자연 분리). future 레슨 white lerp 0.35 → 0.15, accent alpha 0.45 → 0.55 — 컬럼/타 학생 스케줄 변별 강화 |
 | 2026-04-27 | §7.124 — 주간 그리드 구분선 `scheduleGridLine` (#E8E8E8) → 신규 `scheduleWeeklyGridLine` (ink alpha 0.08). paper 컬럼 위 동시대비 cool tint 회피, 종이 위 연필선 느낌. 일간 타임라인·picker 영향 없음 |
+| 2026-05-04 | 공통 헤더를 Compact Work Header 로 갱신. 선생님 스케줄 탭은 반복 업무 화면이므로 `NotebookMasthead`/`Programme of Schedule` 대형 헤더를 제거하고, toolbar + view toggle + add + CompactWeekStrip + 날짜/정렬 1줄 구조로 통일 |
+| 2026-05-04 | Compact Work Header 를 Paper Work Header 로 보완. 홈/수강관리/프로필/학생 홈과 같은 `PaperScaffold` 배경을 기본값으로 통일하고, 스케줄 상단은 `Schedule` Playfair 제목 + `ThinRule` 하단 바로 정렬 |
 | 2026-04-27 | §7.125 — 헤더(CompactWeekStrip) 7컬럼과 그리드 7컬럼 가로 정렬. weeklyGrid 모드일 때 헤더 좌측 패딩 +36 (시간 라벨 폭) 추가, 그리드 외부 패딩 `space2`(8) → `screenPadding`(16) 통일. 결과: 양측 7컬럼 시작 X = 52, 너비 = (W − 68) / 7 동일 |
 | 2026-04-27 | §7.126 — 좌측 공간 축소 + 모든 모드 헤더 동일 사이즈. §7.125 의 weeklyGrid 헤더 +36 분기 되돌림. 시간 라벨 폭 36 → 16 (헤더 좌측 패딩 영역에 흡수), 그리드 외부 좌측 패딩 0 (우측 screenPadding 만 유지). 7컬럼 시작 X = 16, 너비 = (W − 32) / 7 — 헤더와 정확히 정렬, 좌측 36px 확장 |

@@ -10,10 +10,7 @@ import '../../providers/tuner_provider.dart';
 /// Fish indicator that follows around the circular tuner.
 /// Uses polar coordinates and cents-based accuracy visualization.
 class TunerFishIndicator extends ConsumerStatefulWidget {
-  const TunerFishIndicator({
-    super.key,
-    required this.circleSize,
-  });
+  const TunerFishIndicator({super.key, required this.circleSize});
 
   final double circleSize;
 
@@ -40,9 +37,13 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
 
   // Animation durations
   static const _tailSlowDuration = Duration(milliseconds: 600);
-  static const _tailFastDuration = Duration(milliseconds: 100); // Faster tail when hit
+  static const _tailFastDuration = Duration(
+    milliseconds: 100,
+  ); // Faster tail when hit
   static const _bubbleSlowDuration = Duration(milliseconds: 3000);
-  static const _bubbleFastDuration = Duration(milliseconds: 800); // Faster bubbles when hit
+  static const _bubbleFastDuration = Duration(
+    milliseconds: 800,
+  ); // Faster bubbles when hit
 
   @override
   void initState() {
@@ -76,12 +77,14 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
 
     // Update tail speed - stop, change duration, restart
     _tailController.stop();
-    _tailController.duration = isPerfect ? _tailFastDuration : _tailSlowDuration;
+    _tailController.duration =
+        isPerfect ? _tailFastDuration : _tailSlowDuration;
     _tailController.repeat(reverse: true);
 
     // Update bubble speed - stop, change duration, restart
     _bubbleController.stop();
-    _bubbleController.duration = isPerfect ? _bubbleFastDuration : _bubbleSlowDuration;
+    _bubbleController.duration =
+        isPerfect ? _bubbleFastDuration : _bubbleSlowDuration;
     _bubbleController.repeat();
   }
 
@@ -104,7 +107,8 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
   double _calculateAngle(NoteName note, double centDeviation) {
     final baseAngle = _indexToAngleRad(note.index);
     // Cent offset: ±50¢ = ±15° (half of 30° segment)
-    final centOffset = (centDeviation.clamp(-50.0, 50.0) / 50.0) * (math.pi / 12);
+    final centOffset =
+        (centDeviation.clamp(-50.0, 50.0) / 50.0) * (math.pi / 12);
     return baseAngle + centOffset;
   }
 
@@ -131,10 +135,9 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
       _angleAnimation = Tween<double>(
         begin: _currentAngle,
         end: endAngle,
-      ).animate(CurvedAnimation(
-        parent: _angleController,
-        curve: Curves.easeOutCubic,
-      ));
+      ).animate(
+        CurvedAnimation(parent: _angleController, curve: Curves.easeOutCubic),
+      );
       _targetAngle = newTargetAngle;
       // Update current angle to end value after animation completes
       _angleController.forward(from: 0).then((_) {
@@ -157,14 +160,20 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
     if (currentNote != null) {
       // If perfect, snap to note center (centDeviation = 0)
       // Otherwise, use actual centDeviation for smooth movement
-      final effectiveCentDeviation = isPerfect ? 0.0 : currentNote.centDeviation;
-      final newTarget = _calculateAngle(currentNote.name, effectiveCentDeviation);
+      final effectiveCentDeviation =
+          isPerfect ? 0.0 : currentNote.centDeviation;
+      final newTarget = _calculateAngle(
+        currentNote.name,
+        effectiveCentDeviation,
+      );
       _updateAngle(newTarget);
     }
 
     // Fish size (1.5x larger)
     final fishSize = widget.circleSize * 0.15;
-    final radius = widget.circleSize / 2 - fishSize * 0.3; // Fish close to outer circle edge
+    final radius =
+        widget.circleSize / 2 -
+        fishSize * 0.3; // Fish close to outer circle edge
     final center = Offset(widget.circleSize / 2, widget.circleSize / 2);
 
     final isVisible = isListening && currentNote != null;
@@ -242,7 +251,8 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
     final bubbles = <Widget>[];
 
     // Use cat face color for bubbles
-    final bubbleColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.3)!;
+    final bubbleColor =
+        Color.lerp(AppColors.paper, AppColors.paperAccent, 0.3)!;
 
     // Bubble 1 (larger, slower)
     final bubble1Phase = phase;
@@ -395,7 +405,7 @@ class _CuteFishPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Use cat colors (same as cat face and eye)
-    final faceColor = Color.lerp(Colors.white, AppColors.paperAccent, 0.2)!;
+    final faceColor = Color.lerp(AppColors.paper, AppColors.paperAccent, 0.2)!;
     final eyeColor = AppColors.paperAccent;
 
     // Scale factors based on SVG viewBox 64x64
@@ -414,16 +424,19 @@ class _CuteFishPainter extends CustomPainter {
     final tailY = 32 * sy + wiggle;
 
     // === BODY (ellipse - fill only, no stroke) ===
-    final fillPaint = Paint()
-      ..color = faceColor
-      ..style = PaintingStyle.fill;
+    final fillPaint =
+        Paint()
+          ..color = faceColor
+          ..style = PaintingStyle.fill;
 
     final bodyPath = Path();
-    bodyPath.addOval(Rect.fromCenter(
-      center: Offset((36 + centerOffsetX) * sx, 32 * sy),
-      width: 36 * sx,  // horizontal diameter
-      height: 28 * sy, // vertical diameter
-    ));
+    bodyPath.addOval(
+      Rect.fromCenter(
+        center: Offset((36 + centerOffsetX) * sx, 32 * sy),
+        width: 36 * sx, // horizontal diameter
+        height: 28 * sy, // vertical diameter
+      ),
+    );
     canvas.drawPath(bodyPath, fillPaint);
 
     // === TAIL (V-shape pointing right with wiggle - filled) ===
@@ -436,9 +449,10 @@ class _CuteFishPainter extends CustomPainter {
     canvas.drawPath(tailPath, fillPaint);
 
     // === EYE (filled circle - cat eye color) ===
-    final eyePaint = Paint()
-      ..color = eyeColor
-      ..style = PaintingStyle.fill;
+    final eyePaint =
+        Paint()
+          ..color = eyeColor
+          ..style = PaintingStyle.fill;
     canvas.drawCircle(
       Offset((28 + centerOffsetX) * sx, 30 * sy),
       2.4 * sx,
@@ -482,17 +496,20 @@ class _CuteFishShadowPainter extends CustomPainter {
     final tailTipX = (62 + centerOffsetX) * sx;
     final tailY = 32 * sy + wiggle;
 
-    final shadowPaint = Paint()
-      ..color = shadowColor
-      ..style = PaintingStyle.fill;
+    final shadowPaint =
+        Paint()
+          ..color = shadowColor
+          ..style = PaintingStyle.fill;
 
     // Shadow body (same shape as fish body)
     final bodyPath = Path();
-    bodyPath.addOval(Rect.fromCenter(
-      center: Offset((36 + centerOffsetX) * sx, 32 * sy),
-      width: 36 * sx,
-      height: 28 * sy,
-    ));
+    bodyPath.addOval(
+      Rect.fromCenter(
+        center: Offset((36 + centerOffsetX) * sx, 32 * sy),
+        width: 36 * sx,
+        height: 28 * sy,
+      ),
+    );
     canvas.drawPath(bodyPath, shadowPaint);
 
     // Shadow tail (same shape as fish tail)

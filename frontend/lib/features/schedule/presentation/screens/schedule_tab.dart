@@ -9,7 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -338,14 +338,6 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  String _volumeIssueString(DateTime now) {
-    final romanMonth = const [
-      'I', 'II', 'III', 'IV', 'V', 'VI',
-      'VII', 'VIII', 'IX', 'X', 'XI', 'XII',
-    ][now.month - 1];
-    return 'VOL. $romanMonth · NO. ${now.day}';
-  }
-
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final viewMode = ref.watch(scheduleViewModeProvider);
 
@@ -359,34 +351,49 @@ class ScheduleTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── SCHEDULE + 뷰 모드 토글(3개) + 추가 버튼 — 한 줄 ──
-          NotebookMasthead(
-            eyebrow: 'SCHEDULE',
-            meta: '',
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ViewModeToggle(
-                  currentMode: viewMode,
-                  onChanged: (mode) {
-                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
-                  },
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Schedule', style: NotebookTypography.appBarTitle),
+                    Text(
+                      '스케줄',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.space2),
-                IconButton(
-                  onPressed: () => _navigateToAddLesson(context, ref),
-                  icon: const Icon(
-                    Icons.add,
-                    color: AppColors.ink,
-                    size: 22,
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ViewModeToggle(
+                    currentMode: viewMode,
+                    onChanged: (mode) {
+                      ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                    },
                   ),
-                  tooltip: AppStrings.addLessonTooltip,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                ),
-              ],
-            ),
+                  const SizedBox(width: AppSpacing.space2),
+                  IconButton(
+                    onPressed: () => _navigateToAddLesson(context, ref),
+                    icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
+                    tooltip: AppStrings.addLessonTooltip,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
+          const SizedBox(height: AppSpacing.space2),
+          const ThinRule(),
         ],
       ),
     );
@@ -469,7 +476,10 @@ class ScheduleTab extends ConsumerWidget {
           if (isToday) ...[
             const SizedBox(width: AppSpacing.space2),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: 2,
+              ),
               // Notebook × Score: 각진 뱃지 (§7.113 매트릭스 — 컨테이너 bg zero)
               decoration: BoxDecoration(
                 color: AppColors.paperAccent.withValues(alpha: 0.1),
@@ -707,24 +717,15 @@ class _SwipeableLessonCard extends ConsumerWidget {
     required Color confirmColor,
     required Future<void> Function() onConfirm,
   }) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text(AppStrings.goBack),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: confirmColor),
-                child: Text(confirmLabel),
-              ),
-            ],
-          ),
+      title: title,
+      content: Text(message),
+      confirmLabel: confirmLabel,
+      cancelLabel: AppStrings.goBack,
+      confirmColor: confirmColor,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
     );
 
     if (confirmed == true) {
@@ -772,8 +773,8 @@ class _ViewModeToggle extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
+                    horizontal: AppSpacing.space2,
+                    vertical: AppSpacing.space2,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected ? AppColors.paper : Colors.transparent,

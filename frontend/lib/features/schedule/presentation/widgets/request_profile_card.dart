@@ -152,7 +152,7 @@ class RequestProfileCard extends StatelessWidget {
     return Row(
       children: [
         if (request.isAcademy && academyName != null) ...[
-          const Text('🏫', style: TextStyle(fontSize: 12)),
+          Text('🏫', style: AppTypography.bodySmall),
           const SizedBox(width: 3),
           Flexible(
             child: Text(
@@ -168,9 +168,7 @@ class RequestProfileCard extends StatelessWidget {
         ] else ...[
           Text(
             AppStrings.individualLesson,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
           const SizedBox(width: AppSpacing.space2),
         ],
@@ -217,9 +215,7 @@ class RequestProfileCard extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: 2,
       ),
-      decoration: BoxDecoration(
-        color: typeColor.withValues(alpha: 0.12),
-      ),
+      decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.12)),
       child: Text(
         request.typeDisplayLabel,
         style: AppTypography.caption.copyWith(
@@ -237,9 +233,7 @@ class RequestProfileCard extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12)),
       child: Text(
         request.statusChipLabel,
         style: AppTypography.caption.copyWith(

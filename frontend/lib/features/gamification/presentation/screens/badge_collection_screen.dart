@@ -1,8 +1,10 @@
 // Badge collection and point history screen.
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -21,17 +23,20 @@ class BadgeCollectionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('내 성장'),
+        title: const Text(AppStrings.gamificationMyGrowth),
       ),
       body: gamificationAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('데이터를 불러올 수 없습니다')),
+        error:
+            (_, __) => const Center(
+              child: Text(AppStrings.gamificationDataLoadFailed),
+            ),
         data: (data) => _buildContent(context, data),
       ),
     );
@@ -53,7 +58,10 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
         // Badges section
         // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-        Text('획득한 뱃지', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.gamificationEarnedBadges,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         _buildBadgeGrid(data.earnedBadges),
 
@@ -61,7 +69,10 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
         // Point history
         // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-        Text('포인트 히스토리', style: NotebookTypography.sectionTitle),
+        Text(
+          AppStrings.gamificationPointHistory,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space3),
         _buildPointHistory(data.recentHistory),
 
@@ -86,7 +97,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
             height: 72,
             decoration: BoxDecoration(
               color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             alignment: Alignment.center,
             child: Text(
@@ -189,7 +200,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                   badge.isEarned
                       ? rarityColor.withValues(alpha: 0.15)
                       : AppColors.paperDark,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              borderRadius: BorderRadius.zero,
             ),
             alignment: Alignment.center,
             child: Icon(

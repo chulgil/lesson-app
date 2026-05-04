@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -28,7 +29,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     final teacherId = ref.watch(currentUserIdProvider);
     final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(title: const Text(AppStrings.timeExceptionTitle)),
       body: availabilityAsync.when(
@@ -298,10 +299,11 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   }
 
   Future<void> _showAddExceptionDialog() async {
-    final result = await showModalBottomSheet<TimeException>(
+    final result = await showNotebookBottomSheet<TimeException>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder: (context) => const _AddExceptionBottomSheet(),
     );
 
@@ -314,30 +316,19 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   }
 
   Future<void> _confirmDelete(TimeException exception) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(AppStrings.deleteExceptionTitle),
-            content: Text(
-              AppStrings.deleteExceptionConfirm(
-                _formatDateRange(exception.startDate, exception.endDate),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.deleteExceptionTitle,
+      content: Text(
+        AppStrings.deleteExceptionConfirm(
+          _formatDateRange(exception.startDate, exception.endDate),
+        ),
+      ),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
     );
 
     if (confirmed == true && mounted) {

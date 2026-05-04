@@ -184,6 +184,16 @@ class RequestHistoryChat extends StatelessWidget {
                         event.actorType == ProposerRole.teacher
                             ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(AppSpacing.radiusLarge),
+                      topRight: const Radius.circular(AppSpacing.radiusLarge),
+                      bottomLeft: Radius.circular(
+                        isMyMessage ? AppSpacing.radiusLarge : 4,
+                      ),
+                      bottomRight: Radius.circular(
+                        isMyMessage ? 4 : AppSpacing.radiusLarge,
+                      ),
+                    ),
                   ),
                   child: _buildBubbleContent(
                     event,

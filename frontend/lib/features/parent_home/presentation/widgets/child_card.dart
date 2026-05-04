@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -29,13 +30,6 @@ class ChildCard extends ConsumerWidget {
             color: AppColors.paper,
             borderRadius: BorderRadius.zero,
             border: Border.all(color: AppColors.inkQuaternary),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: Column(
             children: [
@@ -152,21 +146,21 @@ class ChildCard extends ConsumerWidget {
                 children: [
                   _buildStatItem(
                     icon: Icons.school,
-                    label: '다음 레슨',
+                    label: AppStrings.parentHomeNextLesson,
                     value: '내일 14:00',
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(width: AppSpacing.space4),
                   _buildStatItem(
                     icon: Icons.fitness_center,
-                    label: '오늘 연습',
+                    label: AppStrings.parentHomeTodayPracticeLabel,
                     value: '45분',
                     color: AppColors.paperOk,
                   ),
                   const SizedBox(width: AppSpacing.space4),
                   _buildStatItem(
                     icon: Icons.local_fire_department,
-                    label: '연습 스트릭',
+                    label: AppStrings.parentHomePracticeStreak,
                     value: '5일',
                     color: AppColors.paperAccent,
                   ),

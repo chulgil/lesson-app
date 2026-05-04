@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -205,7 +206,10 @@ class StudentProfileTab extends ConsumerWidget {
 
             // Instrument tag
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.paper.withValues(alpha: 0.15),
               ),
@@ -307,13 +311,13 @@ class StudentProfileTab extends ConsumerWidget {
         children: [
           _buildMenuItem(
             icon: Icons.person_outline,
-            title: '프로필 수정',
+            title: AppStrings.studentHomeMenuProfileEdit,
             onTap: () => context.push(AppRoutes.profileEdit),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.school_outlined,
-            title: '내 선생님',
+            title: AppStrings.studentHomeMenuMyTeachers,
             subtitle: teacherSubtitle,
             onTap: () => context.push(AppRoutes.myTeachers),
           ),
@@ -326,7 +330,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.library_music_outlined,
-            title: '레퍼토리',
+            title: AppStrings.studentHomeMenuRepertoire,
             subtitle: repertoireCount != null ? '$repertoireCount곡 진행 중' : null,
             onTap:
                 () => context.push(
@@ -336,7 +340,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.history,
-            title: '연습 기록 내역',
+            title: AppStrings.studentHomeMenuPracticeHistory,
             onTap:
                 () => context.push(
                   '${AppRoutes.repertoireHistory}?studentId=$studentId',
@@ -345,16 +349,16 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.headphones_outlined,
-            title: '레슨 녹음 파일',
-            subtitle: '전체 녹음 관리',
+            title: AppStrings.studentHomeMenuRecordings,
+            subtitle: AppStrings.studentHomeMenuRecordingsSubtitle,
             onTap: () => context.push(AppRoutes.allRecordings),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.family_restroom,
             iconColor: AppColors.paperAccent,
-            title: '학부모 초대',
-            subtitle: '학부모님과 연결하기',
+            title: AppStrings.studentHomeMenuParentInvite,
+            subtitle: AppStrings.studentHomeMenuParentInviteSubtitle,
             onTap: () => _showInviteCodeDialog(context, ref),
           ),
         ],
@@ -373,14 +377,14 @@ class StudentProfileTab extends ConsumerWidget {
         children: [
           _buildMenuItem(
             icon: Icons.notifications_outlined,
-            title: '알림 설정',
-            subtitle: '카테고리별 알림 관리',
+            title: AppStrings.studentHomeMenuNotificationSettings,
+            subtitle: AppStrings.studentHomeMenuNotificationSubtitle,
             onTap: () => context.push(AppRoutes.notificationSettings),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.alarm_outlined,
-            title: '연습 리마인더',
+            title: AppStrings.studentHomePracticeReminder,
             subtitle:
                 reminderSettings.isEnabled
                     ? reminderSettings.formattedTime
@@ -390,26 +394,26 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.language_outlined,
-            title: '언어',
-            subtitle: '한국어',
+            title: AppStrings.studentHomeMenuLanguage,
+            subtitle: AppStrings.studentHomeMenuLanguageValue,
             onTap: () => LanguageSelectSheet.show(context),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.backup_outlined,
-            title: '녹음 백업',
+            title: AppStrings.studentHomeMenuRecordingBackup,
             onTap: () => context.push(AppRoutes.backupSettings),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.help_outline,
-            title: '도움말',
+            title: AppStrings.studentHomeHelpTitle,
             onTap: () => context.push(AppRoutes.help),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.info_outline,
-            title: '앱 정보',
+            title: AppStrings.studentHomeAppInfoTitle,
             onTap: () => context.push(AppRoutes.appInfo),
           ),
         ],
@@ -487,7 +491,10 @@ class StudentProfileTab extends ConsumerWidget {
       child: OutlinedButton.icon(
         onPressed: () => _showLogoutDialog(context),
         icon: Icon(Icons.logout, color: AppColors.paperAccent),
-        label: Text('로그아웃', style: TextStyle(color: AppColors.paperAccent)),
+        label: Text(
+          AppStrings.studentHomeLogout,
+          style: TextStyle(color: AppColors.paperAccent),
+        ),
         // §7.132: paperAccent.alpha border → solid paperAccent.
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
@@ -501,9 +508,9 @@ class StudentProfileTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('로그아웃'),
-            content: const Text('정말 로그아웃 하시겠습니까?'),
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.studentHomeLogout),
+            content: const Text(AppStrings.studentHomeLogoutConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -515,7 +522,7 @@ class StudentProfileTab extends ConsumerWidget {
                   context.go(AppRoutes.login);
                 },
                 child: Text(
-                  '로그아웃',
+                  AppStrings.studentHomeLogout,
                   style: TextStyle(color: AppColors.paperAccent),
                 ),
               ),
@@ -550,12 +557,15 @@ class StudentProfileTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('학부모 초대 코드'),
+          (dialogContext) => NotebookAlertDialog(
+            title: const Text(AppStrings.studentHomeParentInviteCodeTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('학부모님을 초대합니다', style: AppTypography.bodyMedium),
+                Text(
+                  AppStrings.studentHomeParentInviteMessage,
+                  style: AppTypography.bodyMedium,
+                ),
                 const SizedBox(height: AppSpacing.space4),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -609,13 +619,13 @@ class StudentProfileTab extends ConsumerWidget {
                   Clipboard.setData(ClipboardData(text: inviteCode));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('초대 코드가 복사되었습니다'),
+                      content: Text(AppStrings.studentHomeInviteCodeCopied),
                       duration: Duration(seconds: 2),
                     ),
                   );
                 },
                 icon: const Icon(Icons.copy, size: 18),
-                label: const Text('복사'),
+                label: const Text(AppStrings.studentHomeCopyAction),
               ),
               FilledButton.icon(
                 onPressed: () {
@@ -630,7 +640,7 @@ class StudentProfileTab extends ConsumerWidget {
                   );
                 },
                 icon: const Icon(Icons.share, size: 18),
-                label: const Text('공유'),
+                label: const Text(AppStrings.studentHomeShareAction),
               ),
             ],
           ),

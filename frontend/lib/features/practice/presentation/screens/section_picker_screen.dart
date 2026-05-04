@@ -6,8 +6,10 @@
 // - Any other section selection needs
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -65,7 +67,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
   Widget build(BuildContext context) {
     final sectionsAsync = ref.watch(allSectionsForAssignmentProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(widget.title ?? '섹션 선택'),
@@ -81,7 +83,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '레퍼토리 또는 섹션 검색...',
+                hintText: AppStrings.practiceSectionSearchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon:
                     _searchQuery.isNotEmpty

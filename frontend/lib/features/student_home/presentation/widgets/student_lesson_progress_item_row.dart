@@ -142,6 +142,7 @@ IconData _iconFor(StudentLessonProgressKind kind) {
       Icons.card_membership_outlined,
     StudentLessonProgressKind.scheduleConfirmation =>
       Icons.event_available_outlined,
+    StudentLessonProgressKind.scheduleChange => Icons.update_outlined,
     StudentLessonProgressKind.renewal => Icons.autorenew,
   };
 }

@@ -1,6 +1,7 @@
 // Completion toggle widget
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -39,14 +40,15 @@ class CompletionToggle extends StatelessWidget {
 
   /// Standard mode: Simple toggle (date-aware)
   Widget _buildStandardCard(
-      BuildContext context, DateTime date, bool hasRepresentativeRecording) {
+    BuildContext context,
+    DateTime date,
+    bool hasRepresentativeRecording,
+  ) {
     // Use date-specific completion status instead of global isCompleted
     final isCompleted = section.isCompletedForDate(date);
 
-    return Card(
-      color: isCompleted
-          ? AppColors.paperOk.withValues(alpha: 0.1)
-          : null,
+    return NotebookCard(
+      color: isCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
       child: InkWell(
         onTap: onToggle,
         child: Padding(
@@ -54,12 +56,8 @@ class CompletionToggle extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                isCompleted
-                    ? Icons.check_circle
-                    : Icons.check_circle_outline,
-                color: isCompleted
-                    ? AppColors.paperOk
-                    : AppColors.inkTertiary,
+                isCompleted ? Icons.check_circle : Icons.check_circle_outline,
+                color: isCompleted ? AppColors.paperOk : AppColors.inkTertiary,
                 size: 32,
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -71,21 +69,16 @@ class CompletionToggle extends StatelessWidget {
                       isCompleted ? '연습 완료!' : '연습 완료로 표시',
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: isCompleted
-                            ? AppColors.paperOk
-                            : AppColors.ink,
+                        color: isCompleted ? AppColors.paperOk : AppColors.ink,
                       ),
                     ),
                     Text(
-                      isCompleted
-                          ? '탭하여 완료 취소'
-                          : '탭하여 이 섹션을 완료로 표시하세요',
+                      isCompleted ? '탭하여 완료 취소' : '탭하여 이 섹션을 완료로 표시하세요',
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkSecondary,
                       ),
                     ),
-                    if (!isCompleted &&
-                        hasRepresentativeRecording) ...[
+                    if (!isCompleted && hasRepresentativeRecording) ...[
                       const SizedBox(height: AppSpacing.space1),
                       _buildShareHint(),
                     ],
@@ -101,12 +94,15 @@ class CompletionToggle extends StatelessWidget {
 
   /// N회 반복 mode: Tap to increment, shows x/n progress
   Widget _buildRepeatCountCard(
-      BuildContext context, DateTime date, bool hasRepresentativeRecording) {
+    BuildContext context,
+    DateTime date,
+    bool hasRepresentativeRecording,
+  ) {
     final completedCount = section.getRepeatCompletedCount(date);
     final totalCount = section.repeatCount!;
     final isAllCompleted = completedCount >= totalCount;
 
-    return Card(
+    return NotebookCard(
       color: isAllCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
       child: InkWell(
         onTap: onToggle,
@@ -120,14 +116,17 @@ class CompletionToggle extends StatelessWidget {
                 children: List.generate(totalCount, (index) {
                   final isCompleted = index < completedCount;
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space1,
+                    ),
                     child: Opacity(
                       opacity: isCompleted ? 1.0 : 0.3,
                       child: Text(
                         '🐾',
-                        style: TextStyle(
-                          fontSize: totalCount <= 5 ? 28 : 20,
-                        ),
+                        style: (totalCount <= 5
+                                ? AppTypography.displayMedium
+                                : AppTypography.headingMedium)
+                            .copyWith(height: 1),
                       ),
                     ),
                   );
@@ -142,9 +141,7 @@ class CompletionToggle extends StatelessWidget {
                     : '탭하여 연습 기록 ($completedCount/$totalCount회)',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isAllCompleted
-                      ? AppColors.paperOk
-                      : AppColors.ink,
+                  color: isAllCompleted ? AppColors.paperOk : AppColors.ink,
                 ),
               ),
               Text(
@@ -170,17 +167,11 @@ class CompletionToggle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.share,
-          size: 12,
-          color: AppColors.ink,
-        ),
+        Icon(Icons.share, size: 12, color: AppColors.ink),
         const SizedBox(width: AppSpacing.space1),
         Text(
           '완료 시 대표녹음이 선생님께 공유됩니다',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.ink,
-          ),
+          style: AppTypography.caption.copyWith(color: AppColors.ink),
         ),
       ],
     );

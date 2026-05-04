@@ -49,7 +49,7 @@ async def test_fw_teacher_onboarding(teacher: TeacherActions):
 @pytest.mark.asyncio
 async def test_fw_subscription_lifecycle(teacher: TeacherActions):
     """Template → subscription → deduct 6/8 → verify remaining → payment."""
-    tmpl_id = await teacher.create_template("바이올린 8회", lessons_count=8, amount=320000)
+    await teacher.create_template("바이올린 8회", lessons_count=8, amount=320000)
     sid = await teacher.create_student("이서연")
     sub_id = await teacher.create_subscription(sid, total_lessons=8, amount=320000)
 
@@ -346,11 +346,11 @@ async def test_fw_unified_lesson_request_approve(teacher: TeacherActions, studen
 
     # Step 4: 선생님이 승인
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
     # Step 5: 학생이 상태 확인
     req = await student.get_lesson_request(request_id)
-    assert_status(req, "approved")
+    assert_status(req, "timeConfirmed")
 
 
 # ===========================================================================
@@ -413,7 +413,7 @@ async def test_fw_unified_lesson_request_returning_student(teacher: TeacherActio
 
     # Step 3: 선생님이 승인
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
 
 # ===========================================================================
@@ -489,7 +489,7 @@ async def test_fw_time_negotiation_counter_propose_then_approve(teacher: Teacher
 
     # Step 4: 선생님이 승인 (기존 status update 엔드포인트)
     approved = await teacher.approve_lesson_request(request_id)
-    assert_status(approved, "approved")
+    assert_status(approved, "timeConfirmed")
 
 
 # ===========================================================================

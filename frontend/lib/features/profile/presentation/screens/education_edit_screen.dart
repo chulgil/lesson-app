@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -107,7 +108,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
+          const SnackBar(content: Text(AppStrings.profileSaveErrorRetry)),
         );
       }
     } finally {
@@ -120,26 +121,15 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
   Future<void> _delete() async {
     if (!_isEdit) return;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('학력 삭제'),
-            content: const Text('이 학력 정보를 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.profileEducationDeleteTitle,
+      content: const Text(AppStrings.profileEducationDeleteConfirm),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true) {
@@ -154,7 +144,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('삭제 중 오류가 발생했습니다. 다시 시도해주세요.')),
+            const SnackBar(content: Text(AppStrings.profileDeleteErrorRetry)),
           );
           setState(() => _isLoading = false);
         }
@@ -164,9 +154,13 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: Text(_isEdit ? '학력 수정' : '학력 추가'),
+        title: Text(
+          _isEdit
+              ? AppStrings.profileEducationEditTitle
+              : AppStrings.profileEducationAddTitle,
+        ),
         actions: [
           if (_isEdit)
             IconButton(
@@ -186,7 +180,9 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _schoolController,
-              decoration: _inputDecoration(hintText: '예: 서울대학교'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.profileEducationHintSchool,
+              ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return '학교명을 입력해주세요';
@@ -224,7 +220,9 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _majorController,
-              decoration: _inputDecoration(hintText: '예: 음악학과 바이올린 전공'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.profileEducationHintMajor,
+              ),
             ),
 
             const SizedBox(height: AppSpacing.space4),
@@ -239,7 +237,9 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(4),
               ],
-              decoration: _inputDecoration(hintText: '예: 2020'),
+              decoration: _inputDecoration(
+                hintText: AppStrings.profileEducationHintGradYear,
+              ),
               validator: (value) {
                 if (value != null && value.isNotEmpty) {
                   final year = int.tryParse(value);

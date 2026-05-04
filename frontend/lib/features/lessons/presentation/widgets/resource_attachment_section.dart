@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
 import 'add_youtube_resource_sheet.dart';
@@ -232,7 +233,7 @@ class _AttachedResourceList extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(resource.type.icon, style: const TextStyle(fontSize: 16)),
+          Text(resource.type.icon, style: AppTypography.bodyLarge),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -289,8 +290,10 @@ class _AddResourceButton extends ConsumerWidget {
   }
 
   void _showAddOptions(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookBottomSheet<void>(
       context: context,
+      padding: EdgeInsets.zero,
+      showHandle: false,
       builder:
           (ctx) => SafeArea(
             child: Padding(
@@ -358,10 +361,9 @@ class _AddResourceButton extends ConsumerWidget {
   }
 
   void _showLibraryPicker(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (ctx) => Consumer(
             builder: (ctx, modalRef, _) {
@@ -425,7 +427,7 @@ class _AddResourceButton extends ConsumerWidget {
                               return ListTile(
                                 leading: Text(
                                   r.type.icon,
-                                  style: const TextStyle(fontSize: 24),
+                                  style: AppTypography.headingLarge,
                                 ),
                                 title: Text(
                                   r.title,
@@ -474,10 +476,9 @@ class _AddResourceButton extends ConsumerWidget {
   }
 
   void _showAddYoutube(BuildContext context) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder:
           (_) => AddYoutubeResourceSheet(onResourceCreated: onResourceSelected),
     );

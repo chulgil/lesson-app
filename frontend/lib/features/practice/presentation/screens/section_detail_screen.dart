@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -62,7 +63,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       }
     });
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
         titleSpacing: 0,
         title: Text(
@@ -122,7 +123,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       body: sectionAsync.when(
         data: (section) {
           if (section == null) {
-            return const Center(child: Text('섹션을 찾을 수 없습니다'));
+            return const Center(
+              child: Text(AppStrings.practiceSectionNotFound),
+            );
           }
           return _buildContent(context, section);
         },
@@ -138,7 +141,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  Text(
+                    AppStrings.practiceErrorOccurred,
+                    style: AppTypography.bodyLarge,
+                  ),
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
                     onPressed:
@@ -180,7 +186,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           // Practice stats section (moved above notes)
           // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
           // 로 통일 (§7.17).
-          Text('연습기록', style: NotebookTypography.sectionTitle),
+          Text(
+            AppStrings.practicePracticeRecordTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.space2),
           PracticeStatsEditor(
             section: section,
@@ -204,7 +213,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
             children: [
               // Notebook × Score: 스크린 섹션 제목은 Playfair sectionTitle
               // 로 통일 (§7.17).
-              Text('녹음', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.practiceRecordingTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
               const Spacer(),
               if (sortedRecordings.length >= 2)
                 TextButton.icon(
@@ -262,6 +274,11 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
             onToggle: () => _toggleCompletion(section),
             selectedDate: widget.selectedDate,
           ),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
         ],
       ),
     );
@@ -295,7 +312,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceStatusChangeFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -326,7 +343,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('연습 기록이 수정되었습니다'),
+            content: Text(AppStrings.practiceStatsUpdatedSnack),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -335,7 +352,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('수정에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text(AppStrings.practiceUpdateFailedRetry),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -369,34 +386,25 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
     return dateStr;
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
+  Future<void> _showDeleteConfirmation(BuildContext context) async {
     final navigator = Navigator.of(context);
-    showDialog(
+    final confirmed = await showNotebookDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('섹션 삭제'),
-            content: const Text('이 섹션과 모든 녹음을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(dialogContext).pop();
-                  await ref
-                      .read(sectionCrudProvider.notifier)
-                      .deleteSection(widget.sectionId, widget.repertoireId);
-                  ref.invalidate(studentRepertoiresProvider(widget.studentId));
-                  if (mounted) {
-                    navigator.pop();
-                  }
-                },
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      title: AppStrings.practiceSectionDeleteTitle,
+      message: AppStrings.practiceSectionDeleteConfirm,
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
     );
+
+    if (confirmed == true) {
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .deleteSection(widget.sectionId, widget.repertoireId);
+      ref.invalidate(studentRepertoiresProvider(widget.studentId));
+      if (mounted) {
+        navigator.pop();
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import 'lesson_student_info.dart';
 
 /// Student picker bottom sheet
@@ -14,12 +15,9 @@ void showLessonStudentPicker({
   required LessonStudentInfo? selectedStudent,
   required ValueChanged<LessonStudentInfo> onStudentSelected,
 }) {
-  showModalBottomSheet(
+  showNotebookModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero,
-    ),
     builder:
         (context) => DraggableScrollableSheet(
           initialChildSize: 0.6,

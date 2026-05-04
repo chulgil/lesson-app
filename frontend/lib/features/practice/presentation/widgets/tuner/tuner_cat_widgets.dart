@@ -55,16 +55,7 @@ class StatusBubble extends StatelessWidget {
         horizontal: AppSpacing.space3,
         vertical: 6,
       ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: Text(
         message,
         style: AppTypography.bodyMedium.copyWith(
@@ -144,13 +135,6 @@ class CatSpeechBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20 * adjustedScale), // More rounded
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Text(
         message,
@@ -227,8 +211,8 @@ class NoteWithCent extends StatelessWidget {
             // Note name (large)
             Text(
               note.name.sharpName,
-              style: TextStyle(
-                fontSize: 72, // Increased to 72
+              style: AppTypography.displayLarge.copyWith(
+                fontSize: 72,
                 fontWeight: FontWeight.bold,
                 color: noteColor,
               ),
@@ -236,7 +220,7 @@ class NoteWithCent extends StatelessWidget {
             // Octave
             Text(
               '${note.octave}',
-              style: TextStyle(
+              style: AppTypography.displayLarge.copyWith(
                 fontSize: 38,
                 fontWeight: FontWeight.w600,
                 color: noteColor.withValues(alpha: 0.7),
@@ -247,7 +231,7 @@ class NoteWithCent extends StatelessWidget {
         // Cent deviation (below, closer)
         Text(
           centText,
-          style: TextStyle(
+          style: AppTypography.headingMedium.copyWith(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: centColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -20,9 +21,9 @@ class ChildProfilesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profilesAsync = ref.watch(childProfilesProvider(parentId));
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       appBar: AppBar(
-        title: const Text('자녀 관리'),
+        title: const Text(AppStrings.parentHomeChildManagement),
         centerTitle: true,
         actions: [
           IconButton(
@@ -45,7 +46,10 @@ class ChildProfilesScreen extends ConsumerWidget {
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  Text(
+                    AppStrings.errorOccurred,
+                    style: AppTypography.bodyLarge,
+                  ),
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
                     onPressed:
@@ -79,7 +83,10 @@ class ChildProfilesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text('등록된 자녀가 없습니다', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.parentHomeNoChildren,
+              style: NotebookTypography.sectionTitle,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
@@ -93,7 +100,7 @@ class ChildProfilesScreen extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () => _navigateToAddChild(context),
               icon: const Icon(Icons.add),
-              label: const Text('자녀 추가하기'),
+              label: const Text(AppStrings.parentHomeAddChild),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
                 foregroundColor: AppColors.paper,
@@ -137,7 +144,7 @@ class ChildProfilesScreen extends ConsumerWidget {
       child: OutlinedButton.icon(
         onPressed: () => _navigateToAddChild(context),
         icon: const Icon(Icons.add),
-        label: const Text('자녀 추가하기'),
+        label: const Text(AppStrings.parentHomeAddChild),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.paperAccent,
           side: BorderSide(color: AppColors.paperAccent),
@@ -201,7 +208,7 @@ class _ChildProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(

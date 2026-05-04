@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -72,7 +73,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     return lessonAsync.when(
       data: (lesson) {
         if (lesson == null) {
-          return Scaffold(
+          return NotebookScreenScaffold(
             appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
             body: const Center(child: Text(AppStrings.lessonNotFound)),
           );
@@ -80,7 +81,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
 
         _initFromLesson(lesson);
 
-        return Scaffold(
+        return NotebookScreenScaffold(
           appBar: AppBar(
             title: Text(AppStrings.studentFeedbackTitle(lesson.studentName)),
             actions: [
@@ -178,12 +179,12 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         );
       },
       loading:
-          () => Scaffold(
+          () => NotebookScreenScaffold(
             appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
-          (error, _) => Scaffold(
+          (error, _) => NotebookScreenScaffold(
             appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
             body: Center(
               child: Text(

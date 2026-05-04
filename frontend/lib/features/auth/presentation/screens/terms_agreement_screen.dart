@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../providers/auth_provider.dart';
 
@@ -46,7 +48,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       body: SafeArea(
         child: Padding(
@@ -57,7 +59,10 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               const SizedBox(height: AppSpacing.space8),
 
               // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
-              Text('서비스 이용 동의', style: NotebookTypography.sectionTitle),
+              Text(
+                AppStrings.authTermsAgreement,
+                style: NotebookTypography.sectionTitle,
+              ),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 '원활한 서비스 이용을 위해\n아래 약관에 동의해 주세요.',
@@ -76,7 +81,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               // Individual items
               _buildTermItem(
                 required: true,
-                label: '서비스 이용약관 동의',
+                label: AppStrings.authTermsOfService,
                 value: _termsOfService,
                 onChanged: (v) => setState(() => _termsOfService = v ?? false),
                 onViewContent:
@@ -89,7 +94,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               const SizedBox(height: AppSpacing.space3),
               _buildTermItem(
                 required: true,
-                label: '개인정보 수집·이용 동의',
+                label: AppStrings.authPrivacyPolicy,
                 value: _privacyPolicy,
                 onChanged: (v) => setState(() => _privacyPolicy = v ?? false),
                 onViewContent:
@@ -102,7 +107,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               const SizedBox(height: AppSpacing.space3),
               _buildTermItem(
                 required: false,
-                label: '마케팅 정보 수신 동의',
+                label: AppStrings.authMarketingConsent,
                 value: _marketingConsent,
                 onChanged:
                     (v) => setState(() => _marketingConsent = v ?? false),
@@ -127,9 +132,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                     disabledBackgroundColor: AppColors.paperAccent.withValues(
                       alpha: 0.3,
                     ),
-                    shape: RoundedRectangleBorder(
-                      
-                    ),
+                    shape: RoundedRectangleBorder(),
                   ),
                   child: Text(
                     '계속',
@@ -163,9 +166,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
           color: AppColors.paper,
           border: Border.all(
             color:
-                _allChecked
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
+                _allChecked ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -240,12 +241,9 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
   }
 
   void _showTermsContent(BuildContext context, String title, String content) {
-    showModalBottomSheet(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,

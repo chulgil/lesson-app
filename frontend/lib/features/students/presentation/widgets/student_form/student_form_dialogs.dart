@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
@@ -7,6 +8,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/utils/image_utils.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 
 /// Show image picker options and return the cropped image path.
 ///
@@ -19,7 +21,7 @@ Future<String?> showImagePickerFlow(
 }) async {
   final action = await showImagePickerBottomSheet(
     context,
-    title: '프로필 사진',
+    title: AppStrings.studentProfilePhotoTitle,
     showDelete: existingImage != null,
   );
 
@@ -60,51 +62,50 @@ Future<ImagePickerAction?> showImagePickerBottomSheet(
   required String title,
   bool showDelete = false,
 }) async {
-  return showModalBottomSheet<ImagePickerAction>(
+  return showNotebookBottomSheet<ImagePickerAction>(
     context: context,
-    shape: const RoundedRectangleBorder(),
+    showHandle: false,
+    padding: EdgeInsets.zero,
     builder:
-        (context) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: AppSpacing.space2),
-              const BottomSheetHandle(margin: EdgeInsets.zero),
-              const SizedBox(height: AppSpacing.space3),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.screenPadding,
-                ),
-                child: Text(
-                  title,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+        (context) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space2),
+            const BottomSheetHandle(margin: EdgeInsets.zero),
+            const SizedBox(height: AppSpacing.space3),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: Text(
+                title,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: AppSpacing.space2),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text(AppStrings.studentImageGallery),
+              onTap: () => Navigator.pop(context, ImagePickerAction.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text(AppStrings.studentImageCamera),
+              onTap: () => Navigator.pop(context, ImagePickerAction.camera),
+            ),
+            if (showDelete)
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('갤러리에서 선택'),
-                onTap: () => Navigator.pop(context, ImagePickerAction.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('카메라로 촬영'),
-                onTap: () => Navigator.pop(context, ImagePickerAction.camera),
-              ),
-              if (showDelete)
-                ListTile(
-                  leading: Icon(Icons.delete, color: AppColors.paperAccent),
-                  title: Text(
-                    '사진 삭제',
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
-                  onTap: () => Navigator.pop(context, ImagePickerAction.delete),
+                leading: Icon(Icons.delete, color: AppColors.paperAccent),
+                title: Text(
+                  '사진 삭제',
+                  style: TextStyle(color: AppColors.paperAccent),
                 ),
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
+                onTap: () => Navigator.pop(context, ImagePickerAction.delete),
+              ),
+            const SizedBox(height: AppSpacing.space4),
+          ],
         ),
   );
 }
@@ -118,48 +119,47 @@ void showImagePickerOptions(
   VoidCallback? onGallery,
   VoidCallback? onDelete,
 }) {
-  showModalBottomSheet(
+  showNotebookBottomSheet<void>(
     context: context,
-    shape: const RoundedRectangleBorder(),
+    showHandle: false,
+    padding: EdgeInsets.zero,
     builder:
-        (context) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: AppSpacing.space2),
-              const BottomSheetHandle(margin: EdgeInsets.zero),
-              const SizedBox(height: AppSpacing.space4),
+        (context) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space2),
+            const BottomSheetHandle(margin: EdgeInsets.zero),
+            const SizedBox(height: AppSpacing.space4),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text(AppStrings.studentImageCamera),
+              onTap: () {
+                Navigator.pop(context);
+                onCamera?.call();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text(AppStrings.studentImageGallery),
+              onTap: () {
+                Navigator.pop(context);
+                onGallery?.call();
+              },
+            ),
+            if (onDelete != null)
               ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('카메라로 촬영'),
-                onTap: () {
-                  Navigator.pop(context);
-                  onCamera?.call();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('갤러리에서 선택'),
-                onTap: () {
-                  Navigator.pop(context);
-                  onGallery?.call();
-                },
-              ),
-              if (onDelete != null)
-                ListTile(
-                  leading: Icon(Icons.delete, color: AppColors.paperAccent),
-                  title: Text(
-                    '사진 삭제',
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    onDelete.call();
-                  },
+                leading: Icon(Icons.delete, color: AppColors.paperAccent),
+                title: Text(
+                  '사진 삭제',
+                  style: TextStyle(color: AppColors.paperAccent),
                 ),
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
+                onTap: () {
+                  Navigator.pop(context);
+                  onDelete.call();
+                },
+              ),
+            const SizedBox(height: AppSpacing.space4),
+          ],
         ),
   );
 }
@@ -178,13 +178,13 @@ void showExitConfirmation(
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
-          title: const Text('변경사항 취소'),
-          content: const Text('변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?'),
+        (context) => NotebookAlertDialog(
+          title: const Text(AppStrings.cancelChangesTitle),
+          content: const Text(AppStrings.studentExitConfirmMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('계속 수정'),
+              child: const Text(AppStrings.continueEditing),
             ),
             TextButton(
               onPressed: () {
@@ -194,7 +194,7 @@ void showExitConfirmation(
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.paperAccent,
               ),
-              child: const Text('나가기'),
+              child: const Text(AppStrings.exitAction),
             ),
           ],
         ),
@@ -210,8 +210,8 @@ void showDeleteStudentConfirmation(
   showDialog(
     context: context,
     builder:
-        (context) => AlertDialog(
-          title: const Text('학생 삭제'),
+        (context) => NotebookAlertDialog(
+          title: const Text(AppStrings.studentDeleteTitle),
           content: Text(
             '$studentName 학생을 삭제하시겠습니까?\n\n'
             '관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n'

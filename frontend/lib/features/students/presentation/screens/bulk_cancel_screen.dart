@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/domain/entities/entities.dart';
 import '../providers/bulk_teacher_action_providers.dart';
@@ -61,27 +63,19 @@ class _BulkCancelScreenState extends ConsumerState<BulkCancelScreen> {
   Future<void> _confirm() async {
     final date = _targetDate;
     if (date == null || _submitting) return;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('휴강 공지 발송'),
-            content: Text(
-              '${formatDateYMD(date)}\n'
-              '${_affected.length}건의 레슨이 취소되고, '
-              '${_affected.map((l) => l.studentId).toSet().length}명에게 알림이 발송됩니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('발송'),
-              ),
-            ],
-          ),
+      title: AppStrings.studentBulkCancelConfirmTitle,
+      content: Text(
+        '${formatDateYMD(date)}\n'
+        '${_affected.length}건의 레슨이 취소되고, '
+        '${_affected.map((l) => l.studentId).toSet().length}명에게 알림이 발송됩니다.',
+      ),
+      confirmLabel: '발송',
+      cancelLabel: '취소',
+      confirmColor: AppColors.paperAccent,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
     );
     if (confirmed != true || !mounted) return;
 
@@ -115,8 +109,8 @@ class _BulkCancelScreenState extends ConsumerState<BulkCancelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('휴강 공지')),
+    return NotebookScreenScaffold(
+      appBar: AppBar(title: const Text(AppStrings.studentBulkCancelLabel)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -149,7 +143,7 @@ class _BulkCancelScreenState extends ConsumerState<BulkCancelScreen> {
                 maxLength: 120,
                 decoration: const InputDecoration(
                   labelText: '사유 (선택)',
-                  hintText: '선생님 개인 사정으로 휴강합니다.',
+                  hintText: AppStrings.studentBulkCancelReasonHint,
                   border: OutlineInputBorder(),
                 ),
                 enabled: !_submitting,

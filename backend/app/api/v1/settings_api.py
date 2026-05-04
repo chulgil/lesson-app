@@ -307,6 +307,23 @@ async def create_teaching_resource(
     return result
 
 
+@router.get(
+    "/teaching-resources/{resource_id}",
+    response_model=TeachingResourceResponse,
+    summary="Get teaching resource",
+)
+async def get_teaching_resource(
+    resource_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeachingResourceResponse:
+    service = SettingsService(db)
+    result: TeachingResourceResponse = await service.get_teaching_resource(
+        resource_id, current_user.id
+    )
+    return result
+
+
 @router.put(
     "/teaching-resources/{resource_id}",
     response_model=TeachingResourceResponse,

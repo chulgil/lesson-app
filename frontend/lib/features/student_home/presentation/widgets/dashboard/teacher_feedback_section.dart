@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -27,14 +28,17 @@ class TeacherFeedbackSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-            Text('최근 피드백', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentHomeRecentFeedback,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton(
               onPressed: () {
                 context.push(
                   '${AppRoutes.repertoireHistory}?studentId=$studentId',
                 );
               },
-              child: const Text('더보기'),
+              child: const Text(AppStrings.showMore),
             ),
           ],
         ),

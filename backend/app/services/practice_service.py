@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -298,6 +298,51 @@ class PracticeService:
         )
         if streak is None:
             return PracticeStreakResponse()
+        return PracticeStreakResponse.model_validate(streak)
+
+    async def update_streak(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
+        """Ensure a streak row exists and return it."""
+        from app.models.practice import PracticeStreak
+
+        sid = student_id or current_user.id
+        streak = await self.db.scalar(
+            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        )
+        if streak is None:
+            streak = PracticeStreak(student_id=sid)
+            self.db.add(streak)
+            await self.db.flush()
+            await self.db.refresh(streak)
+        return PracticeStreakResponse.model_validate(streak)
+
+    async def record_practice(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
+        """Record today's practice and update the streak counters."""
+        from app.models.practice import PracticeStreak
+
+        sid = student_id or current_user.id
+        streak = await self.db.scalar(
+            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        )
+        if streak is None:
+            streak = PracticeStreak(student_id=sid)
+            self.db.add(streak)
+
+        today = date.today()
+        if streak.last_practice_date == today:
+            await self.db.flush()
+            await self.db.refresh(streak)
+            return PracticeStreakResponse.model_validate(streak)
+
+        if streak.last_practice_date == today - timedelta(days=1):
+            streak.current_streak += 1
+        else:
+            streak.current_streak = 1
+
+        streak.longest_streak = max(streak.longest_streak, streak.current_streak)
+        streak.last_practice_date = today
+        streak.total_practice_days += 1
+        await self.db.flush()
+        await self.db.refresh(streak)
         return PracticeStreakResponse.model_validate(streak)
 
     async def get_stats(

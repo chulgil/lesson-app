@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -217,7 +218,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               return _buildRepertoireList(sortedRepertoires, studentId);
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+            error:
+                (_, __) =>
+                    Center(child: Text(AppStrings.profileVisibilityErrorState)),
           ),
         ),
       ],

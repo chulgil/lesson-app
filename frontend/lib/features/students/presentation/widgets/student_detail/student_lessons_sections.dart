@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -30,14 +31,17 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('다가오는 레슨', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentUpcomingLessons,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton(
               onPressed: () {
                 context.push(
                   AppRoutes.studentNotes.replaceFirst(':id', studentId),
                 );
               },
-              child: const Text('전체 보기'),
+              child: const Text(AppStrings.studentViewAll),
             ),
           ],
         ),
@@ -51,9 +55,7 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
             if (upcomingLessons.isEmpty) {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(Icons.event_busy, color: AppColors.inkTertiary),
@@ -87,10 +89,8 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
           error:
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft
-                ),
-                child: const Text('레슨 정보를 불러올 수 없습니다'),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+                child: const Text(AppStrings.studentLessonLoadError),
               ),
         ),
       ],
@@ -115,14 +115,17 @@ class StudentRecentLessonsSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Notebook × Score: 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-            Text('최근 레슨', style: NotebookTypography.sectionTitle),
+            Text(
+              AppStrings.studentRecentLessons,
+              style: NotebookTypography.sectionTitle,
+            ),
             TextButton(
               onPressed: () {
                 context.push(
                   AppRoutes.studentNotes.replaceFirst(':id', studentId),
                 );
               },
-              child: const Text('전체 보기'),
+              child: const Text(AppStrings.studentViewAll),
             ),
           ],
         ),
@@ -139,9 +142,7 @@ class StudentRecentLessonsSection extends ConsumerWidget {
             if (recentLessons.isEmpty) {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.paperDark
-                ),
+                decoration: BoxDecoration(color: AppColors.paperDark),
                 child: Row(
                   children: [
                     Icon(Icons.history, color: AppColors.inkTertiary),
@@ -177,10 +178,8 @@ class StudentRecentLessonsSection extends ConsumerWidget {
           error:
               (_, __) => Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft
-                ),
-                child: const Text('레슨 기록을 불러올 수 없습니다'),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+                child: const Text(AppStrings.studentLessonHistoryError),
               ),
         ),
       ],

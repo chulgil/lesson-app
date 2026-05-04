@@ -99,90 +99,35 @@ class RequestListItem extends StatelessWidget {
   }
 
   Widget _buildInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Line 1: source badge + type + elapsed time
-        _buildLine1(),
-        const SizedBox(height: AppSpacing.space1),
-
-        // Line 2: name · instrument · level
-        Text(
-          '$_displayName · ${request.instrument} · ${request.experience.label}',
-          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: AppSpacing.space1),
-
-        // Line 3: 1st preferred time + "외 N건"
-        _buildLine3(),
-      ],
-    );
-  }
-
-  /// Line 1: [학원명/개인레슨] · [체험/정규]
-  Widget _buildLine1() {
     final source =
         request.isAcademy
             ? (academyName ?? AppStrings.academy)
             : AppStrings.individualLesson;
 
-    return Text(
-      '$source · ${request.typeDisplayLabel}',
-      style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  /// Line 3: 1st preferred slot + "외 N건"
-  Widget _buildLine3() {
-    final slots = request.preferredSlots;
-    if (slots.isEmpty) {
-      return Text(
-        AppStrings.noTimeSpecified,
-        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
-      );
-    }
-
-    // Sort by priority, take the first
-    final sorted = [...slots]..sort((a, b) => a.priority.compareTo(b.priority));
-    final firstSlot = sorted.first;
-    final remaining = slots.length - 1;
-
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.calendar_today,
-          size: AppSpacing.iconXS,
-          color: AppColors.inkTertiary,
+        // Line 1: name · instrument · level
+        Text(
+          '$_displayName · ${request.instrument} · ${request.experience.label}',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(width: AppSpacing.space1),
-        Expanded(
-          child: Text(
-            firstSlot.displayLabel,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
+        const SizedBox(height: AppSpacing.space1),
+
+        // Line 2: source · type
+        Text(
+          '$source · ${request.typeDisplayLabel}',
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        if (remaining > 0) ...[
-          const SizedBox(width: AppSpacing.space1),
-          Text(
-            AppStrings.slotsRemaining(remaining),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
-          ),
-        ],
       ],
     );
   }
 
-  /// Right column: status chip + elapsed time (vertically stacked).
+  /// Right column: status chip + elapsed time — matches schedule change request list style.
   Widget _buildRightColumn() {
     final label =
         _isStudentView
@@ -199,19 +144,21 @@ class RequestListItem extends StatelessWidget {
             horizontal: AppSpacing.space2,
             vertical: AppSpacing.space1,
           ),
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.12)),
+          decoration: BoxDecoration(
+            border: Border.all(color: color, width: 1),
+          ),
           child: Text(
             label,
-            style: AppTypography.bodySmall.copyWith(
-              fontWeight: FontWeight.w600,
+            style: AppTypography.caption.copyWith(
               color: color,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           formatRelativeTime(request.createdAt),
-          style: AppTypography.bodySmall.copyWith(
+          style: AppTypography.caption.copyWith(
             color: urgent ? AppColors.paperAccent : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -231,7 +232,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (context) => NotebookAlertDialog(
             title: const Text(AppStrings.deletePracticeItemTitle),
             content: const Text(AppStrings.deletePracticeItemConfirm),
             actions: [
