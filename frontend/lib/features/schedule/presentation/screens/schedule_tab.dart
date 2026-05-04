@@ -376,7 +376,7 @@ class ScheduleTab extends ConsumerWidget {
                 IconButton(
                   onPressed: () => _navigateToAddLesson(context, ref),
                   icon: const Icon(
-                    Icons.check_box_outlined,
+                    Icons.add,
                     color: AppColors.ink,
                     size: 22,
                   ),

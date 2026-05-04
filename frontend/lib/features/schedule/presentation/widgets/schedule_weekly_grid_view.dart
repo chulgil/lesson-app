@@ -28,10 +28,10 @@ import '../utils/schedule_visual_helpers.dart';
 const double _weeklyGridTimeColumnWidth = 16;
 
 @visibleForTesting
-const double scheduleWeeklyGridLessonNameFontSize = 18;
+const double scheduleWeeklyGridLessonNameFontSize = 16;
 
 @visibleForTesting
-const double scheduleWeeklyGridUtilityLabelFontSize = 16.5;
+const double scheduleWeeklyGridUtilityLabelFontSize = 16;
 
 /// Weekly summary grid showing 7-day overview of lessons.
 /// Bird's eye view with instrument-colored cells, today highlight,
@@ -394,7 +394,7 @@ class _ScheduleWeeklyGridViewState
           child: Text(
             '이동',
             style: NotebookTypography.hand.copyWith(
-              color: AppColors.scheduleTravelAccent,
+              color: AppColors.inkSecondary,
               fontSize: scheduleWeeklyGridUtilityLabelFontSize,
               fontWeight: FontWeight.w700,
               height: 1.0,
@@ -536,8 +536,8 @@ class _ScheduleWeeklyGridViewState
           shortName,
           style: NotebookTypography.hand.copyWith(
             fontSize: scheduleWeeklyGridLessonNameFontSize,
-            color: lesson.isPreview ? AppColors.inkTertiary : AppColors.ink,
-            fontWeight: lesson.isPreview ? FontWeight.w400 : FontWeight.w700,
+            color: lesson.isPreview ? AppColors.inkTertiary : AppColors.inkSecondary,
+            fontWeight: FontWeight.w700,
             height: 1.0,
           ),
           maxLines: 1,
