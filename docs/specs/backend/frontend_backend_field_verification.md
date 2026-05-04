@@ -156,17 +156,17 @@
 | 3 | SubscriptionTemplate 필드명 매핑 정리 (ownerId↔teacher_id, totalLessons↔lessons_count, price↔amount) | API 직렬화에서 alias 처리 |
 | 4 | ScheduleCardStatus enum 통일 (changedTime vs rejected, dismissed vs expired) | 상태 표시 불일치 |
 
-### P1 — 기능 완성도
+### ~~P1 — 기능 완성도~~ ✅ 완료 (2026-05-04)
 
-| # | 작업 |
-|---|------|
-| 5 | SubscriptionProposal에 renewal 관련 4개 컬럼 추가 |
-| 6 | SubscriptionUsage에 `note`, `deducted` 컬럼 추가 |
-| 7 | Lesson에 `student_note`, `subscription_id` 컬럼 추가 |
+| # | 작업 | 상태 |
+|---|------|------|
+| ~~5~~ | SubscriptionProposal renewal 4컬럼 | ✅ P0에서 함께 완료 |
+| ~~6~~ | SubscriptionUsage `note`, `deducted` | ✅ P0에서 함께 완료 |
+| ~~7~~ | Lesson `student_note`, `subscription_id` | ✅ 완료 |
 
-### P2 — 나중에
+### P2 — MVP 이후
 
-| # | 작업 |
-|---|------|
-| 8 | 학원(academy) owner_type 지원 |
-| 9 | RelationshipStatus 프론트/백 통일 |
+| # | 작업 | 비고 |
+|---|------|------|
+| 8 | 학원(academy) owner_type 지원 | 학원 기능 구현 시 |
+| 9 | RelationshipStatus 프론트/백 통일 | 백엔드가 상위 집합 (7개 vs 4개), 프론트에서 unknown graceful 처리로 대응 |
