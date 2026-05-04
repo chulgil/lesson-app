@@ -127,11 +127,40 @@ class LessonService:
     async def update_status(self, lesson_id: str, new_status: str, current_user: Any) -> LessonResponse:
         """Change lesson status."""
         from app.models.lesson import Lesson, LessonStatus
+        from app.models.request_event import RequestEvent, RequestEventType
 
         lesson = await self.db.get(Lesson, lesson_id)
         if lesson is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
         lesson.status = LessonStatus(new_status)
+
+        # Phase 3 event logging
+        role = getattr(getattr(current_user, "role", None), "value", None) or "teacher"
+        if new_status == LessonStatus.completed.value:
+            self.db.add(
+                RequestEvent(
+                    request_id=lesson.id,
+                    actor_type=role,
+                    actor_id=current_user.id,
+                    event_type=RequestEventType.lessonCompleted,
+                    subscription_id=lesson.subscription_id,
+                )
+            )
+        elif new_status.startswith("cancelled") or new_status in (
+            LessonStatus.noShow.value,
+            LessonStatus.studentAbsent.value,
+        ):
+            self.db.add(
+                RequestEvent(
+                    request_id=lesson.id,
+                    actor_type=role,
+                    actor_id=current_user.id,
+                    event_type=RequestEventType.lessonCancelled,
+                    subscription_id=lesson.subscription_id,
+                    message=new_status,
+                )
+            )
+
         await self.db.flush()
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
@@ -141,6 +170,7 @@ class LessonService:
     ) -> LessonResponse:
         """Write or update feedback for a lesson."""
         from app.models.lesson import Lesson
+        from app.models.request_event import RequestEvent, RequestEventType
 
         lesson = await self.db.get(Lesson, lesson_id)
         if lesson is None:
@@ -150,6 +180,18 @@ class LessonService:
             lesson.feedback = data.feedback
         if data.practice_tips is not None:
             lesson.practice_tips = data.practice_tips
+
+        # Phase 3 event logging
+        self.db.add(
+            RequestEvent(
+                request_id=lesson.id,
+                actor_type="teacher",
+                actor_id=current_user.id,
+                event_type=RequestEventType.lessonNoteAdded,
+                subscription_id=lesson.subscription_id,
+            )
+        )
+
         await self.db.flush()
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)

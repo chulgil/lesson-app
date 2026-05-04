@@ -452,6 +452,9 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(proposal)
 
+        # Apply golden-time discount metadata for auto-proposals
+        await self._apply_golden_time_discount(proposal, tid)
+
         # GAP-1: Link LessonRequest ↔ Proposal bidirectionally + event log
         if data.lesson_request_id:
             await self._link_request_to_proposal(data.lesson_request_id, proposal.id)
@@ -545,20 +548,29 @@ class SubscriptionService:
 
             template_id = proposal.selected_template_id or proposal.recommended_template_id or proposal.template_id
             template = await self.db.get(SubscriptionTemplate, template_id) if template_id else None
+
+            # Resolve discount amount (golden-time or pre-set)
+            original_amount = template.amount if template else 0
+            discount_amount = await self._resolve_discount_amount(
+                proposal, original_amount,
+            )
+            discount_reason = proposal.discount_reason if discount_amount > 0 else None
+
             sub = Subscription(
                 student_id=proposal.student_id,
                 membership_id=membership_id,
                 type=template.type if template else "monthly",
                 total_lessons=template.lessons_count if template else None,
                 lessons_per_month=template.lessons_per_month if template else None,
-                amount=template.amount if template else 0,
+                amount=original_amount - discount_amount,
+                original_amount=original_amount,
                 status=SubscriptionStatus.active,
                 payment_confirmed=True,
                 payment_method=PaymentMethod.bankTransfer,
                 paid_at=proposal.payment_notified_at or now,
                 payment_confirmed_at=now,
-                discount_amount=proposal.discount_amount,
-                discount_reason=proposal.discount_reason,
+                discount_amount=discount_amount if discount_amount > 0 else None,
+                discount_reason=discount_reason,
             )
             self.db.add(sub)
             await self.db.flush()
@@ -710,6 +722,65 @@ class SubscriptionService:
         relation.status = RelationStatus.active
         relation.active_subscription_id = subscription_id
         await self.db.flush()
+
+    async def _apply_golden_time_discount(
+        self, proposal: Any, teacher_id: str
+    ) -> None:
+        """Tag auto-proposals with golden-time discount metadata.
+
+        The actual discount amount is calculated at confirmation time
+        (see ``_resolve_discount_amount``), because we need to know
+        how many hours elapsed between proposal creation and student
+        acceptance.
+        """
+        from app.models.settings import ProposalSettings
+
+        if not proposal.is_auto_proposal:
+            return
+
+        settings = await self.db.scalar(
+            select(ProposalSettings).where(ProposalSettings.teacher_id == teacher_id)
+        )
+        if settings is None:
+            return
+
+        if settings.golden_time_discount_percent > 0:
+            proposal.discount_amount = None  # Resolved at confirmation
+            proposal.discount_reason = (
+                f"golden_time_{settings.golden_time_hours}h"
+                f"_{settings.golden_time_discount_percent}%"
+            )
+            await self.db.flush()
+
+    async def _resolve_discount_amount(
+        self, proposal: Any, original_amount: int
+    ) -> int:
+        """Calculate the final discount amount for a proposal.
+
+        For golden-time discounts the student must have responded
+        (``payment_notified_at``) within the configured hours window.
+        For other discount types the pre-set ``discount_amount`` is
+        returned as-is.
+        """
+        if not proposal.discount_reason:
+            return proposal.discount_amount or 0
+
+        if proposal.discount_reason.startswith("golden_time_"):
+            from app.models.settings import ProposalSettings
+
+            ps = await self.db.scalar(
+                select(ProposalSettings).where(
+                    ProposalSettings.teacher_id == proposal.teacher_id,
+                )
+            )
+            if ps and proposal.payment_notified_at and proposal.created_at:
+                elapsed = proposal.payment_notified_at - proposal.created_at
+                hours_elapsed = elapsed.total_seconds() / 3600
+                if hours_elapsed <= ps.golden_time_hours:
+                    return int(original_amount * ps.golden_time_discount_percent / 100)
+            return 0
+
+        return proposal.discount_amount or 0
 
     async def _create_confirmation_card(
         self,

@@ -145,6 +145,11 @@ class LessonRequestService:
             message=data.message,
         )
         await self.db.refresh(request)
+
+        # Auto-create subscription proposal if teacher has auto_proposal_enabled
+        if request.request_type != "trial":
+            await self._try_auto_proposal(request, current_user)
+
         return await self._to_response(request)
 
     async def get_by_id(self, request_id: str, current_user: Any) -> LessonRequestResponse:
@@ -555,6 +560,43 @@ class LessonRequestService:
         if count:
             await self.db.flush()
         return count
+
+    async def _try_auto_proposal(self, request: Any, current_user: Any) -> None:
+        """Auto-create subscription proposal if teacher has auto_proposal_enabled."""
+        from app.models.settings import ProposalSettings
+
+        settings = await self.db.scalar(
+            select(ProposalSettings).where(
+                ProposalSettings.teacher_id == request.teacher_id
+            )
+        )
+        if settings is None or not settings.auto_proposal_enabled:
+            return
+
+        # Use recommended template or first from auto list
+        template_id = settings.recommended_template_id
+        if not template_id and settings.auto_proposal_template_ids:
+            template_id = settings.auto_proposal_template_ids[0]
+        if not template_id:
+            return  # No template configured
+
+        from app.models.subscription import SubscriptionProposal
+
+        proposal = SubscriptionProposal(
+            teacher_id=request.teacher_id,
+            student_id=request.student_id,
+            recommended_template_id=template_id,
+            lesson_request_id=request.id,
+            is_auto_proposal=True,
+            status="pending",
+            expires_at=datetime.now(UTC) + timedelta(days=7),
+        )
+        self.db.add(proposal)
+        await self.db.flush()
+
+        # Link back to request
+        request.proposal_id = proposal.id
+        await self.db.flush()
 
     async def _to_response(self, request: Any) -> LessonRequestResponse:
         events = await self._get_events(request.id)

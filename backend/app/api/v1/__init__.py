@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     ai_notes,
     auth,
+    availability,
     bookings,
     device_tokens,
     gamification,
@@ -82,4 +83,9 @@ api_router.include_router(
     schedule_exceptions.router,
     prefix="/schedule-exceptions",
     tags=["schedule-exceptions"],
+)
+api_router.include_router(
+    availability.router,
+    prefix="/availability",
+    tags=["availability"],
 )
