@@ -32,11 +32,16 @@ class ScheduleConfirmationService:
             student_id=data.student_id,
             teacher_id=current_user.id,
             subscription_id=data.subscription_id,
+            lesson_request_id=data.lesson_request_id,
+            card_type=data.card_type,
+            instrument=data.instrument,
             title=data.title,
             message=data.message,
             proposed_day=data.proposed_day,
             proposed_time=data.proposed_time,
             proposed_duration=data.proposed_duration,
+            proposed_slots=data.proposed_slots,
+            total_lessons=data.total_lessons,
             expires_at=data.expires_at,
         )
         self.db.add(card)

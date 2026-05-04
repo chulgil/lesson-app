@@ -358,8 +358,15 @@ class SubscriptionService:
             name=data.name,
             type=data.type,
             lessons_count=data.lessons_count,
+            lessons_per_month=data.lessons_per_month,
+            duration_months=data.duration_months,
+            lesson_duration_minutes=data.lesson_duration_minutes,
+            validity_days=data.validity_days,
             amount=data.amount,
             description=data.description,
+            display_order=data.display_order,
+            reschedule_allowance=data.reschedule_allowance,
+            is_auto_proposal_enabled=data.is_auto_proposal_enabled,
         )
         self.db.add(template)
         await self.db.flush()
@@ -670,9 +677,14 @@ class SubscriptionService:
         """GAP-4: Auto-create a ScheduleConfirmationCard after subscription issuance."""
         from app.models.policy import ScheduleConfirmationCard
 
+        from app.models.policy import ConfirmationCardType
+
         proposed_day: str | None = None
         proposed_time: str | None = None
         proposed_duration: int | None = None
+        instrument: str | None = None
+        card_type = ConfirmationCardType.afterTrial
+        total_lessons: int | None = None
 
         if lesson_request_id:
             from app.models.schedule import LessonRequest
@@ -682,16 +694,30 @@ class SubscriptionService:
                 proposed_day = str(lr.preferred_day) if lr.preferred_day is not None else None
                 proposed_time = lr.preferred_time
                 proposed_duration = lr.preferred_duration
+                instrument = lr.instrument
+                if lr.is_returning_student:
+                    card_type = ConfirmationCardType.reEnrollment
+
+        # Get total_lessons from the subscription
+        from app.models.subscription import Subscription
+
+        sub = await self.db.get(Subscription, subscription_id)
+        if sub:
+            total_lessons = sub.total_lessons
 
         card = ScheduleConfirmationCard(
             student_id=student_id,
             teacher_id=teacher_id,
             subscription_id=subscription_id,
-            title="수업 일정 확인",
-            message="이 시간으로 예약할까요?",
+            lesson_request_id=lesson_request_id,
+            card_type=card_type,
+            instrument=instrument,
+            title="schedule.confirmation_card.title",
+            message="schedule.confirmation_card.message",
             proposed_day=proposed_day,
             proposed_time=proposed_time,
             proposed_duration=proposed_duration,
+            total_lessons=total_lessons,
         )
         self.db.add(card)
         await self.db.flush()
