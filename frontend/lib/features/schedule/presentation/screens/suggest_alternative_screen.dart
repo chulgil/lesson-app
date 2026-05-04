@@ -408,11 +408,17 @@ class _SuggestAlternativeScreenState
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
-              enabledBorder: OutlineInputBorder(
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(color: AppColors.inkQuaternary),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.ink),
               ),
             ),
           ),
