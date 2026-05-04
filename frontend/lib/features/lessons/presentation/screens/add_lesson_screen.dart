@@ -145,9 +145,6 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const LessonFormSectionTitle(AppStrings.bulkFeedbackStepStudent),
               const SizedBox(height: AppSpacing.space3),
 
-              // Quick select chips for recent students
-              _buildRecentStudentChips(),
-
               LessonStudentSelector(
                 selectedStudent: _selectedStudent,
                 onTap: _showStudentPicker,
@@ -427,7 +424,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 Expanded(
                   child: Text(
                     AppStrings.noActiveSubscriptionBanner,
-                    style: AppTypography.caption.copyWith(color: AppColors.ink),
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
                   ),
                 ),
               ],
@@ -468,7 +465,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                     children: [
                       Text(
                         AppStrings.recordLessonChecklistHeader,
-                        style: AppTypography.caption.copyWith(
+                        style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.ink,
                         ),
@@ -476,7 +473,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                       const SizedBox(height: AppSpacing.space1),
                       Text(
                         AppStrings.recordLessonChecklistItems,
-                        style: AppTypography.caption.copyWith(
+                        style: AppTypography.bodySmall.copyWith(
                           color: AppColors.ink,
                         ),
                       ),
