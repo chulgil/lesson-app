@@ -6,8 +6,6 @@ import 'package:lessonaza/features/student_home/presentation/providers/student_l
 import 'package:lessonaza/features/student_home/presentation/widgets/student_lesson_progress_section.dart';
 
 void main() {
-  const studentId = 'student_1';
-
   testWidgets('renders action item before waiting item', (tester) async {
     await _pumpSection(tester, _items());
 
