@@ -469,11 +469,11 @@ class AppStrings {
   static const chatProposalSent = '수강권 안내를 보냈습니다';
   static const chatProposalAccepted = '수강권을 수락했습니다';
   static const chatPaymentNotified = '입금했습니다';
-  static const chatCompleted = '수강권이 발급되었습니다';
+  static const chatCompleted = '수강권이 준비됐어요';
   static const chatWithdrawApproval = '결정을 변경했습니다';
   static const chatPaymentRequested = '입금 안내를 보냈습니다';
   static const chatPaymentConfirmed = '입금을 확인했습니다';
-  static const chatSubscriptionIssued = '수강권이 발행되었습니다';
+  static const chatSubscriptionIssued = '수강권이 준비됐어요';
   static const chatLessonCompleted = '레슨이 완료되었습니다';
   static const chatLessonCancelled = '레슨이 취소되었습니다';
   static const chatScheduleChanged = '스케줄이 변경되었습니다';
@@ -630,8 +630,7 @@ class AppStrings {
   static const actionBoxWaitingPayment = '학생의 입금 완료 알림을 기다리고 있습니다';
 
   /// 선생님: 수강권 발행 완료
-  static const actionBoxSubscriptionReady =
-      '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.';
+  static const actionBoxSubscriptionReady = '수강권이 준비됐어요. 레슨을 시작할 준비가 완료되었습니다.';
 
   /// 학생: 입금 확인 대기
   static const actionBoxWaitingVerify = '선생님의 입금 확인을 기다리고 있습니다';
@@ -639,7 +638,7 @@ class AppStrings {
   // ── Subscription Summary (Phase 3/4 chat) ──────────────────
 
   /// 수강권 요약 메시지
-  static const subscriptionSummaryMessage = '수강권이 발행되었습니다';
+  static const subscriptionSummaryMessage = '수강권이 준비됐어요';
 
   /// 수강권 상세 보기 링크
   static const subscriptionDetailLink = '상세 보기';
@@ -1181,8 +1180,17 @@ class AppStrings {
 
   // ── Subscription Issued Card (D-4) ──────────────────────────
 
-  /// 수강권 발급 메시지
-  static const subscriptionIssuedMessage = '수강권이 발급되었습니다';
+  /// 수강권 준비 완료 메시지
+  static const subscriptionIssuedMessage = '수강권이 준비됐어요';
+
+  /// 수강권 준비 후 스케줄 확인 안내
+  static const subscriptionReadyScheduleNeeded = '첫 레슨 시간을 확인해주세요';
+
+  /// 수강권 준비 후 스케줄 확정 안내
+  static const subscriptionReadyScheduleConfirmed = '다음 레슨 일정에 맞춰 시작합니다';
+
+  /// 후불 수강권 준비 안내
+  static const subscriptionReadyPostpaid = '수강권은 준비됐고, 입금 확인은 나중에 진행됩니다';
 
   /// 유효기간
   static const validityPeriod = '유효기간';

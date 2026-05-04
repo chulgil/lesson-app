@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
@@ -101,7 +102,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '수강권이 발급되었습니다!',
+                AppStrings.subscriptionIssuedMessage,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.paperOk,
@@ -109,7 +110,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '레슨 시간을 확정해주세요',
+                AppStrings.subscriptionReadyScheduleNeeded,
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: AppColors.inkSecondary),

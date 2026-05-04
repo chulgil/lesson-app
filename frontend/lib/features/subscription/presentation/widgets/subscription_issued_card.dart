@@ -36,7 +36,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
         children: [
           // Header
           Text(
-            '\u{1F3B5} ${AppStrings.subscriptionIssuedMessage}',
+            AppStrings.subscriptionIssuedMessage,
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.paperAccent,
