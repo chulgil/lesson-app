@@ -762,7 +762,7 @@ enum StudentFilter {
   poor('부족'),
   paused('휴강'),
   expiring('만료임박'),
-  unpaid('입금 확인 대기'),
+  unpaid('입금대기(후불)'),
   trial('체험'),
   archive('보관');
 
@@ -1050,7 +1050,7 @@ class _StudentCard extends ConsumerWidget {
                   border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
-                  '입금 확인 대기',
+                  '입금대기(후불)',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,

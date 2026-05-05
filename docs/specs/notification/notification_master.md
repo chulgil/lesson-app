@@ -150,7 +150,7 @@
 | `lessonNoteShared` | 선생님 레슨 노트 작성 시 | 레슨 노트 | "선생님이 레슨 노트를 공유했습니다" | note | `/lessons/{id}/note` |
 | `lessonsRunningLow` | 수강권 잔여 횟수 ≤ 2 | 수강권 임박 | "김민수 수강권 1회 남음" | warning | `/subscriptions/{id}` |
 | `paymentRequested` | 수강권 입금 안내 발송 | 입금 안내 | "김민수 수강권 입금 안내가 도착했습니다" | payment | `/subscriptions/{id}` |
-| `paymentReminder` | 입금 확인 대기 지속 | 입금 확인 대기 알림 | "김민수 수강권 입금 확인 대기 중" | payment | `/subscriptions/{id}` |
+| `paymentReminder` | 입금 예정/입금대기(후불) 지속 | 입금 안내 알림 | "김민수 수강권 입금 확인을 부탁드립니다" | payment | `/subscriptions/{id}` |
 | `paymentReceived` | 학생/학부모 입금 완료 알림 | 입금 완료 알림 | "김민수님이 입금 완료를 알렸습니다" | payment | `/subscriptions/{id}` |
 | `streakMilestone` | 연속 N일 달성 | 연습 축하 | "7일 연속 연습!" | celebration | `/practice/stats` |
 | `streakWarning` | 연속 기록 위기 (당일 미연습) | 스트릭 경고 | "연속 연습 기록이 끊어질 수 있어요" | warning | `/practice` |
@@ -311,7 +311,7 @@ StudentNotificationSettings
 ├── practiceReminderTime: TimeOfDay      // 연습 리마인더 시간 (기본 19:00)
 ├── streakWarningEnabled: bool           // 스트릭 경고 (기본 true)
 ├── streakWarningTime: TimeOfDay         // 스트릭 경고 시간 (기본 21:00)
-├── paymentReminderEnabled: bool         // 입금 확인 대기 알림 (기본 true)
+├── paymentReminderEnabled: bool         // 입금 안내/입금대기(후불) 알림 (기본 true)
 ├── dndEnabled: bool                     // 방해금지 (기본 true)
 ├── dndStart: TimeOfDay                  // DND 시작 (기본 22:00)
 ├── dndEnd: TimeOfDay                    // DND 종료 (기본 08:00)

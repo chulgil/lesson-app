@@ -269,14 +269,27 @@ class Subscription extends HiveObject {
   /// 🆕 Check if student can reschedule (has remaining allowance).
   bool get canReschedule => remainingReschedule > 0;
 
-  /// Check if this subscription is unpaid (active but not payment confirmed).
-  bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
+  /// Check if this subscription is pending postpaid deposit:
+  /// active, postpaid, and no student payment has been recorded yet.
+  bool get isUnpaid =>
+      status == SubscriptionStatus.active &&
+      !paymentConfirmed &&
+      paidAt == null;
+
+  /// Student has reported payment, but teacher has not confirmed the deposit.
+  bool get needsPaymentConfirmation =>
+      status == SubscriptionStatus.active &&
+      !paymentConfirmed &&
+      paidAt != null;
 
   /// Payment status label for display.
-  String get paymentStatusLabel =>
-      paymentConfirmed
-          ? AppStrings.paymentStatusPaid
-          : AppStrings.paymentStatusUnpaid;
+  String get paymentStatusLabel {
+    if (paymentConfirmed) return AppStrings.paymentStatusPaid;
+    if (needsPaymentConfirmation) {
+      return AppStrings.paymentStatusNeedsConfirmation;
+    }
+    return AppStrings.paymentStatusUnpaid;
+  }
 
   /// Days until expiration.
   int? get daysUntilExpiration => endDate?.difference(DateTime.now()).inDays;

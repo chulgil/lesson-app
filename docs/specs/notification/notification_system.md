@@ -210,12 +210,12 @@ String buildNotificationBody(
 | 알림 ID | 유형 | 수신자 | 타이밍 | 푸시 | 인앱 |
 |---------|------|--------|--------|------|------|
 | `PAYMENT_REQUESTED` | 입금 안내 | 학생 | 요청 시 | ✓ | ✓ |
-| `PAYMENT_REMINDER` | 입금 확인 대기 알림 | 학생 | D-3, D-1 | ✓ | ✓ |
+| `PAYMENT_REMINDER` | 입금 안내 알림 | 학생 | D-3, D-1 | ✓ | ✓ |
 | `PAYMENT_RECEIVED` | 입금 완료 알림 | 선생님 | 학생/학부모 알림 시 | ✓ | ✓ |
 | `PAYMENT_CONFIRMED` | 입금 확인 완료 | 학생 | 확인 후 | ✓ | ✓ |
 | `LESSONS_RUNNING_LOW` | 레슨 소진 예정 | 학생 | 잔여 1회 | ✓ | ✓ |
 | `MONTHLY_SCHEDULE_CREATED` | 🆕 월정액 스케줄 생성 | 학생 | 월초/입금 예정일 | ✓ | ✓ |
-| `MONTHLY_PAYMENT_PENDING` | 🆕 월정액 입금 확인 대기 | 선생님 | 스케줄 생성 시 | ✗ | ✓ |
+| `MONTHLY_PAYMENT_PENDING` | 🆕 월정액 입금대기(후불) | 선생님 | 스케줄 생성 시 | ✗ | ✓ |
 
 ### 3-1. 수강권 관련 알림 (🆕)
 
@@ -496,7 +496,7 @@ bool shouldSendNotification(
 │                                     │
 │  입금 상태 알림                           │
 │  ┌─────────────────────────────────┐│
-│  │ 입금 확인 대기 알림        [ON] ││
+│  │ 입금 안내 알림     [ON] ││
 │  │ 레슨 소진 알림             [ON] ││
 │  └─────────────────────────────────┘│
 │                                     │

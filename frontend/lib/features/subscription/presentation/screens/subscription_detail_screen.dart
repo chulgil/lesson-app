@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
@@ -758,19 +759,12 @@ class _SubscriptionDetailBodyState
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            title: Text(AppStrings.cancellationFreeProcess),
+          (ctx) => NotebookAlertDialog(
+            title: AppStrings.cancellationFreeProcess,
             content: Text(AppStrings.cancellationFreeConfirmDialog),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: Text(AppStrings.confirm),
-              ),
-            ],
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.pop(ctx, false),
+            onConfirm: () => Navigator.pop(ctx, true),
           ),
     );
     if (confirmed != true || !mounted) return;

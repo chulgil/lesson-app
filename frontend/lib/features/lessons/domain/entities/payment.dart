@@ -13,7 +13,7 @@ part 'payment.g.dart';
 
 /// Payment type enum (trial vs regular)
 enum PaymentType {
-  trial,   // 체험 레슨
+  trial, // 체험 레슨
   regular; // 정규 레슨
 
   String get label {
@@ -28,14 +28,14 @@ enum PaymentType {
 
 /// Payment status enum (V2: state-transition based flow)
 enum PaymentStatus {
-  pending,    // 청구됨 (미수금)
-  paid,       // 입금됨 (학생/학부모가 입금 기록)
-  confirmed,  // 확인 완료 (선생님이 입금 확인)
-  overdue,    // 연체 (마감일 초과)
-  cancelled,  // 취소됨
-  refunded,   // 환불됨
+  pending, // 청구됨 (입금 대기)
+  paid, // 입금됨 (학생/학부모가 입금 기록)
+  confirmed, // 확인 완료 (선생님이 입금 확인)
+  overdue, // 연체 (마감일 초과)
+  cancelled, // 취소됨
+  refunded, // 환불됨
   @Deprecated('Use confirmed instead. Kept for backwards compatibility.')
-  completed;  // V1 완료 → V2 confirmed로 마이그레이션 예정
+  completed; // V1 완료 → V2 confirmed로 마이그레이션 예정
 
   String get label {
     switch (this) {
@@ -77,7 +77,8 @@ enum PaymentStatus {
   }
 
   /// V2: Check if payment requires action
-  bool get requiresAction => this == PaymentStatus.pending || this == PaymentStatus.paid;
+  bool get requiresAction =>
+      this == PaymentStatus.pending || this == PaymentStatus.paid;
 
   /// V2: Check if payment is finalized
   bool get isFinalized =>
@@ -112,7 +113,7 @@ enum PaymentMethod {
 /// Billing target type enum
 enum BillingTargetType {
   student, // Default: student pays themselves
-  parent;  // Parent is the billing target
+  parent; // Parent is the billing target
 
   String get label {
     switch (this) {
@@ -154,7 +155,8 @@ class Payment {
   final String? billingTargetName; // Parent name for display
 
   // V2: State transition timestamps
-  final DateTime? paidAt; // When student/parent recorded payment (maps to studentConfirmedAt)
+  final DateTime?
+  paidAt; // When student/parent recorded payment (maps to studentConfirmedAt)
   final String? paidBy; // Who recorded the payment (student or parent ID)
   final DateTime? confirmedAt; // When teacher confirmed the payment
   final String? confirmedBy; // Who confirmed the payment (teacher ID)
@@ -246,9 +248,9 @@ class Payment {
   /// Format amount as Korean won
   String get formattedAmount {
     final formatter = amount.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
@@ -408,18 +410,18 @@ class TuitionSettings {
   /// Format monthly fee
   String get formattedMonthlyFee {
     final formatter = monthlyFee.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
   /// Format lesson fee
   String get formattedLessonFee {
     final formatter = lessonFee.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
@@ -484,18 +486,18 @@ class PaymentSummary {
   /// Format total received
   String get formattedTotalReceived {
     final formatter = totalReceived.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
   /// Format total pending
   String get formattedTotalPending {
     final formatter = totalPending.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 }

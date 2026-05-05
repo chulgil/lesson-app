@@ -1518,7 +1518,7 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 - `features/parent_home/presentation/screens/parent_dashboard_tab.dart` (3건) — CircleAvatar 배경 + 스탯 배경
 - `features/practice/presentation/widgets/section_detail/recording_control.dart` (1건) — `waveColor`. **훅 `dart format` 자동 적용으로 148줄 diff 발생 — 의미 변경은 1건, 나머지는 순수 포매팅(삼항 전개/trailing comma 정규화)**
 - `features/profile/presentation/screens/profile_preview_screen.dart` (2건) — 프리뷰 헤더/스탯
-- `features/profile/presentation/screens/outstanding_payments_screen.dart` (2건) — 미수금 그라디언트 위 텍스트
+- `features/profile/presentation/screens/outstanding_payments_screen.dart` (2건) — 입금대기(후불) 그라디언트 위 텍스트
 - `features/practice/presentation/widgets/waveform/zoomable_waveform.dart` (2건) — 뷰포트 사각형 paint
 - `features/students/presentation/screens/student_detail_screen.dart` (3건) — TabBar 비선택/배지 보더/악기 칩
 - `features/practice/presentation/widgets/practice_streak_card.dart` (7건) — 스트릭 카드 텍스트/주간 점
@@ -1606,7 +1606,7 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 ---
 
-### 7.56 profile/ 미수금·프로필 미리보기·확장 프로필·공개 프로필 시트 섹션 제목 Playfair 통일 — profile/ 배치 #2 + helper 전파 최적화
+### 7.56 profile/ 입금대기(후불)·프로필 미리보기·확장 프로필·공개 프로필 시트 섹션 제목 Playfair 통일 — profile/ 배치 #2 + helper 전파 최적화
 
 **배경**: profile/ 배치 #1(§7.55, 화면 레이어 3파일) 에 이어 이번 배치는 **helper 전파 패턴을 의도적으로 활용**. profile/ 영역에 산재한 `_buildSection`·`_buildSectionTitle` 같은 section title helper 2개를 한 번씩만 수정하여 9 개 정적 타이틀에 일괄 반영. 공통-우선 원칙(users direction: "공통을 수정하면 일괄반영이 가능하기때문에 공통수정쪽으로 설계되어야합니다") 의 정석 구현.
 
@@ -1614,7 +1614,7 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 
 | 파일 | 라인 | 제목 | 패턴 | 전파 효과 |
 |------|------|------|------|---------|
-| `frontend/lib/features/profile/presentation/screens/outstanding_payments_screen.dart` | 87 | "미수금 목록" | §7.17 direct | 1건 |
+| `frontend/lib/features/profile/presentation/screens/outstanding_payments_screen.dart` | 87 | "입금대기(후불) 목록" | §7.17 direct | 1건 |
 | `frontend/lib/features/profile/presentation/screens/profile_preview_screen.dart` | 350 | `_buildSection` helper `title` 파라미터 | §7.17 helper propagation | **6건** (소개/교수 스타일/전문 분야/학력/경력/자격증) |
 | `frontend/lib/features/profile/presentation/screens/extended_profile_screen.dart` | 86 | `_buildSectionTitle` helper | §7.17 helper propagation | **3건** (학력/경력/자격증) |
 | `frontend/lib/features/profile/presentation/widgets/profile_visibility_widgets.dart` | 514 | "공개 프로필 미리보기" | §7.27 appBarTitle | 1건 (BottomSheetHandle + title 조합) |
@@ -1623,7 +1623,7 @@ alpha 값은 의미(투명도 단계) 이므로 변환하지 않음 — Material
 - **helper 전파 = 공통-우선 원칙의 정량적 증거**: 코드 교체는 4 라인이지만 렌더링 결과는 **11 개 섹션 타이틀** 이 Playfair 로 전환됨. 비율 2.75 배. profile/ 영역처럼 section helper 가 이미 존재하는 도메인에서는 helper 1 수정이 direct 1 수정보다 항상 우위.
 - **§7.27 appBarTitle 판별 — BottomSheetHandle 의 위치**: `profile_visibility_widgets:512` 의 "공개 프로필 미리보기" 는 DraggableScrollableSheet 내부 Column 안에 `BottomSheetHandle` (line 499) + `Padding > Row > [Icon + Text + Spacer + IconButton]` 구조. **BottomSheetHandle 가 같은 Column 의 직전 자식** 이므로 §7.27 판별 적중. `lesson_time_settings_screen` 의 `showModalBottomSheet + SafeArea + Column` 구조와는 달리 handle 이 명시적으로 붙어 있어 appBarTitle 로 판정.
 - **§7.30 예외 5건 정리 (profile/ 도메인)**:
-  - Empty-state headline: `outstanding_payments_screen:48` "미수금이 없습니다"
+  - Empty-state headline: `outstanding_payments_screen:48` "입금대기(후불) 항목이 없습니다"
   - 가격: `outstanding_payments_screen:224` `formatWonWithComma(subscription.amount)` (paperAccent 강조색)
   - 동적 연도 라벨: `payment_management_screen:244` `'$selectedYear년'` (IconButton 사이 동적 연도 스와이퍼)
   - 동적 요금 범위: `extended_profile_dialogs:177` `FeeRange(...).formatted` (슬라이더 아래 동적 금액)
@@ -2090,7 +2090,7 @@ flutter analyze <17 files>
 | `issue_form_membership_widgets.dart` | 224 | '등록된 레슨이 없습니다' | empty state headline |
 | `issue_form_membership_widgets.dart` | 259 | '오류가 발생했습니다' | error headline |
 | `proposal_card_widgets.dart` | 329 | `_formatPrice(discountedPrice)` | dynamic price |
-| `proposal_card_widgets.dart` | 567 | '입금 확인 대기중' | status headline with icon |
+| `proposal_card_widgets.dart` | 567 | '입금 확인 중' | status headline with icon |
 | `template_choice_card.dart` | 72 | `template.name` | dynamic template name |
 | `selectable_template_card.dart` | 147 | `template.formattedPrice` | dynamic price |
 
@@ -2482,14 +2482,14 @@ flutter analyze <17 files>
 | 파일:라인 | 텍스트 | 제외 카테고리 |
 |---|---|---|
 | extended_profile_dialogs:177 | `FeeRange(...).formatted` (`paperAccent` color) | dynamic stat value |
-| outstanding_payments_screen:48 | `'미수금이 없습니다'` (check_circle icon) | empty-state headline with icon |
+| outstanding_payments_screen:48 | `'입금대기(후불) 항목이 없습니다'` (check_circle icon) | empty-state headline with icon |
 | outstanding_payments_screen:224 | `formatWonWithComma(amount)` (`paperAccent` color) | dynamic price value |
 | payment_management_screen:244 | `'$selectedYear년'` (navigation arrows 사이) | dynamic calendar label |
 | payment_detail_sheet:52 | `studentName[0]` (`Colors.white` on paperAccentSoft) | avatar initial |
 
 **§7.50 관찰 (차기 배치 후보)**: `payment_detail_sheet:52` 의 avatar Colors.white 는 paperAccentSoft 배경 위 foreground → §7.50 paper 통일 대상. 이번 배치는 타이포 스코프라 §7.50 은 별도 사이클로 이월.
 
-**가설 검증 결과**: "profile/ = 명사 호명 도메인" 은 **부분 참**. 레퍼토리 메타데이터(난이도·작곡가)는 명사형 모달로 Playfair 승격 가능하나, **profile 의 지배 구조는 "결제 내역·미수금·수수료"라는 금액 중심**이라 **§7.30 dynamic stat value 가 대다수**를 차지. 다음 가설: "숫자 지배 도메인"은 전환율이 낮다 — settings/ 와 gamification/ 가 대안 후보.
+**가설 검증 결과**: "profile/ = 명사 호명 도메인" 은 **부분 참**. 레퍼토리 메타데이터(난이도·작곡가)는 명사형 모달로 Playfair 승격 가능하나, **profile 의 지배 구조는 "결제 내역·입금대기(후불)·수수료"라는 금액 중심**이라 **§7.30 dynamic stat value 가 대다수**를 차지. 다음 가설: "숫자 지배 도메인"은 전환율이 낮다 — settings/ 와 gamification/ 가 대안 후보.
 
 **전환율 비교** (업데이트):
 
@@ -2951,7 +2951,7 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 | `widgets/selectable_template_card.dart` | 147 | #3 | `template.formattedPrice` (선택 여부로 색상 분기) |
 | `widgets/template_choice_card.dart` | 72 | #2 | `template.name` (추천 뱃지 옆) |
 | `widgets/proposal_card_widgets.dart` | 329 | #3 | `_formatPrice(discountedPrice)` 할인 결제가 |
-| `widgets/proposal_card_widgets.dart` | 567 | status+icon | `'입금 확인 대기중'` + `Icons.hourglass_empty` (대기 상태 headline) |
+| `widgets/proposal_card_widgets.dart` | 567 | status+icon | `'입금 확인 중'` + `Icons.hourglass_empty` (대기 상태 headline) |
 
 **포화 도메인 계보**: parent_home(§7.81 0/11) → settings+gamification(§7.79 0/6) → practice(§7.84 0/9) → **subscription-잔재(§7.85 0/15)** 로 4번째. subscription 은 §7.40 이전 배치에서 핵심 템플릿 이름을 이미 승격했으므로, **"한 도메인을 두 세션 걸쳐 감사"** 할 경우 후반부는 §7.30 로 수렴한다는 2차 법칙 관찰. — **Playfair 승격은 도메인 전반 확산이 아니라 "소수 정적 명사 집중"** 에서 완결된다.
 
@@ -3327,7 +3327,7 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 |------|------|-----------|------|
 | widgets/payment_management/payment_summary_section.dart | 29 | `'${month}월 수강료 현황'` | §7.87-h "동적처럼 보이는 정적 명사" — DateTime.now().month 1~12 유한 집합 + 정적 명사 "수강료 현황" |
 | widgets/payment_management/add_payment_sheet.dart | 122 | `'결제 추가'` | 바텀시트 헤더 (§7.27) — Playfair sectionTitle |
-| screens/outstanding_payments_screen.dart | 48 | `'미수금이 없습니다'` | §7.89 3축 빈 상태: Center + mainAxisAlignment.center + Icon + 단일 헤드라인 |
+| screens/outstanding_payments_screen.dart | 48 | `'입금대기(후불) 항목이 없습니다'` | §7.89 3축 빈 상태: Center + mainAxisAlignment.center + Icon + 단일 헤드라인 |
 
 **3 가지 확장 법칙 동시 적용**: 이 3 지점은 §7.17 의 3 가지 확장(§7.27 바텀시트 · §7.87-h 유한집합 · §7.89 빈 상태 3축)이 한 배치에서 모두 관찰된 **법칙 포화 샘플**.
 
@@ -3356,7 +3356,7 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 **결제 모듈의 §7.30 집중**: 16 예외 중 9건(56%)이 `payment_management/` · `outstanding_payments/` · `payment_detail/` 하위. 금액·이니셜·학생명의 삼중 표시가 결제 UI 의 필수 구성요소. **결제 UI 는 §7.30 전형** 이라는 스타일 가이드 시그널.
 
-**은유**: §7.93 은 **"교사 사무실의 명부와 영수증 더미"** — 표지(이미 Playfair)만 두고 내부 기록(명부의 이름, 영수증의 금액, 일자, 잔고)은 모두 명조체. 월별 수강료 현황판 하나(§7.87-h) · 결제 추가 시트의 표지(§7.27) · 미수금 '비어 있음' 문구(§7.89) 3 개만 추가로 필기체 승격. 나머지 16 지점은 **"책상 위 서류의 본문"** — 빠르게 스캔해야 하는 정보이므로 명조체 유지. 선생님 감사 2 번째 배치 완료, `15.8%` 전환율로 **"2차 감사 = 3 가지 확장 법칙으로 10~20% 추가 발견"** 법칙 확립.
+**은유**: §7.93 은 **"교사 사무실의 명부와 영수증 더미"** — 표지(이미 Playfair)만 두고 내부 기록(명부의 이름, 영수증의 금액, 일자, 잔고)은 모두 명조체. 월별 수강료 현황판 하나(§7.87-h) · 결제 추가 시트의 표지(§7.27) · 입금대기(후불) '비어 있음' 문구(§7.89) 3 개만 추가로 필기체 승격. 나머지 16 지점은 **"책상 위 서류의 본문"** — 빠르게 스캔해야 하는 정보이므로 명조체 유지. 선생님 감사 2 번째 배치 완료, `15.8%` 전환율로 **"2차 감사 = 3 가지 확장 법칙으로 10~20% 추가 발견"** 법칙 확립.
 
 ---
 
@@ -3492,7 +3492,7 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 2. `subscription_detail_screen.dart:107` — `AppStrings.errorOccurred` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
 3. `issue_form_membership_widgets.dart:223` — `'등록된 레슨이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
 4. `issue_form_membership_widgets.dart:258` — `'오류가 발생했습니다'` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
-5. `proposal_card_widgets.dart:573` — `'입금 확인 대기중'` → `NotebookTypography.sectionTitle.copyWith(fontWeight: w600)` (§7.89 변형 — 대기 상태 헤드라인)
+5. `proposal_card_widgets.dart:573` — `'입금 확인 중'` → `NotebookTypography.sectionTitle.copyWith(fontWeight: w600)` (§7.89 변형 — 대기 상태 헤드라인)
 6. `subscription_list_screen.dart:307` — `'등록된 수강권이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
 7. `subscription_list_screen.dart:336` — `'등록된 레슨이 없습니다'` → `NotebookTypography.sectionTitle` (§7.89 빈 상태 3축)
 8. `subscription_list_screen.dart:371` — `'오류가 발생했습니다'` → `NotebookTypography.sectionTitle` (§7.89 에러 상태 3축)
@@ -3505,7 +3505,7 @@ week_calendar_widget 은 **ink 검정 배경 위 흰색 그리드** 구조이므
 
 **관찰 1 — "바텀시트 밀도 가설" 정량 비교**: schedule/ (바텀시트 9 / §7.30 19) = 32.14% 바텀시트 비중, 전환율 36.67%. subscription/ (바텀시트 1 / §7.30 10) = 9.09% 바텀시트 비중, 전환율 47.37%. 바텀시트 수치 자체보다 **"§7.89 빈/에러/대기 상태 헤드라인의 절대 밀도"** 가 더 강한 전환율 결정 인자. subscription/ 는 수강권이라는 **"상태가 명확히 분기되는 도메인"** (없음·로딩·에러·대기·활성) 특성상 상태 헤드라인이 8 건 집중 → 전환율 47.37%.
 
-**관찰 2 — "§7.89 변형" 케이스 확립**: `proposal_card_widgets.dart:573 '입금 확인 대기중'` 은 `Container > Column > (Icon + Text)` 구조로 `MainAxisAlignment.center` 명시 없이 컨테이너 내부 정렬만 있음. 그러나 Column 기본 `crossAxis` 가 center 이고 Icon + Text 가 수직 중앙 스택 → **"대기 상태 헤드라인 3축 유사 통과"** 로 판정하여 승격. `request_completion_screen.dart:91` (§7.96) 의 "성공 상태 3축 경계 사례" 에 이어 **"3축 경계 사례 = 승격"** 판례 재확립.
+**관찰 2 — "§7.89 변형" 케이스 확립**: `proposal_card_widgets.dart:573 '입금 확인 중'` 은 `Container > Column > (Icon + Text)` 구조로 `MainAxisAlignment.center` 명시 없이 컨테이너 내부 정렬만 있음. 그러나 Column 기본 `crossAxis` 가 center 이고 Icon + Text 가 수직 중앙 스택 → **"대기 상태 헤드라인 3축 유사 통과"** 로 판정하여 승격. `request_completion_screen.dart:91` (§7.96) 의 "성공 상태 3축 경계 사례" 에 이어 **"3축 경계 사례 = 승격"** 판례 재확립.
 
 **관찰 3 — AppStrings 상수 §7.17 승격의 2 건째**: `subscription_detail_screen.dart:83·107` 이 `AppStrings.subscriptionNotFound` · `AppStrings.errorOccurred` — enum/상수 2원 유한집합으로 §7.87-h 규칙을 직접 적용한 사례. parent_home §7.92 · 선생님 프로필 §7.93 의 이니셜·AppStrings 승격 정책 연장선.
 

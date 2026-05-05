@@ -59,7 +59,7 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space5),
 
-          // Stats section (팔로워 → 입금 확인 대기)
+          // Stats section (팔로워 → 입금대기(후불))
           _buildStatsSection(ref, teacherId),
 
           const SizedBox(height: AppSpacing.space5),
@@ -505,7 +505,7 @@ class ProfileTab extends ConsumerWidget {
     return null;
   }
 
-  /// 자주 쓰는 설정 3개 카드 (가용시간 · 입금 확인 대기 · 수강권 템플릿).
+  /// 자주 쓰는 설정 3개 카드 (가용시간 · 입금대기(후불) · 수강권 템플릿).
   Widget _buildQuickShortcuts(BuildContext context, String teacherId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -542,7 +542,7 @@ class ProfileTab extends ConsumerWidget {
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
-    // 팔로워 → 입금 확인 대기로 교체 (profile_master.md §2.4)
+    // 팔로워 → 입금대기(후불)로 교체 (profile_master.md §2.4)
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
 
     final studentCountValue =
@@ -581,7 +581,7 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('입금 확인 대기', unpaidValue),
+            _buildStatItem('입금대기(후불)', unpaidValue),
           ],
         ),
       ),

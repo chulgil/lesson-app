@@ -300,16 +300,26 @@ Phase 3: 소진 임박
 
 현재 앱은 선생님/학생/학부모 간 실제 결제를 처리하지 않는다. 수강료는 앱 밖에서 무통장입금/현금으로 처리하고, 앱은 `Subscription` 엔티티의 입금 확인 상태만 기록한다 (별도 Payment 엔티티/API 아님).
 
+**용어 정책**:
+- **후불**: 수강권 발급 방식이다. 상태 문구로는 `입금 예정`, `입금 확인 필요`, `입금대기(후불)` 중 현재 단계에 맞는 표현을 쓴다.
+- **입금대기(후불)**: 후불 수강권이 발급됐고 아직 입금 완료 기록이 없는 상태다. `Subscription.status == active && paymentConfirmed == false && paidAt == null`인 수강권만 이 상태로 본다.
+- **입금 확인 필요**: 학생/학부모가 입금 완료를 알렸지만 선생님이 아직 확인하지 않은 상태다. `Subscription.status == active && paymentConfirmed == false && paidAt != null`로 판별한다.
+- **입금 확인 완료**: 선생님이 입금을 확인한 상태다. `paymentConfirmed == true`로 판별한다.
+
 **두 가지 경로:**
 
 | 경로 | 설명 | paymentConfirmed |
 |------|------|:----------------:|
-| **선불 (Proposal 경로)** | 제안 -> 입금대기 -> 입금완료 -> 발급완료 | 항상 true |
-| **후불 (직접 발급)** | 직접발급 -> 입금 확인 대기 또는 입금확인 | false -> true |
+| **선불 (Proposal 경로)** | 제안 -> 입금 예정 -> 입금 완료 알림 -> 입금 확인 완료 -> 발급완료 | 항상 true |
+| **후불 (직접 발급)** | 직접발급 -> 입금대기(후불) 또는 입금확인 | false -> true |
 
-**입금 확인 대기 판별:**
+**입금대기(후불) 판별:**
 ```dart
-bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
+bool get isUnpaid =>
+    status == SubscriptionStatus.active && !paymentConfirmed && paidAt == null;
+
+bool get needsPaymentConfirmation =>
+    status == SubscriptionStatus.active && !paymentConfirmed && paidAt != null;
 ```
 
 #### 3.5.2 2단계 입금확인 플로우 (선불)
@@ -328,15 +338,15 @@ bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
 ```
 선생님: 학생 상세 -> "수강권 발급" -> "나중에 결제" 선택
     -> Subscription 생성 (paymentConfirmed: false)
-    -> 입금 확인 대기 목록에 표시
+    -> 입금대기(후불) 목록에 표시
     -> 나중에 입금확인 시 paymentConfirmed: true로 전환
 ```
 
-#### 3.5.4 입금 확인 대기 관리
+#### 3.5.4 입금대기(후불) 관리
 
-선생님 앱에서 입금 확인 대기 대시보드 제공:
-- 총 입금 확인 대기 금액, 건수, 학생 수
-- 개별 입금 확인 대기 수강권 카드 (입금확인 / 알림 보내기 버튼)
+선생님 앱에서 입금대기(후불) 대시보드 제공:
+- 총 입금대기(후불) 금액, 건수, 학생 수
+- 개별 입금대기(후불) 수강권 카드 (입금확인 / 알림 보내기 버튼)
 
 #### 3.5.5 개선 효과
 
@@ -344,10 +354,10 @@ bool get isUnpaid => status == SubscriptionStatus.active && !paymentConfirmed;
 |------|----------|--------|
 | 입금 안내 | 카톡으로 직접 | 앱 자동 알림 |
 | 입금 확인 | 수동 | 수동 (동일) |
-| 입금 확인 대기 파악 | 수기/기억 | 대시보드 |
+| 입금대기(후불) 파악 | 수기/기억 | 대시보드 |
 | 수강권 발급 | 구두/메모 | 입금확인 1탭 자동 |
 | 잔여 횟수 | 선생님만 기억 | 학생 실시간 확인 |
-| 후불 관리 | 기억에 의존 | 입금 확인 대기 목록 자동 |
+| 후불 관리 | 기억에 의존 | 입금대기(후불) 목록 자동 |
 
 ---
 
@@ -1327,7 +1337,7 @@ frontend/lib/features/schedule/
 | `flow_trial.md` | 3.2 (체험 레슨) |
 | `flow_regular.md` | 3.3 (정기 레슨 등록) |
 | `flow_package.md` | 3.4 (회차권 레슨) |
-| `flow_payment.md` | 3.5 (입금/입금 확인 대기) |
+| `flow_payment.md` | 3.5 (입금/입금대기(후불)) |
 | `flow_cancel.md` | 3.6 (취소/변경/노쇼/보강) |
 | `flow_test_checklist.md` | 13 (구현 현황) |
 | `Unified_Lesson_Booking_Spec.md` | 4 (예약 시스템) |

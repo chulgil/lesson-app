@@ -8,14 +8,14 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../providers/student_roster_summary_provider.dart';
 
-/// 수강 관리 탭 triage 배너 — 만료임박 / 미수금 / 체험 3칸.
+/// 수강 관리 탭 triage 배너 — 만료임박 / 입금대기(후불) / 체험 3칸.
 ///
 /// 선택된 카드에 형광펜(paperHighlight) 배경으로 시각 피드백 제공.
 enum RosterTriageCategory { expiring, unpaid, trial }
 
 class RosterTriageBanner extends ConsumerWidget {
   final void Function(RosterTriageCategory category, Set<String> studentIds)
-      onFilterSelected;
+  onFilterSelected;
   final RosterTriageCategory? selectedCategory;
 
   const RosterTriageBanner({
@@ -52,9 +52,9 @@ class RosterTriageBanner extends ConsumerWidget {
             onTap:
                 summary.expiringCount > 0
                     ? () => onFilterSelected(
-                          RosterTriageCategory.expiring,
-                          summary.expiringStudentIds,
-                        )
+                      RosterTriageCategory.expiring,
+                      summary.expiringStudentIds,
+                    )
                     : null,
           ),
         ),
@@ -67,9 +67,9 @@ class RosterTriageBanner extends ConsumerWidget {
             onTap:
                 summary.unpaidCount > 0
                     ? () => onFilterSelected(
-                          RosterTriageCategory.unpaid,
-                          summary.unpaidStudentIds,
-                        )
+                      RosterTriageCategory.unpaid,
+                      summary.unpaidStudentIds,
+                    )
                     : null,
           ),
         ),
@@ -82,9 +82,9 @@ class RosterTriageBanner extends ConsumerWidget {
             onTap:
                 summary.trialCount > 0
                     ? () => onFilterSelected(
-                          RosterTriageCategory.trial,
-                          summary.trialStudentIds,
-                        )
+                      RosterTriageCategory.trial,
+                      summary.trialStudentIds,
+                    )
                     : null,
           ),
         ),
@@ -113,14 +113,14 @@ class _TriageCard extends StatelessWidget {
         isSelected
             ? AppColors.paperAccent
             : isDisabled
-                ? AppColors.inkQuaternary
-                : AppColors.ink;
+            ? AppColors.inkQuaternary
+            : AppColors.ink;
     final countColor =
         isSelected
             ? AppColors.paperAccent
             : isDisabled
-                ? AppColors.inkTertiary
-                : AppColors.ink;
+            ? AppColors.inkTertiary
+            : AppColors.ink;
     final labelColor =
         isDisabled ? AppColors.inkTertiary : AppColors.inkSecondary;
 

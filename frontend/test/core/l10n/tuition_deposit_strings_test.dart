@@ -18,10 +18,15 @@ void main() {
       expect(AppStrings.paymentGuideTitle, '입금 안내 보내기');
 
       expect(AppStrings.issueFormPaymentSectionTitle, '입금 확인 방식');
-      expect(AppStrings.issueFormPaymentPostpaidNotice, contains('입금 확인 대기'));
+      expect(AppStrings.issueFormPaymentPostpaidNotice, contains('입금대기(후불)'));
       expect(AppStrings.issueFormSummaryFinalAmountLabel, '입금 예정 금액');
       expect(AppStrings.issueFormSummaryPaymentLabel, '입금 상태');
-      expect(AppStrings.issueFormSummaryUnpaidLabel, '입금 확인 대기 (후불)');
+      expect(AppStrings.issueFormSummaryUnpaidLabel, '입금대기(후불)');
+      expect(AppStrings.paymentStatusUnpaid, '입금대기(후불)');
+      expect(AppStrings.paymentStatusNeedsConfirmation, '입금 확인 필요');
+      expect(AppStrings.proposalWaitingTitle, '입금 확인 중');
+      expect(AppStrings.proposalPaymentStatusPending, '입금 확인 필요');
+      expect(AppStrings.proposalConfirmEmptyTitle, '입금 확인이 필요한 제안이 없습니다');
     },
   );
 
@@ -38,18 +43,29 @@ void main() {
     },
   );
 
-  test('active student and profile surfaces use deposit pending wording', () {
-    final checkedFiles = [
-      'lib/features/students/presentation/screens/students_tab.dart',
-      'lib/features/students/presentation/widgets/student_subscription_badge.dart',
-      'lib/features/profile/presentation/screens/profile_tab.dart',
-      'lib/features/students/data/repositories/mock_student_repository.dart',
-      'lib/features/subscription/data/repositories/mock_subscription_repository.dart',
-    ];
+  test(
+    'active student and profile surfaces use postpaid pending deposit wording',
+    () {
+      const deprecatedUnpaidWording =
+          '미'
+          '수금';
+      final checkedFiles = [
+        'lib/features/students/presentation/screens/students_tab.dart',
+        'lib/features/students/presentation/widgets/student_subscription_badge.dart',
+        'lib/features/profile/presentation/screens/profile_tab.dart',
+        'lib/features/students/data/repositories/mock_student_repository.dart',
+        'lib/features/subscription/data/repositories/mock_subscription_repository.dart',
+      ];
 
-    for (final relativePath in checkedFiles) {
-      final contents = File(relativePath).readAsStringSync();
-      expect(contents, isNot(contains('미수금')), reason: relativePath);
-    }
-  });
+      for (final relativePath in checkedFiles) {
+        final contents = File(relativePath).readAsStringSync();
+        expect(
+          contents,
+          isNot(contains(deprecatedUnpaidWording)),
+          reason: relativePath,
+        );
+        expect(contents, isNot(contains('입금 확인 대기')), reason: relativePath);
+      }
+    },
+  );
 }

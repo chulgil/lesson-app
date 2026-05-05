@@ -15,6 +15,8 @@ void main() {
     DateTime? startDate,
     DateTime? endDate,
     SubscriptionStatus status = SubscriptionStatus.active,
+    bool paymentConfirmed = true,
+    DateTime? paidAt,
   }) {
     final now = DateTime.now();
     return Subscription(
@@ -31,6 +33,8 @@ void main() {
       amount: 200000,
       status: status,
       createdAt: now,
+      paymentConfirmed: paymentConfirmed,
+      paidAt: paidAt,
     );
   }
 
@@ -209,6 +213,42 @@ void main() {
         bonusCount: 1,
       );
       expect(sub.baseLessons, 4);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // payment state tests
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  group('payment state', () {
+    test('후불 발급 후 아직 입금하지 않은 활성 수강권은 입금대기(후불)이다', () {
+      final sub = createSubscription(paymentConfirmed: false, paidAt: null);
+
+      expect(sub.isUnpaid, isTrue);
+      expect(sub.needsPaymentConfirmation, isFalse);
+      expect(sub.paymentStatusLabel, '입금대기(후불)');
+    });
+
+    test('학생이 입금 완료를 알렸고 선생님이 확인 전이면 입금 확인 필요 상태다', () {
+      final sub = createSubscription(
+        paymentConfirmed: false,
+        paidAt: DateTime(2026, 5, 5, 10),
+      );
+
+      expect(sub.isUnpaid, isFalse);
+      expect(sub.needsPaymentConfirmation, isTrue);
+      expect(sub.paymentStatusLabel, '입금 확인 필요');
+    });
+
+    test('선생님이 입금을 확인한 수강권은 입금대기(후불)도 입금 확인 필요도 아니다', () {
+      final sub = createSubscription(
+        paymentConfirmed: true,
+        paidAt: DateTime(2026, 5, 5, 10),
+      );
+
+      expect(sub.isUnpaid, isFalse);
+      expect(sub.needsPaymentConfirmation, isFalse);
+      expect(sub.paymentStatusLabel, '입금 확인 완료');
     });
   });
 

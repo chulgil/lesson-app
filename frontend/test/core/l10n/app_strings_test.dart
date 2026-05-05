@@ -160,9 +160,12 @@ void main() {
 
     test('urgentAlertOutstandingFormat uses deposit-only wording', () {
       final result = AppStrings.urgentAlertOutstandingFormat(50000, 3);
+      const deprecatedUnpaidWording =
+          '미'
+          '수금';
 
-      expect(result, contains('입금'));
-      expect(result, isNot(contains('미수금')));
+      expect(result, contains('입금대기(후불)'));
+      expect(result, isNot(contains(deprecatedUnpaidWording)));
       expect(result, isNot(contains('결제')));
     });
   });

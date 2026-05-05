@@ -458,7 +458,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 4. 입금 확인 대기 (학생이 입금 완료 알림)
+    // 4. 입금 확인 필요 (학생이 입금 완료 알림)
     if (status == UnifiedRequestStatus.paymentNotified) {
       return _buildActionRow(
         icon: Icons.account_balance,

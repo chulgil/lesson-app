@@ -25,9 +25,7 @@ class SubscriptionChapterPayment extends StatelessWidget {
         children: [
           _buildRow(
             AppStrings.paymentStatus,
-            subscription.paymentConfirmed
-                ? AppStrings.paymentCompleted
-                : AppStrings.paymentPending,
+            subscription.paymentStatusLabel,
             valueColor:
                 subscription.paymentConfirmed
                     ? AppColors.paperOk

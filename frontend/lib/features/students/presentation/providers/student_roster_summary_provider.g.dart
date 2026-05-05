@@ -7,13 +7,13 @@ part of 'student_roster_summary_provider.dart';
 // **************************************************************************
 
 String _$studentRosterSummaryHash() =>
-    r'86c8834b358cc1197a24de15fe49b142c9abfb74';
+    r'fc3267a491df6286ecef68f10b790a9bad44147a';
 
 /// Derived summary for the enrollments tab triage banner + filters.
 ///
 /// Aggregates per-student subscription + membership state into:
 /// - expiringCount: active subs with endDate within 14 days
-/// - unpaidCount: subs where paymentConfirmed == false
+/// - unpaidCount: subs where Subscription.isUnpaid is true
 /// - trialCount: memberships with MembershipStatus.trial
 /// - archivedStudentIds: students whose active subs == 0 but had past subs
 ///

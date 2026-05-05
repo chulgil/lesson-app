@@ -26,8 +26,8 @@
 /// - `expiringSoonSubscriptionsProvider()` — 만료 임박
 /// - `expiredSubscriptionsProvider()` — 만료된 수강권
 /// - `teacherStudentSubscriptionsProvider(teacherId)` — 선생님 학생들의 수강권
-/// - `unpaidSubscriptionsProvider(teacherId)` — 입금 확인 대기 수강권
-/// - `unpaidSummaryProvider(teacherId)` — 입금 확인 대기 요약 (총액, 학생수)
+/// - `unpaidSubscriptionsProvider(teacherId)` — 입금대기(후불) 수강권
+/// - `unpaidSummaryProvider(teacherId)` — 입금대기(후불) 요약 (총액, 학생수)
 /// - `activeSubscriptionBetweenProvider(studentId:, teacherId:)` — 관계별 활성 수강권
 /// - `canBookLessonProvider(studentId:, teacherId:, isTrialLesson:)` — 레슨 예약 가능 여부
 /// - `subscriptionUsageHistoryProvider(subscriptionId)` — 사용 이력
@@ -35,7 +35,7 @@
 /// ### Proposals
 /// - `teacherProposalsProvider(teacherId)` — 선생님의 전체 제안
 /// - `activeTeacherProposalsProvider(teacherId)` — 진행 중 제안
-/// - `awaitingConfirmationProposalsProvider(teacherId)` — 입금 확인 대기
+/// - `awaitingConfirmationProposalsProvider(teacherId)` — 입금 확인 필요
 /// - `studentProposalsProvider(studentId)` — 학생의 전체 제안
 /// - `activeStudentProposalsProvider(studentId)` — 학생 진행 중 제안
 /// - `pendingStudentProposalsProvider(studentId)` — 학생 대기 중 제안

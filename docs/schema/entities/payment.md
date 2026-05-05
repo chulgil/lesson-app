@@ -17,9 +17,9 @@
 
 | Field | Type | 설명 |
 |-------|------|------|
-| `paymentConfirmed` | `bool` | false = 입금 확인 대기 |
+| `paymentConfirmed` | `bool` | false = 선생님 입금 확인 전 |
 | `paymentMethod` | `SubscriptionPaymentMethod?` | 현금/계좌이체/기타. `card`는 레거시 직렬화 호환용이며 현행 API 입력 금지 |
-| `paidAt` | `DateTime?` | 학생 입금완료 시점 |
+| `paidAt` | `DateTime?` | 학생/학부모 입금 완료 알림 시점. null이면 아직 입금 완료 기록 없음 |
 | `paymentConfirmedAt` | `DateTime?` | 선생님 확인 시점 |
 | `discountAmount` | `int?` | 할인 금액 |
 | `discountReason` | `String?` | 할인 사유 |

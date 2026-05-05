@@ -67,7 +67,7 @@ stateDiagram-v2
 | `approved` (내 차례) | **확인 필요** | 대안 시간 제안 필요 |
 | `negotiating` (내 차례) | **확인 필요** | 학생 역제안에 응답 필요 |
 | `timeConfirmed` | **확인 필요** | 수강권 제안 작성 필요 |
-| `paymentNotified` | **확인 필요** | 미수금 확인 필요 |
+| `paymentNotified` | **확인 필요** | 입금 확인 필요 |
 | `inProgress` | **확인 필요** | 레슨 진행 중 (관리 필요) |
 | `approved` (상대 차례) | **응답 대기** | 학생 응답 대기 |
 | `negotiating` (상대 차례) | **응답 대기** | 학생 응답 대기 |
@@ -89,7 +89,7 @@ stateDiagram-v2
 | `approved` (상대 차례) | **응답 대기** | 선생님 응답 대기 |
 | `negotiating` (상대 차례) | **응답 대기** | 선생님 응답 대기 |
 | `timeConfirmed` | **응답 대기** | 수강권 제안 대기 |
-| `paymentNotified` | **응답 대기** | 미수금 확인 대기 |
+| `paymentNotified` | **응답 대기** | 선생님 입금 확인 대기 |
 | `subscriptionIssued` | **응답 대기** | 수강권 발급 완료 |
 | `completed` / `rejected` / `cancelled` / `expired` | **완료** | 터미널 |
 

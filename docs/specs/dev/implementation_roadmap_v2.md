@@ -61,7 +61,7 @@
 | # | 작업 | 관련 이슈 | 스펙 | 예상 규모 | 상태 |
 |---|------|----------|------|:---------:|:----:|
 | 1-1 | 학생 탭 클래스별 그룹화 | #42 | student_class_system.md | S | done |
-| 1-2 | 프로필 탭 입금 확인 대기 | #43 | subscription_master.md | M | done |
+| 1-2 | 프로필 탭 입금대기(후불) | #43 | subscription_master.md | M | done |
 | 1-3 | 기존 정기레슨 앱 전환 플로우 | #59 | flow_with_app.md | M | done |
 | 1-4 | 약관 동의 화면 | - | terms_agreement | S | ✅ done |
 | 1-5 | Google SSO 연동 마무리 | - | google_sso_setup_guide.md | M | ✅ done |

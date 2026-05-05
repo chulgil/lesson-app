@@ -1601,7 +1601,7 @@ class _CanBookLessonProviderElement
 }
 
 String _$subscriptionSessionEventsHash() =>
-    r'2a93258b595f78e474b4f021676a354a3f1eb29f';
+    r'38705742aa72cd20d64eb1c3d80b2402f475edf7';
 
 /// Get events for a specific subscription session.
 ///
@@ -1766,7 +1766,7 @@ class _SubscriptionSessionEventsProviderElement
 }
 
 String _$pendingScheduleChangeRequestsHash() =>
-    r'b69f6bf79e6405a59b5969d99525aa6ae9593a08';
+    r'e576a00789e345f9154de3cb13367b25038cc7a5';
 
 /// Get pending schedule change requests for badge count.
 ///

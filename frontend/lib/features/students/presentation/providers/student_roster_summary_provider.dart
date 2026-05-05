@@ -13,7 +13,7 @@ part 'student_roster_summary_provider.g.dart';
 ///
 /// Aggregates per-student subscription + membership state into:
 /// - expiringCount: active subs with endDate within 14 days
-/// - unpaidCount: subs where paymentConfirmed == false
+/// - unpaidCount: subs where Subscription.isUnpaid is true
 /// - trialCount: memberships with MembershipStatus.trial
 /// - archivedStudentIds: students whose active subs == 0 but had past subs
 ///
@@ -47,8 +47,8 @@ Future<RosterSummary> studentRosterSummary(StudentRosterSummaryRef ref) async {
     final hasTrial = memberships.any((m) => m.status == MembershipStatus.trial);
     if (hasTrial) trialIds.add(student.id);
 
-    // Unpaid: any subscription with paymentConfirmed == false
-    final hasUnpaid = subscriptions.any((s) => !s.paymentConfirmed);
+    // Unpaid: active postpaid subscription without a recorded student payment.
+    final hasUnpaid = subscriptions.any((s) => s.isUnpaid);
     if (hasUnpaid) unpaidIds.add(student.id);
 
     // Expiring: any active sub with endDate within 14 days

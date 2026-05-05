@@ -182,7 +182,7 @@ timeConfirmed (시간 확정됨)
     │   흐름: timeConfirmed → subscriptionIssued (paymentConfirmed=false)
     │         → (레슨 진행 중) → paymentRequested → paymentConfirmed
     │   입금: 수강권 발급 후 나중에 안내
-    │   ⚠️ 입금 확인 대기로 관리 (대시보드 입금 확인 대기 목록 표시)
+    │   ⚠️ 입금대기(후불)로 관리 (대시보드 입금대기(후불) 목록 표시)
     │
     └─ 경로 C: 무료 발급
         UI: "무료 발급" 카드
@@ -200,7 +200,7 @@ timeConfirmed (시간 확정됨)
 |------|--------|----|------|----------|
 | timeConfirmed | 무료 수강권 발급 | subscriptionIssued | trial + 무료 | N/A |
 | timeConfirmed | 선불 입금 안내 | proposalSent | 기본 경로 | 대기 |
-| timeConfirmed | 후불 수강권 발급 | subscriptionIssued | 후불 선택 | 입금 확인 대기 |
+| timeConfirmed | 후불 수강권 발급 | subscriptionIssued | 후불 선택 | 입금대기(후불) |
 | proposalSent | 학생 수락 | proposalAccepted | - | 대기 |
 | proposalAccepted | 학생 입금 완료 | paymentNotified | - | 입금 알림 |
 | paymentNotified | 선생님 입금 확인 | subscriptionIssued | - | 완료 |
@@ -255,7 +255,7 @@ timeConfirmed (시간 확정됨)
 
 ```
 ┌──────────────────────────────────────────────┐
-│ 💰 입금 확인 대기                             │
+│ 💰 입금 확인 필요                       │
 │                                              │
 │ 학생이 입금 완료를 알렸습니다.                  │
 │                                              │
@@ -294,13 +294,13 @@ timeConfirmed (시간 확정됨)
 └──────────────────────────────────────────────┘
 ```
 
-### 후불 입금 확인 대기 관리
+### 후불 입금대기(후불) 관리
 
-후불(경로 B)로 발급된 수강권은 `paymentConfirmed=false` 상태입니다.
+후불(경로 B)로 발급된 뒤 학생/학부모 입금 완료 기록이 아직 없으면 `paymentConfirmed=false && paidAt=null` 상태입니다.
 
-- **대시보드**: 입금 확인 대기 N건 뱃지 표시
-- **입금 확인 대기 목록**: 학생별 입금 확인 대기 수강권 리스트
-- **입금 안내**: 입금 확인 대기 수강권에서 "입금 안내 보내기" 버튼
+- **대시보드**: 입금대기(후불) N건 뱃지 표시
+- **입금대기(후불) 목록**: 학생별 입금대기(후불) 수강권 리스트
+- **입금 안내**: 입금대기(후불) 수강권에서 "입금 안내 보내기" 버튼
 - **입금 확인**: 학생 입금 → 선생님 확인 → `paymentConfirmed=true`
 
 ### 구현 우선순위
@@ -311,7 +311,7 @@ timeConfirmed (시간 확정됨)
 | 2 | 후불 즉시 발급 카드 (경로 B) | Low |
 | 3 | 무료 발급 카드 (경로 C) | Low |
 | 4 | 2단계 입금 확인 (학생→선생님) | Medium |
-| 5 | 입금 확인 대기 대시보드 | Medium |
+| 5 | 입금대기(후불) 대시보드 | Medium |
 
 ## Progress Bar Component
 

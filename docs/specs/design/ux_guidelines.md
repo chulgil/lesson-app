@@ -167,7 +167,7 @@ Q: 이 색상은 무엇을 의미하나?
 |------|------|------|
 | `hand` | Gaegu 16 | **사람의 액션 산출물 일체**: 선생님 피드백 입력/표시, 학생 메모 입력/표시, 연습노트 본문, 곡 메모, 연습 과제 제목·설명, 레퍼토리·곡명 입력, 일괄 피드백 입력/미리보기 — TextField input style 도 포함 (§7.129, §7.130) |
 | `handOk` | Gaegu 13 / paperOk | 자필 완료 마크 ("✓ 보잉 좋음") |
-| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "미수금") |
+| `indicatorLabel` | Pretendard 11 italic | 시스템 자동 인디케이터 ("오늘", "D-N", "입금대기(후불)") |
 | `pieceTitle` | Playfair w700 | 곡 제목, 카드 헤더 |
 | `sectionTitle` | Playfair italic | 섹션 헤더 |
 | `roman` / `romanActive` | Playfair italic | 로마숫자 인덱스 |
@@ -259,7 +259,7 @@ Q: 이 색상은 무엇을 의미하나?
 
 **근거**: 토스 홈 패턴 — 사용자 인지 부하 감소. 5가지 알림 동시 표시는 과부하.
 
-**Top 1 결정 우선순위**: 미수금 확인 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
+**Top 1 결정 우선순위**: 입금대기(후불) 관리 > 입금 확인 필요 > 만료 > 갱신 예정 > 확인 필요 > 예약 대기
 
 ### 2.6 Progressive Disclosure (점진적 공개)
 
@@ -524,4 +524,4 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 2026-04-16 | 긴급 알림 Top 1 정책, Progressive Disclosure 원칙, 스파크라인 가이드라인 추가 (§2.5~2.7) |
 | 2026-05-04 | **Notebook x Score 팔레트 마이그레이션 반영** — 레거시 토큰(primary/success/warning/error/info/surfaceLight/borderLight/textPrimaryLight 등) 제거, Notebook 팔레트(paper/ink/paperAccent/paperOk) 기준으로 전면 갱신. 카드·버튼·뱃지·칩·긴급도 색상 규칙 모두 현행 코드와 동기화. 버튼 BorderRadius.zero 시그니처 반영 |
 | 2026-05-04 | **수강권 3색 잉크 체계 추가** — `paperTrial`/`paperTrialSoft` 토큰, §6.1 수강권 카드 섹션에 3색 잉크 체계(trial=세피아, monthly=녹색, package=버밀리온) 및 `SubscriptionCard(compact)` 통합 문서화 |
-| 2026-05-05 | **"입금대기" → "미수금" 용어 변경** — 선생님 관점 능동적 표현으로 통일 (업계 표준). indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |
+| 2026-05-05 | **회계식 기존 표현 → "입금대기(후불)" 용어 변경** — 회계/채권 뉘앙스를 줄이고 후불 발급 상태를 명확히 드러내도록 통일. indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |
