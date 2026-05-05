@@ -9,7 +9,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
-from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentSummaryResponse, StudentUpdate
+from app.schemas.student import (
+    StudentCreate,
+    StudentResponse,
+    StudentStatsResponse,
+    StudentSummaryResponse,
+    StudentUpdate,
+)
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
@@ -71,20 +77,12 @@ class StudentService:
 
     async def get_by_id(self, student_id: str, current_user: Any) -> StudentResponse:
         """Return a single student by ID."""
-        from app.models.student import Student
-
-        student = await self.db.get(Student, student_id)
-        if student is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        student = await self._get_accessible_student(student_id, current_user)
         return StudentResponse.model_validate(student)
 
     async def update(self, student_id: str, data: StudentUpdate, current_user: Any) -> StudentResponse:
         """Update student fields."""
-        from app.models.student import Student
-
-        student = await self.db.get(Student, student_id)
-        if student is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -95,7 +93,7 @@ class StudentService:
 
     async def update_status(self, student_id: str, new_status: str, current_user: Any) -> StudentResponse:
         """Update only the student's status field."""
-        from app.models.student import Student, StudentStatus
+        from app.models.student import StudentStatus
 
         valid_statuses = {"trial", "active", "paused", "inactive"}
         if new_status not in valid_statuses:
@@ -104,9 +102,7 @@ class StudentService:
                 detail=f"Invalid status: {new_status}. Must be one of {valid_statuses}",
             )
 
-        student = await self.db.get(Student, student_id)
-        if student is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
 
         student.status = StudentStatus(new_status)
         await self.db.flush()
@@ -115,11 +111,9 @@ class StudentService:
 
     async def delete(self, student_id: str, current_user: Any) -> None:
         """Soft-delete a student."""
-        from app.models.student import Student, StudentStatus
+        from app.models.student import StudentStatus
 
-        student = await self.db.get(Student, student_id)
-        if student is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
         student.status = StudentStatus.inactive
         await self.db.flush()
 
@@ -127,6 +121,7 @@ class StudentService:
         """Return aggregated statistics for a student."""
         from app.models.lesson import Lesson
 
+        await self._get_accessible_student(student_id, current_user)
         total_lessons = await self.db.scalar(
             select(func.count()).where(Lesson.student_id == student_id)
         ) or 0
@@ -171,6 +166,31 @@ class StudentService:
             active_count=active_count,
             by_instrument=by_instrument,
         )
+
+    async def _get_accessible_student(
+        self,
+        student_id: str,
+        current_user: Any,
+        *,
+        require_teacher: bool = False,
+    ) -> Any:
+        """Load a student and enforce the current user's ownership boundary."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+        role = getattr(current_user, "role", None)
+        role_value = getattr(role, "value", role)
+        if role_value == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if student.teacher_id == teacher_id:
+                return student
+        elif not require_teacher and role_value == "student" and student.user_id == current_user.id:
+            return student
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student access denied")
 
     # ------------------------------------------------------------------
     # Student self-service (학생 자기 프로필)

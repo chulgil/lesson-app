@@ -3,6 +3,13 @@
 import pytest
 from httpx import AsyncClient
 
+from app.core.security import create_access_token
+
+
+def _headers(user_id: str, role: str = "teacher") -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
+
 
 @pytest.mark.asyncio
 async def test_create_student(client: AsyncClient, auth_headers, create_test_user):
@@ -102,6 +109,45 @@ async def test_delete_student(client: AsyncClient, auth_headers, create_test_use
 
     response = await client.delete(f"/api/v1/students/{student_id}", headers=auth_headers)
     assert response.status_code == 204
+
+
+@pytest.mark.parametrize(
+    ("method", "path_suffix", "json_body"),
+    [
+        ("GET", "", None),
+        ("PUT", "", {"name": "Hacked Student"}),
+        ("PATCH", "/status", {"status": "inactive"}),
+        ("DELETE", "", None),
+        ("GET", "/stats", None),
+    ],
+)
+@pytest.mark.asyncio
+async def test_other_teacher_cannot_access_student_detail_mutations_or_stats(
+    method: str,
+    path_suffix: str,
+    json_body: dict | None,
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Student detail, mutations, and stats are scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-teacher@test.com")
+    create_resp = await client.post(
+        "/api/v1/students",
+        headers=auth_headers,
+        json={"name": "Owned Student"},
+    )
+    student_id = create_resp.json()["id"]
+
+    response = await client.request(
+        method,
+        f"/api/v1/students/{student_id}{path_suffix}",
+        headers=_headers("other-teacher-id"),
+        json=json_body,
+    )
+
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
