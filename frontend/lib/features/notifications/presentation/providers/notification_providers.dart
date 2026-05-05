@@ -371,11 +371,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       type: NotificationType.trialBookingRequest,
       priority: NotificationPriority.normal,
       title: AppStrings.notifTrialRequestTitle,
-      body: AppStrings.notifTrialRequestBody('박지호', '바이올린'),
+      body: AppStrings.notifTrialRequestBody('박지호', '첼로'),
       createdAt: now.subtract(const Duration(hours: 4)),
       sentAt: now.subtract(const Duration(hours: 4)),
-      actionUrl: '/schedule/lesson-requests',
+      actionUrl: '/schedule/request/ulr_11',
       actionLabel: AppStrings.notifTrialRequestAction,
+      data: {'requestId': 'ulr_11', 'studentId': 'student_3'},
     ),
 
     // ============================================================
