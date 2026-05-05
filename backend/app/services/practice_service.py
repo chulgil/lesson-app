@@ -667,6 +667,7 @@ class PracticeService:
         from app.models.practice import PracticeGoal
 
         sid = student_id or current_user.id
+        await self._assert_can_read_student(sid, current_user)
         goal = await self.db.scalar(
             select(PracticeGoal).where(PracticeGoal.student_id == sid)
         )
@@ -678,6 +679,7 @@ class PracticeService:
         """Create or update practice goals."""
         from app.models.practice import PracticeGoal
 
+        await self._assert_can_manage_student(data.student_id, current_user)
         existing = await self.db.scalar(
             select(PracticeGoal).where(PracticeGoal.student_id == data.student_id)
         )
@@ -708,6 +710,7 @@ class PracticeService:
         from app.models.practice import PracticeStreak
 
         sid = student_id or current_user.id
+        await self._assert_can_read_student(sid, current_user)
         streak = await self.db.scalar(
             select(PracticeStreak).where(PracticeStreak.student_id == sid)
         )
@@ -720,6 +723,7 @@ class PracticeService:
         from app.models.practice import PracticeStreak
 
         sid = student_id or current_user.id
+        await self._assert_can_manage_student(sid, current_user)
         streak = await self.db.scalar(
             select(PracticeStreak).where(PracticeStreak.student_id == sid)
         )
@@ -735,6 +739,7 @@ class PracticeService:
         from app.models.practice import PracticeStreak
 
         sid = student_id or current_user.id
+        await self._assert_can_manage_student(sid, current_user)
         streak = await self.db.scalar(
             select(PracticeStreak).where(PracticeStreak.student_id == sid)
         )
@@ -769,6 +774,7 @@ class PracticeService:
         from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection, PracticeStreak
 
         sid = student_id or current_user.id
+        await self._assert_can_read_student(sid, current_user)
         today = date_cls.today()
         target_year = year or today.year
         target_month = month or today.month
