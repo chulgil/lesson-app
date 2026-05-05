@@ -66,11 +66,16 @@ class SubscriptionExpiryDispatcher:
             recipients.append((student.user_id, "student"))
 
         rels = (
-            await self.db.scalars(select(ParentChildRelation).where(ParentChildRelation.student_id == student_id))
+            await self.db.scalars(
+                select(ParentChildRelation).where(
+                    ParentChildRelation.student_id == student_id,
+                    ParentChildRelation.status == "active",
+                )
+            )
         ).all()
         for rel in rels:
             parent = await self.db.get(Parent, rel.parent_id)
-            if parent is not None and parent.user_id:
+            if parent is not None and parent.user_id and parent.status == "active":
                 recipients.append((parent.user_id, "parent"))
 
         return recipients

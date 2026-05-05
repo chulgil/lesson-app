@@ -49,17 +49,29 @@ async def _make_student(db: AsyncSession, *, student_id: str, teacher_id: str, u
     await db.flush()
 
 
-async def _make_parent_relation(db: AsyncSession, *, parent_user_id: str, parent_id: str, student_id: str) -> None:
-    from app.models.parent import Parent, ParentChildRelation, ParentStatus
+async def _make_parent_relation(
+    db: AsyncSession,
+    *,
+    parent_user_id: str,
+    parent_id: str,
+    student_id: str,
+    parent_status: str = "active",
+    relation_status: str = "active",
+) -> None:
+    from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus, ParentStatus
 
     parent = Parent(
         id=parent_id,
         user_id=parent_user_id,
         name=f"Parent {parent_id}",
-        status=ParentStatus.active,
+        status=ParentStatus(parent_status),
     )
     db.add(parent)
-    rel = ParentChildRelation(parent_id=parent_id, student_id=student_id)
+    rel = ParentChildRelation(
+        parent_id=parent_id,
+        student_id=student_id,
+        status=ParentChildRelationStatus(relation_status),
+    )
     db.add(rel)
     await db.flush()
 
@@ -143,6 +155,43 @@ async def test_dispatch_creates_notifications_for_student_and_parents(db_session
     notifs = (await db_session.scalars(select(Notification))).all()
     user_ids = {n.user_id for n in notifs}
     assert user_ids == {"su1", "pu1", "pu2"}
+
+
+@pytest.mark.asyncio
+async def test_dispatch_skips_inactive_parent_recipients(db_session: AsyncSession) -> None:
+    """Only active parents with active child relations receive expiry notifications."""
+    from app.models.notification import Notification
+    from app.services.subscription_expiry_dispatcher import SubscriptionExpiryDispatcher
+
+    await _make_user(db_session, user_id="t1", role="teacher")
+    await _make_user(db_session, user_id="su1", role="student")
+    await _make_user(db_session, user_id="active-parent", role="parent")
+    await _make_user(db_session, user_id="inactive-parent", role="parent")
+    await _make_user(db_session, user_id="inactive-relation-parent", role="parent")
+    await _make_student(db_session, student_id="s1", teacher_id="t1", user_id="su1")
+    await _make_parent_relation(db_session, parent_user_id="active-parent", parent_id="p-active", student_id="s1")
+    await _make_parent_relation(
+        db_session,
+        parent_user_id="inactive-parent",
+        parent_id="p-inactive",
+        student_id="s1",
+        parent_status="inactive",
+    )
+    await _make_parent_relation(
+        db_session,
+        parent_user_id="inactive-relation-parent",
+        parent_id="p-inactive-rel",
+        student_id="s1",
+        relation_status="inactive",
+    )
+
+    dispatcher = SubscriptionExpiryDispatcher(db_session)
+    milestone = _milestone(sub_id="sub1", student_id="s1", days_left=7, end_date=date(2026, 5, 9))
+    result = await dispatcher.dispatch_milestones([milestone], today_kst=_TODAY_KST)
+
+    assert result["sent"] == 2
+    notifs = (await db_session.scalars(select(Notification))).all()
+    assert {n.user_id for n in notifs} == {"su1", "active-parent"}
 
 
 @pytest.mark.asyncio
