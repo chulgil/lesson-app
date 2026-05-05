@@ -97,8 +97,6 @@ bool _pointsToPresentationProvider(String uri) =>
     uri.startsWith('presentation/providers/');
 
 const _legacyCrossFeaturePresentationProviderImports = <String>{
-  'lib/features/follow/presentation/screens/follow_feed_screen.dart -> ../../../auth/presentation/providers/user_role_provider.dart',
-  'lib/features/follow/presentation/screens/follow_list_screen.dart -> ../../../auth/presentation/providers/user_role_provider.dart',
   'lib/features/home/presentation/providers/assignment_summary_provider.dart -> ../../../practice/presentation/providers/practice_item_providers.dart',
   'lib/features/home/presentation/providers/assignment_summary_provider.dart -> ../../../students/presentation/providers/student_crud_provider.dart',
   'lib/features/home/presentation/widgets/dashboard_tab.dart -> ../../../auth/presentation/providers/user_role_provider.dart',

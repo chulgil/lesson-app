@@ -67,6 +67,33 @@ void main() {
       );
     });
 
+    test('domain layer does not add new Hive persistence annotations', () {
+      final violations = <String>[];
+
+      for (final file in _dartFilesUnder('lib/features')) {
+        if (!_isFeatureDomainFile(file.path)) continue;
+        if (_legacyDomainHivePersistenceExceptions.contains(file.path)) {
+          continue;
+        }
+
+        final source = file.readAsStringSync();
+        final hasHivePersistence =
+            _importOrExportUris(file).any(_pointsToHive) ||
+            RegExp(r'@\s*Hive(?:Type|Field)\b').hasMatch(source) ||
+            RegExp(r'\bextends\s+HiveObject\b').hasMatch(source);
+        if (hasHivePersistence) {
+          violations.add(file.path);
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'New domain models must not depend on Hive persistence annotations. Keep storage adapters in data/core layers, or add a deliberate legacy exception while migrating old models.',
+      );
+    });
+
     test('repository contracts and implementations stay in their layers', () {
       final misplacedContracts = <String>[];
       final misplacedImplementations = <String>[];
@@ -171,15 +198,50 @@ bool _pointsToInfrastructure(String uri) {
   if (uri == 'dart:io') return true;
   if (uri.startsWith('package:firebase_')) return true;
   if (uri.startsWith('package:flutter_local_notifications/')) return true;
-  if (uri.startsWith('package:hive/')) return true;
-  if (uri.startsWith('package:hive_flutter/')) return true;
+  if (_pointsToHive(uri)) return true;
   if (uri.startsWith('package:shared_preferences/')) return true;
   if (uri.contains('/core/config/environment')) return true;
   if (uri.contains('/core/network/')) return true;
   return false;
 }
 
+bool _pointsToHive(String uri) =>
+    uri.startsWith('package:hive/') || uri.startsWith('package:hive_flutter/');
+
 const _legacyRepositoryImplementationExceptions = <String>{};
+
+const _legacyDomainHivePersistenceExceptions = <String>{
+  'lib/features/lessons/domain/entities/attendance_stats.dart',
+  'lib/features/lessons/domain/entities/feedback_preset.dart',
+  'lib/features/practice/domain/entities/practice_goal.dart',
+  'lib/features/practice/domain/entities/practice_note.dart',
+  'lib/features/practice/domain/entities/practice_repertoire.dart',
+  'lib/features/practice/domain/entities/recording.dart',
+  'lib/features/relationship/domain/entities/notification_setting.dart',
+  'lib/features/relationship/domain/entities/relationship_status.dart',
+  'lib/features/relationship/domain/entities/teacher_student_relation.dart',
+  'lib/features/schedule/domain/entities/group_class.dart',
+  'lib/features/schedule/domain/entities/group_class_booking.dart',
+  'lib/features/schedule/domain/entities/group_class_schedule.dart',
+  'lib/features/schedule/domain/entities/makeup_lesson.dart',
+  'lib/features/schedule/domain/entities/no_show_policy.dart',
+  'lib/features/schedule/domain/entities/request_event.dart',
+  'lib/features/schedule/domain/entities/schedule_confirmation_card.dart',
+  'lib/features/schedule/domain/entities/teacher_availability.dart',
+  'lib/features/schedule/domain/entities/unified_lesson_request.dart',
+  'lib/features/student_home/domain/entities/manual_teacher.dart',
+  'lib/features/students/domain/entities/class_membership.dart',
+  'lib/features/students/domain/entities/lesson_class.dart',
+  'lib/features/students/domain/entities/lesson_location.dart',
+  'lib/features/students/domain/entities/lesson_slot.dart',
+  'lib/features/subscription/domain/entities/lesson_policy.dart',
+  'lib/features/subscription/domain/entities/proposal_settings.dart',
+  'lib/features/subscription/domain/entities/subscription.dart',
+  'lib/features/subscription/domain/entities/subscription_proposal.dart',
+  'lib/features/subscription/domain/entities/subscription_settings.dart',
+  'lib/features/subscription/domain/entities/subscription_template.dart',
+  'lib/features/subscription/domain/entities/subscription_usage.dart',
+};
 
 const _mockDataBranchExceptions = <String>{
   'lib/core/providers/repository_provider.dart',

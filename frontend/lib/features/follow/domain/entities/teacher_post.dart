@@ -1,53 +1,40 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'teacher_post.g.dart';
 
 /// Type of post in the follow feed.
-@HiveType(typeId: 140)
 enum PostType {
   /// Performance or recital announcement
-  @HiveField(0)
   performance,
 
   /// Event (discount, campaign, etc.)
-  @HiveField(1)
   event,
 
   /// General notice
-  @HiveField(2)
   notice,
 }
 
 /// A post/announcement from a teacher or academy.
 ///
 /// Displayed in FollowFeedScreen for followers.
-@HiveType(typeId: 141)
 @JsonSerializable()
-class TeacherPost extends HiveObject {
-  @HiveField(0)
+class TeacherPost {
   final String id;
 
   /// Author ID (teacher or academy)
-  @HiveField(1)
   final String authorId;
 
   /// Author display name
-  @HiveField(2)
   final String authorName;
 
-  @HiveField(3)
   final PostType postType;
 
   /// Post title
-  @HiveField(4)
   final String title;
 
   /// Post body content
-  @HiveField(5)
   final String content;
 
-  @HiveField(6)
   final DateTime createdAt;
 
   TeacherPost({

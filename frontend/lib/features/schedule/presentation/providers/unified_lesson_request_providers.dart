@@ -11,6 +11,7 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
+import '../../domain/services/unified_lesson_request_workflow_service.dart';
 import 'schedule_confirmation_card_providers.dart';
 
 part 'unified_lesson_request_providers.g.dart';
@@ -45,6 +46,13 @@ final unifiedLessonRequestRepositoryProvider =
         ref: ref,
         mock: () => MockUnifiedLessonRequestRepository(),
         remote: (apiClient) => RemoteUnifiedLessonRequestRepository(apiClient),
+      ),
+    );
+
+final unifiedLessonRequestWorkflowServiceProvider =
+    Provider<UnifiedLessonRequestWorkflowService>(
+      (ref) => UnifiedLessonRequestWorkflowService(
+        ref.watch(unifiedLessonRequestRepositoryProvider),
       ),
     );
 
@@ -205,44 +213,21 @@ class UnifiedLessonRequestActions {
   UnifiedLessonRequestRepository get _repository =>
       ref.read(unifiedLessonRequestRepositoryProvider);
 
+  UnifiedLessonRequestWorkflowService get _workflowService =>
+      ref.read(unifiedLessonRequestWorkflowServiceProvider);
+
   /// Create a new unified lesson request
   Future<UnifiedLessonRequest> createRequest(
     UnifiedLessonRequest request,
   ) async {
-    final studentId =
-        request.studentId.isNotEmpty
-            ? request.studentId
-            : ref.read(currentUserIdProvider);
-    final effectiveRequest = request.copyWith(studentId: studentId);
-    final result = await _repository.create(effectiveRequest);
-
-    // Create initial request event
-    await _repository.addEvent(
-      RequestEvent(
-        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-        requestId: result.id,
-        actorType: ProposerRole.student,
-        actorId: studentId,
-        eventType: RequestEventType.initialRequest,
-        suggestedSlots:
-            effectiveRequest.preferredSlots
-                .map(
-                  (ps) => TimeSlotOption(
-                    id: 'slot_${ps.priority}',
-                    dayOfWeek: ps.dayOfWeek ?? 0,
-                    startTime: ps.startTime,
-                    endTime: ps.endTime,
-                  ),
-                )
-                .toList(),
-        message: effectiveRequest.message,
-        createdAt: DateTime.now(),
-      ),
+    final result = await _workflowService.createRequest(
+      request,
+      currentUserId: ref.read(currentUserIdProvider),
     );
 
     _invalidateProviders(
-      effectiveRequest.teacherId,
-      studentId,
+      result.teacherId,
+      result.studentId,
       requestId: result.id,
     );
     return result;
@@ -257,29 +242,11 @@ class UnifiedLessonRequestActions {
     int? selectedSlotIndex,
     String? message,
   }) async {
-    final request = await _repository.getById(requestId);
-    if (request == null) {
-      throw Exception('Request not found: $requestId');
-    }
-
-    final result = await _repository.update(
-      request.copyWith(
-        status: UnifiedRequestStatus.timeConfirmed,
-        confirmedAt: request.confirmedAt ?? DateTime.now(),
-      ),
-    );
-
-    await _repository.addEvent(
-      RequestEvent(
-        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-        requestId: requestId,
-        actorType: ProposerRole.teacher,
-        actorId: teacherId,
-        eventType: RequestEventType.approve,
-        selectedSlotIndex: selectedSlotIndex,
-        message: message,
-        createdAt: DateTime.now(),
-      ),
+    final result = await _workflowService.approveRequest(
+      requestId,
+      teacherId: teacherId,
+      selectedSlotIndex: selectedSlotIndex,
+      message: message,
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
@@ -294,19 +261,11 @@ class UnifiedLessonRequestActions {
     int? selectedSlotIndex,
     String? message,
   }) async {
-    final result = await _repository.approve(requestId);
-
-    await _repository.addEvent(
-      RequestEvent(
-        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-        requestId: requestId,
-        actorType: ProposerRole.student,
-        actorId: studentId,
-        eventType: RequestEventType.acceptAlternative,
-        selectedSlotIndex: selectedSlotIndex,
-        message: message,
-        createdAt: DateTime.now(),
-      ),
+    final result = await _workflowService.acceptAlternativeRequest(
+      requestId,
+      studentId: studentId,
+      selectedSlotIndex: selectedSlotIndex,
+      message: message,
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
@@ -321,30 +280,11 @@ class UnifiedLessonRequestActions {
     String studentId, {
     ProposerRole actorRole = ProposerRole.teacher,
   }) async {
-    // Find the previous approve/acceptAlternative event's selectedSlotIndex
-    final events = await _repository.getEventsByRequestId(requestId);
-    int? prevSlotIndex;
-    for (int i = events.length - 1; i >= 0; i--) {
-      if ((events[i].eventType == RequestEventType.approve ||
-              events[i].eventType == RequestEventType.acceptAlternative) &&
-          events[i].selectedSlotIndex != null) {
-        prevSlotIndex = events[i].selectedSlotIndex;
-        break;
-      }
-    }
-
-    final result = await _repository.withdrawApproval(requestId);
-
-    await _repository.addEvent(
-      RequestEvent(
-        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-        requestId: requestId,
-        actorType: actorRole,
-        actorId: actorRole == ProposerRole.teacher ? teacherId : studentId,
-        eventType: RequestEventType.withdrawApproval,
-        selectedSlotIndex: prevSlotIndex,
-        createdAt: DateTime.now(),
-      ),
+    final result = await _workflowService.withdrawApprovalRequest(
+      requestId,
+      teacherId: teacherId,
+      studentId: studentId,
+      actorRole: actorRole,
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
@@ -358,18 +298,10 @@ class UnifiedLessonRequestActions {
     String studentId, {
     String? reason,
   }) async {
-    final result = await _repository.reject(requestId, reason: reason);
-
-    await _repository.addEvent(
-      RequestEvent(
-        id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-        requestId: requestId,
-        actorType: ProposerRole.teacher,
-        actorId: teacherId,
-        eventType: RequestEventType.reject,
-        message: reason,
-        createdAt: DateTime.now(),
-      ),
+    final result = await _workflowService.rejectRequest(
+      requestId,
+      teacherId: teacherId,
+      reason: reason,
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
@@ -384,8 +316,7 @@ class UnifiedLessonRequestActions {
     required List<TimeSlotOption> slots,
     String? message,
   }) async {
-    // Repository internally creates the event — no duplicate here
-    final result = await _repository.proposeAlternatives(
+    final result = await _workflowService.proposeAlternatives(
       requestId,
       slots: slots,
       message: message,
@@ -403,8 +334,7 @@ class UnifiedLessonRequestActions {
     required int selectedSlotIndex,
     String? message,
   }) async {
-    // Repository internally creates the event — no duplicate here
-    final result = await _repository.acceptAlternative(
+    final result = await _workflowService.acceptAlternative(
       requestId,
       selectedSlotIndex: selectedSlotIndex,
       message: message,
@@ -422,8 +352,7 @@ class UnifiedLessonRequestActions {
     required TimeSlotOption slot,
     String? message,
   }) async {
-    // Repository internally creates the event — no duplicate here
-    final result = await _repository.counterPropose(
+    final result = await _workflowService.counterPropose(
       requestId,
       slot: slot,
       message: message,

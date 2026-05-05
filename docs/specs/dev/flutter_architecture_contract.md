@@ -146,6 +146,7 @@ core/startup/
 - domain/data에서 presentation import/export 금지
 - domain에서 data import/export 금지
 - domain service에서 framework driver/API/environment import 금지
+- domain layer에 새 Hive persistence annotation/import 추가 금지
 - repository interface와 implementation 위치 규칙
 - `EnvironmentConfig.useMockData` 직접 분기의 허용 위치
 
