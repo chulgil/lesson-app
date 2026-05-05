@@ -176,6 +176,7 @@ Schema    Schema (Pydantic v2)
 - `models`, `schemas`, `services`는 `app.api` 계층을 import하지 않는다.
 - `schemas`는 `app.models` 계층을 import하지 않는다. API 계약은 Pydantic 필드와 validator로 표현하고, ORM enum/모델 변환은 service/model 계층에서 처리한다.
 - `app.models`에 등록된 테이블은 Alembic active migration에서 생성/변경 이력이 있어야 한다. 테스트 fixture의 `Base.metadata.create_all`은 migration 누락을 숨길 수 있으므로, 새 모델을 추가할 때 migration contract test를 함께 둔다.
+- PostgreSQL native enum을 쓰는 모델 enum 값이 늘어나면 Alembic migration과 enum contract test를 함께 추가한다. SQLite 테스트 DB는 enum type 누락을 드러내지 못하므로, `ALTER TYPE` 또는 enum 재생성 패턴을 migration source 계약으로 검증한다.
 - 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
 - 모든 router decorator는 `status_code`를 명시해야 한다. 기본 200을 쓰는 경우에도 API 문서와 프론트 원격 계약을 위해 `status.HTTP_200_OK`를 적는다.
 - OpenAPI `operationId`는 전체 API에서 유일해야 한다. 동일한 함수명을 여러 라우터에서 쓰거나 레거시/신규 경로를 병행 노출할 때는 명시적 `operation_id`를 지정한다.
