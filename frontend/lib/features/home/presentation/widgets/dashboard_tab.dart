@@ -14,13 +14,7 @@ import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../lessons/presentation/providers/lesson_confirmation_provider.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
-import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../subscription/subscription_facade.dart';
+import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
@@ -37,18 +31,12 @@ class DashboardTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lessonsAsync = ref.watch(lessonsProvider);
-    final lessonStatsAsync = ref.watch(lessonStatsProvider);
-    final teacherId = ref.watch(currentUserIdProvider);
-    final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
-    final needsConfirmationAsync = ref.watch(
-      lessonsNeedingConfirmationProvider,
-    );
+    final dashboard = ref.watch(homeDashboardProvider);
 
     // Get today's lessons
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final todayLessons = lessonsAsync.whenData((lessons) {
+    final todayLessons = dashboard.lessons.whenData((lessons) {
       return lessons.where((lesson) {
           final lessonDate = lesson.date;
           return lessonDate.year == today.year &&
@@ -61,20 +49,15 @@ class DashboardTab extends ConsumerWidget {
     return PaperScaffold(
       child: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(lessonsProvider);
-          ref.invalidate(lessonStatsProvider);
-          ref.invalidate(unpaidSummaryProvider(teacherId));
-          ref.invalidate(pendingBookingsCountProvider(teacherId));
-          ref.invalidate(todayRequestsProvider(teacherId));
-          ref.invalidate(expiringSoonSubscriptionsProvider);
-          ref.invalidate(expiredSubscriptionsProvider);
-          ref.invalidate(lessonsNeedingConfirmationProvider);
+          await ref
+              .read(homeDashboardRefreshProvider)
+              .refresh(dashboard.teacherId);
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
-            AppSpacing.space4,
+            AppSpacing.space2,
             AppSpacing.screenPadding,
             AppSpacing.space8,
           ),
@@ -101,13 +84,13 @@ class DashboardTab extends ConsumerWidget {
 
               // ── 1순위: 긴급 알림 존 ──────────────────────────
               UrgentAlertZone(
-                teacherId: teacherId,
-                unpaidSummary: unpaidSummaryAsync,
-                needsConfirmation: needsConfirmationAsync,
+                teacherId: dashboard.teacherId,
+                unpaidSummary: dashboard.unpaidSummary,
+                needsConfirmation: dashboard.needsConfirmation,
               ),
 
               // ── 2순위: 오늘 ─────────────────────────────────
-              _buildStatsRow(context, todayLessons, lessonStatsAsync),
+              _buildStatsRow(context, todayLessons, dashboard.lessonStats),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -132,7 +115,7 @@ class DashboardTab extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space6),
 
               // ── 이벤트: 대응 필요 (오늘 레슨 바로 아래) ──────────
-              _buildEventsGroup(context, teacherId),
+              _buildEventsGroup(context, dashboard.teacherId),
 
               const SizedBox(height: AppSpacing.space6),
 

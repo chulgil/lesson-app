@@ -9,12 +9,12 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../../features/home/presentation/widgets/time_context_banner.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
-import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../../gamification/presentation/widgets/gamification_header.dart';
+import '../providers/student_home_practice_provider.dart';
+import '../providers/student_home_session_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
@@ -28,10 +28,15 @@ class StudentDashboardTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final currentStudentId = ref.watch(currentUserIdProvider);
+    final currentStudentId = ref.watch(studentHomeCurrentStudentIdProvider);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space2,
+        AppSpacing.screenPadding,
+        AppSpacing.screenPadding,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -235,7 +240,9 @@ class _StudentTimeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
+    final practiceLogsAsync = ref.watch(
+      studentHomePracticeLogsProvider(studentId),
+    );
 
     // 학생은 streak 중심 메시지로 충분 — booking→Lesson 매핑 생략.
     final streakDays =

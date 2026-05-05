@@ -50,12 +50,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: IntrinsicHeight(
                 child: Column(
                   children: [
-                    const SizedBox(height: AppSpacing.space4),
+                    const SizedBox(height: AppSpacing.space2),
                     const NotebookMasthead(
                       eyebrow: 'ESTD. MMXXVI',
                       meta: 'SEOUL · KOREA',
                     ),
-                    const SizedBox(height: AppSpacing.space8),
+                    const Spacer(flex: 2),
                     _buildHeader(),
                     const SizedBox(height: AppSpacing.space8),
                     _buildSocialButtons(context),
@@ -63,8 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const SizedBox(height: AppSpacing.space6),
                       _buildDevAccountsSection(),
                     ],
-                    const Spacer(),
-                    const SizedBox(height: AppSpacing.space6),
+                    const Spacer(flex: 3),
                     _buildFooter(context),
                     const SizedBox(height: AppSpacing.space4),
                   ],
