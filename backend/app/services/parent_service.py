@@ -374,8 +374,23 @@ class ParentService:
     ) -> list[LessonResponse]:
         """Return lessons for a linked child."""
         from app.models.lesson import Lesson
+        from app.models.parent import ParentVisibilitySettings
 
-        query = select(Lesson).where(Lesson.student_id == student_id)
+        await self._assert_parent_can_access_child(current_user.id, student_id)
+
+        blocked_visibility = (
+            select(ParentVisibilitySettings.id)
+            .where(
+                ParentVisibilitySettings.teacher_id == Lesson.teacher_id,
+                ParentVisibilitySettings.student_id == Lesson.student_id,
+                ParentVisibilitySettings.can_view_schedule == False,  # noqa: E712
+            )
+            .exists()
+        )
+        query = select(Lesson).where(
+            Lesson.student_id == student_id,
+            ~blocked_visibility,
+        )
         if date_from:
             query = query.where(Lesson.date >= date_from)
         if date_to:
@@ -383,6 +398,28 @@ class ParentService:
 
         result = await self.db.scalars(query.order_by(Lesson.date.desc()))
         return [LessonResponse.model_validate(lesson) for lesson in result.all()]
+
+    async def _assert_parent_can_access_child(self, parent_user_id: str, student_id: str) -> None:
+        from app.models.parent import Parent, ParentChildRelation
+
+        parent = await self.db.scalar(
+            select(Parent).where(
+                Parent.user_id == parent_user_id,
+                Parent.status == "active",
+            )
+        )
+        if parent is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Parent access denied")
+
+        relation = await self.db.scalar(
+            select(ParentChildRelation.id).where(
+                ParentChildRelation.parent_id == parent.id,
+                ParentChildRelation.student_id == student_id,
+                ParentChildRelation.status == "active",
+            )
+        )
+        if relation is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Child access denied")
 
     async def get_child_practice(
         self,
