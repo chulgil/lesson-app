@@ -272,6 +272,160 @@ async def test_subscription_schedule_change_accept_preserves_source_slots(
 
 
 @pytest.mark.asyncio
+async def test_subscription_schedule_change_events_enforce_turn_order(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Schedule-change accepts/rejects require a pending event from the other side."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session)
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert create_resp.status_code == 201
+    sub_id = create_resp.json()["id"]
+    request_id = f"req-{sub_id}"
+
+    no_pending = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": sub_id,
+            "session_number": 3,
+            "selected_slot_index": 0,
+        },
+    )
+    assert no_pending.status_code == 400
+
+    proposed = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChangeProposed",
+            "subscription_id": sub_id,
+            "session_number": 3,
+            "suggested_slots": [{"id": "slot-a", "dayOfWeek": 2, "startTime": "15:00", "endTime": "16:00"}],
+        },
+    )
+    assert proposed.status_code == 201
+
+    self_accept = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": sub_id,
+            "session_number": 3,
+            "selected_slot_index": 0,
+        },
+    )
+    assert self_accept.status_code == 400
+
+    accepted = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": sub_id,
+            "session_number": 3,
+            "selected_slot_index": 0,
+        },
+    )
+    assert accepted.status_code == 201
+
+    duplicate = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChangeRejected",
+            "subscription_id": sub_id,
+            "session_number": 3,
+        },
+    )
+    assert duplicate.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_parent_cannot_create_subscription_schedule_change_event(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Parents can read child subscription events but cannot create them."""
+    from app.models.parent import Parent, ParentChildRelation
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="parent-user-id",
+        role="parent",
+        name="Parent",
+        email="parent-event@test.com",
+    )
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="student-001"),
+        ]
+    )
+    await db_session.flush()
+    membership_id = await _create_membership(db_session)
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert create_resp.status_code == 201
+    sub_id = create_resp.json()["id"]
+    parent_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'parent-user-id', 'role': 'parent'})}"
+    }
+
+    response = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=parent_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "parent",
+            "actor_id": "parent-profile-id",
+            "event_type": "scheduleChangeProposed",
+            "subscription_id": sub_id,
+            "session_number": 1,
+        },
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_create_subscription_template(client: AsyncClient, auth_headers, create_test_user):
     """POST /api/v1/subscriptions-templates creates a template and returns 201."""
     await create_test_user(user_id="test-user-id", role="teacher")

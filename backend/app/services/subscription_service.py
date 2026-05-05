@@ -297,6 +297,7 @@ class SubscriptionService:
         from app.models.request_event import RequestEvent
 
         await self._get_subscription_for_user(subscription_id, current_user)
+        await self._validate_subscription_event_turn(subscription_id, data, current_user)
         if data.subscription_id is not None and data.subscription_id != subscription_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -346,6 +347,57 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(event)
         return RequestEventResponse.model_validate(event)
+
+    async def _validate_subscription_event_turn(
+        self,
+        subscription_id: str,
+        data: RequestEventCreate,
+        current_user: Any,
+    ) -> None:
+        """Validate schedule-change event ordering for subscription sessions."""
+        from app.models.request_event import RequestEvent, RequestEventType
+
+        role = self._actor_type(current_user)
+        if role == "parent":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+        event_type = data.event_type
+        terminal_types = {
+            RequestEventType.scheduleChangeAccepted,
+            RequestEventType.scheduleChangeRejected,
+        }
+        pending_source_types = {
+            RequestEventType.scheduleChanged,
+            RequestEventType.scheduleChangeProposed,
+            RequestEventType.scheduleChangeCountered,
+        }
+        decision_types = pending_source_types | terminal_types
+
+        if event_type not in terminal_types:
+            return
+
+        query = select(RequestEvent).where(
+            RequestEvent.subscription_id == subscription_id,
+            RequestEvent.event_type.in_(decision_types),
+        )
+        if data.session_number is not None:
+            query = query.where(RequestEvent.session_number == data.session_number)
+
+        latest = (
+            await self.db.scalars(
+                query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc())
+            )
+        ).first()
+        if latest is None or latest.event_type not in pending_source_types:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No pending schedule-change proposal",
+            )
+        if latest.actor_type == data.actor_type:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only the other party can respond to the schedule-change proposal",
+            )
 
     async def _latest_schedule_change_source_event(
         self,
