@@ -196,6 +196,104 @@ void main() {
     },
   );
 
+  testWidgets('accepted schedule event shows the confirmation message', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ScheduleChangeEventBubble(
+            viewerRole: 'teacher',
+            studentName: '김민준',
+            teacherName: '김선아',
+            event: RequestEvent(
+              id: 'event_accept_message',
+              requestId: '',
+              actorType: ProposerRole.teacher,
+              actorId: 'teacher_1',
+              eventType: RequestEventType.scheduleChangeAccepted,
+              suggestedSlots: [
+                TimeSlotOption(
+                  id: 'slot_1',
+                  dayOfWeek: 1,
+                  startTime: '18:00',
+                  endTime: '19:00',
+                ),
+              ],
+              selectedSlotIndex: 0,
+              message: '이 시간으로 확정할게요',
+              createdAt: DateTime(2026, 5, 4, 11),
+              sessionNumber: 6,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('이 시간으로 확정할게요'), findsOneWidget);
+  });
+
+  testWidgets(
+    'accepted schedule event resolves selected third-priority slot from previous request',
+    (tester) async {
+      final requestedEvent = RequestEvent(
+        id: 'event_request',
+        requestId: '',
+        actorType: ProposerRole.student,
+        actorId: 'student_1',
+        eventType: RequestEventType.scheduleChanged,
+        suggestedSlots: [
+          TimeSlotOption(
+            id: 'slot_1',
+            dayOfWeek: 1,
+            startTime: '18:00',
+            endTime: '19:00',
+          ),
+          TimeSlotOption(
+            id: 'slot_2',
+            dayOfWeek: 3,
+            startTime: '17:00',
+            endTime: '18:00',
+          ),
+          TimeSlotOption(
+            id: 'slot_3',
+            dayOfWeek: 5,
+            startTime: '10:00',
+            endTime: '11:00',
+          ),
+        ],
+        createdAt: DateTime(2026, 5, 4, 10),
+        sessionNumber: 6,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ScheduleChangeEventBubble(
+              viewerRole: 'teacher',
+              studentName: '김민준',
+              teacherName: '김선아',
+              event: RequestEvent(
+                id: 'event_accept',
+                requestId: '',
+                actorType: ProposerRole.teacher,
+                actorId: 'teacher_1',
+                eventType: RequestEventType.scheduleChangeAccepted,
+                selectedSlotIndex: 2,
+                createdAt: DateTime(2026, 5, 4, 11),
+                sessionNumber: 6,
+              ),
+              previousEvents: [requestedEvent],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.textContaining('토 10:00 ~ 11:00'), findsWidgets);
+      expect(find.text('6회차 → 토 10:00 ~ 11:00 확정'), findsOneWidget);
+    },
+  );
+
   testWidgets('shows cancelled lesson session number in the chat bubble', (
     tester,
   ) async {

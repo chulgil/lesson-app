@@ -1,14 +1,13 @@
 import '../entities/practice_repertoire.dart';
 
-// Re-export implementation for consumers that need the mock
-export '../../data/repositories/impl/mock_practice_repertoire_impl.dart';
-
 /// Repository for managing practice repertoire data
 abstract class PracticeRepertoireRepository {
   // Repertoire methods
   Future<List<PracticeRepertoire>> getRepertoires(String studentId);
   Future<List<PracticeRepertoire>> getRepertoiresForDate(
-      String studentId, DateTime date);
+    String studentId,
+    DateTime date,
+  );
   Future<PracticeRepertoire?> getRepertoire(String id);
   Future<PracticeRepertoire> createRepertoire(PracticeRepertoire repertoire);
   Future<PracticeRepertoire> updateRepertoire(PracticeRepertoire repertoire);
@@ -26,48 +25,64 @@ abstract class PracticeRepertoireRepository {
   Future<PracticeSection> createSection(PracticeSection section);
   Future<PracticeSection> updateSection(PracticeSection section);
   Future<void> deleteSection(String id);
-  Future<PracticeSection> toggleSectionComplete(String sectionId, {DateTime? date});
+  Future<PracticeSection> toggleSectionComplete(
+    String sectionId, {
+    DateTime? date,
+  });
   Future<PracticeSection> incrementPracticeCount(
-      String sectionId, int practiceSeconds);
+    String sectionId,
+    int practiceSeconds,
+  );
 
   // Daily practice methods
   Future<PracticeSection> toggleDailyCompletion(
-      String sectionId, DateTime date);
+    String sectionId,
+    DateTime date,
+  );
   Future<PracticeSection> toggleSectionRepeat(String sectionId);
 
   // Recording methods
   Future<PracticeRecording> createRecording(PracticeRecording recording);
   Future<void> deleteRecording(String id);
   Future<PracticeSection> setRepresentativeRecording(
-      String sectionId, String recordingId);
+    String sectionId,
+    String recordingId,
+  );
 
   // Section order methods
   Future<void> updateSectionOrders(
-      String repertoireId, List<String> sectionIds);
+    String repertoireId,
+    List<String> sectionIds,
+  );
   Future<PracticeSection> updateLastPracticedAt(String sectionId);
 
   // Orphan recording methods
   Future<List<PracticeRecording>> getOrphanedRecordings();
   Future<void> reassignRecording(String recordingId, String newSectionId);
   Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
-      getAllSectionsWithRepertoire(String studentId);
+  getAllSectionsWithRepertoire(String studentId);
 
   // Get all sections from all users (for orphan recording assignment)
   Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
-      getAllSectionsForAssignment();
+  getAllSectionsForAssignment();
 
   // Get all recordings with their section and repertoire info
   Future<
-      List<
-          ({
-            PracticeRecording recording,
-            PracticeSection? section,
-            PracticeRepertoire? repertoire
-          })>> getAllRecordingsWithSectionInfo();
+    List<
+      ({
+        PracticeRecording recording,
+        PracticeSection? section,
+        PracticeRepertoire? repertoire,
+      })
+    >
+  >
+  getAllRecordingsWithSectionInfo();
 
   // Import recording from external file
   Future<PracticeRecording> importRecording(
-      String sourceFilePath, int durationSeconds);
+    String sourceFilePath,
+    int durationSeconds,
+  );
 
   // Assignment integration (teacher → student repertoire)
   Future<PracticeRepertoire> getOrCreateDefaultRepertoire(String studentId);

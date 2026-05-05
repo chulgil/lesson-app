@@ -129,6 +129,9 @@ class AppStrings {
   /// 아니요 버튼
   static const no = '아니요';
 
+  /// 상대방 (fallback)
+  static const opponent = '상대';
+
   /// 상대방 시간 제안 알림
   static String opponentProposed(String name) => '$name님이 시간을 제안했습니다';
 
@@ -219,7 +222,7 @@ class AppStrings {
   static const requestClosed = '요청이 종료되었습니다';
 
   /// 슬롯 선택 힌트
-  static const slotSelectionHint = '일정을 탭하여 선택하세요';
+  static const slotSelectionHint = '가능한 일정을 선택해 확정하세요';
 
   // ── Schedule Comparison & Actions ─────────────────────────
 
@@ -519,10 +522,10 @@ class AppStrings {
 
   // Profile card
   static const studentMessage = '학생 메시지';
-  static const scheduleChangeAccept = '수락';
-  static const scheduleChangeAccepted = '일정 변경을 수락했습니다';
+  static const scheduleChangeAccept = '선택한 일정 확정';
+  static const scheduleChangeAccepted = '선택한 일정으로 확정했습니다';
   static const scheduleChangeReject = '거절';
-  static const scheduleChangeCounter = '역제안';
+  static const scheduleChangeCounter = '다른 일정 제안';
   static const scheduleChangeConfirmed = '시간이 변경되었습니다';
   static const scheduleChangeRecommended = '추천';
 
@@ -1001,7 +1004,7 @@ class AppStrings {
   static String sessionCollapsedFuture(int n) => '$n회차 · 미정';
 
   /// Bottom input bar
-  static const subscriptionMessageHint = '전달할 메시지를 입력하세요';
+  static const subscriptionMessageHint = '확정 메시지를 남겨주세요 (선택)';
   static const subscriptionSendMessage = '메시지 전송';
   static const messageSentSuccess = '메시지를 전송했습니다';
   static const scheduleChangeButton = '일정 변경';
@@ -1266,6 +1269,9 @@ class AppStrings {
 
   /// 변경요청이 없습니다
   static const noChangeRequests = '변경요청이 없습니다';
+  static const rangeOneWeek = '1주';
+  static const rangeOneMonth = '1달';
+  static const rangeThreeMonths = '3달';
 
   // ── Schedule Guide Info Box (D-7) ──────────────────────────
 

@@ -26,14 +26,13 @@ final notificationApiRepositoryProvider =
 
 typedef NotificationApiRepositoryRef = ProviderRef<NotificationRepository?>;
 String _$notificationServiceHash() =>
-    r'86fee7f1e80c839a0014f1d8283c4fb9e26a098f';
+    r'22046f9f8c790741d2b04a296bcc47739f097ed7';
 
-/// Provider for the notification service
+/// Provider for the notification service.
 ///
 /// Copied from [notificationService].
 @ProviderFor(notificationService)
-final notificationServiceProvider =
-    AutoDisposeProvider<LocalNotificationService>.internal(
+final notificationServiceProvider = Provider<LocalNotificationService>.internal(
   notificationService,
   name: r'notificationServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -43,9 +42,28 @@ final notificationServiceProvider =
   allTransitiveDependencies: null,
 );
 
-typedef NotificationServiceRef
-    = AutoDisposeProviderRef<LocalNotificationService>;
-String _$fcmServiceHash() => r'86d014245bd6fb182b03c37be8d7b299c17cb67c';
+typedef NotificationServiceRef = ProviderRef<LocalNotificationService>;
+String _$notificationSchedulerServiceHash() =>
+    r'3355a3cc8d1e86aaf4753b151c06bcc4f30cda79';
+
+/// Provider for scheduling future notification delivery.
+///
+/// Copied from [notificationSchedulerService].
+@ProviderFor(notificationSchedulerService)
+final notificationSchedulerServiceProvider =
+    Provider<NotificationSchedulerService>.internal(
+  notificationSchedulerService,
+  name: r'notificationSchedulerServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$notificationSchedulerServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef NotificationSchedulerServiceRef
+    = ProviderRef<NotificationSchedulerService>;
+String _$fcmServiceHash() => r'a591c325c23c7af484185a0c7ad33b1c7e4c897d';
 
 /// Provider for FCM push notification service (keepAlive for app lifecycle)
 ///
@@ -121,9 +139,12 @@ final proposalNotificationServiceProvider =
 
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
-String _$userNotificationsHash() => r'9a3c21792285bb1e1431e907a22b1a6b4ac74ce8';
+String _$userNotificationsHash() => r'5aeaa0eab0b8e9a5464dd17d24b3d36f53bc35b3';
 
-/// Provider for user's notifications list
+/// Provider for user's notifications list.
+///
+/// Filters mock notifications by current user role using
+/// [NotificationTypeExtension.targetRole].
 ///
 /// Copied from [userNotifications].
 @ProviderFor(userNotifications)

@@ -1,29 +1,21 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 import '../../../../core/constants/default_ids.dart';
 import '../../domain/entities/practice_repertoire.dart';
-import '../../presentation/providers/practice_repertoire_repository_provider.dart';
-
-part 'default_repertoire_service.g.dart';
+import '../../domain/repositories/practice_repertoire_repository.dart';
 
 /// Service that ensures the default repertoire and quick-record section exist.
 ///
 /// This is used by the quick recording feature to provide a destination
 /// for recordings when the user is not on a specific section screen.
-@Riverpod(keepAlive: true)
-class DefaultRepertoireService extends _$DefaultRepertoireService {
-  @override
-  Future<void> build() async {
-    await ensureDefaultExists();
-  }
+class DefaultRepertoireService {
+  const DefaultRepertoireService(this._repository);
+
+  final PracticeRepertoireRepository _repository;
 
   /// Check if the default repertoire exists; if not, create it with
   /// a default quick-record section.
   Future<void> ensureDefaultExists() async {
-    final repository = ref.read(practiceRepertoireRepositoryProvider);
-
     // Check if default repertoire already exists
-    final existing = await repository.getRepertoire(DefaultIds.repertoireId);
+    final existing = await _repository.getRepertoire(DefaultIds.repertoireId);
     if (existing != null) return;
 
     // Create default repertoire
@@ -36,7 +28,7 @@ class DefaultRepertoireService extends _$DefaultRepertoireService {
       createdAt: now,
       isDefault: true,
     );
-    await repository.createRepertoire(repertoire);
+    await _repository.createRepertoire(repertoire);
 
     // Create default quick-record section inside the repertoire
     final section = PracticeSection(
@@ -50,6 +42,6 @@ class DefaultRepertoireService extends _$DefaultRepertoireService {
       isDefault: true,
       createdAt: now,
     );
-    await repository.createSection(section);
+    await _repository.createSection(section);
   }
 }

@@ -15,9 +15,9 @@ typedef ScheduleEventAction = void Function(RequestEvent event);
 /// Bottom input bar for the subscription detail screen.
 ///
 /// Four exclusive states based on schedule change / cancellation events:
-/// - **default**: "일정 변경 요청하기" button only (no free-form messaging)
-/// - **isWaiting**: "OOO님의 응답을 기다리고 있습니다" + "결정 변경" button
-/// - **canRespond**: Slot selection + message + "수락"/"일정 비교" buttons
+/// - **default**: schedule change button only (no free-form messaging)
+/// - **isWaiting**: waiting notice + decision change button
+/// - **canRespond**: slot selection + message + confirmation/counter buttons
 /// - **cancellationConfirmed**: 취소 확정 후 선생님 [무료 처리] [확인]
 ///
 /// Free-form messaging is intentionally excluded — this screen is dedicated
@@ -206,7 +206,7 @@ class _WaitingDecisionBar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '${opponentName ?? '상대'}님의 응답을 기다리고 있습니다',
+          AppStrings.waitingForResponse(opponentName ?? AppStrings.opponent),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
             fontWeight: FontWeight.w600,
@@ -222,7 +222,7 @@ class _WaitingDecisionBar extends StatelessWidget {
               shape: RoundedRectangleBorder(),
             ),
             child: Text(
-              '결정 변경',
+              AppStrings.withdrawApproval,
               style: AppTypography.buttonSmall.copyWith(color: AppColors.ink),
             ),
           ),
@@ -277,7 +277,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '일정을 탭하여 선택하세요',
+          AppStrings.slotSelectionHint,
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
             fontWeight: FontWeight.w600,
@@ -338,7 +338,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
                     shape: RoundedRectangleBorder(),
                   ),
                   child: Text(
-                    '일정 비교',
+                    AppStrings.scheduleChangeCounter,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.ink,
                     ),
@@ -364,7 +364,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
                     shape: RoundedRectangleBorder(),
                   ),
                   child: Text(
-                    '수락',
+                    AppStrings.scheduleChangeAccept,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.paper,
                     ),

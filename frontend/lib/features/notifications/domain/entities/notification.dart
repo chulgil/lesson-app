@@ -148,6 +148,73 @@ extension NotificationTypeExtension on NotificationType {
 
   /// Whether this notification should appear in app notification center
   bool get shouldShowInApp => true;
+
+  /// Target role for this notification type.
+  /// - 'teacher': only shown to teacher
+  /// - 'student': only shown to student
+  /// - 'both': shown to both roles
+  String get targetRole {
+    switch (this) {
+      // Teacher-only notifications
+      case NotificationType.newStudentRegistered:
+      case NotificationType.trialBookingRequest:
+      case NotificationType.studentPracticeReport:
+      case NotificationType.reviewReceived:
+      case NotificationType.paymentReceived:
+      case NotificationType.proposalAccepted:
+      case NotificationType.rescheduleAllowanceUsed:
+      case NotificationType.rescheduleAllowanceDepleted:
+      case NotificationType.generalAnnouncement:
+        return 'teacher';
+
+      // Student-only notifications
+      case NotificationType.practiceReminder:
+      case NotificationType.practiceAssigned:
+      case NotificationType.streakWarning:
+      case NotificationType.streakMilestone:
+      case NotificationType.weeklyGoalAchieved:
+      case NotificationType.recordingFeedbackReceived:
+      case NotificationType.proposalReceived:
+      case NotificationType.proposalReminder24h:
+      case NotificationType.proposalReminder48h:
+      case NotificationType.proposalReminder72h:
+      case NotificationType.proposalExpired:
+      case NotificationType.paymentRequested:
+      case NotificationType.paymentReminder:
+      case NotificationType.paymentConfirmed:
+      case NotificationType.lessonsRunningLow:
+      case NotificationType.teacherNoshow:
+      case NotificationType.compensationApplied:
+      case NotificationType.lessonNoteShared:
+        return 'student';
+
+      // Both roles
+      case NotificationType.lessonBooked:
+      case NotificationType.lessonReminder:
+      case NotificationType.lessonCancelled:
+      case NotificationType.lessonRescheduled:
+      case NotificationType.lessonStarting:
+      case NotificationType.lessonCompleted:
+      case NotificationType.noshowWarning:
+      case NotificationType.noshowConfirmed:
+      case NotificationType.cancellationDeadline:
+      case NotificationType.connectionRequestReceived:
+      case NotificationType.connectionRequestAccepted:
+      case NotificationType.connectionRequestRejected:
+      case NotificationType.connectionEstablished:
+      case NotificationType.connectionDisconnected:
+      case NotificationType.makeupLessonCreated:
+      case NotificationType.makeupLessonExpiring:
+      case NotificationType.makeupLessonExpired:
+      case NotificationType.scheduleChangeRequested:
+      case NotificationType.scheduleChangeApproved:
+      case NotificationType.scheduleChangeRejected:
+      case NotificationType.scheduleChangeAlternative:
+      case NotificationType.subscriptionExpiringSoon:
+      case NotificationType.subscriptionExpired:
+        return 'both';
+    }
+  }
 }
 
 /// App notification entity

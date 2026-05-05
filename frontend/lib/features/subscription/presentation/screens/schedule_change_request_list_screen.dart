@@ -212,9 +212,9 @@ class _ScheduleChangeRequestListScreenState
 
   Widget _buildRangeFilter() {
     const ranges = [
-      (label: '1주', days: 7),
-      (label: '1달', days: 31),
-      (label: '3달', days: 93),
+      (label: AppStrings.rangeOneWeek, days: 7),
+      (label: AppStrings.rangeOneMonth, days: 31),
+      (label: AppStrings.rangeThreeMonths, days: 93),
     ];
 
     return Padding(
@@ -449,9 +449,7 @@ class _ScheduleChangeRequestListScreenState
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        border: Border.all(color: color, width: 1),
-      ),
+      decoration: BoxDecoration(border: Border.all(color: color, width: 1)),
       child: Text(
         label,
         style: AppTypography.caption.copyWith(

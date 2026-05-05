@@ -8,13 +8,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/config/environment.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../features/notifications/domain/entities/notification_settings.dart';
-import '../../../../features/notifications/domain/services/notification_service.dart';
 import '../../../../features/notifications/domain/services/practice_reminder_scheduler.dart';
+import '../../data/services/fcm_service.dart';
+import '../../data/services/local_notification_service.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../data/repositories/remote_notification_repository.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/services/connection_notification_service.dart';
-import '../../domain/services/fcm_service.dart';
+import '../../domain/services/notification_scheduler_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
 
 part 'notification_providers.g.dart';
@@ -30,12 +32,18 @@ NotificationRepository? notificationApiRepository(Ref ref) {
   return RemoteNotificationRepository(ref.read(apiClientProvider));
 }
 
-/// Provider for the notification service
-@riverpod
+/// Provider for the notification service.
+@Riverpod(keepAlive: true)
 LocalNotificationService notificationService(Ref ref) {
   final service = LocalNotificationService();
   ref.onDispose(() => service.dispose());
   return service;
+}
+
+/// Provider for scheduling future notification delivery.
+@Riverpod(keepAlive: true)
+NotificationSchedulerService notificationSchedulerService(Ref ref) {
+  return NotificationSchedulerService(ref.watch(notificationServiceProvider));
 }
 
 /// Provider for FCM push notification service (keepAlive for app lifecycle)
@@ -44,8 +52,9 @@ FcmService fcmService(Ref ref) {
   final localService = ref.read(notificationServiceProvider);
   final apiClient = ref.read(apiClientProvider);
   final service = FcmService(
-    localNotificationService: localService,
+    notificationDelivery: localService,
     apiClient: apiClient,
+    useMockData: EnvironmentConfig.useMockData,
   );
   ref.onDispose(() => service.dispose());
   return service;
@@ -236,26 +245,33 @@ class TeacherNotificationSettingsNotifier
 // Notification List & Actions Providers (for UI)
 // ============================================================
 
-/// Provider for user's notifications list
+/// Provider for user's notifications list.
+///
+/// Filters mock notifications by current user role using
+/// [NotificationTypeExtension.targetRole].
 @riverpod
 Future<List<AppNotification>> userNotifications(Ref ref) async {
-  // Use remote repository if available
+  // Use remote repository if available (backend filters by user)
   final apiRepo = ref.watch(notificationApiRepositoryProvider);
   if (apiRepo != null) {
     return apiRepo.getNotifications();
   }
 
-  // Mock data fallback
+  // Mock data fallback — filter by role
   await Future.delayed(const Duration(milliseconds: 300));
+  final role = ref.watch(currentUserRoleProvider);
+  final roleStr =
+      role == UserRole.teacher
+          ? 'teacher'
+          : role == UserRole.student
+          ? 'student'
+          : 'student';
 
   final now = DateTime.now();
-  return [
+  final allNotifications = [
     // ============================================================
-    // 🎁 수강권 제안 알림
-    // 학생별로 1개의 제안만 존재 (시스템 자동 또는 선생님 수동)
+    // Student-only: 수강권 제안 알림
     // ============================================================
-
-    // student_1: 체험레슨 후 시스템 자동 제안
     AppNotification(
       id: 'n_proposal_1',
       userId: 'current_user',
@@ -275,7 +291,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     ),
 
     // ============================================================
-    // 🔔 수강권 만료 임박 알림
+    // Both: 수강권 만료 임박 알림
     // ============================================================
     AppNotification(
       id: 'n_sub_expiring_1',
@@ -296,7 +312,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     ),
 
     // ============================================================
-    // 기존 알림
+    // Both: 연결 알림
     // ============================================================
     AppNotification(
       id: 'n1',
@@ -310,17 +326,57 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       actionUrl: '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
       actionLabel: '선생님 보기',
     ),
+
+    // ============================================================
+    // Both: 레슨 알림
+    // ============================================================
     AppNotification(
       id: 'n2',
       userId: 'current_user',
       type: NotificationType.lessonReminder,
       priority: NotificationPriority.normal,
       title: '레슨 알림',
-      body: '내일 오후 3시 김선생님과 레슨이 있습니다',
+      body: '내일 오후 3시 김민수 바이올린 레슨이 있습니다',
       createdAt: now.subtract(const Duration(hours: 2)),
       sentAt: now.subtract(const Duration(hours: 2)),
       readAt: now.subtract(const Duration(hours: 1)),
     ),
+
+    // ============================================================
+    // Teacher-only: 체험 레슨 요청
+    // ============================================================
+    AppNotification(
+      id: 'n_trial_1',
+      userId: 'current_user',
+      type: NotificationType.trialBookingRequest,
+      priority: NotificationPriority.normal,
+      title: '새 체험 요청',
+      body: '박지호님이 바이올린 체험 레슨을 요청했습니다',
+      createdAt: now.subtract(const Duration(hours: 4)),
+      sentAt: now.subtract(const Duration(hours: 4)),
+      actionUrl: '/schedule/lesson-requests',
+      actionLabel: '요청 확인',
+    ),
+
+    // ============================================================
+    // Teacher-only: 입금 완료 알림
+    // ============================================================
+    AppNotification(
+      id: 'n_payment_1',
+      userId: 'current_user',
+      type: NotificationType.paymentReceived,
+      priority: NotificationPriority.normal,
+      title: '입금 완료 알림',
+      body: '김민수님이 수강료 입금 완료를 알렸습니다',
+      createdAt: now.subtract(const Duration(hours: 6)),
+      sentAt: now.subtract(const Duration(hours: 6)),
+      actionUrl: '/subscriptions/sub_1',
+      actionLabel: '입금 확인',
+    ),
+
+    // ============================================================
+    // Student-only: 연습 알림
+    // ============================================================
     AppNotification(
       id: 'n3',
       userId: 'current_user',
@@ -336,13 +392,34 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.streakMilestone,
       priority: NotificationPriority.low,
-      title: '🔥 연속 연습 달성!',
+      title: '연속 연습 달성!',
       body: '7일 연속 연습을 달성했어요!',
       createdAt: now.subtract(const Duration(days: 2)),
       sentAt: now.subtract(const Duration(days: 2)),
       readAt: now.subtract(const Duration(days: 2)),
     ),
+
+    // ============================================================
+    // Both: 스케줄 변경 요청
+    // ============================================================
+    AppNotification(
+      id: 'n_schedule_1',
+      userId: 'current_user',
+      type: NotificationType.scheduleChangeRequested,
+      priority: NotificationPriority.high,
+      title: '일정 변경 요청',
+      body: '김민수 3회차 레슨 일정 변경 요청',
+      createdAt: now.subtract(const Duration(hours: 8)),
+      sentAt: now.subtract(const Duration(hours: 8)),
+      actionUrl: '/subscriptions/sub_1',
+      actionLabel: '변경 확인',
+    ),
   ];
+
+  // Filter by current user role
+  return allNotifications
+      .where((n) => n.type.targetRole == 'both' || n.type.targetRole == roleStr)
+      .toList();
 }
 
 /// Provider for unread notification count (for badge)

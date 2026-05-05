@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../gamification/presentation/providers/point_award_service.dart';
+import '../../data/repositories/mock_practice_item_repository.dart';
 import '../../domain/repositories/practice_item_repository.dart';
 import '../../../lessons/domain/entities/teaching_resource.dart';
 import '../../../lessons/presentation/providers/teaching_resource_providers.dart';
 import 'practice_repertoire_repository_provider.dart';
 import 'practice_repertoire_crud_provider.dart';
 
-import '../../../lessons/presentation/providers/tip_template_providers.dart' show currentTeacherIdProvider;
+import '../../../lessons/presentation/providers/tip_template_providers.dart'
+    show currentTeacherIdProvider;
 
 /// Repository provider
 final practiceItemRepositoryProvider = Provider<PracticeItemRepository>((ref) {
@@ -24,54 +26,63 @@ final currentStudentIdProvider = StateProvider<String?>((ref) {
 /// Practice items by lesson ID
 final practiceItemsByLessonProvider =
     FutureProvider.family<List<PracticeItem>, String>((ref, lessonId) async {
-  final repository = ref.watch(practiceItemRepositoryProvider);
-  return repository.getByLessonId(lessonId);
-});
+      final repository = ref.watch(practiceItemRepositoryProvider);
+      return repository.getByLessonId(lessonId);
+    });
 
 /// Practice items by student ID
 final practiceItemsByStudentProvider =
     FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-  final repository = ref.watch(practiceItemRepositoryProvider);
-  return repository.getByStudentId(studentId);
-});
+      final repository = ref.watch(practiceItemRepositoryProvider);
+      return repository.getByStudentId(studentId);
+    });
 
 /// Weekly practice items for student (current week)
 final weeklyPracticeItemsProvider =
     FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-  final repository = ref.watch(practiceItemRepositoryProvider);
-  final now = DateTime.now();
+      final repository = ref.watch(practiceItemRepositoryProvider);
+      final now = DateTime.now();
 
-  // Calculate start of week (Monday)
-  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-  // Calculate end of week (Sunday)
-  final endOfWeek = startOfWeek.add(const Duration(days: 6));
+      // Calculate start of week (Monday)
+      final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+      // Calculate end of week (Sunday)
+      final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
-  return repository.getByStudentIdAndDateRange(studentId, startOfWeek, endOfWeek);
-});
+      return repository.getByStudentIdAndDateRange(
+        studentId,
+        startOfWeek,
+        endOfWeek,
+      );
+    });
 
 /// Incomplete practice items for student (for dashboard)
 final incompletePracticeItemsProvider =
     FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-  final repository = ref.watch(practiceItemRepositoryProvider);
-  return repository.getIncompleteByStudentId(studentId);
-});
+      final repository = ref.watch(practiceItemRepositoryProvider);
+      return repository.getIncompleteByStudentId(studentId);
+    });
 
 /// Practice items awaiting teacher feedback
-final awaitingFeedbackProvider = FutureProvider<List<PracticeItem>>((ref) async {
+final awaitingFeedbackProvider = FutureProvider<List<PracticeItem>>((
+  ref,
+) async {
   final repository = ref.watch(practiceItemRepositoryProvider);
   final teacherId = ref.watch(currentTeacherIdProvider);
   return repository.getAwaitingFeedback(teacherId);
 });
 
 /// Single practice item by ID
-final practiceItemByIdProvider =
-    FutureProvider.family<PracticeItem?, String>((ref, id) async {
+final practiceItemByIdProvider = FutureProvider.family<PracticeItem?, String>((
+  ref,
+  id,
+) async {
   final repository = ref.watch(practiceItemRepositoryProvider);
   return repository.getById(id);
 });
 
 /// Notifier for practice item CRUD operations (lesson-based)
-class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, String> {
+class PracticeItemsNotifier
+    extends FamilyAsyncNotifier<List<PracticeItem>, String> {
   PracticeItemRepository get _repository =>
       ref.read(practiceItemRepositoryProvider);
 
@@ -177,7 +188,9 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
       ref.invalidate(awaitingFeedbackProvider);
       // Award points when item is toggled to completed
       if (updated.isCompleted) {
-        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(studentId, updated.title);
+        ref
+            .read(pointAwardNotifierProvider.notifier)
+            .awardTaskComplete(studentId, updated.title);
       }
       return updated;
     } catch (e, st) {
@@ -250,11 +263,13 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
 
       if (resourceIds.isNotEmpty) {
         try {
-          final resources =
-              await ref.read(resourcesByIdsProvider(resourceIds).future);
-          final youtubeResource = resources
-              .where((r) => r.type == TeachingResourceType.youtube)
-              .firstOrNull;
+          final resources = await ref.read(
+            resourcesByIdsProvider(resourceIds).future,
+          );
+          final youtubeResource =
+              resources
+                  .where((r) => r.type == TeachingResourceType.youtube)
+                  .firstOrNull;
           if (youtubeResource != null) {
             youtubeUrl = youtubeResource.youtubeUrl;
             youtubeVideoId = youtubeResource.youtubeVideoId;
@@ -285,23 +300,29 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
       // Assignment created successfully but repertoire sync failed.
       // Don't fail the main operation — student can still see the assignment
       // via PracticeItem, just not in the repertoire tab.
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: e,
-        stack: st,
-        library: 'practice_item_providers',
-        context: ErrorDescription('Failed to sync assignment to student repertoire'),
-      ));
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: e,
+          stack: st,
+          library: 'practice_item_providers',
+          context: ErrorDescription(
+            'Failed to sync assignment to student repertoire',
+          ),
+        ),
+      );
     }
   }
 }
 
 final practiceItemsNotifierProvider = AsyncNotifierProvider.family<
-    PracticeItemsNotifier, List<PracticeItem>, String>(
-  PracticeItemsNotifier.new,
-);
+  PracticeItemsNotifier,
+  List<PracticeItem>,
+  String
+>(PracticeItemsNotifier.new);
 
 /// Notifier for student's practice items (student-based operations)
-class StudentPracticeNotifier extends FamilyAsyncNotifier<List<PracticeItem>, String> {
+class StudentPracticeNotifier
+    extends FamilyAsyncNotifier<List<PracticeItem>, String> {
   PracticeItemRepository get _repository =>
       ref.read(practiceItemRepositoryProvider);
 
@@ -321,7 +342,9 @@ class StudentPracticeNotifier extends FamilyAsyncNotifier<List<PracticeItem>, St
       ref.invalidate(awaitingFeedbackProvider);
       // Award points when item is toggled to completed
       if (updated.isCompleted) {
-        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(arg, updated.title);
+        ref
+            .read(pointAwardNotifierProvider.notifier)
+            .awardTaskComplete(arg, updated.title);
       }
       return updated;
     } catch (e, st) {
@@ -358,6 +381,7 @@ class StudentPracticeNotifier extends FamilyAsyncNotifier<List<PracticeItem>, St
 }
 
 final studentPracticeNotifierProvider = AsyncNotifierProvider.family<
-    StudentPracticeNotifier, List<PracticeItem>, String>(
-  StudentPracticeNotifier.new,
-);
+  StudentPracticeNotifier,
+  List<PracticeItem>,
+  String
+>(StudentPracticeNotifier.new);

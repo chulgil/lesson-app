@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../data/repositories/mock_tip_template_repository.dart';
 import '../../domain/entities/tip_template.dart';
 import '../../domain/repositories/tip_template_repository.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
 
 /// Repository provider
 final tipTemplateRepositoryProvider = Provider<TipTemplateRepository>((ref) {
@@ -23,23 +24,27 @@ final tipTemplatesProvider = FutureProvider<List<TipTemplate>>((ref) async {
 
 /// Templates by category
 final tipTemplatesByCategoryProvider =
-    FutureProvider.family<List<TipTemplate>, TipCategory>((ref, category) async {
-  final repository = ref.watch(tipTemplateRepositoryProvider);
-  final teacherId = ref.watch(currentTeacherIdProvider);
-  return repository.getTemplatesByCategory(teacherId, category);
-});
+    FutureProvider.family<List<TipTemplate>, TipCategory>((
+      ref,
+      category,
+    ) async {
+      final repository = ref.watch(tipTemplateRepositoryProvider);
+      final teacherId = ref.watch(currentTeacherIdProvider);
+      return repository.getTemplatesByCategory(teacherId, category);
+    });
 
 /// Templates for specific instrument (includes general tips)
 final tipTemplatesByInstrumentProvider =
     FutureProvider.family<List<TipTemplate>, String?>((ref, instrument) async {
-  final repository = ref.watch(tipTemplateRepositoryProvider);
-  final teacherId = ref.watch(currentTeacherIdProvider);
-  return repository.getTemplatesByInstrument(teacherId, instrument);
-});
+      final repository = ref.watch(tipTemplateRepositoryProvider);
+      final teacherId = ref.watch(currentTeacherIdProvider);
+      return repository.getTemplatesByInstrument(teacherId, instrument);
+    });
 
 /// Frequently used templates
-final frequentTipTemplatesProvider =
-    FutureProvider<List<TipTemplate>>((ref) async {
+final frequentTipTemplatesProvider = FutureProvider<List<TipTemplate>>((
+  ref,
+) async {
   final repository = ref.watch(tipTemplateRepositoryProvider);
   final teacherId = ref.watch(currentTeacherIdProvider);
   return repository.getFrequentlyUsed(teacherId, limit: 5);
@@ -48,11 +53,11 @@ final frequentTipTemplatesProvider =
 /// Search templates
 final tipTemplateSearchProvider =
     FutureProvider.family<List<TipTemplate>, String>((ref, query) async {
-  if (query.isEmpty) return [];
-  final repository = ref.watch(tipTemplateRepositoryProvider);
-  final teacherId = ref.watch(currentTeacherIdProvider);
-  return repository.searchTemplates(teacherId, query);
-});
+      if (query.isEmpty) return [];
+      final repository = ref.watch(tipTemplateRepositoryProvider);
+      final teacherId = ref.watch(currentTeacherIdProvider);
+      return repository.searchTemplates(teacherId, query);
+    });
 
 /// Notifier for CRUD operations
 class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
@@ -82,7 +87,9 @@ class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
     state = const AsyncValue.loading();
     try {
       final newTemplate = await _repository.createTemplate(template);
-      state = await AsyncValue.guard(() => _repository.getTemplates(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getTemplates(_teacherId),
+      );
       return newTemplate;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -94,7 +101,9 @@ class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
     state = const AsyncValue.loading();
     try {
       final updated = await _repository.updateTemplate(template);
-      state = await AsyncValue.guard(() => _repository.getTemplates(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getTemplates(_teacherId),
+      );
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -106,7 +115,9 @@ class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
     state = const AsyncValue.loading();
     try {
       await _repository.deleteTemplate(id);
-      state = await AsyncValue.guard(() => _repository.getTemplates(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getTemplates(_teacherId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -127,5 +138,5 @@ class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
 
 final tipTemplatesNotifierProvider =
     AsyncNotifierProvider<TipTemplatesNotifier, List<TipTemplate>>(
-  TipTemplatesNotifier.new,
-);
+      TipTemplatesNotifier.new,
+    );

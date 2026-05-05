@@ -67,12 +67,31 @@
 ```yaml
 Framework: Flutter 3.x
 Language: Dart
-State Management: Riverpod 또는 Bloc
+State Management: Riverpod
 UI Components: Material 3 + Custom Widgets
 Audio: record, just_audio 패키지
 Local Storage: Hive 또는 sqflite
 HTTP Client: Dio
 ```
+
+#### 상태관리 결정: Riverpod
+
+Flutter 공식 문서는 상태관리를 하나의 정답이 아니라 앱 구조와 팀 선호에 맞춘 선택지로 제시한다. 이 앱은 이미 Riverpod 기반 provider, repository factory, code generation 패턴이 넓게 자리 잡았으므로 Bloc 전환은 비용과 회귀 위험이 더 크다.
+
+**결정:** Riverpod을 유지하고 아키텍처 계약으로 강화한다.
+
+**표준:**
+- 신규/수정 provider는 `riverpod_annotation` code generation을 기본으로 한다.
+- repository provider와 앱 단위 singleton은 `@Riverpod(keepAlive: true)`를 사용한다.
+- 화면, 검색, 상세, 필터처럼 화면 생명주기에 묶인 provider는 기본 autoDispose를 유지한다.
+- `StateProvider`는 enum/string/bool/date 같은 단순 UI state에만 사용한다.
+- 검증, 비동기, 복합 상태는 `Notifier` 또는 `AsyncNotifier`로 승격한다.
+- domain/data 계층은 presentation provider를 import하지 않는다.
+
+참고:
+- Flutter state management options: https://docs.flutter.dev/data-and-backend/state-mgmt/options
+- Riverpod: https://docs-v2.riverpod.dev/
+- Bloc: https://bloclibrary.dev/
 
 ### 2.3 백엔드 (Python FastAPI)
 

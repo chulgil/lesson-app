@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../entities/notification.dart';
-import '../../presentation/providers/notification_providers.dart';
-
-part 'notification_scheduler_service.g.dart';
+import 'notification_service.dart';
 
 /// Service for scheduling future notifications.
 ///
@@ -17,28 +14,23 @@ part 'notification_scheduler_service.g.dart';
 /// - flutter_local_notifications for local scheduling
 /// - Firebase Cloud Messaging for push notifications
 /// - Backend scheduler for reliable delivery
-@Riverpod(keepAlive: true)
-NotificationSchedulerService notificationSchedulerService(
-  NotificationSchedulerServiceRef ref,
-) {
-  return NotificationSchedulerService(ref);
-}
-
 class NotificationSchedulerService {
-  final NotificationSchedulerServiceRef _ref;
+  final NotificationService _notificationDelivery;
 
   // In-memory queue for scheduled notifications (mock implementation)
   // In production, this would be persisted to local storage or backend
   final Map<String, AppNotification> _scheduledNotifications = {};
 
-  NotificationSchedulerService(this._ref);
+  NotificationSchedulerService(this._notificationDelivery);
 
   /// Schedule a notification for future delivery.
   ///
   /// The notification will be delivered at [notification.scheduledAt].
   Future<void> scheduleNotification(AppNotification notification) async {
     if (notification.scheduledAt == null) {
-      debugPrint('[NotificationScheduler] Cannot schedule notification without scheduledAt');
+      debugPrint(
+        '[NotificationScheduler] Cannot schedule notification without scheduledAt',
+      );
       return;
     }
 
@@ -77,7 +69,9 @@ class NotificationSchedulerService {
   Future<void> cancelNotification(String notificationId) async {
     final removed = _scheduledNotifications.remove(notificationId);
     if (removed != null) {
-      debugPrint('[NotificationScheduler] Cancelled notification: $notificationId');
+      debugPrint(
+        '[NotificationScheduler] Cancelled notification: $notificationId',
+      );
     }
   }
 
@@ -107,8 +101,11 @@ class NotificationSchedulerService {
     return _scheduledNotifications.values
         .where((n) => n.userId == userId)
         .toList()
-      ..sort((a, b) => (a.scheduledAt ?? DateTime.now())
-          .compareTo(b.scheduledAt ?? DateTime.now()));
+      ..sort(
+        (a, b) => (a.scheduledAt ?? DateTime.now()).compareTo(
+          b.scheduledAt ?? DateTime.now(),
+        ),
+      );
   }
 
   /// Deliver a notification immediately.
@@ -117,15 +114,14 @@ class NotificationSchedulerService {
     _scheduledNotifications.remove(notification.id);
 
     // Mark as sent
-    final sentNotification = notification.copyWith(
-      sentAt: DateTime.now(),
-    );
+    final sentNotification = notification.copyWith(sentAt: DateTime.now());
 
     // Deliver via NotificationService
     try {
-      final notificationService = _ref.read(notificationServiceProvider);
-      await notificationService.showNotification(sentNotification);
-      debugPrint('[NotificationScheduler] Delivered notification: ${notification.id}');
+      await _notificationDelivery.showNotification(sentNotification);
+      debugPrint(
+        '[NotificationScheduler] Delivered notification: ${notification.id}',
+      );
     } catch (e) {
       debugPrint('[NotificationScheduler] Failed to deliver notification: $e');
     }

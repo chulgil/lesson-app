@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_group_class_booking_repository.dart';
 import '../../data/repositories/remote_group_class_booking_repository.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -21,16 +20,18 @@ part 'group_class_booking_providers.g.dart';
 // ============================================================
 
 final groupClassBookingRepositoryProvider =
-    Provider<GroupClassBookingRepository>((ref) {
-      if (EnvironmentConfig.useMockData) {
-        return MockGroupClassBookingRepository(
-          onWaitlistPromotion: (promoted) {
-            _sendWaitlistPromotionNotification(ref, promoted);
-          },
-        );
-      }
-      return RemoteGroupClassBookingRepository(ref.read(apiClientProvider));
-    });
+    Provider<GroupClassBookingRepository>(
+      (ref) => createRepository<GroupClassBookingRepository>(
+        ref: ref,
+        mock:
+            () => MockGroupClassBookingRepository(
+              onWaitlistPromotion: (promoted) {
+                _sendWaitlistPromotionNotification(ref, promoted);
+              },
+            ),
+        remote: (api) => RemoteGroupClassBookingRepository(api),
+      ),
+    );
 
 void _sendWaitlistPromotionNotification(Ref ref, GroupClassBooking promoted) {
   try {

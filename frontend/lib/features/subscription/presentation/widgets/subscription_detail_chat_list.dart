@@ -350,7 +350,8 @@ class _SessionSection extends ConsumerWidget {
   Widget _buildEventBubbles(List<RequestEvent> events) {
     return Column(
       children:
-          events.map<Widget>((event) {
+          events.asMap().entries.map<Widget>((entry) {
+            final event = entry.value;
             final remainingCredits =
                 subscription.totalRescheduleAllowance -
                 subscription.usedRescheduleCount -
@@ -361,6 +362,7 @@ class _SessionSection extends ConsumerWidget {
               viewerRole: viewerRole,
               studentName: studentName,
               teacherName: teacherName,
+              previousEvents: events.take(entry.key).toList(),
               rescheduleCreditsUsed: 1,
               rescheduleCreditsRemaining:
                   remainingCredits < 0 ? null : remainingCredits,

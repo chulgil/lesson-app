@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/providers/repository_provider.dart';
+import '../../data/repositories/hive_recording_repository.dart';
 import '../../data/repositories/remote_recording_repository.dart';
 import '../../domain/entities/recording.dart';
 import '../../domain/repositories/recording_repository.dart';
@@ -349,7 +350,9 @@ class RecordingNotifier extends _$RecordingNotifier {
       await _repository.saveRecording(recording);
 
       // Award points for saving a recording
-      ref.read(pointAwardNotifierProvider.notifier).awardRecordingSaved(_studentId);
+      ref
+          .read(pointAwardNotifierProvider.notifier)
+          .awardRecordingSaved(_studentId);
 
       // Update state
       state = state.copyWith(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../data/repositories/mock_child_profile_repository.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../domain/repositories/child_profile_repository.dart';
 

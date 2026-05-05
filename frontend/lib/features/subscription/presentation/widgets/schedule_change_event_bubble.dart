@@ -17,6 +17,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   final String viewerRole; // 'teacher' or 'student'
   final String? studentName;
   final String? teacherName;
+  final List<RequestEvent> previousEvents;
 
   /// Session range for bulk change labels (e.g., 4~10).
   final int? bulkFromSession;
@@ -35,6 +36,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     required this.viewerRole,
     this.studentName,
     this.teacherName,
+    this.previousEvents = const [],
     this.bulkFromSession,
     this.bulkToSession,
     this.rescheduleCreditsUsed,
@@ -371,6 +373,16 @@ class ScheduleChangeEventBubble extends StatelessWidget {
             ),
           ),
         ],
+
+        if (event.message != null && event.message!.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            event.message!,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -501,6 +513,12 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         idx >= 0 &&
         idx < event.suggestedSlots.length) {
       return event.suggestedSlots[idx].displayLabel;
+    }
+    for (final previousEvent in previousEvents.reversed) {
+      if (previousEvent.suggestedSlots.isEmpty) continue;
+      if (idx >= 0 && idx < previousEvent.suggestedSlots.length) {
+        return previousEvent.suggestedSlots[idx].displayLabel;
+      }
     }
     return null;
   }

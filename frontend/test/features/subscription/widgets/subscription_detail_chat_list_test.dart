@@ -227,16 +227,17 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('일정을 탭하여 선택하세요'), findsOneWidget);
-      expect(find.text('일정 비교'), findsOneWidget);
-      expect(find.text('수락'), findsOneWidget);
+      expect(find.text('가능한 일정을 선택해 확정하세요'), findsOneWidget);
+      expect(find.text('다른 일정 제안'), findsOneWidget);
+      expect(find.text('선택한 일정 확정'), findsOneWidget);
+      expect(find.text('확정 메시지를 남겨주세요 (선택)'), findsOneWidget);
 
-      await tester.tap(find.text('일정 비교'));
+      await tester.tap(find.text('다른 일정 제안'));
       expect(comparedEvent?.id, 'event_1');
 
       await tester.tap(find.textContaining('2. '));
       await tester.enterText(find.byType(TextField), '이 시간으로 확정할게요');
-      await tester.tap(find.text('수락'));
+      await tester.tap(find.text('선택한 일정 확정'));
 
       expect(acceptedEvent?.id, 'event_1');
       expect(acceptedSlotIndex, 1);
@@ -299,11 +300,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('일정을 탭하여 선택하세요'), findsOneWidget);
+      expect(find.text('가능한 일정을 선택해 확정하세요'), findsOneWidget);
 
       await tester.tap(find.textContaining('3. '));
       await tester.pump();
-      await tester.tap(find.text('수락'));
+      await tester.tap(find.text('선택한 일정 확정'));
 
       expect(acceptedEvent?.id, 'event_2');
       expect(acceptedSlotIndex, 2);

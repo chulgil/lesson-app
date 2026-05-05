@@ -15,7 +15,8 @@ ScheduleConfirmationCardRepository scheduleConfirmationCardRepository(
   if (EnvironmentConfig.useMockData) {
     return MockScheduleConfirmationCardRepository();
   }
-  // Backend API 미구현 — 스케줄 확인 카드 엔드포인트 필요
+  // Narrow exception: no remote repository/API endpoint exists yet, and
+  // createRepository<T>() would read ApiClient in non-mock mode unnecessarily.
   return MockScheduleConfirmationCardRepository();
 }
 

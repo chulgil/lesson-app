@@ -9,7 +9,6 @@ import '../../data/repositories/remote_subscription_proposal_repository.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/repositories/subscription_proposal_repository.dart';
 import '../../domain/services/proposal_reminder_service.dart';
-import '../../../notifications/domain/services/notification_scheduler_service.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
 
 part 'subscription_proposal_providers.g.dart';

@@ -10,7 +10,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
@@ -572,6 +571,7 @@ class _SubscriptionDetailBodyState
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
       actorId: subscription.studentId,
       eventType: RequestEventType.scheduleChangeAccepted,
+      suggestedSlots: event.suggestedSlots,
       selectedSlotIndex: slotIndex,
       message: message.isEmpty ? null : message,
       sessionNumber: _selectedSession,

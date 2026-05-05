@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
+import '../../../profile/data/repositories/mock_teacher_repository.dart';
 import '../../../profile/domain/repositories/teacher_repository.dart';
 import '../../data/repositories/remote_teacher_repository.dart';
 
@@ -10,12 +11,13 @@ import '../../data/repositories/remote_teacher_repository.dart';
 // =============================================================================
 
 /// Teacher repository provider
-final teacherRepositoryProvider = Provider<TeacherRepository>((ref) =>
-    createRepository<TeacherRepository>(
-      ref: ref,
-      mock: () => MockTeacherRepository(),
-      remote: (api) => RemoteTeacherRepository(api),
-    ));
+final teacherRepositoryProvider = Provider<TeacherRepository>(
+  (ref) => createRepository<TeacherRepository>(
+    ref: ref,
+    mock: () => MockTeacherRepository(),
+    remote: (api) => RemoteTeacherRepository(api),
+  ),
+);
 
 // =============================================================================
 // Query Providers

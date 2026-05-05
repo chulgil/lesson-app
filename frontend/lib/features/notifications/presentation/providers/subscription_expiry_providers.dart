@@ -12,6 +12,7 @@ import '../../domain/entities/notification.dart';
 import '../../domain/entities/subscription_expiry_reminder_settings.dart';
 import '../../domain/services/notification_scheduler_service.dart';
 import '../../domain/services/subscription_expiry_notification_service.dart';
+import 'notification_providers.dart';
 
 part 'subscription_expiry_providers.g.dart';
 
