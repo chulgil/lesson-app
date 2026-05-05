@@ -213,3 +213,43 @@ async def test_teacher_cannot_create_lesson_for_other_teachers_existing_student(
     )
 
     assert response.status_code == 403
+
+
+@pytest.mark.parametrize(
+    ("method", "path_suffix", "json_body"),
+    [
+        ("GET", "", None),
+        ("PUT", "", {"name": "Hacked Class"}),
+        ("DELETE", "", None),
+        ("PATCH", "/restore", None),
+        ("GET", "/memberships", None),
+        ("POST", "/memberships", {"student_id": "student-001", "instrument": "violin"}),
+    ],
+)
+@pytest.mark.asyncio
+async def test_other_teacher_cannot_access_lesson_class_or_scoped_memberships(
+    method: str,
+    path_suffix: str,
+    json_body: dict | None,
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Lesson class detail/mutations and scoped memberships are owner-teacher only."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-class-teacher@test.com")
+    create_resp = await client.post(
+        "/api/v1/lessons-classes",
+        headers=auth_headers,
+        json={"name": "Owner Class", "type": "academy"},
+    )
+    class_id = create_resp.json()["id"]
+
+    response = await client.request(
+        method,
+        f"/api/v1/lessons-classes/{class_id}{path_suffix}",
+        headers=_headers("other-teacher-id"),
+        json=json_body,
+    )
+
+    assert response.status_code == 403

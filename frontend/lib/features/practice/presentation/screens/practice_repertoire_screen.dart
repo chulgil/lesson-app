@@ -11,8 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
-import '../../../../features/practice/domain/entities/practice_repertoire.dart';
-import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../../../../features/practice/practice_facade.dart';
 import '../providers/repertoire_archive_provider.dart';
 
 /// Main practice repertoire screen showing all repertoires and sections

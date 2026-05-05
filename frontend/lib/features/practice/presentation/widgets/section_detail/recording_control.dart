@@ -8,8 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../features/practice/presentation/providers/recording_provider.dart';
-import '../../../../../features/practice/presentation/providers/smart_recording_provider.dart';
+import '../../../../../features/practice/practice_facade.dart';
 import '../recording_waveform.dart';
 import '../smart_recording/smart_recording_indicator.dart';
 

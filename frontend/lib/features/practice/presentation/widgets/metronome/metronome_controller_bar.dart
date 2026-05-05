@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
+import '../../../../../features/practice/practice_facade.dart'
+    show metronomeProvider;
 import 'cat_beat_indicator.dart';
 
 /// Compact metronome controller bar for bottom of screen.

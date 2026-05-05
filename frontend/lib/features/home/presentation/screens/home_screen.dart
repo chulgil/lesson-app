@@ -5,9 +5,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../schedule/presentation/screens/schedule_tab.dart';
-import '../../../profile/presentation/screens/profile_tab.dart';
-import '../../../students/presentation/screens/students_tab.dart';
+import '../../../profile/profile_ui_facade.dart';
+import '../../../schedule/schedule_ui_facade.dart';
+import '../../../students/students_ui_facade.dart';
 import '../widgets/dashboard_tab.dart';
 
 /// Home screen (Teacher Dashboard)

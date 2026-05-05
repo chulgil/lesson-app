@@ -10,7 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_facade.dart';
-import '../../../schedule/presentation/widgets/request_list_item.dart';
+import '../../../schedule/schedule_ui_facade.dart';
 
 /// Home dashboard section showing today's lesson requests.
 ///

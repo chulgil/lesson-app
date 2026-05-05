@@ -7,8 +7,14 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../../features/practice/domain/entities/metronome_settings.dart';
-import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
+import '../../../../../features/practice/practice_facade.dart'
+    show
+        AccentPattern,
+        MetronomeSettings,
+        MetronomeSound,
+        Subdivision,
+        TimeSignature,
+        metronomeProvider;
 import 'cat_beat_indicator.dart';
 
 /// Full screen metronome modal with all controls.

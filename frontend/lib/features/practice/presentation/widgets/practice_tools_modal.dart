@@ -5,7 +5,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../features/practice/presentation/providers/metronome_provider.dart';
+import '../../../../features/practice/practice_facade.dart'
+    show metronomeProvider;
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
 import 'practice_tools/tuner_panel.dart';

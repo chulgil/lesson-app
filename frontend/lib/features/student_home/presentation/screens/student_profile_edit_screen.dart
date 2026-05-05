@@ -12,7 +12,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../../../students/students_ui_facade.dart';
 import '../providers/student_home_profile_edit_provider.dart';
 
 /// Student profile edit screen.

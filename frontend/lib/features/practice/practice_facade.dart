@@ -5,8 +5,17 @@ export 'domain/entities/practice_item.dart';
 export 'domain/entities/practice_log.dart';
 export 'domain/entities/practice_repertoire.dart';
 export 'domain/entities/repertoire_sort_type.dart';
+export 'domain/entities/metronome_settings.dart'
+    show
+        AccentPattern,
+        MetronomeSettings,
+        MetronomeSound,
+        Subdivision,
+        TimeSignature;
 export 'domain/entities/student_practice_overview.dart'
     show DailyPracticeEntry, SharedRecording, StudentPracticeOverview;
+export 'presentation/providers/metronome_provider.dart'
+    show Metronome, MetronomeState, metronomeProvider;
 export 'presentation/providers/piece_crud_provider.dart'
     show
         PiecesNotifier,
@@ -21,6 +30,20 @@ export 'presentation/providers/practice_overview_provider.dart'
 export 'presentation/providers/practice_repertoire_crud_provider.dart';
 export 'presentation/providers/practice_repertoire_repository_provider.dart'
     show practiceRepertoireRepositoryProvider;
+export 'presentation/providers/practice_streak_provider.dart'
+    show
+        currentUserStreakProvider,
+        practiceStreakProvider,
+        streakNotifierProvider;
 export 'presentation/providers/recording_feedback_provider.dart'
     show recordingFeedbackCountProvider;
+export 'presentation/providers/recording_provider.dart'
+    show
+        audioPlayerServiceProvider,
+        audioRecorderServiceProvider,
+        microphonePermissionProvider,
+        RecordingState,
+        recordingNotifierProvider;
 export 'presentation/providers/repertoire_sort_provider.dart';
+export 'presentation/providers/smart_recording_provider.dart'
+    show smartRecordingNotifierProvider, smartRecordingSettingsNotifierProvider;

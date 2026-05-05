@@ -11,7 +11,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../../profile/profile_facade.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/presentation/widgets/selectable_template_card.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 
 /// Payment method for subscription issuance.
 enum PaymentMethod { prepaid, postpaid, free }

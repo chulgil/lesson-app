@@ -8,7 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../students/presentation/widgets/student_form/instrument_selector.dart';
+import '../../../students/students_ui_facade.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../providers/manual_teacher_provider.dart';
 

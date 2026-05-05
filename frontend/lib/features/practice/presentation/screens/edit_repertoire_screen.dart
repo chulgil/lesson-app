@@ -6,9 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../../../../features/practice/practice_facade.dart';
 import '../../../../core/widgets/app_date_picker.dart';
-import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/add_section_widgets.dart';
 import '../widgets/section_form/date_range_section.dart';
 

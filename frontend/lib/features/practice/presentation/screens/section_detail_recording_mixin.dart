@@ -7,13 +7,9 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/practice/domain/entities/practice_repertoire.dart';
+import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
 import '../../domain/entities/smart_recording.dart';
-import '../../../../features/practice/presentation/providers/metronome_provider.dart';
-import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
-import '../../../../features/practice/presentation/providers/recording_provider.dart';
-import '../../../../features/practice/presentation/providers/smart_recording_provider.dart';
 import '../../../../core/audio/audio_trimmer_service.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';

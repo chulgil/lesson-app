@@ -8,7 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../../../../features/practice/practice_facade.dart';
 import '../../../../core/widgets/app_date_picker.dart';
 import '../widgets/section_form/date_range_section.dart';
 

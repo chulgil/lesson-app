@@ -20,7 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/booking/entities/lesson_booking.dart';
 import '../../core/booking/entities/time_slot.dart';
-import '../lessons/presentation/providers/booking_providers.dart';
+import '../lessons/lessons_facade.dart';
 
 // Re-export entities so consumers only need this one import
 export '../../core/booking/entities/lesson_booking.dart'; // LessonBooking, enums, request types
@@ -31,44 +31,50 @@ export '../../core/booking/entities/time_slot.dart'; // TimeSlot
 // =============================================================================
 
 /// Single booking by ID.
-final bookingByIdProvider =
-    FutureProvider.family<LessonBooking?, String>((ref, id) {
+final bookingByIdProvider = FutureProvider.family<LessonBooking?, String>((
+  ref,
+  id,
+) {
   return ref.watch(bookingProvider(id).future);
 });
 
 /// All bookings for a student (student home, trial cards).
 final studentBookingListProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, studentId) {
-  return ref.watch(studentBookingsProvider(studentId).future);
-});
+      return ref.watch(studentBookingsProvider(studentId).future);
+    });
 
 /// All bookings for a teacher (teacher schedule).
 final teacherBookingListProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-  return ref.watch(teacherBookingsProvider(teacherId).future);
-});
+      return ref.watch(teacherBookingsProvider(teacherId).future);
+    });
 
 /// Pending bookings awaiting teacher approval.
 final pendingBookingListProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-  return ref.watch(pendingBookingsProvider(teacherId).future);
-});
+      return ref.watch(pendingBookingsProvider(teacherId).future);
+    });
 
 /// Badge count for pending bookings.
-final pendingCountProvider =
-    FutureProvider.family<int, String>((ref, teacherId) {
+final pendingCountProvider = FutureProvider.family<int, String>((
+  ref,
+  teacherId,
+) {
   return ref.watch(pendingBookingsCountProvider(teacherId).future);
 });
 
 /// Confirmed upcoming bookings.
 final upcomingConfirmedProvider =
     FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-  return ref.watch(upcomingBookingsProvider(teacherId).future);
-});
+      return ref.watch(upcomingBookingsProvider(teacherId).future);
+    });
 
 /// Teacher's available time slots.
-final teacherSlotsProvider =
-    FutureProvider.family<List<TimeSlot>, String>((ref, teacherId) {
+final teacherSlotsProvider = FutureProvider.family<List<TimeSlot>, String>((
+  ref,
+  teacherId,
+) {
   return ref.watch(teacherAvailabilityProvider(teacherId).future);
 });
 
@@ -101,13 +107,12 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
     required String teacherName,
     required TrialLessonRequest request,
     int fee = 30000,
-  }) =>
-      _inner.requestTrialLesson(
-        teacherId: teacherId,
-        teacherName: teacherName,
-        request: request,
-        fee: fee,
-      );
+  }) => _inner.requestTrialLesson(
+    teacherId: teacherId,
+    teacherName: teacherName,
+    request: request,
+    fee: fee,
+  );
 
   Future<LessonBooking> approveTrial(
     String bookingId, {
@@ -120,13 +125,12 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
     required String teacherName,
     required RegularLessonRequest request,
     int monthlyFee = 200000,
-  }) =>
-      _inner.requestRegularLesson(
-        teacherId: teacherId,
-        teacherName: teacherName,
-        request: request,
-        monthlyFee: monthlyFee,
-      );
+  }) => _inner.requestRegularLesson(
+    teacherId: teacherId,
+    teacherName: teacherName,
+    request: request,
+    monthlyFee: monthlyFee,
+  );
 
   Future<LessonBooking> registerRegular({
     required String teacherId,
@@ -134,22 +138,23 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
     required String studentId,
     required String studentName,
     required RegularLessonRegistration registration,
-  }) =>
-      _inner.registerRegularLesson(
-        teacherId: teacherId,
-        teacherName: teacherName,
-        studentId: studentId,
-        studentName: studentName,
-        registration: registration,
-      );
+  }) => _inner.registerRegularLesson(
+    teacherId: teacherId,
+    teacherName: teacherName,
+    studentId: studentId,
+    studentName: studentName,
+    registration: registration,
+  );
 
   Future<LessonBooking> markUnavailable(
     String bookingId,
     String reason, {
     List<TimeSlot>? suggestedTimeSlots,
-  }) =>
-      _inner.markUnavailable(bookingId, reason,
-          suggestedTimeSlots: suggestedTimeSlots);
+  }) => _inner.markUnavailable(
+    bookingId,
+    reason,
+    suggestedTimeSlots: suggestedTimeSlots,
+  );
 
   Future<LessonBooking> cancel(String bookingId, String? reason) =>
       _inner.cancelBooking(bookingId, reason);
@@ -167,8 +172,8 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
 
 final bookingFacadeProvider =
     AsyncNotifierProvider<BookingFacadeNotifier, List<LessonBooking>>(
-  BookingFacadeNotifier.new,
-);
+      BookingFacadeNotifier.new,
+    );
 
 // =============================================================================
 // FORM STATE — re-exported from existing providers for booking flow screens

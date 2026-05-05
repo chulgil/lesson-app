@@ -13,7 +13,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/presentation/widgets/subscription_card.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../providers/child_profile_provider.dart';
 import 'parent_dashboard_tab.dart';

@@ -8,7 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../subscription/presentation/widgets/subscription_badge.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 import '../providers/home_lesson_summary_provider.dart';
 
 /// Lesson card — **Notebook × Score 스타일**.

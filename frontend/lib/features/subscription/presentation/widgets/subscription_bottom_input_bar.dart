@@ -6,7 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/widgets/schedule_slot_choice_list.dart';
+import '../../../schedule/schedule_ui_facade.dart';
 import '../../domain/entities/subscription.dart';
 
 typedef AcceptScheduleChoice =

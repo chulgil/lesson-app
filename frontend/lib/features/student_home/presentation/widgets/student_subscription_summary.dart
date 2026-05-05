@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../subscription/presentation/widgets/subscription_membership_card.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 import '../providers/student_home_subscription_summary_provider.dart';
 
 /// Widget showing student's subscription summary on dashboard.

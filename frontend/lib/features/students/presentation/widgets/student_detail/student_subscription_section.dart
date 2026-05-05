@@ -9,7 +9,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
-import '../../../../subscription/presentation/widgets/subscription_membership_card.dart';
+import '../../../../subscription/subscription_ui_facade.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../providers/lesson_class_providers.dart';
 import '../../providers/membership_providers.dart';

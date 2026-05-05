@@ -12,7 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/profile/profile_facade.dart';
 import '../../../auth/auth_facade.dart';
-import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../../../students/students_ui_facade.dart';
 import '../providers/background_image_provider.dart';
 import '../providers/profile_image_provider.dart';
 

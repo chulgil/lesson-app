@@ -278,22 +278,14 @@ class LessonService:
 
     async def get_class_by_id(self, class_id: str, current_user: Any) -> LessonClassResponse:
         """Return a lesson class."""
-        from app.models.lesson import LessonClass
-
-        lc = await self.db.get(LessonClass, class_id)
-        if lc is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        lc = await self._get_accessible_class(class_id, current_user)
         return LessonClassResponse.model_validate(lc)
 
     async def update_class(
         self, class_id: str, data: LessonClassUpdate, current_user: Any
     ) -> LessonClassResponse:
         """Update a lesson class."""
-        from app.models.lesson import LessonClass
-
-        lc = await self.db.get(LessonClass, class_id)
-        if lc is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        lc = await self._get_accessible_class(class_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -304,21 +296,13 @@ class LessonService:
 
     async def delete_class(self, class_id: str, current_user: Any) -> None:
         """Archive a lesson class."""
-        from app.models.lesson import LessonClass
-
-        lc = await self.db.get(LessonClass, class_id)
-        if lc is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        lc = await self._get_accessible_class(class_id, current_user)
         lc.is_archived = True
         await self.db.flush()
 
     async def restore_class(self, class_id: str, current_user: Any) -> LessonClassResponse:
         """Restore an archived lesson class."""
-        from app.models.lesson import LessonClass
-
-        lc = await self.db.get(LessonClass, class_id)
-        if lc is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        lc = await self._get_accessible_class(class_id, current_user)
         lc.is_archived = False
         await self.db.flush()
         await self.db.refresh(lc)
@@ -335,6 +319,19 @@ class LessonService:
                 lc.sort_order = idx
         await self.db.flush()
 
+    async def _get_accessible_class(self, class_id: str, current_user: Any) -> Any:
+        """Load a lesson class and enforce the current teacher's ownership boundary."""
+        from app.models.lesson import LessonClass
+
+        lesson_class = await self.db.get(LessonClass, class_id)
+        if lesson_class is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+
+        teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if lesson_class.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson class access denied")
+        return lesson_class
+
     # ------------------------------------------------------------------
     # Memberships
     # ------------------------------------------------------------------
@@ -345,6 +342,7 @@ class LessonService:
         """List all memberships in a class."""
         from app.models.lesson import ClassMembership
 
+        await self._get_accessible_class(class_id, current_user)
         result = await self.db.scalars(
             select(ClassMembership).where(ClassMembership.lesson_class_id == class_id)
         )
@@ -397,6 +395,7 @@ class LessonService:
         """Add a student to a class."""
         from app.models.lesson import ClassMembership
 
+        await self._get_accessible_class(class_id, current_user)
         membership = ClassMembership(
             lesson_class_id=class_id,
             student_id=data.student_id,

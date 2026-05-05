@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../lessons/lessons_facade.dart';
-import '../../../lessons/presentation/widgets/attendance_confirmation_sheet.dart';
+import '../../../lessons/lessons_ui_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 
 /// Urgent alerts zone — **Notebook × Score 스타일 "긴급 메모 스트립"**.

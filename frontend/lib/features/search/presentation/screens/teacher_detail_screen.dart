@@ -11,7 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
+import '../../../../features/schedule/schedule_ui_facade.dart';
 import '../../../profile/domain/entities/invite.dart';
 import '../../../profile/profile_facade.dart';
 import '../../search_facade.dart';

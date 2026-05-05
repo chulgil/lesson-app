@@ -11,7 +11,7 @@ import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/presentation/widgets/subscription_card.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 
 /// Home dashboard section showing teacher's issued subscriptions.
 ///

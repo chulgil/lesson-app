@@ -8,7 +8,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
 import '../../../../practice/practice_facade.dart';
-import '../../../../practice/presentation/widgets/teacher_feedback_sheet.dart';
+import '../../../../practice/practice_ui_facade.dart';
 
 /// Tab content showing practice progress and statistics
 class StudentPracticeTab extends ConsumerWidget {
