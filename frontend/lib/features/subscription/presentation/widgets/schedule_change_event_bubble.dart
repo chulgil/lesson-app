@@ -352,24 +352,22 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header: "[slot]을 선택했습니다"
-        if (selectedSlotLabel != null)
-          Text(
-            AppStrings.slotAccepted(selectedSlotLabel),
-            style: AppTypography.bodySmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
-            ),
+        Text(
+          sessionNum > 0
+              ? AppStrings.sessionScheduleConfirmed(sessionNum)
+              : AppStrings.scheduleConfirmed,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
           ),
+        ),
 
-        // Confirmation line
-        if (selectedSlotLabel != null && sessionNum > 0) ...[
+        if (selectedSlotLabel != null) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            AppStrings.sessionConfirmed(sessionNum, selectedSlotLabel),
+            selectedSlotLabel,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.paperOk,
-              fontWeight: FontWeight.w600,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

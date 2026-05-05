@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/student_home/domain/entities/student_lesson_progress_item.dart';
 import 'package:lessonaza/features/student_home/presentation/providers/student_lesson_progress_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/widgets/student_lesson_progress_section.dart';
@@ -31,6 +33,36 @@ void main() {
     await _pumpSection(tester, const []);
 
     expect(find.textContaining('레슨 진행'), findsNothing);
+  });
+
+  testWidgets('opens request detail with student viewer role', (tester) async {
+    Object? capturedExtra;
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder:
+              (context, state) => const Scaffold(
+                body: StudentLessonProgressSection(studentId: 'student_1'),
+              ),
+        ),
+        GoRoute(
+          path: AppRoutes.requestDetail,
+          builder: (context, state) {
+            capturedExtra = state.extra;
+            return const Scaffold(body: Text('request detail'));
+          },
+        ),
+      ],
+    );
+
+    await _pumpSectionWithRouter(tester, [_studentRequestItem()], router);
+
+    await tester.tap(find.text('레슨 신청을 보냈어요'));
+    await tester.pumpAndSettle();
+
+    expect(capturedExtra, {'viewerRole': 'student'});
+    expect(find.text('request detail'), findsOneWidget);
   });
 
   testWidgets('lays out on narrow width without RenderBox errors', (
@@ -71,18 +103,29 @@ Future<void> _pumpSection(
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpSectionWithRouter(
+  WidgetTester tester,
+  List<StudentLessonProgressItem> items,
+  GoRouter router,
+) async {
+  const studentId = 'student_1';
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        studentLessonProgressProvider(
+          studentId,
+        ).overrideWith((ref) async => items),
+      ],
+      child: MaterialApp.router(routerConfig: router),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 List<StudentLessonProgressItem> _items() {
   final now = DateTime.now();
   return [
-    StudentLessonProgressItem(
-      id: 'waiting',
-      kind: StudentLessonProgressKind.request,
-      priority: StudentLessonProgressPriority.waiting,
-      title: '레슨 신청을 보냈어요',
-      subtitle: '선생님 답변을 기다리고 있어요',
-      statusLabel: '대기',
-      createdAt: now.subtract(const Duration(hours: 3)),
-    ),
+    _studentRequestItem(createdAt: now.subtract(const Duration(hours: 3))),
     StudentLessonProgressItem(
       id: 'action',
       kind: StudentLessonProgressKind.scheduleConfirmation,
@@ -93,4 +136,18 @@ List<StudentLessonProgressItem> _items() {
       createdAt: now.subtract(const Duration(minutes: 20)),
     ),
   ];
+}
+
+StudentLessonProgressItem _studentRequestItem({DateTime? createdAt}) {
+  return StudentLessonProgressItem(
+    id: 'waiting',
+    kind: StudentLessonProgressKind.request,
+    priority: StudentLessonProgressPriority.waiting,
+    title: '레슨 신청을 보냈어요',
+    subtitle: '선생님 답변을 기다리고 있어요',
+    statusLabel: '대기',
+    createdAt: createdAt ?? DateTime(2026, 5, 5, 9),
+    route: AppRoutes.requestDetail.replaceFirst(':id', 'request_1'),
+    routeExtra: const {'viewerRole': 'student'},
+  );
 }

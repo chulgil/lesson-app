@@ -9,7 +9,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
-import '../../../../subscription/presentation/widgets/subscription_card.dart';
+import '../../../../subscription/presentation/widgets/subscription_membership_card.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../providers/lesson_class_providers.dart';
 import '../../providers/membership_providers.dart';
@@ -133,14 +133,13 @@ class StudentSubscriptionSection extends ConsumerWidget {
               return _buildNoSubscriptionState(context, membership);
             }
 
-            final lessonClassAsync = ref.watch(
-              lessonClassProvider(membership.lessonClassId),
-            );
-            final className = lessonClassAsync.valueOrNull?.name;
+            final classNameAsync = ref
+                .watch(lessonClassProvider(membership.lessonClassId))
+                .whenData((lessonClass) => lessonClass?.name);
 
-            return SubscriptionCard(compact: true,
+            return SubscriptionMembershipCard(
               subscription: subscription,
-              className: className,
+              classNameAsync: classNameAsync,
               instrument: membership.instrument,
               onTap:
                   () => context.push(

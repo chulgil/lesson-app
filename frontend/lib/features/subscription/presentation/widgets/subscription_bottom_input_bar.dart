@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/widgets/schedule_slot_choice_list.dart';
 import '../../domain/entities/subscription.dart';
 
 typedef AcceptScheduleChoice =
@@ -271,40 +272,28 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
   @override
   Widget build(BuildContext context) {
     final slots = widget.event.suggestedSlots.take(3).toList();
+    final choices =
+        slots
+            .asMap()
+            .entries
+            .map(
+              (entry) => ScheduleSlotChoice(
+                priority: entry.key + 1,
+                label: entry.value.displayLabel,
+              ),
+            )
+            .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          AppStrings.slotSelectionHint,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
-            fontWeight: FontWeight.w600,
-          ),
+        ScheduleSlotChoiceList(
+          choices: choices,
+          selectedIndex: _selectedSlotIndex,
+          onSelected: (index) => setState(() => _selectedSlotIndex = index),
         ),
         const SizedBox(height: AppSpacing.space2),
-        for (int i = 0; i < slots.length; i++) ...[
-          InkWell(
-            onTap: () => setState(() => _selectedSlotIndex = i),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.space2),
-              decoration: BoxDecoration(
-                color:
-                    _selectedSlotIndex == i
-                        ? AppColors.paperAccentSoft
-                        : AppColors.paper,
-                border: Border.all(color: AppColors.inkQuaternary),
-              ),
-              child: Text(
-                '${i + 1}. ${slots[i].displayLabel}',
-                style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space1),
-        ],
-        const SizedBox(height: AppSpacing.space1),
         TextField(
           controller: _messageController,
           minLines: 1,

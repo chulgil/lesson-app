@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../features/lessons/presentation/providers/booking_providers.dart';
+import '../providers/student_home_booking_provider.dart';
 
 /// Trial Booking Card - displays a single trial lesson booking with status and actions
 class TrialBookingCard extends ConsumerWidget {
@@ -315,8 +315,11 @@ class TrialBookingCard extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       try {
         await ref
-            .read(bookingsNotifierProvider.notifier)
-            .cancelBooking(booking.id, null);
+            .read(studentHomeBookingActionsProvider)
+            .cancelTrialBooking(
+              studentId: booking.studentId,
+              bookingId: booking.id,
+            );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

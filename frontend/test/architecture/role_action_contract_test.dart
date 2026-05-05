@@ -49,9 +49,19 @@ void main() {
         File(
           'lib/features/student_home/presentation/widgets/student_subscription_summary.dart',
         ).readAsStringSync();
+    final lessonProgressMapper =
+        File(
+          'lib/features/student_home/presentation/mappers/student_lesson_progress_mapper.dart',
+        ).readAsStringSync();
+    final lessonProgressSection =
+        File(
+          'lib/features/student_home/presentation/widgets/student_lesson_progress_section.dart',
+        ).readAsStringSync();
 
     expect(lessonCard, contains("extra: {'viewerRole': 'student'}"));
     expect(subscriptionSummary, contains("extra: {'viewerRole': 'student'}"));
+    expect(lessonProgressMapper, contains("'viewerRole': 'student'"));
+    expect(lessonProgressSection, contains('extra: sortedItems[i].routeExtra'));
   });
 
   test(
@@ -81,4 +91,62 @@ void main() {
       );
     },
   );
+
+  test('student home does not link to legacy booking detail route', () {
+    final forbiddenUsages = <String>[];
+    for (final file in Directory('lib/features/student_home')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))) {
+      final content = file.readAsStringSync();
+      if (content.contains('AppRoutes.bookingDetail')) {
+        forbiddenUsages.add(file.path);
+      }
+    }
+
+    expect(
+      forbiddenUsages,
+      isEmpty,
+      reason:
+          'Student trial/upcoming booking cards must open the current MyBookings flow, not the legacy unregistered booking detail route.',
+    );
+  });
+
+  test('student home booking widgets use student-home application providers', () {
+    final bookingWidgets = [
+      File(
+        'lib/features/student_home/presentation/widgets/dashboard/next_lesson_card.dart',
+      ),
+      File(
+        'lib/features/student_home/presentation/widgets/trial_bookings_section.dart',
+      ),
+      File(
+        'lib/features/student_home/presentation/widgets/trial_booking_card.dart',
+      ),
+    ];
+
+    for (final file in bookingWidgets) {
+      final content = file.readAsStringSync();
+      expect(
+        content,
+        isNot(
+          contains('/lessons/presentation/providers/booking_providers.dart'),
+        ),
+        reason:
+            '${file.path} must not import the lessons presentation booking provider directly.',
+      );
+      expect(
+        content,
+        isNot(contains('studentBookingsProvider(')),
+        reason:
+            '${file.path} must use student_home application providers for booking reads.',
+      );
+      expect(
+        content,
+        isNot(contains('bookingsNotifierProvider')),
+        reason:
+            '${file.path} must use a student_home action provider for booking mutations.',
+      );
+    }
+  });
 }

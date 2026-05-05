@@ -8,10 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../students/domain/entities/class_membership.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/subscription_facade.dart';
+import '../../../subscription/presentation/widgets/subscription_membership_card.dart';
+import '../providers/student_home_subscription_summary_provider.dart';
 
 /// Widget showing student's subscription summary on dashboard.
 class StudentSubscriptionSummary extends ConsumerWidget {
@@ -26,26 +24,17 @@ class StudentSubscriptionSummary extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final membershipsAsync = ref.watch(
-      activeStudentMembershipsProvider(studentId),
-    );
-    final subscriptionsAsync = ref.watch(
-      activeStudentSubscriptionsProvider(studentId),
+    final summariesAsync = ref.watch(
+      studentHomeSubscriptionSummariesProvider(studentId),
     );
 
-    return membershipsAsync.when(
-      data: (memberships) {
-        if (memberships.isEmpty) {
+    return summariesAsync.when(
+      data: (items) {
+        if (items.isEmpty) {
           return _buildEmptyState(context);
         }
 
-        return subscriptionsAsync.when(
-          data:
-              (subscriptions) =>
-                  _buildContent(context, ref, memberships, subscriptions),
-          loading: () => _buildLoadingState(),
-          error: (_, __) => _buildErrorState(),
-        );
+        return _buildContent(context, items);
       },
       loading: () => _buildLoadingState(),
       error: (_, __) => _buildErrorState(),
@@ -54,9 +43,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
 
   Widget _buildContent(
     BuildContext context,
-    WidgetRef ref,
-    List<ClassMembership> memberships,
-    List<Subscription> subscriptions,
+    List<StudentHomeSubscriptionSummaryItem> items,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,17 +66,14 @@ class StudentSubscriptionSummary extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space3),
 
         // Subscription cards
-        ...memberships.map((membership) {
-          final subscription = subscriptions.firstWhere(
-            (s) => s.membershipId == membership.id,
-            orElse: () => _createEmptySubscription(membership),
-          );
-
+        ...items.map((item) {
+          final subscription = item.subscription;
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-            child: _SubscriptionMiniCard(
-              membership: membership,
+            child: SubscriptionMembershipCard(
               subscription: subscription,
+              classNameAsync: AsyncData(item.className),
+              instrument: item.instrument,
               onTap:
                   subscription.id.isNotEmpty
                       ? () {
@@ -106,18 +90,6 @@ class StudentSubscriptionSummary extends ConsumerWidget {
           );
         }),
       ],
-    );
-  }
-
-  Subscription _createEmptySubscription(ClassMembership membership) {
-    return Subscription(
-      id: '',
-      studentId: studentId,
-      membershipId: membership.id,
-      type: SubscriptionType.monthly,
-      amount: 0,
-      status: SubscriptionStatus.expired,
-      createdAt: DateTime.now(),
     );
   }
 
@@ -167,196 +139,6 @@ class StudentSubscriptionSummary extends ConsumerWidget {
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
-      ),
-    );
-  }
-}
-
-/// Enhanced card showing subscription info with progress bar, session count,
-/// and quick schedule-change action. Toss card pattern: biggest info first.
-class _SubscriptionMiniCard extends ConsumerWidget {
-  final ClassMembership membership;
-  final Subscription subscription;
-  final VoidCallback? onTap;
-
-  const _SubscriptionMiniCard({
-    required this.membership,
-    required this.subscription,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final lessonClassAsync = ref.watch(
-      lessonClassProvider(membership.lessonClassId),
-    );
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          border: Border.all(
-            color:
-                subscription.isExpiringSoon
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
-            width: subscription.isExpiringSoon ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row 1: Badge + Name + Instrument
-            Row(
-              children: [
-                _buildStatusBadge(),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: lessonClassAsync.when(
-                    data:
-                        (lessonClass) => Text(
-                          '${lessonClass?.name ?? '개인레슨'} · ${membership.instrument}',
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    loading: () => const Text('...'),
-                    error: (_, __) => Text(membership.instrument),
-                  ),
-                ),
-                if (_daysRemaining != null)
-                  Text(
-                    'D-$_daysRemaining',
-                    style: AppTypography.caption.copyWith(
-                      color:
-                          _daysRemaining! <= 7
-                              ? AppColors.paperAccent
-                              : AppColors.inkTertiary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.space3),
-
-            // Row 2: Progress bar + Session count (big number)
-            if (_totalSessions > 0) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      child: LinearProgressIndicator(
-                        value: _progressValue,
-                        minHeight: 6,
-                        backgroundColor: AppColors.inkQuaternary,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _progressColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Text(
-                    '${subscription.usedLessons}/$_totalSessions',
-                    style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.ink,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    AppStrings.sessionUnit,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.inkTertiary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.space3),
-            ],
-
-            // Row 3: Detail link only (schedule change is in subscription detail)
-            if (subscription.id.isNotEmpty)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (onTap != null)
-                    TextButton(
-                      onPressed: onTap,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppStrings.viewDetail,
-                            style: AppTypography.buttonSmall.copyWith(
-                              color: AppColors.paperAccent,
-                            ),
-                          ),
-                          const SizedBox(width: 2),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 12,
-                            color: AppColors.paperAccent,
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  int get _totalSessions => subscription.totalLessonsForDisplay ?? 0;
-
-  double get _progressValue {
-    if (_totalSessions == 0) return 0;
-    return (subscription.usedLessons / _totalSessions).clamp(0.0, 1.0);
-  }
-
-  Color get _progressColor {
-    if (subscription.isExpiringSoon) return AppColors.paperAccent;
-    if (_progressValue >= 0.9) return AppColors.paperAccent;
-    return AppColors.ink;
-  }
-
-  int? get _daysRemaining {
-    if (subscription.endDate == null) return null;
-    final days = subscription.endDate!.difference(DateTime.now()).inDays;
-    return days >= 0 ? days : null;
-  }
-
-  Widget _buildStatusBadge() {
-    if (subscription.id.isEmpty) {
-      return _badge(AppStrings.unregistered, AppColors.inkTertiary);
-    }
-    if (subscription.status == SubscriptionStatus.expired) {
-      return _badge(AppStrings.expired, AppColors.paperAccent);
-    }
-    if (subscription.isExpiringSoon) {
-      return _badge(AppStrings.expiringSoon, AppColors.paperAccent);
-    }
-    return _badge(AppStrings.active, AppColors.paperOk);
-  }
-
-  Widget _badge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space2,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1)),
-      child: Text(
-        label,
-        style: AppTypography.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
       ),
     );
   }

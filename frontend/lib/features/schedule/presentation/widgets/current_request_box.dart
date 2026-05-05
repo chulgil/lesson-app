@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import 'schedule_slot_choice_list.dart';
 
 /// Current request action box — phase-aware actions.
 ///
@@ -206,30 +207,28 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   /// My turn: compact chat-input style — slot chips + message input + buttons
   Widget _buildMyTurn() {
     final slotLabels = _latestSlotLabels;
+    final slotChoices =
+        slotLabels
+            .asMap()
+            .entries
+            .map(
+              (entry) => ScheduleSlotChoice(
+                priority: entry.key + 1,
+                label: entry.value,
+              ),
+            )
+            .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Slot selection hint (shown only when nothing selected)
-        if (slotLabels.isNotEmpty && _selectedSlotIndex == null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.space1),
-            child: Row(
-              children: [
-                Icon(Icons.touch_app, size: 14, color: AppColors.inkTertiary),
-                const SizedBox(width: AppSpacing.space1),
-                Text(
-                  AppStrings.slotSelectionHint,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
-              ],
-            ),
+        if (slotChoices.isNotEmpty)
+          ScheduleSlotChoiceList(
+            choices: slotChoices,
+            selectedIndex: _selectedSlotIndex,
+            onSelected: (index) => setState(() => _selectedSlotIndex = index),
           ),
-        // Compact slot selection (horizontal chips)
-        if (slotLabels.isNotEmpty) _buildCompactSlots(slotLabels),
         const SizedBox(height: AppSpacing.space2),
 
         // Message input
@@ -276,7 +275,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                     ),
                   ),
                   child: Text(
-                    AppStrings.counterPropose,
+                    AppStrings.scheduleChangeCounter,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -309,7 +308,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                     ),
                   ),
                   child: Text(
-                    AppStrings.accept,
+                    AppStrings.scheduleChangeAccept,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.paper,
                     ),
@@ -320,49 +319,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           ],
         ),
       ],
-    );
-  }
-
-  /// Compact horizontal slot chips (tap to select)
-  Widget _buildCompactSlots(List<String> slotLabels) {
-    return Wrap(
-      spacing: AppSpacing.space2,
-      runSpacing: AppSpacing.space1,
-      children:
-          slotLabels.asMap().entries.map((entry) {
-            final index = entry.key;
-            final label = entry.value;
-            final isSelected = _selectedSlotIndex == index;
-
-            return GestureDetector(
-              onTap: () => setState(() => _selectedSlotIndex = index),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space1 + 2,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? AppColors.paperAccentSoft : AppColors.paper,
-                  border: Border.all(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.inkQuaternary,
-                    width: isSelected ? 1.5 : 1,
-                  ),
-                ),
-                child: Text(
-                  '${index + 1}. $label',
-                  style: AppTypography.caption.copyWith(
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? AppColors.paperAccent : AppColors.ink,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
     );
   }
 

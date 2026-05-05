@@ -12,6 +12,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/notification.dart';
+import '../navigation/notification_navigation_target.dart';
 import '../providers/notification_providers.dart';
 import '../widgets/notification_item.dart';
 
@@ -189,9 +190,12 @@ class NotificationListScreen extends ConsumerWidget {
     // Mark as read
     ref.read(notificationActionsProvider.notifier).markAsRead(notification.id);
 
-    // Navigate to action URL if present
-    if (notification.actionUrl != null && notification.actionUrl!.isNotEmpty) {
-      context.push(notification.actionUrl!);
+    final target = resolveNotificationNavigationTarget(
+      notification,
+      viewerRole: ref.read(notificationViewerRoleProvider),
+    );
+    if (target != null) {
+      context.push(target.location, extra: target.extra);
     }
   }
 

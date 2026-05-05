@@ -44,6 +44,7 @@ StudentLessonProgressItem _requestItem(UnifiedLessonRequest request) {
     statusLabel: request.studentActionLabel,
     createdAt: request.createdAt,
     route: AppRoutes.requestDetail.replaceFirst(':id', request.id),
+    routeExtra: _studentViewerExtra,
   );
 }
 
@@ -147,6 +148,7 @@ StudentLessonProgressItem _scheduleCardItem(ScheduleConfirmationCard card) {
               ':id',
               card.subscriptionId,
             ),
+    routeExtra: _studentViewerExtra,
   );
 }
 
@@ -204,6 +206,7 @@ StudentLessonProgressItem _scheduleChangeItem(RequestEvent event) {
     statusLabel: _scheduleChangeStatusLabel(priority),
     createdAt: event.createdAt,
     route: sessionRoute,
+    routeExtra: _studentViewerExtra,
   );
 }
 
@@ -291,6 +294,9 @@ Iterable<StudentLessonProgressItem> _recentSubscriptionReadyItems(
             ':id',
             subscription.id,
           ),
+          routeExtra: _studentViewerExtra,
         ),
       );
 }
+
+const _studentViewerExtra = {'viewerRole': 'student'};

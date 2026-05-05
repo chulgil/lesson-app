@@ -15,7 +15,7 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/subscription_card.dart';
+import '../widgets/subscription_membership_card.dart';
 
 /// Screen showing list of student's subscriptions.
 class SubscriptionListScreen extends ConsumerWidget {
@@ -114,10 +114,10 @@ class SubscriptionListScreen extends ConsumerWidget {
               orElse:
                   () => _createPlaceholderMembership(subscription.membershipId),
             );
-            return _SubscriptionCardWithClass(
-              membership: membership,
-              subscription: subscription,
+            return _buildSubscriptionMembershipCard(
               ref: ref,
+              subscription: subscription,
+              membership: membership,
               onTap: () => _navigateToDetail(context, subscription.id),
             );
           }),
@@ -137,10 +137,10 @@ class SubscriptionListScreen extends ConsumerWidget {
               orElse:
                   () => _createPlaceholderMembership(subscription.membershipId),
             );
-            return _SubscriptionCardWithClass(
-              membership: membership,
-              subscription: subscription,
+            return _buildSubscriptionMembershipCard(
               ref: ref,
+              subscription: subscription,
+              membership: membership,
               onTap: () => _navigateToDetail(context, subscription.id),
             );
           }),
@@ -160,10 +160,10 @@ class SubscriptionListScreen extends ConsumerWidget {
               orElse:
                   () => _createPlaceholderMembership(subscription.membershipId),
             );
-            return _SubscriptionCardWithClass(
-              membership: membership,
-              subscription: subscription,
+            return _buildSubscriptionMembershipCard(
               ref: ref,
+              subscription: subscription,
+              membership: membership,
               onTap: () => _navigateToDetail(context, subscription.id),
             );
           }),
@@ -280,6 +280,24 @@ class SubscriptionListScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSubscriptionMembershipCard({
+    required WidgetRef ref,
+    required Subscription subscription,
+    required ClassMembership membership,
+    VoidCallback? onTap,
+  }) {
+    final classNameAsync = ref
+        .watch(lessonClassProvider(membership.lessonClassId))
+        .whenData((lessonClass) => lessonClass?.name);
+
+    return SubscriptionMembershipCard(
+      subscription: subscription,
+      classNameAsync: classNameAsync,
+      instrument: membership.instrument,
+      onTap: onTap,
+    );
+  }
+
   ClassMembership _createPlaceholderMembership(String id) {
     return ClassMembership(
       id: id,
@@ -388,52 +406,6 @@ class SubscriptionListScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Subscription card with lesson class info.
-class _SubscriptionCardWithClass extends StatelessWidget {
-  final ClassMembership membership;
-  final Subscription subscription;
-  final WidgetRef ref;
-  final VoidCallback? onTap;
-
-  const _SubscriptionCardWithClass({
-    required this.membership,
-    required this.subscription,
-    required this.ref,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final lessonClassAsync = ref.watch(
-      lessonClassProvider(membership.lessonClassId),
-    );
-
-    return lessonClassAsync.when(
-      data:
-          (lessonClass) => SubscriptionCard(compact: true,
-            subscription: subscription,
-            className: lessonClass?.name ?? AppStrings.individualLesson,
-            instrument: membership.instrument,
-            onTap: onTap,
-          ),
-      loading:
-          () => SubscriptionCard(compact: true,
-            subscription: subscription,
-            className: '...',
-            instrument: membership.instrument,
-            onTap: onTap,
-          ),
-      error:
-          (_, __) => SubscriptionCard(compact: true,
-            subscription: subscription,
-            className: AppStrings.lessonClassErrorFallback,
-            instrument: membership.instrument,
-            onTap: onTap,
-          ),
     );
   }
 }

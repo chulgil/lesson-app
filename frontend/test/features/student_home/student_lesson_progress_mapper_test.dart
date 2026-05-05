@@ -79,6 +79,33 @@ void main() {
 
     expect(items, hasLength(1));
     expect(items.first.route, '/subscriptions/sub_1?session=4');
+    expect(items.first.routeExtra, {'viewerRole': 'student'});
+  });
+
+  test('maps lesson request detail route with student viewer role', () {
+    final items = buildStudentLessonProgressItems(
+      studentId: 'student_1',
+      requests: [
+        UnifiedLessonRequest(
+          id: 'request_1',
+          type: LessonRequestType.regular,
+          status: UnifiedRequestStatus.pending,
+          studentId: 'student_1',
+          teacherId: 'teacher_1',
+          instrument: '바이올린',
+          goal: UnifiedLessonGoal.hobby,
+          experience: UnifiedExperienceLevel.beginner,
+          createdAt: DateTime(2026, 5, 5, 9),
+          preferredSlots: const [],
+        ),
+      ],
+      proposals: const [],
+      subscriptions: const [],
+    );
+
+    expect(items, hasLength(1));
+    expect(items.first.route, '/schedule/request/request_1');
+    expect(items.first.routeExtra, {'viewerRole': 'student'});
   });
 
   test(

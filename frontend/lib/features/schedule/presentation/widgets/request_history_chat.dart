@@ -301,6 +301,8 @@ class RequestHistoryChat extends StatelessWidget {
     final String displayLabel;
     if (isMessageOnly) {
       displayLabel = AppStrings.chatMessageAdded;
+    } else if (isAcceptEvent) {
+      displayLabel = AppStrings.lessonScheduleConfirmed;
     } else if (event.eventType == RequestEventType.initialRequest &&
         request != null) {
       displayLabel =

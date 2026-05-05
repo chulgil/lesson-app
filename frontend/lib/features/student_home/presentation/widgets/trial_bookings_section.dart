@@ -8,8 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../features/lessons/presentation/providers/booking_providers.dart';
+import '../providers/student_home_booking_provider.dart';
 import 'compact_trial_booking_card.dart';
 
 /// Trial bookings section for student dashboard
@@ -20,18 +19,12 @@ class TrialBookingsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
+    final bookingsAsync = ref.watch(
+      studentHomeTrialBookingsProvider(studentId),
+    );
 
     return bookingsAsync.when(
-      data: (bookings) {
-        // Filter for active trial bookings
-        final trialBookings =
-            bookings
-                .where((b) => b.lessonType == LessonType.trial)
-                .where((b) => b.status.isActive || b.status.canRetry)
-                .toList()
-              ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
-
+      data: (trialBookings) {
         if (trialBookings.isEmpty) {
           return _buildEmptyState(context);
         }

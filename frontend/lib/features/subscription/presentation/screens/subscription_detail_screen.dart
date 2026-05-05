@@ -133,6 +133,14 @@ class SubscriptionDetailScreen extends ConsumerWidget {
   }
 }
 
+String subscriptionDetailOpponentName({
+  required String viewerRole,
+  required String studentName,
+  required String teacherName,
+}) {
+  return viewerRole == 'teacher' ? studentName : teacherName;
+}
+
 /// Stateful body with session selection, chat scroll, and bottom input.
 class _SubscriptionDetailBody extends ConsumerStatefulWidget {
   final Subscription subscription;
@@ -244,6 +252,7 @@ class _SubscriptionDetailBodyState
       membershipProvider(subscription.membershipId),
     );
     final studentNames = ref.watch(studentNameMapProvider);
+    final teacherNames = ref.watch(teacherNameMapProvider);
 
     return membershipAsync.when(
       data: (membership) {
@@ -262,6 +271,15 @@ class _SubscriptionDetailBodyState
         final lessonClass = lessonClassAsync?.valueOrNull;
         final isAcademy = lessonClass?.type.name == 'academy';
         final typeLabel = subscription.typeLabel;
+        final teacherName =
+            lessonClass == null
+                ? AppStrings.teacher
+                : teacherNames[lessonClass.teacherId] ?? AppStrings.teacher;
+        final opponentName = subscriptionDetailOpponentName(
+          viewerRole: widget.viewerRole,
+          studentName: studentName,
+          teacherName: teacherName,
+        );
 
         final appBarTitle =
             isAcademy && lessonClass != null
@@ -341,6 +359,7 @@ class _SubscriptionDetailBodyState
                   instrument: instrument,
                   viewerRole: widget.viewerRole,
                   studentName: studentName,
+                  teacherName: teacherName,
                   onOpponentAvatarTap:
                       () => _showProfileBottomSheet(
                         context,
@@ -359,7 +378,7 @@ class _SubscriptionDetailBodyState
             subscription: subscription,
             viewerRole: widget.viewerRole,
             events: sessionEvents,
-            opponentName: studentName,
+            opponentName: opponentName,
             selectedSession: _selectedSession,
             onScheduleChange: () => _handleScheduleChange(context),
             onAcceptScheduleChoice: _handleAcceptScheduleChoice,

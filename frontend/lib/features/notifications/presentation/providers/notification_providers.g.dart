@@ -139,7 +139,7 @@ final proposalNotificationServiceProvider =
 
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
-String _$userNotificationsHash() => r'5aeaa0eab0b8e9a5464dd17d24b3d36f53bc35b3';
+String _$userNotificationsHash() => r'24e31a590c0b3a6ece3efa86ea0eedb957b0232c';
 
 /// Provider for user's notifications list.
 ///

@@ -157,7 +157,7 @@ void main() {
   });
 
   testWidgets(
-    'accepted schedule event uses the same speech bubble without success-card styling',
+    'accepted schedule event separates confirmation state from selected time',
     (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -189,7 +189,10 @@ void main() {
         ),
       );
 
-      expect(find.textContaining('18:00'), findsWidgets);
+      expect(find.text('6회차 일정이 확정되었습니다'), findsOneWidget);
+      expect(find.text('화 18:00 ~ 19:00'), findsOneWidget);
+      expect(find.text('화 18:00 ~ 19:00을 선택했습니다'), findsNothing);
+      expect(find.text('6회차 → 화 18:00 ~ 19:00 확정'), findsNothing);
       expect(find.byIcon(Icons.check_circle), findsNothing);
       expect(roundedDecorations(tester), isNotEmpty);
       expect(angularScheduleCardDecorations(tester), isEmpty);
@@ -290,7 +293,9 @@ void main() {
       );
 
       expect(find.textContaining('토 10:00 ~ 11:00'), findsWidgets);
-      expect(find.text('6회차 → 토 10:00 ~ 11:00 확정'), findsOneWidget);
+      expect(find.text('6회차 일정이 확정되었습니다'), findsOneWidget);
+      expect(find.text('6회차 → 토 10:00 ~ 11:00 확정'), findsNothing);
+      expect(find.text('토 10:00 ~ 11:00을 선택했습니다'), findsNothing);
     },
   );
 

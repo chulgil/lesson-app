@@ -59,7 +59,10 @@ class StudentLessonProgressSection extends ConsumerWidget {
                       onTap:
                           sortedItems[i].route == null
                               ? null
-                              : () => context.push(sortedItems[i].route!),
+                              : () => context.push(
+                                sortedItems[i].route!,
+                                extra: sortedItems[i].routeExtra,
+                              ),
                     ),
                   ],
                 ],

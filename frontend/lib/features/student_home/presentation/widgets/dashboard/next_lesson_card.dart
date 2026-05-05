@@ -10,7 +10,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../../features/lessons/presentation/providers/booking_providers.dart';
+import '../../providers/student_home_booking_provider.dart';
 
 /// Card showing the next upcoming lesson for a student.
 class NextLessonCard extends ConsumerWidget {
@@ -20,24 +20,17 @@ class NextLessonCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
+    final bookingAsync = ref.watch(studentHomeNextLessonProvider(studentId));
 
-    return bookingsAsync.when(
+    return bookingAsync.when(
       loading: () => _buildLoadingState(),
       error: (_, __) => _buildEmptyState(context),
-      data: (bookings) {
-        final now = DateTime.now();
-        final upcomingBookings =
-            bookings
-                .where((b) => b.status.isActive && b.lessonDate.isAfter(now))
-                .toList()
-              ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
-
-        if (upcomingBookings.isEmpty) {
+      data: (booking) {
+        if (booking == null) {
           return _buildEmptyState(context);
         }
 
-        return _buildContent(context, upcomingBookings.first);
+        return _buildContent(context, booking);
       },
     );
   }
@@ -120,7 +113,16 @@ class NextLessonCard extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        context.push(AppRoutes.bookingDetail.replaceFirst(':id', booking.id));
+        context.push(
+          AppRoutes.myBookings,
+          extra: {
+            'studentId': booking.studentId,
+            'studentName': booking.studentName,
+            'teacherId': booking.teacherId,
+            'teacherName': booking.teacherName,
+            'instrument': booking.instrument,
+          },
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import 'schedule_slot_choice_list.dart';
 import 'weekly_calendar_picker.dart' show WeeklyCalendarPicker;
 
 /// Bottom sheet for teacher to review student's 3 preferred time slots
@@ -171,108 +172,22 @@ class _UnifiedApprovalBottomSheetState
   }
 
   Widget _buildPreferredSlotsSection() {
-    final slots = widget.request.preferredSlots;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '학생 희망 시간 중 하나를 선택해주세요',
-          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.space3),
-        if (slots.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(color: AppColors.scheduleMutedBackground),
-            child: Text(
-              '희망 시간이 없습니다',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
+    final slots = [...widget.request.preferredSlots]
+      ..sort((a, b) => a.priority.compareTo(b.priority));
+    final choices =
+        slots
+            .map(
+              (slot) => ScheduleSlotChoice(
+                priority: slot.priority,
+                label: slot.displayLabel,
               ),
-            ),
-          )
-        else
-          ...slots.asMap().entries.map((entry) {
-            final index = entry.key;
-            final slot = entry.value;
-            final isSelected = _selectedSlotIndex == index;
+            )
+            .toList();
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() => _selectedSlotIndex = index);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paper,
-                    borderRadius: BorderRadius.zero,
-                    border: Border.all(
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.inkQuaternary,
-                      width: isSelected ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? AppColors.paperAccent
-                                  : AppColors.scheduleMutedBackground,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${slot.priority}',
-                            style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  isSelected
-                                      ? AppColors.paper
-                                      : AppColors.inkSecondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.space3),
-                      Expanded(
-                        child: Text(
-                          slot.displayLabel,
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight:
-                                isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                            color:
-                                isSelected
-                                    ? AppColors.paperAccent
-                                    : AppColors.ink,
-                          ),
-                        ),
-                      ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle,
-                          color: AppColors.paperAccent,
-                          size: 24,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-      ],
+    return ScheduleSlotChoiceList(
+      choices: choices,
+      selectedIndex: _selectedSlotIndex,
+      onSelected: (index) => setState(() => _selectedSlotIndex = index),
     );
   }
 
@@ -293,7 +208,7 @@ class _UnifiedApprovalBottomSheetState
           Expanded(
             child: Text(
               currentRound == 0
-                  ? '희망 시간 중 하나를 선택하거나, 모두 불가하면 역제안하세요'
+                  ? '가능한 일정 중 하나를 선택하거나, 모두 불가하면 다른 일정을 제안하세요'
                   : '협상 $currentRound/$maxRounds 라운드',
               style: AppTypography.caption.copyWith(color: AppColors.ink),
             ),
@@ -316,7 +231,7 @@ class _UnifiedApprovalBottomSheetState
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
-              '역제안 — 가능한 시간을 선택해주세요',
+              '${AppStrings.scheduleChangeCounter} — 가능한 일정을 선택해주세요',
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -369,7 +284,6 @@ class _UnifiedApprovalBottomSheetState
   Widget _buildMainButtons() {
     return Row(
       children: [
-        // Counter-propose
         Expanded(
           child: OutlinedButton(
             onPressed:
@@ -382,7 +296,7 @@ class _UnifiedApprovalBottomSheetState
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: Text(
-              '역제안',
+              AppStrings.scheduleChangeCounter,
               style: AppTypography.button.copyWith(
                 color: AppColors.paperAccent,
               ),
@@ -390,8 +304,8 @@ class _UnifiedApprovalBottomSheetState
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
-        // Accept
         Expanded(
+          flex: 2,
           child: FilledButton(
             onPressed:
                 _selectedSlotIndex != null && !_isProcessing
@@ -416,7 +330,7 @@ class _UnifiedApprovalBottomSheetState
                       ),
                     )
                     : Text(
-                      AppStrings.accept,
+                      AppStrings.scheduleChangeAccept,
                       style: AppTypography.button.copyWith(
                         color: AppColors.paper,
                       ),

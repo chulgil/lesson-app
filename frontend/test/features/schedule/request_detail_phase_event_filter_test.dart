@@ -107,7 +107,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.chatApprove), findsOneWidget);
+    expect(find.text(AppStrings.chatApprove), findsNothing);
+    expect(find.text(AppStrings.lessonScheduleConfirmed), findsOneWidget);
     expect(find.text('목 17:00 ~ 18:00'), findsOneWidget);
     expect(find.text('이 일정으로 확정할게요'), findsOneWidget);
     final roundedBubbleDecorations = tester

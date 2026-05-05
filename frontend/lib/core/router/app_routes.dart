@@ -104,7 +104,6 @@ class AppRoutes {
   static const regularLessonRequest = '/schedule/regular/request';
   static const registerRegularLesson = '/schedule/regular/register';
   static const bookingList = '/schedule/bookings';
-  static const bookingDetail = '/schedule/booking/:id';
   static const lessonBooking = '/schedule/book-lesson';
   static const lessonRequest = '/schedule/lesson-request';
   static const lessonRequests = '/schedule/lesson-requests';

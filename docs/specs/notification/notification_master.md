@@ -154,12 +154,17 @@
 | `proposalAccepted` | normal | X | O |
 | `proposalExpired` | normal | X | O |
 
-#### 수강권 만료 알림
+#### 수강권 상태 알림
 
 | 타입 | 우선순위 | DND 우회 | 푸시 |
 |------|---------|---------|------|
+| `lessonsRunningLow` | high | X | O |
 | `subscriptionExpiringSoon` | high | X | O |
 | `subscriptionExpired` | high | X | O |
+
+수강권 알림은 서버의 수강권 원장을 단일 진실 공급원으로 삼는다. `subscriptionExpiringSoon`은 실제 `endDate` 기준 D-14/D-7/D-3/D-1/D-0 같은 만료 임계값에 들어온 경우에만 발행한다. 남은 회차가 적지만 만료일이 임계값에 들어오지 않은 경우에는 `lessonsRunningLow`를 발행하고, 제목/본문에 "N일 후 만료" 같은 날짜 기반 문구를 넣지 않는다.
+
+서버는 `/subscriptions/{subscriptionId}` 딥링크에 필요한 payload를 함께 내려준다. 필수 필드는 `subscriptionId`, `studentId`, `teacherId`, `remainingLessons`, `totalLessons`, `endDate`, `daysUntilExpiration`, `reason`이다. `reason`은 `dateExpiring`, `lessonsLow`, `expired`, `depleted` 중 하나를 사용한다. 프론트는 서버가 내려준 제목/본문을 표시하되, mock과 테스트에서는 알림 타입과 payload가 실제 수강권 상태와 일치하는지 검증한다.
 
 #### 변경 허용 알림
 

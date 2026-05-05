@@ -19,6 +19,7 @@ class StudentLessonProgressItem {
   final String statusLabel;
   final DateTime createdAt;
   final String? route;
+  final Object? routeExtra;
 
   const StudentLessonProgressItem({
     required this.id,
@@ -29,6 +30,7 @@ class StudentLessonProgressItem {
     required this.statusLabel,
     required this.createdAt,
     this.route,
+    this.routeExtra,
   });
 
   static List<StudentLessonProgressItem> sorted(

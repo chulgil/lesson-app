@@ -26,6 +26,15 @@ const _notificationSettingsBoxName = 'notification_settings';
 const _studentSettingsKey = 'student_settings';
 const _teacherSettingsKey = 'teacher_settings';
 
+final notificationViewerRoleProvider = Provider<String>((ref) {
+  final role = ref.watch(currentUserRoleProvider);
+  return role == UserRole.teacher
+      ? 'teacher'
+      : role == UserRole.parent
+      ? 'parent'
+      : 'student';
+});
+
 /// Notification repository provider (only used for remote mode).
 @Riverpod(keepAlive: true)
 NotificationRepository? notificationApiRepository(Ref ref) {
@@ -293,22 +302,22 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     ),
 
     // ============================================================
-    // Both: 수강권 만료 임박 알림
+    // Student-only: 수강권 잔여 회차 부족 알림
     // ============================================================
     AppNotification(
-      id: 'n_sub_expiring_1',
+      id: 'n_lessons_low_1',
       userId: 'current_user',
-      type: NotificationType.subscriptionExpiringSoon,
+      type: NotificationType.lessonsRunningLow,
       priority: NotificationPriority.high,
-      title: AppStrings.notifSubExpiringTitle(3),
-      body: AppStrings.notifSubExpiringBody(2),
+      title: AppStrings.notifLessonsRunningLowTitle(2),
+      body: AppStrings.notifLessonsRunningLowBody,
       createdAt: now.subtract(const Duration(hours: 3)),
       sentAt: now.subtract(const Duration(hours: 3)),
-      actionUrl: '/subscriptions/sub_pkg_01',
+      actionUrl: '/subscriptions/sub_mon_04',
       actionLabel: AppStrings.notifSubExpiringAction,
       data: {
-        'subscriptionId': 'sub_pkg_01',
-        'daysLeft': 3,
+        'subscriptionId': 'sub_mon_04',
+        'remainingLessons': 2,
         'studentId': 'student_1',
       },
     ),
@@ -339,8 +348,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
         body: AppStrings.notifConnectionStudent('김선생님'),
         createdAt: now.subtract(const Duration(minutes: 5)),
         sentAt: now.subtract(const Duration(minutes: 5)),
-        actionUrl:
-            '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
+        actionUrl: '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
         actionLabel: AppStrings.notifViewTeacher,
       ),
 
