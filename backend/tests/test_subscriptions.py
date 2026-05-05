@@ -348,6 +348,60 @@ async def test_subscription_template_frontend_contract_aliases_and_actions(
 
 
 @pytest.mark.asyncio
+async def test_subscription_template_actions_reject_other_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Template detail and mutations are scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-template@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/subscriptions-templates",
+        headers=auth_headers,
+        json={"name": "Owner Only", "type": "package", "lessons_count": 4, "amount": 100000},
+    )
+    assert create_response.status_code == 201
+    template_id = create_response.json()["id"]
+    other_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
+    }
+
+    assert (
+        await client.get(f"/api/v1/subscriptions-templates/{template_id}", headers=other_headers)
+    ).status_code == 403
+    assert (
+        await client.put(
+            f"/api/v1/subscriptions-templates/{template_id}",
+            headers=other_headers,
+            json={"name": "Hijacked"},
+        )
+    ).status_code == 403
+    assert (
+        await client.patch(
+            f"/api/v1/subscriptions-templates/{template_id}/toggle-active",
+            headers=other_headers,
+        )
+    ).status_code == 403
+    assert (
+        await client.delete(f"/api/v1/subscriptions-templates/{template_id}", headers=other_headers)
+    ).status_code == 403
+    assert (
+        await client.patch(
+            "/api/v1/subscriptions-templates/reorder",
+            headers=other_headers,
+            json={"ordered_ids": [template_id]},
+        )
+    ).status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_create_subscription_proposal(client: AsyncClient, auth_headers, create_test_user):
     """POST /api/v1/subscriptions-proposals creates a proposal and returns 201."""
     await create_test_user(user_id="test-user-id", role="teacher")
@@ -365,6 +419,50 @@ async def test_create_subscription_proposal(client: AsyncClient, auth_headers, c
     assert data["student_id"] == "student-001"
     assert data["status"] == "pending"
     assert data["teacher_id"] == "test-user-id-prof"
+
+
+@pytest.mark.asyncio
+async def test_subscription_proposals_are_scoped_to_current_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Teachers only list and read proposals they own."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-proposal@test.com",
+    )
+    other_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
+    }
+
+    owned = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={"student_id": "student-owned", "message": "owned"},
+    )
+    assert owned.status_code == 201
+    foreign = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=other_headers,
+        json={"student_id": "student-foreign", "message": "foreign"},
+    )
+    assert foreign.status_code == 201
+
+    listed = await client.get("/api/v1/subscriptions-proposals", headers=auth_headers)
+    assert listed.status_code == 200
+    ids = {item["id"] for item in listed.json()["items"]}
+    assert owned.json()["id"] in ids
+    assert foreign.json()["id"] not in ids
+
+    forbidden = await client.get(
+        f"/api/v1/subscriptions-proposals/{foreign.json()['id']}",
+        headers=auth_headers,
+    )
+    assert forbidden.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -403,6 +501,70 @@ async def test_subscription_proposal_notify_payment_action_marks_deposit_notifie
     data = response.json()
     assert data["status"] == "paymentNotified"
     assert data["payment_notified_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_subscription_proposal_actions_require_owned_teacher_or_linked_student(
+    client: AsyncClient,
+    auth_headers,
+    student_auth_headers,
+    create_test_user,
+):
+    """Only the proposal teacher or linked student can mutate proposal state."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-confirm@test.com",
+    )
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="Linked Student",
+        email="linked-student@test.com",
+    )
+    await create_test_user(
+        user_id="other-student",
+        role="student",
+        name="Other Student",
+        email="other-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={"student_id": "test-student-id", "message": "입금 안내"},
+    )
+    assert create_response.status_code == 201
+    proposal_id = create_response.json()["id"]
+    other_student_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-student', 'role': 'student'})}"
+    }
+    other_teacher_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
+    }
+
+    other_student_response = await client.patch(
+        f"/api/v1/subscriptions-proposals/{proposal_id}/respond",
+        headers=other_student_headers,
+        json={"action": "notify_payment"},
+    )
+    assert other_student_response.status_code == 403
+
+    linked_student_response = await client.patch(
+        f"/api/v1/subscriptions-proposals/{proposal_id}/respond",
+        headers=student_auth_headers,
+        json={"action": "notify_payment"},
+    )
+    assert linked_student_response.status_code == 200
+
+    other_teacher_response = await client.patch(
+        f"/api/v1/subscriptions-proposals/{proposal_id}/confirm",
+        headers=other_teacher_headers,
+        json={},
+    )
+    assert other_teacher_response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -604,6 +766,71 @@ async def test_subscription_detail_and_mutations_reject_other_teacher(
             json={"payment_method": "cash"},
         )
     ).status_code == 403
+    assert (
+        await client.post(f"/api/v1/subscriptions/{sub_id}/renew", headers=other_headers)
+    ).status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_linked_student_user_can_read_profile_subscription(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Student users access subscriptions by their linked Student profile id."""
+    from app.models.student import Student
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="student-user-id",
+        role="student",
+        name="Linked Student",
+        email="student-profile@test.com",
+    )
+    student = Student(
+        id="student-profile-id",
+        user_id="student-user-id",
+        teacher_id="test-user-id-prof",
+        name="Linked Student",
+        instrument="piano",
+    )
+    db_session.add(student)
+    await db_session.flush()
+    membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id",
+        student_id="student-profile-id",
+    )
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-profile-id",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+    student_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'student-user-id', 'role': 'student'})}"
+    }
+
+    listed = await client.get(
+        "/api/v1/subscriptions",
+        headers=student_headers,
+        params={"student_id": "student-profile-id"},
+    )
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 1
+    assert listed.json()["items"][0]["id"] == sub_id
+
+    detail = await client.get(f"/api/v1/subscriptions/{sub_id}", headers=student_headers)
+    assert detail.status_code == 200
+    assert detail.json()["id"] == sub_id
 
 
 @pytest.mark.asyncio

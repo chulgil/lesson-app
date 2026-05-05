@@ -57,7 +57,7 @@ class SubscriptionService:
         query = select(Subscription)
         role = self._actor_type(user)
         if role == "student":
-            query = query.where(Subscription.student_id == user.id)
+            query = query.where(Subscription.student_id.in_(await self._student_identifiers(user)))
         elif role == "teacher":
             identifiers = await self._teacher_identifiers(user)
             query = (
@@ -166,7 +166,7 @@ class SubscriptionService:
         self, subscription_id: str, data: UseLessonRequest, current_user: Any
     ) -> SubscriptionResponse:
         """Deduct a lesson usage from a subscription."""
-        from app.models.subscription import Subscription, SubscriptionUsage
+        from app.models.subscription import SubscriptionUsage
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
@@ -198,7 +198,7 @@ class SubscriptionService:
 
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Use a reschedule credit from a subscription."""
-        from app.models.subscription import Subscription, SubscriptionUsage
+        from app.models.subscription import SubscriptionUsage
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
@@ -221,7 +221,7 @@ class SubscriptionService:
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status."""
-        from app.models.subscription import Subscription, SubscriptionStatus
+        from app.models.subscription import SubscriptionStatus
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
@@ -244,7 +244,7 @@ class SubscriptionService:
 
     async def add_usage(self, subscription_id: str, data: dict, current_user: Any) -> Any:
         """Add a usage record to a subscription."""
-        from app.models.subscription import Subscription, SubscriptionUsage
+        from app.models.subscription import SubscriptionUsage
 
         await self._get_subscription_for_teacher(subscription_id, current_user)
 
@@ -388,8 +388,10 @@ class SubscriptionService:
             )
 
         role = self._actor_type(current_user)
-        if role == "student" and sub.student_id == current_user.id:
-            return sub
+        if role == "student":
+            student_ids = await self._student_identifiers(current_user)
+            if sub.student_id in student_ids:
+                return sub
 
         if role == "teacher":
             identifiers = [current_user.id]
@@ -416,6 +418,17 @@ class SubscriptionService:
         teacher_profile_id = await try_resolve_teacher_id(self.db, user.id)
         if teacher_profile_id and teacher_profile_id not in identifiers:
             identifiers.append(teacher_profile_id)
+        return identifiers
+
+    async def _student_identifiers(self, user: Any) -> list[str]:
+        """Return user id plus linked Student profile ids for student actors."""
+        from app.models.student import Student
+
+        identifiers = [user.id]
+        result = await self.db.scalars(select(Student.id).where(Student.user_id == user.id))
+        for student_id in result.all():
+            if student_id not in identifiers:
+                identifiers.append(student_id)
         return identifiers
 
     def _remaining_lessons(self, sub: Any) -> int | None:
@@ -523,22 +536,14 @@ class SubscriptionService:
 
     async def get_template_by_id(self, template_id: str, current_user: Any) -> SubscriptionTemplateResponse:
         """Return one template by ID."""
-        from app.models.subscription import SubscriptionTemplate
-
-        template = await self.db.get(SubscriptionTemplate, template_id)
-        if template is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        template = await self._get_template_for_teacher(template_id, current_user)
         return SubscriptionTemplateResponse.model_validate(template)
 
     async def update_template(
         self, template_id: str, data: SubscriptionTemplateUpdate, current_user: Any
     ) -> SubscriptionTemplateResponse:
         """Update a template."""
-        from app.models.subscription import SubscriptionTemplate
-
-        template = await self.db.get(SubscriptionTemplate, template_id)
-        if template is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        template = await self._get_template_for_teacher(template_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         update_data.pop("owner_id", None)
@@ -551,21 +556,13 @@ class SubscriptionService:
 
     async def deactivate_template(self, template_id: str, current_user: Any) -> None:
         """Deactivate a template (soft delete)."""
-        from app.models.subscription import SubscriptionTemplate
-
-        template = await self.db.get(SubscriptionTemplate, template_id)
-        if template is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        template = await self._get_template_for_teacher(template_id, current_user)
         template.is_active = False
         await self.db.flush()
 
     async def toggle_template_active(self, template_id: str, current_user: Any) -> SubscriptionTemplateResponse:
         """Toggle a template active flag."""
-        from app.models.subscription import SubscriptionTemplate
-
-        template = await self.db.get(SubscriptionTemplate, template_id)
-        if template is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+        template = await self._get_template_for_teacher(template_id, current_user)
         template.is_active = not template.is_active
         await self.db.flush()
         await self.db.refresh(template)
@@ -575,11 +572,27 @@ class SubscriptionService:
         """Persist template display order for the current teacher."""
         from app.models.subscription import SubscriptionTemplate
 
+        identifiers = await self._teacher_identifiers(current_user)
         for index, template_id in enumerate(ordered_ids):
             template = await self.db.get(SubscriptionTemplate, template_id)
             if template is not None:
+                if template.teacher_id not in identifiers:
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
                 template.display_order = index
         await self.db.flush()
+
+    async def _get_template_for_teacher(self, template_id: str, current_user: Any) -> Any:
+        """Return a template only if it belongs to the current teacher."""
+        from app.models.subscription import SubscriptionTemplate
+
+        template = await self.db.get(SubscriptionTemplate, template_id)
+        if template is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+
+        identifiers = await self._teacher_identifiers(current_user)
+        if template.teacher_id not in identifiers:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return template
 
     # ------------------------------------------------------------------
     # Proposals
@@ -595,15 +608,9 @@ class SubscriptionService:
         """Create a renewal proposal linked to the expiring/expired subscription."""
         from datetime import timedelta
 
-        from app.models.subscription import Subscription, SubscriptionProposal, SubscriptionTemplate
+        from app.models.subscription import SubscriptionProposal, SubscriptionTemplate
 
-        sub = await self.db.get(Subscription, previous_subscription_id)
-        if sub is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Subscription not found",
-            )
-
+        sub = await self._get_subscription_for_teacher(previous_subscription_id, current_user)
         tid = await resolve_teacher_id(self.db, current_user.id)
 
         # Find a matching active template by teacher + subscription type
@@ -646,6 +653,13 @@ class SubscriptionService:
         from app.models.subscription import SubscriptionProposal
 
         query = select(SubscriptionProposal)
+        role = self._actor_type(user)
+        if role == "teacher":
+            query = query.where(SubscriptionProposal.teacher_id.in_(await self._teacher_identifiers(user)))
+        elif role == "student":
+            query = query.where(SubscriptionProposal.student_id.in_(await self._student_identifiers(user)))
+        else:
+            query = query.where(False)
         if student_id:
             query = query.where(SubscriptionProposal.student_id == student_id)
         if status:
@@ -660,12 +674,44 @@ class SubscriptionService:
 
     async def get_proposal_by_id(self, proposal_id: str, current_user: Any) -> SubscriptionProposalResponse:
         """Return one proposal by ID."""
+        proposal = await self._get_proposal_for_user(proposal_id, current_user)
+        return SubscriptionProposalResponse.model_validate(proposal)
+
+    async def _get_proposal_for_user(self, proposal_id: str, current_user: Any) -> Any:
+        """Return a proposal only if the current actor can access it."""
         from app.models.subscription import SubscriptionProposal
 
         proposal = await self.db.get(SubscriptionProposal, proposal_id)
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
-        return SubscriptionProposalResponse.model_validate(proposal)
+
+        role = self._actor_type(current_user)
+        if role == "teacher":
+            identifiers = await self._teacher_identifiers(current_user)
+            if proposal.teacher_id in identifiers:
+                return proposal
+        elif role == "student":
+            identifiers = await self._student_identifiers(current_user)
+            if proposal.student_id in identifiers:
+                return proposal
+            if await self._is_unlinked_student_profile(proposal.student_id):
+                return proposal
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _is_unlinked_student_profile(self, student_id: str) -> bool:
+        """Legacy compatibility for teacher-created offline student profiles."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        return student is not None and student.user_id is None
+
+    async def _get_proposal_for_teacher(self, proposal_id: str, current_user: Any) -> Any:
+        """Return a proposal only if the current teacher owns it."""
+        proposal = await self._get_proposal_for_user(proposal_id, current_user)
+        if self._actor_type(current_user) != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return proposal
 
     async def create_proposal(
         self, data: SubscriptionProposalCreate, current_user: Any
@@ -736,11 +782,9 @@ class SubscriptionService:
         self, proposal_id: str, data: ProposalRespondRequest, current_user: Any
     ) -> SubscriptionProposalResponse:
         """Accept or reject a proposal."""
-        from app.models.subscription import ProposalStatus, SubscriptionProposal
+        from app.models.subscription import ProposalStatus
 
-        proposal = await self.db.get(SubscriptionProposal, proposal_id)
-        if proposal is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
+        proposal = await self._get_proposal_for_user(proposal_id, current_user)
 
         if data.action in ("notify_payment", "accept", "select_template"):
             proposal.status = ProposalStatus.paymentNotified
@@ -780,14 +824,11 @@ class SubscriptionService:
             ProposalPaymentStatus,
             ProposalStatus,
             Subscription,
-            SubscriptionProposal,
             SubscriptionStatus,
             SubscriptionTemplate,
         )
 
-        proposal = await self.db.get(SubscriptionProposal, proposal_id)
-        if proposal is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
+        proposal = await self._get_proposal_for_teacher(proposal_id, current_user)
 
         if proposal.status != "paymentNotified":
             raise HTTPException(
