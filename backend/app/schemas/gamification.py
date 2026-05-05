@@ -2,7 +2,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
 
 
 class PointHistoryResponse(BaseModel):
@@ -30,6 +30,30 @@ class BadgeResponse(BaseModel):
     badge_icon: str
     rarity: str
     earned_at: _dt.datetime
+
+    @computed_field
+    @property
+    def name(self) -> str:
+        """Frontend PracticeBadge name."""
+        return self.badge_name
+
+    @computed_field
+    @property
+    def description(self) -> str:
+        """Frontend PracticeBadge description."""
+        return self.badge_description
+
+    @computed_field
+    @property
+    def icon(self) -> str:
+        """Frontend PracticeBadge icon."""
+        return self.badge_icon
+
+    @computed_field
+    @property
+    def is_earned(self) -> bool:
+        """Earned badge entries are always earned."""
+        return True
 
 
 class StudentGamificationResponse(BaseModel):

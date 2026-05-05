@@ -33,7 +33,7 @@ async def get_student_gamification(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> StudentGamificationResponse:
     service = GamificationService(db)
-    data = await service.get_student_gamification(student_id)
+    data = await service.get_student_gamification(student_id, current_user)
     return StudentGamificationResponse.model_validate(data)
 
 

@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 # Level thresholds
 LEVEL_THRESHOLDS = [
@@ -43,9 +45,11 @@ class GamificationService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def get_student_gamification(self, student_id: str) -> dict[str, Any]:
+    async def get_student_gamification(self, student_id: str, current_user: Any) -> dict[str, Any]:
         """Get aggregated gamification data for a student."""
         from app.models.gamification import GamificationBadge, GamificationPoint
+
+        await self._assert_student_access(student_id, current_user)
 
         # Total points
         total = await self.db.scalar(
@@ -84,6 +88,25 @@ class GamificationService:
             "earned_badges": badges,
             "recent_history": history,
         }
+
+    async def _assert_student_access(self, student_id: str, current_user: Any) -> None:
+        """Enforce ownership when the student profile exists."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            return
+
+        role = getattr(current_user, "role", None)
+        role_value = getattr(role, "value", role)
+        if role_value == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if student.teacher_id == teacher_id:
+                return
+        elif role_value == "student" and student.user_id == current_user.id:
+            return
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student access denied")
 
     async def award_points(
         self,

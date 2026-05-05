@@ -2,6 +2,15 @@
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import create_access_token
+from app.models.student import Student
+
+
+def _headers(user_id: str, role: str = "teacher") -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.mark.asyncio
@@ -77,6 +86,77 @@ async def test_award_points_boundary_level_up(client: AsyncClient, auth_headers,
     data = response.json()
     assert data["total_points"] == 100
     assert data["level"] == 2
+
+
+@pytest.mark.asyncio
+async def test_gamification_badge_response_matches_frontend_practice_badge_contract(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """earned_badges items expose the fields parsed by Flutter PracticeBadge."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add(
+        Student(
+            id="badge-student",
+            teacher_id="test-user-id-prof",
+            name="Badge Student",
+            instrument="violin",
+        )
+    )
+    await db_session.flush()
+    await client.post(
+        "/api/v1/gamification/badge-student/badges",
+        headers=auth_headers,
+        json={
+            "badges": [
+                {
+                    "name": "First Practice",
+                    "description": "Completed first practice",
+                    "icon": "music_note",
+                    "rarity": "common",
+                }
+            ]
+        },
+    )
+
+    response = await client.get("/api/v1/gamification/badge-student", headers=auth_headers)
+
+    assert response.status_code == 200
+    badge = response.json()["earned_badges"][0]
+    assert badge["name"] == "First Practice"
+    assert badge["description"] == "Completed first practice"
+    assert badge["icon"] == "music_note"
+    assert badge["is_earned"] is True
+
+
+@pytest.mark.asyncio
+async def test_other_teacher_cannot_read_existing_students_gamification(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Gamification for an existing student is scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-gamification@test.com")
+    db_session.add(
+        Student(
+            id="owned-gamification-student",
+            teacher_id="test-user-id-prof",
+            name="Owned Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/gamification/owned-gamification-student",
+        headers=_headers("other-teacher-id"),
+    )
+
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
