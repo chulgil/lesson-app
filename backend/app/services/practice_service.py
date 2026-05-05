@@ -379,6 +379,7 @@ class PracticeService:
         """Add a section to a repertoire."""
         from app.models.practice import PracticeSection
 
+        await self._get_repertoire_for_user(data.repertoire_id, current_user, manage=True)
         section = PracticeSection(
             repertoire_id=data.repertoire_id,
             piece_name=data.piece_name or "Untitled",
@@ -396,11 +397,7 @@ class PracticeService:
         self, section_id: str, data: SectionUpdate, current_user: Any
     ) -> SectionResponse:
         """Update a section."""
-        from app.models.practice import PracticeSection
-
-        section = await self.db.get(PracticeSection, section_id)
-        if section is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -416,11 +413,7 @@ class PracticeService:
 
     async def delete_section(self, section_id: str, current_user: Any) -> None:
         """Delete a section."""
-        from app.models.practice import PracticeSection
-
-        section = await self.db.get(PracticeSection, section_id)
-        if section is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
         await self.db.delete(section)
         await self.db.flush()
 
@@ -428,11 +421,9 @@ class PracticeService:
         self, section_id: str, data: SectionCompleteRequest, current_user: Any
     ) -> SectionResponse:
         """Toggle section completion for a given date."""
-        from app.models.practice import DailyPracticeStatus, PracticeSection
+        from app.models.practice import DailyPracticeStatus
 
-        section = await self.db.get(PracticeSection, section_id)
-        if section is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
 
         # Update or create daily status
         existing = await self.db.scalar(

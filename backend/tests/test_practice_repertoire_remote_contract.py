@@ -398,3 +398,212 @@ async def test_student_can_access_own_repertoires_only(
         json={"student_id": "student-profile-id", "name": "Own New"},
     )
     assert create_response.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_teacher_cannot_mutate_other_teacher_sections(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Teachers cannot create, update, complete, or delete sections for another teacher's student."""
+    from app.models.practice import PracticeRepertoire, PracticeSection
+    from app.models.student import Student
+
+    await create_test_user(user_id="teacher-user-id", role="teacher", email="teacher@test.com")
+    await create_test_user(user_id="other-teacher-user-id", role="teacher", email="other-teacher@test.com")
+    db_session.add_all(
+        [
+            Student(
+                id="other-student",
+                teacher_id="other-teacher-user-id-prof",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeRepertoire(
+                id="other-repertoire",
+                student_id="other-student",
+                name="Other Etudes",
+                start_date=date(2026, 5, 1),
+            ),
+            PracticeSection(
+                id="other-section",
+                repertoire_id="other-repertoire",
+                piece_name="Other Section",
+                start_measure=1,
+                end_measure=8,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("teacher-user-id", "teacher")
+
+    create_response = await client.post(
+        "/api/v1/practice/sections",
+        headers=headers,
+        json={
+            "repertoire_id": "other-repertoire",
+            "piece_name": "Forbidden",
+            "start_measure": 1,
+            "end_measure": 4,
+        },
+    )
+    assert create_response.status_code == 403
+
+    update_response = await client.put(
+        "/api/v1/practice/sections/other-section",
+        headers=headers,
+        json={"piece_name": "Forbidden Update"},
+    )
+    assert update_response.status_code == 403
+
+    complete_response = await client.patch(
+        "/api/v1/practice/sections/other-section/complete",
+        headers=headers,
+        json={"date": "2026-05-05", "is_completed": True},
+    )
+    assert complete_response.status_code == 403
+
+    delete_response = await client.delete("/api/v1/practice/sections/other-section", headers=headers)
+    assert delete_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_parent_can_read_but_not_mutate_linked_child_sections(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Parents can read linked child sections but direct section mutations return 403."""
+    from app.models.parent import Parent, ParentChildRelation
+    from app.models.practice import PracticeRepertoire, PracticeSection
+    from app.models.student import Student
+
+    await create_test_user(user_id="parent-user-id", role="parent")
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            Student(
+                id="child-student",
+                teacher_id="teacher-profile-id",
+                name="Child",
+                instrument="violin",
+            ),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="child-student"),
+            PracticeRepertoire(
+                id="child-repertoire",
+                student_id="child-student",
+                name="Child Etudes",
+                start_date=date(2026, 5, 1),
+            ),
+            PracticeSection(
+                id="child-section",
+                repertoire_id="child-repertoire",
+                piece_name="Child Section",
+                start_measure=1,
+                end_measure=8,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("parent-user-id", "parent")
+
+    read_response = await client.get("/api/v1/practice/sections/child-section", headers=headers)
+    assert read_response.status_code == 200
+
+    update_response = await client.put(
+        "/api/v1/practice/sections/child-section",
+        headers=headers,
+        json={"piece_name": "Parent Update"},
+    )
+    assert update_response.status_code == 403
+
+    complete_response = await client.patch(
+        "/api/v1/practice/sections/child-section/complete",
+        headers=headers,
+        json={"date": "2026-05-05", "is_completed": True},
+    )
+    assert complete_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_student_can_mutate_own_sections_only(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Students can mutate only sections under their linked student profile."""
+    from app.models.practice import PracticeRepertoire, PracticeSection
+    from app.models.student import Student
+
+    await create_test_user(user_id="student-user-id", role="student")
+    db_session.add_all(
+        [
+            Student(
+                id="student-profile-id",
+                user_id="student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Student",
+                instrument="violin",
+            ),
+            Student(
+                id="other-student",
+                user_id="other-student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeRepertoire(
+                id="own-repertoire",
+                student_id="student-profile-id",
+                name="Own Etudes",
+                start_date=date(2026, 5, 1),
+            ),
+            PracticeSection(
+                id="own-section",
+                repertoire_id="own-repertoire",
+                piece_name="Own Section",
+                start_measure=1,
+                end_measure=8,
+            ),
+            PracticeRepertoire(
+                id="other-repertoire",
+                student_id="other-student",
+                name="Other Etudes",
+                start_date=date(2026, 5, 1),
+            ),
+            PracticeSection(
+                id="other-student-section",
+                repertoire_id="other-repertoire",
+                piece_name="Other Section",
+                start_measure=1,
+                end_measure=8,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("student-user-id", "student")
+
+    own_update = await client.put(
+        "/api/v1/practice/sections/own-section",
+        headers=headers,
+        json={"piece_name": "Own Update"},
+    )
+    assert own_update.status_code == 200
+
+    other_update = await client.put(
+        "/api/v1/practice/sections/other-student-section",
+        headers=headers,
+        json={"piece_name": "Forbidden Update"},
+    )
+    assert other_update.status_code == 403
+
+    own_complete = await client.patch(
+        "/api/v1/practice/sections/own-section/complete",
+        headers=headers,
+        json={"date": "2026-05-05", "is_completed": True},
+    )
+    assert own_complete.status_code == 200
