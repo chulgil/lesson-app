@@ -164,6 +164,157 @@ async def test_confirmation_card_lookup_by_subscription_and_status_update(
 
 
 @pytest.mark.asyncio
+async def test_confirmation_card_status_update_accepts_dismissed(
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Student clients can dismiss a pending confirmation card through /status."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="Student",
+        email="student@test.com",
+    )
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="status-dismissed-card",
+            student_id="test-student-id",
+            teacher_id="teacher-001",
+            subscription_id="sub-status-dismissed-001",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.patch(
+        "/api/v1/schedule/confirmation-cards/status-dismissed-card/status",
+        headers=student_auth_headers,
+        json={"status": "dismissed"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "dismissed"
+    assert body["responded_at"] is not None
+
+
+@pytest.mark.parametrize(
+    ("card_id", "action"),
+    [
+        ("confirm-changed-time-card", "changedTime"),
+        ("confirm-dismissed-card", "dismissed"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_confirmation_card_confirm_accepts_changed_time_and_dismissed(
+    card_id: str,
+    action: str,
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Student clients can change time or dismiss a pending card through /confirm."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="Student",
+        email="student@test.com",
+    )
+    db_session.add(
+        ScheduleConfirmationCard(
+            id=card_id,
+            student_id="test-student-id",
+            teacher_id="teacher-001",
+            subscription_id=f"sub-{card_id}",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.patch(
+        f"/api/v1/schedule/confirmation-cards/{card_id}/confirm",
+        headers=student_auth_headers,
+        json={"action": action},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == action
+    assert body["responded_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_confirmation_card_rejects_updates_after_confirmed(
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Confirmed cards cannot be changed through /status or /confirm."""
+    from app.models.policy import ConfirmationCardStatus, ScheduleConfirmationCard
+
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="Student",
+        email="student@test.com",
+    )
+    status_card = ScheduleConfirmationCard(
+        id="status-confirmed-card",
+        student_id="test-student-id",
+        teacher_id="teacher-001",
+        subscription_id="sub-status-confirmed-001",
+        card_type="afterTrial",
+        title="Confirmed schedule",
+        status=ConfirmationCardStatus.confirmed,
+        created_at=datetime.now(UTC),
+    )
+    confirm_card = ScheduleConfirmationCard(
+        id="confirm-confirmed-card",
+        student_id="test-student-id",
+        teacher_id="teacher-001",
+        subscription_id="sub-confirm-confirmed-001",
+        card_type="afterTrial",
+        title="Confirmed schedule",
+        status=ConfirmationCardStatus.confirmed,
+        created_at=datetime.now(UTC),
+    )
+    db_session.add_all([status_card, confirm_card])
+    await db_session.flush()
+
+    status_response = await client.patch(
+        "/api/v1/schedule/confirmation-cards/status-confirmed-card/status",
+        headers=student_auth_headers,
+        json={"status": "dismissed"},
+    )
+    confirm_response = await client.patch(
+        "/api/v1/schedule/confirmation-cards/confirm-confirmed-card/confirm",
+        headers=student_auth_headers,
+        json={"action": "dismissed"},
+    )
+
+    assert status_response.status_code == 400
+    assert confirm_response.status_code == 400
+    await db_session.refresh(status_card)
+    await db_session.refresh(confirm_card)
+    assert status_card.status == ConfirmationCardStatus.confirmed
+    assert confirm_card.status == ConfirmationCardStatus.confirmed
+
+
+@pytest.mark.asyncio
 async def test_dismiss_all_only_updates_visible_pending_cards(
     client: AsyncClient,
     create_test_user,
