@@ -106,7 +106,7 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(0, 'I', '홈'),
-              _buildNavItem(1, 'II', '스케줄'),
+              _buildNavItem(1, 'II', '레슨'),
               // Center practice button (same level as other items)
               const PracticeCenterButton(size: 48),
               _buildNavItem(2, 'III', '연습'),
