@@ -14,6 +14,7 @@ from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
     ConfirmPaymentRequest,
+    NotifyPaymentRequest,
     ProposalConfirmRequest,
     ProposalRespondRequest,
     SubscriptionCreate,
@@ -59,6 +60,7 @@ async def list_subscriptions(
     membership_id: str | None = None,
     teacher_id: str | None = None,
     payment_confirmed: str | None = None,
+    deposit_status: str | None = None,
     sub_status: Annotated[str | None, Query(alias="status")] = None,
 ) -> PaginatedResponse[SubscriptionResponse]:
     """List subscriptions with optional filters."""
@@ -72,6 +74,7 @@ async def list_subscriptions(
         membership_id=membership_id,
         teacher_id=teacher_id,
         payment_confirmed=payment_confirmed,
+        deposit_status=deposit_status,
         status=sub_status,
     )
 
@@ -285,6 +288,23 @@ async def confirm_payment(
     """Mark a subscription as paid."""
     service = SubscriptionService(db)
     return await service.confirm_payment(subscription_id, body, current_user)
+
+
+@router.patch(
+    "/{subscription_id}/notify-payment",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Notify external tuition deposit",
+)
+async def notify_payment(
+    subscription_id: str,
+    body: NotifyPaymentRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SubscriptionResponse:
+    """Record a student or parent external deposit notification."""
+    service = SubscriptionService(db)
+    return await service.notify_payment(subscription_id, body, current_user)
 
 
 # ---------------------------------------------------------------------------

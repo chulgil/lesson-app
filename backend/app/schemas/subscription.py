@@ -122,6 +122,13 @@ class SubscriptionUpdate(BaseModel):
     original_amount: int | None = None
     reschedule_deadline_hours: int | None = None
 
+    @field_validator("payment_method")
+    @classmethod
+    def validate_current_payment_method(cls, value: str | None) -> str | None:
+        if value == "card":
+            raise ValueError("card/PG payments are not supported for current tuition deposits")
+        return value
+
 
 class UseLessonRequest(BaseModel):
     """Deduct a lesson from a subscription."""
@@ -204,6 +211,19 @@ class SubscriptionUsageCreate(BaseModel):
 
 class ConfirmPaymentRequest(BaseModel):
     """Confirm a manual tuition deposit on a subscription."""
+
+    payment_method: str | None = None
+
+    @field_validator("payment_method")
+    @classmethod
+    def validate_current_payment_method(cls, value: str | None) -> str | None:
+        if value == "card":
+            raise ValueError("card/PG payments are not supported for current tuition deposits")
+        return value
+
+
+class NotifyPaymentRequest(BaseModel):
+    """Notify that an external tuition deposit was made."""
 
     payment_method: str | None = None
 

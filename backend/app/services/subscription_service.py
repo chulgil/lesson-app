@@ -13,6 +13,7 @@ from app.schemas.common import PaginatedResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
     ConfirmPaymentRequest,
+    NotifyPaymentRequest,
     ProposalRespondRequest,
     SubscriptionCreate,
     SubscriptionProposalCreate,
@@ -48,6 +49,7 @@ class SubscriptionService:
         membership_id: str | None = None,
         teacher_id: str | None = None,
         payment_confirmed: str | None = None,
+        deposit_status: str | None = None,
         status: str | None = None,
     ) -> PaginatedResponse[SubscriptionResponse]:
         """List subscriptions with filters."""
@@ -85,6 +87,26 @@ class SubscriptionService:
         if payment_confirmed is not None:
             confirmed = payment_confirmed.lower() not in ("false", "0", "no")
             query = query.where(Subscription.payment_confirmed == confirmed)
+        if deposit_status:
+            if deposit_status == "unpaid":
+                query = query.where(
+                    Subscription.status == "active",
+                    Subscription.payment_confirmed.is_(False),
+                    Subscription.paid_at.is_(None),
+                )
+            elif deposit_status == "needsConfirmation":
+                query = query.where(
+                    Subscription.status == "active",
+                    Subscription.payment_confirmed.is_(False),
+                    Subscription.paid_at.is_not(None),
+                )
+            elif deposit_status == "confirmed":
+                query = query.where(Subscription.payment_confirmed.is_(True))
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid deposit_status",
+                )
         if teacher_id:
             if role == "teacher":
                 query = query.where(LessonClass.teacher_id == teacher_id)
@@ -557,9 +579,33 @@ class SubscriptionService:
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
         sub.payment_confirmed = True
+        if sub.paid_at is None:
+            sub.paid_at = datetime.now(UTC)
         sub.payment_confirmed_at = datetime.now(UTC)
         if data.payment_method:
             sub.payment_method = PaymentMethod(data.payment_method)
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return SubscriptionResponse.model_validate(sub)
+
+    async def notify_payment(
+        self,
+        subscription_id: str,
+        data: NotifyPaymentRequest,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """Record that a student or parent reports an external tuition deposit."""
+        from app.models.subscription import PaymentMethod
+
+        sub = await self._get_subscription_for_user(subscription_id, current_user)
+        if sub.payment_confirmed:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment already confirmed",
+            )
+        if data.payment_method:
+            sub.payment_method = PaymentMethod(data.payment_method)
+        sub.paid_at = datetime.now(UTC)
         await self.db.flush()
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)

@@ -82,6 +82,196 @@ async def test_create_subscription_preserves_pending_deposit_status(
 
 
 @pytest.mark.asyncio
+async def test_subscription_deposit_status_filters_follow_external_deposit_policy(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Subscription list filters distinguish unpaid, notified, and confirmed external deposits."""
+    from datetime import UTC, datetime
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session, teacher_id="test-user-id-prof")
+
+    unpaid = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+        },
+    )
+    assert unpaid.status_code == 201
+    notified = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+            "paid_at": datetime(2026, 5, 5, tzinfo=UTC).isoformat(),
+        },
+    )
+    assert notified.status_code == 201
+    confirmed = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": True,
+            "paid_at": datetime(2026, 5, 5, tzinfo=UTC).isoformat(),
+            "payment_confirmed_at": datetime(2026, 5, 6, tzinfo=UTC).isoformat(),
+        },
+    )
+    assert confirmed.status_code == 201
+
+    unpaid_list = await client.get(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        params={"deposit_status": "unpaid"},
+    )
+    needs_confirmation_list = await client.get(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        params={"deposit_status": "needsConfirmation"},
+    )
+    confirmed_list = await client.get(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        params={"deposit_status": "confirmed"},
+    )
+
+    assert [item["id"] for item in unpaid_list.json()["items"]] == [unpaid.json()["id"]]
+    assert [item["id"] for item in needs_confirmation_list.json()["items"]] == [notified.json()["id"]]
+    assert [item["id"] for item in confirmed_list.json()["items"]] == [confirmed.json()["id"]]
+    assert needs_confirmation_list.json()["items"][0]["payment_status"] == "needsConfirmation"
+
+
+@pytest.mark.asyncio
+async def test_student_and_parent_can_notify_external_deposit_without_payments_api(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """External tuition deposit notification stays on subscriptions, not /payments."""
+    from app.models.parent import Parent, ParentChildRelation
+    from app.models.student import Student
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="student-user-id",
+        role="student",
+        name="Student",
+        email="student-notify@test.com",
+    )
+    await create_test_user(
+        user_id="parent-user-id",
+        role="parent",
+        name="Parent",
+        email="parent-notify@test.com",
+    )
+    membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id-prof",
+        student_id="student-profile-id",
+    )
+    db_session.add_all(
+        [
+            Student(id="student-profile-id", user_id="student-user-id", teacher_id="test-user-id-prof", name="Student"),
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="student-profile-id"),
+        ]
+    )
+    await db_session.flush()
+
+    create_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-profile-id",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+            "payment_method": "bankTransfer",
+        },
+    )
+    assert create_response.status_code == 201
+    sub_id = create_response.json()["id"]
+
+    student_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'student-user-id', 'role': 'student'})}"
+    }
+    parent_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'parent-user-id', 'role': 'parent'})}"
+    }
+
+    student_notify = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/notify-payment",
+        headers=student_headers,
+        json={"payment_method": "bankTransfer"},
+    )
+    assert student_notify.status_code == 200
+    assert student_notify.json()["payment_confirmed"] is False
+    assert student_notify.json()["paid_at"] is not None
+    assert student_notify.json()["payment_status"] == "needsConfirmation"
+
+    parent_notify = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/notify-payment",
+        headers=parent_headers,
+        json={"payment_method": "cash"},
+    )
+    assert parent_notify.status_code == 200
+
+    openapi = await client.get("/openapi.json")
+    assert not any(path.startswith("/api/v1/payments") for path in openapi.json()["paths"])
+
+
+@pytest.mark.asyncio
+async def test_subscription_deposit_status_rejects_card_pg_method(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Current tuition deposits must not accept card/PG-style payment methods."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    create_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "monthly",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+        },
+    )
+    assert create_response.status_code == 201
+
+    notify_response = await client.patch(
+        f"/api/v1/subscriptions/{create_response.json()['id']}/notify-payment",
+        headers=auth_headers,
+        json={"payment_method": "card"},
+    )
+    assert notify_response.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_list_subscriptions(client: AsyncClient, auth_headers, create_test_user):
     """GET /api/v1/subscriptions returns a paginated list."""
     await create_test_user(user_id="test-user-id", role="teacher")
