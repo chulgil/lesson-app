@@ -155,6 +155,7 @@ class _SuggestAlternativeScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
           AppStrings.counterPropose,
@@ -198,11 +199,10 @@ class _SuggestAlternativeScreenState
           // Suggested slots list (hidden in accept mode)
           if (_suggestedSlots.isNotEmpty && !_isAcceptMode)
             _buildSuggestedSlotsList(),
-
-          // Bottom section: message + buttons
-          _buildBottomSection(),
         ],
       ),
+      // Bottom section as bottomNavigationBar — stays above keyboard
+      bottomNavigationBar: _buildBottomSection(),
     );
   }
 
@@ -372,72 +372,76 @@ class _SuggestAlternativeScreenState
   }
 
   /// Bottom section with message input and action buttons.
+  /// Rendered as [bottomNavigationBar] so it stays above the keyboard.
   Widget _buildBottomSection() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.space3,
-        AppSpacing.screenPadding,
-        MediaQuery.of(context).padding.bottom + AppSpacing.space4,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Message input (same style as chat input)
-          TextField(
-            controller: _messageController,
-            maxLines: _isAcceptMode ? 2 : 8,
-            minLines: 1,
-            maxLength: 200,
-            style: AppTypography.bodySmall,
-            decoration: InputDecoration(
-              hintText:
-                  _isAcceptMode
-                      ? AppStrings.acceptMessageHint
-                      : AppStrings.messageHint,
-              hintStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-              counterText: '',
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.inkQuaternary),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.inkQuaternary),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.ink),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.screenPadding,
+          AppSpacing.space3,
+          AppSpacing.screenPadding,
+          AppSpacing.space4,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Message input (same style as chat input)
+            TextField(
+              controller: _messageController,
+              maxLines: _isAcceptMode ? 2 : 3,
+              minLines: 1,
+              maxLength: 200,
+              style: AppTypography.bodySmall,
+              decoration: InputDecoration(
+                hintText:
+                    _isAcceptMode
+                        ? AppStrings.acceptMessageHint
+                        : AppStrings.messageHint,
+                hintStyle: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+                counterText: '',
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2,
+                ),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: AppColors.ink),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space2),
 
-          // Action buttons
-          _isAcceptMode
-              ? _buildAcceptButton(
-                ref
-                        .watch(
-                          weekLessonsWithPreviewProvider((
-                            weekStart: _weekStart,
-                            teacherId: _effectiveTeacherId,
-                          )),
-                        )
-                        .valueOrNull ??
-                    [],
-              )
-              : _buildProposeButtons(),
-        ],
+            // Action buttons
+            _isAcceptMode
+                ? _buildAcceptButton(
+                  ref
+                          .watch(
+                            weekLessonsWithPreviewProvider((
+                              weekStart: _weekStart,
+                              teacherId: _effectiveTeacherId,
+                            )),
+                          )
+                          .valueOrNull ??
+                      [],
+                )
+                : _buildProposeButtons(),
+          ],
+        ),
       ),
     );
   }
