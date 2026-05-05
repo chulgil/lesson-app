@@ -6,7 +6,7 @@ import secrets
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -140,6 +140,7 @@ class RelationshipService:
     async def get_notification_settings(self, user_id: str, target_user_id: str, current_user: Any) -> Any:
         """Return notification settings for a user/target pair, creating defaults when absent."""
         self._assert_notification_settings_owner(user_id, current_user)
+        await self._assert_notification_settings_target_access(user_id, target_user_id)
         from app.models.settings import NotificationSettings
 
         settings = await self.db.scalar(
@@ -189,6 +190,61 @@ class RelationshipService:
     def _assert_notification_settings_owner(self, user_id: str, current_user: Any) -> None:
         if user_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot manage another user's settings")
+
+    async def _assert_notification_settings_target_access(self, user_id: str, target_user_id: str) -> None:
+        """Require an active teacher-student relation before creating target settings."""
+        if user_id == target_user_id:
+            return
+
+        if await self._has_active_teacher_student_relation(user_id, target_user_id):
+            return
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot manage notification settings for an unrelated target",
+        )
+
+    async def _has_active_teacher_student_relation(self, user_id: str, target_user_id: str) -> bool:
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+
+        user_teacher_ids = await self._teacher_relation_ids_for_user(user_id)
+        target_teacher_ids = await self._teacher_relation_ids_for_user(target_user_id)
+        user_student_ids = await self._student_relation_ids_for_user(user_id)
+        target_student_ids = await self._student_relation_ids_for_user(target_user_id)
+
+        relation_id = await self.db.scalar(
+            select(TeacherStudentRelation.id)
+            .where(
+                TeacherStudentRelation.status == RelationStatus.active,
+                or_(
+                    and_(
+                        TeacherStudentRelation.teacher_id.in_(user_teacher_ids),
+                        TeacherStudentRelation.student_id.in_(target_student_ids),
+                    ),
+                    and_(
+                        TeacherStudentRelation.teacher_id.in_(target_teacher_ids),
+                        TeacherStudentRelation.student_id.in_(user_student_ids),
+                    ),
+                ),
+            )
+            .limit(1)
+        )
+        return relation_id is not None
+
+    async def _teacher_relation_ids_for_user(self, user_id: str) -> set[str]:
+        teacher_ids = {user_id}
+        teacher_id = await try_resolve_teacher_id(self.db, user_id)
+        if teacher_id is not None:
+            teacher_ids.add(teacher_id)
+        return teacher_ids
+
+    async def _student_relation_ids_for_user(self, user_id: str) -> set[str]:
+        from app.models.student import Student
+
+        student_ids = {user_id}
+        result = await self.db.scalars(select(Student.id).where(Student.user_id == user_id))
+        student_ids.update(result.all())
+        return student_ids
 
     async def follow(self, following_id: str, target_type: str, current_user: Any) -> Any:
         """Follow a user."""
