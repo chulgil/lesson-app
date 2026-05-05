@@ -458,6 +458,16 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 전체 읽음 | `PATCH /notifications/read-all` |
 | 미읽음 수 | `GET /notifications/unread-count` |
 
+#### 읽음 상태 계약
+
+> 2026-05-05 백엔드 계약 고정: 빨간 뱃지와 알림 행의 미읽음 표시는 모두 `notifications.read_at` 하나를 기준으로 한다.
+
+- 알림센터 행의 미읽음 표시는 `readAt == null`일 때만 표시한다.
+- 앱바 붉은 뱃지는 `GET /notifications/unread-count`의 `count > 0`일 때만 표시한다.
+- `GET /notifications` 응답은 `id`, `user_id`, `type`, `priority`, `title`, `body`, `data`, `created_at`, `scheduled_at`, `sent_at`, `read_at`, `is_read`, `is_push`, `is_in_app`, `action_url`, `action_label`을 포함한다.
+- `PATCH /notifications/{id}/read`는 현재 사용자 소유 알림만 처리한다. 이미 읽은 알림은 기존 `read_at`을 보존한다.
+- `PATCH /notifications/read-all`은 현재 사용자 미읽음 알림만 일괄 갱신하며 다른 사용자 알림은 변경하지 않는다.
+
 ---
 
 ## 5. 구현 파일 위치

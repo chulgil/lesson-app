@@ -108,8 +108,17 @@ class AppNotification {
   final DateTime? readAt;               // 읽음 시간
   final bool isPush;                    // 푸시 알림 여부
   final bool isInApp;                   // 인앱 알림 여부
+  final String? actionUrl;              // 탭 시 이동할 딥링크
+  final String? actionLabel;            // 액션 버튼 텍스트
 }
 ```
+
+백엔드 원격 계약:
+
+- `readAt == null`이면 미읽음, `readAt != null`이면 읽음이다.
+- `isRead`는 백엔드 응답 편의 필드이며 `readAt != null`과 항상 같은 의미여야 한다.
+- 붉은 뱃지는 `GET /api/v1/notifications/unread-count`의 `count`로 계산한다.
+- 단건/전체 읽음 API는 현재 사용자 범위에서만 `read_at`을 갱신한다.
 
 ---
 

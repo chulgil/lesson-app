@@ -127,6 +127,20 @@ app/
 | Auth (JWT + OAuth) | ✅ 완성 | 자체 JWT + Google/Kakao/Apple OAuth 2.0 |
 | Backend Architecture Contract | ✅ 연결 | Router 직접 DB 접근 금지, `/payments/*` 금지, lower-layer API import 금지 |
 
+### 알림 API 계약 (2026-05-05)
+
+프론트 `RemoteNotificationRepository`와 백엔드 `/api/v1/notifications`는 다음 계약을 따른다.
+
+| 기능 | 백엔드 기준 |
+|------|-------------|
+| 목록 | `GET /api/v1/notifications`, 현재 사용자 알림만 페이지네이션으로 반환 |
+| 필터 | `is_read=true/false`, `type=<notificationType>` |
+| 응답 필드 | `id`, `user_id`, `type`, `priority`, `title`, `body`, `data`, `created_at`, `scheduled_at`, `sent_at`, `read_at`, `is_read`, `is_push`, `is_in_app`, `action_url`, `action_label` |
+| 미읽음 판단 | DB `notifications.read_at IS NULL` |
+| 붉은 뱃지 | `GET /api/v1/notifications/unread-count`의 `count > 0` |
+| 단건 읽음 | `PATCH /api/v1/notifications/{id}/read`, 현재 사용자 소유 알림만 허용, 기존 `read_at` 보존 |
+| 전체 읽음 | `PATCH /api/v1/notifications/read-all`, 현재 사용자 미읽음 알림만 갱신 |
+
 ### 향후 항목
 
 1. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환) — 프론트엔드 작업

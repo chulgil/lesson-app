@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 from typing import Any
-
-from datetime import datetime, timezone
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select, update
@@ -69,7 +68,8 @@ class NotificationService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
         if notif.user_id != user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your notification")
-        notif.read_at = datetime.now(timezone.utc)
+        if notif.read_at is None:
+            notif.read_at = datetime.now(UTC)
         await self.db.flush()
 
     async def mark_all_read(self, user_id: str) -> None:
@@ -79,7 +79,7 @@ class NotificationService:
         await self.db.execute(
             update(Notification)
             .where(Notification.user_id == user_id, Notification.read_at.is_(None))
-            .values(read_at=datetime.now(timezone.utc))
+            .values(read_at=datetime.now(UTC))
         )
         await self.db.flush()
 
@@ -116,7 +116,7 @@ class NotificationService:
         """
         from app.models.notification import Notification
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         notification = Notification(
             user_id=user_id,
