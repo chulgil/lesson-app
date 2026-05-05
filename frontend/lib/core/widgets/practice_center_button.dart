@@ -61,15 +61,24 @@ class _PracticeCenterButtonState extends State<PracticeCenterButton> {
       onTapCancel: () => setState(() => _isPressed = false),
       onLongPress: _onLongPress,
       child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
+        scale: _isPressed ? 0.92 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
           width: widget.size,
           height: widget.size,
           decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft,
-            borderRadius: BorderRadius.zero,
+            color: AppColors.paperAccent,
+            border: Border.all(
+              color: AppColors.ink.withValues(alpha: 0.15),
+              width: 2,
+            ),
           ),
+          foregroundDecoration:
+              _isPressed
+                  ? BoxDecoration(
+                    color: AppColors.ink.withValues(alpha: 0.1),
+                  )
+                  : null,
           child: Center(
             child: SvgPicture.string(
               _metronomeIconSvg,
