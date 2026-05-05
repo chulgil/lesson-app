@@ -75,6 +75,7 @@ async def create_review(
 @router.put(
     "/{review_id}",
     response_model=TeacherReviewResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update a review",
 )
 async def update_review(

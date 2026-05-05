@@ -57,6 +57,7 @@ async def create_exception(
 @router.put(
     "/{exception_id}",
     response_model=ScheduleExceptionResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update a schedule exception",
     operation_id="update_schedule_exception_legacy",
 )

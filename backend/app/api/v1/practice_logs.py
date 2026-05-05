@@ -121,6 +121,7 @@ async def get_practice_log_by_id(
 @router.put(
     "/{log_id}",
     response_model=PracticeLogResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update practice log",
 )
 async def update_practice_log(
@@ -151,6 +152,7 @@ async def delete_practice_log(
 @router.patch(
     "/{log_id}/tasks/{task_id}/toggle",
     response_model=PracticeLogResponse,
+    status_code=status.HTTP_200_OK,
     summary="Toggle task completion",
 )
 async def toggle_task(

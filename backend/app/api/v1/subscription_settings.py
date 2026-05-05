@@ -66,6 +66,7 @@ async def create_subscription_settings(
 @router.put(
     "/{settings_id}",
     response_model=SubscriptionSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update subscription settings",
 )
 async def update_subscription_settings(

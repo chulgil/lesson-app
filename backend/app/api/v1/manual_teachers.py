@@ -59,7 +59,7 @@ async def get_manual_teacher(
     return await service.get_manual_teacher(teacher_id, current_user)
 
 
-@router.put("/{teacher_id}", response_model=ManualTeacherResponse)
+@router.put("/{teacher_id}", response_model=ManualTeacherResponse, status_code=status.HTTP_200_OK)
 async def update_manual_teacher(
     teacher_id: str,
     body: ManualTeacherUpdate,

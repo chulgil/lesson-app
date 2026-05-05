@@ -55,6 +55,7 @@ async def create_availability(
 @router.put(
     "/{availability_id}",
     response_model=TeacherAvailabilityResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update teacher availability",
 )
 async def update_availability(

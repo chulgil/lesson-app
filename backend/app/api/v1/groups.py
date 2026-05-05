@@ -70,6 +70,7 @@ async def create_group_schedule(
 @router.patch(
     "/schedules/{schedule_id}/cancel",
     response_model=GroupClassScheduleResponse,
+    status_code=status.HTTP_200_OK,
     summary="Cancel a group class schedule",
 )
 async def cancel_group_schedule(
@@ -154,6 +155,7 @@ async def create_group_booking(
 @router.patch(
     "/bookings/{booking_id}/cancel",
     response_model=GroupClassBookingResponse,
+    status_code=status.HTTP_200_OK,
     summary="Cancel a group booking",
 )
 async def cancel_group_booking(
@@ -170,6 +172,7 @@ async def cancel_group_booking(
 @router.patch(
     "/bookings/{booking_id}/attendance",
     response_model=GroupClassBookingResponse,
+    status_code=status.HTTP_200_OK,
     summary="Mark attendance",
 )
 async def mark_attendance(
@@ -200,6 +203,7 @@ async def list_schedule_bookings(
 @router.post(
     "/bookings/promote",
     response_model=GroupClassBookingResponse | None,
+    status_code=status.HTTP_200_OK,
     summary="Promote next waitlisted booking",
 )
 async def promote_from_waitlist(
@@ -216,6 +220,7 @@ async def promote_from_waitlist(
 @router.post(
     "/bookings/auto-cancel-waitlist",
     response_model=list[GroupClassBookingResponse],
+    status_code=status.HTTP_200_OK,
     summary="Auto-cancel expired waitlist entries",
 )
 async def auto_cancel_waitlist(
@@ -232,6 +237,7 @@ async def auto_cancel_waitlist(
 @router.post(
     "/bookings/batch-attendance",
     response_model=list[GroupClassBookingResponse],
+    status_code=status.HTTP_200_OK,
     summary="Mark attendance for multiple bookings",
 )
 async def batch_attendance(
@@ -246,6 +252,7 @@ async def batch_attendance(
 @router.patch(
     "/bookings/{booking_id}/deduct",
     response_model=GroupClassBookingResponse,
+    status_code=status.HTTP_200_OK,
     summary="Deduct subscription credit for a booking",
 )
 async def deduct_subscription(

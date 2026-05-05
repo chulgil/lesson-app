@@ -87,6 +87,7 @@ async def get_invite_by_code(
 @router.patch(
     "/{invite_id}/revoke",
     response_model=InviteResponse,
+    status_code=status.HTTP_200_OK,
     summary="Revoke invite",
 )
 async def revoke_invite(
@@ -168,6 +169,7 @@ async def list_pending_requests(
 @router.patch(
     "/connection-requests/{request_id}/respond",
     response_model=ConnectionRequestResponse,
+    status_code=status.HTTP_200_OK,
     summary="Respond to connection request",
 )
 async def respond_to_request(
@@ -186,6 +188,7 @@ async def respond_to_request(
 @router.patch(
     "/connection-requests/{request_id}/cancel",
     response_model=ConnectionRequestResponse,
+    status_code=status.HTTP_200_OK,
     summary="Cancel a sent connection request",
 )
 async def cancel_request(
@@ -227,6 +230,7 @@ async def list_connections(
 @router.patch(
     "/connections/{connection_id}/reactivate",
     response_model=ConnectionResponse,
+    status_code=status.HTTP_200_OK,
     summary="Reactivate connection",
 )
 async def reactivate_connection(

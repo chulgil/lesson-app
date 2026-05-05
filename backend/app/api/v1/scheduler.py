@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db, require_internal_api_key
@@ -18,6 +18,7 @@ router = APIRouter(dependencies=[Depends(require_internal_api_key)])
 
 @router.post(
     "/attendance/notify-unconfirmed",
+    status_code=status.HTTP_200_OK,
     summary="Notify unconfirmed lessons (30min+)",
 )
 async def notify_unconfirmed(
@@ -31,6 +32,7 @@ async def notify_unconfirmed(
 
 @router.post(
     "/attendance/auto-complete",
+    status_code=status.HTTP_200_OK,
     summary="Auto-complete expired lessons (24h+)",
 )
 async def auto_complete(
@@ -44,6 +46,7 @@ async def auto_complete(
 
 @router.post(
     "/attendance/detect-absence-patterns",
+    status_code=status.HTTP_200_OK,
     summary="Detect absence patterns (2+ in 14 days)",
 )
 async def detect_absences(
@@ -57,6 +60,7 @@ async def detect_absences(
 
 @router.post(
     "/attendance/run-all",
+    status_code=status.HTTP_200_OK,
     summary="Run all attendance automation tasks",
 )
 async def run_all(

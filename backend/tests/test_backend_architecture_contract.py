@@ -30,6 +30,7 @@ SQLALCHEMY_QUERY_IMPORTS = {
     "select",
     "update",
 }
+MUTATING_HTTP_METHODS = {"post", "put", "patch", "delete"}
 PUBLIC_API_OPERATIONS = {
     ("POST", "/api/v1/auth/oauth/{provider}"),
     ("POST", "/api/v1/auth/dev-login"),
@@ -62,6 +63,32 @@ def test_api_routers_do_not_run_database_queries_directly() -> None:
             if isinstance(node, ast.Attribute) and node.attr in DB_METHODS:
                 if isinstance(node.value, ast.Name) and node.value.id in {"db", "session"}:
                     violations.append(f"{_module_path(path)} calls {node.value.id}.{node.attr}()")
+
+    assert violations == []
+
+
+def test_mutating_api_routes_declare_status_codes() -> None:
+    """POST, PUT, PATCH, and DELETE routes should not rely on FastAPI's default 200."""
+    violations: list[str] = []
+    for path in _python_files(API_V1_ROOT):
+        if path.name == "__init__.py":
+            continue
+        tree = ast.parse(path.read_text())
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.AsyncFunctionDef | ast.FunctionDef):
+                continue
+            for decorator in node.decorator_list:
+                if not isinstance(decorator, ast.Call) or not isinstance(decorator.func, ast.Attribute):
+                    continue
+                method = decorator.func.attr
+                if method not in MUTATING_HTTP_METHODS:
+                    continue
+                if any(keyword.arg == "status_code" for keyword in decorator.keywords):
+                    continue
+                route_path = "<unknown>"
+                if decorator.args and isinstance(decorator.args[0], ast.Constant):
+                    route_path = str(decorator.args[0].value)
+                violations.append(f"{_module_path(path)}:{node.lineno} @{method}({route_path})")
 
     assert violations == []
 

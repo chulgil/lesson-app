@@ -73,6 +73,7 @@ async def get_public_teacher_settings(
 @router.put(
     "/teacher",
     response_model=TeacherSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update teacher settings",
 )
 async def update_teacher_settings(
@@ -109,6 +110,7 @@ async def get_subscription_settings(
 @router.put(
     "/subscription",
     response_model=SubscriptionSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update subscription settings",
 )
 async def update_subscription_settings(
@@ -145,6 +147,7 @@ async def get_proposal_settings(
 @router.put(
     "/proposal",
     response_model=ProposalSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update proposal settings",
 )
 async def update_proposal_settings(
@@ -182,6 +185,7 @@ async def get_notification_settings(
 @router.put(
     "/notification/{target_user_id}",
     response_model=NotificationSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update notification settings for a target",
 )
 async def update_notification_settings(
@@ -236,6 +240,7 @@ async def create_feedback_preset(
 @router.put(
     "/feedback-presets/{preset_id}",
     response_model=FeedbackPresetResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update feedback preset",
 )
 async def update_feedback_preset(
@@ -327,6 +332,7 @@ async def get_teaching_resource(
 @router.put(
     "/teaching-resources/{resource_id}",
     response_model=TeachingResourceResponse,
+    status_code=status.HTTP_200_OK,
     summary="Update teaching resource",
 )
 async def update_teaching_resource(
