@@ -834,6 +834,144 @@ async def test_linked_student_user_can_read_profile_subscription(
 
 
 @pytest.mark.asyncio
+async def test_parent_can_read_linked_child_subscription_history_and_events(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """A linked parent can read child subscriptions and related read-only history."""
+    from app.models.parent import Parent, ParentChildRelation
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="parent-user-id",
+        role="parent",
+        name="Parent",
+        email="parent-subscription@test.com",
+    )
+    parent = Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent")
+    relation = ParentChildRelation(parent_id="parent-profile-id", student_id="student-001")
+    db_session.add_all([parent, relation])
+    await db_session.flush()
+    membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id",
+        student_id="student-001",
+    )
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+
+    usage = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/usage",
+        headers=auth_headers,
+        json={"lesson_id": "lesson-001", "type": "lesson"},
+    )
+    assert usage.status_code == 201
+    event = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChangeProposed",
+            "subscription_id": sub_id,
+            "session_number": 1,
+            "suggested_slots": [{"id": "slot-a", "dayOfWeek": 2, "startTime": "15:00", "endTime": "16:00"}],
+        },
+    )
+    assert event.status_code == 201
+    parent_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'parent-user-id', 'role': 'parent'})}"
+    }
+
+    listed = await client.get(
+        "/api/v1/subscriptions",
+        headers=parent_headers,
+        params={"student_id": "student-001"},
+    )
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 1
+    assert listed.json()["items"][0]["id"] == sub_id
+
+    detail = await client.get(f"/api/v1/subscriptions/{sub_id}", headers=parent_headers)
+    assert detail.status_code == 200
+    assert detail.json()["id"] == sub_id
+
+    usage_history = await client.get(f"/api/v1/subscriptions/{sub_id}/usage", headers=parent_headers)
+    assert usage_history.status_code == 200
+    assert usage_history.json()["items"][0]["lesson_id"] == "lesson-001"
+
+    events = await client.get(f"/api/v1/subscriptions/{sub_id}/events", headers=parent_headers)
+    assert events.status_code == 200
+    assert events.json()[0]["event_type"] == "scheduleChangeProposed"
+
+
+@pytest.mark.asyncio
+async def test_parent_cannot_read_unlinked_child_subscription(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """A parent cannot read subscriptions for a child without an active relation."""
+    from app.models.parent import Parent
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="parent-user-id",
+        role="parent",
+        name="Parent",
+        email="parent-unlinked-subscription@test.com",
+    )
+    db_session.add(Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"))
+    await db_session.flush()
+    membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id",
+        student_id="student-001",
+    )
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+    parent_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'parent-user-id', 'role': 'parent'})}"
+    }
+
+    listed = await client.get(
+        "/api/v1/subscriptions",
+        headers=parent_headers,
+        params={"student_id": "student-001"},
+    )
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 0
+    assert (await client.get(f"/api/v1/subscriptions/{sub_id}", headers=parent_headers)).status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_subscription_remaining_lessons_matches_frontend_hybrid_calculation(
     client: AsyncClient,
     auth_headers,

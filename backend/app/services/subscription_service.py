@@ -58,6 +58,8 @@ class SubscriptionService:
         role = self._actor_type(user)
         if role == "student":
             query = query.where(Subscription.student_id.in_(await self._student_identifiers(user)))
+        elif role == "parent":
+            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(user)))
         elif role == "teacher":
             identifiers = await self._teacher_identifiers(user)
             query = (
@@ -392,6 +394,10 @@ class SubscriptionService:
             student_ids = await self._student_identifiers(current_user)
             if sub.student_id in student_ids:
                 return sub
+        elif role == "parent":
+            student_ids = await self._parent_child_student_ids(current_user)
+            if sub.student_id in student_ids:
+                return sub
 
         if role == "teacher":
             identifiers = [current_user.id]
@@ -430,6 +436,22 @@ class SubscriptionService:
             if student_id not in identifiers:
                 identifiers.append(student_id)
         return identifiers
+
+    async def _parent_child_student_ids(self, user: Any) -> list[str]:
+        """Return active child Student ids for a parent user."""
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == user.id))
+        if parent_id is None:
+            return []
+
+        result = await self.db.scalars(
+            select(ParentChildRelation.student_id).where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        return list(result.all())
 
     def _remaining_lessons(self, sub: Any) -> int | None:
         type_value = getattr(sub.type, "value", sub.type)
