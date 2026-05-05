@@ -108,7 +108,11 @@ feature root에 facade를 둘 수 있지만 다음 중 하나로 명시한다.
 
 - `feature/<name>_facade.dart`: 다른 feature가 사용할 public API만 export한다.
 - 내부 presentation provider/widget을 직접 export하는 facade는 legacy API로 보고 새 코드에서는 추가하지 않는다.
-- cross-feature 접근은 facade 또는 domain contract를 통해 한다. 다른 feature의 presentation provider를 직접 import하는 패턴은 후속 리팩토링 대상이다.
+- cross-feature 접근은 facade, domain contract, application service, shared core provider 중 하나를 통해 한다.
+- 새 코드에서 다른 feature의 `presentation/providers`를 직접 import/export하지 않는다.
+- 기존 cross-feature presentation provider import는 `frontend/test/architecture/feature_dependency_contract_test.dart`의 legacy baseline에만 남긴다.
+- legacy import를 제거하면 baseline도 함께 줄인다. 새 baseline 항목 추가는 architecture debt 증가로 보고 별도 이슈와 설계 사유가 필요하다.
+- 특정 feature의 상태/행동을 외부에서 재사용해야 하면 먼저 그 feature의 public API를 정의한다. public API는 UI widget 내부 provider가 아니라 domain-facing DTO, usecase, facade method, 또는 좁은 read-only provider로 노출한다.
 
 ## UI Text and i18n
 
@@ -144,6 +148,12 @@ core/startup/
 - domain service에서 framework driver/API/environment import 금지
 - repository interface와 implementation 위치 규칙
 - `EnvironmentConfig.useMockData` 직접 분기의 허용 위치
+
+`frontend/test/architecture/feature_dependency_contract_test.dart`가 다음을 검사한다.
+
+- 다른 feature의 `presentation/providers` 직접 import/export는 legacy baseline에 명시된 항목만 허용
+- baseline에 없는 새 cross-feature presentation provider 의존 추가 금지
+- 제거된 legacy 의존은 baseline에서도 제거하도록 강제
 
 검증 명령:
 
