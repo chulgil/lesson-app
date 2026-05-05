@@ -14,7 +14,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
@@ -217,16 +216,12 @@ class _StudentDetailContent extends ConsumerWidget {
   }
 
   void _showMoreOptions(BuildContext context, WidgetRef ref) {
-    showNotebookModalBottomSheet<void>(
+    showNotebookBottomSheet<void>(
       context: context,
       builder:
-          (context) => SafeArea(
-            child: Column(
+          (context) => Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: AppSpacing.space2),
-                const BottomSheetHandle(margin: EdgeInsets.zero),
-                const SizedBox(height: AppSpacing.space4),
                 _MoreOptionTile(
                   icon: Icons.edit_outlined,
                   title: AppStrings.studentEditInfoTitle,
@@ -364,7 +359,6 @@ class _StudentDetailContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
               ],
             ),
-          ),
     );
   }
 

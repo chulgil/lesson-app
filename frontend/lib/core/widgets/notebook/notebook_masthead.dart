@@ -22,7 +22,7 @@ class NotebookMasthead extends StatelessWidget {
 
   /// Masthead 상단 여백 — 독립 화면 (push, 자체 SafeArea).
   /// SafeArea top inset 바로 아래이므로 탭보다 넉넉하게.
-  static const double mastheadTopPaddingScreen = 16.0;
+  static const double mastheadTopPaddingScreen = 8.0;
   /// 좌측 로고/라벨 — 대문자 + letterSpacing 5.
   final String eyebrow;
 
