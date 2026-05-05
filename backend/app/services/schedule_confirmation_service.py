@@ -96,14 +96,9 @@ class ScheduleConfirmationService:
 
         query = query.order_by(ScheduleConfirmationCard.created_at.desc())
         result = await self.db.scalars(query)
-        return [
-            ScheduleConfirmationCardResponse.model_validate(card)
-            for card in result.all()
-        ]
+        return [ScheduleConfirmationCardResponse.model_validate(card) for card in result.all()]
 
-    async def get_card_by_id(
-        self, card_id: str, current_user: Any
-    ) -> ScheduleConfirmationCardResponse:
+    async def get_card_by_id(self, card_id: str, current_user: Any) -> ScheduleConfirmationCardResponse:
         """Return a single confirmation card by ID."""
         card = await self._get_card_for_user(card_id, current_user)
         return ScheduleConfirmationCardResponse.model_validate(card)
@@ -114,13 +109,18 @@ class ScheduleConfirmationService:
         """Return a confirmation card by subscription ID."""
         from app.models.policy import ScheduleConfirmationCard
 
-        query = select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == subscription_id)
-        query = await self._apply_access_filter(query, current_user)
-        card = await self.db.scalar(query)
+        card = await self.db.scalar(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == subscription_id)
+        )
         if card is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Schedule confirmation card not found",
+            )
+        if not await self._can_access(card, current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden",
             )
         return ScheduleConfirmationCardResponse.model_validate(card)
 
@@ -202,9 +202,7 @@ class ScheduleConfirmationService:
             card.responded_at = now
 
         await self.db.flush()
-        return ScheduleConfirmationCardDismissAllResponse(
-            message=f"Dismissed {len(cards)} pending card"
-        )
+        return ScheduleConfirmationCardDismissAllResponse(message=f"Dismissed {len(cards)} pending card")
 
     # ------------------------------------------------------------------
     # Private helpers

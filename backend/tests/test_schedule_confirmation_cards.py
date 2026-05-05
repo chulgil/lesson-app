@@ -60,6 +60,96 @@ async def test_confirmation_card_response_includes_flutter_aliases(
 
 
 @pytest.mark.asyncio
+async def test_confirmation_card_response_aliases_fallback_without_proposed_slots(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Response aliases fall back to proposed_* fields when proposed_slots is absent."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(user_id="alias-fallback-teacher", role="teacher", email="alias-fallback-teacher@test.com")
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="card-alias-fallback",
+            student_id="alias-fallback-student",
+            teacher_id="alias-fallback-teacher",
+            subscription_id="sub-alias-fallback",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            proposed_day="4",
+            proposed_time="18:30",
+            proposed_duration=45,
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/confirmation-cards/card-alias-fallback",
+        headers=_headers("alias-fallback-teacher", "teacher"),
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["suggestedDay"] == 4
+    assert body["suggestedTime"] == "18:30"
+    assert body["lessonDuration"] == 45
+    assert body["suggestedDay2"] is None
+    assert body["suggestedTime2"] is None
+    assert body["suggestedDay3"] is None
+    assert body["suggestedTime3"] is None
+
+
+@pytest.mark.asyncio
+async def test_confirmation_card_response_aliases_preserve_only_available_partial_slots(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Partial proposed_slots populate only available suggested* aliases."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(user_id="partial-slots-teacher", role="teacher", email="partial-slots-teacher@test.com")
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="card-partial-slots",
+            student_id="partial-slots-student",
+            teacher_id="partial-slots-teacher",
+            subscription_id="sub-partial-slots",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            proposed_day="1",
+            proposed_time="15:00",
+            proposed_duration=60,
+            proposed_slots=[
+                {"day": 5},
+                {"time": "19:00"},
+            ],
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/confirmation-cards/card-partial-slots",
+        headers=_headers("partial-slots-teacher", "teacher"),
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["suggestedDay"] == 5
+    assert body["suggestedTime"] is None
+    assert body["lessonDuration"] == 60
+    assert body["suggestedDay2"] is None
+    assert body["suggestedTime2"] == "19:00"
+    assert body["suggestedDay3"] is None
+    assert body["suggestedTime3"] is None
+
+
+@pytest.mark.asyncio
 async def test_parent_can_read_linked_child_pending_confirmation_cards(
     client: AsyncClient,
     create_test_user,
@@ -161,6 +251,98 @@ async def test_confirmation_card_lookup_by_subscription_and_status_update(
     assert update.status_code == 200
     assert update.json()["status"] == "changedTime"
     assert update.json()["responded_at"] is not None
+
+
+@pytest.mark.parametrize(
+    ("actor_id", "role", "expected_status"),
+    [
+        ("access-owner-teacher", "teacher", 200),
+        ("access-other-teacher", "teacher", 403),
+        ("access-owner-student", "student", 200),
+        ("access-other-student", "student", 403),
+    ],
+)
+@pytest.mark.asyncio
+async def test_confirmation_card_get_by_id_respects_teacher_and_student_access_filter(
+    actor_id: str,
+    role: str,
+    expected_status: int,
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """GET by card id is visible only to the owning teacher or student."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(user_id="access-owner-teacher", role="teacher", email="access-owner-teacher@test.com")
+    await create_test_user(user_id="access-other-teacher", role="teacher", email="access-other-teacher@test.com")
+    await create_test_user(
+        user_id="access-owner-student",
+        role="student",
+        name="Access Owner Student",
+        email="access-owner-student@test.com",
+    )
+    await create_test_user(
+        user_id="access-other-student",
+        role="student",
+        name="Access Other Student",
+        email="access-other-student@test.com",
+    )
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="access-filter-card",
+            student_id="access-owner-student",
+            teacher_id="access-owner-teacher",
+            subscription_id="sub-access-filter",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/confirmation-cards/access-filter-card",
+        headers=_headers(actor_id, role),
+    )
+
+    assert response.status_code == expected_status
+    if expected_status == 200:
+        assert response.json()["id"] == "access-filter-card"
+
+
+@pytest.mark.asyncio
+async def test_confirmation_card_lookup_by_subscription_rejects_other_teacher(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Lookup by subscription applies the same access filter as card id lookup."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(user_id="by-sub-owner-teacher", role="teacher", email="by-sub-owner-teacher@test.com")
+    await create_test_user(user_id="by-sub-other-teacher", role="teacher", email="by-sub-other-teacher@test.com")
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="by-sub-access-card",
+            student_id="by-sub-access-student",
+            teacher_id="by-sub-owner-teacher",
+            subscription_id="sub-by-sub-access",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/confirmation-cards/by-subscription/sub-by-sub-access",
+        headers=_headers("by-sub-other-teacher", "teacher"),
+    )
+
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio

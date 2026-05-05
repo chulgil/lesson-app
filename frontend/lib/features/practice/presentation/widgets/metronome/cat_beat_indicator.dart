@@ -362,32 +362,35 @@ class _PawPainter extends CustomPainter {
           ..color = _pawColor.withValues(alpha: opacity)
           ..style = PaintingStyle.fill;
 
+    // Ink outline for visibility on paper background
+    final outlinePaint =
+        Paint()
+          ..color = AppColors.ink.withValues(alpha: opacity * 0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2;
+
     // Scale factor to fit paw in given size (SVG viewBox is 24x24)
     final scale = size.width / 24.0;
 
-    // Draw 3 small circles (jelly pads)
-    canvas.drawCircle(Offset(7.6 * scale, 8.3 * scale), 1.65 * scale, pawPaint);
-    canvas.drawCircle(
-      Offset(12.0 * scale, 7.3 * scale),
-      1.75 * scale,
-      pawPaint,
-    );
-    canvas.drawCircle(
-      Offset(16.4 * scale, 8.3 * scale),
-      1.65 * scale,
-      pawPaint,
-    );
+    // Draw 3 small circles (jelly pads) — fill + outline
+    for (final pad in [
+      (Offset(7.6 * scale, 8.3 * scale), 1.65 * scale),
+      (Offset(12.0 * scale, 7.3 * scale), 1.75 * scale),
+      (Offset(16.4 * scale, 8.3 * scale), 1.65 * scale),
+    ]) {
+      canvas.drawCircle(pad.$1, pad.$2, pawPaint);
+      canvas.drawCircle(pad.$1, pad.$2, outlinePaint);
+    }
 
-    // Draw main pad (bean shape)
-    final mainPadPath = Path();
-    mainPadPath.addOval(
-      Rect.fromCenter(
-        center: Offset(12.0 * scale, 14.5 * scale),
-        width: 10.5 * scale,
-        height: 7.5 * scale,
-      ),
+    // Draw main pad (bean shape) — fill + outline
+    final mainPadRect = Rect.fromCenter(
+      center: Offset(12.0 * scale, 14.5 * scale),
+      width: 10.5 * scale,
+      height: 7.5 * scale,
     );
+    final mainPadPath = Path()..addOval(mainPadRect);
     canvas.drawPath(mainPadPath, pawPaint);
+    canvas.drawPath(mainPadPath, outlinePaint);
   }
 
   @override
