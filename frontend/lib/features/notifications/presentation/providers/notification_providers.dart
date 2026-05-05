@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../features/notifications/domain/entities/notification_settings.dart';
 import '../../../../features/notifications/domain/services/practice_reminder_scheduler.dart';
@@ -260,6 +261,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
   // Mock data fallback — filter by role
   await Future.delayed(const Duration(milliseconds: 300));
   final role = ref.watch(currentUserRoleProvider);
+  final isTeacher = role == UserRole.teacher;
   final roleStr =
       role == UserRole.teacher
           ? 'teacher'
@@ -277,12 +279,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.proposalReceived,
       priority: NotificationPriority.high,
-      title: '수강권 제안이 도착했어요!',
-      body: '체험레슨 후 72시간 골든타임 할인 혜택을 확인해보세요',
+      title: AppStrings.notifProposalTitle,
+      body: AppStrings.notifProposalBody,
       createdAt: now.subtract(const Duration(hours: 1)),
       sentAt: now.subtract(const Duration(hours: 1)),
       actionUrl: '/proposals/proposal_auto_1',
-      actionLabel: '제안 확인하기',
+      actionLabel: AppStrings.notifProposalAction,
       data: {
         'proposalId': 'proposal_auto_1',
         'teacherId': 'teacher_1',
@@ -298,12 +300,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.subscriptionExpiringSoon,
       priority: NotificationPriority.high,
-      title: '수강권이 3일 후 만료됩니다',
-      body: '남은 횟수 2회 · 갱신 요청을 보내보세요',
+      title: AppStrings.notifSubExpiringTitle(3),
+      body: AppStrings.notifSubExpiringBody(2),
       createdAt: now.subtract(const Duration(hours: 3)),
       sentAt: now.subtract(const Duration(hours: 3)),
       actionUrl: '/subscriptions/sub_1',
-      actionLabel: '수강권 확인',
+      actionLabel: AppStrings.notifSubExpiringAction,
       data: {
         'subscriptionId': 'sub_1',
         'daysLeft': 3,
@@ -312,31 +314,49 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     ),
 
     // ============================================================
-    // Both: 연결 알림
+    // Both: 연결 알림 (역할별 메시지)
     // ============================================================
-    AppNotification(
-      id: 'n1',
-      userId: 'current_user',
-      type: NotificationType.connectionRequestAccepted,
-      priority: NotificationPriority.high,
-      title: '연결 완료',
-      body: '김선생님과 연결되었습니다! 지금 체험레슨을 예약해보세요.',
-      createdAt: now.subtract(const Duration(minutes: 5)),
-      sentAt: now.subtract(const Duration(minutes: 5)),
-      actionUrl: '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
-      actionLabel: '선생님 보기',
-    ),
+    if (isTeacher)
+      AppNotification(
+        id: 'n1_t',
+        userId: 'current_user',
+        type: NotificationType.connectionRequestAccepted,
+        priority: NotificationPriority.high,
+        title: AppStrings.notifConnectionComplete,
+        body: AppStrings.notifConnectionTeacher('박지호'),
+        createdAt: now.subtract(const Duration(minutes: 5)),
+        sentAt: now.subtract(const Duration(minutes: 5)),
+        actionUrl: '/students/student_1',
+        actionLabel: AppStrings.notifViewStudent,
+      ),
+    if (!isTeacher)
+      AppNotification(
+        id: 'n1_s',
+        userId: 'current_user',
+        type: NotificationType.connectionRequestAccepted,
+        priority: NotificationPriority.high,
+        title: AppStrings.notifConnectionComplete,
+        body: AppStrings.notifConnectionStudent('김선생님'),
+        createdAt: now.subtract(const Duration(minutes: 5)),
+        sentAt: now.subtract(const Duration(minutes: 5)),
+        actionUrl:
+            '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
+        actionLabel: AppStrings.notifViewTeacher,
+      ),
 
     // ============================================================
-    // Both: 레슨 알림
+    // Both: 레슨 알림 (역할별 메시지)
     // ============================================================
     AppNotification(
       id: 'n2',
       userId: 'current_user',
       type: NotificationType.lessonReminder,
       priority: NotificationPriority.normal,
-      title: '레슨 알림',
-      body: '내일 오후 3시 김민수 바이올린 레슨이 있습니다',
+      title: AppStrings.notifLessonReminderTitle,
+      body:
+          isTeacher
+              ? AppStrings.notifLessonReminderTeacher('박지호 바이올린', '내일 오후 3시')
+              : AppStrings.notifLessonReminderStudent('김선생님', '내일 오후 3시'),
       createdAt: now.subtract(const Duration(hours: 2)),
       sentAt: now.subtract(const Duration(hours: 2)),
       readAt: now.subtract(const Duration(hours: 1)),
@@ -350,12 +370,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.trialBookingRequest,
       priority: NotificationPriority.normal,
-      title: '새 체험 요청',
-      body: '박지호님이 바이올린 체험 레슨을 요청했습니다',
+      title: AppStrings.notifTrialRequestTitle,
+      body: AppStrings.notifTrialRequestBody('박지호', '바이올린'),
       createdAt: now.subtract(const Duration(hours: 4)),
       sentAt: now.subtract(const Duration(hours: 4)),
       actionUrl: '/schedule/lesson-requests',
-      actionLabel: '요청 확인',
+      actionLabel: AppStrings.notifTrialRequestAction,
     ),
 
     // ============================================================
@@ -366,12 +386,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.paymentReceived,
       priority: NotificationPriority.normal,
-      title: '입금 완료 알림',
-      body: '김민수님이 수강료 입금 완료를 알렸습니다',
+      title: AppStrings.notifPaymentReceivedTitle,
+      body: AppStrings.notifPaymentReceivedBody('김민수'),
       createdAt: now.subtract(const Duration(hours: 6)),
       sentAt: now.subtract(const Duration(hours: 6)),
       actionUrl: '/subscriptions/sub_1',
-      actionLabel: '입금 확인',
+      actionLabel: AppStrings.notifPaymentReceivedAction,
     ),
 
     // ============================================================
@@ -382,8 +402,8 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.practiceReminder,
       priority: NotificationPriority.normal,
-      title: '연습 시간이에요!',
-      body: '오늘의 연습 목표를 달성해보세요',
+      title: AppStrings.notifPracticeReminderTitle,
+      body: AppStrings.notifPracticeReminderBody,
       createdAt: now.subtract(const Duration(days: 1)),
       sentAt: now.subtract(const Duration(days: 1)),
     ),
@@ -392,8 +412,8 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.streakMilestone,
       priority: NotificationPriority.low,
-      title: '연속 연습 달성!',
-      body: '7일 연속 연습을 달성했어요!',
+      title: AppStrings.notifStreakTitle,
+      body: AppStrings.notifStreakBody(7),
       createdAt: now.subtract(const Duration(days: 2)),
       sentAt: now.subtract(const Duration(days: 2)),
       readAt: now.subtract(const Duration(days: 2)),
@@ -407,12 +427,12 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       userId: 'current_user',
       type: NotificationType.scheduleChangeRequested,
       priority: NotificationPriority.high,
-      title: '일정 변경 요청',
-      body: '김민수 3회차 레슨 일정 변경 요청',
+      title: AppStrings.notifScheduleChangeTitle,
+      body: AppStrings.notifScheduleChangeBody('김민수', 3),
       createdAt: now.subtract(const Duration(hours: 8)),
       sentAt: now.subtract(const Duration(hours: 8)),
       actionUrl: '/subscriptions/sub_1',
-      actionLabel: '변경 확인',
+      actionLabel: AppStrings.notifScheduleChangeAction,
     ),
   ];
 

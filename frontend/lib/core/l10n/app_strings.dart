@@ -1023,6 +1023,44 @@ class AppStrings {
       '이번 취소에 사용된 변경/취소권 1회를 돌려주시겠습니까?';
   static const cancellationFreeProcessed = '변경/취소권을 돌려주었습니다';
   static const cancellationCreditRefundedChat = '선생님이 변경/취소권을 돌려주었습니다';
+
+  /// Notification mock strings (i18n)
+  static const notifProposalTitle = '수강권 제안이 도착했어요!';
+  static const notifProposalBody = '체험레슨 후 72시간 골든타임 할인 혜택을 확인해보세요';
+  static const notifProposalAction = '제안 확인하기';
+  static String notifSubExpiringTitle(int days) => '수강권이 $days일 후 만료됩니다';
+  static String notifSubExpiringBody(int remaining) =>
+      '남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
+  static const notifSubExpiringAction = '수강권 확인';
+  static const notifConnectionComplete = '연결 완료';
+  static String notifConnectionTeacher(String name) =>
+      '$name님과 연결되었습니다';
+  static String notifConnectionStudent(String name) =>
+      '$name과 연결되었습니다! 지금 체험레슨을 예약해보세요.';
+  static const notifViewStudent = '학생 보기';
+  static const notifViewTeacher = '선생님 보기';
+  static const notifLessonReminderTitle = '레슨 알림';
+  static String notifLessonReminderTeacher(String student, String time) =>
+      '$time $student 레슨이 있습니다';
+  static String notifLessonReminderStudent(String teacher, String time) =>
+      '$time $teacher과 레슨이 있습니다';
+  static const notifTrialRequestTitle = '새 체험 요청';
+  static String notifTrialRequestBody(String student, String instrument) =>
+      '$student님이 $instrument 체험 레슨을 요청했습니다';
+  static const notifTrialRequestAction = '요청 확인';
+  static const notifPaymentReceivedTitle = '입금 완료 알림';
+  static String notifPaymentReceivedBody(String student) =>
+      '$student님이 수강료 입금 완료를 알렸습니다';
+  static const notifPaymentReceivedAction = '입금 확인';
+  static const notifPracticeReminderTitle = '연습 시간이에요!';
+  static const notifPracticeReminderBody = '오늘의 연습 목표를 달성해보세요';
+  static const notifStreakTitle = '연속 연습 달성!';
+  static String notifStreakBody(int days) =>
+      '$days일 연속 연습을 달성했어요!';
+  static const notifScheduleChangeTitle = '일정 변경 요청';
+  static String notifScheduleChangeBody(String student, int session) =>
+      '$student $session회차 레슨 일정 변경 요청';
+  static const notifScheduleChangeAction = '변경 확인';
   static const viewDetail = '상세 보기';
   static const sessionUnit = '회';
   static const unregistered = '미등록';

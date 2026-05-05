@@ -27,7 +27,7 @@ fi
 
 # 하드코딩 한글 텍스트 검출
 # Text('한글...'), label: '한글...', hintText: '한글...' 패턴
-VIOLATIONS=$(grep -n "Text('[가-힣]\|label: '[가-힣]\|hintText: '[가-힣]\|hint.*'[가-힣]\|title: '[가-힣]\|return '[가-힣]" "$FILE_PATH" 2>/dev/null | grep -v "AppStrings\|// ignore-hardcode" | head -5)
+VIOLATIONS=$(grep -n "Text('[가-힣]\|label: '[가-힣]\|hintText: '[가-힣]\|hint.*'[가-힣]\|title: '[가-힣]\|body: '[가-힣]\|return '[가-힣]" "$FILE_PATH" 2>/dev/null | grep -v "AppStrings\|// ignore-hardcode" | head -5)
 
 if [[ -n "$VIOLATIONS" ]]; then
     echo "WARNING: Hardcoded Korean text detected in $FILE_PATH" >&2
