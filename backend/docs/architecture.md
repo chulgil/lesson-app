@@ -177,6 +177,7 @@ Schema    Schema (Pydantic v2)
 - `schemas`는 `app.models` 계층을 import하지 않는다. API 계약은 Pydantic 필드와 validator로 표현하고, ORM enum/모델 변환은 service/model 계층에서 처리한다.
 - 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
 - OpenAPI `operationId`는 전체 API에서 유일해야 한다. 동일한 함수명을 여러 라우터에서 쓰거나 레거시/신규 경로를 병행 노출할 때는 명시적 `operation_id`를 지정한다.
+- `/api/v1`의 non-204 2xx 응답은 OpenAPI response schema를 가져야 한다. 프론트 호환성 때문에 여러 shape를 반환하는 레거시 endpoint도 Pydantic union schema로 명시한다.
 - `/api/v1` operation은 공개 allowlist를 제외하고 OpenAPI security 요구사항을 가져야 한다.
   - 공개 allowlist: `POST /auth/oauth/{provider}`, `POST /auth/dev-login`, `POST /auth/token/refresh`, `GET /users/supported-locales`
   - 내부 자동화 API: `/scheduler/*`는 사용자 JWT가 아니라 `X-Internal-API-Key` 헤더와 `INTERNAL_API_KEY` 환경변수로 보호한다.

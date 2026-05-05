@@ -103,6 +103,23 @@ class SlotsResponse(BaseModel):
     slots: list[SlotStatus] = []
 
 
+class FrontendTimeSlotResponse(BaseModel):
+    """Weekly availability slot shape consumed by the Flutter booking repository."""
+
+    id: str
+    day_of_week: int
+    start_time: str
+    end_time: str
+    is_active: bool = True
+
+
+class SlotsRangeResponse(BaseModel):
+    """Available slots for a date range."""
+
+    dates: list[_dt.date] = []
+    slots: list[SlotStatus] = []
+
+
 # ---------------------------------------------------------------------------
 # Weekly schedule (availability + bookings merged)
 # ---------------------------------------------------------------------------

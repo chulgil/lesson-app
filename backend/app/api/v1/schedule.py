@@ -12,9 +12,12 @@ from app.models.user import User
 from app.schemas.schedule import (
     AvailabilityCreate,
     AvailabilityResponse,
+    FrontendTimeSlotResponse,
     ScheduleExceptionCreate,
     ScheduleExceptionResponse,
     ScheduleExceptionUpdate,
+    SlotsRangeResponse,
+    SlotsResponse,
     WeeklyScheduleResponse,
 )
 from app.services.schedule_service import ScheduleService
@@ -111,7 +114,7 @@ async def get_weekly_schedule(
 
 @router.get(
     "/slots",
-    response_model=None,
+    response_model=list[FrontendTimeSlotResponse] | SlotsRangeResponse | SlotsResponse,
     status_code=status.HTTP_200_OK,
     summary="Available booking slots",
 )
@@ -126,7 +129,7 @@ async def get_available_slots(
     limit: int | None = None,
     available_only: bool = False,
     student_id: str | None = None,
-):
+) -> list[dict] | dict | SlotsResponse:
     """Return bookable slots or frontend-compatible availability shapes."""
     del current_user, student_id
     service = ScheduleService(db)

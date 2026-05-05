@@ -148,6 +148,28 @@ def test_api_v1_routes_require_security_unless_publicly_documented() -> None:
     assert unsecured_operations == []
 
 
+def test_api_v1_success_responses_declare_body_schemas_unless_no_content() -> None:
+    """2xx responses with bodies must be explicit OpenAPI contracts."""
+    schema = app.openapi()
+    missing_response_schemas: list[str] = []
+    for path, path_item in schema["paths"].items():
+        if not path.startswith("/api/v1/"):
+            continue
+        for method, operation in path_item.items():
+            if method not in {"get", "post", "put", "patch", "delete"}:
+                continue
+            for status_code, response in operation.get("responses", {}).items():
+                if not str(status_code).startswith("2") or str(status_code) == "204":
+                    continue
+                content = response.get("content", {}) if isinstance(response, dict) else {}
+                has_schema = any(media_type.get("schema") for media_type in content.values())
+                if not has_schema:
+                    operation_id = operation.get("operationId", "<missing operationId>")
+                    missing_response_schemas.append(f"{method.upper()} {path} {status_code} ({operation_id})")
+
+    assert missing_response_schemas == []
+
+
 def test_app_lifespan_runs_runtime_configuration_validation() -> None:
     """FastAPI startup must fail early for unsafe production-like configuration."""
     source = inspect.getsource(app_main.lifespan)
