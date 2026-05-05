@@ -12,6 +12,10 @@ from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import LessonResponse
 from app.schemas.parent import (
+    ChildProfileCreate,
+    ChildProfileResponse,
+    ChildProfileUpdate,
+    ChildTeacherConnectRequest,
     ParentChildRelationResponse,
     ParentChildRelationUpdate,
     ParentConnectChildRequest,
@@ -124,6 +128,119 @@ async def connect_child(
     return await service.connect_child(body.invite_code, current_user)
 
 
+@router.get(
+    "/{parent_id}/child-profiles",
+    response_model=list[ChildProfileResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List child profiles for a parent",
+)
+async def list_child_profiles(
+    parent_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[ChildProfileResponse]:
+    """Return child-profile shaped children for a parent."""
+    service = ParentService(db)
+    return await service.get_child_profiles(parent_id, current_user)
+
+
+@router.post(
+    "/child-profiles",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create child profile",
+)
+async def create_child_profile(
+    body: ChildProfileCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> ChildProfileResponse:
+    """Create a parent-owned child profile."""
+    service = ParentService(db)
+    return await service.create_child_profile(body, current_user)
+
+
+@router.get(
+    "/child-profiles/{child_id}",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get child profile",
+)
+async def get_child_profile(
+    child_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ChildProfileResponse:
+    """Return a child profile by child/student ID."""
+    service = ParentService(db)
+    return await service.get_child_profile(child_id, current_user)
+
+
+@router.put(
+    "/child-profiles/{child_id}",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update child profile",
+)
+async def update_child_profile(
+    child_id: str,
+    body: ChildProfileUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> ChildProfileResponse:
+    """Update a parent-owned child profile."""
+    service = ParentService(db)
+    return await service.update_child_profile(child_id, body, current_user)
+
+
+@router.delete(
+    "/child-profiles/{child_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Soft-delete child profile",
+)
+async def delete_child_profile(
+    child_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> None:
+    """Soft-delete a parent-owned child profile."""
+    service = ParentService(db)
+    await service.delete_child_profile(child_id, current_user)
+
+
+@router.post(
+    "/child-profiles/{child_id}/teacher",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Connect teacher to child profile",
+)
+async def connect_teacher_to_child(
+    child_id: str,
+    body: ChildTeacherConnectRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> ChildProfileResponse:
+    """Connect a teacher to a parent-owned child profile."""
+    service = ParentService(db)
+    return await service.connect_teacher_to_child(child_id, body, current_user)
+
+
+@router.delete(
+    "/child-profiles/{child_id}/teacher",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Disconnect teacher from child profile",
+)
+async def disconnect_teacher_from_child(
+    child_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> ChildProfileResponse:
+    """Disconnect a teacher from a parent-owned child profile."""
+    service = ParentService(db)
+    return await service.disconnect_teacher_from_child(child_id, current_user)
+
+
 @router.post(
     "/invitations",
     response_model=ParentInvitationResponse,
@@ -155,11 +272,13 @@ async def get_or_list_invitations(
 ) -> ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse]:
     """Return one invitation by code, or a filtered invitation list."""
     service = ParentService(db)
-    result: ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse] = await service.get_or_list_invitations(
-        current_user,
-        code=code,
-        student_id=student_id,
-        status_filter=status_filter or status,
+    result: ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse] = (
+        await service.get_or_list_invitations(
+            current_user,
+            code=code,
+            student_id=student_id,
+            status_filter=status_filter or status,
+        )
     )
     return result
 

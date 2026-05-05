@@ -86,6 +86,86 @@ class ParentConnectChildRequest(BaseModel):
     invite_code: str
 
 
+class ChildProfileResponse(BaseModel):
+    """Child profile response matching the Flutter ChildProfile contract."""
+
+    id: str
+    parent_id: str
+    name: str
+    birth_year: int
+    instrument: str
+    level: str
+    teacher_id: str | None = None
+    teacher_name: str | None = None
+    linked_student_id: str
+    profile_color: str
+    status: str = "active"
+    connection_status: str = "unconnected"
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
+
+    model_config = ConfigDict(
+        alias_generator=lambda field_name: "".join(
+            word.capitalize() if index else word
+            for index, word in enumerate(field_name.split("_"))
+        ),
+        populate_by_name=True,
+    )
+
+
+class ChildProfileCreate(BaseModel):
+    """Create a parent-owned child profile backed by Student."""
+
+    parent_id: str
+    name: str
+    birth_year: int
+    instrument: str = ""
+    level: str = "beginner"
+    profile_color: str | None = None
+
+    model_config = ConfigDict(
+        alias_generator=lambda field_name: "".join(
+            word.capitalize() if index else word
+            for index, word in enumerate(field_name.split("_"))
+        ),
+        populate_by_name=True,
+    )
+
+
+class ChildProfileUpdate(BaseModel):
+    """Update a child profile."""
+
+    name: str | None = None
+    birth_year: int | None = None
+    instrument: str | None = None
+    level: str | None = None
+    profile_color: str | None = None
+    status: str | None = None
+
+    model_config = ConfigDict(
+        alias_generator=lambda field_name: "".join(
+            word.capitalize() if index else word
+            for index, word in enumerate(field_name.split("_"))
+        ),
+        populate_by_name=True,
+    )
+
+
+class ChildTeacherConnectRequest(BaseModel):
+    """Connect a teacher to a parent-owned child profile."""
+
+    teacher_id: str
+    teacher_name: str | None = None
+
+    model_config = ConfigDict(
+        alias_generator=lambda field_name: "".join(
+            word.capitalize() if index else word
+            for index, word in enumerate(field_name.split("_"))
+        ),
+        populate_by_name=True,
+    )
+
+
 class ParentInvitationCreate(BaseModel):
     """Create a parent invitation."""
 

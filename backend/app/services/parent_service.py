@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import secrets
 import string
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -14,6 +14,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import LessonResponse
 from app.schemas.parent import (
+    ChildProfileCreate,
+    ChildProfileResponse,
+    ChildProfileUpdate,
+    ChildTeacherConnectRequest,
     ParentChildRelationResponse,
     ParentChildRelationUpdate,
     ParentCreate,
@@ -193,6 +197,172 @@ class ParentService:
         await self.db.refresh(link)
 
         return self._relation_response(link)
+
+    async def get_child_profiles(self, parent_id: str, current_user: Any) -> list[ChildProfileResponse]:
+        """Return active child profiles for a parent."""
+        from app.models.parent import ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import Student
+
+        await self._assert_can_access_parent(parent_id, current_user)
+        result = await self.db.execute(
+            select(Student, ParentChildRelation)
+            .join(ParentChildRelation, ParentChildRelation.student_id == Student.id)
+            .where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+            .order_by(Student.created_at.desc())
+        )
+        return [await self._child_profile_response(student, relation) for student, relation in result.all()]
+
+    async def get_child_profile(self, child_id: str, current_user: Any) -> ChildProfileResponse:
+        """Return a child profile if visible to the current parent/teacher."""
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        return await self._child_profile_response(student, relation)
+
+    async def create_child_profile(
+        self,
+        data: ChildProfileCreate,
+        current_user: Any,
+    ) -> ChildProfileResponse:
+        """Create a parent-owned child profile backed by Student."""
+        from app.models.parent import ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import Student, StudentLevel
+
+        await self._assert_can_access_parent(data.parent_id, current_user)
+        student = Student(
+            teacher_id="",
+            name=data.name,
+            instrument=data.instrument,
+            level=StudentLevel(data.level),
+            birth_date=date(data.birth_year, 1, 1),
+            profile_color=data.profile_color or "#6B5B95",
+        )
+        self.db.add(student)
+        await self.db.flush()
+
+        relation = ParentChildRelation(
+            parent_id=data.parent_id,
+            student_id=student.id,
+            status=ParentChildRelationStatus.active,
+        )
+        self.db.add(relation)
+        await self.db.flush()
+        await self.db.refresh(student)
+        await self.db.refresh(relation)
+        return await self._child_profile_response(student, relation)
+
+    async def update_child_profile(
+        self,
+        child_id: str,
+        data: ChildProfileUpdate,
+        current_user: Any,
+    ) -> ChildProfileResponse:
+        """Update a parent-owned child profile."""
+        from app.models.parent import ParentChildRelationStatus
+        from app.models.student import StudentLevel
+
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        update_data = data.model_dump(exclude_unset=True)
+        if "name" in update_data:
+            student.name = update_data["name"]
+        if "instrument" in update_data:
+            student.instrument = update_data["instrument"]
+        if "level" in update_data:
+            student.level = StudentLevel(update_data["level"])
+        if "birth_year" in update_data:
+            student.birth_date = date(update_data["birth_year"], 1, 1)
+        if "profile_color" in update_data:
+            student.profile_color = update_data["profile_color"]
+        if "status" in update_data:
+            relation.status = ParentChildRelationStatus(update_data["status"])
+            if relation.status == ParentChildRelationStatus.inactive and relation.unlinked_at is None:
+                relation.unlinked_at = datetime.now(UTC)
+            elif relation.status != ParentChildRelationStatus.inactive:
+                relation.unlinked_at = None
+
+        await self.db.flush()
+        await self.db.refresh(student)
+        await self.db.refresh(relation)
+        return await self._child_profile_response(student, relation)
+
+    async def delete_child_profile(self, child_id: str, current_user: Any) -> None:
+        """Soft-delete a child profile by marking the parent relation inactive."""
+        from app.models.parent import ParentChildRelationStatus
+
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        student.is_active = False
+        relation.status = ParentChildRelationStatus.inactive
+        relation.unlinked_at = datetime.now(UTC)
+        await self.db.flush()
+
+    async def connect_teacher_to_child(
+        self,
+        child_id: str,
+        data: ChildTeacherConnectRequest,
+        current_user: Any,
+    ) -> ChildProfileResponse:
+        """Connect a teacher to a parent-owned child profile."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.models.teacher import Teacher
+
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        teacher = await self.db.get(Teacher, data.teacher_id)
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+
+        student.teacher_id = teacher.id
+        teacher_relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.teacher_id == teacher.id,
+                TeacherStudentRelation.student_id == student.id,
+            )
+        )
+        if teacher_relation is None:
+            teacher_relation = TeacherStudentRelation(
+                teacher_id=teacher.id,
+                student_id=student.id,
+                status=RelationStatus.active,
+                connected_at=datetime.now(UTC),
+                is_app_connected=True,
+                app_connected_at=datetime.now(UTC),
+            )
+            self.db.add(teacher_relation)
+        else:
+            teacher_relation.status = RelationStatus.active
+            teacher_relation.connected_at = teacher_relation.connected_at or datetime.now(UTC)
+            teacher_relation.disconnected_at = None
+            teacher_relation.is_app_connected = True
+            teacher_relation.app_connected_at = teacher_relation.app_connected_at or datetime.now(UTC)
+
+        await self.db.flush()
+        await self.db.refresh(student)
+        return await self._child_profile_response(student, relation, teacher_name=data.teacher_name)
+
+    async def disconnect_teacher_from_child(
+        self,
+        child_id: str,
+        current_user: Any,
+    ) -> ChildProfileResponse:
+        """Disconnect the current teacher relation from a child profile."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        if student.teacher_id:
+            teacher_relation = await self.db.scalar(
+                select(TeacherStudentRelation).where(
+                    TeacherStudentRelation.teacher_id == student.teacher_id,
+                    TeacherStudentRelation.student_id == student.id,
+                )
+            )
+            if teacher_relation is not None:
+                teacher_relation.status = RelationStatus.disconnected
+                teacher_relation.disconnected_at = datetime.now(UTC)
+                teacher_relation.is_app_connected = False
+        student.teacher_id = ""
+        await self.db.flush()
+        await self.db.refresh(student)
+        return await self._child_profile_response(student, relation)
 
     async def get_child_lessons(
         self,
@@ -522,6 +692,68 @@ class ParentService:
         if relation is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Relation not found")
         return relation
+
+    async def _get_child_profile_for_user(self, child_id: str, current_user: Any) -> tuple[Any, Any]:
+        """Return Student and parent relation if the current user can access the child."""
+        from app.models.parent import ParentChildRelation
+        from app.models.student import Student
+
+        student = await self.db.get(Student, child_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child profile not found")
+
+        relation = await self.db.scalar(select(ParentChildRelation).where(ParentChildRelation.student_id == child_id))
+        if relation is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child profile not found")
+
+        await self._assert_can_access_parent(relation.parent_id, current_user)
+        return student, relation
+
+    async def _child_profile_response(
+        self,
+        student: Any,
+        relation: Any,
+        *,
+        teacher_name: str | None = None,
+    ) -> ChildProfileResponse:
+        """Map Student + ParentChildRelation to the Flutter child profile shape."""
+        if teacher_name is None and student.teacher_id:
+            teacher_name = await self._teacher_name(student.teacher_id)
+
+        status_value = getattr(relation.status, "value", relation.status)
+        teacher_id = student.teacher_id or None
+        connection_status = "connected" if status_value == "active" and teacher_id else "unconnected"
+        if status_value == "pending":
+            connection_status = "pending"
+
+        return ChildProfileResponse(
+            id=student.id,
+            parent_id=relation.parent_id,
+            name=student.name,
+            birth_year=student.birth_date.year if student.birth_date else date.today().year,
+            instrument=student.instrument,
+            level=getattr(student.level, "value", student.level),
+            teacher_id=teacher_id,
+            teacher_name=teacher_name,
+            linked_student_id=student.id,
+            profile_color=student.profile_color or "#6B5B95",
+            status=status_value,
+            connection_status=connection_status,
+            created_at=student.created_at,
+            updated_at=student.updated_at,
+        )
+
+    async def _teacher_name(self, teacher_id: str) -> str | None:
+        from app.models.teacher import Teacher
+        from app.models.user import User
+
+        result = await self.db.execute(
+            select(User.name)
+            .join(Teacher, Teacher.user_id == User.id)
+            .where(Teacher.id == teacher_id)
+        )
+        name: str | None = result.scalar_one_or_none()
+        return name
 
     async def _assert_can_access_parent(self, parent_id: str, current_user: Any) -> None:
         from app.models.parent import Parent
