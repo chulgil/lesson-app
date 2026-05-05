@@ -96,11 +96,9 @@ async def complete_onboarding(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> UserResponse:
     """Mark the current user's onboarding as completed."""
-    current_user.onboarding_completed = True
-    db.add(current_user)
-    await db.flush()
-    await db.refresh(current_user)
-    return UserResponse.model_validate(current_user)
+    service = UserService(db)
+    user = await service.complete_onboarding(current_user.id)
+    return UserResponse.model_validate(user)
 
 
 @router.get(

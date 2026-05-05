@@ -56,6 +56,14 @@ class UserService:
         await self.db.refresh(user)
         return user
 
+    async def complete_onboarding(self, user_id: str) -> Any:
+        """Mark onboarding as completed."""
+        user = await self.get_by_id(user_id)
+        user.onboarding_completed = True
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
+
     @staticmethod
     def get_supported_locales() -> SupportedLocalesResponse:
         """Return the static list of supported locales."""

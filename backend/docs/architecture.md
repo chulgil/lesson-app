@@ -1,10 +1,10 @@
 # Backend Architecture
 
-> 마지막 업데이트: 2026-03-02
+> 마지막 업데이트: 2026-05-05
 
 ## 개요
 
-음악 레슨/연습 관리 앱의 백엔드 API 서버. Flutter 프론트엔드와 REST API로 통신하며, 기존 Hive(로컬 DB) 기반 구조를 서버 기반으로 전환한다.
+음악 레슨/연습 관리 앱의 백엔드 API 서버. Flutter 프론트엔드와 REST API로 통신하며, 오프라인/Mock 중심 프론트 기능을 서버 기반 원격 repository 계약으로 전환한다.
 
 ---
 
@@ -16,7 +16,7 @@
 | ORM | SQLAlchemy | 2.0+ | async engine |
 | Database | PostgreSQL | 17+ | Docker / codenavi 서버 |
 | Schema | Pydantic | v2 | 요청/응답 직렬화 |
-| Auth | JWT + OAuth2 | - | Google/Kakao/Apple |
+| Auth | 자체 JWT + OAuth2 | - | Google/Kakao/Apple, dev-login |
 | i18n | 자체 구현 | - | ko, en, ja (확장 가능) |
 | Migration | Alembic | 1.13+ | auto-generate |
 | Package | UV | latest | 의존성 관리 |
@@ -41,26 +41,24 @@ backend/
 │   │   ├── i18n.py                   # 다국어 미들웨어 + 번역 로더
 │   │   └── storage.py                # Vultr Object Storage 클라이언트
 │   │
-│   ├── models/                       # SQLAlchemy ORM 모델
+│   ├── models/                       # SQLAlchemy ORM 모델 (28 files)
 │   │   ├── base.py                   # Base, TimestampMixin, UUIDMixin
-│   │   ├── user.py                   # User, OAuthAccount
+│   │   ├── user.py                   # User, OAuthAccount, TokenBlacklist
 │   │   ├── teacher.py                # Teacher, Education, Career, Certificate
 │   │   ├── student.py                # Student
-│   │   ├── lesson_class.py           # LessonClass, ClassMembership
-│   │   ├── lesson.py                 # Lesson, LessonPiece, LessonRecording
-│   │   ├── subscription.py           # Subscription, SubscriptionUsage, Template, Proposal
+│   │   ├── lesson.py                 # LessonClass, ClassMembership, Lesson, LessonRecording
+│   │   ├── subscription.py           # Subscription, Usage, Template, Proposal
 │   │   ├── payment.py                # Payment, TuitionSettings (레거시 상태 기록용, API 없음)
-│   │   ├── practice.py               # PracticeRepertoire, Section, Recording, Note, Goal, Streak
-│   │   ├── practice_item.py          # PracticeItem (teacher assignments)
-│   │   ├── schedule.py               # TeacherAvailability, TimeSlot, LessonBooking
-│   │   ├── group_class.py            # GroupClass, GroupClassBooking
+│   │   ├── practice.py               # Repertoire, Section, Recording, Note, Goal, Piece
+│   │   ├── schedule.py               # Availability, Booking, LessonRequest
+│   │   ├── schedule_ext.py           # ScheduleException, GroupClassSchedule, NoShow, ScheduleChange
 │   │   ├── relationship.py           # TeacherStudentRelation, Follow
 │   │   ├── parent.py                 # Parent, ParentChildRelation, ParentTeacherConnection
-│   │   ├── notification.py           # Notification
-│   │   ├── lesson_request.py         # LessonRequest
-│   │   └── lesson_policy.py          # LessonPolicy, MakeupLesson, ScheduleConfirmationCard
+│   │   ├── settings.py               # teacher/subscription/proposal/notification settings
+│   │   ├── policy.py                 # LessonPolicy, MakeupLesson, ScheduleConfirmationCard
+│   │   └── request_event.py          # LessonRequest / subscription event log
 │   │
-│   ├── schemas/                      # Pydantic v2 요청/응답 스키마
+│   ├── schemas/                      # Pydantic v2 요청/응답 스키마 (31 files)
 │   │   ├── auth.py                   # TokenResponse, OAuthRequest
 │   │   ├── user.py                   # UserRead, UserUpdate
 │   │   ├── teacher.py                # TeacherRead, TeacherUpdate
@@ -80,20 +78,23 @@ backend/
 │   │       ├── users.py              # /users/*
 │   │       ├── teachers.py           # /teachers/*
 │   │       ├── students.py           # /students/*
-│   │       ├── lesson_classes.py     # /lesson-classes/*
+│   │       ├── memberships.py        # /memberships/*
 │   │       ├── lessons.py            # /lessons/*
 │   │       ├── subscriptions.py      # /subscriptions/*
 │   │       ├── practice.py           # /practice/*
-│   │       ├── practice_items.py     # /practice-items/*
+│   │       ├── practice_logs.py      # /practice-logs/*
 │   │       ├── recordings.py         # /recordings/*
 │   │       ├── schedule.py           # /schedule/*
 │   │       ├── bookings.py           # /bookings/*
 │   │       ├── relationships.py      # /relationships/*
 │   │       ├── parents.py            # /parents/*
 │   │       ├── notifications.py      # /notifications/*
-│   │       └── follows.py            # /follows/*
+│   │       ├── schedule_confirmations.py # /schedule/confirmation-cards/*
+│   │       ├── schedule_exceptions.py    # /schedule-exceptions/*
+│   │       ├── settings_api.py       # /settings/*
+│   │       └── device_tokens.py      # /device-tokens/*
 │   │
-│   ├── services/                     # 비즈니스 로직
+│   ├── services/                     # 비즈니스 로직 (36 files)
 │   │   ├── auth_service.py           # OAuth + JWT
 │   │   ├── lesson_service.py         # 레슨 CRUD + 상태 관리
 │   │   ├── subscription_service.py   # 구독 + 차감 + 제안 워크플로우
@@ -101,10 +102,13 @@ backend/
 │   │   ├── recording_service.py      # 녹음 업로드/다운로드 (Object Storage)
 │   │   ├── schedule_service.py       # 가용시간 + 예약
 │   │   ├── notification_service.py   # 알림 생성 + 발송
+│   │   ├── analytics_service.py      # 월간 통계 집계
+│   │   ├── post_service.py           # 선생님/학원 피드
+│   │   ├── lesson_policy_service.py  # 레슨 정책 CRUD
 │   │
 │   └── utils/
-│       ├── datetime_utils.py         # UTC ↔ 사용자 타임존 변환
-│       ├── currency_utils.py         # 통화 포맷팅 (KRW, USD, JPY)
+│       ├── datetime.py               # UTC ↔ 사용자 타임존 변환
+│       ├── currency.py               # 통화 포맷팅 (KRW, USD, JPY)
 │       └── pagination.py             # 페이지네이션 헬퍼
 │
 ├── alembic/                          # DB 마이그레이션
@@ -117,7 +121,8 @@ backend/
 │   ├── test_auth.py
 │   ├── test_lessons.py
 │   ├── test_subscriptions.py
-│   └── test_practice.py
+│   ├── test_practice.py
+│   └── test_backend_architecture_contract.py
 │
 ├── pyproject.toml                    # UV 의존성 + 프로젝트 설정
 ├── .env.example                      # 환경변수 샘플
@@ -135,7 +140,7 @@ backend/
 │  - Auth middleware              │  JWT 검증
 ├─────────────────────────────────┤
 │  Service Layer (services/)      │  비즈니스 로직
-│  - Transaction management       │  async with session
+│  - Transaction management       │  get_db dependency commit/rollback
 │  - Cross-domain orchestration   │  예: 레슨 완료 → 구독 차감 → 알림
 ├─────────────────────────────────┤
 │  Model Layer (models/)          │  SQLAlchemy ORM
@@ -156,10 +161,32 @@ Router → Service → Model → Database
 Schema    Schema (Pydantic v2)
 ```
 
-- **Router**: HTTP 요청 수신, 스키마 검증, 서비스 호출
+- **Router**: HTTP 요청 수신, 스키마 검증, 서비스 호출. DB query/mutation 직접 수행 금지
 - **Service**: 트랜잭션 관리, 비즈니스 규칙, 여러 모델 조합
 - **Model**: DB 테이블 매핑, 관계 정의
 - **Schema**: 요청/응답 직렬화, 필드 검증
+
+### 자동 아키텍처 계약
+
+`backend/tests/test_backend_architecture_contract.py`는 다음 규칙을 강제한다.
+
+- API router는 `select`, `func`, `insert`, `update`, `delete` 같은 SQLAlchemy query helper를 직접 import하지 않는다.
+- API router는 `db.get/scalar/scalars/execute/add/delete/flush/refresh`를 직접 호출하지 않는다.
+- `models`, `schemas`, `services`는 `app.api` 계층을 import하지 않는다.
+- 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
+
+기능 추가 전후에 다음 명령으로 검증한다.
+
+```bash
+cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
+```
+
+### 도메인 경계
+
+- 수강권 입금 상태는 `/subscriptions/*`에서 `payment_confirmed`, `paid_at`, `payment_confirmed_at`으로 관리한다.
+- `payments` / `tuition_settings` 모델은 레거시 상태 기록용이며 현행 API surface가 아니다.
+- 선생님/학원 수강료는 앱 밖 무통장입금/현금으로 처리한다. PG, 카드, 정산, 영수증, 자동 입금 매칭은 구현 대상이 아니다.
+- 향후 Lessonaza 앱 사용료 과금은 별도 스펙과 별도 모델/라우터로 분리한다.
 
 ---
 

@@ -174,6 +174,24 @@ class AuthService:
         self.db.add(blacklist_entry)
         await self.db.flush()
 
+    async def update_new_user_role(self, user: Any, role: str) -> Any:
+        """Set role for a newly registered user and create the matching profile."""
+        from app.models.user import UserRole
+
+        if user.role is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Role is already set. Contact support to change it.",
+            )
+
+        role_enum = UserRole(role)
+        user.role = role_enum
+        self.db.add(user)
+        await self._ensure_role_profile(user, role_enum)
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
+
     # ------------------------------------------------------------------
     # Provider-specific user info fetching
     # ------------------------------------------------------------------

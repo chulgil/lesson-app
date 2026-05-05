@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, UploadFile, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.profile_image import ProfileImageUploadResponse
 
@@ -15,6 +17,9 @@ class ProfileImageService:
 
     ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+    def __init__(self, db: AsyncSession | None = None) -> None:
+        self.db = db
 
     async def upload(
         self,
@@ -49,12 +54,64 @@ class ProfileImageService:
             image_url=file_url,
             image_type=image_type,
             file_key=file_key,
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
         )
 
     async def delete(self, file_key: str) -> None:
         """Delete an image from object storage."""
         await self._delete_from_storage(file_key)
+
+    async def update_profile_image(
+        self,
+        *,
+        current_user_id: str,
+        entity_type: str,
+        entity_id: str | None,
+        image_url: str | None,
+    ) -> None:
+        """Update profile_image_url in the appropriate table."""
+        if self.db is None:
+            raise RuntimeError("Database session is required")
+        if entity_type == "teacher":
+            from app.models.user import User as UserModel
+
+            user = await self.db.get(UserModel, current_user_id)
+            if user:
+                user.profile_image_url = image_url
+                await self.db.flush()
+        elif entity_type == "student" and entity_id:
+            from app.models.student import Student
+
+            student = await self.db.get(Student, entity_id)
+            if student:
+                student.profile_image_url = image_url
+                await self.db.flush()
+
+    async def update_background_image(
+        self,
+        *,
+        current_user_id: str,
+        entity_type: str,
+        entity_id: str | None,
+        image_url: str | None,
+    ) -> None:
+        """Update background_image_url in the appropriate table."""
+        if self.db is None:
+            raise RuntimeError("Database session is required")
+        if entity_type == "teacher":
+            from app.models.teacher import Teacher
+
+            teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == current_user_id))
+            if teacher:
+                teacher.background_image = image_url
+                await self.db.flush()
+        elif entity_type == "student" and entity_id:
+            from app.models.student import Student
+
+            student = await self.db.get(Student, entity_id)
+            if student:
+                student.background_image_url = image_url
+                await self.db.flush()
 
     async def _upload_to_storage(self, file_key: str, content: bytes, content_type: str | None) -> str:
         """Upload to Vultr Object Storage and return URL."""

@@ -36,7 +36,7 @@ async def upload_image(
     - entity_type: "teacher" or "student"
     - entity_id: student ID (for student images); defaults to current user ID
     """
-    service = ProfileImageService()
+    service = ProfileImageService(db)
     result = await service.upload(
         file=file,
         image_type=image_type,
@@ -47,11 +47,20 @@ async def upload_image(
 
     # Update the user's profile image URL in the database
     if image_type == "profile":
-        await _update_profile_image(db, current_user, entity_type, entity_id, result.image_url)
+        await service.update_profile_image(
+            current_user_id=current_user.id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            image_url=result.image_url,
+        )
     elif image_type == "background":
-        await _update_background_image(db, current_user, entity_type, entity_id, result.image_url)
+        await service.update_background_image(
+            current_user_id=current_user.id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            image_url=result.image_url,
+        )
 
-    await db.commit()
     return result
 
 
@@ -70,51 +79,20 @@ async def delete_image(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> ProfileImageDeleteResponse:
     """Delete a profile or background image and reset to default."""
+    service = ProfileImageService(db)
     if image_type == "profile":
-        await _update_profile_image(db, current_user, entity_type, entity_id, None)
-    elif image_type == "background":
-        await _update_background_image(db, current_user, entity_type, entity_id, None)
-
-    await db.commit()
-    return ProfileImageDeleteResponse()
-
-
-async def _update_profile_image(
-    db: AsyncSession, current_user: User, entity_type: str,
-    entity_id: str | None, image_url: str | None,
-) -> None:
-    """Update profile_image_url in the appropriate table."""
-    if entity_type == "teacher":
-        from app.models.user import User as UserModel
-        user = await db.get(UserModel, current_user.id)
-        if user:
-            user.profile_image_url = image_url
-            await db.flush()
-    elif entity_type == "student" and entity_id:
-        from app.models.student import Student
-        student = await db.get(Student, entity_id)
-        if student:
-            student.profile_image_url = image_url
-            await db.flush()
-
-
-async def _update_background_image(
-    db: AsyncSession, current_user: User, entity_type: str,
-    entity_id: str | None, image_url: str | None,
-) -> None:
-    """Update background_image_url in the appropriate table."""
-    if entity_type == "teacher":
-        from sqlalchemy import select
-        from app.models.teacher import Teacher
-        teacher = await db.scalar(
-            select(Teacher).where(Teacher.user_id == current_user.id)
+        await service.update_profile_image(
+            current_user_id=current_user.id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            image_url=None,
         )
-        if teacher:
-            teacher.background_image = image_url
-            await db.flush()
-    elif entity_type == "student" and entity_id:
-        from app.models.student import Student
-        student = await db.get(Student, entity_id)
-        if student:
-            student.background_image_url = image_url
-            await db.flush()
+    elif image_type == "background":
+        await service.update_background_image(
+            current_user_id=current_user.id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            image_url=None,
+        )
+
+    return ProfileImageDeleteResponse()

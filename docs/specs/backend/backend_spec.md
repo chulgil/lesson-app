@@ -1,17 +1,17 @@
 # Backend Spec — Lessonaza API
 
-> 작성일: 2026-03-16 | 상태: Phase 1 완료
+> 작성일: 2026-03-16 | 업데이트: 2026-05-05 | 상태: Phase 1 완료 + 아키텍처 가드레일 보강
 
 ## 개요
 
-FastAPI + PostgreSQL + Supabase Auth 기반 백엔드 API.
+FastAPI + PostgreSQL + 자체 JWT/OAuth 기반 백엔드 API.
 
 | 항목 | 값 |
 |------|-----|
 | Framework | FastAPI 0.115+ (async) |
 | ORM | SQLAlchemy 2.0 (asyncpg) |
 | DB | PostgreSQL 17 |
-| Auth | Supabase Auth (Google/Kakao/Apple OAuth) |
+| Auth | 자체 JWT + Google/Kakao/Apple OAuth + dev-login |
 | Storage | Vultr Object Storage (S3-compatible) |
 | Cache | Redis (planned) |
 | Python | 3.12+ |
@@ -74,10 +74,10 @@ FastAPI + PostgreSQL + Supabase Auth 기반 백엔드 API.
 
 ```
 app/
-├── api/v1/          # 31개 라우터 (252 엔드포인트)
-├── services/        # 31개 서비스 (비즈니스 로직)
-├── models/          # 26개 모델 파일 (64+ 테이블)
-├── schemas/         # 24개 스키마 파일 (Pydantic v2)
+├── api/v1/          # 37개 라우터 파일
+├── services/        # 36개 서비스 파일 (비즈니스 로직)
+├── models/          # 28개 모델 파일 (64+ 테이블)
+├── schemas/         # 31개 스키마 파일 (Pydantic v2)
 ├── core/            # config, database, deps, security, i18n, storage
 ├── jobs/            # 백그라운드 작업 (APScheduler KST 00:05)
 ├── utils/           # 헬퍼 유틸리티
@@ -91,6 +91,23 @@ app/
 - **UUID PK**: UUIDMixin (String(36), uuid4)
 - **Timestamps**: TimestampMixin (created_at, updated_at)
 - **Pagination**: PaginatedResponse[T] 제네릭 (page, size, total, pages)
+
+### 아키텍처 가드레일
+
+`backend/tests/test_backend_architecture_contract.py`가 다음 규칙을 자동 검증한다.
+
+- API router는 DB query/mutation을 직접 수행하지 않고 service layer로 위임한다.
+- API router는 SQLAlchemy query helper(`select`, `func`, `insert`, `update`, `delete`)를 직접 import하지 않는다.
+- lower layer(`models`, `schemas`, `services`)는 `app.api`를 import하지 않는다.
+- 현행 수강료 정책상 `/payments/*` 라우터를 만들지 않는다.
+
+새 백엔드 기능은 다음 순서를 따른다.
+
+1. 스펙/프론트 repository 계약 확인
+2. 실패하는 계약 테스트 작성
+3. service layer 구현
+4. router는 schema validation + service 호출만 담당
+5. `uv run pytest tests/test_backend_architecture_contract.py -q`로 계층 규칙 검증
 
 ## 다음 단계
 
@@ -107,7 +124,8 @@ app/
 | mypy 파이프라인 | ✅ 연결 | 점진적 strict, 베이스라인 120 에러/30 파일 |
 | FCM Push Notification | ✅ 구현됨 | lazy init, 배포 시 `GOOGLE_APPLICATION_CREDENTIALS` 설정만 필요 |
 | Subscription Expiry Dispatcher | ✅ 구현+연결 | APScheduler 00:05 KST 매일 실행, advisory lock |
-| Auth (JWT + OAuth) | ✅ 완성 | 커스텀 JWT + Google/Kakao/Apple OAuth 2.0 |
+| Auth (JWT + OAuth) | ✅ 완성 | 자체 JWT + Google/Kakao/Apple OAuth 2.0 |
+| Backend Architecture Contract | ✅ 연결 | Router 직접 DB 접근 금지, `/payments/*` 금지, lower-layer API import 금지 |
 
 ### 향후 항목
 

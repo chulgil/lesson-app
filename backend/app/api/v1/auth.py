@@ -118,25 +118,6 @@ async def update_my_role(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> UserResponse:
     """Set the role for a newly registered user (role must be null)."""
-    from app.models.user import UserRole
-
-    if current_user.role is not None:
-        from fastapi import HTTPException
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role is already set. Contact support to change it.",
-        )
-
-    role_enum = UserRole(body.role)
-    current_user.role = role_enum
-    db.add(current_user)
-
-    # Auto-create role-specific profile
     service = AuthService(db)
-    await service._ensure_role_profile(current_user, role_enum)
-
-    await db.flush()
-    await db.commit()
-    await db.refresh(current_user)
-    return UserResponse.model_validate(current_user)
+    user = await service.update_new_user_role(current_user, body.role)
+    return UserResponse.model_validate(user)
