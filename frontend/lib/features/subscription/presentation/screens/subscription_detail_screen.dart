@@ -13,6 +13,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/presentation/screens/suggest_alternative_screen.dart';
 import '../../../schedule/presentation/widgets/schedule_change_slot_bottom_sheet.dart';
 import '../../../schedule/presentation/widgets/schedule_change_type_bottom_sheet.dart';
 import '../../../students/domain/entities/lesson_class.dart';
@@ -152,7 +153,6 @@ class _SubscriptionDetailBody extends ConsumerStatefulWidget {
 class _SubscriptionDetailBodyState
     extends ConsumerState<_SubscriptionDetailBody> {
   late int _selectedSession;
-  final TextEditingController _messageController = TextEditingController();
 
   // Event strip state — matches RequestDetailScreen pattern exactly
   String? _eventMessage;
@@ -175,7 +175,6 @@ class _SubscriptionDetailBodyState
   @override
   void dispose() {
     _eventTimer?.cancel();
-    _messageController.dispose();
     super.dispose();
   }
 
@@ -269,6 +268,18 @@ class _SubscriptionDetailBodyState
                 ? '${AppStrings.scheduleChangeTitle} · ${lessonClass.name} $studentName ($typeLabel)'
                 : '${AppStrings.scheduleChangeTitle} · $studentName ($typeLabel)';
 
+        // Watch session events for turn-based locking
+        final sessionEvents =
+            ref
+                .watch(
+                  subscriptionSessionEventsProvider(
+                    subscriptionId: subscription.id,
+                    sessionNumber: _selectedSession,
+                  ),
+                )
+                .valueOrNull ??
+            [];
+
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
           appBar: AppBar(
@@ -347,9 +358,14 @@ class _SubscriptionDetailBodyState
           bottomNavigationBar: SubscriptionBottomInputBar(
             subscription: subscription,
             viewerRole: widget.viewerRole,
-            messageController: _messageController,
-            onSendMessage: _handleSendMessage,
+            events: sessionEvents,
+            opponentName: studentName,
             onScheduleChange: () => _handleScheduleChange(context),
+            onAcceptScheduleChoice: _handleAcceptScheduleChoice,
+            onCompareSchedule:
+                (event) => _handleCompareSchedule(context, event),
+            onWithdrawScheduleDecision:
+                (event) => _handleWithdrawScheduleDecision(context, event),
           ),
         );
       },
@@ -539,24 +555,125 @@ class _SubscriptionDetailBodyState
   // Action Handlers
   // ═══════════════════════════════════════════════════════════════
 
-  void _handleSendMessage() {
-    final text = _messageController.text.trim();
-    if (text.isEmpty) return;
-
-    // Record message event in chat
-    final event = RequestEvent(
+  /// Accept a proposed schedule slot.
+  void _handleAcceptScheduleChoice(
+    RequestEvent event,
+    int slotIndex,
+    String message,
+  ) {
+    final acceptEvent = RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
       actorId: subscription.studentId,
-      eventType: RequestEventType.message,
-      message: text,
+      eventType: RequestEventType.scheduleChangeAccepted,
+      selectedSlotIndex: slotIndex,
+      message: message.isEmpty ? null : message,
       sessionNumber: _selectedSession,
       createdAt: DateTime.now(),
     );
-    addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
-    _messageController.clear();
-    _showSuccess(AppStrings.messageSentSuccess);
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      acceptEvent,
+    );
+    if (mounted) _showSuccess(AppStrings.scheduleChangeAccepted);
+  }
+
+  /// Open schedule comparison screen to counter-propose.
+  Future<void> _handleCompareSchedule(
+    BuildContext context,
+    RequestEvent event,
+  ) async {
+    final result = await Navigator.push<SuggestAlternativeResult>(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SuggestAlternativeScreen(
+              message: '',
+              durationMinutes: 60,
+              teacherId: subscription.membershipId,
+            ),
+      ),
+    );
+    if (result == null || !mounted) return;
+
+    if (result.slots.isEmpty) return;
+
+    final suggestedSlots =
+        result.slots
+            .map(
+              (s) => TimeSlotOption(
+                id: s.id,
+                dayOfWeek: s.dayOfWeek,
+                startTime:
+                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                endTime:
+                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+              ),
+            )
+            .toList();
+
+    final counterEvent = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
+      actorId: subscription.studentId,
+      eventType: RequestEventType.scheduleChangeCountered,
+      suggestedSlots: suggestedSlots,
+      message: result.message.isEmpty ? null : result.message,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
+    );
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      counterEvent,
+    );
+    if (mounted) _showSuccess(AppStrings.alternativeProposeSent);
+  }
+
+  /// Withdraw current decision and re-propose via schedule comparison.
+  Future<void> _handleWithdrawScheduleDecision(
+    BuildContext context,
+    RequestEvent event,
+  ) async {
+    final result = await Navigator.push<SuggestAlternativeResult>(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => SuggestAlternativeScreen(
+              message: '',
+              durationMinutes: 60,
+              teacherId: subscription.membershipId,
+            ),
+      ),
+    );
+    if (result == null || !mounted) return;
+
+    if (result.slots.isEmpty) return;
+
+    final suggestedSlots =
+        result.slots
+            .map(
+              (s) => TimeSlotOption(
+                id: s.id,
+                dayOfWeek: s.dayOfWeek,
+                startTime:
+                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                endTime:
+                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+              ),
+            )
+            .toList();
+
+    _recordScheduleChangeEvent(
+      changeType: ScheduleChangeType.singleLesson,
+      suggestedSlots: suggestedSlots,
+      message: result.message.isEmpty ? null : result.message,
+    );
   }
 
   /// Schedule change — same flow as RequestDetailScreen._handleScheduleChange:

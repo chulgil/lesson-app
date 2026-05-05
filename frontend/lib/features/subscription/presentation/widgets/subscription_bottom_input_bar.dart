@@ -14,22 +14,21 @@ typedef ScheduleEventAction = void Function(RequestEvent event);
 
 /// Bottom input bar for the subscription detail screen.
 ///
-/// Pixel-exact match with [CurrentRequestBox] layout:
-/// - Container: surfaceLight + borderLight top + space3 padding + SafeArea
-/// - TextField: bodySmall, radiusMedium, maxLength 200, counterText ''
-/// - Buttons: buttonHeightSmall (40), radiusMedium, buttonSmall font
-/// - Row: Outlined(일정 변경) + Filled(메시지 전송)
+/// Three exclusive states based on schedule change events:
+/// - **default**: "일정 변경 요청하기" button only (no free-form messaging)
+/// - **isWaiting**: "OOO님의 응답을 기다리고 있습니다" + "결정 변경" button
+/// - **canRespond**: Slot selection + message + "수락"/"일정 비교" buttons
+///
+/// Free-form messaging is intentionally excluded — this screen is dedicated
+/// to schedule change negotiation only. General communication uses the
+/// teacher announcement feature.
 ///
 /// Hidden when the subscription is expired or depleted.
 class SubscriptionBottomInputBar extends StatelessWidget {
   final Subscription subscription;
   final String viewerRole;
-  final TextEditingController messageController;
-  final VoidCallback? onSendMessage;
+  final TextEditingController? messageController;
   final VoidCallback? onScheduleChange;
-  final VoidCallback? onLessonComplete;
-  final VoidCallback? onCancel;
-  final bool isBulkMode;
   final List<RequestEvent> events;
   final String? opponentName;
   final AcceptScheduleChoice? onAcceptScheduleChoice;
@@ -40,12 +39,8 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     super.key,
     required this.subscription,
     required this.viewerRole,
-    required this.messageController,
-    this.onSendMessage,
+    this.messageController,
     this.onScheduleChange,
-    this.onLessonComplete,
-    this.onCancel,
-    this.isBulkMode = false,
     this.events = const [],
     this.opponentName,
     this.onAcceptScheduleChoice,
@@ -96,83 +91,30 @@ class SubscriptionBottomInputBar extends StatelessWidget {
               onCompare: onCompareSchedule,
             ),
           ] else ...[
-            // Message input — matches CurrentRequestBox TextField exactly
-            TextField(
-              controller: messageController,
-              maxLines: 8,
-              minLines: 1,
-              maxLength: 200,
-              style: AppTypography.bodySmall,
-              decoration: InputDecoration(
-                hintText: AppStrings.subscriptionMessageHint,
-                hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-                counterText: '',
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
+            // Default: schedule change button only (no free-form messaging)
+            Text(
+              AppStrings.scheduleChangeGuideDefault,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
-
-            // Action buttons — matches CurrentRequestBox Row exactly
-            Row(
-              children: [
-                // Schedule change (outlined) — secondary action
-                Expanded(
-                  child: SizedBox(
-                    height: AppSpacing.buttonHeightSmall,
-                    child: OutlinedButton(
-                      onPressed: onScheduleChange,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.inkQuaternary),
-                        shape: RoundedRectangleBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.space3,
-                        ),
-                      ),
-                      child: Text(
-                        AppStrings.scheduleChangeButton,
-                        style: AppTypography.buttonSmall.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                    ),
+            SizedBox(
+              width: double.infinity,
+              height: AppSpacing.buttonHeightSmall,
+              child: ElevatedButton(
+                onPressed: onScheduleChange,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                  shape: RoundedRectangleBorder(),
+                ),
+                child: Text(
+                  AppStrings.scheduleChangeButton,
+                  style: AppTypography.buttonSmall.copyWith(
+                    color: AppColors.paper,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.space2),
-
-                // Send message (filled primary) — primary action
-                Expanded(
-                  child: SizedBox(
-                    height: AppSpacing.buttonHeightSmall,
-                    child: ElevatedButton(
-                      onPressed: onSendMessage,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.paperAccent,
-                        shape: RoundedRectangleBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.space3,
-                        ),
-                      ),
-                      child: Text(
-                        AppStrings.subscriptionSendMessage,
-                        style: AppTypography.buttonSmall.copyWith(
-                          color: AppColors.paper,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ],
@@ -249,13 +191,13 @@ class _WaitingDecisionBar extends StatelessWidget {
 class _ScheduleChoiceBar extends StatefulWidget {
   const _ScheduleChoiceBar({
     required this.event,
-    required this.messageController,
+    this.messageController,
     required this.onAccept,
     required this.onCompare,
   });
 
   final RequestEvent event;
-  final TextEditingController messageController;
+  final TextEditingController? messageController;
   final AcceptScheduleChoice? onAccept;
   final ScheduleEventAction? onCompare;
 
@@ -265,6 +207,22 @@ class _ScheduleChoiceBar extends StatefulWidget {
 
 class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
   int? _selectedSlotIndex;
+  late final TextEditingController _ownController;
+
+  TextEditingController get _messageController =>
+      widget.messageController ?? _ownController;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _ownController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +262,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
         ],
         const SizedBox(height: AppSpacing.space1),
         TextField(
-          controller: widget.messageController,
+          controller: _messageController,
           minLines: 1,
           maxLines: 3,
           maxLength: 200,
@@ -355,7 +313,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
                           : () => widget.onAccept!(
                             widget.event,
                             _selectedSlotIndex!,
-                            widget.messageController.text,
+                            _messageController.text,
                           ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
