@@ -33,7 +33,9 @@ class LessonPolicyService:
     async def create_policy(self, payload: LessonPolicyPayload, current_user: Any) -> LessonPolicyResponse:
         from app.models.policy import LessonPolicy
 
-        teacher_id = payload.teacher_id or await resolve_teacher_id(self.db, current_user.id)
+        current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        teacher_id = payload.teacher_id or current_teacher_id
+        self._assert_policy_teacher_owner(teacher_id, current_teacher_id)
         existing = await self._get_by_teacher(teacher_id)
         if existing is not None:
             self._apply_payload(existing, payload)
@@ -48,23 +50,34 @@ class LessonPolicyService:
         await self.db.refresh(policy)
         return self._to_response(policy)
 
-    async def update_policy(self, policy_id: str, payload: LessonPolicyPayload) -> LessonPolicyResponse:
+    async def update_policy(
+        self,
+        policy_id: str,
+        payload: LessonPolicyPayload,
+        current_user: Any,
+    ) -> LessonPolicyResponse:
         from app.models.policy import LessonPolicy
 
         policy = await self.db.get(LessonPolicy, policy_id)
         if policy is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson policy not found")
+        current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        self._assert_policy_teacher_owner(policy.teacher_id, current_teacher_id)
+        if payload.teacher_id is not None:
+            self._assert_policy_teacher_owner(payload.teacher_id, current_teacher_id)
         self._apply_payload(policy, payload)
         await self.db.flush()
         await self.db.refresh(policy)
         return self._to_response(policy)
 
-    async def delete_policy(self, policy_id: str) -> None:
+    async def delete_policy(self, policy_id: str, current_user: Any) -> None:
         from app.models.policy import LessonPolicy
 
         policy = await self.db.get(LessonPolicy, policy_id)
         if policy is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson policy not found")
+        current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        self._assert_policy_teacher_owner(policy.teacher_id, current_teacher_id)
         await self.db.delete(policy)
         await self.db.flush()
 
@@ -72,6 +85,10 @@ class LessonPolicyService:
         from app.models.policy import LessonPolicy
 
         return await self.db.scalar(select(LessonPolicy).where(LessonPolicy.teacher_id == teacher_id))
+
+    def _assert_policy_teacher_owner(self, teacher_id: str, current_teacher_id: str) -> None:
+        if teacher_id != current_teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot manage another teacher's policy")
 
     def _to_response(self, policy: Any) -> LessonPolicyResponse:
         return LessonPolicyResponse(

@@ -9,6 +9,8 @@ from datetime import UTC, date, datetime
 
 import pytest
 
+from app.core.security import create_access_token
+
 # ---------------------------------------------------------------------------
 # Auth contracts
 # ---------------------------------------------------------------------------
@@ -1289,6 +1291,62 @@ async def test_contract_lesson_policy_frontend_repository(
         headers=auth_headers,
     )
     assert delete_resp.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_lesson_policy_mutations_are_scoped_to_owning_teacher(
+    client, create_test_user
+):
+    """Teachers cannot create, update, or delete another teacher's policy."""
+    await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-policy@test.com")
+    await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-policy@test.com")
+
+    teacher_a_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-a-id', 'role': 'teacher'})}"
+    }
+    teacher_b_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-b-id', 'role': 'teacher'})}"
+    }
+
+    cross_create = await client.post(
+        "/api/v1/lesson-policies",
+        json={
+            "teacher_id": "teacher-b-id-prof",
+            "min_cancel_hours": 6,
+        },
+        headers=teacher_a_headers,
+    )
+    assert cross_create.status_code == 403
+
+    own_create = await client.post(
+        "/api/v1/lesson-policies",
+        json={
+            "teacher_id": "teacher-b-id-prof",
+            "min_cancel_hours": 6,
+        },
+        headers=teacher_b_headers,
+    )
+    assert own_create.status_code == 201
+    policy_id = own_create.json()["id"]
+
+    cross_update = await client.put(
+        f"/api/v1/lesson-policies/{policy_id}",
+        json={"max_changes_per_month": 5},
+        headers=teacher_a_headers,
+    )
+    assert cross_update.status_code == 403
+
+    cross_delete = await client.delete(
+        f"/api/v1/lesson-policies/{policy_id}",
+        headers=teacher_a_headers,
+    )
+    assert cross_delete.status_code == 403
+
+    still_exists = await client.get(
+        "/api/v1/lesson-policies/teacher/teacher-b-id-prof",
+        headers=teacher_b_headers,
+    )
+    assert still_exists.status_code == 200
 
 
 @pytest.mark.asyncio

@@ -88,7 +88,7 @@ async def update_policy(
 ) -> LessonPolicyResponse:
     """Update a policy."""
     service = LessonPolicyService(db)
-    return await service.update_policy(policy_id, payload)
+    return await service.update_policy(policy_id, payload, current_user)
 
 
 @router.delete(
@@ -102,4 +102,4 @@ async def delete_policy(
 ) -> None:
     """Delete a policy."""
     service = LessonPolicyService(db)
-    await service.delete_policy(policy_id)
+    await service.delete_policy(policy_id, current_user)
