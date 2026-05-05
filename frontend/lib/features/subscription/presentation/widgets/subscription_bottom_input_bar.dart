@@ -14,14 +14,14 @@ typedef ScheduleEventAction = void Function(RequestEvent event);
 
 /// Bottom input bar for the subscription detail screen.
 ///
-/// Three exclusive states based on schedule change events:
+/// Four exclusive states based on schedule change / cancellation events:
 /// - **default**: "일정 변경 요청하기" button only (no free-form messaging)
 /// - **isWaiting**: "OOO님의 응답을 기다리고 있습니다" + "결정 변경" button
 /// - **canRespond**: Slot selection + message + "수락"/"일정 비교" buttons
+/// - **cancellationConfirmed**: 취소 확정 후 선생님 [무료 처리] [확인]
 ///
 /// Free-form messaging is intentionally excluded — this screen is dedicated
-/// to schedule change negotiation only. General communication uses the
-/// teacher announcement feature.
+/// to schedule change negotiation only.
 ///
 /// Hidden when the subscription is expired or depleted.
 class SubscriptionBottomInputBar extends StatelessWidget {
@@ -31,9 +31,12 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   final VoidCallback? onScheduleChange;
   final List<RequestEvent> events;
   final String? opponentName;
+  final int selectedSession;
   final AcceptScheduleChoice? onAcceptScheduleChoice;
   final ScheduleEventAction? onCompareSchedule;
   final ScheduleEventAction? onWithdrawScheduleDecision;
+  final void Function(RequestEvent event)? onCancellationFreeProcess;
+  final void Function(RequestEvent event)? onCancellationAcknowledge;
 
   const SubscriptionBottomInputBar({
     super.key,
@@ -43,9 +46,12 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     this.onScheduleChange,
     this.events = const [],
     this.opponentName,
+    this.selectedSession = 1,
     this.onAcceptScheduleChoice,
     this.onCompareSchedule,
     this.onWithdrawScheduleDecision,
+    this.onCancellationFreeProcess,
+    this.onCancellationAcknowledge,
   });
 
   @override
@@ -55,11 +61,18 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     }
 
     final scheduleEvent = _latestScheduleDecisionEvent();
+    final cancellationEvent = _latestCancellationEvent();
     final isWaiting = scheduleEvent != null && _isMyEvent(scheduleEvent);
     final canRespond =
         scheduleEvent != null &&
         !_isMyEvent(scheduleEvent) &&
         scheduleEvent.suggestedSlots.isNotEmpty;
+
+    // Cancellation confirmed: show teacher actions (free process / acknowledge)
+    final isCancellationConfirmed =
+        cancellationEvent != null &&
+        cancellationEvent.eventType ==
+            RequestEventType.lessonCancellationConfirmed;
 
     // Matches CurrentRequestBox.build() container exactly
     return Container(
@@ -77,7 +90,16 @@ class SubscriptionBottomInputBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (isWaiting) ...[
+          if (isCancellationConfirmed) ...[
+            _CancellationConfirmedBar(
+              event: cancellationEvent,
+              subscription: subscription,
+              viewerRole: viewerRole,
+              selectedSession: selectedSession,
+              onFreeProcess: onCancellationFreeProcess,
+              onAcknowledge: onCancellationAcknowledge,
+            ),
+          ] else if (isWaiting) ...[
             _WaitingDecisionBar(
               event: scheduleEvent,
               opponentName: opponentName,
@@ -135,6 +157,28 @@ class SubscriptionBottomInputBar extends StatelessWidget {
             .toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return candidates.isEmpty ? null : candidates.first;
+  }
+
+  /// Latest cancellation-related event for the current session.
+  RequestEvent? _latestCancellationEvent() {
+    final candidates =
+        events
+            .where(
+              (event) =>
+                  event.eventType ==
+                      RequestEventType.lessonCancellationConfirmed ||
+                  event.eventType ==
+                      RequestEventType.cancellationCreditRefunded,
+            )
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    if (candidates.isEmpty) return null;
+    // If credit was already refunded, no action needed
+    if (candidates.first.eventType ==
+        RequestEventType.cancellationCreditRefunded) {
+      return null;
+    }
+    return candidates.first;
   }
 
   bool _isMyEvent(RequestEvent event) {
@@ -330,6 +374,125 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
             ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+/// Fourth state: cancellation confirmed — teacher can free-process or acknowledge.
+class _CancellationConfirmedBar extends StatelessWidget {
+  const _CancellationConfirmedBar({
+    required this.event,
+    required this.subscription,
+    required this.viewerRole,
+    required this.selectedSession,
+    this.onFreeProcess,
+    this.onAcknowledge,
+  });
+
+  final RequestEvent event;
+  final Subscription subscription;
+  final String viewerRole;
+  final int selectedSession;
+  final void Function(RequestEvent event)? onFreeProcess;
+  final void Function(RequestEvent event)? onAcknowledge;
+
+  bool get _isTeacher => viewerRole == 'teacher';
+  bool get _creditWasUsed => (event.changeCreditUsed ?? 0) > 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          AppStrings.cancellationConfirmedTitle(selectedSession),
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        Text(
+          _creditWasUsed
+              ? AppStrings.cancellationCreditUsed(
+                event.changeCreditUsed ?? 1,
+                event.changeCreditRemainingAfter ??
+                    subscription.remainingReschedule,
+              )
+              : AppStrings.cancellationNoCreditUsed,
+          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        if (_isTeacher && _creditWasUsed) ...[
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: AppSpacing.buttonHeightSmall,
+                  child: OutlinedButton(
+                    onPressed:
+                        onFreeProcess == null
+                            ? null
+                            : () => onFreeProcess!(event),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.inkQuaternary),
+                      shape: RoundedRectangleBorder(),
+                    ),
+                    child: Text(
+                      AppStrings.cancellationFreeProcess,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: SizedBox(
+                  height: AppSpacing.buttonHeightSmall,
+                  child: ElevatedButton(
+                    onPressed:
+                        onAcknowledge == null
+                            ? null
+                            : () => onAcknowledge!(event),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.paperAccent,
+                      shape: RoundedRectangleBorder(),
+                    ),
+                    child: Text(
+                      AppStrings.cancellationAcknowledge,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color: AppColors.paper,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ] else if (_isTeacher) ...[
+          SizedBox(
+            width: double.infinity,
+            height: AppSpacing.buttonHeightSmall,
+            child: ElevatedButton(
+              onPressed:
+                  onAcknowledge == null ? null : () => onAcknowledge!(event),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+                shape: RoundedRectangleBorder(),
+              ),
+              child: Text(
+                AppStrings.cancellationAcknowledge,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.paper,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

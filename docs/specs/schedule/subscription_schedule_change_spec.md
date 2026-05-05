@@ -204,12 +204,27 @@ sequenceDiagram
 | 메시지 첨부 | 수락/역제안 시 | 제안/수락/역제안 시 |
 | 일정 비교 | SuggestAlternativeScreen | SuggestAlternativeScreen (동일) |
 
-## 7. 관련 파일
+## 7. 레슨 취소 흐름
+
+레슨 취소는 일정 변경과 본질적으로 다른 단방향 흐름이다.
+별도 스펙 문서로 분리: **[lesson_cancellation_flow_spec.md](lesson_cancellation_flow_spec.md)**
+
+하단 바는 일정 변경(3상태) + 취소 확정(1상태) = **총 4상태**로 동작한다.
+
+| 상태 | 트리거 | 스펙 |
+|------|--------|------|
+| Default | 보류 이벤트 없음 | 이 문서 §4.1 |
+| Waiting | 일정 변경 제안 전송 | 이 문서 §4.2 |
+| CanRespond | 상대방 일정 변경 수신 | 이 문서 §4.3 |
+| CancellationConfirmed | 학생 취소 자동 확정 | [lesson_cancellation_flow_spec.md](lesson_cancellation_flow_spec.md) §5 |
+
+## 8. 관련 파일
 
 | 파일 | 역할 |
 |------|------|
 | `subscription_detail_screen.dart` | 수강권 상세 화면 (핸들러) |
-| `subscription_bottom_input_bar.dart` | 하단 입력 바 (3상태 UI) |
+| `subscription_bottom_input_bar.dart` | 하단 입력 바 (4상태 UI) |
 | `suggest_alternative_screen.dart` | 일정 비교 화면 (공유) |
 | `schedule_change_slot_bottom_sheet.dart` | 슬롯 선택 바텀시트 |
 | `schedule_change_type_bottom_sheet.dart` | 변경 타입 선택 (단일/전체) |
+| `cancel_lesson_bottom_sheet.dart` | 취소 사유 선택 + 제출 |

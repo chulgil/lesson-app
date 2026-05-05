@@ -452,6 +452,8 @@ class AppStrings {
   static const eventSubscriptionIssued = '수강권 발행';
   static const eventLessonCompleted = '레슨 완료';
   static const eventLessonCancelled = '레슨 취소';
+  static const eventLessonCancellationConfirmed = '취소 확정';
+  static const eventCancellationCreditRefunded = '무료 처리';
   static const eventScheduleChanged = '스케줄 변경';
   static const eventLessonNoteAdded = '레슨 노트';
   static const eventSubscriptionRenewed = '수강권 연장';
@@ -1005,6 +1007,19 @@ class AppStrings {
   static const scheduleChangeButton = '일정 변경';
   static const scheduleChangeGuideDefault = '일정 변경이 필요하면 아래 버튼을 눌러 요청하세요';
   static const scheduleChange = '일정 변경';
+
+  /// Cancellation confirmed — teacher bottom bar
+  static String cancellationConfirmedTitle(int session) =>
+      '$session회차 레슨이 취소되었습니다';
+  static String cancellationCreditUsed(int used, int remaining) =>
+      '변경/취소권 $used회 사용 · 잔여 $remaining회';
+  static const cancellationNoCreditUsed = '마감 시간 전 취소 · 변경/취소권 미사용';
+  static const cancellationFreeProcess = '무료 처리';
+  static const cancellationAcknowledge = '확인';
+  static const cancellationFreeConfirmDialog =
+      '이번 취소에 사용된 변경/취소권 1회를 돌려주시겠습니까?';
+  static const cancellationFreeProcessed = '변경/취소권을 돌려주었습니다';
+  static const cancellationCreditRefundedChat = '선생님이 변경/취소권을 돌려주었습니다';
   static const viewDetail = '상세 보기';
   static const sessionUnit = '회';
   static const unregistered = '미등록';

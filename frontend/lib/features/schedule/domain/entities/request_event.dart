@@ -126,7 +126,14 @@ enum RequestEventType {
 
   /// General text message (subscription detail chat)
   @HiveField(26)
-  message;
+  message,
+
+  // Phase 3: 레슨 취소 확정 + 크레딧 반환
+  @HiveField(27)
+  lessonCancellationConfirmed,
+
+  @HiveField(28)
+  cancellationCreditRefunded;
 
   String get label {
     switch (this) {
@@ -183,6 +190,10 @@ enum RequestEventType {
         return AppStrings.eventScheduleChangeCountered;
       case RequestEventType.message:
         return '';
+      case RequestEventType.lessonCancellationConfirmed:
+        return AppStrings.eventLessonCancellationConfirmed;
+      case RequestEventType.cancellationCreditRefunded:
+        return AppStrings.eventCancellationCreditRefunded;
     }
   }
 
@@ -386,6 +397,10 @@ class RequestEvent {
         return AppStrings.chatScheduleChangeCountered;
       case RequestEventType.message:
         return message ?? '';
+      case RequestEventType.lessonCancellationConfirmed:
+        return AppStrings.eventLessonCancellationConfirmed;
+      case RequestEventType.cancellationCreditRefunded:
+        return AppStrings.cancellationCreditRefundedChat;
     }
   }
 

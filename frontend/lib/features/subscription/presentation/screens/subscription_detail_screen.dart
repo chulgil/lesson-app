@@ -360,12 +360,16 @@ class _SubscriptionDetailBodyState
             viewerRole: widget.viewerRole,
             events: sessionEvents,
             opponentName: studentName,
+            selectedSession: _selectedSession,
             onScheduleChange: () => _handleScheduleChange(context),
             onAcceptScheduleChoice: _handleAcceptScheduleChoice,
             onCompareSchedule:
                 (event) => _handleCompareSchedule(context, event),
             onWithdrawScheduleDecision:
                 (event) => _handleWithdrawScheduleDecision(context, event),
+            onCancellationFreeProcess:
+                (event) => _handleCancellationFreeProcess(context, event),
+            onCancellationAcknowledge: _handleCancellationAcknowledge,
           ),
         );
       },
@@ -744,5 +748,60 @@ class _SubscriptionDetailBodyState
     if (mounted) {
       _showSuccess(AppStrings.scheduleChangePropose);
     }
+  }
+
+  /// Cancellation free process — teacher returns the credit to student.
+  Future<void> _handleCancellationFreeProcess(
+    BuildContext context,
+    RequestEvent event,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(AppStrings.cancellationFreeProcess),
+            content: Text(AppStrings.cancellationFreeConfirmDialog),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(AppStrings.confirm),
+              ),
+            ],
+          ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final refundEvent = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: ProposerRole.teacher,
+      actorId: subscription.studentId,
+      eventType: RequestEventType.cancellationCreditRefunded,
+      changeCreditUsed: 0,
+      changeCreditRemainingAfter:
+          (event.changeCreditRemainingAfter ?? 0) +
+          (event.changeCreditUsed ?? 1),
+      sessionNumber: _selectedSession,
+      message: AppStrings.cancellationCreditRefundedChat,
+      createdAt: DateTime.now(),
+    );
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      refundEvent,
+    );
+    if (mounted) _showSuccess(AppStrings.cancellationFreeProcessed);
+  }
+
+  /// Cancellation acknowledge — teacher confirms the cancellation (no credit change).
+  void _handleCancellationAcknowledge(RequestEvent event) {
+    // No-op: cancellation is already confirmed. This just dismisses the bar.
+    // The UI will transition back to default when the next event is checked.
+    if (mounted) _showSuccess(AppStrings.cancellationAcknowledge);
   }
 }
