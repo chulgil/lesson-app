@@ -16,9 +16,13 @@ class NotebookMasthead extends StatelessWidget {
   /// 모든 탭에서 동일한 masthead 높이 (border 포함).
   static const double mastheadHeight = 48.0;
 
-  /// Masthead 상단 여백 — 모든 탭/화면에서 동일.
+  /// Masthead 상단 여백 — 탭 내부 (HomeScreen SafeArea 하위).
   /// 변경 시 전역 일괄 적용.
   static const double mastheadTopPadding = 8.0;
+
+  /// Masthead 상단 여백 — 독립 화면 (push, 자체 SafeArea).
+  /// SafeArea top inset 바로 아래이므로 탭보다 넉넉하게.
+  static const double mastheadTopPaddingScreen = 4.0;
   /// 좌측 로고/라벨 — 대문자 + letterSpacing 5.
   final String eyebrow;
 

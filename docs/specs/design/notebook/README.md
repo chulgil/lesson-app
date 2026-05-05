@@ -121,6 +121,14 @@ Programme Title (38pt 가운데 큰 문구)은 수강관리에서만 사용하�
 
 `NotebookMasthead.mastheadHeight = 48.0` 상수로 전역 통일.
 별도 `ThinRule` 추가 금지 — masthead 자체가 상단 2px + 하단 1px 을 포함.
+텍스트는 `CrossAxisAlignment.center` 로 세로 가운데 정렬.
+
+**상단 여백 상수:**
+
+| 상수 | 값 | 용도 |
+|------|-----|------|
+| `mastheadTopPadding` | 8.0 | 탭 내부 (HomeScreen SafeArea 하위) |
+| `mastheadTopPaddingScreen` | 4.0 | 독립 화면 (push, 자체 SafeArea) |
 
 | 탭 | eyebrow | trailing | Programme Title |
 |----|---------|----------|----------------|

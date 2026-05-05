@@ -109,7 +109,7 @@ class StudentDetailScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: NotebookMasthead.mastheadTopPadding),
+            const SizedBox(height: NotebookMasthead.mastheadTopPaddingScreen),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
