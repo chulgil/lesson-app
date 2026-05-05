@@ -44,7 +44,7 @@ async def list_practice_logs(
     pagination: Annotated[dict, Depends(get_pagination)] = None,  # type: ignore[assignment]
 ) -> PaginatedResponse[PracticeLogResponse]:
     service = PracticeLogService(db)
-    logs = await service.get_logs(student_id, year=year, month=month, log_date=date)
+    logs = await service.get_logs(student_id, current_user, year=year, month=month, log_date=date)
     start = pagination["offset"]
     end = start + pagination["size"]
     return PaginatedResponse.create(
@@ -68,7 +68,7 @@ async def get_practice_log_by_date(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse | None:
     service = PracticeLogService(db)
-    return await service.get_log_by_date(student_id, date)
+    return await service.get_log_by_date(student_id, date, current_user)
 
 
 @router.get(
@@ -87,7 +87,7 @@ async def get_weekly_practice(
     if week_start is None:
         today = _dt.date.today()
         week_start = today - _dt.timedelta(days=today.weekday())
-    return await service.get_weekly_practice(student_id, week_start)
+    return await service.get_weekly_practice(student_id, week_start, current_user)
 
 
 @router.get(
@@ -104,7 +104,7 @@ async def get_monthly_stats(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeStatsResponse:
     service = PracticeLogService(db)
-    data = await service.get_monthly_stats(student_id, year, month)
+    data = await service.get_monthly_stats(student_id, year, month, current_user)
     return PracticeStatsResponse.model_validate(data)
 
 
@@ -120,7 +120,7 @@ async def get_practice_log_by_id(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    result: PracticeLogResponse = await service.get_log_by_id(log_id)
+    result: PracticeLogResponse = await service.get_log_by_id(log_id, current_user)
     return result
 
 
@@ -137,7 +137,7 @@ async def update_practice_log(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    result: PracticeLogResponse = await service.update_log(log_id, body.model_dump(exclude_none=True))
+    result: PracticeLogResponse = await service.update_log(log_id, body.model_dump(exclude_none=True), current_user)
     return result
 
 
@@ -152,7 +152,7 @@ async def delete_practice_log(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> None:
     service = PracticeLogService(db)
-    await service.delete_log(log_id)
+    await service.delete_log(log_id, current_user)
 
 
 @router.patch(
@@ -168,7 +168,7 @@ async def toggle_task(
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    result: PracticeLogResponse = await service.toggle_task(log_id, task_id)
+    result: PracticeLogResponse = await service.toggle_task(log_id, task_id, current_user)
     return result
 
 
@@ -200,5 +200,5 @@ async def create_practice_log(
             detail="student_id is required",
         )
     data = body.model_dump(exclude={"student_id"})
-    result: PracticeLogResponse = await service.create_log(target_student_id, data)
+    result: PracticeLogResponse = await service.create_log(target_student_id, data, current_user)
     return result

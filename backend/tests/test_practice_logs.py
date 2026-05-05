@@ -3,6 +3,13 @@
 import pytest
 from httpx import AsyncClient
 
+from app.core.security import create_access_token
+
+
+def _headers(user_id: str, role: str) -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
+
 
 @pytest.mark.asyncio
 async def test_create_practice_log(client: AsyncClient, auth_headers, create_test_user):
@@ -303,3 +310,193 @@ async def test_zero_minutes_practice_log(client: AsyncClient, auth_headers, crea
     )
     assert response.status_code == 201
     assert response.json()["total_minutes"] == 0
+
+
+@pytest.mark.asyncio
+async def test_teacher_cannot_access_other_teacher_practice_logs(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Teachers can only read or mutate logs for students they own."""
+    from datetime import date
+
+    from app.models.practice_log import PracticeLog
+    from app.models.student import Student
+
+    await create_test_user(user_id="teacher-user-id", role="teacher", email="teacher@test.com")
+    await create_test_user(user_id="other-teacher-user-id", role="teacher", email="other-teacher@test.com")
+    db_session.add_all(
+        [
+            Student(
+                id="owned-student",
+                teacher_id="teacher-user-id-prof",
+                name="Owned",
+                instrument="violin",
+            ),
+            Student(
+                id="other-student",
+                teacher_id="other-teacher-user-id-prof",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeLog(
+                id="other-log",
+                student_id="other-student",
+                date=date(2026, 3, 16),
+                total_minutes=30,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("teacher-user-id", "teacher")
+
+    list_response = await client.get(
+        "/api/v1/practice-logs",
+        headers=headers,
+        params={"student_id": "other-student"},
+    )
+    assert list_response.status_code == 403
+
+    create_response = await client.post(
+        "/api/v1/practice-logs",
+        headers=headers,
+        params={"student_id": "other-student"},
+        json={"date": "2026-03-17", "total_minutes": 20},
+    )
+    assert create_response.status_code == 403
+
+    update_response = await client.put(
+        "/api/v1/practice-logs/other-log",
+        headers=headers,
+        json={"total_minutes": 60},
+    )
+    assert update_response.status_code == 403
+
+    delete_response = await client.delete("/api/v1/practice-logs/other-log", headers=headers)
+    assert delete_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_parent_can_read_but_not_mutate_linked_child_practice_logs(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Parents can read active linked child logs but cannot mutate practice logs."""
+    from datetime import date
+
+    from app.models.parent import Parent, ParentChildRelation
+    from app.models.practice_log import PracticeLog
+    from app.models.student import Student
+
+    await create_test_user(user_id="parent-user-id", role="parent")
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            Student(
+                id="child-student",
+                teacher_id="teacher-profile-id",
+                name="Child",
+                instrument="violin",
+            ),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="child-student"),
+            PracticeLog(
+                id="child-log",
+                student_id="child-student",
+                date=date(2026, 3, 16),
+                total_minutes=30,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("parent-user-id", "parent")
+
+    list_response = await client.get(
+        "/api/v1/practice-logs",
+        headers=headers,
+        params={"student_id": "child-student"},
+    )
+    assert list_response.status_code == 200
+    assert [item["id"] for item in list_response.json()["items"]] == ["child-log"]
+
+    detail_response = await client.get("/api/v1/practice-logs/child-log", headers=headers)
+    assert detail_response.status_code == 200
+
+    create_response = await client.post(
+        "/api/v1/practice-logs",
+        headers=headers,
+        params={"student_id": "child-student"},
+        json={"date": "2026-03-17", "total_minutes": 20},
+    )
+    assert create_response.status_code == 403
+
+    toggle_response = await client.patch(
+        "/api/v1/practice-logs/child-log/tasks/t1/toggle",
+        headers=headers,
+    )
+    assert toggle_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_student_can_access_own_practice_logs_only(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Students can read and write only their own linked student profile logs."""
+    from datetime import date
+
+    from app.models.practice_log import PracticeLog
+    from app.models.student import Student
+
+    await create_test_user(user_id="student-user-id", role="student")
+    db_session.add_all(
+        [
+            Student(
+                id="student-profile-id",
+                user_id="student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Student",
+                instrument="violin",
+            ),
+            Student(
+                id="other-student",
+                user_id="other-student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeLog(
+                id="own-log",
+                student_id="student-profile-id",
+                date=date(2026, 3, 16),
+                total_minutes=30,
+            ),
+            PracticeLog(
+                id="other-student-log",
+                student_id="other-student",
+                date=date(2026, 3, 16),
+                total_minutes=40,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("student-user-id", "student")
+
+    own_response = await client.get("/api/v1/practice-logs/own-log", headers=headers)
+    assert own_response.status_code == 200
+
+    other_response = await client.get("/api/v1/practice-logs/other-student-log", headers=headers)
+    assert other_response.status_code == 403
+
+    create_response = await client.post(
+        "/api/v1/practice-logs",
+        headers=headers,
+        params={"student_id": "student-profile-id"},
+        json={"date": "2026-03-17", "total_minutes": 20},
+    )
+    assert create_response.status_code == 201

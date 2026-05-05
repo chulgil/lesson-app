@@ -20,6 +20,7 @@ class PracticeLogService:
     async def get_logs(
         self,
         student_id: str,
+        current_user: Any,
         *,
         year: int | None = None,
         month: int | None = None,
@@ -28,6 +29,7 @@ class PracticeLogService:
         """Get practice logs with optional date/month filters."""
         from app.models.practice_log import PracticeLog
 
+        await self._assert_can_read_student(student_id, current_user)
         query = select(PracticeLog).where(PracticeLog.student_id == student_id)
         if log_date is not None:
             query = query.where(PracticeLog.date == log_date)
@@ -42,10 +44,11 @@ class PracticeLogService:
         )
         return list(result.all())
 
-    async def get_log_by_date(self, student_id: str, log_date: date) -> Any | None:
+    async def get_log_by_date(self, student_id: str, log_date: date, current_user: Any) -> Any | None:
         """Get practice log for a specific date."""
         from app.models.practice_log import PracticeLog
 
+        await self._assert_can_read_student(student_id, current_user)
         return await self.db.scalar(
             select(PracticeLog).where(
                 PracticeLog.student_id == student_id,
@@ -53,20 +56,22 @@ class PracticeLogService:
             )
         )
 
-    async def get_log_by_id(self, log_id: str) -> Any:
+    async def get_log_by_id(self, log_id: str, current_user: Any) -> Any:
         """Get practice log by ID."""
         from app.models.practice_log import PracticeLog
 
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
+        await self._assert_can_read_student(log.student_id, current_user)
         return log
 
-    async def create_log(self, student_id: str, data: dict) -> Any:
+    async def create_log(self, student_id: str, data: dict, current_user: Any) -> Any:
         """Create a practice log."""
         from app.models.practice_log import PracticeLog
 
-        existing = await self.get_log_by_date(student_id, data["date"])
+        await self._assert_can_manage_student(student_id, current_user)
+        existing = await self.get_log_by_date(student_id, data["date"], current_user)
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -79,13 +84,14 @@ class PracticeLogService:
         await self.db.refresh(log)
         return log
 
-    async def update_log(self, log_id: str, data: dict) -> Any:
+    async def update_log(self, log_id: str, data: dict, current_user: Any) -> Any:
         """Update a practice log."""
         from app.models.practice_log import PracticeLog
 
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
+        await self._assert_can_manage_student(log.student_id, current_user)
         for key, value in data.items():
             if value is not None:
                 setattr(log, key, value)
@@ -93,17 +99,18 @@ class PracticeLogService:
         await self.db.refresh(log)
         return log
 
-    async def delete_log(self, log_id: str) -> None:
+    async def delete_log(self, log_id: str, current_user: Any) -> None:
         """Delete a practice log."""
         from app.models.practice_log import PracticeLog
 
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
+        await self._assert_can_manage_student(log.student_id, current_user)
         await self.db.delete(log)
         await self.db.flush()
 
-    async def toggle_task(self, log_id: str, task_id: str) -> Any:
+    async def toggle_task(self, log_id: str, task_id: str, current_user: Any) -> Any:
         """Toggle task completion in a practice log."""
         from sqlalchemy.orm.attributes import flag_modified
 
@@ -112,6 +119,7 @@ class PracticeLogService:
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
+        await self._assert_can_manage_student(log.student_id, current_user)
         tasks = list(log.tasks or [])
         for task in tasks:
             if task.get("id") == task_id:
@@ -123,12 +131,13 @@ class PracticeLogService:
         await self.db.refresh(log)
         return log
 
-    async def get_weekly_practice(self, student_id: str, week_start: date) -> list[bool]:
+    async def get_weekly_practice(self, student_id: str, week_start: date, current_user: Any) -> list[bool]:
         """Get 7-day practice status (Mon-Sun)."""
         from datetime import timedelta
 
         from app.models.practice_log import PracticeLog
 
+        await self._assert_can_read_student(student_id, current_user)
         week_end = week_start + timedelta(days=6)
         result = await self.db.scalars(
             select(PracticeLog.date).where(
@@ -143,10 +152,11 @@ class PracticeLogService:
             for i in range(7)
         ]
 
-    async def get_monthly_stats(self, student_id: str, year: int, month: int) -> dict:
+    async def get_monthly_stats(self, student_id: str, year: int, month: int, current_user: Any) -> dict:
         """Get monthly practice statistics."""
         from app.models.practice_log import PracticeLog
 
+        await self._assert_can_read_student(student_id, current_user)
         start = date(year, month, 1)
         _, last_day = calendar.monthrange(year, month)
         end = date(year, month, last_day)
@@ -175,3 +185,64 @@ class PracticeLogService:
             "total_minutes": total_minutes,
             "average_minutes_per_day": round(total_minutes / max(count, 1), 1),
         }
+
+    async def _assert_can_read_student(self, student_id: str, current_user: Any) -> None:
+        role = self._role(current_user)
+        if role == "teacher":
+            await self._assert_teacher_owns_student_if_present(student_id, current_user)
+            return
+        if role == "student" and await self._student_matches_user(student_id, current_user):
+            return
+        if role == "parent" and student_id in await self._parent_child_student_ids(current_user):
+            return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_can_manage_student(self, student_id: str, current_user: Any) -> None:
+        role = self._role(current_user)
+        if role == "teacher":
+            await self._assert_teacher_owns_student_if_present(student_id, current_user)
+            return
+        if role == "student" and await self._student_matches_user(student_id, current_user):
+            return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_teacher_owns_student_if_present(self, student_id: str, current_user: Any) -> None:
+        from app.models.student import Student
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            return
+        teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if student.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _student_matches_user(self, student_id: str, current_user: Any) -> bool:
+        from app.models.student import Student
+
+        if student_id == current_user.id:
+            return True
+        linked_id = await self.db.scalar(
+            select(Student.id).where(
+                Student.id == student_id,
+                Student.user_id == current_user.id,
+            )
+        )
+        return linked_id is not None
+
+    async def _parent_child_student_ids(self, current_user: Any) -> list[str]:
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == current_user.id))
+        if parent_id is None:
+            return []
+        result = await self.db.scalars(
+            select(ParentChildRelation.student_id).where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        return list(result.all())
+
+    def _role(self, current_user: Any) -> str | None:
+        return getattr(getattr(current_user, "role", None), "value", None)
