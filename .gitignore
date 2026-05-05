@@ -148,5 +148,6 @@ design-plan/
 .autopus/
 autopus.yaml
 
-# BMAD generated research/planning output
+# Retired BMAD project artifacts
+_bmad/
 _bmad-output/
