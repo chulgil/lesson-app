@@ -18,12 +18,16 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
-import '../../../../features/students/domain/entities/student.dart';
+import '../../../../features/students/students_facade.dart'
+    show
+        Student,
+        StudentStatus,
+        studentProfileImageNotifierProvider,
+        studentProvider,
+        studentsNotifierProvider;
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
-import '../../presentation/providers/student_crud_provider.dart';
-import '../providers/student_image_provider.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 
 /// Student detail screen — Notebook × Score 레이아웃.
@@ -119,13 +123,16 @@ class StudentDetailScreen extends ConsumerWidget {
                 meta: '',
                 trailing: IconButton(
                   onPressed: () => context.pop(),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.ink,
-                  size: 22,
-                ),
-                padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.ink,
+                    size: 22,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                 ),
               ),
             ),
@@ -575,6 +582,7 @@ class _NotebookHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: NotebookMasthead.mastheadTopPaddingScreen),
           // ── Masthead: 좌 STUDENT eyebrow + 우 back/more 아이콘 ──
           Padding(
             padding: const EdgeInsets.symmetric(
