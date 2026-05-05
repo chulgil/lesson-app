@@ -10,7 +10,6 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../providers/student_home_session_provider.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
@@ -99,8 +98,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.space2),
-              const ThinRule(),
             ],
           ),
         ),

@@ -9,7 +9,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../providers/student_home_booking_provider.dart';
@@ -152,8 +151,6 @@ class StudentLessonsTab extends ConsumerWidget {
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
           ),
-          const SizedBox(height: AppSpacing.space2),
-          const ThinRule(),
         ],
       ),
     );

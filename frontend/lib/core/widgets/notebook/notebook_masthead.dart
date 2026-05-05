@@ -9,8 +9,12 @@ import '../../theme/notebook_typography.dart';
 /// - 좌: Playfair Display eyebrow ("LESSONAZA" 등)
 /// - 우: IBM Plex Mono 메타 ("VOL. IV · NO. 18 · APR MMXXVI")
 ///
-/// 스펙: `docs/specs/design/notebook/README.md` §6.2
+/// 스펙: `docs/specs/design/notebook/README.md` §1.2.1
+///
+/// 높이는 [mastheadHeight] 로 전역 통일. 변경 시 모든 탭에 일괄 적용.
 class NotebookMasthead extends StatelessWidget {
+  /// 모든 탭에서 동일한 masthead 높이 (border 포함).
+  static const double mastheadHeight = 48.0;
   /// 좌측 로고/라벨 — 대문자 + letterSpacing 5.
   final String eyebrow;
 
@@ -34,13 +38,14 @@ class NotebookMasthead extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: mastheadHeight,
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(color: AppColors.ink, width: 2),
           bottom: BorderSide(color: AppColors.ink, width: 1),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 0),
       child: Row(
         crossAxisAlignment:
             trailing != null

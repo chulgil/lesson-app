@@ -12,7 +12,6 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../home/presentation/widgets/lesson_card.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../student_home/presentation/screens/student_lessons_tab.dart';
@@ -374,8 +373,6 @@ class ScheduleTab extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.space2),
-          const ThinRule(),
         ],
       ),
     );

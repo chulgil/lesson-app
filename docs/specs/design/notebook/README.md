@@ -114,11 +114,13 @@
 Programme Title (38pt 가운데 큰 문구)은 수강관리에서만 사용하고, 나머지 탭은 제외.
 
 ```
-┌─────────────────────────────────────┐
-│ EYEBROW           VOL. IV · NO. 23 +│  ← NotebookMasthead (eyebrow + meta + trailing icon)
-│ ─────────────────────────────────── │  ← ThinRule
-└─────────────────────────────────────┘
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ← 2px top border (ink)
+│ EYEBROW           VOL. IV · NO. 23 +│  ← NotebookMasthead (height: 48px 고정)
+─────────────────────────────────────  ← 1px bottom border (ink)
 ```
+
+`NotebookMasthead.mastheadHeight = 48.0` 상수로 전역 통일.
+별도 `ThinRule` 추가 금지 — masthead 자체가 상단 2px + 하단 1px 을 포함.
 
 | 탭 | eyebrow | trailing | Programme Title |
 |----|---------|----------|----------------|
