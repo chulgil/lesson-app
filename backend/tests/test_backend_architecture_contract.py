@@ -82,6 +82,22 @@ def test_lower_layers_do_not_import_api_layer() -> None:
     assert violations == []
 
 
+def test_schemas_do_not_import_model_layer() -> None:
+    """Pydantic schemas should describe API contracts without depending on ORM models."""
+    violations: list[str] = []
+    for path in _python_files(APP_ROOT / "schemas"):
+        tree = ast.parse(path.read_text())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("app.models"):
+                violations.append(f"{_module_path(path)} imports {node.module}")
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.startswith("app.models"):
+                        violations.append(f"{_module_path(path)} imports {alias.name}")
+
+    assert violations == []
+
+
 def test_openapi_operation_ids_are_unique() -> None:
     """OpenAPI operation IDs must be stable and unique for docs and generated clients."""
     schema = app.openapi()

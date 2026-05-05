@@ -7,8 +7,6 @@ from datetime import datetime
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
-from app.models.request_event import RequestEventType, ScheduleChangeType
-
 
 class TimeSlotOptionSchema(BaseModel):
     """Time slot option proposed within an event."""
@@ -38,11 +36,11 @@ class RequestEventCreate(BaseModel):
     request_id: str
     actor_type: str
     actor_id: str
-    event_type: RequestEventType
+    event_type: str
     suggested_slots: list[TimeSlotOptionSchema] = []
     selected_slot_index: int | None = None
     message: str | None = None
-    schedule_change_type: ScheduleChangeType | None = None
+    schedule_change_type: str | None = None
     proposed_day_of_week: int | None = None
     proposed_time: str | None = None
     subscription_id: str | None = None
@@ -70,11 +68,11 @@ class RequestEventResponse(BaseModel):
     request_id: str
     actor_type: str
     actor_id: str
-    event_type: RequestEventType
+    event_type: str
     suggested_slots: list[TimeSlotOptionSchema] | None = None
     selected_slot_index: int | None = None
     message: str | None = None
-    schedule_change_type: ScheduleChangeType | None = None
+    schedule_change_type: str | None = None
     proposed_day_of_week: int | None = None
     proposed_time: str | None = None
     subscription_id: str | None = None

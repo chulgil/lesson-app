@@ -5,8 +5,6 @@ import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.notification import NotificationPriority
-
 
 class NotificationResponse(BaseModel):
     """Notification representation."""
@@ -16,7 +14,7 @@ class NotificationResponse(BaseModel):
     id: str
     user_id: str
     type: str | None = None
-    priority: NotificationPriority = NotificationPriority.normal
+    priority: str = "normal"
     title: str | None = None
     body: str | None = None
     data: dict | None = None

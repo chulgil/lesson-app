@@ -173,6 +173,7 @@ Schema    Schema (Pydantic v2)
 - API router는 `select`, `func`, `insert`, `update`, `delete` 같은 SQLAlchemy query helper를 직접 import하지 않는다.
 - API router는 `db.get/scalar/scalars/execute/add/delete/flush/refresh`를 직접 호출하지 않는다.
 - `models`, `schemas`, `services`는 `app.api` 계층을 import하지 않는다.
+- `schemas`는 `app.models` 계층을 import하지 않는다. API 계약은 Pydantic 필드와 validator로 표현하고, ORM enum/모델 변환은 service/model 계층에서 처리한다.
 - 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
 - OpenAPI `operationId`는 전체 API에서 유일해야 한다. 동일한 함수명을 여러 라우터에서 쓰거나 레거시/신규 경로를 병행 노출할 때는 명시적 `operation_id`를 지정한다.
 

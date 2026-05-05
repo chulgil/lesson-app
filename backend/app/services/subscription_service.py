@@ -380,7 +380,7 @@ class SubscriptionService:
         current_user: Any,
     ) -> RequestEventResponse:
         """Persist a subscription chat event."""
-        from app.models.request_event import RequestEvent
+        from app.models.request_event import RequestEvent, RequestEventType, ScheduleChangeType
 
         await self._get_subscription_for_user(subscription_id, current_user)
         await self._validate_subscription_event_turn(subscription_id, data, current_user)
@@ -391,17 +391,26 @@ class SubscriptionService:
             )
 
         suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
-        schedule_change_type = data.schedule_change_type
+        event_type = RequestEventType(data.event_type)
+        schedule_change_type = (
+            ScheduleChangeType(data.schedule_change_type)
+            if data.schedule_change_type is not None
+            else None
+        )
         proposed_day_of_week = data.proposed_day_of_week
         proposed_time = data.proposed_time
         selected_slot_index = data.selected_slot_index
 
-        if data.event_type.value in {"scheduleChangeAccepted", "withdrawApproval"} and not suggested_slots:
+        terminal_replay_types = {
+            RequestEventType.scheduleChangeAccepted,
+            RequestEventType.withdrawApproval,
+        }
+        if event_type in terminal_replay_types and not suggested_slots:
             source = await self._latest_schedule_change_source_event(
                 request_id=data.request_id or subscription_id,
                 subscription_id=subscription_id,
                 session_number=data.session_number,
-                include_accepted=data.event_type.value == "withdrawApproval",
+                include_accepted=event_type == RequestEventType.withdrawApproval,
             )
             if source is not None:
                 suggested_slots = list(source.suggested_slots or [])
@@ -416,7 +425,7 @@ class SubscriptionService:
             request_id=data.request_id or subscription_id,
             actor_type=data.actor_type,
             actor_id=data.actor_id,
-            event_type=data.event_type,
+            event_type=event_type,
             suggested_slots=suggested_slots,
             selected_slot_index=selected_slot_index,
             message=data.message,
@@ -447,7 +456,7 @@ class SubscriptionService:
         if role == "parent":
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
-        event_type = data.event_type
+        event_type = RequestEventType(data.event_type)
         terminal_types = {
             RequestEventType.scheduleChangeAccepted,
             RequestEventType.scheduleChangeRejected,
