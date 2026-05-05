@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -16,6 +16,7 @@ from app.schemas.subscription import (
     NotifyPaymentRequest,
     ProposalRespondRequest,
     SubscriptionCreate,
+    SubscriptionDepositSummaryResponse,
     SubscriptionProposalCreate,
     SubscriptionProposalResponse,
     SubscriptionResponse,
@@ -119,6 +120,69 @@ class SubscriptionService:
         result = await self.db.scalars(query.offset(offset).limit(size))
         items = [SubscriptionResponse.model_validate(s) for s in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
+
+    async def get_deposit_summary(
+        self,
+        *,
+        user: Any,
+        year: int | None = None,
+        month: int | None = None,
+    ) -> SubscriptionDepositSummaryResponse:
+        """Summarize visible manual tuition deposit states."""
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.subscription import Subscription
+
+        query = select(Subscription).where(Subscription.status == "active")
+        role = self._actor_type(user)
+        if role == "student":
+            query = query.where(Subscription.student_id.in_(await self._student_identifiers(user)))
+        elif role == "parent":
+            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(user)))
+        elif role == "teacher":
+            identifiers = await self._teacher_identifiers(user)
+            query = (
+                query.join(
+                    ClassMembership,
+                    Subscription.membership_id == ClassMembership.id,
+                )
+                .join(
+                    LessonClass,
+                    ClassMembership.lesson_class_id == LessonClass.id,
+                )
+                .where(LessonClass.teacher_id.in_(identifiers))
+            )
+        else:
+            query = query.where(False)
+
+        if year is not None and month is not None:
+            start = date(year, month, 1)
+            end = date(year + 1, 1, 1) if month == 12 else date(year, month + 1, 1)
+            query = query.where(Subscription.start_date >= start, Subscription.start_date < end)
+        elif year is not None:
+            query = query.where(
+                Subscription.start_date >= date(year, 1, 1),
+                Subscription.start_date < date(year + 1, 1, 1),
+            )
+
+        subscriptions = (await self.db.scalars(query)).all()
+        summary = SubscriptionDepositSummaryResponse(year=year, month=month)
+        student_ids: set[str] = set()
+        for sub in subscriptions:
+            amount = sub.amount or 0
+            summary.total_count += 1
+            summary.total_amount += amount
+            student_ids.add(sub.student_id)
+            if sub.payment_confirmed:
+                summary.confirmed_count += 1
+                summary.confirmed_amount += amount
+            elif sub.paid_at is not None:
+                summary.needs_confirmation_count += 1
+                summary.needs_confirmation_amount += amount
+            else:
+                summary.unpaid_count += 1
+                summary.unpaid_amount += amount
+        summary.student_count = len(student_ids)
+        return summary
 
     async def create(self, data: SubscriptionCreate, current_user: Any) -> SubscriptionResponse:
         """Create a new subscription."""

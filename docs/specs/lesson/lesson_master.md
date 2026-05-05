@@ -348,6 +348,16 @@ bool get needsPaymentConfirmation =>
 - 총 입금대기(후불) 금액, 건수, 학생 수
 - 개별 입금대기(후불) 수강권 카드 (입금확인 / 알림 보내기 버튼)
 
+백엔드 계약:
+- 입금대기(후불) 목록: `GET /api/v1/subscriptions?deposit_status=unpaid`
+- 입금 확인 필요 목록: `GET /api/v1/subscriptions?deposit_status=needsConfirmation`
+- 입금 확인 완료 목록: `GET /api/v1/subscriptions?deposit_status=confirmed`
+- 입금 상태 요약: `GET /api/v1/subscriptions/deposits/summary?year=YYYY&month=M`
+- 학생/학부모 입금 완료 알림: `PATCH /api/v1/subscriptions/{subscription_id}/notify-payment`
+- 선생님 입금 확인: `PATCH /api/v1/subscriptions/{subscription_id}/confirm-payment`
+
+입금 상태 요약은 별도 `Payment` API가 아니라 현재 사용자가 볼 수 있는 `Subscription`만 집계한다.
+
 #### 3.5.5 개선 효과
 
 | 항목 | 앱 미사용 | 앱 사용 |

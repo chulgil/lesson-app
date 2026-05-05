@@ -58,6 +58,28 @@ class SubscriptionResponse(BaseModel):
     updated_at: _dt.datetime | None = None
 
 
+def _camel_alias(field_name: str) -> str:
+    return "".join(word.capitalize() if index else word for index, word in enumerate(field_name.split("_")))
+
+
+class SubscriptionDepositSummaryResponse(BaseModel):
+    """Manual tuition deposit summary derived from Subscription payment state."""
+
+    model_config = ConfigDict(populate_by_name=True, alias_generator=_camel_alias)
+
+    year: int | None = None
+    month: int | None = None
+    total_count: int = 0
+    total_amount: int = 0
+    student_count: int = 0
+    unpaid_count: int = 0
+    unpaid_amount: int = 0
+    needs_confirmation_count: int = 0
+    needs_confirmation_amount: int = 0
+    confirmed_count: int = 0
+    confirmed_amount: int = 0
+
+
 class SubscriptionCreate(BaseModel):
     """Create a subscription."""
 

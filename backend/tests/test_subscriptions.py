@@ -160,6 +160,116 @@ async def test_subscription_deposit_status_filters_follow_external_deposit_polic
 
 
 @pytest.mark.asyncio
+async def test_subscription_deposit_summary_counts_visible_manual_deposit_statuses(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Deposit summary aggregates Subscription payment state, not an app payment API."""
+    from datetime import UTC, datetime
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    visible_membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id-prof",
+        student_id="student-001",
+    )
+    second_visible_membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id-prof",
+        student_id="student-002",
+    )
+    other_membership_id = await _create_membership(
+        db_session,
+        teacher_id="other-teacher-prof",
+        student_id="student-999",
+    )
+
+    payloads = [
+        {
+            "student_id": "student-001",
+            "membership_id": visible_membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "start_date": "2026-05-01",
+            "payment_confirmed": False,
+        },
+        {
+            "student_id": "student-002",
+            "membership_id": second_visible_membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 150000,
+            "start_date": "2026-05-03",
+            "payment_confirmed": False,
+            "paid_at": datetime(2026, 5, 5, tzinfo=UTC).isoformat(),
+        },
+        {
+            "student_id": "student-002",
+            "membership_id": second_visible_membership_id,
+            "type": "monthly",
+            "total_lessons": 4,
+            "amount": 170000,
+            "start_date": "2026-05-10",
+            "payment_confirmed": True,
+            "paid_at": datetime(2026, 5, 10, tzinfo=UTC).isoformat(),
+            "payment_confirmed_at": datetime(2026, 5, 11, tzinfo=UTC).isoformat(),
+        },
+        {
+            "student_id": "student-001",
+            "membership_id": visible_membership_id,
+            "type": "monthly",
+            "total_lessons": 4,
+            "amount": 90000,
+            "start_date": "2026-04-01",
+            "payment_confirmed": False,
+        },
+    ]
+    for payload in payloads:
+        response = await client.post("/api/v1/subscriptions", headers=auth_headers, json=payload)
+        assert response.status_code == 201
+
+    from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
+
+    db_session.add(
+        Subscription(
+            student_id="student-999",
+            membership_id=other_membership_id,
+            type=SubscriptionType.package,
+            total_lessons=4,
+            amount=999000,
+            start_date=datetime(2026, 5, 1, tzinfo=UTC).date(),
+            status=SubscriptionStatus.active,
+            payment_confirmed=False,
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/subscriptions/deposits/summary",
+        headers=auth_headers,
+        params={"year": 2026, "month": 5},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "year": 2026,
+        "month": 5,
+        "totalCount": 3,
+        "totalAmount": 440000,
+        "studentCount": 2,
+        "unpaidCount": 1,
+        "unpaidAmount": 120000,
+        "needsConfirmationCount": 1,
+        "needsConfirmationAmount": 150000,
+        "confirmedCount": 1,
+        "confirmedAmount": 170000,
+    }
+
+
+@pytest.mark.asyncio
 async def test_student_and_parent_can_notify_external_deposit_without_payments_api(
     client: AsyncClient,
     auth_headers,

@@ -141,6 +141,21 @@ app/
 | 단건 읽음 | `PATCH /api/v1/notifications/{id}/read`, 현재 사용자 소유 알림만 허용, 기존 `read_at` 보존 |
 | 전체 읽음 | `PATCH /api/v1/notifications/read-all`, 현재 사용자 미읽음 알림만 갱신 |
 
+### 수강권 입금 상태 API 계약 (2026-05-05)
+
+현행 정책은 앱 내 결제/PG가 아니라 선생님이 앱 밖에서 받은 수강료 입금 상태를 기록하는 것이다. 따라서 `/payments/*` 라우터는 만들지 않고, `Subscription`의 입금 상태 필드를 기준으로 관리한다.
+
+| 기능 | 백엔드 기준 |
+|------|-------------|
+| 입금대기 목록 | `GET /api/v1/subscriptions?deposit_status=unpaid` |
+| 입금 확인 필요 목록 | `GET /api/v1/subscriptions?deposit_status=needsConfirmation` |
+| 입금 확인 완료 목록 | `GET /api/v1/subscriptions?deposit_status=confirmed` |
+| 입금 상태 요약 | `GET /api/v1/subscriptions/deposits/summary?year=YYYY&month=M` |
+| 학생/학부모 입금 알림 | `PATCH /api/v1/subscriptions/{subscription_id}/notify-payment` |
+| 선생님 입금 확인 | `PATCH /api/v1/subscriptions/{subscription_id}/confirm-payment` |
+
+상태 판별은 `payment_confirmed`와 `paid_at`만 사용한다. `payment_confirmed=false && paid_at=null`은 `unpaid`, `payment_confirmed=false && paid_at!=null`은 `needsConfirmation`, `payment_confirmed=true`는 `confirmed`이다.
+
 ### 향후 항목
 
 1. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환) — 프론트엔드 작업

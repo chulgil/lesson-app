@@ -18,6 +18,7 @@ from app.schemas.subscription import (
     ProposalConfirmRequest,
     ProposalRespondRequest,
     SubscriptionCreate,
+    SubscriptionDepositSummaryResponse,
     SubscriptionProposalCreate,
     SubscriptionProposalResponse,
     SubscriptionResponse,
@@ -93,6 +94,23 @@ async def create_subscription(
     """Create a new subscription."""
     service = SubscriptionService(db)
     return await service.create(body, current_user)
+
+
+@router.get(
+    "/deposits/summary",
+    response_model=SubscriptionDepositSummaryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Summarize manual tuition deposits",
+)
+async def get_deposit_summary(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    year: int | None = None,
+    month: int | None = None,
+) -> SubscriptionDepositSummaryResponse:
+    """Return manual tuition deposit state summary for visible subscriptions."""
+    service = SubscriptionService(db)
+    return await service.get_deposit_summary(user=current_user, year=year, month=month)
 
 
 @router.get(
