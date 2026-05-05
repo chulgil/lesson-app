@@ -611,6 +611,78 @@ async def test_contract_location_crud(client, auth_headers, create_test_user):
     assert react_resp.status_code == 200
 
 
+@pytest.mark.asyncio
+async def test_location_crud_is_scoped_to_owner(client, create_test_user):
+    """Teachers cannot read or mutate another teacher's locations."""
+    await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-location@test.com")
+    await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-location@test.com")
+
+    teacher_a_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-a-id', 'role': 'teacher'})}"
+    }
+    teacher_b_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-b-id', 'role': 'teacher'})}"
+    }
+
+    create_resp = await client.post(
+        "/api/v1/locations",
+        json={
+            "name": "Teacher B Studio",
+            "type": "teacherStudio",
+            "address": "서울시 강남구",
+            "is_default": True,
+        },
+        headers=teacher_b_headers,
+    )
+    assert create_resp.status_code == 201
+    location_id = create_resp.json()["id"]
+
+    cross_list = await client.get(
+        "/api/v1/locations?owner_id=teacher-b-id",
+        headers=teacher_a_headers,
+    )
+    assert cross_list.status_code == 403
+
+    cross_get = await client.get(
+        f"/api/v1/locations/{location_id}",
+        headers=teacher_a_headers,
+    )
+    assert cross_get.status_code == 403
+
+    cross_update = await client.put(
+        f"/api/v1/locations/{location_id}",
+        json={"name": "Hijacked Studio"},
+        headers=teacher_a_headers,
+    )
+    assert cross_update.status_code == 403
+
+    cross_default = await client.patch(
+        f"/api/v1/locations/{location_id}/default",
+        headers=teacher_a_headers,
+    )
+    assert cross_default.status_code == 403
+
+    cross_deactivate = await client.patch(
+        f"/api/v1/locations/{location_id}/deactivate",
+        headers=teacher_a_headers,
+    )
+    assert cross_deactivate.status_code == 403
+
+    cross_reactivate = await client.patch(
+        f"/api/v1/locations/{location_id}/reactivate",
+        headers=teacher_a_headers,
+    )
+    assert cross_reactivate.status_code == 403
+
+    owner_get = await client.get(
+        f"/api/v1/locations/{location_id}",
+        headers=teacher_b_headers,
+    )
+    assert owner_get.status_code == 200
+    assert owner_get.json()["name"] == "Teacher B Studio"
+    assert owner_get.json()["is_active"] is True
+
+
 # ---------------------------------------------------------------------------
 # Schedule exception contracts
 # ---------------------------------------------------------------------------

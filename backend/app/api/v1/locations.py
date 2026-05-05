@@ -34,9 +34,9 @@ async def list_locations(
     """
     service = LocationService(db)
     if class_id:
-        return await service.get_by_class_id(class_id)
+        return await service.get_by_class_id(class_id, current_user)
     if owner_id:
-        return await service.get_by_owner_id(owner_id)
+        return await service.get_by_owner_id(owner_id, current_user)
     return await service.get_by_owner_id(current_user.id)
 
 
@@ -69,7 +69,7 @@ async def get_location(
 ) -> LocationResponse:
     """Return a single location by ID."""
     service = LocationService(db)
-    return await service.get_by_id(location_id)
+    return await service.get_by_id(location_id, current_user)
 
 
 @router.put(
@@ -103,7 +103,7 @@ async def set_default_location(
 ) -> SuccessResponse:
     """Set a location as default for a class."""
     service = LocationService(db)
-    await service.set_default(location_id, class_id or "")
+    await service.set_default(location_id, class_id or "", current_user)
     return SuccessResponse(message="Default location updated")
 
 
@@ -120,7 +120,7 @@ async def deactivate_location(
 ) -> SuccessResponse:
     """Soft-delete a location."""
     service = LocationService(db)
-    await service.deactivate(location_id)
+    await service.deactivate(location_id, current_user)
     return SuccessResponse(message="Location deactivated")
 
 
@@ -137,5 +137,5 @@ async def reactivate_location(
 ) -> SuccessResponse:
     """Reactivate a previously deactivated location."""
     service = LocationService(db)
-    await service.reactivate(location_id)
+    await service.reactivate(location_id, current_user)
     return SuccessResponse(message="Location reactivated")
