@@ -198,6 +198,51 @@ async def test_in_app_badge_and_list_exclude_push_only_notifications(
 
 
 @pytest.mark.asyncio
+async def test_in_app_badge_and_list_exclude_future_scheduled_notifications(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """The red badge and in-app list ignore notifications scheduled for later."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    visible_unread = Notification(
+        user_id="test-user-id",
+        type="lessonReminder",
+        priority=NotificationPriority.normal,
+        title="현재 표시 알림",
+        body="붉은점 대상",
+        is_in_app=True,
+    )
+    future_scheduled = Notification(
+        user_id="test-user-id",
+        type="lessonStarting",
+        priority=NotificationPriority.urgent,
+        title="예약 알림",
+        body="아직 표시하지 않음",
+        scheduled_at=datetime.now(UTC) + timedelta(hours=1),
+        is_in_app=True,
+    )
+    db_session.add_all([visible_unread, future_scheduled])
+    await db_session.flush()
+
+    list_response = await client.get("/api/v1/notifications", headers=auth_headers)
+    count_response = await client.get("/api/v1/notifications/unread-count", headers=auth_headers)
+    read_all_response = await client.patch("/api/v1/notifications/read-all", headers=auth_headers)
+    await db_session.refresh(visible_unread)
+    await db_session.refresh(future_scheduled)
+
+    assert list_response.status_code == 200
+    items = list_response.json()["items"]
+    assert [item["id"] for item in items] == [visible_unread.id]
+    assert count_response.status_code == 200
+    assert count_response.json() == {"count": 1}
+    assert read_all_response.status_code == 200
+    assert visible_unread.read_at is not None
+    assert future_scheduled.read_at is None
+
+
+@pytest.mark.asyncio
 async def test_mark_read_is_user_scoped_and_preserves_existing_read_timestamp(
     client: AsyncClient,
     auth_headers,

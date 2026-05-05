@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select, update
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import NotificationPriority
@@ -41,9 +41,10 @@ class NotificationService:
         """List notifications for a user."""
         from app.models.notification import Notification
 
+        visible_filter = self._visible_in_app_filter(Notification)
         query = select(Notification).where(
             Notification.user_id == user_id,
-            Notification.is_in_app.is_(True),
+            visible_filter,
         )
         if is_read is not None:
             if is_read:
@@ -79,11 +80,12 @@ class NotificationService:
         """Mark all notifications as read for a user."""
         from app.models.notification import Notification
 
+        visible_filter = self._visible_in_app_filter(Notification)
         await self.db.execute(
             update(Notification)
             .where(
                 Notification.user_id == user_id,
-                Notification.is_in_app.is_(True),
+                visible_filter,
                 Notification.read_at.is_(None),
             )
             .values(read_at=datetime.now(UTC))
@@ -94,14 +96,26 @@ class NotificationService:
         """Return the number of unread notifications."""
         from app.models.notification import Notification
 
+        visible_filter = self._visible_in_app_filter(Notification)
         count = await self.db.scalar(
             select(func.count()).where(
                 Notification.user_id == user_id,
-                Notification.is_in_app.is_(True),
+                visible_filter,
                 Notification.read_at.is_(None),
             )
         )
         return count or 0
+
+    def _visible_in_app_filter(self, notification_model: Any) -> Any:
+        """Return the predicate for notifications visible in the in-app inbox."""
+        return and_(
+            notification_model.is_in_app.is_(True),
+            or_(
+                notification_model.sent_at.isnot(None),
+                notification_model.scheduled_at.is_(None),
+                notification_model.scheduled_at <= datetime.now(UTC),
+            ),
+        )
 
     async def create_and_send(
         self,
