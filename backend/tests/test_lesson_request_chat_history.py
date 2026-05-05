@@ -321,6 +321,65 @@ async def test_lesson_request_events_endpoint_persists_remote_repository_events(
 
 
 @pytest.mark.asyncio
+async def test_lesson_request_detail_events_expose_schedule_change_snapshot_aliases(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """Nested detail events expose frontend snapshot aliases, not only DB names."""
+    await create_test_user(user_id="snapshot-teacher", role="teacher", name="스냅샷 선생님")
+    await create_test_user(
+        user_id="snapshot-student",
+        role="student",
+        name="스냅샷 학생",
+        email="snapshot-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("snapshot-student", "student"),
+        json={
+            "teacher_id": "snapshot-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    event_response = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("snapshot-teacher", "teacher"),
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "snapshot-teacher",
+            "event_type": "lessonCancelled",
+            "subscription_id": "snapshot-sub-001",
+            "session_number": 3,
+            "changeCreditUsed": 1,
+            "changeCreditRemainingAfter": 2,
+            "keepsSessionNumber": True,
+        },
+    )
+    assert event_response.status_code == 201
+    assert event_response.json()["changeCreditUsed"] == 1
+
+    detail_response = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_id}",
+        headers=_headers("snapshot-teacher", "teacher"),
+    )
+    assert detail_response.status_code == 200
+    event = detail_response.json()["events"][-1]
+    assert event["event_type"] == "lessonCancelled"
+    assert event["changeCreditUsed"] == 1
+    assert event["changeCreditRemainingAfter"] == 2
+    assert event["keepsSessionNumber"] is True
+
+
+@pytest.mark.asyncio
 async def test_schedule_change_accept_event_preserves_source_slots_for_history(
     client: AsyncClient,
     create_test_user,
@@ -398,6 +457,24 @@ async def test_schedule_change_accept_event_preserves_source_slots_for_history(
     assert body["suggested_slots"][1]["id"] == "slot-b"
     assert body["suggested_slots"][1]["day_of_week"] == 3
     assert body["selected_slot_index"] == 1
+
+    withdrawn = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_id}/events",
+        headers=_headers("change-student", "student"),
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "change-student",
+            "event_type": "withdrawApproval",
+            "subscription_id": "sub-change-001",
+            "session_number": 4,
+        },
+    )
+    assert withdrawn.status_code == 201
+    withdraw_body = withdrawn.json()
+    assert withdraw_body["event_type"] == "withdrawApproval"
+    assert withdraw_body["suggested_slots"][1]["id"] == "slot-b"
+    assert withdraw_body["selected_slot_index"] == 1
 
 
 @pytest.mark.asyncio

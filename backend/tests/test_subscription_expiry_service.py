@@ -8,7 +8,7 @@ Plan C §2: status 자동 전이 (active → expiringSoon at D-7, expiringSoon �
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from freezegun import freeze_time
@@ -37,6 +37,41 @@ def _make_subscription(
         total_lessons=8,
         used_lessons=0,
     )
+
+
+async def _create_membership_and_relation(
+    db_session: AsyncSession,
+    *,
+    teacher_id: str,
+    student_id: str,
+    relation_status: str = "active",
+    active_subscription_id: str | None = None,
+):
+    from app.models.lesson import ClassMembership, LessonClass
+    from app.models.relationship import RelationStatus, TeacherStudentRelation
+
+    lesson_class = LessonClass(teacher_id=teacher_id, name="만료 테스트 클래스", type="private")
+    db_session.add(lesson_class)
+    await db_session.flush()
+
+    membership = ClassMembership(
+        lesson_class_id=lesson_class.id,
+        student_id=student_id,
+        instrument="piano",
+        status="active",
+    )
+    db_session.add(membership)
+    await db_session.flush()
+
+    relation = TeacherStudentRelation(
+        teacher_id=teacher_id,
+        student_id=student_id,
+        status=RelationStatus(relation_status),
+        active_subscription_id=active_subscription_id,
+    )
+    db_session.add(relation)
+    await db_session.flush()
+    return membership, relation
 
 
 @pytest.mark.asyncio
@@ -211,3 +246,75 @@ async def test_run_daily_check_returns_milestone_subscriptions(
     for entry in result["milestones"]:
         milestones[entry["days_left"]] = milestones.get(entry["days_left"], 0) + 1
     assert milestones == {14: 1, 7: 1, 1: 1, 0: 1}
+
+
+@pytest.mark.asyncio
+@freeze_time(_FROZEN_UTC)
+async def test_expired_subscription_transitions_active_relation_to_expired(
+    db_session: AsyncSession,
+) -> None:
+    """수강권 만료 시 연결 관계도 expired 로 전이한다."""
+    from app.models.relationship import RelationStatus
+    from app.models.subscription import SubscriptionStatus
+    from app.services.subscription_expiry_service import SubscriptionExpiryService
+
+    membership, relation = await _create_membership_and_relation(
+        db_session,
+        teacher_id="teacher-001",
+        student_id="student-001",
+        relation_status="active",
+    )
+    sub = _make_subscription(
+        student_id="student-001",
+        membership_id=membership.id,
+        end_date=date(2026, 5, 1),
+        status="expiringSoon",
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    relation.active_subscription_id = sub.id
+    await db_session.flush()
+
+    result = await SubscriptionExpiryService(db_session).run_daily_check()
+
+    await db_session.refresh(sub)
+    await db_session.refresh(relation)
+    assert result["transitions"] == 1
+    assert sub.status == SubscriptionStatus.expired
+    assert relation.status == RelationStatus.expired
+    assert relation.active_subscription_id is None
+    assert relation.last_subscription_expired_at is not None
+    assert relation.expired_until is not None
+
+
+@pytest.mark.asyncio
+@freeze_time(_FROZEN_UTC)
+async def test_expired_relation_transitions_to_past_after_30_days(
+    db_session: AsyncSession,
+) -> None:
+    """수강권 만료 후 30일이 지난 관계는 past 로 전이한다."""
+    from app.models.relationship import RelationStatus
+    from app.services.subscription_expiry_service import SubscriptionExpiryService
+
+    membership, relation = await _create_membership_and_relation(
+        db_session,
+        teacher_id="teacher-001",
+        student_id="student-001",
+        relation_status="expired",
+    )
+    relation.last_subscription_expired_at = datetime.now(UTC) - timedelta(days=31)
+    relation.expired_until = datetime.now(UTC) - timedelta(days=1)
+    sub = _make_subscription(
+        student_id="student-001",
+        membership_id=membership.id,
+        end_date=date(2026, 4, 1),
+        status="expired",
+    )
+    db_session.add(sub)
+    await db_session.flush()
+
+    result = await SubscriptionExpiryService(db_session).run_daily_check()
+
+    await db_session.refresh(relation)
+    assert result["relationship_transitions"] == 1
+    assert relation.status == RelationStatus.past

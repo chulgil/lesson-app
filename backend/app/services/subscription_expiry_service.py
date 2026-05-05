@@ -9,7 +9,7 @@ Phase 6c (notification dispatch) 는 본 service 의 milestones 결과를 입력
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -31,7 +31,8 @@ NOTIFY_MILESTONES = (14, 7, 1, 0)
 EXPIRING_THRESHOLD_DAYS = 7
 
 # 만료 스캔 대상 status — paused 등 비활성은 제외
-_SCAN_STATUSES = (SubscriptionStatus.active, SubscriptionStatus.expiringSoon)
+_SCAN_STATUSES = (SubscriptionStatus.active, SubscriptionStatus.expiringSoon, SubscriptionStatus.expired)
+RELATION_PAST_AFTER_DAYS = 30
 
 
 def compute_today_kst() -> date:
@@ -92,6 +93,7 @@ class SubscriptionExpiryService:
         ).all()
 
         transitions = 0
+        relationship_transitions = 0
         milestones: list[dict[str, Any]] = []
 
         for sub in rows:
@@ -110,6 +112,12 @@ class SubscriptionExpiryService:
                 )
                 sub.status = target
                 transitions += 1
+
+            relationship_transitions += await self._transition_relationship_for_subscription(
+                sub,
+                days_left=days_left,
+                target_status=target,
+            )
 
             if days_left in NOTIFY_MILESTONES:
                 # Resolve teacher_id via membership → lesson_class (#250)
@@ -136,6 +144,59 @@ class SubscriptionExpiryService:
 
         return {
             "transitions": transitions,
+            "relationship_transitions": relationship_transitions,
             "milestones": milestones,
             "today_kst": today,
         }
+
+    async def _transition_relationship_for_subscription(
+        self,
+        sub: Subscription,
+        *,
+        days_left: int,
+        target_status: SubscriptionStatus,
+    ) -> int:
+        """Keep teacher-student relation aligned with subscription expiry lifecycle."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+
+        membership = await self.db.get(ClassMembership, sub.membership_id)
+        if membership is None:
+            return 0
+        lesson_class = await self.db.get(LessonClass, membership.lesson_class_id)
+        if lesson_class is None:
+            return 0
+
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.teacher_id == lesson_class.teacher_id,
+                TeacherStudentRelation.student_id == sub.student_id,
+            )
+        )
+        if relation is None:
+            return 0
+
+        now = datetime.now(UTC)
+        if (
+            target_status == SubscriptionStatus.expired
+            and days_left < 0
+            and relation.status == RelationStatus.active
+            and relation.active_subscription_id == sub.id
+        ):
+            relation.status = RelationStatus.expired
+            relation.active_subscription_id = None
+            relation.last_subscription_expired_at = now
+            relation.expired_until = now + timedelta(days=RELATION_PAST_AFTER_DAYS)
+            await self.db.flush()
+            return 1
+
+        if (
+            target_status == SubscriptionStatus.expired
+            and relation.status == RelationStatus.expired
+            and relation.expired_until is not None
+            and relation.expired_until <= now
+        ):
+            relation.status = RelationStatus.past
+            await self.db.flush()
+            return 1
+
+        return 0

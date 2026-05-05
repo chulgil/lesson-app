@@ -246,6 +246,21 @@ class RequestEvent {
   @HiveField(13)
   final int? sessionNumber;
 
+  /// Snapshot of reschedule/cancellation credits used by this event.
+  @HiveField(14)
+  @JsonKey(name: 'changeCreditUsed')
+  final int? changeCreditUsed;
+
+  /// Remaining credits after this event, preserved for historical rendering.
+  @HiveField(15)
+  @JsonKey(name: 'changeCreditRemainingAfter')
+  final int? changeCreditRemainingAfter;
+
+  /// Whether this event keeps the same session number after cancellation/change.
+  @HiveField(16)
+  @JsonKey(name: 'keepsSessionNumber')
+  final bool? keepsSessionNumber;
+
   const RequestEvent({
     required this.id,
     required this.requestId,
@@ -261,6 +276,9 @@ class RequestEvent {
     this.proposedTime,
     this.subscriptionId,
     this.sessionNumber,
+    this.changeCreditUsed,
+    this.changeCreditRemainingAfter,
+    this.keepsSessionNumber,
   });
 
   factory RequestEvent.fromJson(Map<String, dynamic> json) =>
@@ -283,6 +301,9 @@ class RequestEvent {
     String? proposedTime,
     String? subscriptionId,
     int? sessionNumber,
+    int? changeCreditUsed,
+    int? changeCreditRemainingAfter,
+    bool? keepsSessionNumber,
   }) {
     return RequestEvent(
       id: id ?? this.id,
@@ -299,6 +320,10 @@ class RequestEvent {
       proposedTime: proposedTime ?? this.proposedTime,
       subscriptionId: subscriptionId ?? this.subscriptionId,
       sessionNumber: sessionNumber ?? this.sessionNumber,
+      changeCreditUsed: changeCreditUsed ?? this.changeCreditUsed,
+      changeCreditRemainingAfter:
+          changeCreditRemainingAfter ?? this.changeCreditRemainingAfter,
+      keepsSessionNumber: keepsSessionNumber ?? this.keepsSessionNumber,
     );
   }
 

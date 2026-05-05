@@ -25,9 +25,14 @@ class SubscriptionResponse(BaseModel):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def remaining_lessons(self) -> int | None:
-        if self.total_lessons is None:
+        if self.type == "trial":
+            return 1 + self.bonus_count - self.used_lessons
+        base = self.total_lessons
+        if base is None and self.type == "monthly":
+            base = self.lessons_per_month
+        if base is None:
             return None
-        return self.total_lessons - self.used_lessons
+        return base + self.bonus_count - self.used_lessons
 
     amount: int | None = None
     start_date: _dt.date | None = None

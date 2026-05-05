@@ -16,9 +16,16 @@ class TimeSlotOptionSchema(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     id: str | None = None
-    day_of_week: int | None = Field(default=None, validation_alias=AliasChoices("day_of_week", "dayOfWeek"))
-    start_time: str = Field(validation_alias=AliasChoices("start_time", "startTime"))
-    end_time: str = Field(validation_alias=AliasChoices("end_time", "endTime"))
+    day_of_week: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("day_of_week", "dayOfWeek"),
+    )
+    start_time: str = Field(
+        validation_alias=AliasChoices("start_time", "startTime"),
+    )
+    end_time: str = Field(
+        validation_alias=AliasChoices("end_time", "endTime"),
+    )
     is_selected: bool = False
     date: datetime | None = None
 
@@ -72,8 +79,11 @@ class RequestEventResponse(BaseModel):
     proposed_time: str | None = None
     subscription_id: str | None = None
     session_number: int | None = None
-    change_credit_used: int | None = None
-    change_credit_remaining_after: int | None = None
-    keeps_session_number: bool | None = None
+    change_credit_used: int | None = Field(default=None, serialization_alias="changeCreditUsed")
+    change_credit_remaining_after: int | None = Field(
+        default=None,
+        serialization_alias="changeCreditRemainingAfter",
+    )
+    keeps_session_number: bool | None = Field(default=None, serialization_alias="keepsSessionNumber")
     created_at: datetime
     updated_at: datetime | None = None

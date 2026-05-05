@@ -183,16 +183,20 @@ class LessonRequestService:
         schedule_change_type = data.schedule_change_type
         proposed_day_of_week = data.proposed_day_of_week
         proposed_time = data.proposed_time
+        selected_slot_index = data.selected_slot_index
 
         if data.event_type.value in {"scheduleChangeAccepted", "withdrawApproval"} and not suggested_slots:
             source = await self._latest_schedule_change_source_event(
                 request_id=request_id,
                 subscription_id=data.subscription_id,
                 session_number=data.session_number,
+                include_accepted=data.event_type.value == "withdrawApproval",
             )
             if source is not None:
                 suggested_slots = list(source.suggested_slots or [])
                 schedule_change_type = schedule_change_type or source.schedule_change_type
+                if selected_slot_index is None:
+                    selected_slot_index = source.selected_slot_index
                 if proposed_day_of_week is None:
                     proposed_day_of_week = source.proposed_day_of_week
                 proposed_time = proposed_time or source.proposed_time
@@ -203,7 +207,7 @@ class LessonRequestService:
             actor_id=data.actor_id,
             event_type=data.event_type,
             suggested_slots=suggested_slots,
-            selected_slot_index=data.selected_slot_index,
+            selected_slot_index=selected_slot_index,
             message=data.message,
             schedule_change_type=schedule_change_type,
             proposed_day_of_week=proposed_day_of_week,
@@ -544,26 +548,29 @@ class LessonRequestService:
         request_id: str,
         subscription_id: str | None,
         session_number: int | None,
+        include_accepted: bool = False,
     ) -> Any | None:
         """Find the latest schedule-change proposal/request whose slots must be replayed."""
         from app.models.request_event import RequestEvent, RequestEventType
 
+        event_types = [
+            RequestEventType.scheduleChanged,
+            RequestEventType.scheduleChangeProposed,
+            RequestEventType.scheduleChangeCountered,
+        ]
+        if include_accepted:
+            event_types.append(RequestEventType.scheduleChangeAccepted)
+
         query = select(RequestEvent).where(
             RequestEvent.request_id == request_id,
-            RequestEvent.event_type.in_(
-                [
-                    RequestEventType.scheduleChanged,
-                    RequestEventType.scheduleChangeProposed,
-                    RequestEventType.scheduleChangeCountered,
-                ]
-            ),
+            RequestEvent.event_type.in_(event_types),
         )
         if subscription_id is not None:
             query = query.where(RequestEvent.subscription_id == subscription_id)
         if session_number is not None:
             query = query.where(RequestEvent.session_number == session_number)
 
-        result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc()))
+        result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))
         return result.first()
 
     def _canonical_request_status(self, request_status: str) -> str:

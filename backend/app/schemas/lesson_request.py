@@ -162,9 +162,12 @@ class RequestEventResponse(BaseModel):
     proposed_time: str | None = None
     subscription_id: str | None = None
     session_number: int | None = None
-    change_credit_used: int | None = None
-    change_credit_remaining_after: int | None = None
-    keeps_session_number: bool | None = None
+    change_credit_used: int | None = Field(default=None, serialization_alias="changeCreditUsed")
+    change_credit_remaining_after: int | None = Field(
+        default=None,
+        serialization_alias="changeCreditRemainingAfter",
+    )
+    keeps_session_number: bool | None = Field(default=None, serialization_alias="keepsSessionNumber")
 
 
 class LessonRequestCalendarItem(BaseModel):

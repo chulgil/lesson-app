@@ -55,6 +55,25 @@ class SubscriptionService:
         from app.models.subscription import Subscription
 
         query = select(Subscription)
+        role = self._actor_type(user)
+        if role == "student":
+            query = query.where(Subscription.student_id == user.id)
+        elif role == "teacher":
+            identifiers = await self._teacher_identifiers(user)
+            query = (
+                query.join(
+                    ClassMembership,
+                    Subscription.membership_id == ClassMembership.id,
+                )
+                .join(
+                    LessonClass,
+                    ClassMembership.lesson_class_id == LessonClass.id,
+                )
+                .where(LessonClass.teacher_id.in_(identifiers))
+            )
+        else:
+            query = query.where(False)
+
         if student_id:
             query = query.where(Subscription.student_id == student_id)
         if membership_id:
@@ -65,17 +84,10 @@ class SubscriptionService:
             confirmed = payment_confirmed.lower() not in ("false", "0", "no")
             query = query.where(Subscription.payment_confirmed == confirmed)
         if teacher_id:
-            query = (
-                query.join(
-                    ClassMembership,
-                    Subscription.membership_id == ClassMembership.id,
-                )
-                .join(
-                    LessonClass,
-                    ClassMembership.lesson_class_id == LessonClass.id,
-                )
-                .where(LessonClass.teacher_id == teacher_id)
-            )
+            if role == "teacher":
+                query = query.where(LessonClass.teacher_id == teacher_id)
+            else:
+                query = query.where(False)
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
@@ -88,9 +100,23 @@ class SubscriptionService:
         """Create a new subscription."""
         from app.models.subscription import Subscription
 
+        membership_id = data.membership_id
+        if membership_id:
+            await self._get_subscription_membership_for_teacher(
+                membership_id,
+                current_user,
+                student_id=data.student_id,
+            )
+        else:
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            membership_id = await self._find_or_create_membership(
+                teacher_id=teacher_id,
+                student_id=data.student_id,
+            )
+
         sub = Subscription(
             student_id=data.student_id,
-            membership_id=data.membership_id or "",
+            membership_id=membership_id,
             type=data.type or "monthly",
             total_lessons=data.total_lessons,
             used_lessons=data.used_lessons,
@@ -122,20 +148,12 @@ class SubscriptionService:
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Return a subscription by ID."""
-        from app.models.subscription import Subscription
-
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_user(subscription_id, current_user)
         return SubscriptionResponse.model_validate(sub)
 
     async def update(self, subscription_id: str, data: SubscriptionUpdate, current_user: Any) -> SubscriptionResponse:
         """Update a subscription."""
-        from app.models.subscription import Subscription
-
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -150,12 +168,10 @@ class SubscriptionService:
         """Deduct a lesson usage from a subscription."""
         from app.models.subscription import Subscription, SubscriptionUsage
 
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
-        remaining = (sub.total_lessons or 0) - (sub.used_lessons or 0)
-        if sub.total_lessons is not None and remaining <= 0:
+        remaining = self._remaining_lessons(sub)
+        if remaining is not None and remaining <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No remaining lessons",
@@ -184,15 +200,21 @@ class SubscriptionService:
         """Use a reschedule credit from a subscription."""
         from app.models.subscription import Subscription, SubscriptionUsage
 
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+
+        remaining = (sub.total_reschedule_allowance or 0) - (sub.used_reschedule_count or 0)
+        if remaining <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No remaining reschedule credits",
+            )
 
         usage = SubscriptionUsage(
             subscription_id=subscription_id,
             type="reschedule",
         )
         self.db.add(usage)
+        sub.used_reschedule_count = (sub.used_reschedule_count or 0) + 1
         await self.db.flush()
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)
@@ -201,9 +223,7 @@ class SubscriptionService:
         """Update subscription status."""
         from app.models.subscription import Subscription, SubscriptionStatus
 
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
         sub.status = SubscriptionStatus(new_status)
         await self.db.flush()
@@ -214,6 +234,7 @@ class SubscriptionService:
         """Get usage history for a subscription."""
         from app.models.subscription import SubscriptionUsage
 
+        await self._get_subscription_for_user(subscription_id, current_user)
         result = await self.db.scalars(
             select(SubscriptionUsage)
             .where(SubscriptionUsage.subscription_id == subscription_id)
@@ -225,9 +246,7 @@ class SubscriptionService:
         """Add a usage record to a subscription."""
         from app.models.subscription import Subscription, SubscriptionUsage
 
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        await self._get_subscription_for_teacher(subscription_id, current_user)
 
         usage = SubscriptionUsage(
             subscription_id=subscription_id,
@@ -282,24 +301,79 @@ class SubscriptionService:
                 detail="Event subscription_id must match path subscription_id",
             )
 
+        suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
+        schedule_change_type = data.schedule_change_type
+        proposed_day_of_week = data.proposed_day_of_week
+        proposed_time = data.proposed_time
+        selected_slot_index = data.selected_slot_index
+
+        if data.event_type.value in {"scheduleChangeAccepted", "withdrawApproval"} and not suggested_slots:
+            source = await self._latest_schedule_change_source_event(
+                request_id=data.request_id or subscription_id,
+                subscription_id=subscription_id,
+                session_number=data.session_number,
+                include_accepted=data.event_type.value == "withdrawApproval",
+            )
+            if source is not None:
+                suggested_slots = list(source.suggested_slots or [])
+                schedule_change_type = schedule_change_type or source.schedule_change_type
+                if selected_slot_index is None:
+                    selected_slot_index = source.selected_slot_index
+                if proposed_day_of_week is None:
+                    proposed_day_of_week = source.proposed_day_of_week
+                proposed_time = proposed_time or source.proposed_time
+
         event = RequestEvent(
             request_id=data.request_id or subscription_id,
             actor_type=data.actor_type,
             actor_id=data.actor_id,
             event_type=data.event_type,
-            suggested_slots=[slot.model_dump(mode="json") for slot in data.suggested_slots],
-            selected_slot_index=data.selected_slot_index,
+            suggested_slots=suggested_slots,
+            selected_slot_index=selected_slot_index,
             message=data.message,
-            schedule_change_type=data.schedule_change_type,
-            proposed_day_of_week=data.proposed_day_of_week,
-            proposed_time=data.proposed_time,
+            schedule_change_type=schedule_change_type,
+            proposed_day_of_week=proposed_day_of_week,
+            proposed_time=proposed_time,
             subscription_id=subscription_id,
             session_number=data.session_number,
+            change_credit_used=data.change_credit_used,
+            change_credit_remaining_after=data.change_credit_remaining_after,
+            keeps_session_number=data.keeps_session_number,
         )
         self.db.add(event)
         await self.db.flush()
         await self.db.refresh(event)
         return RequestEventResponse.model_validate(event)
+
+    async def _latest_schedule_change_source_event(
+        self,
+        *,
+        request_id: str,
+        subscription_id: str,
+        session_number: int | None,
+        include_accepted: bool = False,
+    ) -> Any | None:
+        """Find the event that an accept/withdraw action is responding to."""
+        from app.models.request_event import RequestEvent, RequestEventType
+
+        event_types = [
+            RequestEventType.scheduleChanged,
+            RequestEventType.scheduleChangeProposed,
+            RequestEventType.scheduleChangeCountered,
+        ]
+        if include_accepted:
+            event_types.append(RequestEventType.scheduleChangeAccepted)
+
+        query = select(RequestEvent).where(
+            RequestEvent.request_id == request_id,
+            RequestEvent.subscription_id == subscription_id,
+            RequestEvent.event_type.in_(event_types),
+        )
+        if session_number is not None:
+            query = query.where(RequestEvent.session_number == session_number)
+
+        result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))
+        return result.first()
 
     async def _get_subscription_for_user(self, subscription_id: str, current_user: Any) -> Any:
         """Return subscription if the current user can access it."""
@@ -337,15 +411,64 @@ class SubscriptionService:
         role = getattr(user, "role", None)
         return getattr(role, "value", role) or ""
 
+    async def _teacher_identifiers(self, user: Any) -> list[str]:
+        identifiers = [user.id]
+        teacher_profile_id = await try_resolve_teacher_id(self.db, user.id)
+        if teacher_profile_id and teacher_profile_id not in identifiers:
+            identifiers.append(teacher_profile_id)
+        return identifiers
+
+    def _remaining_lessons(self, sub: Any) -> int | None:
+        type_value = getattr(sub.type, "value", sub.type)
+        if type_value == "trial":
+            return 1 + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+        base = sub.total_lessons
+        if base is None and type_value == "monthly":
+            base = sub.lessons_per_month
+        if base is None:
+            return None
+        return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+
+    async def _get_subscription_for_teacher(self, subscription_id: str, current_user: Any) -> Any:
+        sub = await self._get_subscription_for_user(subscription_id, current_user)
+        if self._actor_type(current_user) != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return sub
+
+    async def _get_subscription_membership_for_teacher(
+        self,
+        membership_id: str,
+        current_user: Any,
+        *,
+        student_id: str | None = None,
+    ) -> Any:
+        from app.models.lesson import ClassMembership, LessonClass
+
+        identifiers = await self._teacher_identifiers(current_user)
+        membership = await self.db.scalar(
+            select(ClassMembership)
+            .join(LessonClass, ClassMembership.lesson_class_id == LessonClass.id)
+            .where(
+                ClassMembership.id == membership_id,
+                LessonClass.teacher_id.in_(identifiers),
+            )
+        )
+        if membership is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        if student_id is not None and membership.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="membership_id does not belong to student_id",
+            )
+        return membership
+
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
     ) -> SubscriptionResponse:
         """Confirm a manual tuition deposit."""
-        from app.models.subscription import PaymentMethod, Subscription
+        from app.models.subscription import PaymentMethod
 
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
         sub.payment_confirmed = True
         sub.payment_confirmed_at = datetime.now(UTC)
         if data.payment_method:

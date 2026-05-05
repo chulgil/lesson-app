@@ -195,6 +195,51 @@ void main() {
       expect(copy.eventType, RequestEventType.approve);
       expect(copy.message, 'new');
     });
+
+    test('스케줄 변경 스냅샷 필드 복사', () {
+      final original = createEvent();
+      final copy = original.copyWith(
+        changeCreditUsed: 1,
+        changeCreditRemainingAfter: 2,
+        keepsSessionNumber: true,
+      );
+
+      expect(copy.changeCreditUsed, 1);
+      expect(copy.changeCreditRemainingAfter, 2);
+      expect(copy.keepsSessionNumber, isTrue);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // JSON
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  group('JSON', () {
+    test('스케줄 변경 스냅샷 camelCase 필드 round-trip', () {
+      final event = RequestEvent.fromJson({
+        'id': 'evt_1',
+        'request_id': 'req_1',
+        'actor_type': 'student',
+        'actor_id': 'student_1',
+        'event_type': 'lessonCancelled',
+        'suggested_slots': [],
+        'created_at': '2026-03-29T14:00:00.000',
+        'subscription_id': 'sub_1',
+        'session_number': 3,
+        'changeCreditUsed': 1,
+        'changeCreditRemainingAfter': 2,
+        'keepsSessionNumber': true,
+      });
+
+      expect(event.changeCreditUsed, 1);
+      expect(event.changeCreditRemainingAfter, 2);
+      expect(event.keepsSessionNumber, isTrue);
+
+      final json = event.toJson();
+      expect(json['changeCreditUsed'], 1);
+      expect(json['changeCreditRemainingAfter'], 2);
+      expect(json['keepsSessionNumber'], isTrue);
+    });
   });
 
   // ═══════════════════════════════════════════════════════════════════════════

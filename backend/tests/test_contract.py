@@ -332,11 +332,29 @@ async def test_contract_membership_preserves_frontend_lesson_location_id(client,
 async def test_contract_subscription_preserves_frontend_full_json_fields(client, auth_headers, create_test_user):
     """Subscription.toJson includes billing, discount, and reschedule policy fields."""
     await create_test_user()
+    student_resp = await client.post(
+        "/api/v1/students",
+        json={"name": "수강권필드", "instrument": "piano"},
+        headers=auth_headers,
+    )
+    assert student_resp.status_code == 201
+    class_resp = await client.post(
+        "/api/v1/lessons-classes",
+        json={"name": "수강권 계약 클래스", "type": "private"},
+        headers=auth_headers,
+    )
+    assert class_resp.status_code == 201
+    membership_resp = await client.post(
+        f"/api/v1/lessons-classes/{class_resp.json()['id']}/memberships",
+        json={"student_id": student_resp.json()["id"], "instrument": "piano"},
+        headers=auth_headers,
+    )
+    assert membership_resp.status_code == 201
     create_resp = await client.post(
         "/api/v1/subscriptions",
         json={
-            "student_id": "student-sub-full",
-            "membership_id": "membership-sub-full",
+            "student_id": student_resp.json()["id"],
+            "membership_id": membership_resp.json()["id"],
             "type": "package",
             "status": "active",
             "total_lessons": 8,
@@ -430,11 +448,29 @@ async def test_contract_subscription_use_lesson_records_frontend_context(
 ):
     """RemoteSubscriptionRepository.useLesson sends teacher_name and instrument for usage history."""
     await create_test_user()
+    student_resp = await client.post(
+        "/api/v1/students",
+        json={"name": "사용내역학생", "instrument": "cello"},
+        headers=auth_headers,
+    )
+    assert student_resp.status_code == 201
+    class_resp = await client.post(
+        "/api/v1/lessons-classes",
+        json={"name": "사용내역 클래스", "type": "private"},
+        headers=auth_headers,
+    )
+    assert class_resp.status_code == 201
+    membership_resp = await client.post(
+        f"/api/v1/lessons-classes/{class_resp.json()['id']}/memberships",
+        json={"student_id": student_resp.json()["id"], "instrument": "cello"},
+        headers=auth_headers,
+    )
+    assert membership_resp.status_code == 201
     create_resp = await client.post(
         "/api/v1/subscriptions",
         json={
-            "student_id": "student-usage-context",
-            "membership_id": "membership-usage-context",
+            "student_id": student_resp.json()["id"],
+            "membership_id": membership_resp.json()["id"],
             "type": "monthly",
             "total_lessons": 4,
             "amount": 120000,

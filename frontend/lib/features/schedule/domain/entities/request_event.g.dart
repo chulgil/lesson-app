@@ -31,13 +31,16 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       proposedTime: fields[11] as String?,
       subscriptionId: fields[12] as String?,
       sessionNumber: fields[13] as int?,
+      changeCreditUsed: fields[14] as int?,
+      changeCreditRemainingAfter: fields[15] as int?,
+      keepsSessionNumber: fields[16] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RequestEvent obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +68,13 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       ..writeByte(12)
       ..write(obj.subscriptionId)
       ..writeByte(13)
-      ..write(obj.sessionNumber);
+      ..write(obj.sessionNumber)
+      ..writeByte(14)
+      ..write(obj.changeCreditUsed)
+      ..writeByte(15)
+      ..write(obj.changeCreditRemainingAfter)
+      ..writeByte(16)
+      ..write(obj.keepsSessionNumber);
   }
 
   @override
@@ -287,45 +296,55 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
 // **************************************************************************
 
 RequestEvent _$RequestEventFromJson(Map<String, dynamic> json) => RequestEvent(
-      id: json['id'] as String,
-      requestId: json['request_id'] as String,
-      actorType: $enumDecode(_$ProposerRoleEnumMap, json['actor_type']),
-      actorId: json['actor_id'] as String,
-      eventType: $enumDecode(_$RequestEventTypeEnumMap, json['event_type']),
-      suggestedSlots: (json['suggested_slots'] as List<dynamic>?)
-              ?.map((e) => TimeSlotOption.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      selectedSlotIndex: (json['selected_slot_index'] as num?)?.toInt(),
-      message: json['message'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      scheduleChangeType: $enumDecodeNullable(
-          _$ScheduleChangeTypeEnumMap, json['schedule_change_type']),
-      proposedDayOfWeek: (json['proposed_day_of_week'] as num?)?.toInt(),
-      proposedTime: json['proposed_time'] as String?,
-      subscriptionId: json['subscription_id'] as String?,
-      sessionNumber: (json['session_number'] as num?)?.toInt(),
-    );
+  id: json['id'] as String,
+  requestId: json['request_id'] as String,
+  actorType: $enumDecode(_$ProposerRoleEnumMap, json['actor_type']),
+  actorId: json['actor_id'] as String,
+  eventType: $enumDecode(_$RequestEventTypeEnumMap, json['event_type']),
+  suggestedSlots:
+      (json['suggested_slots'] as List<dynamic>?)
+          ?.map((e) => TimeSlotOption.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  selectedSlotIndex: (json['selected_slot_index'] as num?)?.toInt(),
+  message: json['message'] as String?,
+  createdAt: DateTime.parse(json['created_at'] as String),
+  scheduleChangeType: $enumDecodeNullable(
+    _$ScheduleChangeTypeEnumMap,
+    json['schedule_change_type'],
+  ),
+  proposedDayOfWeek: (json['proposed_day_of_week'] as num?)?.toInt(),
+  proposedTime: json['proposed_time'] as String?,
+  subscriptionId: json['subscription_id'] as String?,
+  sessionNumber: (json['session_number'] as num?)?.toInt(),
+  changeCreditUsed: (json['changeCreditUsed'] as num?)?.toInt(),
+  changeCreditRemainingAfter:
+      (json['changeCreditRemainingAfter'] as num?)?.toInt(),
+  keepsSessionNumber: json['keepsSessionNumber'] as bool?,
+);
 
-Map<String, dynamic> _$RequestEventToJson(RequestEvent instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'request_id': instance.requestId,
-      'actor_type': _$ProposerRoleEnumMap[instance.actorType]!,
-      'actor_id': instance.actorId,
-      'event_type': _$RequestEventTypeEnumMap[instance.eventType]!,
-      'suggested_slots':
-          instance.suggestedSlots.map((e) => e.toJson()).toList(),
-      'selected_slot_index': instance.selectedSlotIndex,
-      'message': instance.message,
-      'created_at': instance.createdAt.toIso8601String(),
-      'schedule_change_type':
-          _$ScheduleChangeTypeEnumMap[instance.scheduleChangeType],
-      'proposed_day_of_week': instance.proposedDayOfWeek,
-      'proposed_time': instance.proposedTime,
-      'subscription_id': instance.subscriptionId,
-      'session_number': instance.sessionNumber,
-    };
+Map<String, dynamic> _$RequestEventToJson(
+  RequestEvent instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'request_id': instance.requestId,
+  'actor_type': _$ProposerRoleEnumMap[instance.actorType]!,
+  'actor_id': instance.actorId,
+  'event_type': _$RequestEventTypeEnumMap[instance.eventType]!,
+  'suggested_slots': instance.suggestedSlots.map((e) => e.toJson()).toList(),
+  'selected_slot_index': instance.selectedSlotIndex,
+  'message': instance.message,
+  'created_at': instance.createdAt.toIso8601String(),
+  'schedule_change_type':
+      _$ScheduleChangeTypeEnumMap[instance.scheduleChangeType],
+  'proposed_day_of_week': instance.proposedDayOfWeek,
+  'proposed_time': instance.proposedTime,
+  'subscription_id': instance.subscriptionId,
+  'session_number': instance.sessionNumber,
+  'changeCreditUsed': instance.changeCreditUsed,
+  'changeCreditRemainingAfter': instance.changeCreditRemainingAfter,
+  'keepsSessionNumber': instance.keepsSessionNumber,
+};
 
 const _$ProposerRoleEnumMap = {
   ProposerRole.student: 'student',

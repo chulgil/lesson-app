@@ -2,6 +2,32 @@
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import create_access_token
+
+
+async def _create_membership(
+    db_session: AsyncSession,
+    *,
+    teacher_id: str = "test-user-id",
+    student_id: str = "student-001",
+) -> str:
+    from app.models.lesson import ClassMembership, LessonClass
+
+    lesson_class = LessonClass(teacher_id=teacher_id, name="구독 테스트 클래스", type="private")
+    db_session.add(lesson_class)
+    await db_session.flush()
+
+    membership = ClassMembership(
+        lesson_class_id=lesson_class.id,
+        student_id=student_id,
+        instrument="piano",
+        status="active",
+    )
+    db_session.add(membership)
+    await db_session.flush()
+    return membership.id
 
 
 @pytest.mark.asyncio
@@ -104,6 +130,145 @@ async def test_use_lesson_deduction(client: AsyncClient, auth_headers, create_te
     data = response.json()
     assert data["used_lessons"] == 1
     assert data["remaining_lessons"] == 7
+
+
+@pytest.mark.asyncio
+async def test_subscription_events_preserve_schedule_change_snapshot(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Subscription events keep schedule-change credit/session snapshots."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session)
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    sub_id = create_resp.json()["id"]
+
+    response = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": f"req-{sub_id}",
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChanged",
+            "subscription_id": sub_id,
+            "session_number": 3,
+            "schedule_change_type": "singleLesson",
+            "changeCreditUsed": 1,
+            "changeCreditRemainingAfter": 2,
+            "keepsSessionNumber": True,
+        },
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["changeCreditUsed"] == 1
+    assert body["changeCreditRemainingAfter"] == 2
+    assert body["keepsSessionNumber"] is True
+
+    list_response = await client.get(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        params={"session_number": 3},
+    )
+    assert list_response.status_code == 200
+    assert list_response.json()[0]["changeCreditUsed"] == 1
+    assert list_response.json()[0]["changeCreditRemainingAfter"] == 2
+    assert list_response.json()[0]["keepsSessionNumber"] is True
+
+
+@pytest.mark.asyncio
+async def test_subscription_schedule_change_accept_preserves_source_slots(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Accepted subscription schedule changes can render the original proposal."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session)
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    sub_id = create_resp.json()["id"]
+    request_id = f"req-{sub_id}"
+
+    proposed = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChangeProposed",
+            "subscription_id": sub_id,
+            "session_number": 2,
+            "schedule_change_type": "singleLesson",
+            "suggested_slots": [
+                {
+                    "id": "slot-a",
+                    "dayOfWeek": 2,
+                    "startTime": "15:00",
+                    "endTime": "16:00",
+                }
+            ],
+        },
+    )
+    assert proposed.status_code == 201
+
+    accepted = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": sub_id,
+            "session_number": 2,
+            "selected_slot_index": 0,
+        },
+    )
+
+    assert accepted.status_code == 201
+    body = accepted.json()
+    assert body["schedule_change_type"] == "singleLesson"
+    assert body["suggested_slots"][0]["id"] == "slot-a"
+    assert body["suggested_slots"][0]["day_of_week"] == 2
+    assert body["suggested_slots"][0]["start_time"] == "15:00"
+    assert body["suggested_slots"][0]["end_time"] == "16:00"
+
+    withdrawn = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": request_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "withdrawApproval",
+            "subscription_id": sub_id,
+            "session_number": 2,
+        },
+    )
+
+    assert withdrawn.status_code == 201
+    withdraw_body = withdrawn.json()
+    assert withdraw_body["suggested_slots"][0]["id"] == "slot-a"
+    assert withdraw_body["selected_slot_index"] == 0
 
 
 @pytest.mark.asyncio
@@ -388,3 +553,145 @@ async def test_subscription_usage_frontend_contract_paginated_and_usage_type(
     assert "items" in history
     assert history["items"][0]["usage_type"] == "lateCancellation"
     assert history["items"][0]["teacher_name"] == "김선생"
+
+
+@pytest.mark.asyncio
+async def test_subscription_detail_and_mutations_reject_other_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """A teacher cannot read or mutate another teacher's subscription by ID."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-teacher@test.com",
+    )
+    membership_id = await _create_membership(db_session, teacher_id="test-user-id")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+    other_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
+    }
+
+    assert (await client.get(f"/api/v1/subscriptions/{sub_id}", headers=other_headers)).status_code == 403
+    assert (
+        await client.put(
+            f"/api/v1/subscriptions/{sub_id}",
+            headers=other_headers,
+            json={"amount": 1},
+        )
+    ).status_code == 403
+    assert (
+        await client.patch(
+            f"/api/v1/subscriptions/{sub_id}/confirm-payment",
+            headers=other_headers,
+            json={"payment_method": "cash"},
+        )
+    ).status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_subscription_remaining_lessons_matches_frontend_hybrid_calculation(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """remaining_lessons follows Flutter's package/monthly/trial + bonus rules."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    package_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-package",
+            "type": "package",
+            "total_lessons": 8,
+            "used_lessons": 3,
+            "bonus_count": 2,
+            "amount": 200000,
+        },
+    )
+    assert package_response.status_code == 201
+    assert package_response.json()["remaining_lessons"] == 7
+
+    monthly_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-monthly",
+            "type": "monthly",
+            "lessons_per_month": 4,
+            "used_lessons": 1,
+            "bonus_count": 1,
+            "amount": 200000,
+        },
+    )
+    assert monthly_response.status_code == 201
+    assert monthly_response.json()["remaining_lessons"] == 4
+
+    trial_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-trial",
+            "type": "trial",
+            "used_lessons": 0,
+            "amount": 0,
+        },
+    )
+    assert trial_response.status_code == 201
+    assert trial_response.json()["remaining_lessons"] == 1
+
+
+@pytest.mark.asyncio
+async def test_use_reschedule_increments_counter_and_rejects_exhausted_credit(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """use-reschedule consumes the same counter the frontend renders."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "package",
+            "total_lessons": 8,
+            "amount": 200000,
+            "total_reschedule_allowance": 1,
+            "used_reschedule_count": 0,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+
+    first = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/use-reschedule",
+        headers=auth_headers,
+    )
+    assert first.status_code == 200
+    assert first.json()["used_reschedule_count"] == 1
+
+    second = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/use-reschedule",
+        headers=auth_headers,
+    )
+    assert second.status_code == 400
