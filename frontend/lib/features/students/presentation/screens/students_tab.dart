@@ -246,13 +246,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             eyebrow: 'ENROLLMENTS',
             meta: _volumeIssueString(DateTime.now()),
             trailing: IconButton(
-              onPressed: () => setState(() => _isSelectionMode = true),
-              icon: const Icon(
-                Icons.check_box_outlined,
-                color: AppColors.ink,
-                size: 22,
-              ),
-              tooltip: '일괄 작업',
+              onPressed: () => context.push(AppRoutes.addStudentMethod),
+              icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
+              tooltip: AppStrings.studentAddLabel,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),

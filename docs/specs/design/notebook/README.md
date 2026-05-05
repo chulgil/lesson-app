@@ -108,17 +108,26 @@
 - 이미지 크롭러 등 외부 플러그인이 자체 대비를 요구하는 표면
 - `showNotebookModalBottomSheet` 내부 child가 자체 frame을 소유하는 드래그형 시트. 이 경우 child 내부 첫 표면은 반드시 `AppColors.paper`/`paperDark` 계열이어야 한다.
 
-#### 1.2.1 Compact Work Header 예외
+#### 1.2.1 탭 헤더 통일 패턴 (2026-05-06 확정)
 
-스케줄 탭처럼 하루에도 여러 번 확인·수정하는 반복 업무 화면은 대형
-`NotebookMasthead`/Programme Title 을 강제하지 않는다. 이 경우 시그니처보다
-작업 가능 높이와 조작 효율을 우선한다.
+모든 주요 탭은 `NotebookMasthead` + `ThinRule` 패턴으로 통일한다.
+Programme Title (38pt 가운데 큰 문구)은 수강관리에서만 사용하고, 나머지 탭은 제외.
 
-예외 조건:
-- 화면의 핵심 과업이 목록/시간표를 반복 확인하고 즉시 조작하는 업무일 것
-- 상단은 56~72px 수준의 compact toolbar 로 제한할 것
-- toolbar 안에 화면명, 주요 보기 전환, 주요 생성 액션을 함께 배치할 것
-- 날짜/필터/정렬 조작은 별도 대형 설명 블록이 아니라 sticky 또는 compact control row 로 배치할 것
+```
+┌─────────────────────────────────────┐
+│ EYEBROW           VOL. IV · NO. 23 +│  ← NotebookMasthead (eyebrow + meta + trailing icon)
+│ ─────────────────────────────────── │  ← ThinRule
+└─────────────────────────────────────┘
+```
+
+| 탭 | eyebrow | trailing | Programme Title |
+|----|---------|----------|----------------|
+| 수강관리 | ENROLLMENTS | + (학생 추가) | "수강 관리" (38pt) |
+| 학생 레슨 | LESSON | + (예약) | 없음 |
+| 학생 연습 | PRACTICE | history + add | 없음 |
+| 선생님 스케줄 | SCHEDULE | view toggle + add | 없음 |
+
+trailing은 `IconButton(Icons.add)` 단일 아이콘 또는 `Row` 조합 가능.
 - `NotebookTypography`, Vermillion accent, ink line 등 나머지 Notebook × Score 언어는 유지할 것
 
 현재 적용 화면:

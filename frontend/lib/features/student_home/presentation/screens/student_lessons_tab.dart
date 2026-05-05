@@ -8,11 +8,12 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../features/lessons/presentation/providers/booking_providers.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../providers/student_home_booking_provider.dart';
+import '../providers/student_home_session_provider.dart';
 import '../widgets/student_lesson_card.dart';
 import '../widgets/trial_booking_card.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
@@ -43,62 +44,17 @@ class StudentLessonsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentStudentId = ref.watch(currentUserIdProvider);
+    final currentStudentId = ref.watch(studentHomeCurrentStudentIdProvider);
     final selectedDate = ref.watch(studentSelectedDateProvider);
     final sortType = ref.watch(studentLessonSortTypeProvider);
-    final lessonsAsync = ref.watch(lessonsProvider);
-    final studentBookings = ref.watch(
-      studentBookingsProvider(currentStudentId),
+    final scheduleAsync = ref.watch(
+      studentHomeLessonsScheduleProvider(currentStudentId),
     );
+    final schedule = scheduleAsync.valueOrNull;
 
-    // Filter lessons for current student
-    final studentLessons =
-        lessonsAsync.whenOrNull(
-          data:
-              (lessons) =>
-                  lessons
-                      .where((l) => l.studentId == currentStudentId)
-                      .toList(),
-        ) ??
-        [];
-
-    // Get trial bookings for display
-    final trialBookings =
-        studentBookings.whenOrNull(
-          data:
-              (bookings) =>
-                  bookings
-                      .where((b) => b.lessonType == LessonType.trial)
-                      .where((b) => b.status.isActive || b.status.canRetry)
-                      .toList()
-                    ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
-        ) ??
-        [];
-
-    // Get marked dates from lessons
-    final markedDates =
-        studentLessons
-            .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
-            .toSet();
-
-    // Add booking dates to marked dates
-    final bookingDates =
-        studentBookings.whenOrNull(
-          data:
-              (bookings) =>
-                  bookings
-                      .where((b) => b.status.isActive)
-                      .map(
-                        (b) => DateTime(
-                          b.lessonDate.year,
-                          b.lessonDate.month,
-                          b.lessonDate.day,
-                        ),
-                      )
-                      .toSet(),
-        ) ??
-        <DateTime>{};
-    markedDates.addAll(bookingDates);
+    final studentLessons = schedule?.lessons ?? <Lesson>[];
+    final trialBookings = schedule?.trialBookings ?? <LessonBooking>[];
+    final markedDates = schedule?.markerDates ?? <DateTime>{};
 
     // Filter lessons for selected date
     final dayLessons =
@@ -132,7 +88,7 @@ class StudentLessonsTab extends ConsumerWidget {
             )
             .toList();
 
-    final isLoading = lessonsAsync.isLoading || studentBookings.isLoading;
+    final isLoading = scheduleAsync.isLoading;
     final totalCount = dayLessons.length + dayTrialBookings.length;
 
     return Column(
@@ -178,35 +134,26 @@ class StudentLessonsTab extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final now = DateTime.now();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.space2,
-        AppSpacing.screenPadding,
-        0,
-      ),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-          Text(
-            AppStrings.studentHomeScheduleTitle,
-            style: NotebookTypography.sectionTitle,
-          ),
-          const Spacer(),
-          FilledButton.icon(
-            onPressed: () {
-              context.push(AppRoutes.selectTeacher);
-            },
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text(AppStrings.studentHomeBookAction),
-            style: FilledButton.styleFrom(
-              minimumSize: Size(0, AppSpacing.buttonHeight),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
+          const SizedBox(height: AppSpacing.space2),
+          NotebookMasthead(
+            eyebrow: 'LESSON',
+            meta: 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}',
+            trailing: IconButton(
+              onPressed: () => context.push(AppRoutes.selectTeacher),
+              icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
+              tooltip: AppStrings.studentHomeBookAction,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
           ),
+          const SizedBox(height: AppSpacing.space2),
+          const ThinRule(),
         ],
       ),
     );

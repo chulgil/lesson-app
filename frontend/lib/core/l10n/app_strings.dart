@@ -1084,6 +1084,10 @@ class AppStrings {
   static const expiringSoon = '만료 예정';
   static const expired = '만료됨';
 
+  /// Practice tab
+  static const repertoireHistory = '레퍼토리 히스토리';
+  static const repertoireAdd = '레퍼토리 추가';
+
   /// Trial lesson detail bottom sheet
   static const trialLessonDetail = '체험레슨 상세';
   static const instrumentLabel = '악기';
@@ -5268,6 +5272,44 @@ class AppStrings {
   static const searchRestartLesson = '다시 시작하기';
   static const searchTrialApply = '체험 신청';
   static const searchAffiliatedTeachers = '소속 선생님';
+  // Search — i18n (2026-05-06)
+  static const searchTabAcademy = '학원';
+  static const searchTabIndividual = '개인 선생님';
+  static const searchHintAcademy = '학원 이름, 악기, 지역으로 검색';
+  static const searchHintTeacher = '선생님 이름, 악기, 지역으로 검색';
+  static const searchErrorOccurred = '검색 중 오류가 발생했습니다';
+  static const searchClearAllFilters = '전체 해제';
+  static const searchNoAcademiesFound = '검색된 학원이 없습니다';
+  static const searchNoTeachersFound = '검색된 선생님이 없습니다';
+  static const searchTrySuggestion = '다른 검색어나 필터를 시도해보세요';
+  static const searchPreviousTeacher = '이전에 레슨했어요';
+  static const searchProfileLoadError = '프로필을 불러올 수 없습니다';
+  static const searchProfileNotFound = '선생님 정보를 찾을 수 없습니다';
+  static const searchAnonymousTeacher = '익명 선생님';
+  static const searchLessonRequestInfo = '선생님에게 레슨 신청서가 전달됩니다';
+  static String searchExperienceYears(int years) => '$years년 이상';
+  // Sort labels
+  static const sortRelevance = '관련도순';
+  static const sortExperienceDesc = '경력 높은순';
+  static const sortExperienceAsc = '경력 낮은순';
+  static const sortFeeAsc = '레슨료 낮은순';
+  static const sortFeeDesc = '레슨료 높은순';
+  static const sortRating = '평점순';
+  static const sortCompletionLevel = '프로필 완성도순';
+  // Lesson type
+  static const lessonTypeInPerson = '대면';
+  static const lessonTypeOnline = '온라인';
+  static const lessonTypeVisit = '방문';
+  // Filter section titles
+  static const filterInstruments = '악기';
+  static const filterLocation = '지역';
+  static const filterLessonType = '레슨 방식';
+  static const filterMinExperience = '최소 경력';
+  // Experience options
+  static const experienceAny = '상관없음';
+  static const experience3plus = '3년 이상';
+  static const experience5plus = '5년 이상';
+  static const experience10plus = '10년 이상';
 
   // ── Invite / Connection ──
   static const inviteHowToConnect = '연결 방법 알아보기';

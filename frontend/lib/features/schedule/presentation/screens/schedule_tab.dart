@@ -10,11 +10,11 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../home/presentation/widgets/lesson_card.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../../lessons/lessons_facade.dart';
 import '../../../student_home/presentation/screens/student_lessons_tab.dart';
 import '../providers/schedule_view_mode_provider.dart';
 import '../widgets/compact_week_strip.dart';
@@ -340,57 +340,39 @@ class ScheduleTab extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final viewMode = ref.watch(scheduleViewModeProvider);
+    final now = DateTime.now();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.space2,
-        AppSpacing.screenPadding,
-        AppSpacing.space1,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Schedule', style: NotebookTypography.appBarTitle),
-                    Text(
-                      '스케줄',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
-                    ),
-                  ],
+          const SizedBox(height: AppSpacing.space2),
+          NotebookMasthead(
+            eyebrow: 'SCHEDULE',
+            meta: 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _ViewModeToggle(
+                  currentMode: viewMode,
+                  onChanged: (mode) {
+                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                  },
                 ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _ViewModeToggle(
-                    currentMode: viewMode,
-                    onChanged: (mode) {
-                      ref.read(scheduleViewModeProvider.notifier).setMode(mode);
-                    },
+                const SizedBox(width: AppSpacing.space2),
+                IconButton(
+                  onPressed: () => _navigateToAddLesson(context, ref),
+                  icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
+                  tooltip: AppStrings.addLessonTooltip,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
                   ),
-                  const SizedBox(width: AppSpacing.space2),
-                  IconButton(
-                    onPressed: () => _navigateToAddLesson(context, ref),
-                    icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
-                    tooltip: AppStrings.addLessonTooltip,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           const ThinRule(),

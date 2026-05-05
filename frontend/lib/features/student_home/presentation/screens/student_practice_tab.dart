@@ -8,12 +8,11 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
-import '../../../../features/practice/domain/entities/practice_repertoire.dart';
-import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../practice/domain/entities/repertoire_sort_type.dart';
-import '../../../practice/presentation/providers/repertoire_sort_provider.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../features/practice/practice_facade.dart';
+import '../providers/student_home_session_provider.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 
 /// Student practice tab with calendar-based repertoire management
@@ -29,7 +28,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final studentId = ref.watch(currentUserIdProvider);
+    final studentId = ref.watch(studentHomeCurrentStudentIdProvider);
     final params = RepertoiresForDateParams(
       studentId: studentId,
       date: _selectedDate,
@@ -46,58 +45,62 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
 
     return Column(
       children: [
-        // Header
+        // Header — Notebook × Score masthead pattern
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space2,
-            AppSpacing.screenPadding,
-            0,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Notebook × Score: 탭 타이틀 Playfair sectionTitle (§7.87-f).
-              Expanded(
-                child: Text(
-                  '내 연습',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: NotebookTypography.sectionTitle,
+              const SizedBox(height: AppSpacing.space2),
+              NotebookMasthead(
+                eyebrow: 'PRACTICE',
+                meta:
+                    'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                          ),
+                      icon: const Icon(
+                        Icons.history,
+                        color: AppColors.ink,
+                        size: 22,
+                      ),
+                      tooltip: AppStrings.repertoireHistory,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space1),
+                    IconButton(
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                          ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: AppColors.ink,
+                        size: 22,
+                      ),
+                      tooltip: AppStrings.repertoireAdd,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              IconButton(
-                onPressed:
-                    () => context.push(
-                      '${AppRoutes.repertoireHistory}?studentId=$studentId',
-                    ),
-                icon: const Icon(Icons.history),
-                tooltip: '레퍼토리 히스토리',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-              ),
-              const SizedBox(width: AppSpacing.space1),
-              Flexible(
-                child: FilledButton.icon(
-                  onPressed: () {
-                    context.push(
-                      '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                    );
-                  },
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text(
-                    '레퍼토리 추가',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  style: FilledButton.styleFrom(
-                    minimumSize: Size(0, AppSpacing.buttonHeight),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                      vertical: AppSpacing.space2,
-                    ),
-                  ),
-                ),
-              ),
+              const SizedBox(height: AppSpacing.space2),
+              const ThinRule(),
             ],
           ),
         ),
