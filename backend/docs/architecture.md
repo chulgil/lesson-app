@@ -180,6 +180,7 @@ Schema    Schema (Pydantic v2)
 - `/api/v1` operation은 공개 allowlist를 제외하고 OpenAPI security 요구사항을 가져야 한다.
   - 공개 allowlist: `POST /auth/oauth/{provider}`, `POST /auth/dev-login`, `POST /auth/token/refresh`, `GET /users/supported-locales`
   - 내부 자동화 API: `/scheduler/*`는 사용자 JWT가 아니라 `X-Internal-API-Key` 헤더와 `INTERNAL_API_KEY` 환경변수로 보호한다.
+- `production`/`beta` 환경에서는 FastAPI lifespan 시작 시 runtime configuration을 검증한다. 배포 환경은 `JWT_SECRET_KEY`와 `INTERNAL_API_KEY`를 32자 이상 secret으로 설정해야 한다.
 
 기능 추가 전후에 다음 명령으로 검증한다.
 

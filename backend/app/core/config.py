@@ -1,5 +1,11 @@
 from pydantic_settings import BaseSettings
 
+PRODUCTION_LIKE_ENVIRONMENTS = {"production", "beta"}
+INSECURE_JWT_SECRETS = {
+    "change-me-in-production",
+    "dev-only-insecure-jwt-secret-change-before-production",
+}
+
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -59,3 +65,13 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def validate_runtime_configuration() -> None:
+    """Validate secrets that must be strong before serving production-like traffic."""
+    if settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS:
+        return
+    if settings.JWT_SECRET_KEY in INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
+        raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
+    if len(settings.INTERNAL_API_KEY) < 32:
+        raise RuntimeError("INTERNAL_API_KEY must be set to a strong secret in production-like environments")

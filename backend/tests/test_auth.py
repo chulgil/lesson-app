@@ -179,3 +179,35 @@ def test_production_jwt_secret_must_be_strong():
     ):
         with pytest.raises(RuntimeError, match="JWT_SECRET_KEY"):
             create_refresh_token(data={"sub": "test-user-id"})
+
+
+def test_production_runtime_config_requires_strong_internal_api_key():
+    """Runtime config validation fails in production when INTERNAL_API_KEY is unset or weak."""
+    from app.core.config import validate_runtime_configuration
+
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "production"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", ""),
+    ):
+        with pytest.raises(RuntimeError, match="INTERNAL_API_KEY"):
+            validate_runtime_configuration()
+
+
+def test_production_runtime_config_requires_strong_jwt_secret():
+    """Runtime config validation fails before startup when JWT_SECRET_KEY is unsafe."""
+    from app.core.config import validate_runtime_configuration
+
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "production"),
+        patch("app.core.config.settings.JWT_SECRET_KEY", "change-me-in-production"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", "x" * 32),
+    ):
+        with pytest.raises(RuntimeError, match="JWT_SECRET_KEY"):
+            validate_runtime_configuration()
+
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "beta"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", "short-key"),
+    ):
+        with pytest.raises(RuntimeError, match="INTERNAL_API_KEY"):
+            validate_runtime_configuration()

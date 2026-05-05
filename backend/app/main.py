@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
+from app.core.config import settings, validate_runtime_configuration
 from app.core.exceptions import register_exception_handlers
 from app.core.i18n import LocaleMiddleware
 
@@ -14,6 +14,8 @@ from app.core.i18n import LocaleMiddleware
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan: startup and shutdown hooks."""
+    validate_runtime_configuration()
+
     # Startup: import all models to register with Base.metadata
     import app.models  # type: ignore[assignment]  # noqa: F401
 

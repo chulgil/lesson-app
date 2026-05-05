@@ -6,7 +6,7 @@ import httpx
 import jwt
 from jwt import PyJWKClient
 
-from app.core.config import settings
+from app.core.config import INSECURE_JWT_SECRETS, PRODUCTION_LIKE_ENVIRONMENTS, settings
 
 # Google OAuth endpoints
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -19,17 +19,11 @@ KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me"
 # Apple JWKS endpoint
 APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys"
 
-_INSECURE_JWT_SECRETS = {
-    "change-me-in-production",
-    "dev-only-insecure-jwt-secret-change-before-production",
-}
-
-
 def _assert_safe_jwt_secret() -> None:
     """Prevent production-like environments from signing tokens with weak defaults."""
-    if settings.ENVIRONMENT not in {"production", "beta"}:
+    if settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS:
         return
-    if settings.JWT_SECRET_KEY in _INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
+    if settings.JWT_SECRET_KEY in INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
         raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
 
 

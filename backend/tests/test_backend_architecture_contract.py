@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import ast
+import inspect
 from pathlib import Path
 
+from app import main as app_main
 from app.main import app
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
@@ -144,3 +146,10 @@ def test_api_v1_routes_require_security_unless_publicly_documented() -> None:
                 unsecured_operations.append(f"{method.upper()} {path} ({operation_id})")
 
     assert unsecured_operations == []
+
+
+def test_app_lifespan_runs_runtime_configuration_validation() -> None:
+    """FastAPI startup must fail early for unsafe production-like configuration."""
+    source = inspect.getsource(app_main.lifespan)
+
+    assert "validate_runtime_configuration()" in source
