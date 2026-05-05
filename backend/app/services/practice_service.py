@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -19,12 +19,20 @@ from app.schemas.practice import (
     PracticePieceUpdate,
     PracticeStatsResponse,
     PracticeStreakResponse,
+    RecordingMetadataCreate,
+    RecordingReassignUpdate,
+    RecordingResponse,
     RepertoireCreate,
     RepertoireResponse,
     RepertoireUpdate,
+    RepresentativeRecordingUpdate,
     SectionCompleteRequest,
     SectionCreate,
     SectionNoteCreate,
+    SectionNoteResponse,
+    SectionNoteUpdate,
+    SectionOrderUpdate,
+    SectionPracticeCountUpdate,
     SectionResponse,
     SectionUpdate,
     StudentPieceProgressUpdate,
@@ -330,6 +338,48 @@ class PracticeService:
         rep.is_archived = True
         await self.db.flush()
 
+    async def archive_repertoire(self, repertoire_id: str, current_user: Any) -> RepertoireResponse:
+        """Archive a repertoire and return it."""
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
+        rep.is_archived = True
+        await self.db.flush()
+        await self.db.refresh(rep)
+        return RepertoireResponse.model_validate(rep)
+
+    async def restore_repertoire(self, repertoire_id: str, current_user: Any) -> RepertoireResponse:
+        """Restore an archived repertoire."""
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
+        rep.is_archived = False
+        rep.archived_at = None
+        await self.db.flush()
+        await self.db.refresh(rep)
+        return RepertoireResponse.model_validate(rep)
+
+    async def permanently_delete_repertoire(self, repertoire_id: str, current_user: Any) -> None:
+        """Permanently delete a repertoire and dependent practice rows."""
+        from app.models.practice import DailyPracticeStatus, PracticeNote, PracticeRecording, PracticeSection
+
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
+        section_ids = list(
+            (
+                await self.db.scalars(
+                    select(PracticeSection.id).where(PracticeSection.repertoire_id == repertoire_id)
+                )
+            ).all()
+        )
+        if section_ids:
+            for model, column in [
+                (PracticeNote, PracticeNote.section_id),
+                (DailyPracticeStatus, DailyPracticeStatus.section_id),
+                (PracticeRecording, PracticeRecording.section_id),
+                (PracticeSection, PracticeSection.id),
+            ]:
+                rows = await self.db.scalars(select(model).where(column.in_(section_ids)))
+                for row in rows.all():
+                    await self.db.delete(row)
+        await self.db.delete(rep)
+        await self.db.flush()
+
     # ------------------------------------------------------------------
     # Sections
     # ------------------------------------------------------------------
@@ -366,6 +416,11 @@ class PracticeService:
             setattr(section, key, value)
         await self.db.flush()
         await self.db.refresh(section)
+        return SectionResponse.model_validate(section)
+
+    async def get_section(self, section_id: str, current_user: Any) -> SectionResponse:
+        """Return section detail."""
+        section = await self._get_section_for_user(section_id, current_user)
         return SectionResponse.model_validate(section)
 
     async def delete_section(self, section_id: str, current_user: Any) -> None:
@@ -409,18 +464,217 @@ class PracticeService:
         await self.db.refresh(section)
         return SectionResponse.model_validate(section)
 
+    async def toggle_daily_completion(self, section_id: str, target_date: date, current_user: Any) -> SectionResponse:
+        """Toggle per-day section completion."""
+        from app.models.practice import DailyPracticeStatus
+
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
+        existing = await self.db.scalar(
+            select(DailyPracticeStatus).where(
+                DailyPracticeStatus.section_id == section_id,
+                DailyPracticeStatus.date == target_date,
+            )
+        )
+        if existing is None:
+            self.db.add(
+                DailyPracticeStatus(
+                    section_id=section_id,
+                    date=target_date,
+                    is_completed=True,
+                    completed_at=datetime.now(UTC),
+                )
+            )
+            section.is_completed = True
+        else:
+            existing.is_completed = not existing.is_completed
+            existing.completed_at = datetime.now(UTC) if existing.is_completed else None
+            section.is_completed = existing.is_completed
+        await self.db.flush()
+        await self.db.refresh(section)
+        return SectionResponse.model_validate(section)
+
+    async def toggle_section_repeat(self, section_id: str, current_user: Any) -> SectionResponse:
+        """Toggle section repeat flag."""
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
+        section.is_repeat = not section.is_repeat
+        await self.db.flush()
+        await self.db.refresh(section)
+        return SectionResponse.model_validate(section)
+
+    async def increment_practice_count(
+        self,
+        section_id: str,
+        data: SectionPracticeCountUpdate,
+        current_user: Any,
+    ) -> SectionResponse:
+        """Increment practice count and seconds for a section."""
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
+        section.practice_count += 1
+        section.total_practice_seconds += data.practice_seconds
+        section.last_practiced_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(section)
+        return SectionResponse.model_validate(section)
+
+    async def update_last_practiced_at(self, section_id: str, current_user: Any) -> SectionResponse:
+        """Set last_practiced_at to now."""
+        section = await self._get_section_for_user(section_id, current_user, manage=True)
+        section.last_practiced_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(section)
+        return SectionResponse.model_validate(section)
+
+    async def update_section_orders(
+        self,
+        repertoire_id: str,
+        data: SectionOrderUpdate,
+        current_user: Any,
+    ) -> None:
+        """Persist section sort order for a repertoire."""
+        from app.models.practice import PracticeSection
+
+        await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
+        sections = await self.db.scalars(
+            select(PracticeSection).where(
+                PracticeSection.repertoire_id == repertoire_id,
+                PracticeSection.id.in_(data.section_ids),
+            )
+        )
+        by_id = {section.id: section for section in sections.all()}
+        for index, section_id in enumerate(data.section_ids):
+            if section_id in by_id:
+                by_id[section_id].sort_order = index
+        await self.db.flush()
+
     async def add_section_note(
         self, section_id: str, data: SectionNoteCreate, current_user: Any
-    ) -> None:
+    ) -> SectionNoteResponse:
         """Add a practice note to a section."""
         from app.models.practice import PracticeNote
 
+        await self._get_section_for_user(section_id, current_user, manage=True)
         note = PracticeNote(
             section_id=section_id,
             content=data.content,
         )
         self.db.add(note)
         await self.db.flush()
+        await self.db.refresh(note)
+        return SectionNoteResponse.model_validate(note)
+
+    async def get_section_notes(self, section_id: str, current_user: Any) -> list[SectionNoteResponse]:
+        """Return notes for a section."""
+        from app.models.practice import PracticeNote
+
+        await self._get_section_for_user(section_id, current_user)
+        notes = await self.db.scalars(
+            select(PracticeNote).where(PracticeNote.section_id == section_id).order_by(PracticeNote.created_at.desc())
+        )
+        return [SectionNoteResponse.model_validate(note) for note in notes.all()]
+
+    async def update_note(
+        self,
+        note_id: str,
+        data: SectionNoteUpdate,
+        current_user: Any,
+    ) -> SectionNoteResponse:
+        """Update a practice note."""
+        note = await self._get_note_for_user(note_id, current_user, manage=True)
+        note.content = data.content
+        await self.db.flush()
+        await self.db.refresh(note)
+        return SectionNoteResponse.model_validate(note)
+
+    async def delete_note(self, note_id: str, current_user: Any) -> None:
+        """Delete a practice note."""
+        note = await self._get_note_for_user(note_id, current_user, manage=True)
+        await self.db.delete(note)
+        await self.db.flush()
+
+    async def create_recording_metadata(
+        self,
+        data: RecordingMetadataCreate,
+        current_user: Any,
+    ) -> RecordingResponse:
+        """Create recording metadata without object storage upload."""
+        from app.models.practice import PracticeRecording
+
+        section = await self._get_section_for_user(data.section_id, current_user, manage=True)
+        student_id = await self._student_id_for_section(section.id)
+        recording = PracticeRecording(
+            section_id=section.id,
+            student_id=student_id,
+            file_path=data.file_path,
+            file_key=data.file_path,
+            file_url=data.file_path,
+            duration_seconds=data.duration_seconds,
+            bpm=data.bpm,
+        )
+        self.db.add(recording)
+        await self.db.flush()
+        await self.db.refresh(recording)
+        return RecordingResponse.model_validate(recording)
+
+    async def set_section_representative_recording(
+        self,
+        section_id: str,
+        data: RepresentativeRecordingUpdate,
+        current_user: Any,
+    ) -> RecordingResponse:
+        """Set representative recording for a section."""
+        from app.models.practice import PracticeRecording
+
+        await self._get_section_for_user(section_id, current_user, manage=True)
+        recording = await self.db.get(PracticeRecording, data.recording_id)
+        if recording is None or recording.section_id != section_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        existing = await self.db.scalars(
+            select(PracticeRecording).where(
+                PracticeRecording.section_id == section_id,
+                PracticeRecording.is_representative == True,  # noqa: E712
+            )
+        )
+        for other in existing.all():
+            other.is_representative = False
+        recording.is_representative = True
+        await self.db.flush()
+        await self.db.refresh(recording)
+        return RecordingResponse.model_validate(recording)
+
+    async def get_orphaned_recordings(self, current_user: Any) -> list[RecordingResponse]:
+        """Return visible recordings whose section no longer exists."""
+        from app.models.practice import PracticeRecording, PracticeSection
+
+        recordings = await self.db.scalars(select(PracticeRecording).order_by(PracticeRecording.created_at.desc()))
+        section_ids = set((await self.db.scalars(select(PracticeSection.id))).all())
+        visible: list[RecordingResponse] = []
+        for recording in recordings.all():
+            if recording.section_id in section_ids:
+                continue
+            if await self._can_read_student(recording.student_id, current_user):
+                visible.append(RecordingResponse.model_validate(recording))
+        return visible
+
+    async def reassign_recording(
+        self,
+        recording_id: str,
+        data: RecordingReassignUpdate,
+        current_user: Any,
+    ) -> RecordingResponse:
+        """Reassign a recording to another section."""
+        from app.models.practice import PracticeRecording
+
+        target_section = await self._get_section_for_user(data.section_id, current_user, manage=True)
+        recording = await self.db.get(PracticeRecording, recording_id)
+        if recording is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
+        if not await self._can_read_student(recording.student_id, current_user):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        recording.section_id = target_section.id
+        recording.student_id = await self._student_id_for_section(target_section.id)
+        await self.db.flush()
+        await self.db.refresh(recording)
+        return RecordingResponse.model_validate(recording)
 
     # ------------------------------------------------------------------
     # Goals
@@ -594,6 +848,65 @@ class PracticeService:
     # ------------------------------------------------------------------
     # Access and mapping helpers
     # ------------------------------------------------------------------
+
+    async def _get_repertoire_for_user(self, repertoire_id: str, current_user: Any, *, manage: bool = False) -> Any:
+        from app.models.practice import PracticeRepertoire
+
+        repertoire = await self.db.get(PracticeRepertoire, repertoire_id)
+        if repertoire is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repertoire not found")
+        if manage:
+            await self._assert_can_manage_student(repertoire.student_id, current_user)
+        else:
+            await self._assert_can_read_student(repertoire.student_id, current_user)
+        return repertoire
+
+    async def _get_section_for_user(self, section_id: str, current_user: Any, *, manage: bool = False) -> Any:
+        from app.models.practice import PracticeRepertoire, PracticeSection
+
+        section = await self.db.get(PracticeSection, section_id)
+        if section is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+        student_id = await self.db.scalar(
+            select(PracticeRepertoire.student_id).where(PracticeRepertoire.id == section.repertoire_id)
+        )
+        if student_id is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repertoire not found")
+        if manage:
+            await self._assert_can_manage_student(student_id, current_user)
+        else:
+            await self._assert_can_read_student(student_id, current_user)
+        return section
+
+    async def _get_note_for_user(self, note_id: str, current_user: Any, *, manage: bool = False) -> Any:
+        from app.models.practice import PracticeNote
+
+        note = await self.db.get(PracticeNote, note_id)
+        if note is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Practice note not found")
+        await self._get_section_for_user(note.section_id, current_user, manage=manage)
+        return note
+
+    async def _student_id_for_section(self, section_id: str) -> str:
+        from app.models.practice import PracticeRepertoire, PracticeSection
+
+        student_id = await self.db.scalar(
+            select(PracticeRepertoire.student_id)
+            .join(PracticeSection, PracticeSection.repertoire_id == PracticeRepertoire.id)
+            .where(PracticeSection.id == section_id)
+        )
+        if student_id is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+        return student_id
+
+    async def _can_read_student(self, student_id: str | None, current_user: Any) -> bool:
+        if student_id is None:
+            return False
+        try:
+            await self._assert_can_read_student(student_id, current_user)
+        except HTTPException:
+            return False
+        return True
 
     async def _get_piece_for_user(self, piece_id: str, current_user: Any) -> Any:
         from app.models.practice import PracticePiece

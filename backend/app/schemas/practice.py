@@ -92,6 +92,9 @@ class SectionResponse(BaseModel):
     end_measure: int | None = None
     is_repeat: bool = False
     is_completed: bool = False
+    practice_count: int = 0
+    total_practice_seconds: int = 0
+    last_practiced_at: _dt.datetime | None = None
     order: int = 0
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
@@ -125,10 +128,67 @@ class SectionCompleteRequest(BaseModel):
     is_completed: bool
 
 
+class SectionDailyCompletionUpdate(BaseModel):
+    """Toggle section completion for a practice date."""
+
+    date: _dt.date
+
+
 class SectionNoteCreate(BaseModel):
     """Add a note to a section."""
 
     content: str
+
+
+class SectionNoteResponse(BaseModel):
+    """Practice note attached to a section."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    section_id: str
+    content: str
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
+
+
+class SectionNoteUpdate(BaseModel):
+    """Update a practice note."""
+
+    content: str
+
+
+class SectionPracticeCountUpdate(BaseModel):
+    """Increment section practice counters."""
+
+    practice_seconds: int = Field(ge=0)
+
+
+class SectionOrderUpdate(BaseModel):
+    """Update section ordering for a repertoire."""
+
+    section_ids: list[str]
+
+
+class RecordingMetadataCreate(BaseModel):
+    """Create recording metadata without uploading a file."""
+
+    section_id: str
+    file_path: str
+    duration_seconds: int = Field(default=0, ge=0)
+    bpm: int | None = Field(default=None, ge=0)
+
+
+class RepresentativeRecordingUpdate(BaseModel):
+    """Set a section representative recording."""
+
+    recording_id: str
+
+
+class RecordingReassignUpdate(BaseModel):
+    """Reassign a recording to a different section."""
+
+    section_id: str
 
 
 # ---------------------------------------------------------------------------

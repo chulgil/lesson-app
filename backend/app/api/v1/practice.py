@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db, get_pagination
 from app.models.user import User
-from app.schemas.common import PaginatedResponse, SuccessResponse
+from app.schemas.common import PaginatedResponse
 from app.schemas.practice import (
     PracticeGoalResponse,
     PracticeGoalUpdate,
@@ -19,12 +19,21 @@ from app.schemas.practice import (
     PracticePieceUpdate,
     PracticeStatsResponse,
     PracticeStreakResponse,
+    RecordingMetadataCreate,
+    RecordingReassignUpdate,
+    RecordingResponse,
     RepertoireCreate,
     RepertoireResponse,
     RepertoireUpdate,
+    RepresentativeRecordingUpdate,
     SectionCompleteRequest,
     SectionCreate,
+    SectionDailyCompletionUpdate,
     SectionNoteCreate,
+    SectionNoteResponse,
+    SectionNoteUpdate,
+    SectionOrderUpdate,
+    SectionPracticeCountUpdate,
     SectionResponse,
     SectionUpdate,
     StudentPieceProgressUpdate,
@@ -283,6 +292,53 @@ async def get_repertoire(
     return await service.get_repertoire_by_id(repertoire_id, current_user)
 
 
+@router.patch(
+    "/repertoires/{repertoire_id}/archive",
+    response_model=RepertoireResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Archive repertoire",
+)
+async def archive_repertoire(
+    repertoire_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RepertoireResponse:
+    """Archive a repertoire."""
+    service = PracticeService(db)
+    return await service.archive_repertoire(repertoire_id, current_user)
+
+
+@router.patch(
+    "/repertoires/{repertoire_id}/restore",
+    response_model=RepertoireResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Restore repertoire",
+)
+async def restore_repertoire(
+    repertoire_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RepertoireResponse:
+    """Restore a repertoire."""
+    service = PracticeService(db)
+    return await service.restore_repertoire(repertoire_id, current_user)
+
+
+@router.delete(
+    "/repertoires/{repertoire_id}/permanent",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Permanently delete repertoire",
+)
+async def permanently_delete_repertoire(
+    repertoire_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Permanently delete a repertoire."""
+    service = PracticeService(db)
+    await service.permanently_delete_repertoire(repertoire_id, current_user)
+
+
 @router.put(
     "/repertoires/{repertoire_id}",
     response_model=RepertoireResponse,
@@ -336,6 +392,22 @@ async def create_section(
     return await service.create_section(body, current_user)
 
 
+@router.get(
+    "/sections/{section_id}",
+    response_model=SectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get section",
+)
+async def get_section(
+    section_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionResponse:
+    """Return section detail."""
+    service = PracticeService(db)
+    return await service.get_section(section_id, current_user)
+
+
 @router.put(
     "/sections/{section_id}",
     response_model=SectionResponse,
@@ -385,9 +457,91 @@ async def toggle_section_complete(
     return await service.toggle_section_complete(section_id, body, current_user)
 
 
+@router.patch(
+    "/sections/{section_id}/daily-completion",
+    response_model=SectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Toggle daily section completion",
+)
+async def toggle_daily_completion(
+    section_id: str,
+    body: SectionDailyCompletionUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionResponse:
+    """Toggle daily section completion."""
+    service = PracticeService(db)
+    return await service.toggle_daily_completion(section_id, body.date, current_user)
+
+
+@router.patch(
+    "/sections/{section_id}/repeat",
+    response_model=SectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Toggle section repeat",
+)
+async def toggle_section_repeat(
+    section_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionResponse:
+    """Toggle section repeat flag."""
+    service = PracticeService(db)
+    return await service.toggle_section_repeat(section_id, current_user)
+
+
+@router.patch(
+    "/sections/{section_id}/practice-count",
+    response_model=SectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Increment section practice count",
+)
+async def increment_practice_count(
+    section_id: str,
+    body: SectionPracticeCountUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionResponse:
+    """Increment section practice counters."""
+    service = PracticeService(db)
+    return await service.increment_practice_count(section_id, body, current_user)
+
+
+@router.patch(
+    "/sections/{section_id}/last-practiced-at",
+    response_model=SectionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update section last practiced time",
+)
+async def update_last_practiced_at(
+    section_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionResponse:
+    """Update section last practiced timestamp."""
+    service = PracticeService(db)
+    return await service.update_last_practiced_at(section_id, current_user)
+
+
+@router.put(
+    "/repertoires/{repertoire_id}/section-orders",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Update section order",
+)
+async def update_section_orders(
+    repertoire_id: str,
+    body: SectionOrderUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Update section sort order."""
+    service = PracticeService(db)
+    await service.update_section_orders(repertoire_id, body, current_user)
+
+
 @router.post(
     "/sections/{section_id}/notes",
-    response_model=SuccessResponse,
+    response_model=SectionNoteResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Add practice note",
 )
@@ -396,11 +550,123 @@ async def add_section_note(
     body: SectionNoteCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-) -> SuccessResponse:
+) -> SectionNoteResponse:
     """Add a practice note to a section."""
     service = PracticeService(db)
-    await service.add_section_note(section_id, body, current_user)
-    return SuccessResponse(message="Note added")
+    return await service.add_section_note(section_id, body, current_user)
+
+
+@router.get(
+    "/sections/{section_id}/notes",
+    response_model=list[SectionNoteResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List practice notes",
+)
+async def list_section_notes(
+    section_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[SectionNoteResponse]:
+    """List notes for a section."""
+    service = PracticeService(db)
+    return await service.get_section_notes(section_id, current_user)
+
+
+@router.put(
+    "/notes/{note_id}",
+    response_model=SectionNoteResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update practice note",
+)
+async def update_note(
+    note_id: str,
+    body: SectionNoteUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SectionNoteResponse:
+    """Update a practice note."""
+    service = PracticeService(db)
+    return await service.update_note(note_id, body, current_user)
+
+
+@router.delete(
+    "/notes/{note_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete practice note",
+)
+async def delete_note(
+    note_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete a practice note."""
+    service = PracticeService(db)
+    await service.delete_note(note_id, current_user)
+
+
+@router.post(
+    "/recordings",
+    response_model=RecordingResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create recording metadata",
+)
+async def create_recording_metadata(
+    body: RecordingMetadataCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RecordingResponse:
+    """Create recording metadata without object storage upload."""
+    service = PracticeService(db)
+    return await service.create_recording_metadata(body, current_user)
+
+
+@router.get(
+    "/recordings/orphaned",
+    response_model=list[RecordingResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List orphaned recordings",
+)
+async def list_orphaned_recordings(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[RecordingResponse]:
+    """List visible orphaned recordings."""
+    service = PracticeService(db)
+    return await service.get_orphaned_recordings(current_user)
+
+
+@router.patch(
+    "/recordings/{recording_id}/reassign",
+    response_model=RecordingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Reassign recording",
+)
+async def reassign_recording(
+    recording_id: str,
+    body: RecordingReassignUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RecordingResponse:
+    """Reassign a recording to another section."""
+    service = PracticeService(db)
+    return await service.reassign_recording(recording_id, body, current_user)
+
+
+@router.patch(
+    "/sections/{section_id}/representative-recording",
+    response_model=RecordingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Set section representative recording",
+)
+async def set_section_representative_recording(
+    section_id: str,
+    body: RepresentativeRecordingUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RecordingResponse:
+    """Set representative recording for a section."""
+    service = PracticeService(db)
+    return await service.set_section_representative_recording(section_id, body, current_user)
 
 
 # ---------------------------------------------------------------------------
