@@ -240,6 +240,7 @@ class PracticeService:
 
         query = select(PracticeRepertoire)
         if student_id:
+            await self._assert_can_read_student(student_id, user)
             query = query.where(PracticeRepertoire.student_id == student_id)
         if not include_archived:
             query = query.where(PracticeRepertoire.is_archived == False)  # noqa: E712
@@ -255,6 +256,7 @@ class PracticeService:
         """Create a repertoire with optional inline sections."""
         from app.models.practice import PracticeRepertoire, PracticeSection
 
+        await self._assert_can_manage_student(data.student_id, current_user)
         repertoire = PracticeRepertoire(
             student_id=data.student_id,
             name=data.name,
@@ -292,6 +294,7 @@ class PracticeService:
             PracticeRepertoire.start_date <= target_date,
         )
         if student_id:
+            await self._assert_can_read_student(student_id, current_user)
             query = query.where(PracticeRepertoire.student_id == student_id)
 
         # end_date can be null (ongoing)
@@ -304,22 +307,14 @@ class PracticeService:
 
     async def get_repertoire_by_id(self, repertoire_id: str, current_user: Any) -> RepertoireResponse:
         """Return a single repertoire with sections."""
-        from app.models.practice import PracticeRepertoire
-
-        rep = await self.db.get(PracticeRepertoire, repertoire_id)
-        if rep is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repertoire not found")
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user)
         return RepertoireResponse.model_validate(rep)
 
     async def update_repertoire(
         self, repertoire_id: str, data: RepertoireUpdate, current_user: Any
     ) -> RepertoireResponse:
         """Update repertoire fields."""
-        from app.models.practice import PracticeRepertoire
-
-        rep = await self.db.get(PracticeRepertoire, repertoire_id)
-        if rep is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repertoire not found")
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -330,11 +325,7 @@ class PracticeService:
 
     async def delete_repertoire(self, repertoire_id: str, current_user: Any) -> None:
         """Archive a repertoire."""
-        from app.models.practice import PracticeRepertoire
-
-        rep = await self.db.get(PracticeRepertoire, repertoire_id)
-        if rep is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Repertoire not found")
+        rep = await self._get_repertoire_for_user(repertoire_id, current_user, manage=True)
         rep.is_archived = True
         await self.db.flush()
 
@@ -940,16 +931,19 @@ class PracticeService:
     async def _assert_can_manage_student(self, student_id: str, current_user: Any) -> None:
         from app.models.student import Student
 
-        if self._role(current_user) != "teacher":
+        role = self._role(current_user)
+        if role == "student":
+            if student_id in await self._student_identifiers(current_user):
+                return
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        if role != "teacher":
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            return
         teacher_id = await self._teacher_profile_id(current_user)
-        owner = await self.db.scalar(
-            select(Student.id).where(
-                Student.id == student_id,
-                Student.teacher_id == teacher_id,
-            )
-        )
-        if owner is None:
+        if student.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     async def _teacher_profile_id(self, current_user: Any) -> str:

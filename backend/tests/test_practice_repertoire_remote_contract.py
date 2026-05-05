@@ -5,6 +5,13 @@ from datetime import UTC, date, datetime
 import pytest
 from httpx import AsyncClient
 
+from app.core.security import create_access_token
+
+
+def _headers(user_id: str, role: str) -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
+
 
 @pytest.mark.asyncio
 async def test_repertoire_archive_restore_and_permanent_delete(
@@ -199,3 +206,195 @@ async def test_recording_metadata_helpers(
     )
     assert reassign_response.status_code == 200
     assert reassign_response.json()["section_id"] == "section-b"
+
+
+@pytest.mark.asyncio
+async def test_teacher_cannot_access_other_teacher_repertoires(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Teachers can only read or mutate repertoires for students they own."""
+    from app.models.practice import PracticeRepertoire
+    from app.models.student import Student
+
+    await create_test_user(user_id="teacher-user-id", role="teacher", email="teacher@test.com")
+    await create_test_user(user_id="other-teacher-user-id", role="teacher", email="other-teacher@test.com")
+    db_session.add_all(
+        [
+            Student(
+                id="owned-student",
+                teacher_id="teacher-user-id-prof",
+                name="Owned",
+                instrument="violin",
+            ),
+            Student(
+                id="other-student",
+                teacher_id="other-teacher-user-id-prof",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeRepertoire(
+                id="other-repertoire",
+                student_id="other-student",
+                name="Other Etudes",
+                start_date=date(2026, 5, 1),
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("teacher-user-id", "teacher")
+
+    list_response = await client.get(
+        "/api/v1/practice/repertoires",
+        headers=headers,
+        params={"student_id": "other-student"},
+    )
+    assert list_response.status_code == 403
+
+    date_response = await client.get(
+        "/api/v1/practice/repertoires/date/2026-05-05",
+        headers=headers,
+        params={"student_id": "other-student"},
+    )
+    assert date_response.status_code == 403
+
+    detail_response = await client.get("/api/v1/practice/repertoires/other-repertoire", headers=headers)
+    assert detail_response.status_code == 403
+
+    create_response = await client.post(
+        "/api/v1/practice/repertoires",
+        headers=headers,
+        json={"student_id": "other-student", "name": "Forbidden"},
+    )
+    assert create_response.status_code == 403
+
+    update_response = await client.put(
+        "/api/v1/practice/repertoires/other-repertoire",
+        headers=headers,
+        json={"name": "Forbidden Update"},
+    )
+    assert update_response.status_code == 403
+
+    delete_response = await client.delete("/api/v1/practice/repertoires/other-repertoire", headers=headers)
+    assert delete_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_parent_can_read_but_not_mutate_linked_child_repertoires(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Parents can read active linked child repertoires but cannot mutate them."""
+    from app.models.parent import Parent, ParentChildRelation
+    from app.models.practice import PracticeRepertoire
+    from app.models.student import Student
+
+    await create_test_user(user_id="parent-user-id", role="parent")
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            Student(
+                id="child-student",
+                teacher_id="teacher-profile-id",
+                name="Child",
+                instrument="violin",
+            ),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="child-student"),
+            PracticeRepertoire(
+                id="child-repertoire",
+                student_id="child-student",
+                name="Child Scales",
+                start_date=date(2026, 5, 1),
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("parent-user-id", "parent")
+
+    list_response = await client.get(
+        "/api/v1/practice/repertoires",
+        headers=headers,
+        params={"student_id": "child-student"},
+    )
+    assert list_response.status_code == 200
+    assert [item["id"] for item in list_response.json()["items"]] == ["child-repertoire"]
+
+    detail_response = await client.get("/api/v1/practice/repertoires/child-repertoire", headers=headers)
+    assert detail_response.status_code == 200
+
+    create_response = await client.post(
+        "/api/v1/practice/repertoires",
+        headers=headers,
+        json={"student_id": "child-student", "name": "Parent Write"},
+    )
+    assert create_response.status_code == 403
+
+    update_response = await client.put(
+        "/api/v1/practice/repertoires/child-repertoire",
+        headers=headers,
+        json={"name": "Parent Update"},
+    )
+    assert update_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_student_can_access_own_repertoires_only(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Students can read and manage only their own linked student profile repertoires."""
+    from app.models.practice import PracticeRepertoire
+    from app.models.student import Student
+
+    await create_test_user(user_id="student-user-id", role="student")
+    db_session.add_all(
+        [
+            Student(
+                id="student-profile-id",
+                user_id="student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Student",
+                instrument="violin",
+            ),
+            Student(
+                id="other-student",
+                user_id="other-student-user-id",
+                teacher_id="teacher-profile-id",
+                name="Other",
+                instrument="piano",
+            ),
+            PracticeRepertoire(
+                id="own-repertoire",
+                student_id="student-profile-id",
+                name="Own",
+                start_date=date(2026, 5, 1),
+            ),
+            PracticeRepertoire(
+                id="other-student-repertoire",
+                student_id="other-student",
+                name="Other",
+                start_date=date(2026, 5, 1),
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    headers = _headers("student-user-id", "student")
+
+    own_response = await client.get("/api/v1/practice/repertoires/own-repertoire", headers=headers)
+    assert own_response.status_code == 200
+
+    other_response = await client.get("/api/v1/practice/repertoires/other-student-repertoire", headers=headers)
+    assert other_response.status_code == 403
+
+    create_response = await client.post(
+        "/api/v1/practice/repertoires",
+        headers=headers,
+        json={"student_id": "student-profile-id", "name": "Own New"},
+    )
+    assert create_response.status_code == 201
