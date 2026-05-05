@@ -83,6 +83,11 @@ class LessonService:
         if data.student_id:
             student = await self.db.get(Student, data.student_id)
             if student:
+                if student.teacher_id != tid:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Student access denied",
+                    )
                 student_name = student.name
 
         lesson = Lesson(
@@ -102,20 +107,12 @@ class LessonService:
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:
         """Return a lesson by ID."""
-        from app.models.lesson import Lesson
-
-        lesson = await self.db.get(Lesson, lesson_id)
-        if lesson is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
         return LessonResponse.model_validate(lesson)
 
     async def update(self, lesson_id: str, data: LessonUpdate, current_user: Any) -> LessonResponse:
         """Update a lesson."""
-        from app.models.lesson import Lesson
-
-        lesson = await self.db.get(Lesson, lesson_id)
-        if lesson is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True, exclude={"pieces"})
         for key, value in update_data.items():
@@ -126,22 +123,16 @@ class LessonService:
 
     async def delete(self, lesson_id: str, current_user: Any) -> None:
         """Delete a lesson."""
-        from app.models.lesson import Lesson
-
-        lesson = await self.db.get(Lesson, lesson_id)
-        if lesson is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
         await self.db.delete(lesson)
         await self.db.flush()
 
     async def update_status(self, lesson_id: str, new_status: str, current_user: Any) -> LessonResponse:
         """Change lesson status."""
-        from app.models.lesson import Lesson, LessonStatus
+        from app.models.lesson import LessonStatus
         from app.models.request_event import RequestEvent, RequestEventType
 
-        lesson = await self.db.get(Lesson, lesson_id)
-        if lesson is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
         lesson.status = LessonStatus(new_status)
 
         # Phase 3 event logging
@@ -179,12 +170,9 @@ class LessonService:
         self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any
     ) -> LessonResponse:
         """Write or update feedback for a lesson."""
-        from app.models.lesson import Lesson
         from app.models.request_event import RequestEvent, RequestEventType
 
-        lesson = await self.db.get(Lesson, lesson_id)
-        if lesson is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
 
         if data.feedback is not None:
             lesson.feedback = data.feedback
@@ -205,6 +193,19 @@ class LessonService:
         await self.db.flush()
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
+
+    async def _get_accessible_lesson(self, lesson_id: str, current_user: Any) -> Any:
+        """Load a lesson and enforce the current teacher's ownership boundary."""
+        from app.models.lesson import Lesson
+
+        lesson = await self.db.get(Lesson, lesson_id)
+        if lesson is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+
+        teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if lesson.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson access denied")
+        return lesson
 
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""

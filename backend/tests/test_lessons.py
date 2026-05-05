@@ -2,6 +2,15 @@
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import create_access_token
+from app.models.student import Student
+
+
+def _headers(user_id: str, role: str = "teacher") -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.mark.asyncio
@@ -132,3 +141,75 @@ async def test_update_lesson_feedback(client: AsyncClient, auth_headers, create_
     data = response.json()
     assert data["feedback"] == "Great progress on the concerto."
     assert data["practice_tips"] == "Focus on measure 32-48"
+
+
+@pytest.mark.parametrize(
+    ("method", "path_suffix", "json_body"),
+    [
+        ("GET", "", None),
+        ("PUT", "", {"duration": 30}),
+        ("DELETE", "", None),
+        ("PATCH", "/status", {"status": "completed"}),
+        ("PUT", "/feedback", {"feedback": "Not allowed"}),
+    ],
+)
+@pytest.mark.asyncio
+async def test_other_teacher_cannot_access_lesson_detail_mutations_or_feedback(
+    method: str,
+    path_suffix: str,
+    json_body: dict | None,
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Lesson detail, mutations, status, and feedback are scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-lesson-teacher@test.com")
+    create_resp = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={"student_id": "student-001", "date": "2026-03-10", "duration": 60},
+    )
+    lesson_id = create_resp.json()["id"]
+
+    response = await client.request(
+        method,
+        f"/api/v1/lessons/{lesson_id}{path_suffix}",
+        headers=_headers("other-teacher-id"),
+        json=json_body,
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_teacher_cannot_create_lesson_for_other_teachers_existing_student(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Creating a lesson with an existing student requires owning that student."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-existing-student@test.com")
+    db_session.add(
+        Student(
+            id="other-owned-student",
+            teacher_id="other-teacher-id-prof",
+            name="Other Teacher Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": "other-owned-student",
+            "date": "2026-03-10",
+            "duration": 60,
+        },
+    )
+
+    assert response.status_code == 403
