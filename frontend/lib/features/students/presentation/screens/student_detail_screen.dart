@@ -18,10 +18,10 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
-import '../../../../features/parent_home/domain/entities/parent.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../parent_home/presentation/providers/parent_crud_provider.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
+import '../../../parent_home/parent_home_facade.dart'
+    show InvitationSource, ParentInvitation, invitationsNotifierProvider;
 import '../../presentation/providers/student_crud_provider.dart';
 import '../providers/student_image_provider.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
@@ -109,18 +109,24 @@ class StudentDetailScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            NotebookMasthead(
-              eyebrow: 'STUDENT',
-              meta: '',
-              trailing: IconButton(
-                onPressed: () => context.pop(),
+            const SizedBox(height: NotebookMasthead.mastheadTopPadding),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: NotebookMasthead(
+                eyebrow: 'STUDENT',
+                meta: '',
+                trailing: IconButton(
+                  onPressed: () => context.pop(),
                 icon: const Icon(
                   Icons.arrow_back,
                   color: AppColors.ink,
                   size: 22,
                 ),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
               ),
             ),
             Expanded(child: child),
