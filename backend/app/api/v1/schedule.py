@@ -158,6 +158,7 @@ async def get_available_slots(
     response_model=ScheduleExceptionResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Add schedule exception",
+    operation_id="create_schedule_exception",
 )
 async def create_exception(
     body: ScheduleExceptionCreate,
@@ -174,6 +175,7 @@ async def create_exception(
     response_model=ScheduleExceptionResponse,
     status_code=status.HTTP_200_OK,
     summary="Update schedule exception",
+    operation_id="update_schedule_exception",
 )
 async def update_exception(
     exception_id: str,
@@ -190,6 +192,7 @@ async def update_exception(
     "/exceptions/{exception_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete schedule exception",
+    operation_id="delete_schedule_exception",
 )
 async def delete_exception(
     exception_id: str,

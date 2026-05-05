@@ -23,6 +23,7 @@ router = APIRouter()
     "/",
     response_model=list[ScheduleExceptionResponse],
     summary="List schedule exceptions",
+    operation_id="list_schedule_exceptions_legacy",
 )
 async def list_exceptions(
     teacher_availability_id: Annotated[str, Query(description="Teacher availability ID")],
@@ -38,6 +39,7 @@ async def list_exceptions(
     response_model=ScheduleExceptionResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a schedule exception",
+    operation_id="create_schedule_exception_legacy",
 )
 async def create_exception(
     teacher_availability_id: Annotated[str, Query(description="Teacher availability ID")],
@@ -56,6 +58,7 @@ async def create_exception(
     "/{exception_id}",
     response_model=ScheduleExceptionResponse,
     summary="Update a schedule exception",
+    operation_id="update_schedule_exception_legacy",
 )
 async def update_exception(
     exception_id: str,
@@ -74,6 +77,7 @@ async def update_exception(
     "/{exception_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a schedule exception",
+    operation_id="delete_schedule_exception_legacy",
 )
 async def delete_exception(
     exception_id: str,

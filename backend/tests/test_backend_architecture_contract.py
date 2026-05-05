@@ -5,6 +5,8 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from app.main import app
+
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 API_V1_ROOT = BACKEND_ROOT / "app" / "api" / "v1"
 APP_ROOT = BACKEND_ROOT / "app"
@@ -78,3 +80,25 @@ def test_lower_layers_do_not_import_api_layer() -> None:
                             violations.append(f"{_module_path(path)} imports {alias.name}")
 
     assert violations == []
+
+
+def test_openapi_operation_ids_are_unique() -> None:
+    """OpenAPI operation IDs must be stable and unique for docs and generated clients."""
+    schema = app.openapi()
+    operation_locations: dict[str, list[str]] = {}
+    for path, path_item in schema["paths"].items():
+        for method, operation in path_item.items():
+            if method not in {"get", "post", "put", "patch", "delete"}:
+                continue
+            operation_id = operation.get("operationId")
+            if not operation_id:
+                continue
+            operation_locations.setdefault(operation_id, []).append(f"{method.upper()} {path}")
+
+    duplicates = {
+        operation_id: locations
+        for operation_id, locations in operation_locations.items()
+        if len(locations) > 1
+    }
+
+    assert duplicates == {}
