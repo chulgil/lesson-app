@@ -496,6 +496,29 @@ class ParentService:
             return ParentInvitationResponse.model_validate(invitation)
 
         query = select(ParentInvitation)
+        role = self._role(current_user)
+        if role == "teacher":
+            from app.models.student import Student
+            from app.services.teacher_id_resolver import resolve_teacher_id
+
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if student_id is not None:
+                student = await self.db.get(Student, student_id)
+                if student is not None and student.teacher_id != teacher_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Not allowed to view invitations",
+                    )
+            query = query.where(ParentInvitation.teacher_id == teacher_id)
+        elif role == "student":
+            query = query.where(ParentInvitation.student_id == current_user.id)
+            if student_id is not None and student_id != current_user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not allowed to view invitations",
+                )
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to view invitations")
         if student_id:
             query = query.where(ParentInvitation.student_id == student_id)
         if status_filter == "pending":

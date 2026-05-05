@@ -227,6 +227,71 @@ async def test_parent_invitation_endpoints_match_frontend_contract(
 
 
 @pytest.mark.asyncio
+async def test_parent_invitation_lists_are_scoped_to_actor(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Invitation list endpoints do not expose other teachers' invitations."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.parent import ParentInvitation
+    from app.models.student import Student
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-invite-teacher@test.com")
+    await create_test_user(user_id="student-user-id", role="student", name="Student", email="student-invite@test.com")
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            ParentInvitation(
+                id="owner-invitation",
+                student_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                source="teacher",
+                parent_phone="01011112222",
+                invitation_code="OWNER-CODE",
+                expires_at=datetime.now(UTC) + timedelta(days=7),
+            ),
+            ParentInvitation(
+                id="other-invitation",
+                student_id="other-student-id",
+                teacher_id="other-teacher-id-prof",
+                source="teacher",
+                parent_phone="01033334444",
+                invitation_code="OTHER-CODE",
+                expires_at=datetime.now(UTC) + timedelta(days=7),
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    owner_list = await client.get("/api/v1/parents/invitations", headers=auth_headers)
+    other_teacher_filtered = await client.get(
+        "/api/v1/parents/invitations",
+        headers=_headers("other-teacher-id", "teacher"),
+        params={"student_id": "student-user-id"},
+    )
+    student_list = await client.get(
+        "/api/v1/parents/invitations",
+        headers=_headers("student-user-id", "student"),
+    )
+
+    assert owner_list.status_code == 200
+    assert [item["id"] for item in owner_list.json()["items"]] == ["owner-invitation"]
+    assert other_teacher_filtered.status_code == 403
+    assert student_list.status_code == 200
+    assert [item["id"] for item in student_list.json()["items"]] == ["owner-invitation"]
+
+
+@pytest.mark.asyncio
 async def test_parent_notification_settings_endpoint_uses_spec_defaults_and_permissions(
     client: AsyncClient,
     create_test_user,
