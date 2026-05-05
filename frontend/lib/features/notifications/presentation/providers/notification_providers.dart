@@ -304,10 +304,10 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       body: AppStrings.notifSubExpiringBody(2),
       createdAt: now.subtract(const Duration(hours: 3)),
       sentAt: now.subtract(const Duration(hours: 3)),
-      actionUrl: '/subscriptions/sub_1',
+      actionUrl: '/subscriptions/sub_pkg_01',
       actionLabel: AppStrings.notifSubExpiringAction,
       data: {
-        'subscriptionId': 'sub_1',
+        'subscriptionId': 'sub_pkg_01',
         'daysLeft': 3,
         'studentId': 'student_1',
       },
@@ -390,7 +390,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       body: AppStrings.notifPaymentReceivedBody('김민수'),
       createdAt: now.subtract(const Duration(hours: 6)),
       sentAt: now.subtract(const Duration(hours: 6)),
-      actionUrl: '/subscriptions/sub_1',
+      actionUrl: '/subscriptions/sub_pkg_01',
       actionLabel: AppStrings.notifPaymentReceivedAction,
     ),
 
@@ -431,7 +431,7 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
       body: AppStrings.notifScheduleChangeBody('김민수', 3),
       createdAt: now.subtract(const Duration(hours: 8)),
       sentAt: now.subtract(const Duration(hours: 8)),
-      actionUrl: '/subscriptions/sub_1',
+      actionUrl: '/subscriptions/sub_pkg_01',
       actionLabel: AppStrings.notifScheduleChangeAction,
     ),
   ];
