@@ -160,6 +160,76 @@ async def test_other_teacher_cannot_read_existing_students_gamification(
 
 
 @pytest.mark.asyncio
+async def test_other_teacher_cannot_award_points_to_existing_student(
+    client: AsyncClient,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Point mutations for existing students are scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-points@test.com")
+    db_session.add(
+        Student(
+            id="owned-points-student",
+            teacher_id="test-user-id-prof",
+            name="Owned Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/gamification/points",
+        headers=_headers("other-teacher-id"),
+        json={
+            "student_id": "owned-points-student",
+            "points": 50,
+            "type": "practiceComplete",
+            "description": "연습 완료",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_other_teacher_cannot_award_badges_to_existing_student(
+    client: AsyncClient,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Badge mutations for existing students are scoped to the owning teacher."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-badges@test.com")
+    db_session.add(
+        Student(
+            id="owned-badge-student",
+            teacher_id="test-user-id-prof",
+            name="Owned Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/gamification/owned-badge-student/badges",
+        headers=_headers("other-teacher-id"),
+        json={
+            "badges": [
+                {
+                    "name": "First Practice",
+                    "description": "Completed first practice",
+                    "icon": "music_note",
+                    "rarity": "common",
+                }
+            ]
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_award_points_unauthorized_student(client: AsyncClient, student_auth_headers, create_test_user):
     """POST /gamification/points as student should return 403."""
     await create_test_user(user_id="test-student-id", role="student", email="student@test.com")

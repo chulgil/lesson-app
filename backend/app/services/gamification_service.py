@@ -115,9 +115,12 @@ class GamificationService:
         points: int,
         point_type: str,
         description: str,
+        current_user: Any,
     ) -> Any:
         """Award points to a student."""
         from app.models.gamification import GamificationPoint
+
+        await self._assert_student_access(student_id, current_user)
 
         entry = GamificationPoint(
             student_id=student_id,
@@ -138,9 +141,12 @@ class GamificationService:
         badge_description: str,
         badge_icon: str,
         rarity: str,
+        current_user: Any,
     ) -> Any:
         """Award a badge to a student (idempotent)."""
         from app.models.gamification import GamificationBadge
+
+        await self._assert_student_access(student_id, current_user)
 
         existing = await self.db.scalar(
             select(GamificationBadge).where(

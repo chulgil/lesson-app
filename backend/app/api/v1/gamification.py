@@ -54,6 +54,7 @@ async def award_points(
         points=body.points,
         point_type=body.type,
         description=body.description,
+        current_user=current_user,
     )
     return result
 
@@ -78,5 +79,6 @@ async def award_badges(
             badge_description=badge.description,
             badge_icon=badge.icon,
             rarity=badge.rarity,
+            current_user=current_user,
         )
     return SuccessResponse(message="Badges awarded")
