@@ -136,6 +136,8 @@ Programme Title (38pt 가운데 큰 문구)은 수강관리에서만 사용하�
 | 학생 레슨 | LESSON | + (예약) | 없음 |
 | 학생 연습 | PRACTICE | history + add | 없음 |
 | 선생님 스케줄 | SCHEDULE | view toggle + add | 없음 |
+| 선생님 프로필 | PROFILE | settings | 없음 |
+| 학생 프로필 | PROFILE | settings | 없음 |
 
 trailing은 `IconButton(Icons.add)` 단일 아이콘 또는 `Row` 조합 가능.
 - `NotebookTypography`, Vermillion accent, ink line 등 나머지 Notebook × Score 언어는 유지할 것

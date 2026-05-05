@@ -10,6 +10,8 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../students/students_facade.dart';
@@ -46,6 +48,36 @@ class ProfileTab extends ConsumerWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
+          // Notebook masthead
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.space2),
+                NotebookMasthead(
+                  eyebrow: 'PROFILE',
+                  meta:
+                      'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
+                  trailing: IconButton(
+                    onPressed:
+                        () => context.push(AppRoutes.notificationSettings),
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: AppSpacing.space4),
 
           // Profile header with key info

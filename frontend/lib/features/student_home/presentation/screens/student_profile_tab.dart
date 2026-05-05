@@ -10,6 +10,8 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../providers/practice_reminder_provider.dart';
 import '../providers/student_home_profile_provider.dart';
 import '../widgets/language_select_sheet.dart';
@@ -26,6 +28,37 @@ class StudentProfileTab extends ConsumerWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
+          // Notebook masthead
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.space2),
+                NotebookMasthead(
+                  eyebrow: 'PROFILE',
+                  meta:
+                      'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
+                  trailing: IconButton(
+                    onPressed:
+                        () => context.push(AppRoutes.notificationSettings),
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Profile header
           _buildProfileHeader(
             context,
@@ -103,93 +136,82 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
-      decoration: const BoxDecoration(color: AppColors.ink),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Profile image
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 48,
-                  backgroundColor: AppColors.paper.withValues(alpha: 0.15),
-                  child: Text(
-                    initial,
-                    style: AppTypography.displayMedium.copyWith(
-                      color: AppColors.paper,
-                      fontWeight: FontWeight.bold,
-                    ),
+      decoration: const BoxDecoration(color: AppColors.paper),
+      child: Column(
+        children: [
+          // Profile image
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 48,
+                backgroundColor: AppColors.paperAccentSoft,
+                child: Text(
+                  initial,
+                  style: AppTypography.displayMedium.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                // §7.132: round → 사각 카메라 뱃지.
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(color: AppColors.paper),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 16,
-                      color: AppColors.ink,
-                    ),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(color: AppColors.paperDark),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    size: 16,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space3),
+
+          // Name
+          Text(
+            name,
+            style: AppTypography.headingLarge.copyWith(color: AppColors.ink),
+          ),
+
+          const SizedBox(height: AppSpacing.space1),
+
+          // Email
+          Text(
+            email,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.space2),
+
+          // Instrument tag
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space2,
+            ),
+            decoration: BoxDecoration(color: AppColors.paperDark),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.music_note, size: 16, color: AppColors.ink),
+                const SizedBox(width: AppSpacing.space1),
+                Text(
+                  instrument,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: AppSpacing.space3),
-
-            // Name
-            Text(
-              name,
-              style: AppTypography.headingLarge.copyWith(
-                color: AppColors.paper,
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.space1),
-
-            // Email
-            Text(
-              email,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.paper.withValues(alpha: 0.7),
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.space2),
-
-            // Instrument tag
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.paper.withValues(alpha: 0.15),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.music_note,
-                    size: 16,
-                    color: AppColors.paper,
-                  ),
-                  const SizedBox(width: AppSpacing.space1),
-                  Text(
-                    instrument,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.paper,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
