@@ -39,6 +39,7 @@ router = APIRouter()
 @router.get(
     "/teacher",
     response_model=TeacherSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get my teacher settings",
 )
 async def get_teacher_settings(
@@ -53,11 +54,13 @@ async def get_teacher_settings(
 @router.get(
     "/teachers/{teacher_id}",
     response_model=TeacherSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get public teacher settings",
 )
 @router.get(
     "/teacher/{teacher_id}",
     response_model=TeacherSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get public teacher settings",
 )
 async def get_public_teacher_settings(
@@ -96,6 +99,7 @@ async def update_teacher_settings(
 @router.get(
     "/subscription",
     response_model=SubscriptionSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get subscription settings",
 )
 async def get_subscription_settings(
@@ -133,6 +137,7 @@ async def update_subscription_settings(
 @router.get(
     "/proposal",
     response_model=ProposalSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get proposal settings",
 )
 async def get_proposal_settings(
@@ -170,6 +175,7 @@ async def update_proposal_settings(
 @router.get(
     "/notification/{target_user_id}",
     response_model=NotificationSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get notification settings for a target",
 )
 async def get_notification_settings(
@@ -209,6 +215,7 @@ async def update_notification_settings(
 @router.get(
     "/feedback-presets",
     response_model=list[FeedbackPresetResponse],
+    status_code=status.HTTP_200_OK,
     summary="List feedback presets",
 )
 async def list_feedback_presets(
@@ -278,6 +285,7 @@ async def delete_feedback_preset(
 @router.get(
     "/teaching-resources",
     response_model=PaginatedResponse[TeachingResourceResponse],
+    status_code=status.HTTP_200_OK,
     summary="List teaching resources",
 )
 async def list_teaching_resources(
@@ -315,6 +323,7 @@ async def create_teaching_resource(
 @router.get(
     "/teaching-resources/{resource_id}",
     response_model=TeachingResourceResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get teaching resource",
 )
 async def get_teaching_resource(

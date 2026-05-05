@@ -24,6 +24,7 @@ router = APIRouter()
 @router.get(
     "/{teacher_id}",
     response_model=PaginatedResponse[TeacherReviewResponse],
+    status_code=status.HTTP_200_OK,
     summary="List reviews for a teacher",
 )
 async def list_reviews(
@@ -44,6 +45,7 @@ async def list_reviews(
 @router.get(
     "/{teacher_id}/summary",
     response_model=TeacherReviewSummary,
+    status_code=status.HTTP_200_OK,
     summary="Get review summary for a teacher",
 )
 async def get_review_summary(

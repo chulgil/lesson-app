@@ -16,7 +16,11 @@ from app.services.post_service import PostService
 router = APIRouter()
 
 
-@router.get("", response_model=PaginatedResponse[TeacherPostResponse])
+@router.get(
+    "",
+    response_model=PaginatedResponse[TeacherPostResponse],
+    status_code=status.HTTP_200_OK,
+)
 async def list_posts(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],

@@ -18,6 +18,7 @@ router = APIRouter()
 @router.get(
     "/teacher/{teacher_id}",
     response_model=SubscriptionSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get subscription settings by teacher",
 )
 async def get_by_teacher(
@@ -33,6 +34,7 @@ async def get_by_teacher(
 @router.get(
     "/organization/{organization_id}",
     response_model=SubscriptionSettingsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get subscription settings by organization",
 )
 async def get_by_organization(

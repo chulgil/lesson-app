@@ -24,6 +24,7 @@ router = APIRouter()
 @router.get(
     "/{student_id}",
     response_model=StudentGamificationResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get student gamification",
 )
 async def get_student_gamification(

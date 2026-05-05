@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_db
@@ -15,7 +15,11 @@ from app.services.analytics_service import AnalyticsService
 router = APIRouter()
 
 
-@router.get("/monthly-stats", response_model=TeacherMonthlyStatsResponse)
+@router.get(
+    "/monthly-stats",
+    response_model=TeacherMonthlyStatsResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def get_monthly_stats(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],

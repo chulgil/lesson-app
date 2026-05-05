@@ -53,6 +53,7 @@ async def create_invite(
 @router.get(
     "/",
     response_model=PaginatedResponse[InviteResponse],
+    status_code=status.HTTP_200_OK,
     summary="List my invites",
 )
 async def list_invites(
@@ -72,6 +73,7 @@ async def list_invites(
 @router.get(
     "/code/{invite_code}",
     response_model=InviteResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get invite by code",
 )
 async def get_invite_by_code(
@@ -131,6 +133,7 @@ async def create_connection_request(
 @router.get(
     "/connection-requests/sent",
     response_model=PaginatedResponse[ConnectionRequestResponse],
+    status_code=status.HTTP_200_OK,
     summary="List sent connection requests",
 )
 async def list_sent_requests(
@@ -150,6 +153,7 @@ async def list_sent_requests(
 @router.get(
     "/connection-requests/pending",
     response_model=PaginatedResponse[ConnectionRequestResponse],
+    status_code=status.HTTP_200_OK,
     summary="List pending connection requests",
 )
 async def list_pending_requests(
@@ -209,6 +213,7 @@ async def cancel_request(
 @router.get(
     "/connections",
     response_model=PaginatedResponse[ConnectionResponse],
+    status_code=status.HTTP_200_OK,
     summary="List my connections",
 )
 async def list_connections(
@@ -260,6 +265,7 @@ async def deactivate_connection(
 @router.get(
     "/{invite_id}",
     response_model=InviteResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get invite by ID",
 )
 async def get_invite(

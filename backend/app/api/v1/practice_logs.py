@@ -25,11 +25,13 @@ router = APIRouter()
 @router.get(
     "/",
     response_model=PaginatedResponse[PracticeLogResponse],
+    status_code=status.HTTP_200_OK,
     summary="List practice logs",
 )
 @router.get(
     "",
     response_model=PaginatedResponse[PracticeLogResponse],
+    status_code=status.HTTP_200_OK,
     summary="List practice logs for a month",
 )
 async def list_practice_logs(
@@ -56,6 +58,7 @@ async def list_practice_logs(
 @router.get(
     "/date/{date}",
     response_model=PracticeLogResponse | None,
+    status_code=status.HTTP_200_OK,
     summary="Get practice log for a date",
 )
 async def get_practice_log_by_date(
@@ -71,6 +74,7 @@ async def get_practice_log_by_date(
 @router.get(
     "/weekly",
     response_model=list[bool],
+    status_code=status.HTTP_200_OK,
     summary="Get weekly practice status",
 )
 async def get_weekly_practice(
@@ -89,6 +93,7 @@ async def get_weekly_practice(
 @router.get(
     "/stats",
     response_model=PracticeStatsResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get monthly practice stats",
 )
 async def get_monthly_stats(
@@ -106,6 +111,7 @@ async def get_monthly_stats(
 @router.get(
     "/{log_id}",
     response_model=PracticeLogResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get practice log by ID",
 )
 async def get_practice_log_by_id(

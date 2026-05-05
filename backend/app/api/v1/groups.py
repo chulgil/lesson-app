@@ -34,6 +34,7 @@ router = APIRouter()
 @router.get(
     "/{group_class_id}/schedules",
     response_model=PaginatedResponse[GroupClassScheduleResponse],
+    status_code=status.HTTP_200_OK,
     summary="List schedules for a group class",
 )
 async def list_group_schedules(
@@ -92,6 +93,7 @@ async def cancel_group_schedule(
 @router.get(
     "/bookings",
     response_model=PaginatedResponse[GroupClassBookingResponse],
+    status_code=status.HTTP_200_OK,
     summary="List group bookings with filters",
 )
 async def list_group_bookings(
@@ -124,6 +126,7 @@ async def list_group_bookings(
 @router.get(
     "/bookings/{booking_id}",
     response_model=GroupClassBookingResponse,
+    status_code=status.HTTP_200_OK,
     summary="Get a group booking by ID",
 )
 async def get_group_booking(
@@ -189,6 +192,7 @@ async def mark_attendance(
 @router.get(
     "/schedules/{schedule_id}/bookings",
     response_model=list[GroupClassBookingResponse],
+    status_code=status.HTTP_200_OK,
     summary="List bookings for a schedule",
 )
 async def list_schedule_bookings(
@@ -289,6 +293,7 @@ async def create_no_show(
 @router.get(
     "/no-shows",
     response_model=PaginatedResponse[NoShowRecordResponse],
+    status_code=status.HTTP_200_OK,
     summary="List no-show records",
 )
 async def list_no_shows(

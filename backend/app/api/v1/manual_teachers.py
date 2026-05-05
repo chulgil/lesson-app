@@ -20,7 +20,11 @@ from app.services.manual_teacher_service import ManualTeacherService
 router = APIRouter()
 
 
-@router.get("", response_model=PaginatedResponse[ManualTeacherResponse])
+@router.get(
+    "",
+    response_model=PaginatedResponse[ManualTeacherResponse],
+    status_code=status.HTTP_200_OK,
+)
 async def list_manual_teachers(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
@@ -49,7 +53,11 @@ async def create_manual_teacher(
     return await service.create_manual_teacher(body, current_user)
 
 
-@router.get("/{teacher_id}", response_model=ManualTeacherResponse)
+@router.get(
+    "/{teacher_id}",
+    response_model=ManualTeacherResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def get_manual_teacher(
     teacher_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],

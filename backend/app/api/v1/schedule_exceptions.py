@@ -22,6 +22,7 @@ router = APIRouter()
 @router.get(
     "/",
     response_model=list[ScheduleExceptionResponse],
+    status_code=status.HTTP_200_OK,
     summary="List schedule exceptions",
     operation_id="list_schedule_exceptions_legacy",
 )

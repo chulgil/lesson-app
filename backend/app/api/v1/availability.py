@@ -25,6 +25,7 @@ router = APIRouter()
 @router.get(
     "/",
     response_model=list[TeacherAvailabilityResponse],
+    status_code=status.HTTP_200_OK,
     summary="List teacher availability",
 )
 async def list_availability(
