@@ -6,6 +6,11 @@ from httpx import AsyncClient
 from app.core.security import create_access_token
 
 
+def _headers(user_id: str, role: str) -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
+
+
 @pytest.mark.asyncio
 async def test_parent_crud_and_relations_match_frontend_contract(
     client: AsyncClient,
@@ -92,6 +97,75 @@ async def test_parent_crud_and_relations_match_frontend_contract(
         params={"student_id": "student-user-id"},
     )
     assert billing_response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_parent_relations_are_scoped_to_teacher_and_linked_parent(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Other teachers and unlinked parents cannot list a student's parent relations."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-parent-rel-teacher@test.com")
+    await create_test_user(user_id="parent-user-id", role="parent", name="Parent", email="parent-rel@test.com")
+    await create_test_user(
+        user_id="other-parent-user-id",
+        role="parent",
+        name="Other Parent",
+        email="other-parent-rel@test.com",
+    )
+
+    from app.models.parent import Parent, ParentChildRelation
+    from app.models.student import Student
+
+    db_session.add_all(
+        [
+            Student(
+                id="owned-student",
+                teacher_id="test-user-id-prof",
+                name="Owned Student",
+                instrument="violin",
+            ),
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", status="active"),
+            Parent(id="other-parent-profile-id", user_id="other-parent-user-id", name="Other Parent", status="active"),
+            ParentChildRelation(
+                id="owned-relation-id",
+                parent_id="parent-profile-id",
+                student_id="owned-student",
+                status="active",
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    owner_response = await client.get(
+        "/api/v1/parents/relations",
+        headers=auth_headers,
+        params={"student_id": "owned-student"},
+    )
+    other_teacher_response = await client.get(
+        "/api/v1/parents/relations",
+        headers=_headers("other-teacher-id", "teacher"),
+        params={"student_id": "owned-student"},
+    )
+    linked_parent_response = await client.get(
+        "/api/v1/parents/relations",
+        headers=_headers("parent-user-id", "parent"),
+        params={"student_id": "owned-student"},
+    )
+    other_parent_response = await client.get(
+        "/api/v1/parents/relations",
+        headers=_headers("other-parent-user-id", "parent"),
+        params={"student_id": "owned-student"},
+    )
+
+    assert owner_response.status_code == 200
+    assert [item["id"] for item in owner_response.json()["items"]] == ["owned-relation-id"]
+    assert other_teacher_response.status_code == 403
+    assert linked_parent_response.status_code == 200
+    assert other_parent_response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -224,4 +298,3 @@ async def test_parent_notification_settings_endpoint_uses_spec_defaults_and_perm
         params={"parent_id": "other-parent-profile-id"},
     )
     assert forbidden_response.status_code == 403
-

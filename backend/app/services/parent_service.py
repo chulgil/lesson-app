@@ -535,12 +535,49 @@ class ParentService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to view relations")
         if role == "student" and current_user.id != student_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to view relations")
+        await self._assert_can_view_student_relations(student_id, current_user)
 
         result = await self.db.scalars(
             select(ParentChildRelation).where(ParentChildRelation.student_id == student_id)
         )
         items = [self._relation_response(relation) for relation in result.all()]
         return PaginatedResponse.create(items=items, total=len(items), page=1, size=max(len(items), 1))
+
+    async def _assert_can_view_student_relations(self, student_id: str, current_user: Any) -> None:
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus, ParentStatus
+        from app.models.student import Student
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        role = self._role(current_user)
+        student = await self.db.get(Student, student_id)
+        if role == "teacher":
+            if student is None:
+                return
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if student.teacher_id == teacher_id:
+                return
+        elif role == "student":
+            if current_user.id == student_id or (student is not None and student.user_id == current_user.id):
+                return
+        elif role == "parent":
+            parent = await self.db.scalar(
+                select(Parent).where(
+                    Parent.user_id == current_user.id,
+                    Parent.status == ParentStatus.active,
+                )
+            )
+            if parent is not None:
+                relation = await self.db.scalar(
+                    select(ParentChildRelation.id).where(
+                        ParentChildRelation.parent_id == parent.id,
+                        ParentChildRelation.student_id == student_id,
+                        ParentChildRelation.status == ParentChildRelationStatus.active,
+                    )
+                )
+                if relation is not None:
+                    return
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to view relations")
 
     async def update_relation(
         self,
