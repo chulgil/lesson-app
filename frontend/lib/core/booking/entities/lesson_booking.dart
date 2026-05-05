@@ -456,6 +456,8 @@ class LessonBooking {
   final List<ScheduleOption>?
   scheduleOptions; // 1-3 options proposed by student
   final String? selectedOptionId; // ID of option selected by teacher
+  // Link to UnifiedLessonRequest (for trial → request detail navigation)
+  final String? requestId;
 
   const LessonBooking({
     required this.id,
@@ -493,6 +495,7 @@ class LessonBooking {
     this.expiredAt,
     this.scheduleOptions,
     this.selectedOptionId,
+    this.requestId,
   });
 
   /// Get formatted time range

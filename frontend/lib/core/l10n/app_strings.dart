@@ -215,14 +215,29 @@ class AppStrings {
   /// 일정이 확정되었습니다
   static const scheduleConfirmed = '일정이 확정되었습니다';
 
+  /// 레슨 일정이 확정되었습니다
+  static const lessonScheduleConfirmed = '레슨 일정이 확정되었습니다';
+
   /// 레슨을 요청했습니다 (접미사)
   static const lessonRequestSuffix = '레슨을 요청했습니다';
 
   /// 종료됨 (terminal 상태 하단바)
   static const requestClosed = '요청이 종료되었습니다';
 
+  /// 가능한 일정 선택 섹션 제목
+  static const availableSchedules = '가능한 일정';
+
   /// 슬롯 선택 힌트
-  static const slotSelectionHint = '가능한 일정을 선택해 확정하세요';
+  static const slotSelectionHint = '가능한 일정 중 하나를 선택해 확정하세요';
+
+  /// 가능한 일정 없음
+  static const noAvailableSchedules = '가능한 일정이 없습니다';
+
+  /// 순위 접미사
+  static const prioritySuffix = '순위';
+
+  /// 선택됨 상태
+  static const selected = '선택됨';
 
   // ── Schedule Comparison & Actions ─────────────────────────
 
@@ -522,7 +537,7 @@ class AppStrings {
 
   // Profile card
   static const studentMessage = '학생 메시지';
-  static const scheduleChangeAccept = '선택한 일정 확정';
+  static const scheduleChangeAccept = '선택한 일정으로 확정';
   static const scheduleChangeAccepted = '선택한 일정으로 확정했습니다';
   static const scheduleChangeReject = '거절';
   static const scheduleChangeCounter = '다른 일정 제안';
@@ -1032,9 +1047,11 @@ class AppStrings {
   static String notifSubExpiringBody(int remaining) =>
       '남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
   static const notifSubExpiringAction = '수강권 확인';
+  static String notifLessonsRunningLowTitle(int remaining) =>
+      '수강권이 $remaining회 남았습니다';
+  static const notifLessonsRunningLowBody = '남은 레슨 일정을 확인하고 갱신을 준비하세요';
   static const notifConnectionComplete = '연결 완료';
-  static String notifConnectionTeacher(String name) =>
-      '$name님과 연결되었습니다';
+  static String notifConnectionTeacher(String name) => '$name님과 연결되었습니다';
   static String notifConnectionStudent(String name) =>
       '$name과 연결되었습니다! 지금 체험레슨을 예약해보세요.';
   static const notifViewStudent = '학생 보기';
@@ -1055,8 +1072,7 @@ class AppStrings {
   static const notifPracticeReminderTitle = '연습 시간이에요!';
   static const notifPracticeReminderBody = '오늘의 연습 목표를 달성해보세요';
   static const notifStreakTitle = '연속 연습 달성!';
-  static String notifStreakBody(int days) =>
-      '$days일 연속 연습을 달성했어요!';
+  static String notifStreakBody(int days) => '$days일 연속 연습을 달성했어요!';
   static const notifScheduleChangeTitle = '일정 변경 요청';
   static String notifScheduleChangeBody(String student, int session) =>
       '$student $session회차 레슨 일정 변경 요청';
@@ -1067,6 +1083,14 @@ class AppStrings {
   static const active = '수강 중';
   static const expiringSoon = '만료 예정';
   static const expired = '만료됨';
+
+  /// Trial lesson detail bottom sheet
+  static const trialLessonDetail = '체험레슨 상세';
+  static const instrumentLabel = '악기';
+  static const lessonDate = '날짜';
+  static const lessonTime = '시간';
+  static const statusLabel = '상태';
+  static const myMessage = '내 메시지';
 
   // === TimeContextBanner (Home) strings ===
   // 선생님 메시지
@@ -1346,6 +1370,9 @@ class AppStrings {
   /// N회차 → dateTime 확정
   static String sessionConfirmed(int n, String dateTime) =>
       '$n회차 → $dateTime 확정';
+
+  /// N회차 일정이 확정되었습니다
+  static String sessionScheduleConfirmed(int n) => '$n회차 일정이 확정되었습니다';
 
   /// 사유:
   static const reasonPrefix = '사유: ';
