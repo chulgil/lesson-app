@@ -12,7 +12,7 @@ Plan A Phase 1 (Issue #235, audit P0-2/P0-4).
 
 import enum
 
-from sqlalchemy import JSON, Boolean, Enum, Index, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -93,7 +93,7 @@ class RequestEvent(UUIDMixin, TimestampMixin, Base):
     proposed_day_of_week: Mapped[int | None] = mapped_column(Integer, nullable=True)
     proposed_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
 
-    subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    subscription_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("subscriptions.id"), nullable=True)
     session_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     change_credit_used: Mapped[int | None] = mapped_column(Integer, nullable=True)
     change_credit_remaining_after: Mapped[int | None] = mapped_column(Integer, nullable=True)

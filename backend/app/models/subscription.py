@@ -1,10 +1,12 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
+
+# ruff: noqa: N815, UP042
 
 
 class SubscriptionType(str, enum.Enum):
@@ -67,8 +69,8 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "subscriptions"
 
-    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    membership_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    student_id: Mapped[str] = mapped_column(String(36), ForeignKey("students.id"), nullable=False)
+    membership_id: Mapped[str] = mapped_column(String(36), ForeignKey("class_memberships.id"), nullable=False)
     type: Mapped[SubscriptionType] = mapped_column(
         Enum(SubscriptionType, native_enum=True),
         nullable=False,
@@ -131,7 +133,7 @@ class SubscriptionUsage(UUIDMixin, Base):
 
     __tablename__ = "subscription_usages"
 
-    subscription_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    subscription_id: Mapped[str] = mapped_column(String(36), ForeignKey("subscriptions.id"), nullable=False)
     lesson_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     used_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -159,7 +161,7 @@ class SubscriptionTemplate(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "subscription_templates"
 
-    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    teacher_id: Mapped[str] = mapped_column(String(36), ForeignKey("teachers.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     type: Mapped[SubscriptionType] = mapped_column(
         Enum(SubscriptionType, native_enum=True),
@@ -187,9 +189,9 @@ class SubscriptionProposal(UUIDMixin, Base):
 
     __tablename__ = "subscription_proposals"
 
-    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    template_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    teacher_id: Mapped[str] = mapped_column(String(36), ForeignKey("teachers.id"), nullable=False)
+    student_id: Mapped[str] = mapped_column(String(36), ForeignKey("students.id"), nullable=False)
+    template_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("subscription_templates.id"), nullable=True)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[ProposalStatus] = mapped_column(
         Enum(ProposalStatus, native_enum=True),
@@ -205,20 +207,26 @@ class SubscriptionProposal(UUIDMixin, Base):
     payment_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    subscription_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("subscriptions.id"), nullable=True)
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     academy_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     discount_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
     discount_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     template_ids: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
-    recommended_template_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
-    selected_template_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    recommended_template_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("subscription_templates.id"), nullable=True
+    )
+    selected_template_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("subscription_templates.id"), nullable=True
+    )
     is_auto_proposal: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_app_transition: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     lesson_request_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     proposal_type: Mapped[str] = mapped_column(String(20), nullable=False, default="proposal")
     is_renewal: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    previous_subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    previous_subscription_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("subscriptions.id"), nullable=True
+    )
     renewal_initiator: Mapped[str | None] = mapped_column(String(20), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
