@@ -14,7 +14,6 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../providers/student_crud_provider.dart';
@@ -24,7 +23,6 @@ import '../providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/bulk_message_sheet.dart';
-import '../widgets/practice_sparkline.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
 import 'bulk_cancel_screen.dart';
@@ -1010,8 +1008,6 @@ class _StudentCard extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            // Row 3: Weekly practice dots
-            _PracticeDots(studentId: swm.studentId),
           ],
         ),
       ),
@@ -1073,57 +1069,6 @@ class _StudentCard extends ConsumerWidget {
       },
       loading: () => const SizedBox(width: 56),
       error: (_, __) => const SizedBox(width: 56),
-    );
-  }
-}
-
-/// Weekly practice dot pattern (●●●●●○○ style).
-/// Practice trend sparkline for student list (ux_guidelines §2.7).
-///
-/// Replaces old _PracticeDots with 7-day bar sparkline.
-class _PracticeDots extends ConsumerWidget {
-  final String studentId;
-
-  const _PracticeDots({required this.studentId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final weeklyAsync = ref.watch(weeklyPracticeProvider(studentId));
-
-    return weeklyAsync.when(
-      data: (days) {
-        // Convert bool[] → double[] (1.0 if practiced, 0.0 otherwise)
-        final values = days.map((d) => d ? 1.0 : 0.0).toList();
-        if (values.length != 7) {
-          // Pad or trim to 7 values
-          while (values.length < 7) {
-            values.insert(0, 0.0);
-          }
-          if (values.length > 7) {
-            values.removeRange(0, values.length - 7);
-          }
-        }
-
-        final practiced = days.where((d) => d).length;
-
-        return Padding(
-          padding: const EdgeInsets.only(top: 3),
-          child: Row(
-            children: [
-              PracticeSparkline(values: values),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                '$practiced/7일',
-                style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
