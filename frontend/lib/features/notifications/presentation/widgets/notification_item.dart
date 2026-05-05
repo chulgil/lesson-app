@@ -261,6 +261,11 @@ class NotificationItem extends StatelessWidget {
       // Bulk teacher actions (§7.119)
       case NotificationType.generalAnnouncement:
         return Icons.campaign_outlined;
+
+      // System auto-send notices (teacher-only)
+      case NotificationType.paymentReminderSentNotice:
+      case NotificationType.renewalReminderSentNotice:
+        return Icons.send_outlined;
     }
   }
 

@@ -32,7 +32,38 @@
 
 ## 2. 핵심 기능
 
-### 2.1 알림 유형 (NotificationType) - 전체 목록
+### 2.1 수신자 역할 매핑 (targetRole)
+
+> **2026-05-05 추가**: 모든 알림 타입은 수신자 역할이 명확히 정의되어야 한다.
+> Mock 데이터와 백엔드 모두 이 매핑을 따른다.
+
+#### 설계 원칙
+
+1. **취소/변경 알림**: 요청자 본인은 이미 알고 있으므로 **상대방에게만** 발송
+2. **만료/수강권 알림**: 양쪽 모두 관리가 필요하므로 **양쪽** 발송
+3. **시스템 자동 발송**: 미수금 리마인더, 재수강 리마인더는 시스템이 학생에게 자동 발송 후 선생님에게 "발송됨" 통지
+4. **선생님은 액션 불필요**: 미수금/재수강 리마인더는 시스템 자동. 선생님은 발송 사실만 확인
+
+#### 수신자 매핑표
+
+| 수신자 | 알림 타입 |
+|--------|----------|
+| **선생님 전용** | `newStudentRegistered`, `trialBookingRequest`, `studentPracticeReport`, `reviewReceived`, `paymentReceived`, `proposalAccepted`, `rescheduleAllowanceUsed`, `rescheduleAllowanceDepleted`, `generalAnnouncement`, `paymentReminderSentNotice`, `renewalReminderSentNotice` |
+| **학생 전용** | `practiceReminder`, `practiceAssigned`, `streakWarning`, `streakMilestone`, `weeklyGoalAchieved`, `recordingFeedbackReceived`, `proposalReceived`, `proposalReminder24h/48h/72h`, `proposalExpired`, `paymentRequested`, `paymentReminder`, `paymentConfirmed`, `lessonsRunningLow`, `teacherNoshow`, `compensationApplied`, `lessonNoteShared` |
+| **상대방에게만** | `lessonCancelled`, `lessonRescheduled`, `scheduleChange*` — 요청자 본인은 이미 알고 있으므로 상대방에게만 |
+| **양쪽** | `lessonBooked`, `lessonReminder`, `lessonStarting`, `lessonCompleted`, `noshowWarning`, `noshowConfirmed`, `cancellationDeadline`, `connectionRequest*`, `connectionEstablished`, `connectionDisconnected`, `makeupLesson*`, `subscriptionExpiring*` |
+
+#### 시스템 자동 발송 알림 (선생님 액션 불필요)
+
+| 알림 | 트리거 | 학생에게 | 선생님에게 |
+|------|--------|---------|----------|
+| `paymentReminder` | 입금 안내 후 N일 경과 | "수강료 입금을 확인해주세요" | `paymentReminderSentNotice`: "OOO님에게 입금 리마인더가 발송되었습니다" |
+| `subscriptionExpiringSoon` | 수강권 D-7/D-3/D-1 | "수강권이 N일 후 만료됩니다" | 동일 알림 (양쪽) |
+| 재수강 리마인더 (신규) | 수강권 만료 후 D+3/D+7 | "수강을 이어가시겠어요?" | `renewalReminderSentNotice`: "OOO님에게 재수강 안내가 발송되었습니다" |
+
+코드 참조: `NotificationTypeExtension.targetRole` (`notification.dart`)
+
+### 2.2 알림 유형 (NotificationType) - 전체 목록
 
 #### 레슨 알림
 

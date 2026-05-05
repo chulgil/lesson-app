@@ -72,6 +72,9 @@ enum NotificationType {
   rescheduleAllowanceDepleted, // All reschedule allowances used
   // Bulk teacher actions (§7.119)
   generalAnnouncement, // Teacher broadcast message (non-urgent)
+  // System auto-send notices (teacher sees "sent to student" notification)
+  paymentReminderSentNotice, // System sent payment reminder to student
+  renewalReminderSentNotice, // System sent renewal reminder to student
 }
 
 /// Notification priority levels
@@ -165,6 +168,8 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.rescheduleAllowanceUsed:
       case NotificationType.rescheduleAllowanceDepleted:
       case NotificationType.generalAnnouncement:
+      case NotificationType.paymentReminderSentNotice:
+      case NotificationType.renewalReminderSentNotice:
         return 'teacher';
 
       // Student-only notifications
