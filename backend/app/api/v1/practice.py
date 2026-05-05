@@ -14,6 +14,9 @@ from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.practice import (
     PracticeGoalResponse,
     PracticeGoalUpdate,
+    PracticePieceCreate,
+    PracticePieceResponse,
+    PracticePieceUpdate,
     PracticeStatsResponse,
     PracticeStreakResponse,
     RepertoireCreate,
@@ -24,10 +27,179 @@ from app.schemas.practice import (
     SectionNoteCreate,
     SectionResponse,
     SectionUpdate,
+    StudentPieceProgressUpdate,
+    StudentPieceRepertoireResponse,
 )
 from app.services.practice_service import PracticeService
 
 router = APIRouter()
+
+
+# ---------------------------------------------------------------------------
+# Piece library
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/pieces",
+    response_model=list[PracticePieceResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List practice pieces",
+)
+async def list_pieces(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[PracticePieceResponse]:
+    """List practice pieces visible to the current user."""
+    service = PracticeService(db)
+    return await service.list_pieces(current_user)
+
+
+@router.post(
+    "/pieces",
+    response_model=PracticePieceResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create practice piece",
+)
+async def create_piece(
+    body: PracticePieceCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticePieceResponse:
+    """Create a teacher-owned practice piece."""
+    service = PracticeService(db)
+    return await service.create_piece(body, current_user)
+
+
+@router.get(
+    "/pieces/search",
+    response_model=list[PracticePieceResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Search practice pieces",
+)
+async def search_pieces(
+    q: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[PracticePieceResponse]:
+    """Search practice pieces by title or composer."""
+    service = PracticeService(db)
+    return await service.search_pieces(q, current_user)
+
+
+@router.get(
+    "/pieces/{piece_id}",
+    response_model=PracticePieceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get practice piece",
+)
+async def get_piece(
+    piece_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticePieceResponse:
+    """Return a practice piece."""
+    service = PracticeService(db)
+    return await service.get_piece(piece_id, current_user)
+
+
+@router.put(
+    "/pieces/{piece_id}",
+    response_model=PracticePieceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update practice piece",
+)
+async def update_piece(
+    piece_id: str,
+    body: PracticePieceUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticePieceResponse:
+    """Update a teacher-owned practice piece."""
+    service = PracticeService(db)
+    return await service.update_piece(piece_id, body, current_user)
+
+
+@router.delete(
+    "/pieces/{piece_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete practice piece",
+)
+async def delete_piece(
+    piece_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete a teacher-owned practice piece."""
+    service = PracticeService(db)
+    await service.delete_piece(piece_id, current_user)
+
+
+@router.get(
+    "/students/{student_id}/repertoire",
+    response_model=StudentPieceRepertoireResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get student piece repertoire",
+)
+async def get_student_piece_repertoire(
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> StudentPieceRepertoireResponse:
+    """Return student piece assignments split by completion."""
+    service = PracticeService(db)
+    return await service.get_student_piece_repertoire(student_id, current_user)
+
+
+@router.post(
+    "/students/{student_id}/pieces/{piece_id}",
+    response_model=PracticePieceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Assign piece to student",
+)
+async def assign_piece_to_student(
+    student_id: str,
+    piece_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticePieceResponse:
+    """Assign a practice piece to a student."""
+    service = PracticeService(db)
+    return await service.assign_piece_to_student(student_id, piece_id, current_user)
+
+
+@router.delete(
+    "/students/{student_id}/pieces/{piece_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remove piece from student",
+)
+async def remove_piece_from_student(
+    student_id: str,
+    piece_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Remove a practice piece from a student."""
+    service = PracticeService(db)
+    await service.remove_piece_from_student(student_id, piece_id, current_user)
+
+
+@router.patch(
+    "/students/{student_id}/pieces/{piece_id}/progress",
+    response_model=PracticePieceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update student piece progress",
+)
+async def update_student_piece_progress(
+    student_id: str,
+    piece_id: str,
+    body: StudentPieceProgressUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticePieceResponse:
+    """Update student practice piece progress."""
+    service = PracticeService(db)
+    return await service.update_student_piece_progress(student_id, piece_id, body, current_user)
 
 
 # ---------------------------------------------------------------------------

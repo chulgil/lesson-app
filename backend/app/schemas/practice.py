@@ -3,7 +3,77 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+def _camel_alias(field_name: str) -> str:
+    return "".join(word.capitalize() if index else word for index, word in enumerate(field_name.split("_")))
+
+
+CAMEL_MODEL_CONFIG = ConfigDict(populate_by_name=True, alias_generator=_camel_alias)
+
+
+# ---------------------------------------------------------------------------
+# Practice piece library
+# ---------------------------------------------------------------------------
+
+
+class PracticePieceCreate(BaseModel):
+    """Create a practice library piece."""
+
+    title: str
+    composer: str | None = None
+    opus: str | None = None
+    movement: str | None = None
+    difficulty: str | None = None
+    notes: str | None = None
+
+
+class PracticePieceUpdate(BaseModel):
+    """Update a practice library piece."""
+
+    title: str | None = None
+    composer: str | None = None
+    opus: str | None = None
+    movement: str | None = None
+    difficulty: str | None = None
+    notes: str | None = None
+
+
+class PracticePieceResponse(BaseModel):
+    """Practice piece response matching Flutter Piece fields."""
+
+    model_config = CAMEL_MODEL_CONFIG
+
+    id: str
+    title: str
+    composer: str | None = None
+    opus: str | None = None
+    movement: str | None = None
+    difficulty: str | None = None
+    progress: str = "notStarted"
+    progress_percentage: float = 0.0
+    notes: str | None = None
+    started_at: _dt.datetime | None = None
+    completed_at: _dt.datetime | None = None
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
+
+
+class StudentPieceProgressUpdate(BaseModel):
+    """Update a student's assigned piece progress."""
+
+    progress: str = Field(pattern="^(notStarted|inProgress|polishing|completed)$")
+
+
+class StudentPieceRepertoireResponse(BaseModel):
+    """Student repertoire response matching Flutter Repertoire fields."""
+
+    model_config = CAMEL_MODEL_CONFIG
+
+    student_id: str
+    current_pieces: list[PracticePieceResponse] = []
+    completed_pieces: list[PracticePieceResponse] = []
 
 # ---------------------------------------------------------------------------
 # Practice section

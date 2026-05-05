@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from enum import StrEnum
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -25,6 +25,55 @@ class PracticeItemPriority(StrEnum):
     must = "must"
     should = "should"
     could = "could"
+
+
+class PieceProgress(StrEnum):
+    notStarted = "notStarted"  # noqa: N815
+    inProgress = "inProgress"  # noqa: N815
+    polishing = "polishing"
+    completed = "completed"
+
+
+class PracticePiece(UUIDMixin, TimestampMixin, Base):
+    """Teacher-owned practice piece library item."""
+
+    __tablename__ = "practice_pieces"
+
+    owner_teacher_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("teachers.id"), nullable=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    composer: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    opus: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    movement: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    difficulty: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        Index("idx_practice_piece_owner", "owner_teacher_id"),
+        Index("idx_practice_piece_title", "title"),
+    )
+
+
+class StudentPracticePiece(UUIDMixin, TimestampMixin, Base):
+    """Student assignment/progress for a practice library piece."""
+
+    __tablename__ = "student_practice_pieces"
+
+    student_id: Mapped[str] = mapped_column(String(36), ForeignKey("students.id"), nullable=False)
+    piece_id: Mapped[str] = mapped_column(String(36), ForeignKey("practice_pieces.id"), nullable=False)
+    progress: Mapped[PieceProgress] = mapped_column(
+        Enum(PieceProgress, native_enum=True),
+        nullable=False,
+        default=PieceProgress.notStarted,
+    )
+    progress_percentage: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        Index("uk_student_piece", "student_id", "piece_id", unique=True),
+        Index("idx_student_piece_student", "student_id"),
+        Index("idx_student_piece_piece", "piece_id"),
+    )
 
 
 class PracticeRepertoire(UUIDMixin, TimestampMixin, Base):

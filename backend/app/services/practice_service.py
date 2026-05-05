@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -14,6 +14,9 @@ from app.schemas.practice import (
     DailyStat,
     PracticeGoalResponse,
     PracticeGoalUpdate,
+    PracticePieceCreate,
+    PracticePieceResponse,
+    PracticePieceUpdate,
     PracticeStatsResponse,
     PracticeStreakResponse,
     RepertoireCreate,
@@ -24,6 +27,8 @@ from app.schemas.practice import (
     SectionNoteCreate,
     SectionResponse,
     SectionUpdate,
+    StudentPieceProgressUpdate,
+    StudentPieceRepertoireResponse,
 )
 
 
@@ -32,6 +37,180 @@ class PracticeService:
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    # ------------------------------------------------------------------
+    # Piece library
+    # ------------------------------------------------------------------
+
+    async def create_piece(self, data: PracticePieceCreate, current_user: Any) -> PracticePieceResponse:
+        """Create a teacher-owned practice piece."""
+        from app.models.practice import PracticePiece
+
+        teacher_id = await self._teacher_profile_id(current_user)
+        piece = PracticePiece(
+            owner_teacher_id=teacher_id,
+            title=data.title,
+            composer=data.composer,
+            opus=data.opus,
+            movement=data.movement,
+            difficulty=data.difficulty,
+            notes=data.notes,
+        )
+        self.db.add(piece)
+        await self.db.flush()
+        await self.db.refresh(piece)
+        return self._piece_response(piece)
+
+    async def list_pieces(self, current_user: Any) -> list[PracticePieceResponse]:
+        """List practice pieces visible to the current user."""
+        from app.models.practice import PracticePiece
+
+        query = select(PracticePiece).order_by(PracticePiece.created_at.desc())
+        if self._role(current_user) == "teacher":
+            query = query.where(PracticePiece.owner_teacher_id == await self._teacher_profile_id(current_user))
+        result = await self.db.scalars(query)
+        return [self._piece_response(piece) for piece in result.all()]
+
+    async def search_pieces(self, query_text: str, current_user: Any) -> list[PracticePieceResponse]:
+        """Search visible pieces by title or composer."""
+        from app.models.practice import PracticePiece
+
+        pattern = f"%{query_text}%"
+        query = select(PracticePiece).where(
+            (PracticePiece.title.ilike(pattern)) | (PracticePiece.composer.ilike(pattern))
+        )
+        if self._role(current_user) == "teacher":
+            query = query.where(PracticePiece.owner_teacher_id == await self._teacher_profile_id(current_user))
+        result = await self.db.scalars(query.order_by(PracticePiece.created_at.desc()))
+        return [self._piece_response(piece) for piece in result.all()]
+
+    async def get_piece(self, piece_id: str, current_user: Any) -> PracticePieceResponse:
+        """Return a practice piece."""
+        piece = await self._get_piece_for_user(piece_id, current_user)
+        return self._piece_response(piece)
+
+    async def update_piece(
+        self,
+        piece_id: str,
+        data: PracticePieceUpdate,
+        current_user: Any,
+    ) -> PracticePieceResponse:
+        """Update a teacher-owned practice piece."""
+        piece = await self._get_piece_for_teacher(piece_id, current_user)
+        update_data = data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(piece, key, value)
+        await self.db.flush()
+        await self.db.refresh(piece)
+        return self._piece_response(piece)
+
+    async def delete_piece(self, piece_id: str, current_user: Any) -> None:
+        """Delete a teacher-owned practice piece."""
+        piece = await self._get_piece_for_teacher(piece_id, current_user)
+        await self.db.delete(piece)
+        await self.db.flush()
+
+    async def get_student_piece_repertoire(
+        self,
+        student_id: str,
+        current_user: Any,
+    ) -> StudentPieceRepertoireResponse:
+        """Return assigned pieces split into current and completed buckets."""
+        from app.models.practice import PracticePiece, StudentPracticePiece
+
+        await self._assert_can_read_student(student_id, current_user)
+        rows = await self.db.execute(
+            select(PracticePiece, StudentPracticePiece)
+            .join(StudentPracticePiece, StudentPracticePiece.piece_id == PracticePiece.id)
+            .where(StudentPracticePiece.student_id == student_id)
+            .order_by(StudentPracticePiece.created_at.desc())
+        )
+        current: list[PracticePieceResponse] = []
+        completed: list[PracticePieceResponse] = []
+        for piece, assignment in rows.all():
+            response = self._piece_response(piece, assignment)
+            if response.progress == "completed":
+                completed.append(response)
+            else:
+                current.append(response)
+        return StudentPieceRepertoireResponse(
+            student_id=student_id,
+            current_pieces=current,
+            completed_pieces=completed,
+        )
+
+    async def assign_piece_to_student(self, student_id: str, piece_id: str, current_user: Any) -> PracticePieceResponse:
+        """Assign a piece to a student."""
+        from app.models.practice import StudentPracticePiece
+
+        await self._assert_can_manage_student(student_id, current_user)
+        piece = await self._get_piece_for_teacher(piece_id, current_user)
+        assignment = await self.db.scalar(
+            select(StudentPracticePiece).where(
+                StudentPracticePiece.student_id == student_id,
+                StudentPracticePiece.piece_id == piece_id,
+            )
+        )
+        if assignment is None:
+            assignment = StudentPracticePiece(student_id=student_id, piece_id=piece_id)
+            self.db.add(assignment)
+            await self.db.flush()
+            await self.db.refresh(assignment)
+        return self._piece_response(piece, assignment)
+
+    async def remove_piece_from_student(self, student_id: str, piece_id: str, current_user: Any) -> None:
+        """Remove an assigned piece from a student."""
+        from app.models.practice import StudentPracticePiece
+
+        await self._assert_can_manage_student(student_id, current_user)
+        assignment = await self.db.scalar(
+            select(StudentPracticePiece).where(
+                StudentPracticePiece.student_id == student_id,
+                StudentPracticePiece.piece_id == piece_id,
+            )
+        )
+        if assignment is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student piece assignment not found")
+        await self.db.delete(assignment)
+        await self.db.flush()
+
+    async def update_student_piece_progress(
+        self,
+        student_id: str,
+        piece_id: str,
+        data: StudentPieceProgressUpdate,
+        current_user: Any,
+    ) -> PracticePieceResponse:
+        """Update progress for a student's assigned piece."""
+        from datetime import datetime
+
+        from app.models.practice import PieceProgress, PracticePiece, StudentPracticePiece
+
+        await self._assert_can_manage_student(student_id, current_user)
+        row = await self.db.execute(
+            select(PracticePiece, StudentPracticePiece)
+            .join(StudentPracticePiece, StudentPracticePiece.piece_id == PracticePiece.id)
+            .where(
+                StudentPracticePiece.student_id == student_id,
+                StudentPracticePiece.piece_id == piece_id,
+            )
+        )
+        result = row.first()
+        if result is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student piece assignment not found")
+        piece, assignment = result
+        assignment.progress = PieceProgress(data.progress)
+        assignment.progress_percentage = self._progress_percentage(data.progress)
+        now = datetime.now(UTC)
+        if data.progress != "notStarted" and assignment.started_at is None:
+            assignment.started_at = now
+        if data.progress == "completed":
+            assignment.completed_at = now
+        elif assignment.completed_at is not None:
+            assignment.completed_at = None
+        await self.db.flush()
+        await self.db.refresh(assignment)
+        return self._piece_response(piece, assignment)
 
     # ------------------------------------------------------------------
     # Repertoires
@@ -411,3 +590,115 @@ class PracticeService:
             longest_streak=streak.longest_streak if streak else 0,
             daily_stats=daily_map,
         )
+
+    # ------------------------------------------------------------------
+    # Access and mapping helpers
+    # ------------------------------------------------------------------
+
+    async def _get_piece_for_user(self, piece_id: str, current_user: Any) -> Any:
+        from app.models.practice import PracticePiece
+
+        piece = await self.db.get(PracticePiece, piece_id)
+        if piece is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Piece not found")
+        if (
+            self._role(current_user) == "teacher"
+            and piece.owner_teacher_id != await self._teacher_profile_id(current_user)
+        ):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return piece
+
+    async def _get_piece_for_teacher(self, piece_id: str, current_user: Any) -> Any:
+        if self._role(current_user) != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+        return await self._get_piece_for_user(piece_id, current_user)
+
+    async def _assert_can_read_student(self, student_id: str, current_user: Any) -> None:
+        role = self._role(current_user)
+        if role == "teacher":
+            await self._assert_can_manage_student(student_id, current_user)
+            return
+        if role == "student" and student_id in await self._student_identifiers(current_user):
+            return
+        if role == "parent" and student_id in await self._parent_child_student_ids(current_user):
+            return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_can_manage_student(self, student_id: str, current_user: Any) -> None:
+        from app.models.student import Student
+
+        if self._role(current_user) != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+        teacher_id = await self._teacher_profile_id(current_user)
+        owner = await self.db.scalar(
+            select(Student.id).where(
+                Student.id == student_id,
+                Student.teacher_id == teacher_id,
+            )
+        )
+        if owner is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _teacher_profile_id(self, current_user: Any) -> str:
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        return await resolve_teacher_id(self.db, current_user.id)
+
+    async def _student_identifiers(self, user: Any) -> list[str]:
+        from app.models.student import Student
+
+        identifiers = [user.id]
+        result = await self.db.scalars(select(Student.id).where(Student.user_id == user.id))
+        for student_id in result.all():
+            if student_id not in identifiers:
+                identifiers.append(student_id)
+        return identifiers
+
+    async def _parent_child_student_ids(self, user: Any) -> list[str]:
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == user.id))
+        if parent_id is None:
+            return []
+        result = await self.db.scalars(
+            select(ParentChildRelation.student_id).where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        return list(result.all())
+
+    def _piece_response(self, piece: Any, assignment: Any | None = None) -> PracticePieceResponse:
+        progress = (
+            getattr(assignment.progress, "value", assignment.progress)
+            if assignment is not None
+            else "notStarted"
+        )
+        percentage = (assignment.progress_percentage / 100) if assignment is not None else 0.0
+        return PracticePieceResponse(
+            id=piece.id,
+            title=piece.title,
+            composer=piece.composer,
+            opus=piece.opus,
+            movement=piece.movement,
+            difficulty=piece.difficulty,
+            progress=progress,
+            progress_percentage=percentage,
+            notes=piece.notes,
+            started_at=assignment.started_at if assignment is not None else None,
+            completed_at=assignment.completed_at if assignment is not None else None,
+            created_at=piece.created_at,
+            updated_at=piece.updated_at,
+        )
+
+    @staticmethod
+    def _progress_percentage(progress: str) -> int:
+        return {
+            "notStarted": 0,
+            "inProgress": 40,
+            "polishing": 80,
+            "completed": 100,
+        }[progress]
+
+    def _role(self, current_user: Any) -> str | None:
+        return getattr(getattr(current_user, "role", None), "value", None)

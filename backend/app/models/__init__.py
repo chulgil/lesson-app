@@ -29,10 +29,12 @@ from app.models.practice import (  # noqa: F401
     PracticeGoal,
     PracticeItem,
     PracticeNote,
+    PracticePiece,
     PracticeRecording,
     PracticeRepertoire,
     PracticeSection,
     PracticeStreak,
+    StudentPracticePiece,
 )
 from app.models.practice_log import PracticeLog  # noqa: F401
 from app.models.relationship import Follow, TeacherStudentRelation  # noqa: F401
