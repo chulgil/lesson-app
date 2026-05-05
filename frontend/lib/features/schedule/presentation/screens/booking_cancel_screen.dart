@@ -10,7 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../search/presentation/providers/teacher_search_provider.dart';
+import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../providers/teacher_availability_providers.dart';
 

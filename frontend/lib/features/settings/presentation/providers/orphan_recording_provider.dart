@@ -5,9 +5,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../practice/domain/entities/practice_repertoire.dart';
-import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
-import '../../../practice/presentation/providers/practice_repertoire_repository_provider.dart';
+import '../../../practice/practice_facade.dart'
+    show
+        PracticeRecording,
+        PracticeRepertoire,
+        PracticeSection,
+        practiceRepertoireRepositoryProvider,
+        sectionProvider;
 
 part 'orphan_recording_provider.g.dart';
 
@@ -34,7 +38,9 @@ class OrphanRecordingsDiagnostic {
 
 /// Provider for orphaned recordings with diagnostic info.
 @riverpod
-Future<OrphanRecordingsDiagnostic> orphanedRecordingsWithDiagnostic(Ref ref) async {
+Future<OrphanRecordingsDiagnostic> orphanedRecordingsWithDiagnostic(
+  Ref ref,
+) async {
   final repository = ref.watch(practiceRepertoireRepositoryProvider);
 
   // Get diagnostic counts
@@ -67,15 +73,23 @@ Future<List<PracticeRecording>> orphanedRecordings(Ref ref) async {
 /// Returns all sections from all users (not filtered by studentId).
 @riverpod
 Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
-    allSectionsForAssignment(Ref ref) async {
+allSectionsForAssignment(Ref ref) async {
   final repository = ref.watch(practiceRepertoireRepositoryProvider);
   return repository.getAllSectionsForAssignment();
 }
 
 /// Provider for all recordings with their section and repertoire info.
 @riverpod
-Future<List<({PracticeRecording recording, PracticeSection? section, PracticeRepertoire? repertoire})>>
-    allRecordingsWithSectionInfo(Ref ref) async {
+Future<
+  List<
+    ({
+      PracticeRecording recording,
+      PracticeSection? section,
+      PracticeRepertoire? repertoire,
+    })
+  >
+>
+allRecordingsWithSectionInfo(Ref ref) async {
   final repository = ref.watch(practiceRepertoireRepositoryProvider);
   return repository.getAllRecordingsWithSectionInfo();
 }
@@ -113,7 +127,10 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
   }
 
   /// Reassign a recording to a new section.
-  Future<bool> reassignRecording(String recordingId, String newSectionId) async {
+  Future<bool> reassignRecording(
+    String recordingId,
+    String newSectionId,
+  ) async {
     state = const AsyncValue.loading();
 
     try {
@@ -158,7 +175,10 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
   }
 
   /// Import a recording from external file.
-  Future<bool> importRecording(String sourceFilePath, int durationSeconds) async {
+  Future<bool> importRecording(
+    String sourceFilePath,
+    int durationSeconds,
+  ) async {
     state = const AsyncValue.loading();
 
     try {

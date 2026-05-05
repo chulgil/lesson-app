@@ -4,9 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
-import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../lessons/presentation/providers/lesson_repository_provider.dart';
-import '../../../search/presentation/providers/teacher_providers.dart';
+import '../../../lessons/lessons_facade.dart';
+import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
 import '../../data/repositories/remote_teacher_availability_repository.dart';
@@ -23,12 +22,13 @@ part 'teacher_availability_providers.g.dart';
 // ============================================================
 
 final teacherAvailabilityRepositoryProvider =
-    Provider<TeacherAvailabilityRepository>((ref) =>
-        createRepository<TeacherAvailabilityRepository>(
-          ref: ref,
-          mock: () => MockTeacherAvailabilityRepository(),
-          remote: (api) => RemoteTeacherAvailabilityRepository(api),
-        ));
+    Provider<TeacherAvailabilityRepository>(
+      (ref) => createRepository<TeacherAvailabilityRepository>(
+        ref: ref,
+        mock: () => MockTeacherAvailabilityRepository(),
+        remote: (api) => RemoteTeacherAvailabilityRepository(api),
+      ),
+    );
 
 // ============================================================
 // Teacher Availability Settings
@@ -511,7 +511,10 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
 
     try {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
-      final updated = await repository.updateWeeklySchedule(teacherId, schedule);
+      final updated = await repository.updateWeeklySchedule(
+        teacherId,
+        schedule,
+      );
       state = AsyncValue.data(updated);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

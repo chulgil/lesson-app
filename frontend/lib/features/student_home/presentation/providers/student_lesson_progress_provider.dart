@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/student_lesson_progress_item.dart';
 import '../mappers/student_lesson_progress_mapper.dart';

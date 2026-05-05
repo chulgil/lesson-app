@@ -11,8 +11,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
-import '../../../parent_home/presentation/providers/user_profile_provider.dart';
-import '../providers/teacher_search_provider.dart';
+import '../../../parent_home/parent_home_facade.dart';
+import '../../search_facade.dart';
 
 /// Academy detail screen - shows academy info and teacher list
 class AcademyDetailScreen extends ConsumerWidget {

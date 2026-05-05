@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/domain/entities/entities.dart';
 import '../providers/bulk_teacher_action_providers.dart';
 

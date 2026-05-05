@@ -6,12 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../notifications/notifications_facade.dart';
+import '../../../notifications/domain/entities/notification.dart';
 import '../../data/repositories/mock_group_class_booking_repository.dart';
 import '../../data/repositories/remote_group_class_booking_repository.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/repositories/group_class_booking_repository.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
-import '../../../notifications/domain/entities/notification.dart';
 
 part 'group_class_booking_providers.g.dart';
 

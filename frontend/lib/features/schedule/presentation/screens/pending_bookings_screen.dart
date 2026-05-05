@@ -8,7 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../features/lessons/presentation/providers/booking_providers.dart';
+import '../../../../features/lessons/lessons_facade.dart';
 import '../widgets/approval_bottom_sheet.dart';
 import '../widgets/teacher_approval_card.dart';
 

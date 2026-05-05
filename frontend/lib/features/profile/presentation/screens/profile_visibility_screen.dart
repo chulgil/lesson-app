@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
+import '../../../../features/profile/profile_facade.dart';
 import '../widgets/profile_visibility_widgets.dart';
 
 /// Screen for managing profile visibility settings

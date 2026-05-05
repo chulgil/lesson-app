@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../lessons/presentation/providers/lesson_repository_provider.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../lessons/lessons_facade.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../domain/services/bulk_teacher_action_service.dart';
 
 part 'bulk_teacher_action_providers.g.dart';

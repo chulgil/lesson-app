@@ -1,10 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../relationship/presentation/providers/relationship_providers.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../relationship/relationship_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
 import '../../data/repositories/remote_unified_lesson_request_repository.dart';
 import '../../domain/entities/request_event.dart';

@@ -12,7 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
-import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
+import '../../../../features/settings/settings_facade.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/weekly_calendar_picker.dart';
 import 'request_completion_screen.dart';

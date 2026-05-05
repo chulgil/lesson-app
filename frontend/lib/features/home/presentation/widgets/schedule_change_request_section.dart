@@ -10,9 +10,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/request_event.dart';
-import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../schedule/schedule_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 
 /// Home dashboard section showing pending schedule change requests.
 ///
@@ -318,9 +317,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
             horizontal: AppSpacing.space2,
             vertical: AppSpacing.space1,
           ),
-          decoration: BoxDecoration(
-            border: Border.all(color: color, width: 1),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: color, width: 1)),
           child: Text(
             label,
             style: AppTypography.caption.copyWith(

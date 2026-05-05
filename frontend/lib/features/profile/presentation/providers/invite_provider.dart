@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_invite_repository.dart';
 import '../../domain/entities/invite.dart';
 import '../../domain/repositories/invite_repository.dart';
-import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 import '../../../invite/data/repositories/remote_invite_repository.dart';
-import '../../../notifications/domain/services/connection_notification_service.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../notifications/notifications_facade.dart';
 
 part 'invite_provider.g.dart';
 

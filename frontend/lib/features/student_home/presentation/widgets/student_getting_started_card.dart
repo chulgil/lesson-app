@@ -8,8 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../../features/profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
+import '../providers/student_home_booking_provider.dart';
 
 /// Getting Started checklist card for new students.
 /// Shows actionable steps to help them get started with lessons.
@@ -21,15 +21,17 @@ class StudentGettingStartedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connectionsAsync = ref.watch(myConnectionsProvider);
-    final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
+    final hasAnyBookingAsync = ref.watch(
+      studentHomeHasAnyBookingProvider(studentId),
+    );
 
     // 로딩 중이면 숨김 (깜빡임 방지)
-    if (connectionsAsync.isLoading || bookingsAsync.isLoading) {
+    if (connectionsAsync.isLoading || hasAnyBookingAsync.isLoading) {
       return const SizedBox.shrink();
     }
 
     final hasConnections = connectionsAsync.valueOrNull?.isNotEmpty ?? false;
-    final hasLessons = bookingsAsync.valueOrNull?.isNotEmpty ?? false;
+    final hasLessons = hasAnyBookingAsync.valueOrNull ?? false;
     const hasProfile = true; // Already set during onboarding
 
     // Hide when all steps are completed

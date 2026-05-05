@@ -13,8 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../students/domain/entities/student.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../students/students_facade.dart';
 
 /// Available instruments for student selection
 const _instruments = [

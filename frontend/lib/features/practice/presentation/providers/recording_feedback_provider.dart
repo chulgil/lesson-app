@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../domain/entities/recording_feedback.dart';
 
 part 'recording_feedback_provider.g.dart';

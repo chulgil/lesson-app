@@ -8,13 +8,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_template.dart';
-import '../providers/lesson_policy_providers.dart';
+import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
 import '../widgets/issue_form_membership_widgets.dart';
@@ -186,13 +183,17 @@ class _IssueSubscriptionScreenState
     final membershipsAsync =
         widget.isBatchMode
             ? const AsyncValue<List<ClassMembership>>.data([])
-            : ref.watch(studentMembershipsProvider(widget.primaryStudentId));
+            : ref.watch(
+              subscriptionIssueMembershipsProvider(widget.primaryStudentId),
+            );
 
     // Pre-fill amount from student.monthlyFee (once only)
     if (!_hasPrefilledAmount &&
         !widget.isBatchMode &&
         widget.templateId == null) {
-      final studentAsync = ref.watch(studentProvider(widget.primaryStudentId));
+      final studentAsync = ref.watch(
+        subscriptionIssueStudentProvider(widget.primaryStudentId),
+      );
       studentAsync.whenData((student) {
         if (student != null && student.monthlyFee > 0 && _originalAmount == 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -772,16 +773,8 @@ class _IssueSubscriptionScreenState
     if (_appliedPolicyMembershipId == membership.id && _policyApplied) return;
 
     try {
-      final lessonClass = await ref.read(
-        lessonClassProvider(membership.lessonClassId).future,
-      );
-      if (lessonClass == null || !mounted) return;
-
       final policy = await ref.read(
-        effectivePolicyProvider(
-          teacherId: lessonClass.teacherId,
-          lessonClassId: membership.lessonClassId,
-        ).future,
+        subscriptionIssueEffectivePolicyProvider(membership).future,
       );
       if (policy == null || !mounted) return;
 

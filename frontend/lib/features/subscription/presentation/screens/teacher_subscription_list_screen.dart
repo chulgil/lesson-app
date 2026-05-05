@@ -8,10 +8,9 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../schedule/schedule_facade.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/subscription_card.dart';
@@ -143,7 +142,8 @@ class _TeacherSubscriptionListScreenState
                     : null;
             final studentName = studentNames[subscription.studentId];
 
-            return SubscriptionCard(compact: true,
+            return SubscriptionCard(
+              compact: true,
               subscription: subscription,
               className: lessonClassAsync?.valueOrNull?.name,
               instrument: instrument,
@@ -159,7 +159,8 @@ class _TeacherSubscriptionListScreenState
             );
           },
           loading:
-              () => SubscriptionCard(compact: true,
+              () => SubscriptionCard(
+                compact: true,
                 subscription: subscription,
                 onTap:
                     () => context.push(
@@ -171,7 +172,8 @@ class _TeacherSubscriptionListScreenState
                     ),
               ),
           error:
-              (_, __) => SubscriptionCard(compact: true,
+              (_, __) => SubscriptionCard(
+                compact: true,
                 subscription: subscription,
                 onTap:
                     () => context.push(

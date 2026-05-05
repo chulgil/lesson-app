@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/class_membership.dart';
 import '../../domain/entities/roster_summary.dart';
 import 'membership_providers.dart';

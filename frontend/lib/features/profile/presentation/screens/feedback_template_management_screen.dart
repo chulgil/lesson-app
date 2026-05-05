@@ -8,8 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/domain/entities/feedback_template.dart';
-import '../../../lessons/presentation/providers/feedback_template_providers.dart';
 import '../widgets/feedback_template_form_sheet.dart';
 
 /// Screen for managing teacher's feedback templates.

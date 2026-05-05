@@ -9,7 +9,7 @@ import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/practice_center_button.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../providers/student_home_session_provider.dart';
 import 'student_dashboard_tab.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -31,7 +31,7 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
     super.initState();
     // Auto-switch to student role when entering this screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+      ref.read(studentHomeSessionActionsProvider).setStudentRole();
     });
     // Show recording recovery message if any recordings were recovered at startup
     WidgetsBinding.instance.addPostFrameCallback((_) {

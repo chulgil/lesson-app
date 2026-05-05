@@ -9,7 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/entities/group_class_schedule.dart';

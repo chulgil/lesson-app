@@ -9,7 +9,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../lessons/domain/entities/lesson.dart';
-import '../../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../providers/student_home_teacher_feedback_provider.dart';
 
 /// Section showing the most recent teacher feedback.
 class TeacherFeedbackSection extends ConsumerWidget {
@@ -19,7 +19,9 @@ class TeacherFeedbackSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
+    final feedbackAsync = ref.watch(
+      studentHomeLatestTeacherFeedbackProvider(studentId),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,24 +45,15 @@ class TeacherFeedbackSection extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
-        lessonsAsync.when(
+        feedbackAsync.when(
           loading: () => const SizedBox.shrink(),
           error: (_, __) => const SizedBox.shrink(),
-          data: (lessons) {
-            final feedbackLessons =
-                lessons
-                    .where(
-                      (l) =>
-                          l.status == LessonStatus.completed && l.hasFeedback,
-                    )
-                    .toList()
-                  ..sort((a, b) => b.date.compareTo(a.date));
-
-            if (feedbackLessons.isEmpty) {
+          data: (feedbackLesson) {
+            if (feedbackLesson == null) {
               return _buildEmptyState();
             }
 
-            return _buildTeacherFeedback(feedbackLessons.first);
+            return _buildTeacherFeedback(feedbackLesson);
           },
         ),
       ],

@@ -8,8 +8,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../notifications/presentation/providers/subscription_expiry_providers.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../providers/notification_settings_provider.dart';
 
 /// Notification settings screen with category-based ON/OFF switches.

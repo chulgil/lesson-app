@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_feedback_template_repository.dart';
 import '../../domain/entities/feedback_template.dart';
 import '../../domain/repositories/feedback_template_repository.dart';

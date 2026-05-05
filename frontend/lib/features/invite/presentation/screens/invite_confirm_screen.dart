@@ -10,9 +10,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
-import '../../../../features/auth/presentation/providers/user_role_provider.dart';
-import '../../../../features/profile/presentation/providers/invite_provider.dart';
-import '../../../parent_home/presentation/providers/user_profile_provider.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../parent_home/parent_home_facade.dart';
+import '../../../profile/profile_facade.dart';
 
 /// Screen for confirming connection request from an invite
 class InviteConfirmScreen extends ConsumerStatefulWidget {

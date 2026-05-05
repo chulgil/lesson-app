@@ -1,17 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/lesson_repository_provider.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../lessons/lessons_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/services/preview_lesson_generator.dart';
 import '../providers/unified_lesson_request_providers.dart';
 
 /// Provider that loads all lessons for a given week (Mon-Sun).
 /// [weekStartDate] should be the Monday of the target week.
-final weekLessonsProvider =
-    FutureProvider.family<List<Lesson>, DateTime>((ref, weekStartDate) async {
+final weekLessonsProvider = FutureProvider.family<List<Lesson>, DateTime>((
+  ref,
+  weekStartDate,
+) async {
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = weekStartDate.add(const Duration(days: 6));
   return repository.getLessonsByDateRange(weekStartDate, weekEnd);
@@ -21,17 +21,22 @@ final weekLessonsProvider =
 ///
 /// Preview lessons are generated from ClassMembership.lessonSlots for weeks
 /// beyond subscription coverage. Rendered with dashed borders in the grid.
-final weekLessonsWithPreviewProvider = FutureProvider.family<List<Lesson>,
-    ({DateTime weekStart, String teacherId})>((ref, params) async {
+final weekLessonsWithPreviewProvider = FutureProvider.family<
+  List<Lesson>,
+  ({DateTime weekStart, String teacherId})
+>((ref, params) async {
   // Get real lessons
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = params.weekStart.add(const Duration(days: 6));
-  final realLessons =
-      await repository.getLessonsByDateRange(params.weekStart, weekEnd);
+  final realLessons = await repository.getLessonsByDateRange(
+    params.weekStart,
+    weekEnd,
+  );
 
   // Get teacher's classes → memberships → subscriptions for preview generation
-  final classes = await ref
-      .watch(teacherLessonClassesProvider(params.teacherId).future);
+  final classes = await ref.watch(
+    teacherLessonClassesProvider(params.teacherId).future,
+  );
 
   if (classes.isEmpty) return realLessons;
 
@@ -40,13 +45,15 @@ final weekLessonsWithPreviewProvider = FutureProvider.family<List<Lesson>,
   final studentNames = ref.watch(studentNameMapProvider);
 
   for (final cls in classes) {
-    final memberships =
-        await ref.watch(classMembershipsProvider(cls.id).future);
+    final memberships = await ref.watch(
+      classMembershipsProvider(cls.id).future,
+    );
     allMemberships.addAll(memberships);
 
     for (final m in memberships) {
-      final subs =
-          await ref.watch(studentSubscriptionsProvider(m.studentId).future);
+      final subs = await ref.watch(
+        studentSubscriptionsProvider(m.studentId).future,
+      );
       allSubscriptions.addAll(subs);
     }
   }

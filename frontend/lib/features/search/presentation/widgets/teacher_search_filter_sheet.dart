@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
+import '../../../../features/search/search_facade.dart'
+    show
+        availableAreasProvider,
+        availableInstrumentsProvider,
+        teacherSearchFilterStateProvider;
 import '../../../profile/domain/entities/teacher_profile.dart';
 
 /// Filter bottom sheet for teacher search
@@ -82,7 +85,7 @@ class _TeacherSearchFilterSheetState
                     padding: const EdgeInsets.all(AppSpacing.space4),
                     children: [
                       // Instruments
-                      _buildSectionTitle('악기'),
+                      _buildSectionTitle(AppStrings.filterInstruments),
                       const SizedBox(height: AppSpacing.space2),
                       instrumentsAsync.when(
                         loading: () => const CircularProgressIndicator(),
@@ -105,7 +108,7 @@ class _TeacherSearchFilterSheetState
                       const SizedBox(height: AppSpacing.space6),
 
                       // Areas
-                      _buildSectionTitle('지역'),
+                      _buildSectionTitle(AppStrings.filterLocation),
                       const SizedBox(height: AppSpacing.space2),
                       areasAsync.when(
                         loading: () => const CircularProgressIndicator(),
@@ -127,14 +130,14 @@ class _TeacherSearchFilterSheetState
                       const SizedBox(height: AppSpacing.space6),
 
                       // Lesson types
-                      _buildSectionTitle('레슨 방식'),
+                      _buildSectionTitle(AppStrings.filterLessonType),
                       const SizedBox(height: AppSpacing.space2),
                       _buildLessonTypeOptionSelection(),
 
                       const SizedBox(height: AppSpacing.space6),
 
                       // Experience
-                      _buildSectionTitle('최소 경력'),
+                      _buildSectionTitle(AppStrings.filterMinExperience),
                       const SizedBox(height: AppSpacing.space2),
                       _buildExperienceSelection(),
 
@@ -202,10 +205,7 @@ class _TeacherSearchFilterSheetState
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-    );
+    return Text(title, style: NotebookTypography.sectionTitle);
   }
 
   Widget _buildChipSelection(
@@ -278,7 +278,12 @@ class _TeacherSearchFilterSheetState
 
   Widget _buildExperienceSelection() {
     final options = [null, 3, 5, 10];
-    final labels = ['상관없음', '3년 이상', '5년 이상', '10년 이상'];
+    final labels = [
+      AppStrings.experienceAny,
+      AppStrings.experience3plus,
+      AppStrings.experience5plus,
+      AppStrings.experience10plus,
+    ];
 
     return Wrap(
       spacing: 8,

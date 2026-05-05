@@ -12,7 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
+import '../../../../features/profile/profile_facade.dart';
 
 /// Shows dialog to edit experience years.
 void showExperienceDialog(

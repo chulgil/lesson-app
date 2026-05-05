@@ -10,7 +10,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
-import '../../../settings/presentation/providers/teacher_settings_provider.dart';
+import '../../../settings/settings_facade.dart';
 import '../widgets/lesson_time_settings_widgets.dart';
 
 /// Screen for configuring lesson time settings

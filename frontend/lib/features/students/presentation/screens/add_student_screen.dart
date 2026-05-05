@@ -10,7 +10,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../../features/students/presentation/providers/student_crud_provider.dart';
+import '../../../../features/students/students_facade.dart'
+    show studentsNotifierProvider;
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for adding a new student

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:flutter/services.dart';
@@ -12,16 +10,8 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/parent_home/domain/entities/parent.dart';
-import '../../../../features/parent_home/presentation/providers/parent_crud_provider.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
-import '../../../practice/presentation/providers/practice_crud_provider.dart';
-import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
-import '../../../profile/presentation/providers/invite_provider.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../providers/practice_reminder_provider.dart';
+import '../providers/student_home_profile_provider.dart';
 import '../widgets/language_select_sheet.dart';
 import '../widgets/practice_reminder_sheet.dart';
 
@@ -31,34 +21,7 @@ class StudentProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = ref.watch(currentUserIdProvider);
-    final studentAsync = ref.watch(studentProvider(studentId));
-    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
-    final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
-
-    final student = studentAsync.valueOrNull;
-    final studentName = student?.name ?? '-';
-    final studentInitial = student?.initial ?? '-';
-    final studentEmail = student?.email ?? '-';
-    final studentInstrument = student?.instrument ?? '-';
-
-    // Stats calculations
-    final completedLessonCount =
-        lessonsAsync.valueOrNull
-            ?.where((l) => l.status == LessonStatus.completed)
-            .length ??
-        0;
-    final totalPracticeMinutes =
-        practiceLogsAsync.valueOrNull?.fold<int>(
-          0,
-          (sum, log) => sum + log.totalMinutes,
-        ) ??
-        0;
-    final totalPracticeHours = totalPracticeMinutes ~/ 60;
-    final lessonPeriodMonths =
-        student != null
-            ? DateTime.now().difference(student.createdAt).inDays ~/ 30
-            : 0;
+    final profile = ref.watch(studentHomeProfileProvider);
 
     return SingleChildScrollView(
       child: Column(
@@ -66,10 +29,10 @@ class StudentProfileTab extends ConsumerWidget {
           // Profile header
           _buildProfileHeader(
             context,
-            name: studentName,
-            initial: studentInitial,
-            email: studentEmail,
-            instrument: studentInstrument,
+            name: profile.name,
+            initial: profile.initial,
+            email: profile.email,
+            instrument: profile.instrument,
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -80,16 +43,9 @@ class StudentProfileTab extends ConsumerWidget {
               horizontal: AppSpacing.screenPadding,
             ),
             child: _buildStatsSummary(
-              lessonCount:
-                  lessonsAsync.isLoading ? null : '$completedLessonCount회',
-              practiceTime:
-                  practiceLogsAsync.isLoading ? null : '$totalPracticeHours시간',
-              period:
-                  studentAsync.isLoading
-                      ? null
-                      : lessonPeriodMonths < 1
-                      ? '1개월 미만'
-                      : '$lessonPeriodMonths개월',
+              lessonCount: profile.lessonCountLabel,
+              practiceTime: profile.practiceTimeLabel,
+              period: profile.lessonPeriodLabel,
             ),
           ),
 
@@ -100,7 +56,7 @@ class StudentProfileTab extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: _buildMenuSection(context, ref),
+            child: _buildMenuSection(context, ref, profile),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -286,22 +242,11 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(width: 1, height: 40, color: AppColors.inkQuaternary);
   }
 
-  Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
-    final studentId = ref.watch(currentUserIdProvider);
-    final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
-    final repertoireCount = repertoiresAsync.whenOrNull(
-      data: (list) => list.where((r) => !r.isArchived).length,
-    );
-    final connectionsAsync = ref.watch(myConnectionsProvider);
-    final teacherSubtitle = connectionsAsync.whenOrNull(
-      data: (connections) {
-        final active = connections.where((c) => c.isActive).toList();
-        if (active.isEmpty) return null;
-        if (active.length == 1) return active.first.teacherName;
-        return '선생님 ${active.length}명';
-      },
-    );
-
+  Widget _buildMenuSection(
+    BuildContext context,
+    WidgetRef ref,
+    StudentHomeProfileState profile,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
@@ -318,7 +263,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.school_outlined,
             title: AppStrings.studentHomeMenuMyTeachers,
-            subtitle: teacherSubtitle,
+            subtitle: profile.teacherSubtitle,
             onTap: () => context.push(AppRoutes.myTeachers),
           ),
           _buildMenuDivider(),
@@ -331,10 +276,13 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.library_music_outlined,
             title: AppStrings.studentHomeMenuRepertoire,
-            subtitle: repertoireCount != null ? '$repertoireCount곡 진행 중' : null,
+            subtitle:
+                profile.repertoireCount != null
+                    ? '${profile.repertoireCount}곡 진행 중'
+                    : null,
             onTap:
                 () => context.push(
-                  '${AppRoutes.practiceRepertoire}?studentId=$studentId',
+                  '${AppRoutes.practiceRepertoire}?studentId=${profile.studentId}',
                 ),
           ),
           _buildMenuDivider(),
@@ -343,7 +291,7 @@ class StudentProfileTab extends ConsumerWidget {
             title: AppStrings.studentHomeMenuPracticeHistory,
             onTap:
                 () => context.push(
-                  '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                  '${AppRoutes.repertoireHistory}?studentId=${profile.studentId}',
                 ),
           ),
           _buildMenuDivider(),
@@ -531,28 +479,15 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  void _showInviteCodeDialog(BuildContext context, WidgetRef ref) {
-    // Generate a random 6-character alphanumeric invite code
-    final random = Random();
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  Future<void> _showInviteCodeDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final inviteCode =
-        List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
-    final studentId = ref.read(currentUserIdProvider);
-
-    // Create and save the invitation to the repository
-    final invitation = ParentInvitation(
-      id: 'inv_${DateTime.now().millisecondsSinceEpoch}',
-      studentId: studentId,
-      source: InvitationSource.student,
-      parentPhone: '',
-      invitationCode: inviteCode,
-      expiresAt: DateTime.now().add(const Duration(hours: 24)),
-      createdAt: DateTime.now(),
-    );
-
-    ref
-        .read(invitationsNotifierProvider(studentId).notifier)
-        .createInvitation(invitation);
+        await ref
+            .read(studentHomeProfileActionsProvider)
+            .createParentInvitationCode();
+    if (!context.mounted) return;
 
     showDialog(
       context: context,

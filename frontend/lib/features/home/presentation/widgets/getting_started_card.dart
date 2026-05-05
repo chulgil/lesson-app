@@ -10,9 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../providers/home_lesson_summary_provider.dart';
 
 /// Getting Started checklist — **Notebook × Score 스타일**.
 ///
@@ -26,20 +24,15 @@ class GettingStartedCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentsAsync = ref.watch(studentsProvider);
-    final lessonsAsync = ref.watch(lessonsProvider);
+    final studentsAsync = ref.watch(homeStudentsProvider);
+    final hasLessons = ref.watch(homeHasLessonsProvider);
+    final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
+    final firstLessonId = ref.watch(homeFirstLessonIdProvider);
 
     return studentsAsync.when(
       data: (students) {
         // Only show when teacher has 0 students
         if (students.isNotEmpty) return const SizedBox.shrink();
-
-        final hasLessons = lessonsAsync.valueOrNull?.isNotEmpty ?? false;
-        final hasCompletedLesson =
-            lessonsAsync.valueOrNull?.any(
-              (l) => l.status == LessonStatus.completed,
-            ) ??
-            false;
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -83,13 +76,12 @@ class GettingStartedCard extends ConsumerWidget {
                 subtitle: AppStrings.gettingStartedStep3Subtitle,
                 isCompleted: hasCompletedLesson,
                 onTap:
-                    hasLessons
+                    hasLessons && firstLessonId != null
                         ? () {
-                          final firstLesson = lessonsAsync.valueOrNull!.first;
                           context.push(
                             AppRoutes.lessonDetail.replaceFirst(
                               ':id',
-                              firstLesson.id,
+                              firstLessonId,
                             ),
                           );
                         }

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/payment.dart';
+import '../../../students/students_facade.dart' show studentsNotifierProvider;
 import '../../../students/domain/entities/student.dart';
+import '../../domain/entities/payment.dart';
 import '../../domain/repositories/payment_repository.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
 import 'payment_repository_provider.dart';
 
 // Legacy independent payment providers.
@@ -19,15 +19,19 @@ final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
 });
 
 /// Single payment provider
-final paymentProvider =
-    FutureProvider.family<Payment?, String>((ref, paymentId) async {
+final paymentProvider = FutureProvider.family<Payment?, String>((
+  ref,
+  paymentId,
+) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentById(paymentId);
 });
 
 /// Payments by student provider
-final studentPaymentsProvider =
-    FutureProvider.family<List<Payment>, String>((ref, studentId) async {
+final studentPaymentsProvider = FutureProvider.family<List<Payment>, String>((
+  ref,
+  studentId,
+) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentsByStudent(studentId);
 });
@@ -35,9 +39,9 @@ final studentPaymentsProvider =
 /// Payments by status provider
 final paymentsByStatusProvider =
     FutureProvider.family<List<Payment>, PaymentStatus>((ref, status) async {
-  final repository = ref.watch(paymentRepositoryProvider);
-  return repository.getPaymentsByStatus(status);
-});
+      final repository = ref.watch(paymentRepositoryProvider);
+      return repository.getPaymentsByStatus(status);
+    });
 
 /// Pending payments provider
 final pendingPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
@@ -58,19 +62,21 @@ final paymentSummaryProvider = FutureProvider<PaymentSummary>((ref) async {
 });
 
 /// Monthly payment summary provider
-final monthlyPaymentSummaryProvider =
-    FutureProvider.family<PaymentSummary, ({int year, int month})>(
-        (ref, params) async {
+final monthlyPaymentSummaryProvider = FutureProvider.family<
+  PaymentSummary,
+  ({int year, int month})
+>((ref, params) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentSummary(year: params.year, month: params.month);
 });
 
 /// Tuition settings provider
-final tuitionSettingsProvider =
-    FutureProvider.family<TuitionSettings?, String>((ref, studentId) async {
-  final repository = ref.watch(paymentRepositoryProvider);
-  return repository.getTuitionSettings(studentId);
-});
+final tuitionSettingsProvider = FutureProvider.family<TuitionSettings?, String>(
+  (ref, studentId) async {
+    final repository = ref.watch(paymentRepositoryProvider);
+    return repository.getTuitionSettings(studentId);
+  },
+);
 
 /// Payments notifier for CRUD operations
 class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
@@ -114,11 +120,13 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
     if (current == null) return;
 
     final payment = current.firstWhere((p) => p.id == paymentId);
-    await updatePayment(payment.copyWith(
-      status: PaymentStatus.confirmed,
-      paymentDate: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
+    await updatePayment(
+      payment.copyWith(
+        status: PaymentStatus.confirmed,
+        paymentDate: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
 
     // Auto-update student status when regular payment is confirmed
     // Trial → remains trial (need explicit upgrade)
@@ -140,11 +148,13 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
     if (current == null) return;
 
     final payment = current.firstWhere((p) => p.id == paymentId);
-    await updatePayment(payment.copyWith(
-      studentConfirmed: true,
-      studentConfirmedAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
+    await updatePayment(
+      payment.copyWith(
+        studentConfirmed: true,
+        studentConfirmedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 
   /// Cancel payment
@@ -153,9 +163,7 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
     if (current == null) return;
 
     final payment = current.firstWhere((p) => p.id == paymentId);
-    await updatePayment(payment.copyWith(
-      status: PaymentStatus.cancelled,
-    ));
+    await updatePayment(payment.copyWith(status: PaymentStatus.cancelled));
   }
 
   /// Delete a payment
@@ -179,8 +187,8 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
 
 final paymentsNotifierProvider =
     AsyncNotifierProvider<PaymentsNotifier, List<Payment>>(
-  PaymentsNotifier.new,
-);
+      PaymentsNotifier.new,
+    );
 
 /// Tuition settings notifier
 class TuitionSettingsNotifier
@@ -205,6 +213,7 @@ class TuitionSettingsNotifier
 }
 
 final tuitionSettingsNotifierProvider = AsyncNotifierProvider.family<
-    TuitionSettingsNotifier, TuitionSettings?, String>(
-  TuitionSettingsNotifier.new,
-);
+  TuitionSettingsNotifier,
+  TuitionSettings?,
+  String
+>(TuitionSettingsNotifier.new);

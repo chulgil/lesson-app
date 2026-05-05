@@ -8,8 +8,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
-import '../../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../lessons/presentation/providers/lesson_note_providers.dart';
+import '../../../../lessons/lessons_facade.dart';
 
 /// Lesson notes preview section for student detail screen.
 class StudentNotesSection extends ConsumerWidget {

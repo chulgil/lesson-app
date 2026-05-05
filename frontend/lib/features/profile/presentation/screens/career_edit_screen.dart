@@ -9,7 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
+import '../../../../features/profile/profile_facade.dart';
 
 /// Screen for adding or editing career record
 class CareerEditScreen extends ConsumerStatefulWidget {

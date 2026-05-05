@@ -152,6 +152,52 @@ async def test_unread_badge_count_tracks_current_user_read_at_only(
 
 
 @pytest.mark.asyncio
+async def test_in_app_badge_and_list_exclude_push_only_notifications(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """The red badge and in-app list ignore push-only notifications."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    in_app_unread = Notification(
+        user_id="test-user-id",
+        type="lessonReminder",
+        priority=NotificationPriority.normal,
+        title="인앱 알림",
+        body="붉은점 대상",
+        is_push=True,
+        is_in_app=True,
+    )
+    push_only_unread = Notification(
+        user_id="test-user-id",
+        type="lessonStarting",
+        priority=NotificationPriority.urgent,
+        title="푸시 전용 알림",
+        body="앱 알림함에서는 제외",
+        is_push=True,
+        is_in_app=False,
+    )
+    db_session.add_all([in_app_unread, push_only_unread])
+    await db_session.flush()
+
+    list_response = await client.get("/api/v1/notifications", headers=auth_headers)
+    count_response = await client.get("/api/v1/notifications/unread-count", headers=auth_headers)
+    read_all_response = await client.patch("/api/v1/notifications/read-all", headers=auth_headers)
+    await db_session.refresh(in_app_unread)
+    await db_session.refresh(push_only_unread)
+
+    assert list_response.status_code == 200
+    items = list_response.json()["items"]
+    assert [item["id"] for item in items] == [in_app_unread.id]
+    assert count_response.status_code == 200
+    assert count_response.json() == {"count": 1}
+    assert read_all_response.status_code == 200
+    assert in_app_unread.read_at is not None
+    assert push_only_unread.read_at is None
+
+
+@pytest.mark.asyncio
 async def test_mark_read_is_user_scoped_and_preserves_existing_read_timestamp(
     client: AsyncClient,
     auth_headers,

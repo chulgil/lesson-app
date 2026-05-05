@@ -123,6 +123,12 @@ void main() {
       File(
         'lib/features/student_home/presentation/widgets/trial_booking_card.dart',
       ),
+      File(
+        'lib/features/student_home/presentation/widgets/student_getting_started_card.dart',
+      ),
+      File(
+        'lib/features/student_home/presentation/screens/student_lessons_tab.dart',
+      ),
     ];
 
     for (final file in bookingWidgets) {
@@ -146,6 +152,20 @@ void main() {
         isNot(contains('bookingsNotifierProvider')),
         reason:
             '${file.path} must use a student_home action provider for booking mutations.',
+      );
+      expect(
+        content,
+        isNot(
+          contains('/lessons/presentation/providers/lesson_crud_provider.dart'),
+        ),
+        reason:
+            '${file.path} must not import the lessons presentation lesson provider directly.',
+      );
+      expect(
+        content,
+        isNot(contains('lessonsProvider')),
+        reason:
+            '${file.path} must use student_home application providers for lesson reads.',
       );
     }
   });

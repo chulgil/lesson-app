@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/presentation/widgets/request_list_item.dart';
 
 /// Home dashboard section showing today's lesson requests.

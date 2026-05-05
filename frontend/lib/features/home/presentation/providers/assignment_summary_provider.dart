@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../practice/presentation/providers/practice_item_providers.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../practice/practice_facade.dart';
+import '../../../students/students_facade.dart';
 
 /// Summary of weekly assignment progress across all students.
 class WeeklyAssignmentSummary {
@@ -40,51 +39,54 @@ class StudentAssignmentStatus {
 }
 
 /// Provider for weekly assignment summary (home dashboard).
-final weeklyAssignmentSummaryProvider =
-    FutureProvider<WeeklyAssignmentSummary>((ref) async {
-  final students = await ref.watch(studentsProvider.future);
-  final repository = ref.watch(practiceItemRepositoryProvider);
+final weeklyAssignmentSummaryProvider = FutureProvider<WeeklyAssignmentSummary>(
+  (ref) async {
+    final students = await ref.watch(studentsProvider.future);
+    final repository = ref.watch(practiceItemRepositoryProvider);
 
-  final now = DateTime.now();
-  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-  final endOfWeek = startOfWeek.add(const Duration(days: 6));
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
-  int totalItems = 0;
-  int completedItems = 0;
-  final incompleteStudents = <StudentAssignmentStatus>[];
+    int totalItems = 0;
+    int completedItems = 0;
+    final incompleteStudents = <StudentAssignmentStatus>[];
 
-  for (final student in students) {
-    final items = await repository.getByStudentIdAndDateRange(
-      student.id,
-      startOfWeek,
-      endOfWeek,
-    );
-    if (items.isEmpty) continue;
+    for (final student in students) {
+      final items = await repository.getByStudentIdAndDateRange(
+        student.id,
+        startOfWeek,
+        endOfWeek,
+      );
+      if (items.isEmpty) continue;
 
-    final completed = items.where((i) => i.isCompleted).length;
-    totalItems += items.length;
-    completedItems += completed;
+      final completed = items.where((i) => i.isCompleted).length;
+      totalItems += items.length;
+      completedItems += completed;
 
-    if (completed < items.length) {
-      final incomplete = items.where((i) => !i.isCompleted).toList();
-      incompleteStudents.add(StudentAssignmentStatus(
-        studentId: student.id,
-        studentName: student.name,
-        totalItems: items.length,
-        completedItems: completed,
-        mostUrgentItem: incomplete.isNotEmpty ? incomplete.first : null,
-      ));
+      if (completed < items.length) {
+        final incomplete = items.where((i) => !i.isCompleted).toList();
+        incompleteStudents.add(
+          StudentAssignmentStatus(
+            studentId: student.id,
+            studentName: student.name,
+            totalItems: items.length,
+            completedItems: completed,
+            mostUrgentItem: incomplete.isNotEmpty ? incomplete.first : null,
+          ),
+        );
+      }
     }
-  }
 
-  // Sort by most incomplete first
-  incompleteStudents.sort(
-    (a, b) => b.incompleteCount.compareTo(a.incompleteCount),
-  );
+    // Sort by most incomplete first
+    incompleteStudents.sort(
+      (a, b) => b.incompleteCount.compareTo(a.incompleteCount),
+    );
 
-  return WeeklyAssignmentSummary(
-    totalItems: totalItems,
-    completedItems: completedItems,
-    incompleteStudents: incompleteStudents,
-  );
-});
+    return WeeklyAssignmentSummary(
+      totalItems: totalItems,
+      completedItems: completedItems,
+      incompleteStudents: incompleteStudents,
+    );
+  },
+);

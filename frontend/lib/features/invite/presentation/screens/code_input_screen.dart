@@ -11,7 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
-import '../../../../features/profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
 
 /// Screen for entering a 6-digit invite code
 class CodeInputScreen extends ConsumerStatefulWidget {

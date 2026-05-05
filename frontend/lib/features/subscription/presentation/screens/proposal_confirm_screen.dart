@@ -8,10 +8,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
 import '../providers/subscription_providers.dart';
@@ -99,7 +99,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     final templateAsync = ref.watch(
       subscriptionTemplateProvider(proposal.templateId),
     );
-    final studentAsync = ref.watch(studentProvider(proposal.studentId));
+    final studentAsync = ref.watch(
+      subscriptionIssueStudentProvider(proposal.studentId),
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),

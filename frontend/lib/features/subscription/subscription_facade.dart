@@ -122,6 +122,8 @@ export 'domain/services/subscription_renewal_service.dart';
 // =============================================================================
 export 'presentation/providers/lesson_policy_providers.dart';
 export 'presentation/providers/proposal_settings_providers.dart';
+export 'presentation/providers/subscription_lifecycle_service_providers.dart'
+    show autoProposalServiceProvider, subscriptionRenewalServiceProvider;
 export 'presentation/providers/subscription_proposal_providers.dart';
 export 'presentation/providers/subscription_providers.dart';
 export 'presentation/providers/subscription_template_providers.dart';

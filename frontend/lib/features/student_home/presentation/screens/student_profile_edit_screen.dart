@@ -12,10 +12,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
-import '../../../students/presentation/providers/student_image_provider.dart';
 import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../providers/student_home_profile_edit_provider.dart';
 
 /// Student profile edit screen.
 class StudentProfileEditScreen extends ConsumerStatefulWidget {
@@ -60,9 +58,10 @@ class _StudentProfileEditScreenState
   }
 
   Future<void> _loadStudentData() async {
-    final studentId = ref.read(currentUserIdProvider);
     try {
-      final student = await ref.read(studentProvider(studentId).future);
+      final student = await ref.read(
+        studentHomeProfileEditStudentProvider.future,
+      );
       if (student != null && mounted) {
         setState(() {
           _currentStudent = student;
@@ -112,7 +111,9 @@ class _StudentProfileEditScreenState
         phone: _phoneController.text.trim(),
       );
 
-      await ref.read(studentsNotifierProvider.notifier).updateStudent(updated);
+      await ref
+          .read(studentHomeProfileEditActionsProvider)
+          .updateStudent(updated);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -329,7 +330,7 @@ class _StudentProfileEditScreenState
     final imagePath =
         studentId != null
             ? ref
-                .watch(studentProfileImageNotifierProvider(studentId))
+                .watch(studentHomeProfileEditImagePathProvider(studentId))
                 .valueOrNull
             : null;
 
@@ -378,11 +379,8 @@ class _StudentProfileEditScreenState
     final studentId = _currentStudent?.id;
     if (studentId == null) return;
 
-    final notifier = ref.read(
-      studentProfileImageNotifierProvider(studentId).notifier,
-    );
-    final currentPath =
-        ref.read(studentProfileImageNotifierProvider(studentId)).valueOrNull;
+    final actions = ref.read(studentHomeProfileEditActionsProvider);
+    final currentPath = actions.profileImagePath(studentId);
 
     final action = await showImagePickerBottomSheet(
       context,
@@ -393,7 +391,7 @@ class _StudentProfileEditScreenState
     if (action == null || !mounted) return;
 
     if (action == ImagePickerAction.delete) {
-      await notifier.removeImage();
+      await actions.removeProfileImage(studentId);
       return;
     }
 
@@ -403,6 +401,6 @@ class _StudentProfileEditScreenState
             : ImageSource.gallery;
 
     if (!mounted) return;
-    await notifier.pickAndSaveImage(source, context);
+    await actions.pickAndSaveProfileImage(studentId, source, context);
   }
 }

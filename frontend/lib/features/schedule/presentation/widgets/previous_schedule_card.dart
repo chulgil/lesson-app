@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../relationship/presentation/providers/relationship_providers.dart';
+import '../../../relationship/relationship_facade.dart';
 
 /// Card widget to display previous schedule for re-enrollment restoration.
 ///

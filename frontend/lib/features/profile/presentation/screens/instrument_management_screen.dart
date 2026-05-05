@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
-import '../../../settings/presentation/providers/teacher_settings_provider.dart';
+import '../../../settings/settings_facade.dart';
 
 /// Screen for managing teacher's instruments
 class InstrumentManagementScreen extends ConsumerStatefulWidget {

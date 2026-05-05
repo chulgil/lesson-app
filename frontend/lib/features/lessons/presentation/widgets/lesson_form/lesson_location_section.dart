@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../students/domain/entities/lesson_location.dart';
-import '../../../../students/presentation/providers/location_providers.dart';
+import '../../../../students/students_facade.dart'
+    show LessonLocation, LocationType;
+import '../../providers/lesson_widget_support_provider.dart';
 
 /// Chip-style picker for selecting a teacher's lesson location.
 ///
@@ -31,7 +32,9 @@ class LessonLocationSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locationsAsync = ref.watch(teacherLocationsProvider(teacherId));
+    final locationsAsync = ref.watch(
+      lessonWidgetTeacherLocationsProvider(teacherId),
+    );
 
     return locationsAsync.when(
       data: (locations) {

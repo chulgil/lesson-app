@@ -11,7 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
-import '../../../../features/profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
 
 /// Screen for viewing established connections
 class MyConnectionsScreen extends ConsumerWidget {

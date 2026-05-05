@@ -13,7 +13,7 @@ import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../providers/student_crud_provider.dart';

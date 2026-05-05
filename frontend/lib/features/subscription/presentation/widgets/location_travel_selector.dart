@@ -6,8 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../students/domain/entities/lesson_location.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../students/students_facade.dart';
 
 /// Location type option with icon and label for ChoiceChip display.
 class _LocationOption {

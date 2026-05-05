@@ -8,8 +8,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../practice/presentation/providers/practice_item_providers.dart';
+import '../../../practice/practice_facade.dart' show PracticeItem;
+import '../providers/lesson_widget_support_provider.dart';
 import 'resource_attachment_section.dart';
 
 /// Bottom sheet for editing practice item
@@ -206,7 +206,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
       );
 
       await ref
-          .read(practiceItemsNotifierProvider(widget.lessonId).notifier)
+          .read(lessonWidgetPracticeItemActionsProvider(widget.lessonId))
           .updateItem(updatedItem);
 
       if (mounted) {
@@ -254,7 +254,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
     try {
       await ref
-          .read(practiceItemsNotifierProvider(widget.lessonId).notifier)
+          .read(lessonWidgetPracticeItemActionsProvider(widget.lessonId))
           .deleteItem(widget.item.id, widget.studentId);
 
       if (mounted) {

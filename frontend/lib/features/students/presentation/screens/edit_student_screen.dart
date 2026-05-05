@@ -11,9 +11,13 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../../features/students/presentation/providers/student_crud_provider.dart';
-import '../providers/membership_providers.dart';
-import '../providers/student_image_provider.dart';
+import '../../../../features/students/students_facade.dart'
+    show
+        studentBackgroundImageNotifierProvider,
+        studentMembershipsProvider,
+        studentProfileImageNotifierProvider,
+        studentProvider,
+        studentsNotifierProvider;
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for editing an existing student

@@ -7,12 +7,12 @@ import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
-import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
+import '../../../../features/onboarding/onboarding_facade.dart';
 
 /// Tutorial screen for teacher onboarding
 class TutorialScreen extends ConsumerStatefulWidget {

@@ -6,17 +6,10 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../relationship/presentation/providers/relationship_providers.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
-import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
-import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
-import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 import '../../domain/entities/subscription.dart';
+import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_providers.dart';
 
 UnifiedRequestStatus lessonRequestStatusForIssuedSubscription() =>
@@ -135,12 +128,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         subscription.membershipId,
       );
       if (teacherId != null) {
-        final relationRepo = ref.read(teacherStudentRelationRepositoryProvider);
-        await relationRepo.onSubscriptionIssued(
-          teacherId: teacherId,
-          studentId: primaryStudentId,
-          subscriptionId: subscription.id,
-        );
+        await ref
+            .read(subscriptionIssueFlowControllerProvider)
+            .activateRelationshipForSubscription(
+              teacherId: teacherId,
+              studentId: primaryStudentId,
+              subscriptionId: subscription.id,
+            );
       }
 
       // Create schedule confirmation card for student (Issue #62)
@@ -148,16 +142,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
       // Update lesson request: link proposal and set status
       if (lessonRequestId != null) {
-        final repo = ref.read(unifiedLessonRequestRepositoryProvider);
-        final request = await repo.getById(lessonRequestId!);
-        if (request != null) {
-          await repo.update(
-            request.copyWith(
-              proposalId: subscription.id,
+        await ref
+            .read(subscriptionIssueFlowControllerProvider)
+            .updateLessonRequestForIssuedSubscription(
+              lessonRequestId: lessonRequestId!,
+              subscriptionId: subscription.id,
               status: lessonRequestStatusForIssuedSubscription(),
-            ),
-          );
-        }
+            );
       }
 
       if (mounted) {
@@ -199,22 +190,18 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   }
 
   Future<String?> _getTeacherIdFromMembership(String membershipId) async {
-    final memberships = ref.read(studentMembershipsProvider(primaryStudentId));
-    final membership = memberships.valueOrNull?.firstWhere(
-      (m) => m.id == membershipId,
-      orElse: () => throw Exception('Membership not found'),
-    );
-    if (membership == null) return null;
-
-    final lessonClass = await ref.read(
-      lessonClassProvider(membership.lessonClassId).future,
-    );
-    return lessonClass?.teacherId;
+    return ref
+        .read(subscriptionIssueFlowControllerProvider)
+        .teacherIdForMembership(
+          studentId: primaryStudentId,
+          membershipId: membershipId,
+        );
   }
 
   Future<String> _getStudentName() async {
-    final student = await ref.read(studentProvider(primaryStudentId).future);
-    return student?.name ?? '';
+    return ref
+        .read(subscriptionIssueFlowControllerProvider)
+        .studentName(primaryStudentId);
   }
 
   /// Update the membership's lesson location and travel time.
@@ -224,22 +211,14 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     required int travelTime,
   }) async {
     try {
-      final memberships = ref.read(
-        studentMembershipsProvider(primaryStudentId),
-      );
-      final membership = memberships.valueOrNull?.firstWhere(
-        (m) => m.id == membershipId,
-        orElse: () => throw Exception('Membership not found'),
-      );
-      if (membership == null) return;
-
-      final updated = membership.copyWith(
-        lessonLocationId: locationId,
-        travelTimeMinutes: travelTime,
-      );
-
-      final membershipRepo = ref.read(membershipRepositoryProvider);
-      await membershipRepo.update(updated);
+      await ref
+          .read(subscriptionIssueFlowControllerProvider)
+          .updateMembershipLocationTravel(
+            studentId: primaryStudentId,
+            membershipId: membershipId,
+            locationId: locationId,
+            travelTime: travelTime,
+          );
     } catch (e) {
       debugPrint('Failed to update membership location/travel: $e');
     }
@@ -248,17 +227,15 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   Future<void> _createScheduleConfirmationCard(
     Subscription subscription,
   ) async {
-    final memberships = ref.read(studentMembershipsProvider(primaryStudentId));
-    final membership = memberships.valueOrNull?.firstWhere(
-      (m) => m.id == subscription.membershipId,
-      orElse: () => throw Exception('Membership not found'),
+    final flow = ref.read(subscriptionIssueFlowControllerProvider);
+    final membership = await flow.membershipForStudent(
+      studentId: primaryStudentId,
+      membershipId: subscription.membershipId,
     );
-
     if (membership == null) return;
 
-    final lessonClassAsync = await ref.read(
-      lessonClassProvider(membership.lessonClassId).future,
-    );
+    final lessonClass = await flow.lessonClassInfoForMembership(membership);
+    final teacherId = lessonClass?.teacherId ?? '';
 
     final cardType = await _detectScheduleCardType(subscription, membership);
 
@@ -271,32 +248,28 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     // Generate up to 2 alternative time slots from teacher's available schedule
     final alternatives = await _getAlternativeSlots(
-      teacherId: lessonClassAsync?.teacherId ?? '',
+      teacherId: teacherId,
       primaryDay: suggestedDay,
       primaryTime: suggestedTime,
     );
 
     try {
-      await ref
-          .read(scheduleConfirmationCardNotifierProvider.notifier)
-          .createCard(
-            studentId: primaryStudentId,
-            teacherId: lessonClassAsync?.teacherId ?? '',
-            teacherName: lessonClassAsync?.name ?? AppStrings.teacher,
-            instrument: membership.instrument,
-            subscriptionId: subscription.id,
-            cardType: cardType,
-            totalLessons: subscription.totalLessons,
-            suggestedDay: suggestedDay,
-            suggestedTime: suggestedTime,
-            lessonDuration: lessonDuration,
-            suggestedDay2: alternatives.isNotEmpty ? alternatives[0].day : null,
-            suggestedTime2:
-                alternatives.isNotEmpty ? alternatives[0].time : null,
-            suggestedDay3: alternatives.length > 1 ? alternatives[1].day : null,
-            suggestedTime3:
-                alternatives.length > 1 ? alternatives[1].time : null,
-          );
+      await flow.createScheduleConfirmationCard(
+        studentId: primaryStudentId,
+        teacherId: teacherId,
+        teacherName: lessonClass?.teacherName ?? AppStrings.teacher,
+        instrument: membership.instrument,
+        subscriptionId: subscription.id,
+        cardType: cardType,
+        totalLessons: subscription.totalLessons,
+        suggestedDay: suggestedDay,
+        suggestedTime: suggestedTime,
+        lessonDuration: lessonDuration,
+        suggestedDay2: alternatives.isNotEmpty ? alternatives[0].day : null,
+        suggestedTime2: alternatives.isNotEmpty ? alternatives[0].time : null,
+        suggestedDay3: alternatives.length > 1 ? alternatives[1].day : null,
+        suggestedTime3: alternatives.length > 1 ? alternatives[1].time : null,
+      );
     } catch (e) {
       debugPrint('Failed to create schedule confirmation card: $e');
     }
@@ -307,9 +280,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     ClassMembership membership,
   ) async {
     try {
-      final allSubscriptions = await ref.read(
-        studentSubscriptionsProvider(primaryStudentId).future,
-      );
+      final allSubscriptions = await ref
+          .read(subscriptionIssueFlowControllerProvider)
+          .studentSubscriptions(primaryStudentId);
 
       final sameMembershipSubs =
           allSubscriptions
@@ -347,37 +320,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     String? primaryTime,
   }) async {
     try {
-      if (teacherId.isEmpty) return [];
-
-      // Use teacher's availability settings to find alternative slots
-      final settingsAsync = ref.read(teacherSettingsByIdProvider(teacherId));
-      final settings = settingsAsync.valueOrNull;
-      if (settings == null) return [];
-
-      final alternatives = <({int day, String time})>[];
-
-      // Collect unique day/time pairs from available slots
-      for (final slot in settings.availableSlots) {
-        if (!slot.isActive) continue;
-
-        final slotDay = slot.dayOfWeek;
-        final slotTimeStr =
-            '${slot.startTime.hour.toString().padLeft(2, '0')}:${slot.startTime.minute.toString().padLeft(2, '0')}';
-
-        // Skip the primary suggestion
-        if (slotDay == primaryDay && slotTimeStr == primaryTime) continue;
-
-        // Avoid duplicates
-        final isDuplicate = alternatives.any(
-          (a) => a.day == slotDay && a.time == slotTimeStr,
-        );
-        if (isDuplicate) continue;
-
-        alternatives.add((day: slotDay, time: slotTimeStr));
-        if (alternatives.length >= 2) break;
-      }
-
-      return alternatives;
+      return ref
+          .read(subscriptionIssueFlowControllerProvider)
+          .alternativeSlots(
+            teacherId: teacherId,
+            primaryDay: primaryDay,
+            primaryTime: primaryTime,
+          );
     } catch (e) {
       debugPrint('Failed to get alternative slots: $e');
       return [];
@@ -456,16 +405,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           await repository.create(subscription);
 
           if (i < lessonRequestIds.length) {
-            final repo = ref.read(unifiedLessonRequestRepositoryProvider);
-            final req = await repo.getById(lessonRequestIds[i]);
-            if (req != null) {
-              await repo.update(
-                req.copyWith(
-                  proposalId: subscription.id,
+            await ref
+                .read(subscriptionIssueFlowControllerProvider)
+                .updateLessonRequestForIssuedSubscription(
+                  lessonRequestId: lessonRequestIds[i],
+                  subscriptionId: subscription.id,
                   status: lessonRequestStatusForIssuedSubscription(),
-                ),
-              );
-            }
+                );
           }
 
           successCount++;

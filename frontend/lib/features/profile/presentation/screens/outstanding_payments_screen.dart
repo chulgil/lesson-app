@@ -7,10 +7,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../notifications/notifications_facade.dart';
+import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 
 /// Tuition deposit status screen.

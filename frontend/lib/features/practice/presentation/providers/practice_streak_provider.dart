@@ -2,27 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/practice/domain/entities/practice_streak.dart';
-import '../../../../features/auth/presentation/providers/user_role_provider.dart';
+import '../../../../features/auth/auth_facade.dart';
 import 'practice_repository_provider.dart';
 
 part 'practice_streak_provider.g.dart';
 
 /// Provider for getting practice streak by student ID
 @riverpod
-Future<PracticeStreak> practiceStreak(
-  Ref ref,
-  String studentId,
-) async {
+Future<PracticeStreak> practiceStreak(Ref ref, String studentId) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getStreak(studentId);
 }
 
 /// Provider for recording practice and updating streak
 @riverpod
-Future<PracticeStreak> recordPractice(
-  Ref ref,
-  String studentId,
-) async {
+Future<PracticeStreak> recordPractice(Ref ref, String studentId) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.recordPractice(studentId);
 }

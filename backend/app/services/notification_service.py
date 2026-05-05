@@ -41,7 +41,10 @@ class NotificationService:
         """List notifications for a user."""
         from app.models.notification import Notification
 
-        query = select(Notification).where(Notification.user_id == user_id)
+        query = select(Notification).where(
+            Notification.user_id == user_id,
+            Notification.is_in_app.is_(True),
+        )
         if is_read is not None:
             if is_read:
                 query = query.where(Notification.read_at.isnot(None))
@@ -78,7 +81,11 @@ class NotificationService:
 
         await self.db.execute(
             update(Notification)
-            .where(Notification.user_id == user_id, Notification.read_at.is_(None))
+            .where(
+                Notification.user_id == user_id,
+                Notification.is_in_app.is_(True),
+                Notification.read_at.is_(None),
+            )
             .values(read_at=datetime.now(UTC))
         )
         await self.db.flush()
@@ -90,6 +97,7 @@ class NotificationService:
         count = await self.db.scalar(
             select(func.count()).where(
                 Notification.user_id == user_id,
+                Notification.is_in_app.is_(True),
                 Notification.read_at.is_(None),
             )
         )

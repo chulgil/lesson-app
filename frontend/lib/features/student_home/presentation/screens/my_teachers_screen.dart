@@ -9,10 +9,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
-import '../../../relationship/presentation/providers/relationship_providers.dart';
+import '../../../relationship/relationship_facade.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../providers/manual_teacher_provider.dart';
 

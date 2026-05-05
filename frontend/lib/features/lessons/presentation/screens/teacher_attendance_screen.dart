@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../domain/entities/lesson.dart';
 import '../providers/attendance_providers.dart';
 

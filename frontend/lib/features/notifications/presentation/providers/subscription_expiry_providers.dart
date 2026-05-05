@@ -4,10 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/entities/subscription_expiry_reminder_settings.dart';
 import '../../domain/services/notification_scheduler_service.dart';

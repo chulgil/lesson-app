@@ -10,11 +10,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../schedule/domain/entities/request_event.dart';
-import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../students/domain/entities/lesson_class.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
+import '../../../schedule/schedule_facade.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 

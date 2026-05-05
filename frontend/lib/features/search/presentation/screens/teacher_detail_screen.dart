@@ -12,9 +12,9 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
-import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
 import '../../../profile/domain/entities/invite.dart';
-import '../../../profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
+import '../../search_facade.dart';
 
 /// Teacher public profile detail screen
 class TeacherDetailScreen extends ConsumerWidget {
@@ -42,7 +42,7 @@ class TeacherDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
-                    '프로필을 불러올 수 없습니다',
+                    AppStrings.searchProfileLoadError,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -68,7 +68,7 @@ class TeacherDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
-                    '선생님 정보를 찾을 수 없습니다',
+                    AppStrings.searchProfileNotFound,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -122,7 +122,7 @@ class _TeacherDetailContent extends ConsumerWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            '${profile.name ?? '익명 선생님'} (선생님)',
+            '${profile.name ?? AppStrings.searchAnonymousTeacher} (선생님)',
             style: NotebookTypography.appBarTitle.copyWith(
               color: AppColors.paper,
             ),
@@ -160,7 +160,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.space3),
                       Text(
-                        profile.name ?? '익명 선생님',
+                        profile.name ?? AppStrings.searchAnonymousTeacher,
                         style: AppTypography.headingMedium.copyWith(
                           color: AppColors.paper,
                         ),
@@ -562,7 +562,7 @@ class _TeacherDetailContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space2),
         // Info text
         Text(
-          '선생님에게 레슨 신청서가 전달됩니다',
+          AppStrings.searchLessonRequestInfo,
           style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
           textAlign: TextAlign.center,
         ),

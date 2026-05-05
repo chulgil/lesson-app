@@ -7,9 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../lessons/presentation/providers/lesson_confirmation_provider.dart';
+import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/presentation/widgets/attendance_confirmation_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
 

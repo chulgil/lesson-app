@@ -2,16 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../gamification/presentation/providers/point_award_service.dart';
+import '../../../gamification/gamification_facade.dart'
+    show pointAwardNotifierProvider;
+import '../../../lessons/lessons_facade.dart'
+    show TeachingResourceType, currentTeacherIdProvider, resourcesByIdsProvider;
 import '../../data/repositories/mock_practice_item_repository.dart';
 import '../../domain/repositories/practice_item_repository.dart';
-import '../../../lessons/domain/entities/teaching_resource.dart';
-import '../../../lessons/presentation/providers/teaching_resource_providers.dart';
 import 'practice_repertoire_repository_provider.dart';
 import 'practice_repertoire_crud_provider.dart';
-
-import '../../../lessons/presentation/providers/tip_template_providers.dart'
-    show currentTeacherIdProvider;
 
 /// Repository provider
 final practiceItemRepositoryProvider = Provider<PracticeItemRepository>((ref) {

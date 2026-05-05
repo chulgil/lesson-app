@@ -9,9 +9,8 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
-import '../../../profile/presentation/providers/teacher_extended_profile_provider.dart';
-import '../../../subscription/domain/entities/subscription_template.dart';
-import '../../../subscription/presentation/providers/subscription_template_providers.dart';
+import '../../../profile/profile_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/widgets/selectable_template_card.dart';
 
 /// Payment method for subscription issuance.

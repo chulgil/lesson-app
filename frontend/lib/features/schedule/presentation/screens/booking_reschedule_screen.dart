@@ -8,7 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';

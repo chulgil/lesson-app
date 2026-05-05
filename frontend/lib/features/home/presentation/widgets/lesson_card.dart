@@ -8,11 +8,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../students/domain/entities/lesson_class.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
-import '../../../subscription/subscription_facade.dart';
+import '../providers/home_lesson_summary_provider.dart';
 
 /// Lesson card — **Notebook × Score 스타일**.
 ///
@@ -83,48 +80,49 @@ class LessonCard extends ConsumerWidget {
                         Text(
                           '${lesson.studentName} · ${lesson.instrument}',
                           style: NotebookTypography.pieceTitle.copyWith(
-                            decoration: _isDimmed ? TextDecoration.lineThrough : null,
+                            decoration:
+                                _isDimmed ? TextDecoration.lineThrough : null,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      _buildBadgesRow(ref),
-                      if (lesson.pieces.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            lesson.pieces.first.displayName,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.inkSecondary,
+                        _buildBadgesRow(ref),
+                        if (lesson.pieces.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              lesson.pieces.first.displayName,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Status label — uppercase sans, 스탬프 느낌
-                SizedBox(
-                  width: 40,
-                  child: Text(
-                    _getStatusLabel(),
-                    style: NotebookTypography.sectionLabel.copyWith(
-                      color: _getStatusColor(),
-                      fontSize: 10,
+                      ],
                     ),
-                    textAlign: TextAlign.end,
                   ),
-                ),
-                const SizedBox(width: AppSpacing.space1),
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.inkTertiary,
-                  size: 18,
-                ),
-              ],
+                  // Status label — uppercase sans, 스탬프 느낌
+                  SizedBox(
+                    width: 40,
+                    child: Text(
+                      _getStatusLabel(),
+                      style: NotebookTypography.sectionLabel.copyWith(
+                        color: _getStatusColor(),
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space1),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppColors.inkTertiary,
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
         ),
       ),
@@ -173,11 +171,11 @@ class LessonCard extends ConsumerWidget {
   Widget _buildBadgesRow(WidgetRef ref) {
     final memberships =
         ref
-            .watch(activeStudentMembershipsProvider(lesson.studentId))
+            .watch(homeActiveStudentMembershipsProvider(lesson.studentId))
             .valueOrNull;
     final subscriptions =
         ref
-            .watch(activeStudentSubscriptionsProvider(lesson.studentId))
+            .watch(homeActiveStudentSubscriptionsProvider(lesson.studentId))
             .valueOrNull;
 
     // Context badge from lesson class
@@ -185,12 +183,13 @@ class LessonCard extends ConsumerWidget {
     if (memberships != null && memberships.isNotEmpty) {
       final lessonClass =
           ref
-              .watch(lessonClassProvider(memberships.first.lessonClassId))
+              .watch(
+                homeLessonClassContextProvider(memberships.first.lessonClassId),
+              )
               .valueOrNull;
       if (lessonClass != null) {
-        final isAcademy = lessonClass.type == LessonClassType.academy;
         contextBadge = Text(
-          isAcademy ? lessonClass.name : AppStrings.individualLesson,
+          lessonClass.label,
           style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

@@ -8,7 +8,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
-import '../../../../practice/presentation/providers/practice_crud_provider.dart';
+import '../../../../practice/practice_facade.dart';
 
 /// Practice summary section showing streak, weekly stats, and chart.
 class PracticeSummarySection extends ConsumerWidget {

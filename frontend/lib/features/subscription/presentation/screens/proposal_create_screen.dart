@@ -8,11 +8,11 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
-import '../providers/subscription_template_providers.dart';
+import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
+import '../providers/subscription_template_providers.dart';
 import '../widgets/selectable_template_card.dart';
 
 /// Screen for teachers to create a subscription proposal.
@@ -59,7 +59,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final studentsAsync = ref.watch(studentsProvider);
+    final studentsAsync = ref.watch(subscriptionIssueStudentsProvider);
     final templatesAsync = ref.watch(
       activeTeacherTemplatesProvider(widget.teacherId),
     );

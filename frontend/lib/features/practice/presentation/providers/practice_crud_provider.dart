@@ -1,48 +1,58 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_log.dart';
-import '../../../gamification/presentation/providers/point_award_service.dart';
+import '../../../gamification/gamification_facade.dart';
 import '../../domain/repositories/practice_repository.dart';
 import 'practice_repository_provider.dart';
 
 /// Practice logs by student
-final practiceLogsProvider =
-    FutureProvider.family<List<PracticeLog>, String>((ref, studentId) async {
+final practiceLogsProvider = FutureProvider.family<List<PracticeLog>, String>((
+  ref,
+  studentId,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getPracticeLogs(studentId);
 });
 
 /// Single practice log
-final practiceLogProvider =
-    FutureProvider.family<PracticeLog?, String>((ref, id) async {
+final practiceLogProvider = FutureProvider.family<PracticeLog?, String>((
+  ref,
+  id,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getPracticeLog(id);
 });
 
 /// Practice log for specific date
-final practiceLogByDateProvider = FutureProvider.family<PracticeLog?,
-    ({String studentId, DateTime date})>((ref, params) async {
-  final repository = ref.watch(practiceRepositoryProvider);
-  return repository.getPracticeLogByDate(params.studentId, params.date);
-});
+final practiceLogByDateProvider =
+    FutureProvider.family<PracticeLog?, ({String studentId, DateTime date})>((
+      ref,
+      params,
+    ) async {
+      final repository = ref.watch(practiceRepositoryProvider);
+      return repository.getPracticeLogByDate(params.studentId, params.date);
+    });
 
 /// Today's practice log for student
-final todayPracticeProvider =
-    FutureProvider.family<PracticeLog?, String>((ref, studentId) async {
+final todayPracticeProvider = FutureProvider.family<PracticeLog?, String>((
+  ref,
+  studentId,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getPracticeLogByDate(studentId, DateTime.now());
 });
 
 /// Weekly practice for student (current week)
-final weeklyPracticeProvider =
-    FutureProvider.family<List<bool>, String>((ref, studentId) async {
+final weeklyPracticeProvider = FutureProvider.family<List<bool>, String>((
+  ref,
+  studentId,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getWeeklyPractice(studentId);
 });
 
 /// Practice notifier for CRUD operations
-class PracticeNotifier
-    extends FamilyAsyncNotifier<List<PracticeLog>, String> {
+class PracticeNotifier extends FamilyAsyncNotifier<List<PracticeLog>, String> {
   PracticeRepository get _repository => ref.read(practiceRepositoryProvider);
 
   @override
@@ -93,7 +103,9 @@ class PracticeNotifier
       state = await AsyncValue.guard(() => _repository.getPracticeLogs(arg));
       // Award points when task is toggled to completed
       if (updated.isCompleted) {
-        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(arg, updated.title);
+        ref
+            .read(pointAwardNotifierProvider.notifier)
+            .awardTaskComplete(arg, updated.title);
       }
       return updated;
     } catch (e, st) {
@@ -108,7 +120,7 @@ class PracticeNotifier
   }
 }
 
-final practiceNotifierProvider = AsyncNotifierProvider.family<PracticeNotifier,
-    List<PracticeLog>, String>(
-  PracticeNotifier.new,
-);
+final practiceNotifierProvider =
+    AsyncNotifierProvider.family<PracticeNotifier, List<PracticeLog>, String>(
+      PracticeNotifier.new,
+    );

@@ -10,7 +10,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/week_lessons_provider.dart';

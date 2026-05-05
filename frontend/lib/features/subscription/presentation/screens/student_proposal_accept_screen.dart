@@ -8,7 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../search/presentation/providers/teacher_search_provider.dart';
+import '../../../search/search_facade.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';

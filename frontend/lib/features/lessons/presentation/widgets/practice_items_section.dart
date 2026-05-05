@@ -9,8 +9,8 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/like_stamp.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
-import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../practice/presentation/providers/practice_item_providers.dart';
+import '../../../practice/practice_facade.dart' show PracticeItem;
+import '../providers/lesson_widget_support_provider.dart';
 import 'add_practice_item_sheet.dart';
 import 'edit_practice_item_sheet.dart';
 import 'resource_attachment_section.dart';
@@ -30,7 +30,7 @@ class PracticeItemsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final itemsAsync = ref.watch(practiceItemsNotifierProvider(lessonId));
+    final itemsAsync = ref.watch(lessonWidgetPracticeItemsProvider(lessonId));
 
     return itemsAsync.when(
       data: (items) => _buildContent(context, ref, items),
@@ -62,9 +62,14 @@ class PracticeItemsSection extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space3),
                   TextButton.icon(
                     onPressed:
-                        () => ref.invalidate(
-                          practiceItemsNotifierProvider(lessonId),
-                        ),
+                        () =>
+                            ref
+                                .read(
+                                  lessonWidgetPracticeItemActionsProvider(
+                                    lessonId,
+                                  ),
+                                )
+                                .invalidateItems(),
                     icon: const Icon(Icons.refresh),
                     label: const Text(AppStrings.retry),
                   ),
@@ -330,13 +335,13 @@ class PracticeItemsSection extends ConsumerWidget {
 
   Future<void> _toggleComplete(WidgetRef ref, PracticeItem item) async {
     await ref
-        .read(practiceItemsNotifierProvider(lessonId).notifier)
+        .read(lessonWidgetPracticeItemActionsProvider(lessonId))
         .toggleComplete(item.id, studentId);
   }
 
   Future<void> _toggleLike(WidgetRef ref, PracticeItem item) async {
     await ref
-        .read(practiceItemsNotifierProvider(lessonId).notifier)
+        .read(lessonWidgetPracticeItemActionsProvider(lessonId))
         .toggleLike(item.id, studentId);
   }
 

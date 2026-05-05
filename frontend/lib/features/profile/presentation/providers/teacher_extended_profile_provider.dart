@@ -1,8 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../features/auth/presentation/providers/user_role_provider.dart';
-import '../../../../features/onboarding/presentation/providers/teacher_profile_repository_provider.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../onboarding/onboarding_facade.dart';
+import '../../domain/entities/teacher_profile.dart';
 
 part 'teacher_extended_profile_provider.g.dart';
 
@@ -405,12 +405,11 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
       // Also update legacy single account with the default
-      final defaultAccount = accounts.where((a) => a.isDefault).firstOrNull ?? accounts.firstOrNull;
+      final defaultAccount =
+          accounts.where((a) => a.isDefault).firstOrNull ??
+          accounts.firstOrNull;
       final updated = await repo.updateProfile(
-        current.copyWith(
-          bankAccounts: accounts,
-          bankAccount: defaultAccount,
-        ),
+        current.copyWith(bankAccounts: accounts, bankAccount: defaultAccount),
       );
       state = AsyncValue.data(updated);
     } catch (e, st) {

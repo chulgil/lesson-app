@@ -7,9 +7,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
-import '../../../profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
+import '../../search_facade.dart';
 import '../widgets/teacher_search_card.dart';
 import '../widgets/teacher_search_filter_sheet.dart';
 
@@ -93,8 +93,14 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           unselectedLabelColor: AppColors.inkSecondary,
           indicatorWeight: 3,
           tabs: const [
-            Tab(icon: Icon(Icons.school_outlined), text: '학원'),
-            Tab(icon: Icon(Icons.person_outline), text: '개인 선생님'),
+            Tab(
+              icon: Icon(Icons.school_outlined),
+              text: AppStrings.searchTabAcademy,
+            ),
+            Tab(
+              icon: Icon(Icons.person_outline),
+              text: AppStrings.searchTabIndividual,
+            ),
           ],
         ),
       ),
@@ -108,8 +114,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
               decoration: InputDecoration(
                 hintText:
                     currentTab == TeacherSearchType.academy
-                        ? '학원 이름, 악기, 지역으로 검색'
-                        : '선생님 이름, 악기, 지역으로 검색',
+                        ? AppStrings.searchHintAcademy
+                        : AppStrings.searchHintTeacher,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon:
                     _searchController.text.isNotEmpty
@@ -161,7 +167,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                         ),
                         const SizedBox(height: AppSpacing.space2),
                         Text(
-                          '검색 중 오류가 발생했습니다',
+                          AppStrings.searchErrorOccurred,
                           style: AppTypography.bodyMedium,
                         ),
                         const SizedBox(height: AppSpacing.space2),
@@ -272,11 +278,14 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
     if (filter.minExperience != null) {
       chips.add(
-        _buildFilterChip('${filter.minExperience}년 이상', () {
-          ref
-              .read(teacherSearchFilterStateProvider.notifier)
-              .updateMinExperience(null);
-        }),
+        _buildFilterChip(
+          AppStrings.searchExperienceYears(filter.minExperience!),
+          () {
+            ref
+                .read(teacherSearchFilterStateProvider.notifier)
+                .updateMinExperience(null);
+          },
+        ),
       );
     }
 
@@ -286,7 +295,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           ref.read(teacherSearchFilterStateProvider.notifier).clearFilter();
         },
         child: Text(
-          '전체 해제',
+          AppStrings.searchClearAllFilters,
           style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
         ),
       ),
@@ -332,14 +341,16 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
-              isAcademyTab ? '검색된 학원이 없습니다' : '검색된 선생님이 없습니다',
+              isAcademyTab
+                  ? AppStrings.searchNoAcademiesFound
+                  : AppStrings.searchNoTeachersFound,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
             Text(
-              '다른 검색어나 필터를 시도해보세요',
+              AppStrings.searchTrySuggestion,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -386,30 +397,30 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
   String _getSortLabel(TeacherSortOption option) {
     switch (option) {
       case TeacherSortOption.relevance:
-        return '관련도순';
+        return AppStrings.sortRelevance;
       case TeacherSortOption.experienceDesc:
-        return '경력 높은순';
+        return AppStrings.sortExperienceDesc;
       case TeacherSortOption.experienceAsc:
-        return '경력 낮은순';
+        return AppStrings.sortExperienceAsc;
       case TeacherSortOption.feeAsc:
-        return '레슨료 낮은순';
+        return AppStrings.sortFeeAsc;
       case TeacherSortOption.feeDesc:
-        return '레슨료 높은순';
+        return AppStrings.sortFeeDesc;
       case TeacherSortOption.rating:
-        return '평점순';
+        return AppStrings.sortRating;
       case TeacherSortOption.completionLevel:
-        return '프로필 완성도순';
+        return AppStrings.sortCompletionLevel;
     }
   }
 
   String _getLessonTypeOptionLabel(LessonTypeOption type) {
     switch (type) {
       case LessonTypeOption.inPerson:
-        return '대면';
+        return AppStrings.lessonTypeInPerson;
       case LessonTypeOption.online:
-        return '온라인';
+        return AppStrings.lessonTypeOnline;
       case LessonTypeOption.visit:
-        return '방문';
+        return AppStrings.lessonTypeVisit;
     }
   }
 }

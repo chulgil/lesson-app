@@ -10,11 +10,10 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
-import '../../../students/presentation/providers/grouped_students_provider.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
 

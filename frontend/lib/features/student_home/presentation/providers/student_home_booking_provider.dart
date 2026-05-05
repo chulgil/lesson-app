@@ -32,6 +32,67 @@ final studentHomeTrialBookingsProvider = FutureProvider.autoDispose.family<
     ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
 });
 
+final studentHomeHasAnyBookingProvider = FutureProvider.autoDispose
+    .family<bool, String>((ref, studentId) async {
+      final bookings = await ref.watch(
+        studentBookingsProvider(studentId).future,
+      );
+      return bookings.isNotEmpty;
+    });
+
+final studentHomeLessonsScheduleProvider = FutureProvider.autoDispose.family<
+  StudentHomeLessonsSchedule,
+  String
+>((ref, studentId) async {
+  final lessons = await ref.watch(lessonsByStudentProvider(studentId).future);
+  final bookings = await ref.watch(studentBookingsProvider(studentId).future);
+  final trialBookings =
+      bookings
+          .where((booking) => booking.lessonType == LessonType.trial)
+          .where(
+            (booking) => booking.status.isActive || booking.status.canRetry,
+          )
+          .toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  final markerDates =
+      lessons
+          .map(
+            (lesson) =>
+                DateTime(lesson.date.year, lesson.date.month, lesson.date.day),
+          )
+          .toSet();
+  markerDates.addAll(
+    bookings
+        .where((booking) => booking.status.isActive)
+        .map(
+          (booking) => DateTime(
+            booking.lessonDate.year,
+            booking.lessonDate.month,
+            booking.lessonDate.day,
+          ),
+        ),
+  );
+
+  return StudentHomeLessonsSchedule(
+    lessons: lessons,
+    trialBookings: trialBookings,
+    markerDates: markerDates,
+  );
+});
+
+class StudentHomeLessonsSchedule {
+  final List<Lesson> lessons;
+  final List<LessonBooking> trialBookings;
+  final Set<DateTime> markerDates;
+
+  const StudentHomeLessonsSchedule({
+    required this.lessons,
+    required this.trialBookings,
+    required this.markerDates,
+  });
+}
+
 final studentHomeBookingActionsProvider = Provider<StudentHomeBookingActions>((
   ref,
 ) {

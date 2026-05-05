@@ -2,8 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../schedule/domain/entities/unified_lesson_request.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_confirmation_dialog.dart';
 import 'lesson_crud_provider.dart';
@@ -59,10 +58,7 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
       );
 
       // Auto-record RequestEvent for chapter model integration
-      await _recordLessonEventToRequest(
-        lesson: lesson,
-        isCompleted: true,
-      );
+      await _recordLessonEventToRequest(lesson: lesson, isCompleted: true);
 
       // Refresh lessons list
       ref.invalidate(lessonsProvider);
@@ -114,9 +110,10 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
 
       // Record subscription usage if deducted
       if (isDeducted) {
-        final usageType = reason == LessonNonCompletionReason.studentAbsent
-            ? UsageType.studentAbsent
-            : UsageType.lateCancellation;
+        final usageType =
+            reason == LessonNonCompletionReason.studentAbsent
+                ? UsageType.studentAbsent
+                : UsageType.lateCancellation;
 
         await _recordSubscriptionUsage(
           lesson: lesson,
@@ -275,13 +272,13 @@ Future<List<Lesson>> lessonsNeedingConfirmation(Ref ref) async {
   final now = DateTime.now();
 
   return lessons.where((lesson) {
-    // Only scheduled lessons
-    if (lesson.status != LessonStatus.scheduled) return false;
+      // Only scheduled lessons
+      if (lesson.status != LessonStatus.scheduled) return false;
 
-    // Check if lesson time has passed
-    final lessonEndTime = _parseLessonEndTime(lesson);
-    return lessonEndTime.isBefore(now);
-  }).toList()
+      // Check if lesson time has passed
+      final lessonEndTime = _parseLessonEndTime(lesson);
+      return lessonEndTime.isBefore(now);
+    }).toList()
     ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
 }
 

@@ -7,9 +7,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/like_stamp.dart';
-import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../practice/presentation/providers/practice_item_providers.dart';
 import '../../../lessons/presentation/widgets/resource_attachment_section.dart';
+import '../../../practice/practice_facade.dart';
 
 /// Widget to display student's weekly practice items (from teacher assignments)
 class WeeklyPracticeWidget extends ConsumerWidget {

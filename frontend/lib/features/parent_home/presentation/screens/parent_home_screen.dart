@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
-import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
+import '../../../../features/parent_home/parent_home_facade.dart';
 import 'parent_dashboard_tab.dart';
 import 'parent_lessons_tab.dart';
 import 'parent_assignments_tab.dart';

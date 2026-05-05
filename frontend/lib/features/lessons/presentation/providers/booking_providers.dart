@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/booking/repositories/booking_repository.dart';
-import '../../../subscription/presentation/providers/subscription_lifecycle_service_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import 'booking_repository_provider.dart';
 
 // Export repository provider

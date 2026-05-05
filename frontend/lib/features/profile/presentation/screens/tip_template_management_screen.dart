@@ -8,8 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../lessons/lessons_facade.dart';
 import '../../../../features/lessons/domain/entities/tip_template.dart';
-import '../../../lessons/presentation/providers/tip_template_providers.dart';
 
 /// Screen for managing tip templates
 class TipTemplateManagementScreen extends ConsumerStatefulWidget {

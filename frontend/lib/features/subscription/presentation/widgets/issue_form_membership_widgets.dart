@@ -6,8 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../students/domain/entities/class_membership.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
+import '../../../students/students_facade.dart';
 
 /// Radio list for selecting a membership (lesson class)
 class MembershipSelectorWidget extends ConsumerWidget {

@@ -11,7 +11,7 @@ import '../../domain/entities/recording.dart';
 import '../../domain/repositories/recording_repository.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/audio/audio_player_service.dart';
-import '../../../gamification/presentation/providers/point_award_service.dart';
+import '../../../gamification/gamification_facade.dart';
 
 part 'recording_provider.g.dart';
 

@@ -7,10 +7,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../features/practice/domain/entities/practice_repertoire.dart';
-import '../../../practice/presentation/providers/practice_item_providers.dart';
-import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
-import '../providers/tip_template_providers.dart';
+import '../../../practice/practice_facade.dart' show PracticeRepertoire;
+import '../providers/lesson_widget_support_provider.dart';
 import 'resource_attachment_section.dart';
 
 /// Range type for practice sections
@@ -112,7 +110,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   Widget build(BuildContext context) {
     // Fetch student's existing repertoires
     final repertoiresAsync = ref.watch(
-      studentRepertoiresProvider(widget.studentId),
+      lessonWidgetStudentRepertoiresProvider(widget.studentId),
     );
 
     return Container(
@@ -661,14 +659,14 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     setState(() => _isSubmitting = true);
 
     try {
-      final teacherId = ref.read(currentTeacherIdProvider);
+      final teacherId = ref.read(lessonWidgetCurrentTeacherIdProvider);
       final pieceName = _pieceNameController.text.trim();
 
       // Create or get repertoire
       PracticeRepertoire repertoire;
       if (_isCreatingNewRepertoire) {
         repertoire = await ref
-            .read(repertoireCrudProvider.notifier)
+            .read(lessonWidgetRepertoireActionsProvider)
             .createRepertoire(
               studentId: widget.studentId,
               name: _newRepertoireNameController.text.trim(),
@@ -684,7 +682,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       final endMeasure = int.parse(firstRange.endController.text.trim());
 
       final section = await ref
-          .read(sectionCrudProvider.notifier)
+          .read(lessonWidgetRepertoireActionsProvider)
           .createSection(
             repertoireId: repertoireId,
             pieceName: pieceName,
@@ -701,7 +699,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
       // Create practice item (always repertoire type)
       await ref
-          .read(practiceItemsNotifierProvider(widget.lessonId).notifier)
+          .read(lessonWidgetPracticeItemActionsProvider(widget.lessonId))
           .addItem(
             studentId: widget.studentId,
             teacherId: teacherId,

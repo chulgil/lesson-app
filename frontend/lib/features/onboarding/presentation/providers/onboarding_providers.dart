@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../profile/domain/repositories/teacher_profile_repository.dart';
-import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../auth/auth_facade.dart';
 import 'teacher_profile_repository_provider.dart';
 
 part 'onboarding_providers.g.dart';
@@ -19,10 +19,7 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
   @override
   TeacherOnboardingState build() {
     final userId = ref.watch(currentUserIdProvider);
-    return TeacherOnboardingState(
-      userId: userId,
-      startedAt: DateTime.now(),
-    );
+    return TeacherOnboardingState(userId: userId, startedAt: DateTime.now());
   }
 
   /// Move to next step
@@ -63,14 +60,13 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
 
     // Debug: allow any 6-digit code for testing
     if (code.length == 6) {
-      final verified = (current ?? PhoneVerification(
-        phoneNumber: '',
-        verificationCode: code,
-        codeSentAt: DateTime.now(),
-      )).copyWith(
-        isVerified: true,
-        verifiedAt: DateTime.now(),
-      );
+      final verified = (current ??
+              PhoneVerification(
+                phoneNumber: '',
+                verificationCode: code,
+                codeSentAt: DateTime.now(),
+              ))
+          .copyWith(isVerified: true, verifiedAt: DateTime.now());
       state = state.copyWith(
         phoneVerification: verified,
         currentStep: OnboardingStep.profileSetup,
@@ -96,9 +92,7 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
     }
 
     // Increment attempt count
-    final updated = current.copyWith(
-      attemptCount: current.attemptCount + 1,
-    );
+    final updated = current.copyWith(attemptCount: current.attemptCount + 1);
     state = state.copyWith(phoneVerification: updated);
     return false;
   }
@@ -369,7 +363,9 @@ final profileMissingFieldsProvider = Provider<List<String>>((ref) {
 });
 
 /// Build onboarding profile from form data
-final onboardingProfileFromFormProvider = Provider<TeacherOnboardingProfile?>((ref) {
+final onboardingProfileFromFormProvider = Provider<TeacherOnboardingProfile?>((
+  ref,
+) {
   final isValid = ref.watch(isProfileFormValidProvider);
   if (!isValid) return null;
 

@@ -8,11 +8,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
-import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../students/presentation/providers/lesson_class_providers.dart';
-import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../schedule/schedule_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/widgets/subscription_card.dart';
 
 /// Home dashboard section showing teacher's issued subscriptions.
@@ -179,7 +177,8 @@ class _SubscriptionCardWithName extends StatelessWidget {
     return membershipAsync.when(
       data: (membership) {
         if (membership == null) {
-          return SubscriptionCard(compact: true,
+          return SubscriptionCard(
+            compact: true,
             subscription: subscription,
             onTap: onTap,
           );
@@ -192,7 +191,8 @@ class _SubscriptionCardWithName extends StatelessWidget {
 
         return lessonClassAsync.when(
           data:
-              (lessonClass) => SubscriptionCard(compact: true,
+              (lessonClass) => SubscriptionCard(
+                compact: true,
                 subscription: subscription,
                 className: lessonClass?.name,
                 instrument: membership.instrument,
@@ -200,13 +200,15 @@ class _SubscriptionCardWithName extends StatelessWidget {
                 onTap: onTap,
               ),
           loading:
-              () => SubscriptionCard(compact: true,
+              () => SubscriptionCard(
+                compact: true,
                 subscription: subscription,
                 instrument: membership.instrument,
                 onTap: onTap,
               ),
           error:
-              (_, __) => SubscriptionCard(compact: true,
+              (_, __) => SubscriptionCard(
+                compact: true,
                 subscription: subscription,
                 instrument: membership.instrument,
                 onTap: onTap,
@@ -214,11 +216,17 @@ class _SubscriptionCardWithName extends StatelessWidget {
         );
       },
       loading:
-          () =>
-              SubscriptionCard(compact: true,subscription: subscription, onTap: onTap),
+          () => SubscriptionCard(
+            compact: true,
+            subscription: subscription,
+            onTap: onTap,
+          ),
       error:
-          (_, __) =>
-              SubscriptionCard(compact: true,subscription: subscription, onTap: onTap),
+          (_, __) => SubscriptionCard(
+            compact: true,
+            subscription: subscription,
+            onTap: onTap,
+          ),
     );
   }
 }

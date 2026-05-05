@@ -8,7 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/subscription_card.dart';

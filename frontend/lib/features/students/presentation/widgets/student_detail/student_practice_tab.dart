@@ -7,9 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
-import '../../../../practice/domain/entities/student_practice_overview.dart';
-import '../../../../practice/presentation/providers/practice_overview_provider.dart';
-import '../../../../practice/presentation/providers/recording_feedback_provider.dart';
+import '../../../../practice/practice_facade.dart';
 import '../../../../practice/presentation/widgets/teacher_feedback_sheet.dart';
 
 /// Tab content showing practice progress and statistics

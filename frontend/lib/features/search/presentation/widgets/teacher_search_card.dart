@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -137,7 +138,7 @@ class TeacherSearchCard extends StatelessWidget {
           Icon(Icons.history, size: 12, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space1),
           Text(
-            '이전에 레슨했어요',
+            AppStrings.searchPreviousTeacher,
             style: AppTypography.caption.copyWith(
               color: AppColors.ink,
               fontWeight: FontWeight.w600,

@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
-import '../../../../features/parent_home/presentation/providers/parent_crud_provider.dart';
+import '../../../../features/parent_home/parent_home_facade.dart';
 import 'notification_settings_sheet.dart';
 
 /// Notification settings section in the parent profile tab
