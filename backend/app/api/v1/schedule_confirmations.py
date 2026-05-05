@@ -12,7 +12,10 @@ from app.models.user import User
 from app.schemas.schedule_confirmation import (
     ScheduleConfirmationCardConfirm,
     ScheduleConfirmationCardCreate,
+    ScheduleConfirmationCardDismissAll,
+    ScheduleConfirmationCardDismissAllResponse,
     ScheduleConfirmationCardResponse,
+    ScheduleConfirmationCardStatusUpdate,
 )
 from app.services.schedule_confirmation_service import ScheduleConfirmationService
 
@@ -55,6 +58,38 @@ async def list_confirmation_cards(
 
 
 @router.get(
+    "/by-subscription/{subscription_id}",
+    response_model=ScheduleConfirmationCardResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get schedule confirmation card by subscription ID",
+)
+async def get_confirmation_card_by_subscription(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ScheduleConfirmationCardResponse:
+    """Return a single confirmation card by subscription ID."""
+    service = ScheduleConfirmationService(db)
+    return await service.get_card_by_subscription_id(subscription_id, current_user)
+
+
+@router.post(
+    "/dismiss-all",
+    response_model=ScheduleConfirmationCardDismissAllResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Dismiss all pending schedule confirmation cards",
+)
+async def dismiss_all_confirmation_cards(
+    body: ScheduleConfirmationCardDismissAll,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ScheduleConfirmationCardDismissAllResponse:
+    """Dismiss all pending confirmation cards for a visible student."""
+    service = ScheduleConfirmationService(db)
+    return await service.dismiss_all_pending(body, current_user)
+
+
+@router.get(
     "/{card_id}",
     response_model=ScheduleConfirmationCardResponse,
     status_code=status.HTTP_200_OK,
@@ -68,6 +103,23 @@ async def get_confirmation_card(
     """Return a single confirmation card by ID."""
     service = ScheduleConfirmationService(db)
     return await service.get_card_by_id(card_id, current_user)
+
+
+@router.patch(
+    "/{card_id}/status",
+    response_model=ScheduleConfirmationCardResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update schedule confirmation card status",
+)
+async def update_confirmation_card_status(
+    card_id: str,
+    body: ScheduleConfirmationCardStatusUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> ScheduleConfirmationCardResponse:
+    """Update confirmation card status from Flutter card actions."""
+    service = ScheduleConfirmationService(db)
+    return await service.update_card_status(card_id, body, current_user)
 
 
 @router.patch(

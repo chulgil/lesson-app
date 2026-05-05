@@ -12,7 +12,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.schedule_confirmation import (
     ScheduleConfirmationCardConfirm,
     ScheduleConfirmationCardCreate,
+    ScheduleConfirmationCardDismissAll,
+    ScheduleConfirmationCardDismissAllResponse,
     ScheduleConfirmationCardResponse,
+    ScheduleConfirmationCardStatusUpdate,
 )
 
 
@@ -84,7 +87,7 @@ class ScheduleConfirmationService:
         from app.models.policy import ScheduleConfirmationCard
 
         query = select(ScheduleConfirmationCard)
-        query = self._apply_access_filter(query, current_user)
+        query = await self._apply_access_filter(query, current_user)
 
         if student_id:
             query = query.where(ScheduleConfirmationCard.student_id == student_id)
@@ -103,6 +106,22 @@ class ScheduleConfirmationService:
     ) -> ScheduleConfirmationCardResponse:
         """Return a single confirmation card by ID."""
         card = await self._get_card_for_user(card_id, current_user)
+        return ScheduleConfirmationCardResponse.model_validate(card)
+
+    async def get_card_by_subscription_id(
+        self, subscription_id: str, current_user: Any
+    ) -> ScheduleConfirmationCardResponse:
+        """Return a confirmation card by subscription ID."""
+        from app.models.policy import ScheduleConfirmationCard
+
+        query = select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == subscription_id)
+        query = await self._apply_access_filter(query, current_user)
+        card = await self.db.scalar(query)
+        if card is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Schedule confirmation card not found",
+            )
         return ScheduleConfirmationCardResponse.model_validate(card)
 
     async def confirm_card(
@@ -134,6 +153,58 @@ class ScheduleConfirmationService:
         await self.db.flush()
         await self.db.refresh(card)
         return ScheduleConfirmationCardResponse.model_validate(card)
+
+    async def update_card_status(
+        self,
+        card_id: str,
+        data: ScheduleConfirmationCardStatusUpdate,
+        current_user: Any,
+    ) -> ScheduleConfirmationCardResponse:
+        """Update a confirmation card status through the Flutter repository contract."""
+        from app.models.policy import ConfirmationCardStatus
+
+        card = await self._get_card_for_user(card_id, current_user)
+        if card.status != ConfirmationCardStatus.pending:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Card is already {card.status.value}, cannot change status",
+            )
+
+        card.status = ConfirmationCardStatus(data.status)
+        card.response_message = data.response_message
+        card.responded_at = data.responded_at or datetime.now(UTC)
+
+        if data.status == "confirmed" and card.subscription_id:
+            await self._create_bookings_for_subscription(card)
+
+        await self.db.flush()
+        await self.db.refresh(card)
+        return ScheduleConfirmationCardResponse.model_validate(card)
+
+    async def dismiss_all_pending(
+        self,
+        data: ScheduleConfirmationCardDismissAll,
+        current_user: Any,
+    ) -> ScheduleConfirmationCardDismissAllResponse:
+        """Dismiss all pending visible cards for a student."""
+        from app.models.policy import ConfirmationCardStatus, ScheduleConfirmationCard
+
+        query = select(ScheduleConfirmationCard).where(
+            ScheduleConfirmationCard.student_id == data.student_id,
+            ScheduleConfirmationCard.status == ConfirmationCardStatus.pending,
+        )
+        query = await self._apply_access_filter(query, current_user)
+        cards = (await self.db.scalars(query)).all()
+
+        now = datetime.now(UTC)
+        for card in cards:
+            card.status = ConfirmationCardStatus.dismissed
+            card.responded_at = now
+
+        await self.db.flush()
+        return ScheduleConfirmationCardDismissAllResponse(
+            message=f"Dismissed {len(cards)} pending card"
+        )
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -243,33 +314,67 @@ class ScheduleConfirmationService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Schedule confirmation card not found",
             )
-        if not self._can_access(card, current_user):
+        if not await self._can_access(card, current_user):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Forbidden",
             )
         return card
 
-    def _can_access(self, card: Any, current_user: Any) -> bool:
+    async def _can_access(self, card: Any, current_user: Any) -> bool:
         role = self._actor_type(current_user)
         if role == "teacher":
             result: bool = card.teacher_id == current_user.id
             return result
         if role == "student":
-            result2: bool = card.student_id == current_user.id
+            result2: bool = card.student_id in await self._student_identifiers(current_user)
             return result2
+        if role == "parent":
+            result3: bool = card.student_id in await self._parent_child_student_ids(current_user)
+            return result3
         return False
 
-    def _apply_access_filter(self, query: Any, current_user: Any) -> Any:
+    async def _apply_access_filter(self, query: Any, current_user: Any) -> Any:
         from app.models.policy import ScheduleConfirmationCard
 
         role = self._actor_type(current_user)
         if role == "teacher":
             return query.where(ScheduleConfirmationCard.teacher_id == current_user.id)
         if role == "student":
-            return query.where(ScheduleConfirmationCard.student_id == current_user.id)
+            return query.where(ScheduleConfirmationCard.student_id.in_(await self._student_identifiers(current_user)))
+        if role == "parent":
+            return query.where(
+                ScheduleConfirmationCard.student_id.in_(await self._parent_child_student_ids(current_user))
+            )
         return query.where(False)
 
     def _actor_type(self, user: Any) -> str:
         role = getattr(user, "role", None)
         return getattr(role, "value", role) or ""
+
+    async def _student_identifiers(self, user: Any) -> list[str]:
+        """Return user id plus linked Student profile ids for student actors."""
+        from app.models.student import Student
+
+        identifiers = [user.id]
+        result = await self.db.scalars(select(Student.id).where(Student.user_id == user.id))
+        for student_id in result.all():
+            if student_id not in identifiers:
+                identifiers.append(student_id)
+        return identifiers
+
+    async def _parent_child_student_ids(self, user: Any) -> list[str]:
+        """Return active child Student ids for a parent user."""
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == user.id))
+        if parent_id is None:
+            return []
+
+        result = await self.db.scalars(
+            select(ParentChildRelation.student_id).where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        return list(result.all())
