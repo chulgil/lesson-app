@@ -1,7 +1,6 @@
 """Scheduler endpoints for automated attendance processing.
 
 These endpoints are designed to be called by cron jobs or admin tools.
-In production, protect with API key or internal network restriction.
 """
 
 from __future__ import annotations
@@ -11,10 +10,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db
+from app.core.deps import get_db, require_internal_api_key
 from app.services.attendance_scheduler_service import AttendanceSchedulerService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_internal_api_key)])
 
 
 @router.post(

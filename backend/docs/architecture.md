@@ -22,6 +22,7 @@
 | Package | UV | latest | 의존성 관리 |
 | Runtime | Python | 3.12+ | - |
 | File Storage | Vultr Object Storage | - | 녹음 파일 |
+| Internal Jobs | APScheduler + internal API key | - | 자동화 job 및 수동 실행 API |
 | Server | Nginx + uvicorn | - | 리버스 프록시 |
 
 ---
@@ -176,6 +177,9 @@ Schema    Schema (Pydantic v2)
 - `schemas`는 `app.models` 계층을 import하지 않는다. API 계약은 Pydantic 필드와 validator로 표현하고, ORM enum/모델 변환은 service/model 계층에서 처리한다.
 - 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
 - OpenAPI `operationId`는 전체 API에서 유일해야 한다. 동일한 함수명을 여러 라우터에서 쓰거나 레거시/신규 경로를 병행 노출할 때는 명시적 `operation_id`를 지정한다.
+- `/api/v1` operation은 공개 allowlist를 제외하고 OpenAPI security 요구사항을 가져야 한다.
+  - 공개 allowlist: `POST /auth/oauth/{provider}`, `POST /auth/dev-login`, `POST /auth/token/refresh`, `GET /users/supported-locales`
+  - 내부 자동화 API: `/scheduler/*`는 사용자 JWT가 아니라 `X-Internal-API-Key` 헤더와 `INTERNAL_API_KEY` 환경변수로 보호한다.
 
 기능 추가 전후에 다음 명령으로 검증한다.
 
@@ -232,6 +236,7 @@ VULTR_STORAGE_BUCKET=lesson-app-recordings
 
 # Server
 CORS_ORIGINS=["http://localhost:3000"]
+INTERNAL_API_KEY=generate-with-openssl-rand-hex-32
 ```
 
 ### Config 클래스

@@ -28,6 +28,12 @@ SQLALCHEMY_QUERY_IMPORTS = {
     "select",
     "update",
 }
+PUBLIC_API_OPERATIONS = {
+    ("POST", "/api/v1/auth/oauth/{provider}"),
+    ("POST", "/api/v1/auth/dev-login"),
+    ("POST", "/api/v1/auth/token/refresh"),
+    ("GET", "/api/v1/users/supported-locales"),
+}
 
 
 def _python_files(root: Path) -> list[Path]:
@@ -118,3 +124,23 @@ def test_openapi_operation_ids_are_unique() -> None:
     }
 
     assert duplicates == {}
+
+
+def test_api_v1_routes_require_security_unless_publicly_documented() -> None:
+    """Every v1 API operation must declare auth unless it is an explicit public contract."""
+    schema = app.openapi()
+    unsecured_operations: list[str] = []
+    for path, path_item in schema["paths"].items():
+        if not path.startswith("/api/v1/"):
+            continue
+        for method, operation in path_item.items():
+            if method not in {"get", "post", "put", "patch", "delete"}:
+                continue
+            route_key = (method.upper(), path)
+            if route_key in PUBLIC_API_OPERATIONS:
+                continue
+            if not operation.get("security"):
+                operation_id = operation.get("operationId", "<missing operationId>")
+                unsecured_operations.append(f"{method.upper()} {path} ({operation_id})")
+
+    assert unsecured_operations == []

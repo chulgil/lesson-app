@@ -2,19 +2,22 @@
 
 from __future__ import annotations
 
+import secrets
 from collections.abc import Callable
 from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, Query, Request, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import verify_token
 from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
+internal_api_key_header = APIKeyHeader(name="X-Internal-API-Key", auto_error=False)
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +112,23 @@ def require_role(*roles: str) -> Callable[..., Any]:
         return current_user
 
     return role_checker
+
+
+async def require_internal_api_key(
+    api_key: Annotated[str | None, Depends(internal_api_key_header)],
+) -> None:
+    """Authorize internal automation endpoints with a dedicated API key."""
+    configured_key = settings.INTERNAL_API_KEY
+    if not configured_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Internal API key is not configured",
+        )
+    if api_key is None or not secrets.compare_digest(api_key, configured_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid internal API key",
+        )
 
 
 # ---------------------------------------------------------------------------
