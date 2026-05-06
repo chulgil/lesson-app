@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'feedback_preset.g.dart';
@@ -7,33 +6,25 @@ part 'feedback_preset.g.dart';
 ///
 /// Teachers can add their own presets in addition to the default ones.
 /// Default presets can be hidden but not permanently deleted.
-@HiveType(typeId: 111)
 @JsonSerializable()
-class FeedbackPreset extends HiveObject {
-  @HiveField(0)
+class FeedbackPreset {
   final String id;
 
   /// The preset phrase text
-  @HiveField(1)
   final String text;
 
   /// Teacher who created this preset (null = default/system preset)
-  @HiveField(2)
   final String? teacherId;
 
   /// Display order (lower = first)
-  @HiveField(3)
   final int sortOrder;
 
   /// Whether this is a default (system) preset
-  @HiveField(4)
   final bool isDefault;
 
   /// Whether this preset is hidden (for default presets that user wants to hide)
-  @HiveField(5)
   final bool isHidden;
 
-  @HiveField(6)
   final DateTime createdAt;
 
   FeedbackPreset({

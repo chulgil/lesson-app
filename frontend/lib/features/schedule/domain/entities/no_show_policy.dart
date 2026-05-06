@@ -1,23 +1,14 @@
 // No-Show Policy entity
 // Spec: docs/specs/lesson/lesson_schedule.md - 노쇼 정책 시스템
 
-import 'package:hive/hive.dart';
-
-part 'no_show_policy.g.dart';
-
 /// 노쇼 정책 - 선생님이 설정
-@HiveType(typeId: 88)
 enum NoShowPolicy {
-  @HiveField(0)
   deductCredit, // 기본값: 회차 차감
 
-  @HiveField(1)
   halfCredit, // 0.5회 차감
 
-  @HiveField(2)
   noDeduction, // 차감 없음 (관대한 정책)
 
-  @HiveField(3)
   reschedule; // 보강으로 전환
 
   /// 차감 비율 (회차권 기준)
@@ -39,43 +30,31 @@ enum NoShowPolicy {
 }
 
 /// 노쇼 기록
-@HiveType(typeId: 89)
-class NoShowRecord extends HiveObject {
-  @HiveField(0)
+class NoShowRecord {
   final String id;
 
-  @HiveField(1)
   final String lessonId;
 
-  @HiveField(2)
   final String studentId;
 
-  @HiveField(3)
   final String teacherId;
 
-  @HiveField(4)
   final DateTime lessonDate;
 
-  @HiveField(5)
   final NoShowPolicy appliedPolicy;
 
   /// 차감된 회차 (0, 0.5, 1)
-  @HiveField(6)
   final double deductedCredits;
 
   /// 생성된 보강 ID (reschedule 정책인 경우)
-  @HiveField(7)
   final String? makeupLessonId;
 
-  @HiveField(8)
   final DateTime createdAt;
 
   /// 노쇼 처리 담당자 (자동 또는 선생님 ID)
-  @HiveField(9)
   final String processedBy;
 
   /// 추가 메모
-  @HiveField(10)
   final String? note;
 
   NoShowRecord({

@@ -1,73 +1,51 @@
 // Group class schedule entity for individual class sessions
 
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'group_class_schedule.g.dart';
 
 /// Schedule status for group class sessions
-@HiveType(typeId: 82)
 enum ScheduleStatus {
-  @HiveField(0)
   open, // Available for booking
 
-  @HiveField(1)
   full, // At capacity, waitlist may be available
 
-  @HiveField(2)
   closed, // No longer accepting bookings
 
-  @HiveField(3)
   cancelled, // Class was cancelled
 
-  @HiveField(4)
   completed, // Class has finished
 
-  @HiveField(5)
   inProgress, // Class is currently in session
 }
 
 /// Individual group class schedule (session)
-@HiveType(typeId: 83)
 @JsonSerializable()
-class GroupClassSchedule extends HiveObject {
-  @HiveField(0)
+class GroupClassSchedule {
   final String id;
 
-  @HiveField(1)
   final String groupClassId;
 
-  @HiveField(2)
   final DateTime startTime;
 
-  @HiveField(3)
   final DateTime endTime;
 
-  @HiveField(4)
   final ScheduleStatus status;
 
-  @HiveField(5)
   final int currentBookings; // Current confirmed bookings
 
-  @HiveField(6)
   final int waitlistCount; // Current waitlist count
 
-  @HiveField(7)
   final int maxCapacity; // Copied from GroupClass for convenience
 
-  @HiveField(8)
   final int? waitlistCapacity; // Copied from GroupClass
 
-  @HiveField(9)
   final String? notes; // Any notes for this specific session
 
-  @HiveField(10)
   final String? cancelReason; // Reason if cancelled
 
-  @HiveField(11)
   final DateTime createdAt;
 
-  @HiveField(12)
   final DateTime? updatedAt;
 
   GroupClassSchedule({

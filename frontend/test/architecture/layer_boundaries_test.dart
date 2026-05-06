@@ -506,10 +506,6 @@ const _legacyDomainLocalizationDependencies = <String>{};
 const _legacyDomainDisplayGetterDependencies = <String>{};
 
 const _legacyDomainHivePersistenceExceptions = <String>{
-  'lib/features/lessons/domain/entities/attendance_stats.dart',
-  'lib/features/lessons/domain/entities/feedback_preset.dart',
-  'lib/features/practice/domain/entities/practice_goal.dart',
-  'lib/features/practice/domain/entities/practice_note.dart',
   'lib/features/practice/domain/entities/practice_repertoire.dart',
   'lib/features/practice/domain/entities/recording.dart',
   'lib/features/relationship/domain/entities/notification_setting.dart',
@@ -517,14 +513,11 @@ const _legacyDomainHivePersistenceExceptions = <String>{
   'lib/features/relationship/domain/entities/teacher_student_relation.dart',
   'lib/features/schedule/domain/entities/group_class.dart',
   'lib/features/schedule/domain/entities/group_class_booking.dart',
-  'lib/features/schedule/domain/entities/group_class_schedule.dart',
   'lib/features/schedule/domain/entities/makeup_lesson.dart',
-  'lib/features/schedule/domain/entities/no_show_policy.dart',
   'lib/features/schedule/domain/entities/request_event.dart',
   'lib/features/schedule/domain/entities/schedule_confirmation_card.dart',
   'lib/features/schedule/domain/entities/teacher_availability.dart',
   'lib/features/schedule/domain/entities/unified_lesson_request.dart',
-  'lib/features/student_home/domain/entities/manual_teacher.dart',
   'lib/features/students/domain/entities/class_membership.dart',
   'lib/features/students/domain/entities/lesson_class.dart',
   'lib/features/students/domain/entities/lesson_location.dart',

@@ -1,25 +1,18 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'practice_note.g.dart';
 
 /// Practice note model for tracking practice observations
-@HiveType(typeId: 31)
 @JsonSerializable()
-class PracticeNote extends HiveObject {
-  @HiveField(0)
+class PracticeNote {
   final String id;
 
-  @HiveField(1)
   final String sectionId;
 
-  @HiveField(2)
   final String content;
 
-  @HiveField(3)
   final DateTime createdAt;
 
-  @HiveField(4)
   final DateTime? updatedAt;
 
   PracticeNote({

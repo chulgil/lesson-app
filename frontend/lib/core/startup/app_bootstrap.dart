@@ -7,7 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../../features/notifications/data/services/fcm_service.dart';
 import '../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../features/practice/domain/entities/recording.dart';
-import '../../features/student_home/domain/entities/manual_teacher.dart';
+import '../../features/student_home/data/models/manual_teacher_hive_model.dart';
 import '../../firebase_options.dart';
 import '../audio/audio_session_manager.dart';
 import 'startup_recovery.dart';

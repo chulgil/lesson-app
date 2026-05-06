@@ -1,40 +1,29 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'practice_goal.g.dart';
 
 /// Practice goal model for tracking daily/weekly targets
-@HiveType(typeId: 32)
 @JsonSerializable()
-class PracticeGoal extends HiveObject {
-  @HiveField(0)
+class PracticeGoal {
   final String id;
 
-  @HiveField(1)
   final String studentId;
 
   // === Daily goals ===
-  @HiveField(2)
   final int? dailyTimeMinutes; // Daily practice time goal (minutes)
 
-  @HiveField(3)
   final int? dailySectionCount; // Daily completed section count goal
 
   // === Weekly goals ===
-  @HiveField(4)
   final int? weeklyTimeMinutes; // Weekly practice time goal (minutes)
 
-  @HiveField(5)
   final int? weeklyDayCount; // Weekly practice day count goal
 
   // === Metadata ===
-  @HiveField(6)
   final bool isActive; // Whether goal is active
 
-  @HiveField(7)
   final DateTime createdAt;
 
-  @HiveField(8)
   final DateTime? updatedAt;
 
   PracticeGoal({
@@ -59,8 +48,7 @@ class PracticeGoal extends HiveObject {
       dailyTimeMinutes != null || dailySectionCount != null;
 
   /// Whether weekly goal is set
-  bool get hasWeeklyGoal =>
-      weeklyTimeMinutes != null || weeklyDayCount != null;
+  bool get hasWeeklyGoal => weeklyTimeMinutes != null || weeklyDayCount != null;
 
   /// Whether any goal is set
   bool get hasAnyGoal => hasDailyGoal || hasWeeklyGoal;
@@ -107,12 +95,14 @@ class PracticeGoal extends HiveObject {
       studentId: studentId ?? this.studentId,
       dailyTimeMinutes:
           clearDailyTime ? null : (dailyTimeMinutes ?? this.dailyTimeMinutes),
-      dailySectionCount: clearDailySection
-          ? null
-          : (dailySectionCount ?? this.dailySectionCount),
-      weeklyTimeMinutes: clearWeeklyTime
-          ? null
-          : (weeklyTimeMinutes ?? this.weeklyTimeMinutes),
+      dailySectionCount:
+          clearDailySection
+              ? null
+              : (dailySectionCount ?? this.dailySectionCount),
+      weeklyTimeMinutes:
+          clearWeeklyTime
+              ? null
+              : (weeklyTimeMinutes ?? this.weeklyTimeMinutes),
       weeklyDayCount:
           clearWeeklyDay ? null : (weeklyDayCount ?? this.weeklyDayCount),
       isActive: isActive ?? this.isActive,

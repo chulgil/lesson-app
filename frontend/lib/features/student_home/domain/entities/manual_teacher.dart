@@ -1,53 +1,41 @@
-import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../../../../core/theme/app_colors.dart';
 
 part 'manual_teacher.g.dart';
 
 /// Profile color palette for manual teachers (Notebook × Score — ink-led).
 const _profileColors = [
-  AppColors.ink,
-  AppColors.paperAccent,
-  AppColors.paperOk,
-  AppColors.paperHighlight,
-  AppColors.profileRed,
-  AppColors.profileTeal,
-  AppColors.profilePurple,
-  AppColors.profileOrange,
+  0xff14161c,
+  0xff9b1b12,
+  0xff3f5d2f,
+  0xfff7d755,
+  0xffe74c3c,
+  0xff1abc9c,
+  0xff9b59b6,
+  0xffe67e22,
 ];
 
 /// Generate a profile color from the teacher's name.
-Color _profileColorFromName(String name) {
+int _profileColorValueFromName(String name) {
   if (name.isEmpty) return _profileColors[0];
   final hash = name.codeUnits.fold(0, (sum, c) => sum + c);
   return _profileColors[hash % _profileColors.length];
 }
 
 /// Manually registered teacher (offline teacher not on the app).
-@HiveType(typeId: 110)
 @JsonSerializable()
-class ManualTeacher extends HiveObject {
-  @HiveField(0)
+class ManualTeacher {
   final String id;
 
-  @HiveField(1)
   final String name;
 
-  @HiveField(2)
   final String? instrument;
 
-  @HiveField(3)
   final String? phone;
 
-  @HiveField(4)
   final String? notes;
 
-  @HiveField(5)
   final DateTime createdAt;
 
-  @HiveField(6)
   final int profileColorValue;
 
   ManualTeacher({
@@ -59,11 +47,7 @@ class ManualTeacher extends HiveObject {
     required this.createdAt,
     int? profileColorValue,
   }) : profileColorValue =
-           profileColorValue ?? _profileColorFromName(name).toARGB32();
-
-  /// Profile color derived from stored int value.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  Color get profileColor => Color(profileColorValue);
+           profileColorValue ?? _profileColorValueFromName(name);
 
   /// First character of name for avatar display.
   String get initial => name.isNotEmpty ? name[0] : '?';
