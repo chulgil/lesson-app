@@ -116,7 +116,10 @@ class AvailabilityService:
         )
 
     async def update(
-        self, availability_id: str, data: TeacherAvailabilityUpdate
+        self,
+        availability_id: str,
+        data: TeacherAvailabilityUpdate,
+        current_user: Any | None = None,
     ) -> TeacherAvailabilityResponse:
         """Update an existing availability record."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
@@ -127,6 +130,7 @@ class AvailabilityService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Availability not found",
             )
+        await self._assert_availability_owner(avail, current_user)
 
         if data.day_of_week is not None:
             avail.day_of_week = data.day_of_week
@@ -172,7 +176,7 @@ class AvailabilityService:
             updated_at=avail.updated_at,
         )
 
-    async def delete(self, availability_id: str) -> None:
+    async def delete(self, availability_id: str, current_user: Any | None = None) -> None:
         """Delete an availability record and its time slots."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 
@@ -182,6 +186,7 @@ class AvailabilityService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Availability not found",
             )
+        await self._assert_availability_owner(avail, current_user)
 
         # Delete associated time slots
         old_slots = await self.db.scalars(
@@ -200,7 +205,10 @@ class AvailabilityService:
     # ------------------------------------------------------------------
 
     async def add_time_slot(
-        self, availability_id: str, data: TimeSlotCreate
+        self,
+        availability_id: str,
+        data: TimeSlotCreate,
+        current_user: Any | None = None,
     ) -> TimeSlotResponse:
         """Add a single time slot to an existing availability record."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
@@ -211,6 +219,7 @@ class AvailabilityService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Availability not found",
             )
+        await self._assert_availability_owner(avail, current_user)
 
         slot = AvailabilityTimeSlot(
             availability_id=availability_id,
@@ -223,9 +232,9 @@ class AvailabilityService:
         await self.db.refresh(slot)
         return TimeSlotResponse.model_validate(slot)
 
-    async def remove_time_slot(self, slot_id: str) -> None:
+    async def remove_time_slot(self, slot_id: str, current_user: Any | None = None) -> None:
         """Remove a single time slot by ID."""
-        from app.models.schedule import AvailabilityTimeSlot
+        from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 
         slot = await self.db.get(AvailabilityTimeSlot, slot_id)
         if slot is None:
@@ -233,5 +242,25 @@ class AvailabilityService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Time slot not found",
             )
+        avail = await self.db.get(TeacherAvailability, slot.availability_id)
+        if avail is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Availability not found",
+            )
+        await self._assert_availability_owner(avail, current_user)
         await self.db.delete(slot)
         await self.db.flush()
+
+    async def _assert_availability_owner(self, availability: Any, current_user: Any | None) -> None:
+        if current_user is None:
+            return
+
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        identifiers = [current_user.id]
+        teacher_profile_id = await try_resolve_teacher_id(self.db, current_user.id)
+        if teacher_profile_id is not None:
+            identifiers.append(teacher_profile_id)
+        if availability.teacher_id not in identifiers:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")

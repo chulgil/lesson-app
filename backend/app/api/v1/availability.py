@@ -66,7 +66,7 @@ async def update_availability(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TeacherAvailabilityResponse:
     service = AvailabilityService(db)
-    return await service.update(availability_id, body)
+    return await service.update(availability_id, body, current_user)
 
 
 @router.delete(
@@ -80,7 +80,7 @@ async def delete_availability(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> None:
     service = AvailabilityService(db)
-    await service.delete(availability_id)
+    await service.delete(availability_id, current_user)
 
 
 @router.post(
@@ -96,7 +96,7 @@ async def add_time_slot(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> TimeSlotResponse:
     service = AvailabilityService(db)
-    return await service.add_time_slot(availability_id, body)
+    return await service.add_time_slot(availability_id, body, current_user)
 
 
 @router.delete(
@@ -110,4 +110,4 @@ async def remove_time_slot(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> None:
     service = AvailabilityService(db)
-    await service.remove_time_slot(slot_id)
+    await service.remove_time_slot(slot_id, current_user)
