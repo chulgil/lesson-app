@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -266,6 +267,94 @@ class SettingsService:
         else:
             await self.db.delete(preset)
             await self.db.flush()
+
+    # -----------------------------------------------------------------------
+    # Tip Templates
+    # -----------------------------------------------------------------------
+
+    async def get_tip_templates(
+        self,
+        teacher_id: str,
+        *,
+        category: str | None = None,
+        instrument: str | None = None,
+        query: str | None = None,
+        frequent: bool = False,
+        limit: int | None = None,
+    ) -> list[Any]:
+        from app.models.tip import TipTemplate
+
+        stmt = select(TipTemplate).where(TipTemplate.teacher_id == teacher_id)
+        if category:
+            stmt = stmt.where(TipTemplate.category == category)
+        if instrument is not None:
+            stmt = stmt.where(
+                or_(
+                    TipTemplate.instrument == instrument,
+                    TipTemplate.instrument.is_(None),
+                )
+            )
+        if query:
+            like_query = f"%{query}%"
+            stmt = stmt.where(TipTemplate.content.ilike(like_query))
+        if frequent:
+            stmt = stmt.order_by(TipTemplate.usage_count.desc(), TipTemplate.last_used_at.desc().nullslast())
+        else:
+            stmt = stmt.order_by(TipTemplate.created_at.desc())
+        if limit is not None:
+            stmt = stmt.limit(limit)
+
+        result = await self.db.scalars(stmt)
+        return list(result.all())
+
+    async def get_tip_template(self, template_id: str, teacher_id: str) -> Any:
+        from app.models.tip import TipTemplate
+
+        template = await self.db.get(TipTemplate, template_id)
+        if template is None or template.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tip template not found")
+        return template
+
+    async def create_tip_template(self, teacher_id: str, data: dict) -> Any:
+        from app.models.tip import TipCategory, TipTemplate
+
+        template = TipTemplate(
+            teacher_id=teacher_id,
+            content=data["content"],
+            category=TipCategory(data.get("category") or "general"),
+            instrument=data.get("instrument"),
+        )
+        self.db.add(template)
+        await self.db.flush()
+        await self.db.refresh(template)
+        return template
+
+    async def update_tip_template(self, template_id: str, teacher_id: str, data: dict) -> Any:
+        from app.models.tip import TipCategory
+
+        template = await self.get_tip_template(template_id, teacher_id)
+        for key, value in data.items():
+            if value is None:
+                continue
+            if key == "category":
+                value = TipCategory(value)
+            setattr(template, key, value)
+        await self.db.flush()
+        await self.db.refresh(template)
+        return template
+
+    async def increment_tip_template_usage(self, template_id: str, teacher_id: str) -> Any:
+        template = await self.get_tip_template(template_id, teacher_id)
+        template.usage_count = (template.usage_count or 0) + 1
+        template.last_used_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(template)
+        return template
+
+    async def delete_tip_template(self, template_id: str, teacher_id: str) -> None:
+        template = await self.get_tip_template(template_id, teacher_id)
+        await self.db.delete(template)
+        await self.db.flush()
 
     # -----------------------------------------------------------------------
     # Teaching Resources

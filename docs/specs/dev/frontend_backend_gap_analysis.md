@@ -1,6 +1,7 @@
 # 프론트엔드-백엔드 갭 분석 리포트
 
 > 작성일: 2026-03-19
+> 최근 백엔드 재검토: 2026-05-06
 > 분석 범위: Frontend Remote Repository ↔ Backend API Router 정합성
 
 ---
@@ -95,8 +96,33 @@
 | 36 | Student | LocationRepository | ❌ | LOW | 레슨 장소 |
 | 37 | Schedule | ScheduleConfirmationCardRepository | ❌ | MEDIUM | 확인 카드 |
 | 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
-| 39 | Tip | TipTemplateRepository | ❌ | LOW | Provider toggle 없음 |
+| 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 40 | Subscription | SubscriptionSettingsRepository | ❌ | LOW | **Orphan** — Provider 미연결 |
+
+### 2-3. 2026-05-06 백엔드 mock replacement 재검토
+
+프론트 mock을 전면 대체하려면 백엔드는 화면 전용 API보다 재사용 가능한 도메인 API를 제공해야 한다. 현재 기준 핵심 원칙은 다음과 같다.
+
+| 원칙 | 백엔드 API 기준 |
+|------|----------------|
+| 선생님 개인 라이브러리 | `/settings/*` 아래 teacher-scoped CRUD로 제공한다. 예: feedback presets, teaching resources, tip templates |
+| 수강권 회차별 상태 | `/subscriptions/{subscription_id}/events`를 SSOT로 사용하고, 목록/배지는 `/subscriptions/schedule-change-events/pending`으로 제공한다 |
+| 수강료/결제 | 앱 내 PG 결제가 아니라 선생님이 확인하는 무통장입금 상태값이므로 `/subscriptions/*`의 deposit/payment state API로 제공한다 |
+| 연습/곡/레퍼토리 | student-scoped library + section/note/recording API로 제공한다. 화면별 mock shape가 아니라 `student_id`, `repertoire_id`, `section_id`를 기준으로 재사용한다 |
+
+이번 재검토에서 추가된 백엔드 API:
+
+| Repository | 추가 API | 남은 작업 |
+|------------|----------|-----------|
+| TipTemplateRepository | `GET /settings/tip-templates`, `POST /settings/tip-templates`, `GET /settings/tip-templates/{id}`, `PUT /settings/tip-templates/{id}`, `PATCH /settings/tip-templates/{id}/usage`, `DELETE /settings/tip-templates/{id}` | 프론트 `RemoteTipTemplateRepository` 추가 및 provider mock-only 제거 |
+| Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
+
+다음 백엔드 우선순위:
+
+1. `FeedbackTemplateRepository`: 현재 `FeedbackPreset`은 짧은 텍스트 preset이고, 프론트 `FeedbackTemplate`은 title/body/tags/category/usage를 가진 별도 장문 템플릿이다. 모델/마이그레이션/API가 필요하다.
+2. `PracticeItemRepository`: provider가 mock 전용이다. 기존 `practice_items` 모델을 재사용해 lesson/student/teacher scoped CRUD와 status update API를 열어야 한다.
+3. `PieceRepository`: `practice_pieces`, `student_practice_pieces` 기반 API는 일부 있지만 프론트 계약 전체를 대체하려면 library CRUD/search + student repertoire assignment/progress API를 하나로 정렬해야 한다.
+4. `PaymentRepository`: 앱 내 결제가 아니므로 별도 PG API가 아니라 `/subscriptions` 입금 상태와 사용 이력으로 대체할지, legacy repository를 제거할지 결정해야 한다.
 
 ---
 

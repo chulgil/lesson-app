@@ -200,6 +200,7 @@ cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
 - 선생님/학원 수강료는 앱 밖 무통장입금/현금으로 처리한다. PG, 카드, 정산, 영수증, 자동 입금 매칭은 구현 대상이 아니다.
 - 향후 Lessonaza 앱 사용료 과금은 별도 스펙과 별도 모델/라우터로 분리한다.
 - 수강권 회차별 시간변경은 `/subscriptions/{subscription_id}/events`의 `RequestEvent`가 원격 SSOT다. 단일 회차는 `session_number`, 변경 범위는 `schedule_change_type`으로 식별하고, 변경/수락/거절/역제안은 `scheduleChanged`, `scheduleChangeProposed`, `scheduleChangeAccepted`, `scheduleChangeRejected`, `scheduleChangeCountered` 이벤트로 기록한다. 배지/목록은 `GET /subscriptions/schedule-change-events/pending`에서 현재 사용자가 응답해야 하는 최신 회차 이벤트만 반환한다. `/schedule-changes` 라우트는 레거시 일정 변경 표면이므로 수강권 상세 화면의 회차별 변경 계약을 확장할 때는 우선 subscription event API를 확장한다.
+- 프론트 mock 대체 API는 화면별 mock shape를 그대로 복제하지 않는다. teacher/student/subscription scoped 도메인 API로 제공하고, 프론트 remote repository가 그 API를 조합한다. 선생님 개인 라이브러리는 `/settings/*` 아래에 둔다. 예: `feedback-presets`, `teaching-resources`, `tip-templates`.
 
 ### DB 무결성 baseline
 

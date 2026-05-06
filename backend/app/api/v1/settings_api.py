@@ -25,6 +25,9 @@ from app.schemas.settings import (
     TeachingResourceCreate,
     TeachingResourceResponse,
     TeachingResourceUpdate,
+    TipTemplateCreate,
+    TipTemplateResponse,
+    TipTemplateUpdate,
 )
 from app.services.settings_service import SettingsService
 
@@ -275,6 +278,126 @@ async def delete_feedback_preset(
 ) -> None:
     service = SettingsService(db)
     await service.delete_feedback_preset(preset_id)
+
+
+# ---------------------------------------------------------------------------
+# Tip Templates
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/tip-templates",
+    response_model=list[TipTemplateResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List tip templates",
+)
+async def list_tip_templates(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    category: str | None = None,
+    instrument: str | None = None,
+    query: str | None = None,
+    frequent: bool = False,
+    limit: int | None = None,
+) -> list[TipTemplateResponse]:
+    service = SettingsService(db)
+    return await service.get_tip_templates(
+        current_user.id,
+        category=category,
+        instrument=instrument,
+        query=query,
+        frequent=frequent,
+        limit=limit,
+    )
+
+
+@router.post(
+    "/tip-templates",
+    response_model=TipTemplateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create tip template",
+)
+async def create_tip_template(
+    body: TipTemplateCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TipTemplateResponse:
+    service = SettingsService(db)
+    result: TipTemplateResponse = await service.create_tip_template(
+        current_user.id,
+        body.model_dump(),
+    )
+    return result
+
+
+@router.get(
+    "/tip-templates/{template_id}",
+    response_model=TipTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get tip template",
+)
+async def get_tip_template(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TipTemplateResponse:
+    service = SettingsService(db)
+    result: TipTemplateResponse = await service.get_tip_template(template_id, current_user.id)
+    return result
+
+
+@router.put(
+    "/tip-templates/{template_id}",
+    response_model=TipTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update tip template",
+)
+async def update_tip_template(
+    template_id: str,
+    body: TipTemplateUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TipTemplateResponse:
+    service = SettingsService(db)
+    result: TipTemplateResponse = await service.update_tip_template(
+        template_id,
+        current_user.id,
+        body.model_dump(exclude_none=True),
+    )
+    return result
+
+
+@router.patch(
+    "/tip-templates/{template_id}/usage",
+    response_model=TipTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Increment tip template usage",
+)
+async def increment_tip_template_usage(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TipTemplateResponse:
+    service = SettingsService(db)
+    result: TipTemplateResponse = await service.increment_tip_template_usage(
+        template_id,
+        current_user.id,
+    )
+    return result
+
+
+@router.delete(
+    "/tip-templates/{template_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete tip template",
+)
+async def delete_tip_template(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    service = SettingsService(db)
+    await service.delete_tip_template(template_id, current_user.id)
 
 
 # ---------------------------------------------------------------------------

@@ -262,6 +262,91 @@ async def test_delete_nonexistent_preset(client: AsyncClient, auth_headers, crea
 
 
 # ---------------------------------------------------------------------------
+# Tip Templates
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_tip_template_api_supports_reusable_teacher_library(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Tip template endpoints replace the frontend mock repository contract."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/settings/tip-templates",
+        headers=auth_headers,
+        json={
+            "content": "느린 템포에서 오른손 각도를 먼저 확인하세요.",
+            "category": "technique",
+            "instrument": "violin",
+        },
+    )
+    assert created.status_code == 201
+    created_body = created.json()
+    assert created_body["teacher_id"] == "test-user-id"
+    assert created_body["content"] == "느린 템포에서 오른손 각도를 먼저 확인하세요."
+    assert created_body["category"] == "technique"
+    assert created_body["instrument"] == "violin"
+    assert created_body["usage_count"] == 0
+
+    await client.post(
+        "/api/v1/settings/tip-templates",
+        headers=auth_headers,
+        json={
+            "content": "매일 짧게라도 녹음하고 다시 들어보세요.",
+            "category": "practice",
+        },
+    )
+
+    by_category = await client.get(
+        "/api/v1/settings/tip-templates",
+        headers=auth_headers,
+        params={"category": "technique"},
+    )
+    assert by_category.status_code == 200
+    assert [item["id"] for item in by_category.json()] == [created_body["id"]]
+
+    searched = await client.get(
+        "/api/v1/settings/tip-templates",
+        headers=auth_headers,
+        params={"query": "오른손"},
+    )
+    assert searched.status_code == 200
+    assert [item["id"] for item in searched.json()] == [created_body["id"]]
+
+    used = await client.patch(
+        f"/api/v1/settings/tip-templates/{created_body['id']}/usage",
+        headers=auth_headers,
+    )
+    assert used.status_code == 200
+    assert used.json()["usage_count"] == 1
+    assert used.json()["last_used_at"] is not None
+
+    frequent = await client.get(
+        "/api/v1/settings/tip-templates",
+        headers=auth_headers,
+        params={"frequent": "true", "limit": 1},
+    )
+    assert frequent.status_code == 200
+    assert [item["id"] for item in frequent.json()] == [created_body["id"]]
+
+    updated = await client.put(
+        f"/api/v1/settings/tip-templates/{created_body['id']}",
+        headers=auth_headers,
+        json={"content": "오른손 각도와 활 압력을 같이 확인하세요."},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["content"] == "오른손 각도와 활 압력을 같이 확인하세요."
+
+    deleted = await client.delete(
+        f"/api/v1/settings/tip-templates/{created_body['id']}",
+        headers=auth_headers,
+    )
+    assert deleted.status_code == 204
+
+
+# ---------------------------------------------------------------------------
 # Teaching Resources
 # ---------------------------------------------------------------------------
 
