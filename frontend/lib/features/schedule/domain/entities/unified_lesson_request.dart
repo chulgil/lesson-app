@@ -1,92 +1,34 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'unified_lesson_request.g.dart';
 
 /// Type of lesson being requested
-@HiveType(typeId: 120)
-enum LessonRequestType {
-  @HiveField(0)
-  trial,
-
-  @HiveField(1)
-  regular,
-
-  @HiveField(2)
-  package,
-}
+enum LessonRequestType { trial, regular, package }
 
 /// Goal for the lesson
-@HiveType(typeId: 121)
-enum UnifiedLessonGoal {
-  @HiveField(0)
-  hobby,
-
-  @HiveField(1)
-  exam,
-
-  @HiveField(2)
-  major,
-
-  @HiveField(3)
-  other,
-}
+enum UnifiedLessonGoal { hobby, exam, major, other }
 
 /// Experience level of the student
-@HiveType(typeId: 122)
-enum UnifiedExperienceLevel {
-  @HiveField(0)
-  beginner,
-
-  @HiveField(1)
-  intermediate,
-
-  @HiveField(2)
-  advanced,
-}
+enum UnifiedExperienceLevel { beginner, intermediate, advanced }
 
 /// Status of the unified lesson request
-@HiveType(typeId: 123)
 enum UnifiedRequestStatus {
-  @HiveField(0)
   pending,
-
-  @HiveField(1)
   approved,
-
-  @HiveField(2)
   negotiating,
-
-  @HiveField(3)
   timeConfirmed,
-
-  @HiveField(4)
   proposalSent,
-
-  @HiveField(5)
   proposalAccepted,
-
-  @HiveField(6)
   paymentNotified,
-
-  @HiveField(7)
   completed,
-
-  @HiveField(8)
   rejected,
-
-  @HiveField(9)
   cancelled,
-
-  @HiveField(10)
   expired,
 
   // Phase 2: 수강권 발행 (NEW)
-  @HiveField(11)
   subscriptionIssued,
 
   // Phase 3: 레슨 진행 (NEW)
-  @HiveField(12)
   inProgress;
 
   bool get isActive => [
@@ -119,51 +61,24 @@ enum RequestPhase {
 }
 
 /// Who proposed the time slot
-@HiveType(typeId: 124)
-enum ProposerRole {
-  @HiveField(0)
-  student,
-
-  @HiveField(1)
-  teacher,
-}
+enum ProposerRole { student, teacher }
 
 /// Action type in a time proposal
-@HiveType(typeId: 125)
-enum ProposalAction {
-  @HiveField(0)
-  propose,
-
-  @HiveField(1)
-  accept,
-
-  @HiveField(2)
-  reject,
-
-  @HiveField(3)
-  counterPropose,
-}
+enum ProposalAction { propose, accept, reject, counterPropose }
 
 /// A time slot option within a proposal
-@HiveType(typeId: 126)
 @JsonSerializable()
-class TimeSlotOption extends HiveObject {
-  @HiveField(0)
+class TimeSlotOption {
   final String id;
 
-  @HiveField(1)
   final int dayOfWeek; // 0=Mon...6=Sun
 
-  @HiveField(2)
   final String startTime; // HH:mm
 
-  @HiveField(3)
   final String endTime; // HH:mm
 
-  @HiveField(4)
   final bool isSelected;
 
-  @HiveField(5)
   final DateTime? date;
 
   TimeSlotOption({
@@ -200,28 +115,20 @@ class TimeSlotOption extends HiveObject {
 }
 
 /// A negotiation turn (proposal or counter-proposal)
-@HiveType(typeId: 127)
 @JsonSerializable()
-class TimeProposal extends HiveObject {
-  @HiveField(0)
+class TimeProposal {
   final String id;
 
-  @HiveField(1)
   final String proposerId;
 
-  @HiveField(2)
   final ProposerRole role;
 
-  @HiveField(3)
   final List<TimeSlotOption> slots;
 
-  @HiveField(4)
   final String? message;
 
-  @HiveField(5)
   final ProposalAction action;
 
-  @HiveField(6)
   final DateTime createdAt;
 
   TimeProposal({
@@ -241,24 +148,18 @@ class TimeProposal extends HiveObject {
 }
 
 /// Preferred time slot with priority ranking (1=highest, 3=lowest).
-@HiveType(typeId: 129)
 @JsonSerializable()
 class PreferredTimeSlot {
-  @HiveField(0)
   final int priority;
 
   /// Specific date for trial/per-session lessons.
-  @HiveField(1)
   final DateTime? date;
 
   /// Day of week for regular lessons (0=Mon...6=Sun).
-  @HiveField(2)
   final int? dayOfWeek;
 
-  @HiveField(3)
   final String startTime;
 
-  @HiveField(4)
   final String endTime;
 
   const PreferredTimeSlot({
@@ -276,85 +177,61 @@ class PreferredTimeSlot {
 }
 
 /// Unified lesson request — replaces separate trial/regular/returning flows
-@HiveType(typeId: 128)
 @JsonSerializable()
-class UnifiedLessonRequest extends HiveObject {
-  @HiveField(0)
+class UnifiedLessonRequest {
   final String id;
 
-  @HiveField(1)
   final String studentId;
 
-  @HiveField(2)
   final String teacherId;
 
   // Lesson info
-  @HiveField(3)
   final LessonRequestType type;
 
-  @HiveField(4)
   final String instrument;
 
-  @HiveField(5)
   final UnifiedLessonGoal goal;
 
-  @HiveField(6)
   final UnifiedExperienceLevel experience;
 
-  @HiveField(7)
   final String? message;
 
   // Time negotiation
-  @HiveField(8)
   final int? preferredDay; // 0=Mon...6=Sun
 
-  @HiveField(9)
   final String? preferredTime; // HH:mm
 
-  @HiveField(10)
   final int preferredDuration; // minutes
 
-  @HiveField(11)
   final List<TimeProposal> proposals;
 
-  @HiveField(12)
   final int currentRound;
 
   // Returning student info
-  @HiveField(13)
   final bool isReturningStudent;
 
   // Status
-  @HiveField(14)
   final UnifiedRequestStatus status;
 
-  @HiveField(15)
   final DateTime createdAt;
 
-  @HiveField(16)
   final DateTime? confirmedAt;
 
-  @HiveField(17)
   final DateTime? cancelledAt;
 
-  @HiveField(18)
   @JsonKey(name: 'decline_reason')
   final String? rejectionReason;
 
   // Price reference
-  @HiveField(19)
   final int? suggestedPrice;
 
   // Preferred time slots (v2.0 — max 3 preferences)
-  @HiveField(20)
   final List<PreferredTimeSlot> preferredSlots;
 
   // Linked subscription proposal (v3.0 — proposal integration)
-  @HiveField(21)
   final String? proposalId;
 
   // v4.0: Academy association
-  @HiveField(22)
   final String? academyId;
 
   UnifiedLessonRequest({

@@ -505,12 +505,7 @@ const _legacyDomainLocalizationDependencies = <String>{};
 
 const _legacyDomainDisplayGetterDependencies = <String>{};
 
-const _legacyDomainHivePersistenceExceptions = <String>{
-  'lib/features/schedule/domain/entities/request_event.dart',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart',
-  'lib/features/subscription/domain/entities/subscription.dart',
-  'lib/features/subscription/domain/entities/subscription_proposal.dart',
-};
+const _legacyDomainHivePersistenceExceptions = <String>{};
 
 const _mockDataBranchExceptions = <String>{
   'lib/core/providers/repository_provider.dart',
