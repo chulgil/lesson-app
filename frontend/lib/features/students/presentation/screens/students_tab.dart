@@ -317,7 +317,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       child: TextField(
         controller: _searchController,
         onChanged: (value) {
-          ref.read(studentSearchQueryProvider.notifier).state = value;
+          ref.read(studentSearchQueryProvider.notifier).setQuery(value);
         },
         decoration: InputDecoration(
           hintText: AppStrings.studentSearchByNameOrInstrument,
@@ -330,7 +330,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   ? IconButton(
                     onPressed: () {
                       _searchController.clear();
-                      ref.read(studentSearchQueryProvider.notifier).state = '';
+                      ref.read(studentSearchQueryProvider.notifier).clear();
                     },
                     icon: const Icon(Icons.clear, size: 20),
                   )

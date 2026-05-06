@@ -1,26 +1,42 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/students/domain/entities/student.dart';
 import '../../domain/repositories/student_repository.dart';
 import 'student_repository_provider.dart';
 
+part 'student_crud_provider.g.dart';
+
 /// All students provider
-final studentsProvider = FutureProvider<List<Student>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Student>> students(StudentsRef ref) async {
   final repository = ref.watch(studentRepositoryProvider);
   return repository.getStudents();
-});
+}
 
 /// Single student provider
-final studentProvider =
-    FutureProvider.family<Student?, String>((ref, id) async {
+@Riverpod(keepAlive: true)
+Future<Student?> student(StudentRef ref, String id) async {
   final repository = ref.watch(studentRepositoryProvider);
   return repository.getStudent(id);
-});
+}
 
 /// Search students provider
-final studentSearchQueryProvider = StateProvider<String>((ref) => '');
+@Riverpod(keepAlive: true)
+class StudentSearchQuery extends _$StudentSearchQuery {
+  @override
+  String build() => '';
 
-final filteredStudentsProvider = FutureProvider<List<Student>>((ref) async {
+  void setQuery(String query) {
+    state = query;
+  }
+
+  void clear() {
+    state = '';
+  }
+}
+
+@Riverpod(keepAlive: true)
+Future<List<Student>> filteredStudents(FilteredStudentsRef ref) async {
   final query = ref.watch(studentSearchQueryProvider);
   final repository = ref.watch(studentRepositoryProvider);
 
@@ -28,10 +44,11 @@ final filteredStudentsProvider = FutureProvider<List<Student>>((ref) async {
     return repository.getStudents();
   }
   return repository.searchStudents(query);
-});
+}
 
 /// Student list notifier for CRUD operations
-class StudentsNotifier extends AsyncNotifier<List<Student>> {
+@Riverpod(keepAlive: true)
+class StudentsNotifier extends _$StudentsNotifier {
   StudentRepository get _repository => ref.read(studentRepositoryProvider);
 
   @override
@@ -81,7 +98,9 @@ class StudentsNotifier extends AsyncNotifier<List<Student>> {
 
   /// Update student status (trial → active, active → paused, etc.)
   Future<Student> updateStudentStatus(
-      String studentId, StudentStatus status) async {
+    String studentId,
+    StudentStatus status,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final updated = await _repository.updateStudentStatus(studentId, status);
@@ -95,19 +114,18 @@ class StudentsNotifier extends AsyncNotifier<List<Student>> {
 }
 
 /// Provider to get students by enrollment status (trial/active/paused/inactive)
-final studentsByEnrollmentStatusProvider =
-    FutureProvider.family<List<Student>, StudentStatus>((ref, status) async {
+@Riverpod(keepAlive: true)
+Future<List<Student>> studentsByEnrollmentStatus(
+  StudentsByEnrollmentStatusRef ref,
+  StudentStatus status,
+) async {
   final repository = ref.watch(studentRepositoryProvider);
   return repository.getStudentsByStatus(status);
-});
+}
 
 /// Trial students provider
-final trialStudentsProvider = FutureProvider<List<Student>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Student>> trialStudents(TrialStudentsRef ref) async {
   final repository = ref.watch(studentRepositoryProvider);
   return repository.getStudentsByStatus(StudentStatus.trial);
-});
-
-final studentsNotifierProvider =
-    AsyncNotifierProvider<StudentsNotifier, List<Student>>(
-  StudentsNotifier.new,
-);
+}
