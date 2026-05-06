@@ -1,7 +1,7 @@
 """RequestEvent SSOT model — backend port of frontend Hive entity.
 
 Frontend SSOT: `frontend/lib/features/schedule/domain/entities/request_event.dart`
-- RequestEventType (Hive typeId 130) — 27 values
+- RequestEventType (Hive typeId 130) — 29 values
 - RequestEvent (Hive typeId 131) — 14 fields
 - ScheduleChangeType (Hive typeId 132) — 2 values
 
@@ -19,7 +19,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 class RequestEventType(str, enum.Enum):
-    """27 event types in a lesson request lifecycle (chat history)."""
+    """29 event types in a lesson request lifecycle (chat history)."""
 
     # Phase 1 — 레슨 신청
     initialRequest = "initialRequest"
@@ -57,6 +57,10 @@ class RequestEventType(str, enum.Enum):
 
     # General
     message = "message"
+
+    # Phase 3 — 레슨 취소 확정 + 크레딧 반환
+    lessonCancellationConfirmed = "lessonCancellationConfirmed"
+    cancellationCreditRefunded = "cancellationCreditRefunded"
 
 
 class ScheduleChangeType(str, enum.Enum):

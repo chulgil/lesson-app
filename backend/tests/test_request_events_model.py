@@ -1,6 +1,6 @@
 """Tests for RequestEvent model — Plan A Phase 1.
 
-Validates that 27 RequestEventType values + 2 ScheduleChangeType values
+Validates that 29 RequestEventType values + 2 ScheduleChangeType values
 are persisted correctly in the request_events table.
 """
 
@@ -12,12 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.asyncio
-async def test_request_event_persists_27_event_types(db_session: AsyncSession) -> None:
-    """RequestEvent model must persist all 27 event types (P0-2).
+async def test_request_event_persists_29_event_types(db_session: AsyncSession) -> None:
+    """RequestEvent model must persist all 29 event types (P0-2).
 
     Mirrors frontend SSOT in
     `frontend/lib/features/schedule/domain/entities/request_event.dart`
-    (RequestEventType, Hive typeId 130, 27 values).
+    (RequestEventType, Hive typeId 130, 29 values).
     """
     from app.models.request_event import (
         RequestEvent,
@@ -43,8 +43,10 @@ async def test_request_event_persists_27_event_types(db_session: AsyncSession) -
     await db_session.flush()
 
     rows = (await db_session.scalars(select(RequestEvent).where(RequestEvent.request_id == request_id))).all()
-    assert len(rows) == 27, f"기대 27 event, 실제 {len(rows)}"
+    assert len(rows) == 29, f"기대 29 event, 실제 {len(rows)}"
     assert {r.event_type for r in rows} == set(RequestEventType)
+    assert RequestEventType.lessonCancellationConfirmed in {r.event_type for r in rows}
+    assert RequestEventType.cancellationCreditRefunded in {r.event_type for r in rows}
 
 
 @pytest.mark.asyncio
