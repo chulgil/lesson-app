@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 
-final studentHomeProfileEditStudentProvider =
-    FutureProvider.autoDispose<Student?>((ref) {
-      final studentId = ref.watch(currentUserIdProvider);
-      return ref.watch(studentProvider(studentId).future);
-    });
+part 'student_home_profile_edit_provider.g.dart';
 
-final studentHomeProfileEditImagePathProvider = FutureProvider.autoDispose
-    .family<String?, String>((ref, studentId) {
-      return ref.watch(studentProfileImageNotifierProvider(studentId).future);
-    });
+@riverpod
+Future<Student?> studentHomeProfileEditStudent(
+  StudentHomeProfileEditStudentRef ref,
+) {
+  final studentId = ref.watch(currentUserIdProvider);
+  return ref.watch(studentProvider(studentId).future);
+}
 
-final studentHomeProfileEditActionsProvider =
-    Provider.autoDispose<StudentHomeProfileEditActions>((ref) {
-      return StudentHomeProfileEditActions(ref);
-    });
+@riverpod
+Future<String?> studentHomeProfileEditImagePath(
+  StudentHomeProfileEditImagePathRef ref,
+  String studentId,
+) {
+  return ref.watch(studentProfileImageNotifierProvider(studentId).future);
+}
+
+@riverpod
+StudentHomeProfileEditActions studentHomeProfileEditActions(
+  StudentHomeProfileEditActionsRef ref,
+) {
+  return StudentHomeProfileEditActions(ref);
+}
 
 class StudentHomeProfileEditActions {
-  final Ref _ref;
+  final StudentHomeProfileEditActionsRef _ref;
 
   const StudentHomeProfileEditActions(this._ref);
 

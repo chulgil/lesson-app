@@ -1,49 +1,55 @@
 // 학생 홈에서 필요한 예약 데이터를 화면 용도별로 조합하는 provider입니다.
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../lessons/lessons_facade.dart';
 
-final studentHomeNextLessonProvider = FutureProvider.autoDispose
-    .family<LessonBooking?, String>((ref, studentId) async {
-      final bookings = await ref.watch(
-        studentBookingsProvider(studentId).future,
-      );
-      final now = DateTime.now();
-      final upcomingBookings =
-          bookings
-              .where((booking) => booking.status.isActive)
-              .where((booking) => booking.lessonDate.isAfter(now))
-              .toList()
-            ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
+part 'student_home_booking_provider.g.dart';
 
-      return upcomingBookings.isEmpty ? null : upcomingBookings.first;
-    });
+@riverpod
+Future<LessonBooking?> studentHomeNextLesson(
+  StudentHomeNextLessonRef ref,
+  String studentId,
+) async {
+  final bookings = await ref.watch(studentBookingsProvider(studentId).future);
+  final now = DateTime.now();
+  final upcomingBookings =
+      bookings
+          .where((booking) => booking.status.isActive)
+          .where((booking) => booking.lessonDate.isAfter(now))
+          .toList()
+        ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
 
-final studentHomeTrialBookingsProvider = FutureProvider.autoDispose.family<
-  List<LessonBooking>,
-  String
->((ref, studentId) async {
+  return upcomingBookings.isEmpty ? null : upcomingBookings.first;
+}
+
+@riverpod
+Future<List<LessonBooking>> studentHomeTrialBookings(
+  StudentHomeTrialBookingsRef ref,
+  String studentId,
+) async {
   final bookings = await ref.watch(studentBookingsProvider(studentId).future);
   return bookings
       .where((booking) => booking.lessonType == LessonType.trial)
       .where((booking) => booking.status.isActive || booking.status.canRetry)
       .toList()
     ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
-});
+}
 
-final studentHomeHasAnyBookingProvider = FutureProvider.autoDispose
-    .family<bool, String>((ref, studentId) async {
-      final bookings = await ref.watch(
-        studentBookingsProvider(studentId).future,
-      );
-      return bookings.isNotEmpty;
-    });
+@riverpod
+Future<bool> studentHomeHasAnyBooking(
+  StudentHomeHasAnyBookingRef ref,
+  String studentId,
+) async {
+  final bookings = await ref.watch(studentBookingsProvider(studentId).future);
+  return bookings.isNotEmpty;
+}
 
-final studentHomeLessonsScheduleProvider = FutureProvider.autoDispose.family<
-  StudentHomeLessonsSchedule,
-  String
->((ref, studentId) async {
+@riverpod
+Future<StudentHomeLessonsSchedule> studentHomeLessonsSchedule(
+  StudentHomeLessonsScheduleRef ref,
+  String studentId,
+) async {
   final lessons = await ref.watch(lessonsByStudentProvider(studentId).future);
   final bookings = await ref.watch(studentBookingsProvider(studentId).future);
   final trialBookings =
@@ -79,7 +85,7 @@ final studentHomeLessonsScheduleProvider = FutureProvider.autoDispose.family<
     trialBookings: trialBookings,
     markerDates: markerDates,
   );
-});
+}
 
 class StudentHomeLessonsSchedule {
   final List<Lesson> lessons;
@@ -93,14 +99,15 @@ class StudentHomeLessonsSchedule {
   });
 }
 
-final studentHomeBookingActionsProvider = Provider<StudentHomeBookingActions>((
-  ref,
+@riverpod
+StudentHomeBookingActions studentHomeBookingActions(
+  StudentHomeBookingActionsRef ref,
 ) {
   return StudentHomeBookingActions(ref);
-});
+}
 
 class StudentHomeBookingActions {
-  final Ref _ref;
+  final StudentHomeBookingActionsRef _ref;
 
   const StudentHomeBookingActions(this._ref);
 

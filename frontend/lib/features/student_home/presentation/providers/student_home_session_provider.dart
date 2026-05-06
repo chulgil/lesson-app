@@ -1,19 +1,23 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 
-final studentHomeCurrentStudentIdProvider = Provider<String>((ref) {
-  return ref.watch(currentUserIdProvider);
-});
+part 'student_home_session_provider.g.dart';
 
-final studentHomeSessionActionsProvider = Provider<StudentHomeSessionActions>((
-  ref,
+@riverpod
+String studentHomeCurrentStudentId(StudentHomeCurrentStudentIdRef ref) {
+  return ref.watch(currentUserIdProvider);
+}
+
+@riverpod
+StudentHomeSessionActions studentHomeSessionActions(
+  StudentHomeSessionActionsRef ref,
 ) {
   return StudentHomeSessionActions(ref);
-});
+}
 
 class StudentHomeSessionActions {
-  final Ref _ref;
+  final StudentHomeSessionActionsRef _ref;
 
   const StudentHomeSessionActions(this._ref);
 

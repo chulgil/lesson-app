@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -9,9 +9,10 @@ import '../../../practice/practice_facade.dart';
 import '../../../profile/profile_facade.dart';
 import '../../../students/students_facade.dart';
 
-final studentHomeProfileProvider = Provider.autoDispose<
-  StudentHomeProfileState
->((ref) {
+part 'student_home_profile_provider.g.dart';
+
+@riverpod
+StudentHomeProfileState studentHomeProfile(StudentHomeProfileRef ref) {
   final studentId = ref.watch(currentUserIdProvider);
   final studentAsync = ref.watch(studentProvider(studentId));
   final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
@@ -65,7 +66,7 @@ final studentHomeProfileProvider = Provider.autoDispose<
     repertoireCount: repertoireCount,
     teacherSubtitle: teacherSubtitle,
   );
-});
+}
 
 class StudentHomeProfileState {
   final String studentId;
@@ -93,14 +94,15 @@ class StudentHomeProfileState {
   });
 }
 
-final studentHomeProfileActionsProvider = Provider<StudentHomeProfileActions>((
-  ref,
+@Riverpod(keepAlive: true)
+StudentHomeProfileActions studentHomeProfileActions(
+  StudentHomeProfileActionsRef ref,
 ) {
   return StudentHomeProfileActions(ref);
-});
+}
 
 class StudentHomeProfileActions {
-  final Ref _ref;
+  final StudentHomeProfileActionsRef _ref;
 
   const StudentHomeProfileActions(this._ref);
 
