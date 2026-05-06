@@ -1,28 +1,20 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'teacher_availability.g.dart';
 
 /// Type of availability slot
-@HiveType(typeId: 70)
 enum AvailabilityType {
-  @HiveField(0)
   regular, // Weekly recurring
 
-  @HiveField(1)
   oneTime, // One-time slot
 }
 
 /// Status of a time slot
-@HiveType(typeId: 71)
 enum SlotStatus {
-  @HiveField(0)
   available, // Can be booked
 
-  @HiveField(1)
   booked, // Already booked
 
-  @HiveField(2)
   cancelled, // Cancelled (holiday, etc.)
 }
 
@@ -30,50 +22,38 @@ enum SlotStatus {
 ///
 /// Root entity for managing teacher's available time slots.
 /// Contains weekly schedules and exceptions (holidays, etc.).
-@HiveType(typeId: 72)
 @JsonSerializable()
-class TeacherAvailability extends HiveObject {
-  @HiveField(0)
+class TeacherAvailability {
   final String id;
 
-  @HiveField(1)
   final String teacherId;
 
   /// Default lesson duration in minutes (30, 45, 50, 60)
   /// This is how long each lesson lasts.
-  @HiveField(2)
   final int slotDurationMinutes;
 
   /// Weekly recurring schedules
-  @HiveField(3)
   final List<WeeklySchedule> weeklySchedules;
 
   /// Exceptions (holidays, special closures)
-  @HiveField(4)
   final List<TimeException> exceptions;
 
   /// Number of weeks to auto-generate slots
-  @HiveField(5)
   final int autoGenerateWeeks;
 
-  @HiveField(6)
   final DateTime createdAt;
 
-  @HiveField(7)
   final DateTime? updatedAt;
 
   /// Slot start time interval in minutes (30 or 60)
   /// This determines available start times: 30 = 10:00, 10:30, 11:00...
   /// 60 = 10:00, 11:00, 12:00...
-  @HiveField(8)
   final int slotStartInterval;
 
   /// Break time between lessons in minutes (0, 5, 10, 15)
-  @HiveField(9)
   final int breakTimeBetweenLessons;
 
   /// Minimum hours before booking (e.g., 24 = must book at least 24 hours ahead)
-  @HiveField(10)
   final int minBookingHours;
 
   TeacherAvailability({
@@ -131,29 +111,22 @@ class TeacherAvailability extends HiveObject {
 }
 
 /// Weekly recurring schedule template
-@HiveType(typeId: 73)
 @JsonSerializable()
-class WeeklySchedule extends HiveObject {
-  @HiveField(0)
+class WeeklySchedule {
   final String id;
 
   /// Day of week (0=Monday, 6=Sunday)
-  @HiveField(1)
   final int dayOfWeek;
 
   /// Start time in "HH:mm" format (e.g., "14:00")
-  @HiveField(2)
   final String startTime;
 
   /// End time in "HH:mm" format (e.g., "18:00")
-  @HiveField(3)
   final String endTime;
 
   /// Whether this schedule is active
-  @HiveField(4)
   final bool isActive;
 
-  @HiveField(5)
   final DateTime createdAt;
 
   WeeklySchedule({
@@ -199,15 +172,11 @@ class WeeklySchedule extends HiveObject {
 }
 
 /// Exception type for time exceptions
-@HiveType(typeId: 74)
 enum ExceptionType {
-  @HiveField(0)
   holiday, // Single day holiday
 
-  @HiveField(1)
   vacation, // Multi-day vacation
 
-  @HiveField(2)
   additionalSlot, // Extra one-time slot
 }
 
@@ -226,35 +195,26 @@ extension ExceptionTypeExtension on ExceptionType {
 }
 
 /// Time exception (holiday, vacation, or additional slot)
-@HiveType(typeId: 75)
 @JsonSerializable()
-class TimeException extends HiveObject {
-  @HiveField(0)
+class TimeException {
   final String id;
 
-  @HiveField(1)
   final ExceptionType type;
 
   /// Start date of exception
-  @HiveField(2)
   final DateTime startDate;
 
   /// End date (same as startDate for single day)
-  @HiveField(3)
   final DateTime endDate;
 
   /// Optional specific time for additionalSlot type
-  @HiveField(4)
   final String? startTime;
 
-  @HiveField(5)
   final String? endTime;
 
   /// Reason for the exception
-  @HiveField(6)
   final String? reason;
 
-  @HiveField(7)
   final DateTime createdAt;
 
   TimeException({

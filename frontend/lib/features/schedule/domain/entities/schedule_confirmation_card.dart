@@ -1,21 +1,16 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'schedule_confirmation_card.g.dart';
 
 /// Type of schedule confirmation card based on scenario.
-@HiveType(typeId: 100)
 enum ScheduleCardType {
   /// New student after trial lesson - suggest trial time
-  @HiveField(0)
   afterTrial,
 
   /// Re-enrollment - suggest previous schedule
-  @HiveField(1)
   reEnrollment,
 
   /// Additional instrument - no previous schedule, must select
-  @HiveField(2)
   additionalInstrument,
 }
 
@@ -27,22 +22,17 @@ extension ScheduleCardTypeExtension on ScheduleCardType {
 }
 
 /// Status of schedule confirmation card.
-@HiveType(typeId: 101)
 enum ScheduleCardStatus {
   /// Waiting for student to confirm
-  @HiveField(0)
   pending,
 
   /// Student confirmed the suggested time
-  @HiveField(1)
   confirmed,
 
   /// Student selected a different time
-  @HiveField(2)
   changedTime,
 
   /// Card dismissed/expired
-  @HiveField(3)
   dismissed,
 }
 
@@ -58,78 +48,58 @@ extension ScheduleCardStatusExtension on ScheduleCardStatus {
 /// This card prompts the student to confirm their lesson schedule after
 /// a subscription has been issued. Depending on the scenario, it may
 /// suggest a previous schedule or trial lesson time.
-@HiveType(typeId: 102)
 @JsonSerializable()
-class ScheduleConfirmationCard extends HiveObject {
-  @HiveField(0)
+class ScheduleConfirmationCard {
   final String id;
 
-  @HiveField(1)
   final String studentId;
 
-  @HiveField(2)
   final String teacherId;
 
-  @HiveField(3)
   final String teacherName;
 
-  @HiveField(4)
   final String? instrument;
 
   /// Related subscription ID
-  @HiveField(5)
   final String subscriptionId;
 
   /// Suggested lesson day (1=Mon, 7=Sun), null if no suggestion
-  @HiveField(6)
   final int? suggestedDay;
 
   /// Suggested lesson time (e.g., "15:00"), null if no suggestion
-  @HiveField(7)
   final String? suggestedTime;
 
   /// Lesson duration in minutes
-  @HiveField(8)
   final int? lessonDuration;
 
   /// Card type based on scenario
-  @HiveField(9)
   final ScheduleCardType cardType;
 
   /// Current status
-  @HiveField(10)
   final ScheduleCardStatus status;
 
   /// When the card was created
-  @HiveField(11)
   final DateTime createdAt;
 
   /// When the student responded
-  @HiveField(12)
   final DateTime? respondedAt;
 
   /// Subscription details for display
-  @HiveField(13)
   final int? totalLessons;
 
   /// Related lesson request ID (for re-enrollment)
-  @HiveField(14)
   final String? lessonRequestId;
 
   /// Alternative suggestion 2 (day 1=Mon..7=Sun)
-  @HiveField(15)
   final int? suggestedDay2;
 
   /// Alternative suggestion 2 time (e.g., "16:00")
-  @HiveField(16)
   final String? suggestedTime2;
 
   /// Alternative suggestion 3 (day 1=Mon..7=Sun)
-  @HiveField(17)
   final int? suggestedDay3;
 
   /// Alternative suggestion 3 time (e.g., "14:00")
-  @HiveField(18)
   final String? suggestedTime3;
 
   ScheduleConfirmationCard({
