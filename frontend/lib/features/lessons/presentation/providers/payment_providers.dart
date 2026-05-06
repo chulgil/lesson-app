@@ -1,10 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../students/students_facade.dart' show studentsNotifierProvider;
 import '../../../students/domain/entities/student.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/repositories/payment_repository.dart';
 import 'payment_repository_provider.dart';
+
+part 'payment_providers.g.dart';
 
 // Legacy independent payment providers.
 //
@@ -13,73 +15,83 @@ import 'payment_repository_provider.dart';
 // payment-management feature until a future billing spec is approved.
 
 /// All payments provider
-final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Payment>> allPayments(AllPaymentsRef ref) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getAllPayments();
-});
+}
 
 /// Single payment provider
-final paymentProvider = FutureProvider.family<Payment?, String>((
-  ref,
-  paymentId,
-) async {
+@Riverpod(keepAlive: true)
+Future<Payment?> payment(PaymentRef ref, String paymentId) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentById(paymentId);
-});
+}
 
 /// Payments by student provider
-final studentPaymentsProvider = FutureProvider.family<List<Payment>, String>((
-  ref,
-  studentId,
+@Riverpod(keepAlive: true)
+Future<List<Payment>> studentPayments(
+  StudentPaymentsRef ref,
+  String studentId,
 ) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentsByStudent(studentId);
-});
+}
 
 /// Payments by status provider
-final paymentsByStatusProvider =
-    FutureProvider.family<List<Payment>, PaymentStatus>((ref, status) async {
-      final repository = ref.watch(paymentRepositoryProvider);
-      return repository.getPaymentsByStatus(status);
-    });
+@Riverpod(keepAlive: true)
+Future<List<Payment>> paymentsByStatus(
+  PaymentsByStatusRef ref,
+  PaymentStatus status,
+) async {
+  final repository = ref.watch(paymentRepositoryProvider);
+  return repository.getPaymentsByStatus(status);
+}
 
 /// Pending payments provider
-final pendingPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Payment>> pendingPayments(PendingPaymentsRef ref) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentsByStatus(PaymentStatus.pending);
-});
+}
 
 /// Overdue payments provider
-final overduePaymentsProvider = FutureProvider<List<Payment>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Payment>> overduePayments(OverduePaymentsRef ref) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getOverduePayments();
-});
+}
 
 /// Payment summary provider
-final paymentSummaryProvider = FutureProvider<PaymentSummary>((ref) async {
+@Riverpod(keepAlive: true)
+Future<PaymentSummary> paymentSummary(PaymentSummaryRef ref) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentSummary();
-});
+}
 
 /// Monthly payment summary provider
-final monthlyPaymentSummaryProvider = FutureProvider.family<
-  PaymentSummary,
-  ({int year, int month})
->((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<PaymentSummary> monthlyPaymentSummary(
+  MonthlyPaymentSummaryRef ref,
+  ({int year, int month}) params,
+) async {
   final repository = ref.watch(paymentRepositoryProvider);
   return repository.getPaymentSummary(year: params.year, month: params.month);
-});
+}
 
 /// Tuition settings provider
-final tuitionSettingsProvider = FutureProvider.family<TuitionSettings?, String>(
-  (ref, studentId) async {
-    final repository = ref.watch(paymentRepositoryProvider);
-    return repository.getTuitionSettings(studentId);
-  },
-);
+@Riverpod(keepAlive: true)
+Future<TuitionSettings?> tuitionSettings(
+  TuitionSettingsRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(paymentRepositoryProvider);
+  return repository.getTuitionSettings(studentId);
+}
 
 /// Payments notifier for CRUD operations
-class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
+@Riverpod(keepAlive: true)
+class PaymentsNotifier extends _$PaymentsNotifier {
   PaymentRepository get _repository => ref.read(paymentRepositoryProvider);
 
   @override
@@ -185,14 +197,9 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
   }
 }
 
-final paymentsNotifierProvider =
-    AsyncNotifierProvider<PaymentsNotifier, List<Payment>>(
-      PaymentsNotifier.new,
-    );
-
 /// Tuition settings notifier
-class TuitionSettingsNotifier
-    extends FamilyAsyncNotifier<TuitionSettings?, String> {
+@Riverpod(keepAlive: true)
+class TuitionSettingsNotifier extends _$TuitionSettingsNotifier {
   PaymentRepository get _repository => ref.read(paymentRepositoryProvider);
 
   @override
@@ -211,9 +218,3 @@ class TuitionSettingsNotifier
     }
   }
 }
-
-final tuitionSettingsNotifierProvider = AsyncNotifierProvider.family<
-  TuitionSettingsNotifier,
-  TuitionSettings?,
-  String
->(TuitionSettingsNotifier.new);

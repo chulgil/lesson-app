@@ -1,57 +1,67 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_feedback_template_repository.dart';
 import '../../domain/entities/feedback_template.dart';
 import '../../domain/repositories/feedback_template_repository.dart';
 
-/// Repository provider — singleton mock for now.
-final feedbackTemplateRepositoryProvider = Provider<FeedbackTemplateRepository>(
-  (ref) {
-    return MockFeedbackTemplateRepository();
-  },
-);
+part 'feedback_template_providers.g.dart';
 
-final _currentTeacherIdProvider = Provider<String>((ref) {
+/// Repository provider — singleton mock for now.
+@Riverpod(keepAlive: true)
+FeedbackTemplateRepository feedbackTemplateRepository(
+  FeedbackTemplateRepositoryRef ref,
+) {
+  return MockFeedbackTemplateRepository();
+}
+
+@Riverpod(keepAlive: true)
+String _currentTeacherId(_CurrentTeacherIdRef ref) {
   return ref.watch(currentUserIdProvider);
-});
+}
 
 /// All templates owned by the current teacher.
-final feedbackTemplatesProvider = FutureProvider<List<FeedbackTemplate>>((
-  ref,
+@Riverpod(keepAlive: true)
+Future<List<FeedbackTemplate>> feedbackTemplates(
+  FeedbackTemplatesRef ref,
 ) async {
   final repo = ref.watch(feedbackTemplateRepositoryProvider);
   final teacherId = ref.watch(_currentTeacherIdProvider);
   return repo.getTemplates(teacherId);
-});
+}
 
 /// Templates filtered by category.
-final feedbackTemplatesByCategoryProvider =
-    FutureProvider.family<List<FeedbackTemplate>, FeedbackCategory>((
-      ref,
-      category,
-    ) async {
-      final repo = ref.watch(feedbackTemplateRepositoryProvider);
-      final teacherId = ref.watch(_currentTeacherIdProvider);
-      return repo.getTemplatesByCategory(teacherId, category);
-    });
+@Riverpod(keepAlive: true)
+Future<List<FeedbackTemplate>> feedbackTemplatesByCategory(
+  FeedbackTemplatesByCategoryRef ref,
+  FeedbackCategory category,
+) async {
+  final repo = ref.watch(feedbackTemplateRepositoryProvider);
+  final teacherId = ref.watch(_currentTeacherIdProvider);
+  return repo.getTemplatesByCategory(teacherId, category);
+}
 
 /// Top-N most-used templates (for the picker's "자주 사용" section).
-final frequentFeedbackTemplatesProvider =
-    FutureProvider<List<FeedbackTemplate>>((ref) async {
-      final repo = ref.watch(feedbackTemplateRepositoryProvider);
-      final teacherId = ref.watch(_currentTeacherIdProvider);
-      return repo.getFrequentlyUsed(teacherId, limit: 3);
-    });
+@Riverpod(keepAlive: true)
+Future<List<FeedbackTemplate>> frequentFeedbackTemplates(
+  FrequentFeedbackTemplatesRef ref,
+) async {
+  final repo = ref.watch(feedbackTemplateRepositoryProvider);
+  final teacherId = ref.watch(_currentTeacherIdProvider);
+  return repo.getFrequentlyUsed(teacherId, limit: 3);
+}
 
 /// Search by title/body/tags.
-final feedbackTemplateSearchProvider =
-    FutureProvider.family<List<FeedbackTemplate>, String>((ref, query) async {
-      if (query.isEmpty) return const [];
-      final repo = ref.watch(feedbackTemplateRepositoryProvider);
-      final teacherId = ref.watch(_currentTeacherIdProvider);
-      return repo.searchTemplates(teacherId, query);
-    });
+@Riverpod(keepAlive: true)
+Future<List<FeedbackTemplate>> feedbackTemplateSearch(
+  FeedbackTemplateSearchRef ref,
+  String query,
+) async {
+  if (query.isEmpty) return const [];
+  final repo = ref.watch(feedbackTemplateRepositoryProvider);
+  final teacherId = ref.watch(_currentTeacherIdProvider);
+  return repo.searchTemplates(teacherId, query);
+}
 
 /// CRUD notifier mirroring TipTemplatesNotifier conventions.
 class FeedbackTemplatesNotifier extends AsyncNotifier<List<FeedbackTemplate>> {

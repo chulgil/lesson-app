@@ -1,10 +1,13 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import 'lesson_crud_provider.dart';
 
+part 'lesson_stats_provider.g.dart';
+
 /// Dashboard stats for lessons
-final lessonStatsProvider = Provider<AsyncValue<Map<String, int>>>((ref) {
+@Riverpod(keepAlive: true)
+AsyncValue<Map<String, int>> lessonStats(LessonStatsRef ref) {
   final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
   return lessonsAsync.when(
@@ -14,12 +17,14 @@ final lessonStatsProvider = Provider<AsyncValue<Map<String, int>>>((ref) {
       final weekStart = today.subtract(Duration(days: today.weekday - 1));
       final weekEnd = weekStart.add(const Duration(days: 6));
 
-      final thisWeekLessons = lessons.where((l) {
-        final lessonDate = DateTime(l.date.year, l.date.month, l.date.day);
-        return lessonDate
-                .isAfter(weekStart.subtract(const Duration(days: 1))) &&
-            lessonDate.isBefore(weekEnd.add(const Duration(days: 1)));
-      }).toList();
+      final thisWeekLessons =
+          lessons.where((l) {
+            final lessonDate = DateTime(l.date.year, l.date.month, l.date.day);
+            return lessonDate.isAfter(
+                  weekStart.subtract(const Duration(days: 1)),
+                ) &&
+                lessonDate.isBefore(weekEnd.add(const Duration(days: 1)));
+          }).toList();
 
       return AsyncValue.data({
         'total': lessons.length,
@@ -34,4 +39,4 @@ final lessonStatsProvider = Provider<AsyncValue<Map<String, int>>>((ref) {
     loading: () => const AsyncValue.loading(),
     error: (e, st) => AsyncValue.error(e, st),
   );
-});
+}

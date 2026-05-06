@@ -1,66 +1,79 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_tip_template_repository.dart';
 import '../../domain/entities/tip_template.dart';
 import '../../domain/repositories/tip_template_repository.dart';
 
+part 'tip_template_providers.g.dart';
+
 /// Repository provider
-final tipTemplateRepositoryProvider = Provider<TipTemplateRepository>((ref) {
+@Riverpod(keepAlive: true)
+TipTemplateRepository tipTemplateRepository(TipTemplateRepositoryRef ref) {
   return MockTipTemplateRepository();
-});
+}
 
 /// Current teacher ID provider - uses currentUserIdProvider from auth
-final currentTeacherIdProvider = Provider<String>((ref) {
+@Riverpod(keepAlive: true)
+String currentTeacherId(CurrentTeacherIdRef ref) {
   return ref.watch(currentUserIdProvider);
-});
+}
 
 /// All templates for current teacher
-final tipTemplatesProvider = FutureProvider<List<TipTemplate>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<TipTemplate>> tipTemplates(TipTemplatesRef ref) async {
   final repository = ref.watch(tipTemplateRepositoryProvider);
   final teacherId = ref.watch(currentTeacherIdProvider);
   return repository.getTemplates(teacherId);
-});
+}
 
 /// Templates by category
-final tipTemplatesByCategoryProvider =
-    FutureProvider.family<List<TipTemplate>, TipCategory>((
-      ref,
-      category,
-    ) async {
-      final repository = ref.watch(tipTemplateRepositoryProvider);
-      final teacherId = ref.watch(currentTeacherIdProvider);
-      return repository.getTemplatesByCategory(teacherId, category);
-    });
+@Riverpod(keepAlive: true)
+Future<List<TipTemplate>> tipTemplatesByCategory(
+  TipTemplatesByCategoryRef ref,
+  TipCategory category,
+) async {
+  final repository = ref.watch(tipTemplateRepositoryProvider);
+  final teacherId = ref.watch(currentTeacherIdProvider);
+  return repository.getTemplatesByCategory(teacherId, category);
+}
 
 /// Templates for specific instrument (includes general tips)
-final tipTemplatesByInstrumentProvider =
-    FutureProvider.family<List<TipTemplate>, String?>((ref, instrument) async {
-      final repository = ref.watch(tipTemplateRepositoryProvider);
-      final teacherId = ref.watch(currentTeacherIdProvider);
-      return repository.getTemplatesByInstrument(teacherId, instrument);
-    });
+@Riverpod(keepAlive: true)
+Future<List<TipTemplate>> tipTemplatesByInstrument(
+  TipTemplatesByInstrumentRef ref,
+  String? instrument,
+) async {
+  final repository = ref.watch(tipTemplateRepositoryProvider);
+  final teacherId = ref.watch(currentTeacherIdProvider);
+  return repository.getTemplatesByInstrument(teacherId, instrument);
+}
 
 /// Frequently used templates
-final frequentTipTemplatesProvider = FutureProvider<List<TipTemplate>>((
-  ref,
+@Riverpod(keepAlive: true)
+Future<List<TipTemplate>> frequentTipTemplates(
+  FrequentTipTemplatesRef ref,
 ) async {
   final repository = ref.watch(tipTemplateRepositoryProvider);
   final teacherId = ref.watch(currentTeacherIdProvider);
   return repository.getFrequentlyUsed(teacherId, limit: 5);
-});
+}
 
 /// Search templates
-final tipTemplateSearchProvider =
-    FutureProvider.family<List<TipTemplate>, String>((ref, query) async {
-      if (query.isEmpty) return [];
-      final repository = ref.watch(tipTemplateRepositoryProvider);
-      final teacherId = ref.watch(currentTeacherIdProvider);
-      return repository.searchTemplates(teacherId, query);
-    });
+@Riverpod(keepAlive: true)
+Future<List<TipTemplate>> tipTemplateSearch(
+  TipTemplateSearchRef ref,
+  String query,
+) async {
+  if (query.isEmpty) return [];
+  final repository = ref.watch(tipTemplateRepositoryProvider);
+  final teacherId = ref.watch(currentTeacherIdProvider);
+  return repository.searchTemplates(teacherId, query);
+}
 
 /// Notifier for CRUD operations
-class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
+@Riverpod(keepAlive: true)
+class TipTemplatesNotifier extends _$TipTemplatesNotifier {
   TipTemplateRepository get _repository =>
       ref.read(tipTemplateRepositoryProvider);
   String get _teacherId => ref.read(currentTeacherIdProvider);
@@ -135,8 +148,3 @@ class TipTemplatesNotifier extends AsyncNotifier<List<TipTemplate>> {
     }
   }
 }
-
-final tipTemplatesNotifierProvider =
-    AsyncNotifierProvider<TipTemplatesNotifier, List<TipTemplate>>(
-      TipTemplatesNotifier.new,
-    );
