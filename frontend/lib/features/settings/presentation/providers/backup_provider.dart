@@ -4,30 +4,34 @@
 
 import 'dart:io';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../domain/entities/backup_state.dart';
 import '../../data/services/backup_service.dart';
 
+part 'backup_provider.g.dart';
+
 /// Provider for BackupService singleton.
-final backupServiceProvider = Provider<BackupService>((ref) {
+@Riverpod(keepAlive: true)
+BackupService backupService(BackupServiceRef ref) {
   return BackupService();
-});
+}
 
 /// Current backup state provider.
-final backupStateProvider =
-    AsyncNotifierProvider<BackupNotifier, BackupState>(BackupNotifier.new);
+final backupStateProvider = backupStateNotifierProvider;
 
 /// List of available backup files.
-final backupListProvider = FutureProvider<List<BackupFileInfo>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<BackupFileInfo>> backupList(BackupListRef ref) async {
   final service = ref.watch(backupServiceProvider);
   return service.listBackups();
-});
+}
 
 /// Backup notifier for managing backup operations.
-class BackupNotifier extends AsyncNotifier<BackupState> {
+@Riverpod(keepAlive: true)
+class BackupStateNotifier extends _$BackupStateNotifier {
   BackupService get _service => ref.read(backupServiceProvider);
 
   @override
@@ -40,28 +44,23 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
     final current = state.value ?? const BackupState();
 
     // Set backing up state
-    state = AsyncValue.data(current.copyWith(
-      isBackingUp: true,
-      progress: 0.0,
-      lastError: null,
-    ));
+    state = AsyncValue.data(
+      current.copyWith(isBackingUp: true, progress: 0.0, lastError: null),
+    );
 
     try {
       final backupFile = await _service.createBackup(
         onProgress: (progress, status) {
           final currentState = state.value ?? const BackupState();
-          state = AsyncValue.data(currentState.copyWith(
-            progress: progress,
-          ));
+          state = AsyncValue.data(currentState.copyWith(progress: progress));
         },
       );
 
       // Refresh state after backup
       final newState = await _service.getBackupState();
-      state = AsyncValue.data(newState.copyWith(
-        isBackingUp: false,
-        progress: null,
-      ));
+      state = AsyncValue.data(
+        newState.copyWith(isBackingUp: false, progress: null),
+      );
 
       // Invalidate backup list
       ref.invalidate(backupListProvider);
@@ -69,11 +68,13 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
       return backupFile;
     } catch (e) {
       final currentState = state.value ?? const BackupState();
-      state = AsyncValue.data(currentState.copyWith(
-        isBackingUp: false,
-        progress: null,
-        lastError: e.toString(),
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(
+          isBackingUp: false,
+          progress: null,
+          lastError: e.toString(),
+        ),
+      );
       return null;
     }
   }
@@ -96,9 +97,7 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
   Future<RestoreResult?> pickAndRestore() async {
     // Pick file - use FileType.any for iOS compatibility
     // iOS doesn't recognize custom UTIs, so we validate extension after selection
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-    );
+    final result = await FilePicker.platform.pickFiles(type: FileType.any);
 
     if (result == null || result.files.isEmpty) {
       return null;
@@ -125,39 +124,39 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
     final current = state.value ?? const BackupState();
 
     // Set restoring state
-    state = AsyncValue.data(current.copyWith(
-      isRestoring: true,
-      progress: 0.0,
-      lastError: null,
-    ));
+    state = AsyncValue.data(
+      current.copyWith(isRestoring: true, progress: 0.0, lastError: null),
+    );
 
     try {
       final result = await _service.restoreFromBackup(
         backupFile,
         onProgress: (progress, status) {
           final currentState = state.value ?? const BackupState();
-          state = AsyncValue.data(currentState.copyWith(
-            progress: progress,
-          ));
+          state = AsyncValue.data(currentState.copyWith(progress: progress));
         },
       );
 
       // Refresh state after restore
       final newState = await _service.getBackupState();
-      state = AsyncValue.data(newState.copyWith(
-        isRestoring: false,
-        progress: null,
-        lastError: result.success ? null : result.errorMessage,
-      ));
+      state = AsyncValue.data(
+        newState.copyWith(
+          isRestoring: false,
+          progress: null,
+          lastError: result.success ? null : result.errorMessage,
+        ),
+      );
 
       return result;
     } catch (e) {
       final currentState = state.value ?? const BackupState();
-      state = AsyncValue.data(currentState.copyWith(
-        isRestoring: false,
-        progress: null,
-        lastError: e.toString(),
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(
+          isRestoring: false,
+          progress: null,
+          lastError: e.toString(),
+        ),
+      );
       return RestoreResult.failure(e.toString());
     }
   }

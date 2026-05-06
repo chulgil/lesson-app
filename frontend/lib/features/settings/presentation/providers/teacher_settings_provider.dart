@@ -1,57 +1,65 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../domain/repositories/settings_repository.dart';
 import 'settings_repository_provider.dart';
 
+part 'teacher_settings_provider.g.dart';
+
 /// Teacher settings provider (for current logged-in teacher)
-final teacherSettingsProvider =
-    FutureProvider<TeacherSettings>((ref) async {
+@Riverpod(keepAlive: true)
+Future<TeacherSettings> teacherSettings(TeacherSettingsRef ref) async {
   final repository = ref.watch(settingsRepositoryProvider);
   return repository.getTeacherSettings();
-});
+}
 
 /// Teacher settings provider by teacherId (for viewing other teacher's settings)
-final teacherSettingsByIdProvider =
-    FutureProvider.family<TeacherSettings, String>((ref, teacherId) async {
+@Riverpod(keepAlive: true)
+Future<TeacherSettings> teacherSettingsById(
+  TeacherSettingsByIdRef ref,
+  String teacherId,
+) async {
   final repository = ref.watch(settingsRepositoryProvider);
   return repository.getTeacherSettingsById(teacherId);
-});
+}
 
 /// Teacher instruments provider (derived from settings)
-final teacherInstrumentsProvider = Provider<AsyncValue<List<String>>>((ref) {
+@Riverpod(keepAlive: true)
+AsyncValue<List<String>> teacherInstruments(TeacherInstrumentsRef ref) {
   final settingsAsync = ref.watch(teacherSettingsProvider);
   return settingsAsync.when(
     data: (settings) => AsyncValue.data(settings.instruments),
     loading: () => const AsyncValue.loading(),
     error: (e, st) => AsyncValue.error(e, st),
   );
-});
+}
 
 /// Default lesson duration provider (derived from settings)
-final defaultLessonDurationProvider = Provider<AsyncValue<int>>((ref) {
+@Riverpod(keepAlive: true)
+AsyncValue<int> defaultLessonDuration(DefaultLessonDurationRef ref) {
   final settingsAsync = ref.watch(teacherSettingsProvider);
   return settingsAsync.when(
     data: (settings) => AsyncValue.data(settings.defaultLessonDuration),
     loading: () => const AsyncValue.loading(),
     error: (e, st) => AsyncValue.error(e, st),
   );
-});
+}
 
 /// Available time slots provider (derived from settings)
-final availableTimeSlotsProvider =
-    Provider<AsyncValue<List<TimeSlot>>>((ref) {
+@Riverpod(keepAlive: true)
+AsyncValue<List<TimeSlot>> availableTimeSlots(AvailableTimeSlotsRef ref) {
   final settingsAsync = ref.watch(teacherSettingsProvider);
   return settingsAsync.when(
     data: (settings) => AsyncValue.data(settings.availableSlots),
     loading: () => const AsyncValue.loading(),
     error: (e, st) => AsyncValue.error(e, st),
   );
-});
+}
 
 /// Teacher settings notifier for CRUD operations
-class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
+@Riverpod(keepAlive: true)
+class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
   SettingsRepository get _repository => ref.read(settingsRepositoryProvider);
 
   @override
@@ -204,8 +212,11 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
     final current = state.value;
     if (current == null) return;
 
-    final effectiveMessage = (message != null && message.isEmpty) ? null : message;
-    state = AsyncValue.data(current.copyWith(bookingGuidanceMessage: effectiveMessage));
+    final effectiveMessage =
+        (message != null && message.isEmpty) ? null : message;
+    state = AsyncValue.data(
+      current.copyWith(bookingGuidanceMessage: effectiveMessage),
+    );
     try {
       await _repository.updateBookingGuidanceMessage(effectiveMessage);
     } catch (e, st) {
@@ -230,7 +241,9 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
   }
 
   /// Update lesson price table
-  Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable) async {
+  Future<void> updatePriceTable(
+    Map<String, Map<String, int>> priceTable,
+  ) async {
     final current = state.value;
     if (current == null) return;
 
@@ -244,8 +257,3 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
     }
   }
 }
-
-final teacherSettingsNotifierProvider =
-    AsyncNotifierProvider<TeacherSettingsNotifier, TeacherSettings>(
-  TeacherSettingsNotifier.new,
-);
