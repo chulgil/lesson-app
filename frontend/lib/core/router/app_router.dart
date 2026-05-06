@@ -11,6 +11,7 @@ import '../auth/auth_state.dart';
 import '../config/environment.dart';
 import '../widgets/notebook/notebook_surfaces.dart';
 import '../../features/auth/domain/entities/user_role.dart';
+import '../../features/auth/presentation/extensions/user_role_visuals.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import 'app_routes.dart';
 import 'routes/auth_routes.dart';

@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
+import '../../../profile/presentation/extensions/profile_domain_visuals.dart';
 import '../../../profile/profile_facade.dart';
 
 /// Screen for creating and sharing invites

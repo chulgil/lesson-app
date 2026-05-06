@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/child_profile.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 import '../screens/child_profile_form_screen.dart';
 import 'add_child_option.dart';
 import 'profile_menu_section.dart';

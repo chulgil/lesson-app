@@ -11,6 +11,7 @@ import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../features/parent_home/parent_home_facade.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 
 /// Profile switcher widget for switching between parent, student, and child profiles
 ///

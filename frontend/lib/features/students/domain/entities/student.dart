@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../../core/theme/app_colors.dart';
 // Import shared enums from core layer
 import '../../../../core/models/shared_enums.dart';
 import 'lesson_slot.dart';
@@ -19,32 +17,6 @@ enum StudentStatus {
   paused, // 휴강
   inactive; // 수강 종료
 
-  String get label {
-    switch (this) {
-      case StudentStatus.trial:
-        return '체험';
-      case StudentStatus.active:
-        return '정규';
-      case StudentStatus.paused:
-        return '휴강';
-      case StudentStatus.inactive:
-        return '종료';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case StudentStatus.trial:
-        return AppColors.paperAccent;
-      case StudentStatus.active:
-        return AppColors.paperOk;
-      case StudentStatus.paused:
-        return AppColors.inkTertiary;
-      case StudentStatus.inactive:
-        return AppColors.paperAccent;
-    }
-  }
-
   /// Check if student is currently enrolled (trial or active)
   bool get isEnrolled =>
       this == StudentStatus.trial || this == StudentStatus.active;
@@ -56,19 +28,6 @@ enum StudentLevel {
   elementary, // 초급
   intermediate, // 중급
   advanced; // 고급
-
-  String get label {
-    switch (this) {
-      case StudentLevel.beginner:
-        return '입문';
-      case StudentLevel.elementary:
-        return '초급';
-      case StudentLevel.intermediate:
-        return '중급';
-      case StudentLevel.advanced:
-        return '고급';
-    }
-  }
 
   /// Default monthly fee for each level
   int get defaultMonthlyFee {
@@ -89,50 +48,19 @@ enum StudentLevel {
 }
 
 /// Practice status enum
-enum PracticeStatus {
-  good,
-  normal,
-  poor,
-  paused;
-
-  String get label {
-    switch (this) {
-      case PracticeStatus.good:
-        return '우수';
-      case PracticeStatus.normal:
-        return '보통';
-      case PracticeStatus.poor:
-        return '부족';
-      case PracticeStatus.paused:
-        return '휴강';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case PracticeStatus.good:
-        return AppColors.paperOk;
-      case PracticeStatus.normal:
-        return AppColors.practiceNormal;
-      case PracticeStatus.poor:
-        return AppColors.paperAccent;
-      case PracticeStatus.paused:
-        return AppColors.practicePaused;
-    }
-  }
-}
+enum PracticeStatus { good, normal, poor, paused }
 
 /// Name-based profile color generation for API responses.
-Color _profileColorFromName(String name) {
+String _profileColorKeyFromName(String name) {
   const colors = [
-    AppColors.paperAccent,
-    AppColors.paperAccent,
-    AppColors.paperOk,
-    AppColors.ink,
-    AppColors.profileRed,
-    AppColors.profileTeal,
-    AppColors.profilePurple,
-    AppColors.profileOrange,
+    'paperAccent',
+    'paperAccent',
+    'paperOk',
+    'ink',
+    'profileRed',
+    'profileTeal',
+    'profilePurple',
+    'profileOrange',
   ];
   if (name.isEmpty) return colors[0];
   final hash = name.codeUnits.fold(0, (sum, c) => sum + c);
@@ -157,7 +85,7 @@ class Student {
   final String? profileImageUrl;
   final String? backgroundImageUrl;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final Color profileColor;
+  final String profileColorKey;
   final List<LessonSlot> lessonSlots;
   final int lessonDuration;
   final int totalLessons;
@@ -205,7 +133,7 @@ class Student {
     this.email,
     this.profileImageUrl,
     this.backgroundImageUrl,
-    Color? profileColor,
+    String? profileColorKey,
     this.lessonSlots = const [],
     this.lessonDuration = 60,
     this.totalLessons = 0,
@@ -227,7 +155,7 @@ class Student {
     this.address,
     this.addressDetail,
     this.district,
-  }) : profileColor = profileColor ?? _profileColorFromName(name);
+  }) : profileColorKey = profileColorKey ?? _profileColorKeyFromName(name);
 
   /// Create from JSON (profileColor is auto-generated from name).
   factory Student.fromJson(Map<String, dynamic> json) =>
@@ -356,7 +284,7 @@ class Student {
     String? email,
     String? profileImageUrl,
     String? backgroundImageUrl,
-    Color? profileColor,
+    String? profileColorKey,
     List<LessonSlot>? lessonSlots,
     int? lessonDuration,
     int? totalLessons,
@@ -393,7 +321,7 @@ class Student {
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       backgroundImageUrl: backgroundImageUrl ?? this.backgroundImageUrl,
-      profileColor: profileColor ?? this.profileColor,
+      profileColorKey: profileColorKey ?? this.profileColorKey,
       lessonSlots: lessonSlots ?? this.lessonSlots,
       lessonDuration: lessonDuration ?? this.lessonDuration,
       totalLessons: totalLessons ?? this.totalLessons,

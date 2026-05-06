@@ -87,13 +87,6 @@ class LessonClass extends HiveObject {
 
   Map<String, dynamic> toJson() => _$LessonClassToJson(this);
 
-  /// Display icon based on class type — Notebook × Score: ASCII only, no emoji.
-  String get icon => type == LessonClassType.academy ? '■' : '●';
-
-  /// Display label for the class.
-  String get displayLabel =>
-      type == LessonClassType.academy ? name : '개인레슨';
-
   LessonClass copyWith({
     String? id,
     String? teacherId,

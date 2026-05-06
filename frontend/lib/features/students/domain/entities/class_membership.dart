@@ -110,25 +110,13 @@ class ClassMembership extends HiveObject {
   bool get isEnrolled =>
       status == MembershipStatus.trial || status == MembershipStatus.active;
 
-  /// Status display label in Korean.
-  String get statusLabel {
-    switch (status) {
-      case MembershipStatus.trial:
-        return '체험중';
-      case MembershipStatus.active:
-        return '수강중';
-      case MembershipStatus.paused:
-        return '휴강';
-      case MembershipStatus.terminated:
-        return '종료';
-    }
-  }
+  LessonSlot? get primarySlot =>
+      lessonSlots.isNotEmpty ? lessonSlots.first : null;
 
-  LessonSlot? get primarySlot => lessonSlots.isNotEmpty ? lessonSlots.first : null;
-
-  String? get scheduleDisplay => lessonSlots.isNotEmpty
-      ? lessonSlots.map((s) => s.shortLabel).join(', ')
-      : null;
+  String? get scheduleDisplay =>
+      lessonSlots.isNotEmpty
+          ? lessonSlots.map((s) => s.shortLabel).join(', ')
+          : null;
 
   ClassMembership copyWith({
     String? id,

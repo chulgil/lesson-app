@@ -3,7 +3,9 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -338,8 +340,8 @@ class _RegisterRegularLessonScreenState
             return TimeSlot(
               id: 'slot_$day',
               dayOfWeek: day,
-              startTime: time,
-              endTime: addMinutes(time, _selectedLessonDuration),
+              startTime: time.toClockTime(),
+              endTime: addMinutes(time, _selectedLessonDuration).toClockTime(),
             );
           }).toList();
 

@@ -15,6 +15,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
+import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';

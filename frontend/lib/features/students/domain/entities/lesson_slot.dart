@@ -35,17 +35,10 @@ class LessonSlot {
   /// Short day label: "화"
   String get dayLabel => _dayLabels[dayOfWeek.clamp(0, 6)];
 
-  /// Full display: "화요일 14:00~15:00"
-  String get displayLabel => '$dayLabel요일 $startTime~$endTime';
-
   /// Short display: "화 14:00"
   String get shortLabel => '$dayLabel $startTime';
 
-  LessonSlot copyWith({
-    int? dayOfWeek,
-    String? startTime,
-    String? endTime,
-  }) {
+  LessonSlot copyWith({int? dayOfWeek, String? startTime, String? endTime}) {
     return LessonSlot(
       dayOfWeek: dayOfWeek ?? this.dayOfWeek,
       startTime: startTime ?? this.startTime,

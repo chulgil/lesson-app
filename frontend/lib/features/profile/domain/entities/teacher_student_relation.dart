@@ -1,10 +1,6 @@
 // Teacher-Student relation domain entity
 // Moved from lib/models/teacher_student_relation.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-
 /// Teacher-Student relationship status
 enum RelationStatus {
   /// No prior history - first time meeting
@@ -30,52 +26,6 @@ enum RelationLessonType {
 
   /// One-time additional lesson
   oneTime,
-}
-
-extension RelationLessonTypeExtension on RelationLessonType {
-  String get label {
-    switch (this) {
-      case RelationLessonType.trial:
-        return '체험 레슨';
-      case RelationLessonType.regular:
-        return '정기 레슨';
-      case RelationLessonType.oneTime:
-        return '1회 추가 레슨';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case RelationLessonType.trial:
-        return '첫 만남을 위한 1회 레슨';
-      case RelationLessonType.regular:
-        return '매주 고정 시간 레슨';
-      case RelationLessonType.oneTime:
-        return '단발성 추가 레슨';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case RelationLessonType.trial:
-        return Icons.music_note;
-      case RelationLessonType.regular:
-        return Icons.calendar_today;
-      case RelationLessonType.oneTime:
-        return Icons.add_circle_outline;
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case RelationLessonType.trial:
-        return AppColors.ink;
-      case RelationLessonType.regular:
-        return AppColors.paperAccent;
-      case RelationLessonType.oneTime:
-        return AppColors.paperAccent;
-    }
-  }
 }
 
 /// Teacher-Student relationship model
@@ -115,30 +65,6 @@ class TeacherStudentRelation {
   /// Check if one-time lesson is available
   bool get canRequestOneTime =>
       status == RelationStatus.active || status == RelationStatus.inactive;
-
-  /// Status display label
-  String get statusLabel {
-    switch (status) {
-      case RelationStatus.none:
-        return '처음 만남';
-      case RelationStatus.active:
-        return '정규레슨 진행중';
-      case RelationStatus.inactive:
-        return '이전 레슨 이력';
-    }
-  }
-
-  /// Status badge color
-  Color get statusColor {
-    switch (status) {
-      case RelationStatus.none:
-        return AppColors.ink;
-      case RelationStatus.active:
-        return AppColors.paperOk;
-      case RelationStatus.inactive:
-        return AppColors.inkTertiary;
-    }
-  }
 
   TeacherStudentRelation copyWith({
     String? teacherId,

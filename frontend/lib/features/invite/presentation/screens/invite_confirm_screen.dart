@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../parent_home/parent_home_facade.dart';
+import '../../../profile/presentation/extensions/profile_domain_visuals.dart';
 import '../../../profile/profile_facade.dart';
 
 /// Screen for confirming connection request from an invite

@@ -3,10 +3,12 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 
@@ -330,8 +332,8 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
     super.initState();
     if (widget.existingSlot != null) {
       _selectedDay = widget.existingSlot!.dayOfWeek;
-      _startTime = widget.existingSlot!.startTime;
-      _endTime = widget.existingSlot!.endTime;
+      _startTime = widget.existingSlot!.startTime.toFlutterTimeOfDay();
+      _endTime = widget.existingSlot!.endTime.toFlutterTimeOfDay();
     } else {
       _selectedDay = widget.preselectedDay ?? 1;
       _startTime = const TimeOfDay(hour: 9, minute: 0);
@@ -478,8 +480,8 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
           widget.existingSlot?.id ??
           DateTime.now().millisecondsSinceEpoch.toString(),
       dayOfWeek: _selectedDay,
-      startTime: _startTime,
-      endTime: _endTime,
+      startTime: _startTime.toClockTime(),
+      endTime: _endTime.toClockTime(),
       isActive: widget.existingSlot?.isActive ?? true,
     );
 

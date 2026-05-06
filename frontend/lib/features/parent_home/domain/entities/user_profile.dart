@@ -1,9 +1,6 @@
 // User profile domain entity
 // Moved from lib/features/parent_home/domain/entities/user_profile.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
 import 'child_profile.dart';
 
 /// Profile type for dual-role support
@@ -12,44 +9,7 @@ import 'child_profile.dart';
 /// - parent: Managing children's lessons
 /// - student: Own practice and lessons (if user is also a student)
 /// - child: Acting as a specific child (for practice on child's behalf)
-enum ProfileType {
-  parent,
-  student,
-  child;
-
-  String get label {
-    switch (this) {
-      case ProfileType.parent:
-        return '학부모';
-      case ProfileType.student:
-        return '학생';
-      case ProfileType.child:
-        return '자녀';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case ProfileType.parent:
-        return Icons.family_restroom;
-      case ProfileType.student:
-        return Icons.school;
-      case ProfileType.child:
-        return Icons.child_care;
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ProfileType.parent:
-        return AppColors.paperAccent;
-      case ProfileType.student:
-        return AppColors.paperOk;
-      case ProfileType.child:
-        return AppColors.paperAccent;
-    }
-  }
-}
+enum ProfileType { parent, student, child }
 
 /// User profile model for managing active profile context
 ///
@@ -151,28 +111,19 @@ class UserProfile {
 
   /// Switch to parent profile
   UserProfile switchToParent() {
-    return copyWith(
-      activeProfile: ProfileType.parent,
-      activeChildId: null,
-    );
+    return copyWith(activeProfile: ProfileType.parent, activeChildId: null);
   }
 
   /// Switch to student profile (if available)
   UserProfile switchToStudent() {
     if (!hasStudentProfile) return this;
-    return copyWith(
-      activeProfile: ProfileType.student,
-      activeChildId: null,
-    );
+    return copyWith(activeProfile: ProfileType.student, activeChildId: null);
   }
 
   /// Switch to child profile
   UserProfile switchToChild(String childId) {
     if (!children.any((c) => c.id == childId)) return this;
-    return copyWith(
-      activeProfile: ProfileType.child,
-      activeChildId: childId,
-    );
+    return copyWith(activeProfile: ProfileType.child, activeChildId: childId);
   }
 
   @override

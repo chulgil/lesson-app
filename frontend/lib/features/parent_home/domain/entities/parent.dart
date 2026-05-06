@@ -1,10 +1,6 @@
 // Parent domain entity
 // Moved from lib/features/parent_home/domain/entities/parent.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-
 /// V2: Parent permission level enum
 /// 학부모 권한 세분화(V2 계획). 현재 Parent 엔티티의 permission 필드에만 예약됨.
 /// 권한 제어 UI(설정에서 학부모별 권한 조정) 구현 시 활용.
@@ -14,19 +10,6 @@ enum ParentPermission {
   managePayments, // 수강권 입금 상태 관리
   manageLessons, // 레슨 관리 (일정 변경 등)
   fullAccess; // 전체 권한
-
-  String get label {
-    switch (this) {
-      case ParentPermission.viewOnly:
-        return '열람 전용';
-      case ParentPermission.managePayments:
-        return '입금 상태 관리';
-      case ParentPermission.manageLessons:
-        return '레슨 관리';
-      case ParentPermission.fullAccess:
-        return '전체 권한';
-    }
-  }
 
   /// Check if permission allows tuition deposit status actions.
   bool get canManagePayments =>
@@ -43,44 +26,13 @@ enum ParentPermission {
 enum ParentStatus {
   pending, // Invitation sent, not yet registered
   active, // Registered and active
-  inactive; // Deactivated
-
-  String get label {
-    switch (this) {
-      case ParentStatus.pending:
-        return '초대 대기';
-      case ParentStatus.active:
-        return '활성';
-      case ParentStatus.inactive:
-        return '비활성';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ParentStatus.pending:
-        return AppColors.paperAccent;
-      case ParentStatus.active:
-        return AppColors.paperOk;
-      case ParentStatus.inactive:
-        return AppColors.inkTertiary;
-    }
-  }
+  inactive, // Deactivated
 }
 
 /// Invitation source enum (who invited the parent)
 enum InvitationSource {
   student, // Invited by student
-  teacher; // Invited by teacher
-
-  String get label {
-    switch (this) {
-      case InvitationSource.student:
-        return '학생 초대';
-      case InvitationSource.teacher:
-        return '선생님 초대';
-    }
-  }
+  teacher, // Invited by teacher
 }
 
 /// Parent model
@@ -91,7 +43,7 @@ class Parent {
   final String phone;
   final String? email;
   final String? profileImageUrl;
-  final Color profileColor;
+  final String profileColorKey;
   final ParentStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -103,7 +55,7 @@ class Parent {
     required this.phone,
     this.email,
     this.profileImageUrl,
-    required this.profileColor,
+    required this.profileColorKey,
     this.status = ParentStatus.pending,
     required this.createdAt,
     this.updatedAt,
@@ -131,7 +83,7 @@ class Parent {
     String? phone,
     String? email,
     String? profileImageUrl,
-    Color? profileColor,
+    String? profileColorKey,
     ParentStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -143,7 +95,7 @@ class Parent {
       phone: phone ?? this.phone,
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
-      profileColor: profileColor ?? this.profileColor,
+      profileColorKey: profileColorKey ?? this.profileColorKey,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/extensions/user_role_visuals.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/providers/user_role_provider.dart';
 import '../config/environment.dart';
@@ -347,7 +348,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                           if (selected) {
                             ref
                                 .read(selectedMockStudentProvider.notifier)
-                                .state = student;
+                                .selectStudent(student);
                           }
                         },
                         selectedColor: AppColors.paperOk.withValues(alpha: 0.2),

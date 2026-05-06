@@ -5287,6 +5287,14 @@ class AppStrings {
   static const searchProfileNotFound = '선생님 정보를 찾을 수 없습니다';
   static const searchAnonymousTeacher = '익명 선생님';
   static const searchLessonRequestInfo = '선생님에게 레슨 신청서가 전달됩니다';
+  static const searchScopeAll = '전체';
+  static const searchScopeTeachers = '선생님';
+  static const searchScopeStudents = '학생';
+  static const searchScopeLessons = '레슨';
+  static const searchResultTeacher = '선생님';
+  static const searchResultStudent = '학생';
+  static const searchResultLesson = '레슨';
+  static const searchResultPractice = '연습';
   static String searchExperienceYears(int years) => '$years년 이상';
   // Sort labels
   static const sortRelevance = '관련도순';
@@ -5330,9 +5338,11 @@ class AppStrings {
   static const inviteMessageHint = '간단한 자기소개나 인사말을 작성해주세요';
 
   // ── Onboarding ──
+  static const onboardingRoleSelect = '역할 선택';
   static const onboardingPhoneVerification = '휴대폰 인증';
   static const onboardingProfileSetup = '프로필 설정';
   static const onboardingTutorial = '튜토리얼';
+  static const onboardingCompleted = '완료';
   static const onboardingPhone = '휴대폰';
   static const onboardingProfile = '프로필';
   static const onboardingProfileSaveError = '프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.';
@@ -5343,6 +5353,12 @@ class AppStrings {
   static const onboardingSelectInstrument = '악기 선택';
   static const onboardingNameHint = '선생님 이름을 입력해주세요';
   static const onboardingIntroHint = '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)';
+
+  // ── Review ──
+  static const reviewAuthorStudent = '학생';
+  static const reviewAuthorParent = '학부모';
+  static const reviewVisibilityPublic = '공개';
+  static const reviewVisibilityTeacherOnly = '선생님만';
   static const onboardingStudentNameHint = '이름을 입력해주세요';
 
   // ── Auth ──
@@ -5510,6 +5526,49 @@ class AppStrings {
   static const parentHomePaymentNotification = '입금 상태 알림';
   static const parentHomeRequired = '필수';
   static const parentHomeConnectedChildren = '연결된 자녀';
+  static const parentHomeChildStatusActive = '활성';
+  static const parentHomeChildStatusInactive = '비활성';
+  static const parentHomeChildConnectionConnected = '연결됨';
+  static const parentHomeChildConnectionPending = '대기 중';
+  static const parentHomeChildConnectionUnconnected = '미연결';
+  static const parentHomeParentStatusPending = '초대 대기';
+  static const parentHomeParentStatusActive = '활성';
+  static const parentHomeParentStatusInactive = '비활성';
+  static const parentHomePermissionViewOnly = '열람 전용';
+  static const parentHomePermissionManagePayments = '입금 상태 관리';
+  static const parentHomePermissionManageLessons = '레슨 관리';
+  static const parentHomePermissionFullAccess = '전체 권한';
+  static const parentHomeInvitationSourceStudent = '학생 초대';
+  static const parentHomeInvitationSourceTeacher = '선생님 초대';
+  static const parentHomeRelationStatusPending = '대기';
+  static const parentHomeRelationStatusActive = '활성';
+  static const parentHomeRelationStatusInactive = '해제';
+  static const parentHomeProfileTypeParent = '학부모';
+  static const parentHomeProfileTypeStudent = '학생';
+  static const parentHomeProfileTypeChild = '자녀';
+  static const parentHomeNotificationCategoryPayment = '입금 상태';
+  static const parentHomeNotificationCategoryLesson = '레슨';
+  static const parentHomeNotificationCategoryAssignment = '과제/숙제';
+  static const parentHomeNotificationCategoryPractice = '연습';
+  static const parentHomeNotificationCategoryCommunication = '소통';
+  static const parentHomeNotificationCategoryReport = '리포트';
+  static const parentHomeNotificationRequiredSuffix = '(필수)';
+  static const parentHomeNotificationRecommendedSuffix = '(권장)';
+  static const parentHomeNotificationPaymentRequest = '입금 안내';
+  static const parentHomeNotificationPaymentComplete = '입금 확인';
+  static const parentHomeNotificationPaymentDueSoon = '입금 예정일 임박';
+  static const parentHomeNotificationLessonChange = '레슨 일정 변경';
+  static const parentHomeNotificationLessonCancel = '레슨 취소/노쇼';
+  static const parentHomeNotificationLessonStart = '레슨 시작 알림';
+  static const parentHomeNotificationLessonEnd = '레슨 종료 알림';
+  static const parentHomeNotificationNewAssignment = '새 과제 등록';
+  static const parentHomeNotificationAssignmentIncomplete = '과제 미완료 알림 (D-1)';
+  static const parentHomeNotificationPracticeComplete = '연습 완료 알림';
+  static const parentHomeNotificationStreakAchievement = '스트릭 달성 알림';
+  static const parentHomeNotificationTeacherMessage = '선생님 메시지';
+  static const parentHomeNotificationLessonNoteUpdate = '레슨 노트 업데이트';
+  static const parentHomeNotificationWeeklyReport = '주간 요약 리포트';
+  static const parentHomeNotificationMonthlyReport = '월간 상세 리포트';
   static const parentHomeManage = '관리';
   static const parentHomeAddChildMethod = '자녀 추가 방법';
   static const parentHomeAddChild = '자녀 추가하기';
@@ -6087,6 +6146,18 @@ class AppStrings {
   static const studentRenewalProposal = '갱신 제안';
   static const studentAddLesson = '레슨 추가';
   static const studentReregistrationProposal = '재등록 제안';
+  static const studentStatusTrial = '체험';
+  static const studentStatusActive = '정규';
+  static const studentStatusPaused = '휴강';
+  static const studentStatusInactive = '종료';
+  static const studentLevelBeginner = '입문';
+  static const studentLevelElementary = '초급';
+  static const studentLevelIntermediate = '중급';
+  static const studentLevelAdvanced = '고급';
+  static const studentPracticeStatusGood = '우수';
+  static const studentPracticeStatusNormal = '보통';
+  static const studentPracticeStatusPoor = '부족';
+  static const studentPracticeStatusPaused = '휴강';
   static const studentTriageExpiring = '만료임박';
   static const studentTriageUnpaid = '입금대기(후불)';
   static const studentTriageTrial = '체험중';

@@ -7,16 +7,7 @@
 // ignore: unused-enum
 enum ReviewAuthorType {
   student, // Student wrote the review
-  parent; // Parent wrote the review
-
-  String get label {
-    switch (this) {
-      case ReviewAuthorType.student:
-        return '학생';
-      case ReviewAuthorType.parent:
-        return '학부모';
-    }
-  }
+  parent, // Parent wrote the review
 }
 
 /// Review visibility - who can see the review
@@ -24,16 +15,7 @@ enum ReviewAuthorType {
 // ignore: unused-enum
 enum ReviewVisibility {
   public, // Anyone can see
-  teacherOnly; // Only the teacher can see
-
-  String get label {
-    switch (this) {
-      case ReviewVisibility.public:
-        return '공개';
-      case ReviewVisibility.teacherOnly:
-        return '선생님만';
-    }
-  }
+  teacherOnly, // Only the teacher can see
 }
 
 /// Teacher review model
@@ -89,23 +71,6 @@ class TeacherReview {
 
   /// Check if author is a student
   bool get isStudentReview => authorType == ReviewAuthorType.student;
-
-  /// Get display author name (considering anonymity)
-  String get displayAuthorName {
-    if (isAnonymous) {
-      return authorType == ReviewAuthorType.parent ? '학부모' : '학생';
-    }
-    return authorName;
-  }
-
-  /// Get author badge text
-  String get authorBadge {
-    final badge = authorType.label;
-    if (isVerified) {
-      return '$badge ✓';
-    }
-    return badge;
-  }
 
   TeacherReview copyWith({
     String? id,

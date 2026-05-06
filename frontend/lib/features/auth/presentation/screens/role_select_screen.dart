@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/user_role.dart';
+import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
 
 /// Role selection screen shown after first OAuth signup when role is null.

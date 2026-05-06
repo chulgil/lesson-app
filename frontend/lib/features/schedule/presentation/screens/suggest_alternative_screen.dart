@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -636,8 +638,12 @@ class _SuggestAlternativeScreenState
         TimeSlot(
           id: 'suggest_${DateTime.now().millisecondsSinceEpoch}',
           dayOfWeek: date.weekday,
-          startTime: TimeOfDay(hour: hour, minute: minute),
-          endTime: TimeOfDay(hour: endMinutes ~/ 60, minute: endMinutes % 60),
+          startTime: TimeOfDay(hour: hour, minute: minute).toClockTime(),
+          endTime:
+              TimeOfDay(
+                hour: endMinutes ~/ 60,
+                minute: endMinutes % 60,
+              ).toClockTime(),
           isActive: true,
           specificDate: date,
         ),
@@ -737,7 +743,7 @@ class _SuggestAlternativeScreenState
 
     final newStartTime = await showTimePicker(
       context: context,
-      initialTime: slot.startTime,
+      initialTime: slot.startTime.toFlutterTimeOfDay(),
       helpText: AppStrings.selectStartTime,
       cancelText: AppStrings.cancel,
       confirmText: AppStrings.confirm,
@@ -779,8 +785,12 @@ class _SuggestAlternativeScreenState
         TimeSlot(
           id: slot.id,
           dayOfWeek: newDate.weekday,
-          startTime: newStartTime,
-          endTime: TimeOfDay(hour: endMinutes ~/ 60, minute: endMinutes % 60),
+          startTime: newStartTime.toClockTime(),
+          endTime:
+              TimeOfDay(
+                hour: endMinutes ~/ 60,
+                minute: endMinutes % 60,
+              ).toClockTime(),
           isActive: true,
           specificDate: newDate,
         ),

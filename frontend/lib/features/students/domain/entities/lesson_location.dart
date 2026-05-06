@@ -102,47 +102,6 @@ class LessonLocation extends HiveObject {
 
   Map<String, dynamic> toJson() => _$LessonLocationToJson(this);
 
-  /// Icon based on location type.
-  String get icon {
-    switch (type) {
-      case LocationType.academyRoom:
-        return '🏫';
-      case LocationType.teacherStudio:
-        return '🏠';
-      case LocationType.studentHome:
-        return '🚗';
-      case LocationType.externalPlace:
-        return '📍';
-      case LocationType.online:
-        return '💻';
-    }
-  }
-
-  /// Type label in Korean.
-  String get typeLabel {
-    switch (type) {
-      case LocationType.academyRoom:
-        return '학원 레슨실';
-      case LocationType.teacherStudio:
-        return '선생님 스튜디오';
-      case LocationType.studentHome:
-        return '학생 집 방문';
-      case LocationType.externalPlace:
-        return '외부 장소';
-      case LocationType.online:
-        return '온라인';
-    }
-  }
-
-  /// Display address for UI.
-  String get displayAddress {
-    if (type == LocationType.online) {
-      return onlinePlatform ?? '온라인';
-    }
-    if (address == null) return '';
-    return addressDetail != null ? '$address $addressDetail' : address!;
-  }
-
   /// Check if location has coordinates for map.
   bool get hasCoordinates => latitude != null && longitude != null;
 
@@ -185,6 +144,5 @@ class LessonLocation extends HiveObject {
   }
 
   @override
-  String toString() =>
-      'LessonLocation(id: $id, name: $name, type: $type)';
+  String toString() => 'LessonLocation(id: $id, name: $name, type: $type)';
 }

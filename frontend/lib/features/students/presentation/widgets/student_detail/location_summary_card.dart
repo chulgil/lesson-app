@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../../domain/entities/lesson_location.dart';
+import '../../extensions/student_domain_visuals.dart';
 import '../../providers/location_providers.dart';
 
 /// Compact card showing lesson location and travel time for a student.

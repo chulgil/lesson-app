@@ -1,24 +1,8 @@
 // Child profile domain entity
 // Moved from lib/features/parent_home/domain/entities/child_profile.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-
 /// Child profile status enum
-enum ChildProfileStatus {
-  active,
-  inactive;
-
-  String get label {
-    switch (this) {
-      case ChildProfileStatus.active:
-        return '활성';
-      case ChildProfileStatus.inactive:
-        return '비활성';
-    }
-  }
-}
+enum ChildProfileStatus { active, inactive }
 
 /// Child connection status with teacher
 ///
@@ -30,44 +14,7 @@ enum ChildProfileStatus {
 /// ChildProfile.connectionStatus 필드 + isConnected/isPending/isUnconnected getter에 배선.
 /// 선생님 초대 → 연결 플로우 UI 구현 시 외부 세팅 활성화.
 // ignore: unused-enum
-enum ChildConnectionStatus {
-  connected,
-  pending,
-  unconnected;
-
-  String get label {
-    switch (this) {
-      case ChildConnectionStatus.connected:
-        return '연결됨';
-      case ChildConnectionStatus.pending:
-        return '대기 중';
-      case ChildConnectionStatus.unconnected:
-        return '미연결';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ChildConnectionStatus.connected:
-        return AppColors.paperOk;
-      case ChildConnectionStatus.pending:
-        return AppColors.paperAccent;
-      case ChildConnectionStatus.unconnected:
-        return AppColors.inkTertiary;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case ChildConnectionStatus.connected:
-        return Icons.link;
-      case ChildConnectionStatus.pending:
-        return Icons.hourglass_empty;
-      case ChildConnectionStatus.unconnected:
-        return Icons.link_off;
-    }
-  }
-}
+enum ChildConnectionStatus { connected, pending, unconnected }
 
 /// Child profile model for under-14 students (no account registration)
 ///
@@ -85,7 +32,7 @@ class ChildProfile {
   final String? teacherName; // For display
   final String?
   linkedStudentId; // Maps to Student.id for subscription/lesson queries
-  final Color profileColor;
+  final String profileColorKey;
   final ChildProfileStatus status;
   final ChildConnectionStatus connectionStatus;
   final DateTime createdAt;
@@ -101,7 +48,7 @@ class ChildProfile {
     this.teacherId,
     this.teacherName,
     this.linkedStudentId,
-    required this.profileColor,
+    required this.profileColorKey,
     this.status = ChildProfileStatus.active,
     this.connectionStatus = ChildConnectionStatus.unconnected,
     required this.createdAt,
@@ -171,20 +118,20 @@ class ChildProfile {
   }
 
   /// Get instrument icon
-  IconData get instrumentIcon {
+  String get instrumentIconKey {
     switch (instrument.toLowerCase()) {
       case 'violin':
-        return Icons.music_note;
+        return 'musicNote';
       case 'piano':
-        return Icons.piano;
+        return 'piano';
       case 'cello':
-        return Icons.music_note;
+        return 'musicNote';
       case 'viola':
-        return Icons.music_note;
+        return 'musicNote';
       case 'flute':
-        return Icons.music_note;
+        return 'musicNote';
       default:
-        return Icons.music_note;
+        return 'musicNote';
     }
   }
 
@@ -199,7 +146,7 @@ class ChildProfile {
     String? teacherId,
     String? teacherName,
     String? linkedStudentId,
-    Color? profileColor,
+    String? profileColorKey,
     ChildProfileStatus? status,
     ChildConnectionStatus? connectionStatus,
     DateTime? createdAt,
@@ -215,7 +162,7 @@ class ChildProfile {
       teacherId: teacherId ?? this.teacherId,
       teacherName: teacherName ?? this.teacherName,
       linkedStudentId: linkedStudentId ?? this.linkedStudentId,
-      profileColor: profileColor ?? this.profileColor,
+      profileColorKey: profileColorKey ?? this.profileColorKey,
       status: status ?? this.status,
       connectionStatus: connectionStatus ?? this.connectionStatus,
       createdAt: createdAt ?? this.createdAt,

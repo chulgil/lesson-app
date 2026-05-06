@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/parent_home_facade.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 import '../widgets/profile_switcher.dart';
 
 /// Dashboard for unconnected children (practice/metronome only)

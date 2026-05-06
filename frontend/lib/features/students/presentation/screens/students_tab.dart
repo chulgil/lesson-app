@@ -16,6 +16,7 @@ import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/roster_summary.dart';
+import '../extensions/student_domain_visuals.dart';
 import '../providers/student_crud_provider.dart';
 import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';

@@ -1,22 +1,19 @@
-// Onboarding step extensions for teacher registration flow
-// Note: The main OnboardingStep enum is defined in teacher_onboarding.dart
-
+import '../../../../core/l10n/app_strings.dart';
 import '../../../profile/domain/entities/teacher_onboarding.dart';
 
-/// Extension to add UI helpers to OnboardingStep
-extension OnboardingStepExtensions on OnboardingStep {
+extension OnboardingStepVisuals on OnboardingStep {
   String get label {
     switch (this) {
       case OnboardingStep.roleSelect:
-        return '역할 선택';
+        return AppStrings.onboardingRoleSelect;
       case OnboardingStep.phoneVerification:
-        return '휴대폰 인증';
+        return AppStrings.onboardingPhoneVerification;
       case OnboardingStep.profileSetup:
-        return '프로필 설정';
+        return AppStrings.onboardingProfileSetup;
       case OnboardingStep.tutorial:
-        return '튜토리얼';
+        return AppStrings.onboardingTutorial;
       case OnboardingStep.completed:
-        return '완료';
+        return AppStrings.onboardingCompleted;
     }
   }
 
@@ -35,7 +32,5 @@ extension OnboardingStepExtensions on OnboardingStep {
     }
   }
 
-  double get progress {
-    return stepNumber / OnboardingStep.values.length;
-  }
+  double get progress => stepNumber / OnboardingStep.values.length;
 }

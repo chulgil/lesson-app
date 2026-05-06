@@ -53,7 +53,19 @@ final mockStudentsProvider = Provider<List<MockStudentInfo>>((ref) {
 });
 
 /// Currently selected mock student (for student role testing)
-final selectedMockStudentProvider = StateProvider<MockStudentInfo>((ref) {
-  final students = ref.read(mockStudentsProvider);
-  return students.first;
-});
+final selectedMockStudentProvider =
+    NotifierProvider<SelectedMockStudentNotifier, MockStudentInfo>(
+      SelectedMockStudentNotifier.new,
+    );
+
+class SelectedMockStudentNotifier extends Notifier<MockStudentInfo> {
+  @override
+  MockStudentInfo build() {
+    final students = ref.read(mockStudentsProvider);
+    return students.first;
+  }
+
+  void selectStudent(MockStudentInfo student) {
+    state = student;
+  }
+}

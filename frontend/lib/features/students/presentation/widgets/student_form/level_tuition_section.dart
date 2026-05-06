@@ -6,6 +6,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../features/students/domain/entities/student.dart';
+import '../../extensions/student_domain_visuals.dart';
 import 'frequency_option.dart';
 import 'student_form_helpers.dart';
 

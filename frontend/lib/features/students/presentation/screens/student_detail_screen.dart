@@ -27,6 +27,7 @@ import '../../../../features/students/students_facade.dart'
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
+import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 
 /// Student detail screen — Notebook × Score 레이아웃.
@@ -220,145 +221,143 @@ class _StudentDetailContent extends ConsumerWidget {
       context: context,
       builder:
           (context) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _MoreOptionTile(
+                icon: Icons.edit_outlined,
+                title: AppStrings.studentEditInfoTitle,
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push(
+                    AppRoutes.editStudent.replaceFirst(':id', student.id),
+                  );
+                },
+              ),
+              const _MoreOptionDivider(),
+              _MoreOptionTile(
+                icon: Icons.phone_outlined,
+                title: AppStrings.studentCallTitle,
+                enabled: student.phone != null && student.phone!.isNotEmpty,
+                hint:
+                    student.phone == null || student.phone!.isEmpty
+                        ? '전화번호 미등록'
+                        : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  if (student.phone != null && student.phone!.isNotEmpty) {
+                    launchUrl(Uri.parse('tel:${student.phone}'));
+                  }
+                },
+              ),
+              _MoreOptionTile(
+                icon: Icons.message_outlined,
+                title: AppStrings.studentSendMessage,
+                enabled: student.phone != null && student.phone!.isNotEmpty,
+                hint:
+                    student.phone == null || student.phone!.isEmpty
+                        ? '전화번호 미등록'
+                        : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  if (student.phone != null && student.phone!.isNotEmpty) {
+                    launchUrl(Uri.parse('sms:${student.phone}'));
+                  }
+                },
+              ),
+              _MoreOptionTile(
+                icon: Icons.history,
+                title: AppStrings.studentViewLessonHistory,
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push(
+                    AppRoutes.studentNotes.replaceFirst(':id', student.id),
+                  );
+                },
+              ),
+              const _MoreOptionDivider(),
+              if (student.status == StudentStatus.trial)
                 _MoreOptionTile(
-                  icon: Icons.edit_outlined,
-                  title: AppStrings.studentEditInfoTitle,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(
-                      AppRoutes.editStudent.replaceFirst(':id', student.id),
-                    );
-                  },
+                  icon: Icons.upgrade,
+                  title: AppStrings.studentConvertRegular,
+                  hint: AppStrings.studentConvertRegularHint,
+                  onTap:
+                      () => _confirmStatusChange(
+                        context,
+                        ref,
+                        newStatus: StudentStatus.active,
+                        dialogTitle: '정규 전환',
+                        dialogBody: '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
+                      ),
                 ),
-                const _MoreOptionDivider(),
+              if (student.status == StudentStatus.active)
                 _MoreOptionTile(
-                  icon: Icons.phone_outlined,
-                  title: AppStrings.studentCallTitle,
-                  enabled: student.phone != null && student.phone!.isNotEmpty,
-                  hint:
-                      student.phone == null || student.phone!.isEmpty
-                          ? '전화번호 미등록'
-                          : null,
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (student.phone != null && student.phone!.isNotEmpty) {
-                      launchUrl(Uri.parse('tel:${student.phone}'));
-                    }
-                  },
+                  icon: Icons.pause_circle_outline,
+                  title: AppStrings.studentPauseTitle,
+                  hint: AppStrings.studentPauseHint,
+                  onTap:
+                      () => _confirmStatusChange(
+                        context,
+                        ref,
+                        newStatus: StudentStatus.paused,
+                        dialogTitle: '휴강 설정',
+                        dialogBody: '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
+                      ),
                 ),
+              if (student.status == StudentStatus.paused)
                 _MoreOptionTile(
-                  icon: Icons.message_outlined,
-                  title: AppStrings.studentSendMessage,
-                  enabled: student.phone != null && student.phone!.isNotEmpty,
-                  hint:
-                      student.phone == null || student.phone!.isEmpty
-                          ? '전화번호 미등록'
-                          : null,
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (student.phone != null && student.phone!.isNotEmpty) {
-                      launchUrl(Uri.parse('sms:${student.phone}'));
-                    }
-                  },
+                  icon: Icons.play_circle_outline,
+                  title: AppStrings.studentResumeTitle,
+                  hint: AppStrings.studentResumeHint,
+                  onTap:
+                      () => _confirmStatusChange(
+                        context,
+                        ref,
+                        newStatus: StudentStatus.active,
+                        dialogTitle: '레슨 재개',
+                        dialogBody: '${student.name} 학생의 레슨을 재개하시겠습니까?',
+                      ),
                 ),
-                _MoreOptionTile(
-                  icon: Icons.history,
-                  title: AppStrings.studentViewLessonHistory,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(
-                      AppRoutes.studentNotes.replaceFirst(':id', student.id),
-                    );
-                  },
-                ),
-                const _MoreOptionDivider(),
-                if (student.status == StudentStatus.trial)
-                  _MoreOptionTile(
-                    icon: Icons.upgrade,
-                    title: AppStrings.studentConvertRegular,
-                    hint: AppStrings.studentConvertRegularHint,
-                    onTap:
-                        () => _confirmStatusChange(
-                          context,
-                          ref,
-                          newStatus: StudentStatus.active,
-                          dialogTitle: '정규 전환',
-                          dialogBody: '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
-                        ),
-                  ),
-                if (student.status == StudentStatus.active)
-                  _MoreOptionTile(
-                    icon: Icons.pause_circle_outline,
-                    title: AppStrings.studentPauseTitle,
-                    hint: AppStrings.studentPauseHint,
-                    onTap:
-                        () => _confirmStatusChange(
-                          context,
-                          ref,
-                          newStatus: StudentStatus.paused,
-                          dialogTitle: '휴강 설정',
-                          dialogBody: '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
-                        ),
-                  ),
-                if (student.status == StudentStatus.paused)
-                  _MoreOptionTile(
-                    icon: Icons.play_circle_outline,
-                    title: AppStrings.studentResumeTitle,
-                    hint: AppStrings.studentResumeHint,
-                    onTap:
-                        () => _confirmStatusChange(
-                          context,
-                          ref,
-                          newStatus: StudentStatus.active,
-                          dialogTitle: '레슨 재개',
-                          dialogBody: '${student.name} 학생의 레슨을 재개하시겠습니까?',
-                        ),
-                  ),
-                _MoreOptionTile(
-                  icon: Icons.family_restroom,
-                  title: AppStrings.studentParentInviteLabel,
-                  hint: AppStrings.studentParentInviteHint,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showInviteCodeDialog(context, student.name, ref);
-                  },
-                ),
-                const _MoreOptionDivider(),
-                _MoreOptionTile(
-                  icon: Icons.delete_outline,
-                  title: AppStrings.studentDeleteTitle,
-                  isDestructive: true,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final confirmed = await _showDeleteConfirmation(context);
-                    if (confirmed == true) {
-                      try {
-                        await ref
-                            .read(studentsNotifierProvider.notifier)
-                            .deleteStudent(student.id);
-                        if (context.mounted) {
-                          context.pop();
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                AppStrings.studentDeleteFailed,
-                              ),
-                              backgroundColor: AppColors.paperAccent,
-                            ),
-                          );
-                        }
+              _MoreOptionTile(
+                icon: Icons.family_restroom,
+                title: AppStrings.studentParentInviteLabel,
+                hint: AppStrings.studentParentInviteHint,
+                onTap: () {
+                  Navigator.pop(context);
+                  _showInviteCodeDialog(context, student.name, ref);
+                },
+              ),
+              const _MoreOptionDivider(),
+              _MoreOptionTile(
+                icon: Icons.delete_outline,
+                title: AppStrings.studentDeleteTitle,
+                isDestructive: true,
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirmed = await _showDeleteConfirmation(context);
+                  if (confirmed == true) {
+                    try {
+                      await ref
+                          .read(studentsNotifierProvider.notifier)
+                          .deleteStudent(student.id);
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(AppStrings.studentDeleteFailed),
+                            backgroundColor: AppColors.paperAccent,
+                          ),
+                        );
                       }
                     }
-                  },
-                ),
-                const SizedBox(height: AppSpacing.space4),
-              ],
-            ),
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
     );
   }
 

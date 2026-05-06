@@ -1,80 +1,24 @@
 // Invite domain entity
 // Moved from lib/features/profile/domain/entities/invite.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-
 // Re-export shared enums for backward compatibility
 export '../../../../core/models/shared_enums.dart'
     show ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
 
 /// Method used to send/receive invitation
 enum InviteMethod {
-  qrCode,     // QR code scan (in-person)
-  urlLink,    // URL link (message/kakao)
+  qrCode, // QR code scan (in-person)
+  urlLink, // URL link (message/kakao)
   inviteCode, // 6-digit code input
-  inAppSearch; // In-app search (teacher only)
-
-  String get label {
-    switch (this) {
-      case InviteMethod.qrCode:
-        return 'QR 코드';
-      case InviteMethod.urlLink:
-        return 'URL 링크';
-      case InviteMethod.inviteCode:
-        return '초대 코드';
-      case InviteMethod.inAppSearch:
-        return '앱 내 검색';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case InviteMethod.qrCode:
-        return Icons.qr_code;
-      case InviteMethod.urlLink:
-        return Icons.link;
-      case InviteMethod.inviteCode:
-        return Icons.dialpad;
-      case InviteMethod.inAppSearch:
-        return Icons.search;
-    }
-  }
+  inAppSearch, // In-app search (teacher only)
 }
 
 /// Status of an invite link/code
 enum InviteStatus {
-  active,   // Valid and can be used
-  used,     // Already used (single-use)
-  expired,  // Past expiration date
-  revoked;  // Manually revoked by creator
-
-  String get label {
-    switch (this) {
-      case InviteStatus.active:
-        return '활성';
-      case InviteStatus.used:
-        return '사용됨';
-      case InviteStatus.expired:
-        return '만료됨';
-      case InviteStatus.revoked:
-        return '취소됨';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case InviteStatus.active:
-        return AppColors.paperOk;
-      case InviteStatus.used:
-        return AppColors.inkTertiary;
-      case InviteStatus.expired:
-        return AppColors.paperAccent;
-      case InviteStatus.revoked:
-        return AppColors.paperAccent;
-    }
-  }
+  active, // Valid and can be used
+  used, // Already used (single-use)
+  expired, // Past expiration date
+  revoked; // Manually revoked by creator
 
   bool get isValid => this == InviteStatus.active;
 }
@@ -83,15 +27,6 @@ enum InviteStatus {
 enum InviteUserRole {
   teacher,
   student;
-
-  String get label {
-    switch (this) {
-      case InviteUserRole.teacher:
-        return '선생님';
-      case InviteUserRole.student:
-        return '학생';
-    }
-  }
 
   InviteUserRole get opposite {
     switch (this) {
@@ -107,18 +42,18 @@ enum InviteUserRole {
 class Invite {
   final String id;
   final String creatorId;
-  final String? creatorName;     // Creator's display name (for UI)
+  final String? creatorName; // Creator's display name (for UI)
   final InviteUserRole creatorRole;
-  final String inviteCode;       // 6-digit code
-  final String inviteUrl;        // Deep link URL
-  final String qrCodeData;       // Data for QR code generation
+  final String inviteCode; // 6-digit code
+  final String inviteUrl; // Deep link URL
+  final String qrCodeData; // Data for QR code generation
   final InviteStatus status;
   final DateTime createdAt;
   final DateTime expiresAt;
-  final bool isSingleUse;        // If true, can only be used once
-  final int? maxUses;            // Maximum number of uses (null = unlimited)
-  final int useCount;            // Current use count
-  final String? note;            // Optional note/label for the invite
+  final bool isSingleUse; // If true, can only be used once
+  final int? maxUses; // Maximum number of uses (null = unlimited)
+  final int useCount; // Current use count
+  final String? note; // Optional note/label for the invite
 
   const Invite({
     required this.id,
@@ -151,16 +86,6 @@ class Invite {
     final now = DateTime.now();
     if (now.isAfter(expiresAt)) return Duration.zero;
     return expiresAt.difference(now);
-  }
-
-  /// Formatted expiration time
-  String get formattedExpiry {
-    final remaining = timeRemaining;
-    if (remaining == Duration.zero) return '만료됨';
-    if (remaining.inDays > 0) return '${remaining.inDays}일 남음';
-    if (remaining.inHours > 0) return '${remaining.inHours}시간 남음';
-    if (remaining.inMinutes > 0) return '${remaining.inMinutes}분 남음';
-    return '곧 만료';
   }
 
   Invite copyWith({
@@ -208,41 +133,11 @@ class Invite {
 
 /// Status of a connection request
 enum ConnectionRequestStatus {
-  pending,   // Waiting for response
-  accepted,  // Connection established
-  rejected,  // Declined by target
+  pending, // Waiting for response
+  accepted, // Connection established
+  rejected, // Declined by target
   cancelled, // Cancelled by requester
-  expired;   // Request expired
-
-  String get label {
-    switch (this) {
-      case ConnectionRequestStatus.pending:
-        return '대기중';
-      case ConnectionRequestStatus.accepted:
-        return '수락됨';
-      case ConnectionRequestStatus.rejected:
-        return '거절됨';
-      case ConnectionRequestStatus.cancelled:
-        return '취소됨';
-      case ConnectionRequestStatus.expired:
-        return '만료됨';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ConnectionRequestStatus.pending:
-        return AppColors.paperAccent;
-      case ConnectionRequestStatus.accepted:
-        return AppColors.paperOk;
-      case ConnectionRequestStatus.rejected:
-        return AppColors.paperAccent;
-      case ConnectionRequestStatus.cancelled:
-        return AppColors.inkTertiary;
-      case ConnectionRequestStatus.expired:
-        return AppColors.inkTertiary;
-    }
-  }
+  expired; // Request expired
 
   bool get isPending => this == ConnectionRequestStatus.pending;
   bool get isResolved => this != ConnectionRequestStatus.pending;
@@ -259,14 +154,14 @@ class ConnectionRequest {
   final InviteUserRole targetRole;
   final String? targetName;
   final String? targetProfileImage;
-  final InviteMethod method;         // How they found each other
-  final String? inviteId;            // Related invite (if used QR/URL/code)
-  final String? message;             // Optional message from requester
+  final InviteMethod method; // How they found each other
+  final String? inviteId; // Related invite (if used QR/URL/code)
+  final String? message; // Optional message from requester
   final ConnectionRequestStatus status;
   final DateTime createdAt;
   final DateTime? respondedAt;
-  final String? rejectionReason;     // Reason if rejected
-  final DateTime expiresAt;          // Request expires after 7 days
+  final String? rejectionReason; // Reason if rejected
+  final DateTime expiresAt; // Request expires after 7 days
 
   const ConnectionRequest({
     required this.id,
@@ -363,9 +258,9 @@ class Connection {
   final String studentId;
   final String studentName;
   final String? studentProfileImage;
-  final String? connectionRequestId;  // Original request that created this
+  final String? connectionRequestId; // Original request that created this
   final DateTime connectedAt;
-  final bool isActive;                 // Can be deactivated without deletion
+  final bool isActive; // Can be deactivated without deletion
   final DateTime? deactivatedAt;
 
   const Connection({
@@ -413,9 +308,7 @@ class Connection {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Connection &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+      other is Connection && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -431,9 +324,9 @@ class Connection {
 /// Represents one-directional follow (like Instagram)
 class Follow {
   final String id;
-  final String followerId;      // Who is following
+  final String followerId; // Who is following
   final InviteUserRole followerRole;
-  final String followeeId;      // Who is being followed
+  final String followeeId; // Who is being followed
   final InviteUserRole followeeRole;
   final DateTime createdAt;
 

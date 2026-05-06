@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/lesson_booking.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
+import 'package:lessonaza/core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
+import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 
 void main() {
   group('LessonBooking.displayMessage (UnavailableReason 제거 후)', () {
@@ -11,8 +12,7 @@ void main() {
         unavailableMessage: '현재 가능한 시간이 없어 이번에는 어렵습니다.',
       );
 
-      expect(booking.displayMessage,
-          '현재 가능한 시간이 없어 이번에는 어렵습니다.');
+      expect(booking.displayMessage, '현재 가능한 시간이 없어 이번에는 어렵습니다.');
     });
 
     test('unavailable 상태에서 메시지 없으면 null', () {
@@ -42,8 +42,8 @@ void main() {
       final slot = TimeSlot(
         id: 'suggest_1',
         dayOfWeek: 5, // Friday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 14, minute: 45),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 14, minute: 45),
         isActive: true,
         specificDate: DateTime(2026, 3, 27), // Friday
       );
@@ -58,8 +58,8 @@ void main() {
       final slot = TimeSlot(
         id: 'suggest_1',
         dayOfWeek: 1,
-        startTime: const TimeOfDay(hour: 10, minute: 0),
-        endTime: const TimeOfDay(hour: 10, minute: 45),
+        startTime: const ClockTime(hour: 10, minute: 0),
+        endTime: const ClockTime(hour: 10, minute: 45),
         isActive: true,
       );
 
@@ -70,30 +70,29 @@ void main() {
       final slot = TimeSlot(
         id: 'suggest_1',
         dayOfWeek: 1,
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 14, minute: 45),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 14, minute: 45),
         isActive: true,
       );
 
-      expect(slot.containsTime(const TimeOfDay(hour: 14, minute: 0)), isTrue);
-      expect(
-          slot.containsTime(const TimeOfDay(hour: 14, minute: 30)), isTrue);
-      expect(
-          slot.containsTime(const TimeOfDay(hour: 14, minute: 45)), isFalse);
-      expect(
-          slot.containsTime(const TimeOfDay(hour: 13, minute: 59)), isFalse);
+      expect(slot.containsTime(const ClockTime(hour: 14, minute: 0)), isTrue);
+      expect(slot.containsTime(const ClockTime(hour: 14, minute: 30)), isTrue);
+      expect(slot.containsTime(const ClockTime(hour: 14, minute: 45)), isFalse);
+      expect(slot.containsTime(const ClockTime(hour: 13, minute: 59)), isFalse);
     });
 
     test('최대 3개 슬롯 제한 검증', () {
       final slots = <TimeSlot>[];
       for (int i = 0; i < 3; i++) {
-        slots.add(TimeSlot(
-          id: 'suggest_$i',
-          dayOfWeek: i + 1,
-          startTime: TimeOfDay(hour: 14 + i, minute: 0),
-          endTime: TimeOfDay(hour: 14 + i, minute: 45),
-          isActive: true,
-        ));
+        slots.add(
+          TimeSlot(
+            id: 'suggest_$i',
+            dayOfWeek: i + 1,
+            startTime: ClockTime(hour: 14 + i, minute: 0),
+            endTime: ClockTime(hour: 14 + i, minute: 45),
+            isActive: true,
+          ),
+        );
       }
 
       expect(slots.length, 3);
@@ -171,8 +170,8 @@ void main() {
           const TimeSlot(
             id: 's1',
             dayOfWeek: 3,
-            startTime: TimeOfDay(hour: 15, minute: 0),
-            endTime: TimeOfDay(hour: 15, minute: 45),
+            startTime: ClockTime(hour: 15, minute: 0),
+            endTime: ClockTime(hour: 15, minute: 45),
             isActive: true,
           ),
         ],
@@ -198,8 +197,8 @@ LessonBooking _createBooking({
     lessonType: LessonType.trial,
     status: status,
     lessonDate: DateTime(2026, 3, 28),
-    startTime: const TimeOfDay(hour: 14, minute: 0),
-    endTime: const TimeOfDay(hour: 15, minute: 0),
+    startTime: const ClockTime(hour: 14, minute: 0),
+    endTime: const ClockTime(hour: 15, minute: 0),
     fee: 50000,
     createdAt: DateTime(2026, 3, 25),
     unavailableMessage: unavailableMessage,

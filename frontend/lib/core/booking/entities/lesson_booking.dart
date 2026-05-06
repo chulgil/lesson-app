@@ -1,62 +1,20 @@
 // Lesson booking domain entities
 // Moved from lib/features/schedule/domain/entities/lesson_booking.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
+import '../../domain/value_objects/clock_time.dart';
 import 'time_slot.dart';
 
 /// Lesson type enum
 enum LessonType {
   trial, // 체험 레슨
   regular, // 정규 레슨
-  oneTime; // 1회 레슨
-
-  String get label {
-    switch (this) {
-      case LessonType.trial:
-        return '체험';
-      case LessonType.regular:
-        return '정규';
-      case LessonType.oneTime:
-        return '1회';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case LessonType.trial:
-        return AppColors.paperAccent;
-      case LessonType.regular:
-        return AppColors.paperOk;
-      case LessonType.oneTime:
-        return AppColors.ink;
-    }
-  }
+  oneTime, // 1회 레슨
 }
 
 /// Schedule type for regular lessons
 enum ScheduleType {
   fixed, // 고정 시간
-  flexible; // 유동 시간
-
-  String get label {
-    switch (this) {
-      case ScheduleType.fixed:
-        return '고정';
-      case ScheduleType.flexible:
-        return '유동';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case ScheduleType.fixed:
-        return '매주 같은 요일/시간에 레슨';
-      case ScheduleType.flexible:
-        return '매주 가능한 시간 협의';
-    }
-  }
+  flexible, // 유동 시간
 }
 
 /// Booking status enum
@@ -68,83 +26,6 @@ enum BookingStatus {
   cancelled, // 취소
   unavailable, // 일정 조율 필요 (선생님이 해당 시간 불가)
   expired; // 응답 대기 만료 (48시간 초과)
-
-  String get label {
-    switch (this) {
-      case BookingStatus.pending:
-        return '신청완료';
-      case BookingStatus.confirmed:
-        return '확정';
-      case BookingStatus.changeRequested:
-        return '변경요청';
-      case BookingStatus.completed:
-        return '완료';
-      case BookingStatus.cancelled:
-        return '취소';
-      case BookingStatus.unavailable:
-        return '일정조율';
-      case BookingStatus.expired:
-        return '만료';
-    }
-  }
-
-  /// Student-friendly message for unavailable/expired statuses
-  String get studentMessage {
-    switch (this) {
-      case BookingStatus.pending:
-        return '선생님 확인 중이에요';
-      case BookingStatus.confirmed:
-        return '레슨이 확정되었어요';
-      case BookingStatus.changeRequested:
-        return '일정 변경 요청 중';
-      case BookingStatus.completed:
-        return '레슨 완료';
-      case BookingStatus.cancelled:
-        return '취소되었습니다';
-      case BookingStatus.unavailable:
-        return '다른 시간을 확인해주세요';
-      case BookingStatus.expired:
-        return '응답 대기 시간이 지났어요';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case BookingStatus.pending:
-        return AppColors.paperAccent;
-      case BookingStatus.confirmed:
-        return AppColors.ink;
-      case BookingStatus.changeRequested:
-        return AppColors.paperAccent;
-      case BookingStatus.completed:
-        return AppColors.paperOk;
-      case BookingStatus.cancelled:
-        return AppColors.inkTertiary;
-      case BookingStatus.unavailable:
-        return AppColors.paperAccent;
-      case BookingStatus.expired:
-        return AppColors.inkSecondary;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case BookingStatus.pending:
-        return Icons.schedule;
-      case BookingStatus.confirmed:
-        return Icons.check_circle;
-      case BookingStatus.changeRequested:
-        return Icons.swap_horiz;
-      case BookingStatus.completed:
-        return Icons.done_all;
-      case BookingStatus.cancelled:
-        return Icons.cancel;
-      case BookingStatus.unavailable:
-        return Icons.event_busy;
-      case BookingStatus.expired:
-        return Icons.timer_off;
-    }
-  }
 
   /// Check if booking is active
   bool get isActive =>
@@ -169,36 +50,11 @@ enum BookingStatus {
       this == BookingStatus.unavailable || this == BookingStatus.expired;
 }
 
-/// Default message for unavailability
-const kDefaultUnavailableMessage = '현재 가능한 시간이 없어 이번에는 어렵습니다.';
-
 /// Lesson goal enum (for trial lessons)
 enum LessonGoal {
   hobby, // 취미
   exam, // 입시
-  major; // 전공
-
-  String get label {
-    switch (this) {
-      case LessonGoal.hobby:
-        return '취미';
-      case LessonGoal.exam:
-        return '입시';
-      case LessonGoal.major:
-        return '전공';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case LessonGoal.hobby:
-        return '즐겁게 음악을 배우고 싶어요';
-      case LessonGoal.exam:
-        return '입시 준비가 필요해요';
-      case LessonGoal.major:
-        return '전공자로 실력을 키우고 싶어요';
-    }
-  }
+  major, // 전공
 }
 
 /// Experience level enum (for trial lessons)
@@ -207,19 +63,6 @@ enum ExperienceLevel {
   beginner, // 1년 미만
   some, // 1-3년
   experienced; // 3년 이상
-
-  String get label {
-    switch (this) {
-      case ExperienceLevel.none:
-        return '처음';
-      case ExperienceLevel.beginner:
-        return '1년 미만';
-      case ExperienceLevel.some:
-        return '1-3년';
-      case ExperienceLevel.experienced:
-        return '3년 이상';
-    }
-  }
 
   /// Map from StudentLevel to ExperienceLevel
   /// Used when existing student requests trial lesson for new instrument
@@ -253,8 +96,8 @@ class ScheduleOption {
 
   // For single lessons (trial, one-time)
   final DateTime? date;
-  final TimeOfDay? startTime;
-  final TimeOfDay? endTime;
+  final ClockTime? startTime;
+  final ClockTime? endTime;
 
   // For regular lessons (weekly schedule)
   final int? dayOfWeek; // 1 = Monday, 7 = Sunday
@@ -262,8 +105,8 @@ class ScheduleOption {
 
   // For weekly 2x lessons (second slot)
   final int? secondDayOfWeek;
-  final TimeOfDay? secondStartTime;
-  final TimeOfDay? secondEndTime;
+  final ClockTime? secondStartTime;
+  final ClockTime? secondEndTime;
 
   const ScheduleOption({
     required this.id,
@@ -287,108 +130,17 @@ class ScheduleOption {
   /// Check if this is a weekly 2x lesson option
   bool get isWeekly2x => secondDayOfWeek != null;
 
-  /// Get formatted time range for single lessons
-  String get timeRange {
-    if (startTime == null || endTime == null) return '';
-    final startHour = startTime!.hour.toString().padLeft(2, '0');
-    final startMinute = startTime!.minute.toString().padLeft(2, '0');
-    final endHour = endTime!.hour.toString().padLeft(2, '0');
-    final endMinute = endTime!.minute.toString().padLeft(2, '0');
-    return '$startHour:$startMinute - $endHour:$endMinute';
-  }
-
-  /// Get formatted date for single lessons
-  String get formattedDate {
-    if (date == null) return '';
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekday = weekdays[date!.weekday - 1];
-    return '${date!.month}/${date!.day}($weekday)';
-  }
-
-  /// Get full formatted date for single lessons
-  String get fullFormattedDate {
-    if (date == null) return '';
-    final weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-    final weekday = weekdays[date!.weekday - 1];
-    return '${date!.year}년 ${date!.month}월 ${date!.day}일 $weekday';
-  }
-
-  /// Get day name for regular lessons
-  String get dayName {
-    if (dayOfWeek == null) return '';
-    final weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-    return weekdays[dayOfWeek! - 1];
-  }
-
-  /// Get short day name for regular lessons
-  String get shortDayName {
-    if (dayOfWeek == null) return '';
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return weekdays[dayOfWeek! - 1];
-  }
-
-  /// Get second day name for weekly 2x lessons
-  String get secondDayName {
-    if (secondDayOfWeek == null) return '';
-    final weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-    return weekdays[secondDayOfWeek! - 1];
-  }
-
-  /// Get second short day name for weekly 2x lessons
-  String get secondShortDayName {
-    if (secondDayOfWeek == null) return '';
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return weekdays[secondDayOfWeek! - 1];
-  }
-
-  /// Get second time range for weekly 2x lessons
-  String get secondTimeRange {
-    if (secondStartTime == null || secondEndTime == null) return '';
-    final startHour = secondStartTime!.hour.toString().padLeft(2, '0');
-    final startMinute = secondStartTime!.minute.toString().padLeft(2, '0');
-    final endHour = secondEndTime!.hour.toString().padLeft(2, '0');
-    final endMinute = secondEndTime!.minute.toString().padLeft(2, '0');
-    return '$startHour:$startMinute - $endHour:$endMinute';
-  }
-
-  /// Get display summary for single lessons
-  String get singleLessonSummary {
-    return '$formattedDate $timeRange';
-  }
-
-  /// Get display summary for regular lessons
-  String get regularLessonSummary {
-    if (isWeekly2x) {
-      return '$shortDayName $timeRange + $secondShortDayName $secondTimeRange';
-    }
-    return '매주 $dayName $timeRange';
-  }
-
-  /// Get priority label
-  String get priorityLabel {
-    switch (priority) {
-      case 1:
-        return '1순위';
-      case 2:
-        return '2순위';
-      case 3:
-        return '3순위';
-      default:
-        return '$priority순위';
-    }
-  }
-
   ScheduleOption copyWith({
     String? id,
     int? priority,
     DateTime? date,
-    TimeOfDay? startTime,
-    TimeOfDay? endTime,
+    ClockTime? startTime,
+    ClockTime? endTime,
     int? dayOfWeek,
     DateTime? startDate,
     int? secondDayOfWeek,
-    TimeOfDay? secondStartTime,
-    TimeOfDay? secondEndTime,
+    ClockTime? secondStartTime,
+    ClockTime? secondEndTime,
   }) {
     return ScheduleOption(
       id: id ?? this.id,
@@ -426,8 +178,8 @@ class LessonBooking {
   final LessonType lessonType;
   final BookingStatus status;
   final DateTime lessonDate;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
+  final ClockTime startTime;
+  final ClockTime endTime;
   final int durationMinutes;
   final int fee;
   final ScheduleType? scheduleType; // For regular lessons
@@ -444,8 +196,8 @@ class LessonBooking {
   final DateTime? cancelledAt;
   // Change request fields (for changeRequested status)
   final DateTime? requestedDate; // Requested new date
-  final TimeOfDay? requestedStartTime; // Requested new start time
-  final TimeOfDay? requestedEndTime; // Requested new end time
+  final ClockTime? requestedStartTime; // Requested new start time
+  final ClockTime? requestedEndTime; // Requested new end time
   final DateTime? changeRequestedAt; // When change was requested
   // Unavailable fields (for unavailable status - replaces rejected)
   final String? unavailableMessage; // Free text reason
@@ -498,38 +250,6 @@ class LessonBooking {
     this.requestId,
   });
 
-  /// Get formatted time range
-  String get timeRange {
-    final startHour = startTime.hour.toString().padLeft(2, '0');
-    final startMinute = startTime.minute.toString().padLeft(2, '0');
-    final endHour = endTime.hour.toString().padLeft(2, '0');
-    final endMinute = endTime.minute.toString().padLeft(2, '0');
-    return '$startHour:$startMinute - $endHour:$endMinute';
-  }
-
-  /// Get formatted date
-  String get formattedDate {
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekday = weekdays[lessonDate.weekday - 1];
-    return '${lessonDate.month}/${lessonDate.day}($weekday)';
-  }
-
-  /// Get full formatted date
-  String get fullFormattedDate {
-    final weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-    final weekday = weekdays[lessonDate.weekday - 1];
-    return '${lessonDate.year}년 ${lessonDate.month}월 ${lessonDate.day}일 $weekday';
-  }
-
-  /// Get formatted fee
-  String get formattedFee {
-    final formatter = fee.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
-    return '$formatter원';
-  }
-
   /// Check if booking is trial lesson
   bool get isTrial => lessonType == LessonType.trial;
 
@@ -568,38 +288,9 @@ class LessonBooking {
   /// Check if there is a pending change request
   bool get hasChangeRequest => status == BookingStatus.changeRequested;
 
-  /// Get formatted requested time range (for change requests)
-  String? get requestedTimeRange {
-    if (requestedStartTime == null || requestedEndTime == null) return null;
-    final startHour = requestedStartTime!.hour.toString().padLeft(2, '0');
-    final startMinute = requestedStartTime!.minute.toString().padLeft(2, '0');
-    final endHour = requestedEndTime!.hour.toString().padLeft(2, '0');
-    final endMinute = requestedEndTime!.minute.toString().padLeft(2, '0');
-    return '$startHour:$startMinute - $endHour:$endMinute';
-  }
-
-  /// Get formatted requested date (for change requests)
-  String? get formattedRequestedDate {
-    if (requestedDate == null) return null;
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekday = weekdays[requestedDate!.weekday - 1];
-    return '${requestedDate!.month}/${requestedDate!.day}($weekday)';
-  }
-
   /// Check if booking has suggested alternatives
   bool get hasSuggestedTimes =>
       suggestedTimeSlots != null && suggestedTimeSlots!.isNotEmpty;
-
-  /// Get student-friendly display message
-  String? get displayMessage {
-    if (status == BookingStatus.unavailable && unavailableMessage != null) {
-      return unavailableMessage!;
-    }
-    if (status == BookingStatus.expired) {
-      return status.studentMessage;
-    }
-    return null;
-  }
 
   // Multi-option schedule helpers
   /// Check if booking has schedule options
@@ -654,8 +345,8 @@ class LessonBooking {
     LessonType? lessonType,
     BookingStatus? status,
     DateTime? lessonDate,
-    TimeOfDay? startTime,
-    TimeOfDay? endTime,
+    ClockTime? startTime,
+    ClockTime? endTime,
     int? durationMinutes,
     int? fee,
     ScheduleType? scheduleType,
@@ -671,8 +362,8 @@ class LessonBooking {
     DateTime? completedAt,
     DateTime? cancelledAt,
     DateTime? requestedDate,
-    TimeOfDay? requestedStartTime,
-    TimeOfDay? requestedEndTime,
+    ClockTime? requestedStartTime,
+    ClockTime? requestedEndTime,
     DateTime? changeRequestedAt,
     String? unavailableMessage,
     List<TimeSlot>? suggestedTimeSlots,
@@ -745,8 +436,8 @@ class TrialLessonRequest {
   final List<ScheduleOption> scheduleOptions;
   // Legacy single option (for backward compatibility)
   final DateTime? preferredDate;
-  final TimeOfDay? preferredStartTime;
-  final TimeOfDay? preferredEndTime;
+  final ClockTime? preferredStartTime;
+  final ClockTime? preferredEndTime;
 
   const TrialLessonRequest({
     this.studentId,
@@ -784,19 +475,19 @@ class TrialLessonRequest {
   }
 
   /// Get effective start time (from primary option or legacy field)
-  TimeOfDay get effectiveStartTime {
+  ClockTime get effectiveStartTime {
     if (hasMultipleOptions && primaryOption?.startTime != null) {
       return primaryOption!.startTime!;
     }
-    return preferredStartTime ?? const TimeOfDay(hour: 14, minute: 0);
+    return preferredStartTime ?? const ClockTime(hour: 14, minute: 0);
   }
 
   /// Get effective end time (from primary option or legacy field)
-  TimeOfDay get effectiveEndTime {
+  ClockTime get effectiveEndTime {
     if (hasMultipleOptions && primaryOption?.endTime != null) {
       return primaryOption!.endTime!;
     }
-    return preferredEndTime ?? const TimeOfDay(hour: 15, minute: 0);
+    return preferredEndTime ?? const ClockTime(hour: 15, minute: 0);
   }
 
   /// Convert to LessonBooking
@@ -909,8 +600,8 @@ class RegularLessonRequest {
       lessonType: LessonType.regular,
       status: BookingStatus.pending,
       lessonDate: firstLessonDate,
-      startTime: primary?.startTime ?? const TimeOfDay(hour: 14, minute: 0),
-      endTime: primary?.endTime ?? const TimeOfDay(hour: 15, minute: 0),
+      startTime: primary?.startTime ?? const ClockTime(hour: 14, minute: 0),
+      endTime: primary?.endTime ?? const ClockTime(hour: 15, minute: 0),
       fee: monthlyFee,
       studentPhone: studentPhone,
       studentEmail: studentEmail,

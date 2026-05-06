@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 
 /// Detailed notification settings sheet for parents.
 class NotificationSettingsSheet extends StatefulWidget {
@@ -164,7 +165,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
 
                   return Column(
                     children: [
-                      _buildSettingTile(category, item, index),
+                      _buildSettingTile(item),
                       if (!isLast)
                         const Divider(height: 1, indent: 16, endIndent: 16),
                     ],
@@ -176,11 +177,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
     );
   }
 
-  Widget _buildSettingTile(
-    NotificationCategory category,
-    NotificationItem item,
-    int index,
-  ) {
+  Widget _buildSettingTile(NotificationItem item) {
     return ListTile(
       dense: true,
       title: Row(
@@ -224,43 +221,45 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
       trailing: Switch(
         value: item.isEnabled,
         onChanged:
-            item.isRequired
-                ? null
-                : (value) => _handleToggle(category, index, value),
+            item.isRequired ? null : (value) => _handleToggle(item.type, value),
         activeThumbColor: AppColors.paperAccent,
       ),
     );
   }
 
-  void _handleToggle(NotificationCategory category, int index, bool value) {
+  void _handleToggle(NotificationSettingType type, bool value) {
     ParentNotificationSettings updated = _settings;
 
-    switch (category) {
-      case NotificationCategory.payment:
-        if (index == 2) updated = updated.copyWith(paymentDueSoon: value);
-        break;
-      case NotificationCategory.lesson:
-        if (index == 0) updated = updated.copyWith(lessonChange: value);
-        if (index == 1) updated = updated.copyWith(lessonCancel: value);
-        if (index == 2) updated = updated.copyWith(lessonStart: value);
-        if (index == 3) updated = updated.copyWith(lessonEnd: value);
-        break;
-      case NotificationCategory.assignment:
-        if (index == 0) updated = updated.copyWith(newAssignment: value);
-        if (index == 1) updated = updated.copyWith(assignmentIncomplete: value);
-        break;
-      case NotificationCategory.practice:
-        if (index == 0) updated = updated.copyWith(practiceComplete: value);
-        if (index == 1) updated = updated.copyWith(streakAchievement: value);
-        break;
-      case NotificationCategory.communication:
-        if (index == 0) updated = updated.copyWith(teacherMessage: value);
-        if (index == 1) updated = updated.copyWith(lessonNoteUpdate: value);
-        break;
-      case NotificationCategory.report:
-        if (index == 0) updated = updated.copyWith(weeklyReport: value);
-        if (index == 1) updated = updated.copyWith(monthlyReport: value);
-        break;
+    switch (type) {
+      case NotificationSettingType.paymentRequest:
+      case NotificationSettingType.paymentComplete:
+        return;
+      case NotificationSettingType.paymentDueSoon:
+        updated = updated.copyWith(paymentDueSoon: value);
+      case NotificationSettingType.lessonChange:
+        updated = updated.copyWith(lessonChange: value);
+      case NotificationSettingType.lessonCancel:
+        updated = updated.copyWith(lessonCancel: value);
+      case NotificationSettingType.lessonStart:
+        updated = updated.copyWith(lessonStart: value);
+      case NotificationSettingType.lessonEnd:
+        updated = updated.copyWith(lessonEnd: value);
+      case NotificationSettingType.newAssignment:
+        updated = updated.copyWith(newAssignment: value);
+      case NotificationSettingType.assignmentIncomplete:
+        updated = updated.copyWith(assignmentIncomplete: value);
+      case NotificationSettingType.practiceComplete:
+        updated = updated.copyWith(practiceComplete: value);
+      case NotificationSettingType.streakAchievement:
+        updated = updated.copyWith(streakAchievement: value);
+      case NotificationSettingType.teacherMessage:
+        updated = updated.copyWith(teacherMessage: value);
+      case NotificationSettingType.lessonNoteUpdate:
+        updated = updated.copyWith(lessonNoteUpdate: value);
+      case NotificationSettingType.weeklyReport:
+        updated = updated.copyWith(weeklyReport: value);
+      case NotificationSettingType.monthlyReport:
+        updated = updated.copyWith(monthlyReport: value);
     }
 
     _updateSetting(updated);

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/auth/domain/entities/user_role.dart';
+import 'package:lessonaza/features/auth/presentation/extensions/user_role_visuals.dart';
 
 void main() {
   group('UserRole', () {

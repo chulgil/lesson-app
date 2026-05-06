@@ -8,41 +8,26 @@ enum NotificationCategory {
   assignment,
   practice,
   communication,
-  report;
+  report,
+}
 
-  String get label {
-    switch (this) {
-      case NotificationCategory.payment:
-        return '입금 상태';
-      case NotificationCategory.lesson:
-        return '레슨';
-      case NotificationCategory.assignment:
-        return '과제/숙제';
-      case NotificationCategory.practice:
-        return '연습';
-      case NotificationCategory.communication:
-        return '소통';
-      case NotificationCategory.report:
-        return '리포트';
-    }
-  }
-
-  String get icon {
-    switch (this) {
-      case NotificationCategory.payment:
-        return '💰';
-      case NotificationCategory.lesson:
-        return '📅';
-      case NotificationCategory.assignment:
-        return '📝';
-      case NotificationCategory.practice:
-        return '🔥';
-      case NotificationCategory.communication:
-        return '💬';
-      case NotificationCategory.report:
-        return '📊';
-    }
-  }
+/// Stable setting identifiers. UI labels are resolved in presentation.
+enum NotificationSettingType {
+  paymentRequest,
+  paymentComplete,
+  paymentDueSoon,
+  lessonChange,
+  lessonCancel,
+  lessonStart,
+  lessonEnd,
+  newAssignment,
+  assignmentIncomplete,
+  practiceComplete,
+  streakAchievement,
+  teacherMessage,
+  lessonNoteUpdate,
+  weeklyReport,
+  monthlyReport,
 }
 
 /// Parent notification settings model
@@ -125,32 +110,79 @@ class ParentNotificationSettings {
   Map<NotificationCategory, List<NotificationItem>> get groupedSettings {
     return {
       NotificationCategory.payment: [
-        NotificationItem('입금 안내', paymentRequest, isRequired: true),
-        NotificationItem('입금 확인', paymentComplete, isRequired: true),
-        NotificationItem('입금 예정일 임박', paymentDueSoon),
+        NotificationItem(
+          NotificationSettingType.paymentRequest,
+          paymentRequest,
+          isRequired: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.paymentComplete,
+          paymentComplete,
+          isRequired: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.paymentDueSoon,
+          paymentDueSoon,
+        ),
       ],
       NotificationCategory.lesson: [
-        NotificationItem('레슨 일정 변경', lessonChange, isRecommended: true),
-        NotificationItem('레슨 취소/노쇼', lessonCancel, isRecommended: true),
-        NotificationItem('레슨 시작 알림', lessonStart),
-        NotificationItem('레슨 종료 알림', lessonEnd),
+        NotificationItem(
+          NotificationSettingType.lessonChange,
+          lessonChange,
+          isRecommended: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.lessonCancel,
+          lessonCancel,
+          isRecommended: true,
+        ),
+        NotificationItem(NotificationSettingType.lessonStart, lessonStart),
+        NotificationItem(NotificationSettingType.lessonEnd, lessonEnd),
       ],
       NotificationCategory.assignment: [
-        NotificationItem('새 과제 등록', newAssignment, isRecommended: true),
-        NotificationItem('과제 미완료 알림 (D-1)', assignmentIncomplete,
-            isRecommended: true),
+        NotificationItem(
+          NotificationSettingType.newAssignment,
+          newAssignment,
+          isRecommended: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.assignmentIncomplete,
+          assignmentIncomplete,
+          isRecommended: true,
+        ),
       ],
       NotificationCategory.practice: [
-        NotificationItem('연습 완료 알림', practiceComplete),
-        NotificationItem('스트릭 달성 알림', streakAchievement),
+        NotificationItem(
+          NotificationSettingType.practiceComplete,
+          practiceComplete,
+        ),
+        NotificationItem(
+          NotificationSettingType.streakAchievement,
+          streakAchievement,
+        ),
       ],
       NotificationCategory.communication: [
-        NotificationItem('선생님 메시지', teacherMessage, isRecommended: true),
-        NotificationItem('레슨 노트 업데이트', lessonNoteUpdate),
+        NotificationItem(
+          NotificationSettingType.teacherMessage,
+          teacherMessage,
+          isRecommended: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.lessonNoteUpdate,
+          lessonNoteUpdate,
+        ),
       ],
       NotificationCategory.report: [
-        NotificationItem('주간 요약 리포트', weeklyReport, isRecommended: true),
-        NotificationItem('월간 상세 리포트', monthlyReport, isRecommended: true),
+        NotificationItem(
+          NotificationSettingType.weeklyReport,
+          weeklyReport,
+          isRecommended: true,
+        ),
+        NotificationItem(
+          NotificationSettingType.monthlyReport,
+          monthlyReport,
+          isRecommended: true,
+        ),
       ],
     };
   }
@@ -233,23 +265,17 @@ class ParentNotificationSettings {
   int get hashCode => id.hashCode;
 }
 
-/// Helper class for displaying notification items
+/// Parent notification item state.
 class NotificationItem {
-  final String label;
+  final NotificationSettingType type;
   final bool isEnabled;
   final bool isRequired;
   final bool isRecommended;
 
   const NotificationItem(
-    this.label,
+    this.type,
     this.isEnabled, {
     this.isRequired = false,
     this.isRecommended = false,
   });
-
-  String get suffix {
-    if (isRequired) return '(필수)';
-    if (isRecommended) return '(권장)';
-    return '';
-  }
 }

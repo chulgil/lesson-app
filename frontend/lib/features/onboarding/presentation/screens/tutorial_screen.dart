@@ -13,6 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
+import '../models/tutorial_step_content.dart';
 
 /// Tutorial screen for teacher onboarding
 class TutorialScreen extends ConsumerStatefulWidget {

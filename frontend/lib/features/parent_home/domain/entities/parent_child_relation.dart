@@ -6,18 +6,7 @@
 enum ParentChildRelationStatus {
   pending, // Awaiting confirmation
   active, // Active relationship
-  inactive; // Deactivated
-
-  String get label {
-    switch (this) {
-      case ParentChildRelationStatus.pending:
-        return '대기';
-      case ParentChildRelationStatus.active:
-        return '활성';
-      case ParentChildRelationStatus.inactive:
-        return '해제';
-    }
-  }
+  inactive, // Deactivated
 }
 
 /// Backward compatibility alias

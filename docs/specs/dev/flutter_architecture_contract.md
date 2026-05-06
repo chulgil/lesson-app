@@ -118,10 +118,46 @@ feature root에 facade를 둘 수 있지만 다음 중 하나로 명시한다.
 
 사용자에게 보이는 문구는 `AppStrings` 또는 l10n 계층으로 모은다.
 
+- `AppStrings`는 현재 앱의 중앙 문자열 SSOT로 유지한다.
+- Flutter ARB 기반 `AppLocalizations` 구조가 도입되기 전까지는 `AppStrings`를 presentation 계층의 공통 문자열 API로 사용한다.
+- 다국어 적용이 필요해지면 `AppStrings`와 ARB를 중복 관리하지 않고, facade 또는 단계적 migration plan을 통해 하나의 런타임 accessor로 수렴시킨다.
 - 새/수정 UI에서 하드코딩 Korean/English label을 추가하지 않는다.
 - 일정 변경, 확정, 거절, 카운터 제안처럼 메시지/말풍선에 들어가는 문구는 공통 string API를 사용한다.
 - 사용자가 입력한 확정 메시지와 시스템 이벤트 메시지는 별도 필드로 유지하고, 표시 단계에서 누락하지 않는다.
 - n8n/automation으로 전달될 텍스트는 화면별 임의 문구가 아니라 공통 메시지 builder를 통해 생성한다.
+
+### Localization Boundary
+
+문자열 SSOT는 유지하되 domain/data 계층이 직접 의존하지 않는다.
+
+금지:
+- `features/*/domain/**` 에서 `AppStrings`, `AppLocalizations`, `core/l10n` import
+- `features/*/data/**` 에서 `AppStrings`, `AppLocalizations`, `core/l10n` import
+- `core/domain/**`, `core/booking/entities/**`, `core/booking/repositories/**` 에서 Flutter/l10n import
+- domain enum/entity에 `label`, `title`, `emoji`, `statusLabel`, `displayText`, `homeRoute`처럼 화면 표시 목적의 getter 추가
+
+허용:
+- `presentation/screens`, `presentation/widgets`, `presentation/providers`
+- `presentation/extensions`
+- `core/presentation` 또는 공통 UI widget
+- l10n facade 자체와 message builder 구현체
+
+예시:
+
+```dart
+// domain: 순수 상태 값만 유지
+enum LessonRequestStatus { pending, confirmed }
+
+// presentation/extensions/lesson_request_status_visuals.dart
+extension LessonRequestStatusVisuals on LessonRequestStatus {
+  String get label => switch (this) {
+    LessonRequestStatus.pending => AppStrings.lessonRequestPending,
+    LessonRequestStatus.confirmed => AppStrings.lessonRequestConfirmed,
+  };
+}
+```
+
+이 규칙의 목적은 `AppStrings`를 제거하는 것이 아니라, localization 변경이 business rule, repository contract, 서버 payload, 테스트 데이터 구조까지 전염되지 않게 막는 것이다.
 
 ## Startup Bootstrap
 
@@ -147,6 +183,7 @@ core/startup/
 - domain에서 data import/export 금지
 - domain service에서 framework driver/API/environment import 금지
 - domain layer에 새 Hive persistence annotation/import 추가 금지
+- domain/data/core booking 순수 계층에서 Flutter/l10n/AppStrings 의존 금지
 - repository interface와 implementation 위치 규칙
 - `EnvironmentConfig.useMockData` 직접 분기의 허용 위치
 
