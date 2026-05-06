@@ -37,6 +37,7 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Unsupported OAuth provider: {provider}",
             )
+        self._assert_oauth_credentials(provider, request)
 
         # Fetch user info from the provider
         provider_user = await self._get_provider_user(provider, request)
@@ -206,13 +207,26 @@ class AuthService:
             return await self._apple_user_info(request)
         raise HTTPException(status_code=400, detail="Unknown provider")
 
+    def _assert_oauth_credentials(self, provider: str, request: OAuthRequest) -> None:
+        """Reject malformed OAuth requests before external provider calls."""
+        if provider in ("google", "kakao") and not (request.code or request.authorization_code):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="authorization code is required")
+        if provider == "apple" and not request.identity_token:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="identity_token is required")
+
+    def _authorization_code(self, request: OAuthRequest) -> str:
+        code = request.code or request.authorization_code
+        if code is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="authorization code is required")
+        return code
+
     async def _google_user_info(self, request: OAuthRequest) -> dict[str, Any]:
         """Exchange Google authorization code for user info."""
         from app.core.config import settings
 
         async with httpx.AsyncClient() as client:
             token_data = {
-                "code": request.code,
+                "code": self._authorization_code(request),
                 "client_id": settings.GOOGLE_CLIENT_ID,
                 "client_secret": settings.GOOGLE_CLIENT_SECRET,
                 "grant_type": "authorization_code",
@@ -257,7 +271,7 @@ class AuthService:
             token_resp = await client.post(
                 "https://kauth.kakao.com/oauth/token",
                 data={
-                    "code": request.code,
+                    "code": self._authorization_code(request),
                     "client_id": settings.KAKAO_CLIENT_ID,
                     "client_secret": settings.KAKAO_CLIENT_SECRET,
                     "redirect_uri": request.redirect_uri or "",

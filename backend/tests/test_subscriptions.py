@@ -920,6 +920,93 @@ async def test_subscription_proposals_are_scoped_to_current_teacher(
 
 
 @pytest.mark.asyncio
+async def test_create_subscription_proposal_rejects_foreign_student(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Teachers cannot create proposals for another teacher's existing student profile."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-proposal-student@test.com",
+    )
+
+    from app.models.student import Student
+
+    db_session.add(
+        Student(
+            id="foreign-student-profile",
+            user_id="foreign-student-user",
+            teacher_id="other-teacher-prof",
+            name="Foreign Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={
+            "student_id": "foreign-student-profile",
+            "message": "Please review this subscription plan",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_create_subscription_proposal_rejects_foreign_templates(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Teachers cannot create proposals using another teacher's templates."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher",
+        role="teacher",
+        name="Other Teacher",
+        email="other-proposal-template@test.com",
+    )
+    other_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
+    }
+
+    template_response = await client.post(
+        "/api/v1/subscriptions-templates",
+        headers=other_headers,
+        json={
+            "name": "Other Template",
+            "type": "monthly",
+            "lessons_per_month": 4,
+            "amount": 200000,
+        },
+    )
+    assert template_response.status_code == 201
+    foreign_template_id = template_response.json()["id"]
+
+    response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "template_id": foreign_template_id,
+            "recommended_template_id": foreign_template_id,
+            "template_ids": [foreign_template_id],
+            "message": "Please review this subscription plan",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_subscription_proposal_notify_payment_action_marks_deposit_notified(
     client: AsyncClient,
     auth_headers,

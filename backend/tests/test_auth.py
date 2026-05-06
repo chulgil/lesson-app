@@ -21,13 +21,15 @@ async def test_oauth_login_unsupported_provider(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_oauth_login_missing_code(client: AsyncClient):
-    """POST /api/v1/auth/oauth/google without proper credentials returns error."""
-    response = await client.post(
-        "/api/v1/auth/oauth/google",
-        json={"provider": "google"},
-    )
-    # Should fail because code is None and Google exchange will fail
-    assert response.status_code in (401, 422, 500)
+    """POST /api/v1/auth/oauth/google without credentials is rejected locally."""
+    with patch("app.services.auth_service.httpx.AsyncClient") as async_client:
+        response = await client.post(
+            "/api/v1/auth/oauth/google",
+            json={"provider": "google"},
+        )
+
+    assert response.status_code == 400
+    async_client.assert_not_called()
 
 
 @pytest.mark.asyncio

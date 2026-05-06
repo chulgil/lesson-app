@@ -915,6 +915,8 @@ class SubscriptionService:
         from app.models.subscription import SubscriptionProposal
 
         tid = await resolve_teacher_id(self.db, current_user.id)
+        teacher_ids = await self._teacher_identifiers(current_user)
+        await self._assert_proposal_create_resources(data, teacher_ids)
         proposal = SubscriptionProposal(
             teacher_id=tid,
             student_id=data.student_id,
@@ -953,6 +955,60 @@ class SubscriptionService:
             )
 
         return SubscriptionProposalResponse.model_validate(proposal)
+
+    async def _assert_proposal_create_resources(self, data: SubscriptionProposalCreate, teacher_ids: list[str]) -> None:
+        await self._assert_proposal_student_owner(data.student_id, teacher_ids)
+        await self._assert_proposal_template_owner(data.template_id, teacher_ids)
+        await self._assert_proposal_template_owner(data.recommended_template_id, teacher_ids)
+        for template_id in data.template_ids:
+            await self._assert_proposal_template_owner(template_id, teacher_ids)
+        await self._assert_proposal_lesson_request_owner(data.lesson_request_id, teacher_ids)
+        await self._assert_proposal_previous_subscription_owner(data.previous_subscription_id, teacher_ids)
+
+    async def _assert_proposal_student_owner(self, student_id: str, teacher_ids: list[str]) -> None:
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is not None and student.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_proposal_template_owner(self, template_id: str | None, teacher_ids: list[str]) -> None:
+        if template_id is None:
+            return
+
+        from app.models.subscription import SubscriptionTemplate
+
+        template = await self.db.get(SubscriptionTemplate, template_id)
+        if template is not None and template.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_proposal_previous_subscription_owner(
+        self,
+        previous_subscription_id: str | None,
+        teacher_ids: list[str],
+    ) -> None:
+        if previous_subscription_id is None:
+            return
+
+        from app.models.subscription import Subscription
+
+        subscription = await self.db.get(Subscription, previous_subscription_id)
+        if subscription is not None and subscription.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_proposal_lesson_request_owner(
+        self,
+        lesson_request_id: str | None,
+        teacher_ids: list[str],
+    ) -> None:
+        if lesson_request_id is None:
+            return
+
+        from app.models.schedule import LessonRequest
+
+        lesson_request = await self.db.get(LessonRequest, lesson_request_id)
+        if lesson_request is not None and lesson_request.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     async def expire_old_proposals(self) -> int:
         """Mark expired pending proposals as expired."""
