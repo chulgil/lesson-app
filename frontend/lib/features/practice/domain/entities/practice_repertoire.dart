@@ -1,8 +1,6 @@
 // Practice repertoire domain entities
 // Moved from lib/features/practice/domain/entities/practice_repertoire.dart for Clean Architecture
 
-import 'package:hive/hive.dart';
-
 import 'practice_note.dart';
 
 part 'practice_repertoire.g.dart';
@@ -84,27 +82,19 @@ class DailyPracticeStatus {
 }
 
 /// Practice recording model
-@HiveType(typeId: 30)
-class PracticeRecording extends HiveObject {
-  @HiveField(0)
+class PracticeRecording {
   final String id;
 
-  @HiveField(1)
   final String sectionId;
 
-  @HiveField(2)
   final String filePath;
 
-  @HiveField(3)
   final int durationSeconds;
 
-  @HiveField(4)
   final int? bpm; // Metronome BPM used during recording
 
-  @HiveField(5)
   final bool isRepresentative;
 
-  @HiveField(6)
   final DateTime createdAt;
 
   PracticeRecording({
@@ -530,9 +520,16 @@ class PracticeSection {
       sortOrder: sortOrder ?? this.sortOrder,
       lastPracticedAt: lastPracticedAt ?? this.lastPracticedAt,
       youtubeUrl: clearYoutubeUrl ? null : (youtubeUrl ?? this.youtubeUrl),
-      youtubeVideoId: clearYoutubeUrl ? null : (youtubeVideoId ?? this.youtubeVideoId),
-      youtubeStartSeconds: clearYoutubeUrl ? null : (youtubeStartSeconds ?? this.youtubeStartSeconds),
-      youtubeEndSeconds: clearYoutubeUrl ? null : (youtubeEndSeconds ?? this.youtubeEndSeconds),
+      youtubeVideoId:
+          clearYoutubeUrl ? null : (youtubeVideoId ?? this.youtubeVideoId),
+      youtubeStartSeconds:
+          clearYoutubeUrl
+              ? null
+              : (youtubeStartSeconds ?? this.youtubeStartSeconds),
+      youtubeEndSeconds:
+          clearYoutubeUrl
+              ? null
+              : (youtubeEndSeconds ?? this.youtubeEndSeconds),
       teachingResourceIds: teachingResourceIds ?? this.teachingResourceIds,
       assignedByTeacherId: assignedByTeacherId ?? this.assignedByTeacherId,
       practiceItemId: practiceItemId ?? this.practiceItemId,
@@ -673,7 +670,7 @@ class PracticeSection {
   }
 }
 
-/// Helper functions for PracticeNote JSON (since it's HiveObject)
+/// Helper functions for PracticeNote JSON.
 Map<String, dynamic> _practiceNoteToJson(PracticeNote note) => {
   'id': note.id,
   'sectionId': note.sectionId,

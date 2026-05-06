@@ -506,14 +506,10 @@ const _legacyDomainLocalizationDependencies = <String>{};
 const _legacyDomainDisplayGetterDependencies = <String>{};
 
 const _legacyDomainHivePersistenceExceptions = <String>{
-  'lib/features/practice/domain/entities/practice_repertoire.dart',
-  'lib/features/schedule/domain/entities/makeup_lesson.dart',
   'lib/features/schedule/domain/entities/request_event.dart',
   'lib/features/schedule/domain/entities/unified_lesson_request.dart',
   'lib/features/subscription/domain/entities/subscription.dart',
   'lib/features/subscription/domain/entities/subscription_proposal.dart',
-  'lib/features/subscription/domain/entities/subscription_settings.dart',
-  'lib/features/subscription/domain/entities/subscription_template.dart',
 };
 
 const _mockDataBranchExceptions = <String>{

@@ -86,7 +86,8 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
     }
   }
 
-  for (final recording in box.values.toList()) {
+  for (final entry in box.toMap().entries) {
+    final recording = entry.value;
     final storedPath = recording.filePath;
     final file = File(storedPath);
 
@@ -146,7 +147,7 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
     // Update path if recovered
     if (newPath != null) {
       final updated = recording.copyWith(filePath: newPath);
-      await box.put(recording.key, updated);
+      await box.put(entry.key, updated);
       recoveredCount++;
     }
   }
@@ -165,10 +166,11 @@ Future<int> _cleanupOrphanedPracticeRecordings(
 ) async {
   final orphanedKeys = <dynamic>[];
 
-  for (final recording in box.values) {
+  for (final entry in box.toMap().entries) {
+    final recording = entry.value;
     final file = File(recording.filePath);
     if (!await file.exists()) {
-      orphanedKeys.add(recording.key);
+      orphanedKeys.add(entry.key);
     }
   }
 

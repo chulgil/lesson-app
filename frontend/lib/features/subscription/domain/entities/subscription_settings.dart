@@ -1,32 +1,23 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'subscription_settings.g.dart';
 
 /// Discount type for bulk purchase.
-@HiveType(typeId: 60)
 enum DiscountType {
-  @HiveField(0)
   discount, // Percentage discount
 
-  @HiveField(1)
   bonusLessons, // Free bonus lessons
 }
 
 /// Package discount policy for bulk purchase.
-@HiveType(typeId: 61)
 @JsonSerializable()
 class PackageDiscountPolicy {
-  @HiveField(0)
   final int minLessons; // Minimum lessons to qualify (e.g., 10)
 
-  @HiveField(1)
   final DiscountType type; // discount or bonusLessons
 
-  @HiveField(2)
   final int value; // Discount % or bonus lesson count
 
-  @HiveField(3)
   final String? description; // Optional description
 
   const PackageDiscountPolicy({
@@ -63,43 +54,31 @@ class PackageDiscountPolicy {
 }
 
 /// Subscription settings for teacher or organization.
-@HiveType(typeId: 62)
 @JsonSerializable()
-class SubscriptionSettings extends HiveObject {
-  @HiveField(0)
+class SubscriptionSettings {
   final String id;
 
-  @HiveField(1)
   final String? teacherId; // For individual teacher
 
-  @HiveField(2)
   final String? organizationId; // For academy/organization
 
   // Renewal alert settings
-  @HiveField(3)
   final int renewalAlertThreshold; // Alert when remaining <= N (default: 1)
 
-  @HiveField(4)
   final int renewalAlertDays; // Alert N days before expiry (default: 7)
 
   // Bulk purchase policies
-  @HiveField(5)
   final List<PackageDiscountPolicy> discountPolicies;
 
   // Notification settings
-  @HiveField(6)
   final bool enablePushNotification; // App push notification
 
-  @HiveField(7)
   final bool enableBadge; // In-app badge
 
-  @HiveField(8)
   final bool notifyParent; // Also notify parent
 
-  @HiveField(9)
   final DateTime createdAt;
 
-  @HiveField(10)
   final DateTime? updatedAt;
 
   SubscriptionSettings({

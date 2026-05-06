@@ -1,27 +1,20 @@
 // Makeup Lesson entity for tracking makeup/rescheduled lessons
 // Spec: docs/specs/lesson/lesson_schedule.md - 보강 추적 시스템
 
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'makeup_lesson.g.dart';
 
 /// 보강 상태
-@HiveType(typeId: 85)
 enum MakeupStatus {
-  @HiveField(0)
   pending, // 시간 미정
 
-  @HiveField(1)
   scheduled, // 시간 확정
 
-  @HiveField(2)
   completed, // 완료
 
-  @HiveField(3)
   expired, // 만료 (30일)
 
-  @HiveField(4)
   waived; // 선생님이 면제 처리
 
   bool get isActive =>
@@ -29,65 +22,47 @@ enum MakeupStatus {
 }
 
 /// 보강 발생 사유
-@HiveType(typeId: 86)
 enum MakeupReason {
-  @HiveField(0)
   studentCancellation, // 학생 취소 (D-1 이전)
 
-  @HiveField(1)
   teacherCancellation, // 선생님 취소
 
-  @HiveField(2)
   noShowReschedule, // 노쇼 (reschedule 정책)
 
-  @HiveField(3)
   other, // 기타
 }
 
 /// 보강 레슨 엔티티
-@HiveType(typeId: 87)
 @JsonSerializable()
-class MakeupLesson extends HiveObject {
-  @HiveField(0)
+class MakeupLesson {
   final String id;
 
-  @HiveField(1)
   final String studentId;
 
-  @HiveField(2)
   final String teacherId;
 
   /// 원래 레슨 ID (취소/노쇼된)
-  @HiveField(3)
   final String? originalLessonId;
 
   /// 보강 레슨 ID (예약된)
-  @HiveField(4)
   final String? scheduledLessonId;
 
-  @HiveField(5)
   final MakeupStatus status;
 
-  @HiveField(6)
   final MakeupReason reason;
 
-  @HiveField(7)
   final DateTime createdAt;
 
   /// 보강 만료일 (기본 30일)
-  @HiveField(8)
   final DateTime expiresAt;
 
   /// 보강 예약 완료일
-  @HiveField(9)
   final DateTime? scheduledAt;
 
   /// 보강 완료일
-  @HiveField(10)
   final DateTime? completedAt;
 
   /// 추가 메모
-  @HiveField(11)
   final String? note;
 
   MakeupLesson({

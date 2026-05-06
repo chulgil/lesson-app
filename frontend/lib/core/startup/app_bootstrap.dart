@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../../features/notifications/data/services/fcm_service.dart';
+import '../../features/practice/data/models/practice_recording_hive_adapter.dart';
 import '../../features/practice/data/models/recording_hive_adapters.dart';
 import '../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../features/practice/domain/entities/recording.dart';
