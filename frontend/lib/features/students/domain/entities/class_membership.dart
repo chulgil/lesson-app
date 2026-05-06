@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'lesson_slot.dart';
@@ -6,74 +5,53 @@ import 'lesson_slot.dart';
 part 'class_membership.g.dart';
 
 /// Membership status in a class.
-@HiveType(typeId: 53)
 enum MembershipStatus {
-  @HiveField(0)
   trial, // Trial period
 
-  @HiveField(1)
   active, // Active regular enrollment
 
-  @HiveField(2)
   paused, // On hold
 
-  @HiveField(3)
   terminated, // Terminated
 }
 
 /// Student's membership in a class (LessonClass) with lesson information.
-@HiveType(typeId: 54)
 @JsonSerializable()
-class ClassMembership extends HiveObject {
-  @HiveField(0)
+class ClassMembership {
   final String id;
 
-  @HiveField(1)
   final String lessonClassId; // Class ID (FK -> LessonClass)
 
-  @HiveField(2)
   final String studentId; // Student ID (FK -> Student)
 
   // Lesson info for this class
-  @HiveField(3)
   final String instrument; // Instrument (piano, violin, etc.)
 
-  @HiveField(4)
   final MembershipStatus status; // trial/active/paused/terminated
 
-  @HiveField(5)
   final String? level; // Level (beginner/elementary/intermediate/advanced)
 
   // Fee info
-  @HiveField(6)
   final int monthlyFee; // Monthly tuition fee
 
-  @HiveField(7)
   final int lessonsPerWeek; // Lessons per week (1 or 2)
 
   // Lesson schedule
-  @HiveField(8)
   final List<LessonSlot> lessonSlots;
 
-  @HiveField(10)
   final int lessonDuration; // Lesson duration in minutes (default 60)
 
   // Notes
-  @HiveField(11)
   final String? notes; // Special notes
 
   // Location & travel
-  @HiveField(14)
   final String? lessonLocationId; // Default lesson location for this membership
 
-  @HiveField(15)
   final int travelTimeMinutes; // Teacher's travel time to this student (minutes)
 
   // Meta
-  @HiveField(12)
   final DateTime createdAt;
 
-  @HiveField(13)
   final DateTime? updatedAt;
 
   ClassMembership({

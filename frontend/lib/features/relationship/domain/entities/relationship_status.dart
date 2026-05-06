@@ -1,27 +1,18 @@
-import 'package:hive/hive.dart';
-
-part 'relationship_status.g.dart';
-
 /// Subscription-based teacher-student relationship status.
 ///
 /// Relationship is defined by subscription status, not mutual follow.
 /// See: docs/specs/invite/subscription_based_relationship.md
-@HiveType(typeId: 91)
 enum RelationshipStatus {
   /// Trial lesson booked (before subscription)
-  @HiveField(0)
   trialBooked,
 
   /// Active - subscription valid (regular lessons in progress)
-  @HiveField(1)
   active,
 
   /// Expired - subscription expired within 30 days
-  @HiveField(2)
   expired,
 
   /// Past - subscription expired more than 30 days ago
-  @HiveField(3)
   past,
 }
 
@@ -48,7 +39,8 @@ extension RelationshipStatusExtension on RelationshipStatus {
 
   /// Whether this status allows lesson request
   bool get canRequestLesson {
-    return this == RelationshipStatus.expired || this == RelationshipStatus.past;
+    return this == RelationshipStatus.expired ||
+        this == RelationshipStatus.past;
   }
 
   /// Whether this status allows practice sharing

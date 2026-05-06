@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/utils/date_utils.dart';
@@ -15,73 +14,55 @@ part 'teacher_student_relation.g.dart';
 /// - past: Subscription expired more than 30 days ago
 ///
 /// See: docs/specs/invite/subscription_based_relationship.md
-@HiveType(typeId: 90)
 @JsonSerializable()
-class TeacherStudentRelation extends HiveObject {
-  @HiveField(0)
+class TeacherStudentRelation {
   final String id;
 
-  @HiveField(1)
   final String teacherId;
 
-  @HiveField(2)
   final String studentId;
 
   /// Relationship status (subscription-based)
-  @HiveField(3)
   final RelationshipStatus status;
 
   /// Active subscription ID (if exists)
-  @HiveField(4)
   final String? activeSubscriptionId;
 
   /// Last subscription expiration date
-  @HiveField(5)
   final DateTime? lastSubscriptionExpiredAt;
 
   /// Expiry grace period end date (lastSubscriptionExpiredAt + 30 days)
-  @HiveField(6)
   final DateTime? expiredUntil;
 
   /// First connection timestamp
-  @HiveField(7)
   final DateTime createdAt;
 
   /// Last status change timestamp
-  @HiveField(8)
   final DateTime updatedAt;
 
   /// Trial booking ID (when status is trialBooked)
-  @HiveField(9)
   final String? trialBookingId;
 
   /// Total lesson count
-  @HiveField(10)
   final int totalLessonCount;
 
   /// Last lesson datetime
-  @HiveField(11)
   final DateTime? lastLessonAt;
 
   /// User who terminated the relationship (if explicitly terminated)
-  @HiveField(12)
   final String? terminatedBy;
 
   /// Termination reason
-  @HiveField(13)
   final String? terminationReason;
 
   /// Whether manually registered (offline student)
   /// If true, status transition rules don't apply (always active)
-  @HiveField(14)
   final bool isManuallyRegistered;
 
   /// Whether app is connected (for manually registered students who later connect)
-  @HiveField(15)
   final bool isAppConnected;
 
   /// App connection timestamp
-  @HiveField(16)
   final DateTime? appConnectedAt;
 
   // ============================================================
@@ -89,19 +70,15 @@ class TeacherStudentRelation extends HiveObject {
   // ============================================================
 
   /// Last regular lesson day of week (1=월, 7=일)
-  @HiveField(17)
   final int? lastLessonDay;
 
   /// Last regular lesson time (HH:mm format)
-  @HiveField(18)
   final String? lastLessonTime;
 
   /// Last regular lesson duration in minutes
-  @HiveField(19)
   final int? lastLessonDuration;
 
   /// When the schedule was last recorded
-  @HiveField(20)
   final DateTime? lastScheduleRecordedAt;
 
   TeacherStudentRelation({

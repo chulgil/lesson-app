@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'notification_setting.g.dart';
@@ -7,41 +6,31 @@ part 'notification_setting.g.dart';
 ///
 /// Separate from relationship status - user-controlled settings.
 /// See: docs/specs/invite/subscription_based_relationship.md
-@HiveType(typeId: 92)
 @JsonSerializable()
-class NotificationSetting extends HiveObject {
-  @HiveField(0)
+class NotificationSetting {
   final String id;
 
-  @HiveField(1)
   final String userId;
 
   /// Target user ID (the other party in the relationship)
-  @HiveField(2)
   final String targetUserId;
 
   /// Push notification enabled
-  @HiveField(3)
   final bool pushEnabled;
 
   /// Practice status sharing (student only)
   /// - Only shared when relationship is active
   /// - Not shared when expired/past regardless of this setting
-  @HiveField(4)
   final bool practiceShareEnabled;
 
   /// Lesson reminder notification
-  @HiveField(5)
   final bool lessonReminderEnabled;
 
   /// Payment notification
-  @HiveField(6)
   final bool paymentReminderEnabled;
 
-  @HiveField(7)
   final DateTime createdAt;
 
-  @HiveField(8)
   final DateTime updatedAt;
 
   NotificationSetting({

@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'proposal_settings.g.dart';
@@ -10,52 +9,41 @@ part 'proposal_settings.g.dart';
 /// - Which templates to include in auto-proposals
 /// - Golden time discount settings
 /// - Auto-reminder settings
-@HiveType(typeId: 98)
 @JsonSerializable()
-class ProposalSettings extends HiveObject {
-  @HiveField(0)
+class ProposalSettings {
   final String teacherId;
 
   /// Whether to automatically send proposals after trial lesson completion.
   /// Default: true
-  @HiveField(1)
   final bool autoProposalEnabled;
 
   /// Template IDs to include in auto-proposals.
   /// If empty, all active templates are included.
-  @HiveField(2)
   final List<String> autoProposalTemplateIds;
 
   /// Recommended template ID for auto-proposals.
   /// Shown with star (⭐) and pre-selected for students.
-  @HiveField(3)
   final String? recommendedTemplateId;
 
   /// Golden time discount percentage (0-100).
   /// Applied to auto-proposals after trial completion.
-  @HiveField(4)
   final int goldenTimeDiscountPercent;
 
   /// Golden time validity in hours.
   /// Discount expires after this many hours from trial completion.
-  @HiveField(5)
   final int goldenTimeHours;
 
   /// Whether to send automatic reminders.
-  @HiveField(6)
   final bool autoReminderEnabled;
 
   /// Reminder intervals in hours after proposal (e.g., [24, 48, 72]).
-  @HiveField(7)
   final List<int> reminderHours;
 
   /// When these settings were last updated.
-  @HiveField(8)
   final DateTime? updatedAt;
 
   /// Whether to automatically send renewal proposals when subscription is running low.
   /// Default: false (teacher must manually approve renewal proposals)
-  @HiveField(9)
   final bool autoRenewalEnabled;
 
   ProposalSettings({
@@ -78,14 +66,14 @@ class ProposalSettings extends HiveObject {
 
   /// Default settings for a teacher.
   factory ProposalSettings.defaults(String teacherId) => ProposalSettings(
-        teacherId: teacherId,
-        autoProposalEnabled: true,
-        autoProposalTemplateIds: const [],
-        goldenTimeDiscountPercent: 10,
-        goldenTimeHours: 24,
-        autoReminderEnabled: true,
-        reminderHours: const [24, 48, 72],
-      );
+    teacherId: teacherId,
+    autoProposalEnabled: true,
+    autoProposalTemplateIds: const [],
+    goldenTimeDiscountPercent: 10,
+    goldenTimeHours: 24,
+    autoReminderEnabled: true,
+    reminderHours: const [24, 48, 72],
+  );
 
   /// Whether golden time discount is enabled.
   bool get hasGoldenTimeDiscount => goldenTimeDiscountPercent > 0;

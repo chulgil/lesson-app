@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'lesson_slot.g.dart';
@@ -7,16 +6,12 @@ part 'lesson_slot.g.dart';
 ///
 /// Used by [ClassMembership] and [Student] to store per-day lesson schedules.
 /// Supports multiple slots per week (e.g., Tue 14:00 + Thu 16:00).
-@HiveType(typeId: 130)
 @JsonSerializable()
 class LessonSlot {
-  @HiveField(0)
   final int dayOfWeek; // 0=Mon...6=Sun (matches TimeSlotOption convention)
 
-  @HiveField(1)
   final String startTime; // "HH:mm"
 
-  @HiveField(2)
   final String endTime; // "HH:mm"
 
   const LessonSlot({
