@@ -1,93 +1,66 @@
 // Group class entity for group lessons
 // TypeId range: 80-86 for group class related types
 
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'group_class.g.dart';
 
 /// Group class type
-@HiveType(typeId: 80)
 enum GroupClassType {
-  @HiveField(0)
   regular, // Regular recurring class
 
-  @HiveField(1)
   dropIn, // Drop-in class (one-time)
 }
 
 /// No-show policy for group classes
-@HiveType(typeId: 86)
 enum NoShowPolicy {
-  @HiveField(0)
   deduct, // Deduct lesson from subscription
 
-  @HiveField(1)
   noDeduct, // No deduction (mercy policy)
 }
 
 /// Group class definition
-@HiveType(typeId: 81)
 @JsonSerializable()
-class GroupClass extends HiveObject {
-  @HiveField(0)
+class GroupClass {
   final String id;
 
-  @HiveField(1)
   final String teacherId;
 
-  @HiveField(2)
   final String? organizationId; // Academy ID if applicable
 
-  @HiveField(3)
   final String name;
 
-  @HiveField(4)
   final String? description;
 
-  @HiveField(5)
   final GroupClassType type;
 
-  @HiveField(6)
   final int maxCapacity; // Maximum students allowed
 
-  @HiveField(7)
   final int? waitlistCapacity; // Max waitlist size (null = unlimited)
 
-  @HiveField(8)
   final int durationMinutes;
 
-  @HiveField(9)
   final int bookingDeadlineMinutes; // How long before class to allow booking
 
-  @HiveField(10)
-  final int cancelDeadlineMinutes; // How long before class to allow cancellation
+  // How long before class to allow cancellation
+  final int cancelDeadlineMinutes;
 
-  @HiveField(11)
   final NoShowPolicy noShowPolicy;
 
-  @HiveField(12)
   final int? maxNoShowCount; // Max no-shows before warning/action
 
-  @HiveField(13)
   final List<int>? repeatDaysOfWeek; // 1-7 for Mon-Sun (for regular classes)
 
-  @HiveField(14)
   final String? repeatTimeOfDay; // HH:mm format (for regular classes)
 
-  @HiveField(15)
   final String? instrument; // e.g., 'violin', 'piano'
 
-  @HiveField(16)
   final int? pricePerSession; // Price per session (optional)
 
-  @HiveField(17)
   final bool isActive;
 
-  @HiveField(18)
   final DateTime createdAt;
 
-  @HiveField(19)
   final DateTime? updatedAt;
 
   GroupClass({

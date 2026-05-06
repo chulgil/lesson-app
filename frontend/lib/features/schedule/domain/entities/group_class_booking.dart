@@ -1,73 +1,51 @@
 // Group class booking entity for individual student bookings
 
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'group_class_booking.g.dart';
 
 /// Booking status for group class bookings
-@HiveType(typeId: 84)
 enum GroupBookingStatus {
-  @HiveField(0)
   confirmed, // Booking confirmed
 
-  @HiveField(1)
   waitlist, // On waitlist
 
-  @HiveField(2)
   attended, // Student attended the class
 
-  @HiveField(3)
   noShow, // Student didn't show up
 
-  @HiveField(4)
   cancelled, // Booking was cancelled
 
-  @HiveField(5)
   autoCancelled, // Auto-cancelled (class started while on waitlist)
 }
 
 /// Individual booking for a group class schedule
-@HiveType(typeId: 85)
 @JsonSerializable()
-class GroupClassBooking extends HiveObject {
-  @HiveField(0)
+class GroupClassBooking {
   final String id;
 
-  @HiveField(1)
   final String scheduleId; // References GroupClassSchedule
 
-  @HiveField(2)
   final String studentId;
 
-  @HiveField(3)
   final String? subscriptionId; // For lesson deduction
 
-  @HiveField(4)
   final GroupBookingStatus status;
 
-  @HiveField(5)
   final int? waitlistPosition; // Position in waitlist (null if confirmed)
 
-  @HiveField(6)
   final DateTime? attendedAt; // When attendance was marked
 
-  @HiveField(7)
   final bool subscriptionDeducted; // Whether lesson was deducted
 
-  @HiveField(8)
   final String? cancelReason;
 
-  @HiveField(9)
   final DateTime? cancelledAt;
 
-  @HiveField(10)
   final DateTime? promotedAt; // When promoted from waitlist to confirmed
 
-  @HiveField(11)
   final DateTime createdAt;
 
-  @HiveField(12)
   final DateTime? updatedAt;
 
   GroupClassBooking({

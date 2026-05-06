@@ -1,10 +1,3 @@
-// Recording domain entity
-// Moved from lib/features/practice/domain/entities/recording.dart for Clean Architecture
-
-import 'package:hive/hive.dart';
-
-part 'recording.g.dart';
-
 /// Minimum recording duration in seconds.
 /// Recordings shorter than this cannot be saved.
 const int minRecordingSeconds = 5;
@@ -13,36 +6,26 @@ const int minRecordingSeconds = 5;
 const int maxRecordingSeconds = 180;
 
 /// Type of recording.
-@HiveType(typeId: 20)
 enum RecordingType {
-  @HiveField(0)
   student, // Student practice recording
 
-  @HiveField(1)
   teacher, // Teacher reference recording
 
-  @HiveField(2)
   feedback, // AI-converted feedback (text stored)
 }
 
 /// Storage status for server-synced recordings.
-@HiveType(typeId: 21)
 enum StorageStatus {
-  @HiveField(0)
   local, // Only stored locally
 
-  @HiveField(1)
   active, // Server active storage (fast access)
 
-  @HiveField(2)
   archived, // S3 archive (delayed playback)
 
-  @HiveField(3)
   deleted, // Deleted from server
 }
 
 /// Recording model for practice recordings.
-@HiveType(typeId: 22)
 class Recording {
   const Recording({
     required this.id,
@@ -59,40 +42,28 @@ class Recording {
     this.title,
   });
 
-  @HiveField(0)
   final String id;
 
-  @HiveField(1)
   final String repertoireId;
 
-  @HiveField(2)
   final String studentId;
 
-  @HiveField(3)
   final RecordingType type;
 
-  @HiveField(4)
   final String localPath;
 
-  @HiveField(5)
   final String? serverUrl;
 
-  @HiveField(6)
   final int durationSeconds;
 
-  @HiveField(7)
   final bool isRepresentative;
 
-  @HiveField(8)
   final DateTime recordedAt;
 
-  @HiveField(9)
   final DateTime? sharedAt;
 
-  @HiveField(10)
   final StorageStatus storageStatus;
 
-  @HiveField(11)
   final String? title;
 
   /// Formatted duration string (mm:ss).

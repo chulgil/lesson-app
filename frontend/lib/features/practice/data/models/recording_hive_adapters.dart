@@ -1,10 +1,6 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'package:hive/hive.dart';
 
-part of 'recording.dart';
-
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
+import '../../domain/entities/recording.dart';
 
 class RecordingAdapter extends TypeAdapter<Recording> {
   @override
@@ -14,7 +10,7 @@ class RecordingAdapter extends TypeAdapter<Recording> {
   Recording read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Recording(
       id: fields[0] as String,

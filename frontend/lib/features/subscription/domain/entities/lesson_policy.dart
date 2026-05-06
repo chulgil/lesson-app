@@ -1,89 +1,67 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../../../../core/l10n/app_strings.dart';
 
 part 'lesson_policy.g.dart';
 
 /// Lesson policy settings for teachers/academies.
-@HiveType(typeId: 70)
 @JsonSerializable()
-class LessonPolicy extends HiveObject {
-  @HiveField(0)
+class LessonPolicy {
   final String id;
 
   /// Associated lesson class ID. Null means teacher's default policy.
-  @HiveField(1)
   final String? lessonClassId;
 
-  @HiveField(2)
   final String teacherId;
 
   // ===== 변경/취소 정책 =====
 
   /// Minimum hours before lesson to cancel (e.g., 4 = 4시간 전까지)
-  @HiveField(3)
   final int minCancelHours;
 
   /// Maximum schedule changes per month (e.g., 2 = 월 2회)
-  @HiveField(4)
   final int maxChangesPerMonth;
 
   /// Allow same-day cancellation
-  @HiveField(5)
   final bool allowSameDayCancel;
 
   /// Late cancel deadline time (e.g., "20:00" = 전날 20:00까지)
-  @HiveField(6)
   final String? lateCancelDeadline;
 
   // ===== 노쇼 정책 =====
 
   /// Deduct lesson count on no-show
-  @HiveField(7)
   final bool deductLessonOnNoShow;
 
   /// Grace period for lateness in minutes (e.g., 15 = 15분 지각 허용)
-  @HiveField(8)
   final int gracePeriodMinutes;
 
   // ===== 이월 정책 (월정액) =====
 
   /// Allow carryover of unused lessons
-  @HiveField(9)
   final bool allowCarryover;
 
   /// Maximum lessons to carry over
-  @HiveField(10)
   final int maxCarryoverLessons;
 
   /// Carryover validity period in months
-  @HiveField(11)
   final int carryoverPeriodMonths;
 
   // ===== 환불 정책 — 보류 (2026-04-21) =====
   // 앱 내 결제 기능 미구현으로 환불 UI를 연결하지 않는다.
   // 스펙: docs/specs/subscription/lesson_policy_settings.md §4 "보류".
-  // Hive typeId 유지를 위해 필드 자체는 삭제하지 않는다 (기존 저장 데이터 호환).
+  // 기존 원격/JSON 데이터 호환을 위해 필드 자체는 삭제하지 않는다.
 
-  @HiveField(14)
   final int fullRefundDays;
 
-  @HiveField(15)
   final double partialRefundRatio;
 
-  @HiveField(16)
   final double halfwayRefundRatio;
 
-  @HiveField(17)
   final double noShowRefundRatio;
 
   // ===== 메타 =====
 
-  @HiveField(12)
   final DateTime createdAt;
 
-  @HiveField(13)
   final DateTime? updatedAt;
 
   LessonPolicy({
@@ -170,46 +148,6 @@ class LessonPolicy extends HiveObject {
       noShowRefundRatio: noShowRefundRatio ?? this.noShowRefundRatio,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  // ===== Display helpers =====
-
-  /// 취소 정책 요약 텍스트
-  String get cancelPolicySummary {
-    if (allowSameDayCancel) {
-      return AppStrings.policyCancelSameDay;
-    }
-    return AppStrings.policyCancelMinHours(minCancelHours);
-  }
-
-  /// 변경 정책 요약 텍스트
-  String get changePolicySummary {
-    if (maxChangesPerMonth == 0) {
-      return AppStrings.policyChangeNone;
-    }
-    if (maxChangesPerMonth >= 99) {
-      return AppStrings.policyChangeUnlimited;
-    }
-    return AppStrings.policyChangeMonthly(maxChangesPerMonth);
-  }
-
-  /// 노쇼 정책 요약 텍스트
-  String get noShowPolicySummary {
-    if (deductLessonOnNoShow) {
-      return AppStrings.policyNoShowDeduct;
-    }
-    return AppStrings.policyNoShowKeep;
-  }
-
-  /// 이월 정책 요약 텍스트
-  String get carryoverPolicySummary {
-    if (!allowCarryover) {
-      return AppStrings.policyCarryoverNone;
-    }
-    return AppStrings.policyCarryoverMax(
-      maxCarryoverLessons,
-      carryoverPeriodMonths,
     );
   }
 

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:lessonaza/features/practice/domain/entities/recording.dart';
+import 'package:lessonaza/features/practice/data/models/recording_hive_adapters.dart';
 
 /// Initialize test environment with Hive and other dependencies.
 Future<void> initializeTestEnvironment() async {
