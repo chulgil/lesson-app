@@ -364,6 +364,10 @@ async def list_follows(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
     pagination: Annotated[dict, Depends(get_pagination)],
+    follower_id: str | None = None,
+    following_id: str | None = None,
+    target_type: str | None = None,
+    direction: str | None = None,
 ) -> PaginatedResponse[FollowResponse]:
     """List follows for the current user."""
     service = RelationshipService(db)
@@ -372,6 +376,10 @@ async def list_follows(
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
+        follower_id=follower_id,
+        following_id=following_id,
+        target_type=target_type,
+        direction=direction,
     )
 
 

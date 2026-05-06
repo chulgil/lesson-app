@@ -261,7 +261,16 @@ class RelationshipService:
         return follow
 
     async def get_all_follows(
-        self, *, user: Any, page: int, size: int, offset: int
+        self,
+        *,
+        user: Any,
+        page: int,
+        size: int,
+        offset: int,
+        follower_id: str | None = None,
+        following_id: str | None = None,
+        target_type: str | None = None,
+        direction: str | None = None,
     ) -> PaginatedResponse:
         """List follows involving the current user."""
         from app.models.relationship import Follow
@@ -269,9 +278,23 @@ class RelationshipService:
         query = select(Follow).where(
             (Follow.follower_id == user.id) | (Follow.following_id == user.id)
         )
+        if direction == "following":
+            query = query.where(Follow.follower_id == user.id)
+        elif direction == "followers":
+            query = query.where(Follow.following_id == user.id)
+        elif direction is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid follow direction")
+
+        if follower_id:
+            query = query.where(Follow.follower_id == follower_id)
+        if following_id:
+            query = query.where(Follow.following_id == following_id)
+        if target_type:
+            query = query.where(Follow.target_type == target_type)
+
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
-        result = await self.db.scalars(query.offset(offset).limit(size))
+        result = await self.db.scalars(query.order_by(Follow.created_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
     async def update_follow(self, follow_id: str, data: dict[str, Any], current_user: Any) -> Any:

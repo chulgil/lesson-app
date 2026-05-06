@@ -90,3 +90,72 @@ async def test_follow_teacher(client: AsyncClient, auth_headers, create_test_use
     data = response.json()
     assert data["follower_id"] == "test-user-id"
     assert data["following_id"] == "teacher-002"
+
+
+@pytest.mark.asyncio
+async def test_follow_list_supports_server_side_filters(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """RemoteFollowRepository should not need to fetch every follow and filter client-side."""
+    from app.models.relationship import Follow
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add_all(
+        [
+            Follow(
+                id="follow-001",
+                follower_id="test-user-id",
+                following_id="teacher-001",
+                target_type="teacher",
+            ),
+            Follow(
+                id="follow-002",
+                follower_id="other-user",
+                following_id="test-user-id",
+                target_type="teacher",
+            ),
+            Follow(
+                id="follow-003",
+                follower_id="test-user-id",
+                following_id="academy-001",
+                target_type="academy",
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    pair = await client.get(
+        "/api/v1/follows",
+        headers=auth_headers,
+        params={"follower_id": "test-user-id", "following_id": "teacher-001"},
+    )
+    assert pair.status_code == 200
+    assert [item["id"] for item in pair.json()["items"]] == ["follow-001"]
+    assert pair.json()["total"] == 1
+
+    following_teachers = await client.get(
+        "/api/v1/follows",
+        headers=auth_headers,
+        params={"direction": "following", "target_type": "teacher"},
+    )
+    assert following_teachers.status_code == 200
+    assert [item["id"] for item in following_teachers.json()["items"]] == ["follow-001"]
+
+    followers = await client.get(
+        "/api/v1/follows",
+        headers=auth_headers,
+        params={"direction": "followers"},
+    )
+    assert followers.status_code == 200
+    assert [item["id"] for item in followers.json()["items"]] == ["follow-002"]
+
+    forbidden_pair = await client.get(
+        "/api/v1/follows",
+        headers=auth_headers,
+        params={"follower_id": "other-user", "following_id": "someone-else"},
+    )
+    assert forbidden_pair.status_code == 200
+    assert forbidden_pair.json()["items"] == []
