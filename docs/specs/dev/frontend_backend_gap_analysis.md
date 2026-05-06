@@ -94,7 +94,7 @@
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
 | 36 | Student | LocationRepository | ❌ | LOW | 레슨 장소 |
-| 37 | Schedule | ScheduleConfirmationCardRepository | ❌ | MEDIUM | 확인 카드 |
+| 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | `/schedule/confirmation-cards` 응답을 Flutter snake_case 계약과 기존 camelCase alias 모두에 맞춤. teacher profile id 접근과 중복 booking guard 포함 |
 | 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |
@@ -122,7 +122,9 @@
 | Parent membership/class reads | `GET /memberships?student_id={linkedChildId}`, `GET /lessons-classes/{classId}` | 학부모 결제/수강권 화면이 자녀 subscription API와 같은 권한 모델로 membership/class read를 재사용 가능. mutation은 teacher-only 유지 |
 | FollowRepository filtered lookup | `GET /follows?follower_id=&following_id=&target_type=&direction=following|followers` | 프론트 `RemoteFollowRepository`가 전체 목록 조회 후 client-side filter/count 하던 흐름을 서버 필터로 대체 가능 |
 | RequestEvent cancellation parity | `lessonCancellationConfirmed`, `cancellationCreditRefunded` event type 저장 지원 | 프론트 schedule/subscription event enum 29개와 백엔드 PostgreSQL enum을 정렬 |
+| ScheduleConfirmationCardRepository | `GET/POST/PATCH /schedule/confirmation-cards*` 응답에 `teacher_name`, `suggested_day`, `suggested_time`, `lesson_duration`, `suggested_day2/3`, `suggested_time2/3` 제공. 기존 `suggestedDay*`/`lessonDuration` alias 유지 | 프론트 `RemoteScheduleConfirmationCardRepository` 추가 및 provider mock-only 제거. 같은 subscription에서 복수 확인 카드가 생겨도 첫 confirmed card만 booking을 materialize |
 | Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
+| Analytics monthly trend | 기존 `GET /analytics/monthly-stats?month=YYYY-MM`의 `lesson_trend`를 선택 월 포함 6개월 월별 배열로 확장 | 프론트 `RemoteAnalyticsRepository`가 mock의 6개월 trend chart를 백엔드 응답으로 대체 가능. 기존 `test_contract.py` 일부 기대값은 단일 월/빈 배열 기준이라 갱신 필요 |
 
 다음 백엔드 우선순위:
 

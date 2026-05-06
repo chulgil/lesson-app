@@ -32,6 +32,7 @@ class ScheduleConfirmationCardResponse(BaseModel):
     id: str
     student_id: str
     teacher_id: str
+    teacher_name: str = ""
     subscription_id: str | None = None
     lesson_request_id: str | None = None
     card_type: str = "afterTrial"
@@ -73,6 +74,24 @@ class ScheduleConfirmationCardResponse(BaseModel):
         """Flutter card field alias for proposed lesson duration."""
         return self.proposed_duration
 
+    @computed_field(alias="suggested_day")
+    @property
+    def suggested_day_snake(self) -> int | None:
+        """Flutter generated JSON field for the primary suggested day."""
+        return self.suggested_day
+
+    @computed_field(alias="suggested_time")
+    @property
+    def suggested_time_snake(self) -> str | None:
+        """Flutter generated JSON field for the primary suggested time."""
+        return self.suggested_time
+
+    @computed_field(alias="lesson_duration")
+    @property
+    def lesson_duration_snake(self) -> int | None:
+        """Flutter generated JSON field for proposed lesson duration."""
+        return self.lesson_duration
+
     @computed_field(alias="suggestedDay2")
     @property
     def suggested_day2(self) -> int | None:
@@ -85,6 +104,18 @@ class ScheduleConfirmationCardResponse(BaseModel):
         """Flutter card field alias for the second suggested time."""
         return self._slot_time(1)
 
+    @computed_field(alias="suggested_day2")
+    @property
+    def suggested_day2_snake(self) -> int | None:
+        """Flutter generated JSON field for the second suggested day."""
+        return self.suggested_day2
+
+    @computed_field(alias="suggested_time2")
+    @property
+    def suggested_time2_snake(self) -> str | None:
+        """Flutter generated JSON field for the second suggested time."""
+        return self.suggested_time2
+
     @computed_field(alias="suggestedDay3")
     @property
     def suggested_day3(self) -> int | None:
@@ -96,6 +127,18 @@ class ScheduleConfirmationCardResponse(BaseModel):
     def suggested_time3(self) -> str | None:
         """Flutter card field alias for the third suggested time."""
         return self._slot_time(2)
+
+    @computed_field(alias="suggested_day3")
+    @property
+    def suggested_day3_snake(self) -> int | None:
+        """Flutter generated JSON field for the third suggested day."""
+        return self.suggested_day3
+
+    @computed_field(alias="suggested_time3")
+    @property
+    def suggested_time3_snake(self) -> str | None:
+        """Flutter generated JSON field for the third suggested time."""
+        return self.suggested_time3
 
     def _slot_day(self, index: int) -> int | None:
         if not self.proposed_slots or len(self.proposed_slots) <= index:

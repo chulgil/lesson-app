@@ -141,6 +141,9 @@ In `ScheduleConfirmationCardResponse`, add computed/serialized fields that map c
 - `proposed_time` -> `suggestedTime`
 - `proposed_duration` -> `lessonDuration`
 - first three `proposed_slots` entries -> `suggestedDay*` and `suggestedTime*`
+- same values as snake_case `suggested_day`, `suggested_time`, `lesson_duration`,
+  `suggested_day2/3`, and `suggested_time2/3` for Flutter generated JSON
+- `teacher_name` resolved from either `users.id` or `teachers.id`
 
 Do not rename DB columns in this task.
 
@@ -153,6 +156,14 @@ Add methods:
 - `dismiss_all_pending(student_id, current_user)`
 
 Use the existing `_can_access` logic, but extend it to allow parents with active `ParentChildRelation`.
+Teacher access must accept both auth user id and linked Teacher profile id because subscription issuance
+stores profile ids while direct card creation may store user ids.
+
+**Step 3-1: Guard booking materialization**
+
+When a card is confirmed, create bookings only if no other card for the same `subscription_id` is already
+confirmed. This keeps the endpoint safe when frontend and backend both surface confirmation flows or duplicate
+cards are created during retries.
 
 **Step 4: Run tests**
 

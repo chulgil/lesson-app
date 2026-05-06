@@ -1,9 +1,10 @@
 """Schedule confirmation card API contract tests."""
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 
 from app.core.security import create_access_token
 
@@ -57,6 +58,61 @@ async def test_confirmation_card_response_includes_flutter_aliases(
     assert body["suggestedTime2"] == "16:00"
     assert body["suggestedDay3"] == 3
     assert body["suggestedTime3"] == "17:00"
+
+
+@pytest.mark.asyncio
+async def test_confirmation_card_response_matches_flutter_snake_case_contract(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Flutter generated JSON expects teacher_name and snake_case suggested fields."""
+    from app.models.policy import ScheduleConfirmationCard
+
+    await create_test_user(
+        user_id="snake-contract-teacher",
+        role="teacher",
+        name="김지수",
+        email="snake-contract-teacher@test.com",
+    )
+    db_session.add(
+        ScheduleConfirmationCard(
+            id="snake-contract-card",
+            student_id="snake-contract-student",
+            teacher_id="snake-contract-teacher-prof",
+            subscription_id="snake-contract-sub",
+            card_type="afterTrial",
+            title="Confirm schedule",
+            status="pending",
+            proposed_day="6",
+            proposed_time="15:00",
+            proposed_duration=60,
+            proposed_slots=[
+                {"day": 6, "time": "15:00"},
+                {"day": 2, "time": "16:00"},
+            ],
+            created_at=datetime.now(UTC),
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/confirmation-cards/snake-contract-card",
+        headers=_headers("snake-contract-teacher", "teacher"),
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["teacher_name"] == "김지수"
+    assert body["suggested_day"] == 6
+    assert body["suggested_time"] == "15:00"
+    assert body["lesson_duration"] == 60
+    assert body["suggested_day2"] == 2
+    assert body["suggested_time2"] == "16:00"
+    assert body["suggested_day3"] is None
+    assert body["suggested_time3"] is None
+    assert body["suggestedDay"] == 6
+    assert body["suggestedTime"] == "15:00"
 
 
 @pytest.mark.asyncio
@@ -494,6 +550,110 @@ async def test_confirmation_card_rejects_updates_after_confirmed(
     await db_session.refresh(confirm_card)
     assert status_card.status == ConfirmationCardStatus.confirmed
     assert confirm_card.status == ConfirmationCardStatus.confirmed
+
+
+@pytest.mark.asyncio
+async def test_confirmation_card_confirm_does_not_duplicate_subscription_bookings(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Only the first confirmed card for a subscription may materialize bookings."""
+    from app.models.lesson import ClassMembership, LessonClass
+    from app.models.policy import ScheduleConfirmationCard
+    from app.models.schedule import LessonBooking
+    from app.models.student import Student
+    from app.models.subscription import Subscription
+
+    await create_test_user(
+        user_id="dup-booking-teacher",
+        role="teacher",
+        name="Duplicate Teacher",
+        email="dup-booking-teacher@test.com",
+    )
+    await create_test_user(
+        user_id="dup-booking-student-user",
+        role="student",
+        name="Duplicate Student",
+        email="dup-booking-student@test.com",
+    )
+    lesson_class = LessonClass(
+        id="dup-booking-class",
+        teacher_id="dup-booking-teacher-prof",
+        name="Duplicate Guard Class",
+        type="private",
+    )
+    student = Student(
+        id="dup-booking-student",
+        user_id="dup-booking-student-user",
+        teacher_id="dup-booking-teacher-prof",
+        name="Duplicate Student",
+        instrument="violin",
+    )
+    membership = ClassMembership(
+        id="dup-booking-membership",
+        lesson_class_id=lesson_class.id,
+        student_id=student.id,
+        instrument="violin",
+        status="active",
+    )
+    subscription = Subscription(
+        id="dup-booking-subscription",
+        student_id=student.id,
+        membership_id=membership.id,
+        type="package",
+        total_lessons=8,
+        amount=200000,
+    )
+    first_card = ScheduleConfirmationCard(
+        id="dup-booking-card-first",
+        student_id=student.id,
+        teacher_id="dup-booking-teacher-prof",
+        subscription_id=subscription.id,
+        card_type="afterTrial",
+        title="First",
+        status="pending",
+        proposed_day=str((date.today().weekday() + 1) % 7),
+        proposed_time="15:00",
+        proposed_duration=60,
+        created_at=datetime.now(UTC),
+    )
+    second_card = ScheduleConfirmationCard(
+        id="dup-booking-card-second",
+        student_id=student.id,
+        teacher_id="dup-booking-teacher-prof",
+        subscription_id=subscription.id,
+        card_type="afterTrial",
+        title="Second duplicate",
+        status="pending",
+        proposed_day=str((date.today().weekday() + 1) % 7),
+        proposed_time="18:00",
+        proposed_duration=60,
+        created_at=datetime.now(UTC),
+    )
+    db_session.add_all([lesson_class, student, membership, subscription, first_card, second_card])
+    await db_session.flush()
+
+    for card_id in ("dup-booking-card-first", "dup-booking-card-second"):
+        response = await client.patch(
+            f"/api/v1/schedule/confirmation-cards/{card_id}/confirm",
+            headers=_headers("dup-booking-student-user", "student"),
+            json={"action": "confirmed"},
+        )
+        assert response.status_code == 200
+
+    next_date = date.today() + timedelta(days=1)
+    bookings = (
+        await db_session.scalars(
+            select(LessonBooking).where(
+                LessonBooking.student_id == student.id,
+                LessonBooking.teacher_id == "dup-booking-teacher-prof",
+                LessonBooking.scheduled_date >= next_date,
+            )
+        )
+    ).all()
+    assert len(bookings) == 1
+    assert bookings[0].scheduled_time == "15:00"
 
 
 @pytest.mark.asyncio

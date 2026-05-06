@@ -1641,7 +1641,14 @@ async def test_contract_posts_and_monthly_analytics(
     data = analytics_resp.json()
     assert data["month"].startswith("2026-05")
     assert data["total_lessons"] == 0
-    assert data["lesson_trend"] == []
+    assert data["lesson_trend"] == [
+        {"month": "2025-12-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-01-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-02-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-03-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-04-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-05-01T00:00:00", "lesson_count": 0, "revenue": 0},
+    ]
     assert data["practice_ranking"] == []
 
 
@@ -1797,6 +1804,11 @@ async def test_contract_monthly_analytics_aggregates_lessons_and_students(
     assert data["attendance_rate"] == pytest.approx(1 / 3)
     assert data["total_students"] == 1
     assert data["lesson_trend"] == [
+        {"month": "2025-12-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-01-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-02-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-03-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-04-01T00:00:00", "lesson_count": 1, "revenue": 0},
         {"month": "2026-05-01T00:00:00", "lesson_count": 3, "revenue": 0}
     ]
 
@@ -1877,6 +1889,11 @@ async def test_contract_monthly_analytics_aggregates_confirmed_subscription_reve
     assert data["total_revenue"] == 120000
     assert data["revenue_change_percent"] == pytest.approx(50000 / 70000)
     assert data["lesson_trend"] == [
+        {"month": "2025-12-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-01-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-02-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-03-01T00:00:00", "lesson_count": 0, "revenue": 0},
+        {"month": "2026-04-01T00:00:00", "lesson_count": 0, "revenue": 70000},
         {"month": "2026-05-01T00:00:00", "lesson_count": 0, "revenue": 120000}
     ]
 

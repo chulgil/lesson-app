@@ -30,6 +30,9 @@ async def list_teachers(
     instrument: str | None = None,
     area: str | None = None,
     q: str | None = None,
+    lesson_type: str | None = None,
+    min_experience: Annotated[int | None, Query(ge=0)] = None,
+    has_verified_certificate: bool | None = None,
 ) -> PaginatedResponse[TeacherResponse]:
     """Search / list teacher profiles."""
     service = TeacherService(db)
@@ -40,6 +43,9 @@ async def list_teachers(
         instrument=instrument,
         area=area,
         q=q,
+        lesson_type=lesson_type,
+        min_experience=min_experience,
+        has_verified_certificate=has_verified_certificate,
     )
 
 

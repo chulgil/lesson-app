@@ -67,9 +67,12 @@ class TeacherService:
         instrument: str | None = None,
         area: str | None = None,
         q: str | None = None,
+        lesson_type: str | None = None,
+        min_experience: int | None = None,
+        has_verified_certificate: bool | None = None,
     ) -> PaginatedResponse[TeacherResponse]:
         """List / search teachers with pagination."""
-        from app.models.teacher import Teacher
+        from app.models.teacher import CertificateStatus, Teacher, TeacherCertificate
         from app.models.user import User
 
         query = select(Teacher)
@@ -79,6 +82,20 @@ class TeacherService:
             query = query.where(Teacher.instruments.cast(String).ilike(f"%{instrument}%"))
         if area:
             query = query.where(Teacher.lesson_areas.cast(String).ilike(f"%{area}%"))
+        if lesson_type:
+            query = query.where(Teacher.lesson_types.cast(String).ilike(f"%{lesson_type}%"))
+        if min_experience is not None:
+            query = query.where(Teacher.experience_years >= min_experience)
+        if has_verified_certificate is True:
+            approved_certificate_exists = (
+                select(TeacherCertificate.id)
+                .where(
+                    TeacherCertificate.teacher_id == Teacher.id,
+                    TeacherCertificate.status == CertificateStatus.approved,
+                )
+                .exists()
+            )
+            query = query.where(approved_certificate_exists)
         if q:
             query = query.join(User, User.id == Teacher.user_id).where(
                 or_(

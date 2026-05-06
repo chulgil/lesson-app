@@ -124,6 +124,8 @@ class AnalyticsService:
             (total_revenue - previous_revenue) / previous_revenue if previous_revenue else 0
         )
 
+        lesson_trend = await self._build_lesson_trend(teacher_id, parsed_month)
+
         return TeacherMonthlyStatsResponse(
             month=parsed_month,
             total_lessons=total_lessons,
@@ -136,17 +138,69 @@ class AnalyticsService:
             new_students=new_students or 0,
             churned_students=churned_students or 0,
             attendance_rate=attendance_rate,
-            lesson_trend=[
-                MonthlyTrendResponse(
-                    month=parsed_month,
-                    lesson_count=total_lessons,
-                    revenue=total_revenue or 0,
-                )
-            ]
-            if total_lessons or total_revenue
-            else [],
+            lesson_trend=lesson_trend,
             practice_ranking=practice_ranking,
         )
+
+    async def _build_lesson_trend(self, teacher_id: str, parsed_month: datetime) -> list[MonthlyTrendResponse]:
+        from app.models.lesson import Lesson
+        from app.models.student import Student
+        from app.models.subscription import Subscription
+
+        trend_start = parsed_month - relativedelta(months=5)
+        trend_end = parsed_month + relativedelta(months=1)
+        trend_months = [trend_start + relativedelta(months=offset) for offset in range(6)]
+        lesson_counts = {(month.year, month.month): 0 for month in trend_months}
+        revenues = {(month.year, month.month): 0 for month in trend_months}
+
+        lesson_rows = (
+            await self.db.execute(
+                select(Lesson.date, func.count())
+                .where(
+                    Lesson.teacher_id == teacher_id,
+                    Lesson.date >= trend_start.date(),
+                    Lesson.date < trend_end.date(),
+                )
+                .group_by(Lesson.date)
+            )
+        ).all()
+        for lesson_date, lesson_count in lesson_rows:
+            key = (lesson_date.year, lesson_date.month)
+            if key in lesson_counts:
+                lesson_counts[key] += lesson_count
+
+        revenue_date = func.coalesce(
+            Subscription.payment_confirmed_at,
+            Subscription.paid_at,
+            Subscription.created_at,
+        ).label("revenue_date")
+        revenue_rows = (
+            await self.db.execute(
+                select(Subscription.amount, revenue_date)
+                .join(Student, Student.id == Subscription.student_id)
+                .where(
+                    Student.teacher_id == teacher_id,
+                    Subscription.payment_confirmed.is_(True),
+                    revenue_date >= trend_start,
+                    revenue_date < trend_end,
+                )
+            )
+        ).all()
+        for amount, revenue_at in revenue_rows:
+            if isinstance(revenue_at, str):
+                revenue_at = datetime.fromisoformat(revenue_at)
+            key = (revenue_at.year, revenue_at.month)
+            if key in revenues:
+                revenues[key] += amount or 0
+
+        return [
+            MonthlyTrendResponse(
+                month=month,
+                lesson_count=lesson_counts[(month.year, month.month)],
+                revenue=revenues[(month.year, month.month)],
+            )
+            for month in trend_months
+        ]
 
     async def _sum_confirmed_revenue(self, teacher_id: str, start: datetime, end: datetime) -> int:
         from app.models.student import Student

@@ -74,7 +74,7 @@ class ScheduleConfirmationService:
         self.db.add(card)
         await self.db.flush()
         await self.db.refresh(card)
-        return ScheduleConfirmationCardResponse.model_validate(card)
+        return await self._response_for_card(card)
 
     async def get_cards(
         self,
@@ -96,12 +96,12 @@ class ScheduleConfirmationService:
 
         query = query.order_by(ScheduleConfirmationCard.created_at.desc())
         result = await self.db.scalars(query)
-        return [ScheduleConfirmationCardResponse.model_validate(card) for card in result.all()]
+        return [await self._response_for_card(card) for card in result.all()]
 
     async def get_card_by_id(self, card_id: str, current_user: Any) -> ScheduleConfirmationCardResponse:
         """Return a single confirmation card by ID."""
         card = await self._get_card_for_user(card_id, current_user)
-        return ScheduleConfirmationCardResponse.model_validate(card)
+        return await self._response_for_card(card)
 
     async def get_card_by_subscription_id(
         self, subscription_id: str, current_user: Any
@@ -122,7 +122,7 @@ class ScheduleConfirmationService:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Forbidden",
             )
-        return ScheduleConfirmationCardResponse.model_validate(card)
+        return await self._response_for_card(card)
 
     async def confirm_card(
         self,
@@ -148,11 +148,12 @@ class ScheduleConfirmationService:
 
         # GAP-5: Create LessonBooking records when student confirms
         if data.action == "confirmed" and card.subscription_id:
-            await self._create_bookings_for_subscription(card)
+            if not await self._subscription_has_confirmed_card(card):
+                await self._create_bookings_for_subscription(card)
 
         await self.db.flush()
         await self.db.refresh(card)
-        return ScheduleConfirmationCardResponse.model_validate(card)
+        return await self._response_for_card(card)
 
     async def update_card_status(
         self,
@@ -175,11 +176,12 @@ class ScheduleConfirmationService:
         card.responded_at = data.responded_at or datetime.now(UTC)
 
         if data.status == "confirmed" and card.subscription_id:
-            await self._create_bookings_for_subscription(card)
+            if not await self._subscription_has_confirmed_card(card):
+                await self._create_bookings_for_subscription(card)
 
         await self.db.flush()
         await self.db.refresh(card)
-        return ScheduleConfirmationCardResponse.model_validate(card)
+        return await self._response_for_card(card)
 
     async def dismiss_all_pending(
         self,
@@ -207,6 +209,36 @@ class ScheduleConfirmationService:
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    async def _response_for_card(self, card: Any) -> ScheduleConfirmationCardResponse:
+        response = ScheduleConfirmationCardResponse.model_validate(card)
+        response.teacher_name = await self._teacher_name(card.teacher_id)
+        return response
+
+    async def _teacher_name(self, teacher_id: str) -> str:
+        from app.models.teacher import Teacher
+        from app.models.user import User
+
+        user_name = await self.db.scalar(select(User.name).where(User.id == teacher_id))
+        if user_name:
+            return user_name
+
+        profile_name = await self.db.scalar(
+            select(User.name).join(Teacher, Teacher.user_id == User.id).where(Teacher.id == teacher_id)
+        )
+        return profile_name or ""
+
+    async def _subscription_has_confirmed_card(self, card: Any) -> bool:
+        from app.models.policy import ConfirmationCardStatus, ScheduleConfirmationCard
+
+        confirmed_card_id = await self.db.scalar(
+            select(ScheduleConfirmationCard.id).where(
+                ScheduleConfirmationCard.subscription_id == card.subscription_id,
+                ScheduleConfirmationCard.id != card.id,
+                ScheduleConfirmationCard.status == ConfirmationCardStatus.confirmed,
+            )
+        )
+        return confirmed_card_id is not None
 
     async def _create_bookings_for_subscription(self, card: Any) -> None:
         """GAP-5: Create LessonBooking records based on subscription type."""
@@ -322,7 +354,7 @@ class ScheduleConfirmationService:
     async def _can_access(self, card: Any, current_user: Any) -> bool:
         role = self._actor_type(current_user)
         if role == "teacher":
-            result: bool = card.teacher_id == current_user.id
+            result: bool = card.teacher_id in await self._teacher_identifiers(current_user)
             return result
         if role == "student":
             result2: bool = card.student_id in await self._student_identifiers(current_user)
@@ -337,7 +369,8 @@ class ScheduleConfirmationService:
 
         role = self._actor_type(current_user)
         if role == "teacher":
-            return query.where(ScheduleConfirmationCard.teacher_id == current_user.id)
+            teacher_ids = await self._teacher_identifiers(current_user)
+            return query.where(ScheduleConfirmationCard.teacher_id.in_(teacher_ids))
         if role == "student":
             return query.where(ScheduleConfirmationCard.student_id.in_(await self._student_identifiers(current_user)))
         if role == "parent":
@@ -359,6 +392,17 @@ class ScheduleConfirmationService:
         for student_id in result.all():
             if student_id not in identifiers:
                 identifiers.append(student_id)
+        return identifiers
+
+    async def _teacher_identifiers(self, user: Any) -> list[str]:
+        """Return user id plus linked Teacher profile id for teacher actors."""
+        from app.models.teacher import Teacher
+
+        identifiers = [user.id]
+        result = await self.db.scalars(select(Teacher.id).where(Teacher.user_id == user.id))
+        for teacher_id in result.all():
+            if teacher_id not in identifiers:
+                identifiers.append(teacher_id)
         return identifiers
 
     async def _parent_child_student_ids(self, user: Any) -> list[str]:
