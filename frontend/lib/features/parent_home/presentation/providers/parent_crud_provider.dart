@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/parent.dart';
 import '../../domain/entities/parent_child_relation.dart';
@@ -7,116 +7,137 @@ import '../../domain/entities/parent_notification_settings.dart';
 import '../../domain/repositories/parent_repository.dart';
 import 'parent_repository_provider.dart';
 
+part 'parent_crud_provider.g.dart';
+
 // ============================================================================
 // Parent CRUD Providers
 // ============================================================================
 
 /// All parents provider
-final parentsProvider = FutureProvider<List<Parent>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Parent>> parents(ParentsRef ref) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getParents();
-});
+}
 
 /// Single parent provider by ID
-final parentProvider = FutureProvider.family<Parent?, String>((ref, id) async {
+@Riverpod(keepAlive: true)
+Future<Parent?> parent(ParentRef ref, String id) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getParent(id);
-});
+}
 
 /// Parent by user ID provider
-final parentByUserIdProvider =
-    FutureProvider.family<Parent?, String>((ref, userId) async {
+@Riverpod(keepAlive: true)
+Future<Parent?> parentByUserId(ParentByUserIdRef ref, String userId) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getParentByUserId(userId);
-});
+}
 
 // ============================================================================
 // Invitation Providers
 // ============================================================================
 
 /// Invitation by code provider
-final invitationByCodeProvider =
-    FutureProvider.family<ParentInvitation?, String>((ref, code) async {
+@Riverpod(keepAlive: true)
+Future<ParentInvitation?> invitationByCode(
+  InvitationByCodeRef ref,
+  String code,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getInvitationByCode(code);
-});
+}
 
 /// Pending invitations for a student
-final pendingInvitationsProvider =
-    FutureProvider.family<List<ParentInvitation>, String>(
-        (ref, studentId) async {
+@Riverpod(keepAlive: true)
+Future<List<ParentInvitation>> pendingInvitations(
+  PendingInvitationsRef ref,
+  String studentId,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getPendingInvitationsForStudent(studentId);
-});
+}
 
 // ============================================================================
 // Relation Providers
 // ============================================================================
 
 /// Relations for a parent (their children)
-final relationsForParentProvider =
-    FutureProvider.family<List<ParentChildRelation>, String>(
-        (ref, parentId) async {
+@Riverpod(keepAlive: true)
+Future<List<ParentChildRelation>> relationsForParent(
+  RelationsForParentRef ref,
+  String parentId,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getRelationsForParent(parentId);
-});
+}
 
 /// Relations for a student (their parents)
-final relationsForStudentProvider =
-    FutureProvider.family<List<ParentChildRelation>, String>(
-        (ref, studentId) async {
+@Riverpod(keepAlive: true)
+Future<List<ParentChildRelation>> relationsForStudent(
+  RelationsForStudentRef ref,
+  String studentId,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getRelationsForStudent(studentId);
-});
+}
 
 /// Single relation between parent and student
-final parentStudentRelationProvider = FutureProvider.family<ParentChildRelation?,
-    ({String parentId, String studentId})>((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<ParentChildRelation?> parentStudentRelation(
+  ParentStudentRelationRef ref,
+  ({String parentId, String studentId}) params,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getRelation(params.parentId, params.studentId);
-});
+}
 
 // ============================================================================
 // Visibility Settings Providers
 // ============================================================================
 
 /// Visibility settings for a student (set by teacher)
-final visibilitySettingsProvider =
-    FutureProvider.family<ParentVisibilitySettings?,
-        ({String teacherId, String studentId})>((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<ParentVisibilitySettings?> visibilitySettings(
+  VisibilitySettingsRef ref,
+  ({String teacherId, String studentId}) params,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getVisibilitySettings(params.teacherId, params.studentId);
-});
+}
 
 // ============================================================================
 // Notification Settings Providers
 // ============================================================================
 
 /// Notification settings for a parent
-final notificationSettingsProvider =
-    FutureProvider.family<ParentNotificationSettings?, String>(
-        (ref, parentId) async {
+@Riverpod(keepAlive: true)
+Future<ParentNotificationSettings?> notificationSettings(
+  NotificationSettingsRef ref,
+  String parentId,
+) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getNotificationSettings(parentId);
-});
+}
 
 // ============================================================================
 // Billing Provider
 // ============================================================================
 
 /// Billing target parent for a student
-final billingTargetProvider =
-    FutureProvider.family<Parent?, String>((ref, studentId) async {
+@Riverpod(keepAlive: true)
+Future<Parent?> billingTarget(BillingTargetRef ref, String studentId) async {
   final repository = ref.watch(parentRepositoryProvider);
   return repository.getBillingTargetForStudent(studentId);
-});
+}
 
 // ============================================================================
 // Parents Notifier (CRUD Operations)
 // ============================================================================
 
 /// Parent list notifier for CRUD operations
-class ParentsNotifier extends AsyncNotifier<List<Parent>> {
+@Riverpod(keepAlive: true)
+class ParentsNotifier extends _$ParentsNotifier {
   ParentRepository get _repository => ref.read(parentRepositoryProvider);
 
   @override
@@ -165,18 +186,13 @@ class ParentsNotifier extends AsyncNotifier<List<Parent>> {
   }
 }
 
-final parentsNotifierProvider =
-    AsyncNotifierProvider<ParentsNotifier, List<Parent>>(
-  ParentsNotifier.new,
-);
-
 // ============================================================================
 // Invitations Notifier
 // ============================================================================
 
 /// Invitation notifier for creating/managing invitations
-class InvitationsNotifier
-    extends FamilyAsyncNotifier<List<ParentInvitation>, String> {
+@Riverpod(keepAlive: true)
+class InvitationsNotifier extends _$InvitationsNotifier {
   ParentRepository get _repository => ref.read(parentRepositoryProvider);
 
   @override
@@ -189,7 +205,8 @@ class InvitationsNotifier
     try {
       final newInvitation = await _repository.createInvitation(invitation);
       state = await AsyncValue.guard(
-          () => _repository.getPendingInvitationsForStudent(arg));
+        () => _repository.getPendingInvitationsForStudent(studentId),
+      );
       return newInvitation;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -202,7 +219,8 @@ class InvitationsNotifier
     try {
       await _repository.markInvitationUsed(invitationId);
       state = await AsyncValue.guard(
-          () => _repository.getPendingInvitationsForStudent(arg));
+        () => _repository.getPendingInvitationsForStudent(studentId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -210,18 +228,13 @@ class InvitationsNotifier
   }
 }
 
-final invitationsNotifierProvider = AsyncNotifierProvider.family<
-    InvitationsNotifier, List<ParentInvitation>, String>(
-  InvitationsNotifier.new,
-);
-
 // ============================================================================
 // Relations Notifier
 // ============================================================================
 
 /// Relations notifier for managing parent-child relationships
-class RelationsNotifier
-    extends FamilyAsyncNotifier<List<ParentChildRelation>, String> {
+@Riverpod(keepAlive: true)
+class RelationsNotifier extends _$RelationsNotifier {
   ParentRepository get _repository => ref.read(parentRepositoryProvider);
 
   @override
@@ -233,8 +246,9 @@ class RelationsNotifier
     state = const AsyncValue.loading();
     try {
       final newRelation = await _repository.createRelation(relation);
-      state =
-          await AsyncValue.guard(() => _repository.getRelationsForParent(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getRelationsForParent(parentId),
+      );
       return newRelation;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -243,12 +257,14 @@ class RelationsNotifier
   }
 
   Future<ParentChildRelation> updateRelation(
-      ParentChildRelation relation) async {
+    ParentChildRelation relation,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final updated = await _repository.updateRelation(relation);
-      state =
-          await AsyncValue.guard(() => _repository.getRelationsForParent(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getRelationsForParent(parentId),
+      );
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -260,8 +276,9 @@ class RelationsNotifier
     state = const AsyncValue.loading();
     try {
       await _repository.deleteRelation(relationId);
-      state =
-          await AsyncValue.guard(() => _repository.getRelationsForParent(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getRelationsForParent(parentId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -269,30 +286,28 @@ class RelationsNotifier
   }
 }
 
-final relationsNotifierProvider = AsyncNotifierProvider.family<RelationsNotifier,
-    List<ParentChildRelation>, String>(
-  RelationsNotifier.new,
-);
-
 // ============================================================================
 // Visibility Settings Notifier
 // ============================================================================
 
 /// Visibility settings notifier for teacher to manage parent access
-class VisibilitySettingsNotifier
-    extends FamilyAsyncNotifier<ParentVisibilitySettings?,
-        ({String teacherId, String studentId})> {
+@Riverpod(keepAlive: true)
+class VisibilitySettingsNotifier extends _$VisibilitySettingsNotifier {
   ParentRepository get _repository => ref.read(parentRepositoryProvider);
 
   @override
   Future<ParentVisibilitySettings?> build(
-      ({String teacherId, String studentId}) params) async {
+    ({String teacherId, String studentId}) params,
+  ) async {
     return _repository.getVisibilitySettings(
-        params.teacherId, params.studentId);
+      params.teacherId,
+      params.studentId,
+    );
   }
 
   Future<ParentVisibilitySettings> saveSettings(
-      ParentVisibilitySettings settings) async {
+    ParentVisibilitySettings settings,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final saved = await _repository.saveVisibilitySettings(settings);
@@ -305,20 +320,13 @@ class VisibilitySettingsNotifier
   }
 }
 
-final visibilitySettingsNotifierProvider = AsyncNotifierProvider.family<
-    VisibilitySettingsNotifier,
-    ParentVisibilitySettings?,
-    ({String teacherId, String studentId})>(
-  VisibilitySettingsNotifier.new,
-);
-
 // ============================================================================
 // Notification Settings Notifier
 // ============================================================================
 
 /// Notification settings notifier for parent to customize their preferences
-class NotificationSettingsNotifier
-    extends FamilyAsyncNotifier<ParentNotificationSettings?, String> {
+@Riverpod(keepAlive: true)
+class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   ParentRepository get _repository => ref.read(parentRepositoryProvider);
 
   @override
@@ -327,7 +335,8 @@ class NotificationSettingsNotifier
   }
 
   Future<ParentNotificationSettings> saveSettings(
-      ParentNotificationSettings settings) async {
+    ParentNotificationSettings settings,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final saved = await _repository.saveNotificationSettings(settings);
@@ -339,8 +348,3 @@ class NotificationSettingsNotifier
     }
   }
 }
-
-final notificationSettingsNotifierProvider = AsyncNotifierProvider.family<
-    NotificationSettingsNotifier, ParentNotificationSettings?, String>(
-  NotificationSettingsNotifier.new,
-);
