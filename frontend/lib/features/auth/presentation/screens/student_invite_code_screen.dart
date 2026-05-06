@@ -3,9 +3,9 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -267,7 +267,7 @@ class _StudentInviteCodeScreenState
     try {
       final code = _codeController.text.trim().toUpperCase();
 
-      if (EnvironmentConfig.useMockData) {
+      if (ref.read(mockDataModeProvider)) {
         // Mock: accept any 6+ character code
         await Future.delayed(const Duration(seconds: 1));
         if (code.length < 6) {

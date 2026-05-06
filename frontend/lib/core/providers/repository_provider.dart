@@ -3,6 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/environment.dart';
 import '../network/api_client.dart';
 
+/// App-wide data mode boundary.
+///
+/// UI/application code should read this provider instead of importing
+/// [EnvironmentConfig] directly, so environment branching stays centralized.
+final mockDataModeProvider = Provider<bool>((ref) {
+  return EnvironmentConfig.useMockData;
+});
+
 /// Creates a repository provider that switches between Mock and Remote
 /// implementations based on [EnvironmentConfig.useMockData].
 ///

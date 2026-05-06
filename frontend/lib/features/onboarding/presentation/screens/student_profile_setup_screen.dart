@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -67,7 +67,7 @@ class _StudentProfileSetupScreenState
     setState(() => _isLoading = true);
 
     try {
-      if (EnvironmentConfig.useMockData) {
+      if (ref.read(mockDataModeProvider)) {
         // Mock mode: use existing student provider
         final student = Student(
           id: const Uuid().v4(),

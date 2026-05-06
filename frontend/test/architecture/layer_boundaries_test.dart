@@ -518,9 +518,5 @@ const _mockDataBranchExceptions = <String>{
   'lib/features/auth/presentation/providers/auth_provider.dart',
   'lib/features/auth/presentation/providers/user_role_provider.dart',
   'lib/features/auth/presentation/screens/login_screen.dart',
-  'lib/features/auth/presentation/screens/student_invite_code_screen.dart',
   'lib/features/notifications/presentation/providers/notification_providers.dart',
-  'lib/features/onboarding/presentation/screens/student_profile_setup_screen.dart',
-  'lib/features/onboarding/presentation/screens/student_tutorial_screen.dart',
-  'lib/features/onboarding/presentation/screens/tutorial_screen.dart',
 };

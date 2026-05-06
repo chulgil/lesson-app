@@ -3,8 +3,8 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/auth_facade.dart';
@@ -74,7 +74,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   void _navigateToHome() {
     ref.read(teacherOnboardingCompletedProvider.notifier).state = true;
     // Mark onboarding as completed on the server (remote mode)
-    if (!EnvironmentConfig.useMockData) {
+    if (!ref.read(mockDataModeProvider)) {
       ref.read(authNotifierProvider.notifier).completeOnboarding();
     }
     context.go(AppRoutes.home);
