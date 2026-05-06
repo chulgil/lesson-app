@@ -3,9 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/auth/token_storage.dart';
-import '../../../../core/config/environment.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/entities/user_role.dart';
@@ -46,7 +46,7 @@ class AuthNotifier extends _$AuthNotifier {
     _termsAgreed = false;
 
     // In mock mode, skip authentication entirely
-    if (EnvironmentConfig.useMockData) {
+    if (ref.watch(mockDataModeProvider)) {
       return const AuthUnauthenticated();
     }
 

@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/notifications/domain/entities/notification_settings.dart';
 import '../../../../features/notifications/domain/services/practice_reminder_scheduler.dart';
 import '../../../auth/auth_facade.dart';
@@ -38,7 +38,7 @@ final notificationViewerRoleProvider = Provider<String>((ref) {
 /// Notification repository provider (only used for remote mode).
 @Riverpod(keepAlive: true)
 NotificationRepository? notificationApiRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) return null;
+  if (ref.watch(mockDataModeProvider)) return null;
   return RemoteNotificationRepository(ref.read(apiClientProvider));
 }
 
@@ -61,10 +61,11 @@ NotificationSchedulerService notificationSchedulerService(Ref ref) {
 FcmService fcmService(Ref ref) {
   final localService = ref.read(notificationServiceProvider);
   final apiClient = ref.read(apiClientProvider);
+  final useMockData = ref.watch(mockDataModeProvider);
   final service = FcmService(
     notificationDelivery: localService,
     apiClient: apiClient,
-    useMockData: EnvironmentConfig.useMockData,
+    useMockData: useMockData,
   );
   ref.onDispose(() => service.dispose());
   return service;

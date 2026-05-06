@@ -515,8 +515,4 @@ const _mockDataBranchExceptions = <String>{
   'lib/core/services/image_upload_service.dart',
   'lib/core/widgets/debug_role_switcher.dart',
   'lib/main.dart',
-  'lib/features/auth/presentation/providers/auth_provider.dart',
-  'lib/features/auth/presentation/providers/user_role_provider.dart',
-  'lib/features/auth/presentation/screens/login_screen.dart',
-  'lib/features/notifications/presentation/providers/notification_providers.dart',
 };

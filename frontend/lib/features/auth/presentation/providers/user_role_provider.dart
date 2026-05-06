@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../domain/entities/user_role.dart';
 import 'auth_provider.dart';
 
@@ -12,7 +12,7 @@ export '../../domain/entities/user_role.dart';
 /// In mock mode: manual StateProvider (for debug role switching).
 /// In remote mode: derived from AuthNotifier state.
 final currentUserRoleProvider = StateProvider<UserRole>((ref) {
-  if (!EnvironmentConfig.useMockData) {
+  if (!ref.watch(mockDataModeProvider)) {
     final authState = ref.watch(authNotifierProvider);
     if (authState is AuthAuthenticated) {
       return authState.role;
@@ -26,7 +26,7 @@ final currentUserRoleProvider = StateProvider<UserRole>((ref) {
 /// In mock mode: returns mock IDs.
 /// In remote mode: returns actual user ID from auth state.
 final currentUserIdProvider = Provider<String>((ref) {
-  if (!EnvironmentConfig.useMockData) {
+  if (!ref.watch(mockDataModeProvider)) {
     final authState = ref.watch(authNotifierProvider);
     if (authState is AuthAuthenticated) {
       return authState.userId;

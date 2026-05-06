@@ -7,7 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -19,6 +19,15 @@ import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';
+
+const _googleServerClientId = String.fromEnvironment(
+  'GOOGLE_SERVER_CLIENT_ID',
+  defaultValue: '',
+);
+const _googleIosClientId = String.fromEnvironment(
+  'GOOGLE_IOS_CLIENT_ID',
+  defaultValue: '',
+);
 
 /// Login screen — Notebook × Score 디자인.
 /// 스펙: docs/specs/design/notebook/README.md
@@ -35,6 +44,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final useMockData = ref.watch(mockDataModeProvider);
+
     return NotebookScreenScaffold(
       body: PaperScaffold(
         child: SafeArea(
@@ -60,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     _buildHeader(),
                     const SizedBox(height: AppSpacing.space8),
                     _buildSocialButtons(context),
-                    if (EnvironmentConfig.useMockData == false) ...[
+                    if (!useMockData) ...[
                       const SizedBox(height: AppSpacing.space6),
                       _buildDevAccountsSection(),
                     ],
@@ -303,7 +314,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
-    if (EnvironmentConfig.useMockData) {
+    if (ref.read(mockDataModeProvider)) {
       showRoleSelectSheet(
         context,
         authProvider: 'google',
@@ -314,7 +325,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (_isLoading) return;
 
-    if (EnvironmentConfig.googleServerClientId.isEmpty) {
+    if (_googleServerClientId.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -329,11 +340,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final iosClientId = EnvironmentConfig.googleIosClientId;
       final googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
-        clientId: iosClientId.isNotEmpty ? iosClientId : null,
-        serverClientId: EnvironmentConfig.googleServerClientId,
+        clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
+        serverClientId: _googleServerClientId,
       );
       final account = await googleSignIn.signIn();
       if (account == null) {
@@ -373,7 +383,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleKakaoLogin(BuildContext context) {
-    if (!EnvironmentConfig.useMockData) {
+    if (!ref.read(mockDataModeProvider)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(AppStrings.authKakaoNotReady),
@@ -390,7 +400,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleAppleLogin(BuildContext context) {
-    if (!EnvironmentConfig.useMockData) {
+    if (!ref.read(mockDataModeProvider)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Apple 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.'),
