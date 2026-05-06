@@ -69,6 +69,7 @@ from app.models.settings import (  # noqa: F401
     SubscriptionSettings,
     TeacherSettings,
     TeachingResource,
+    TeachingResourceTag,
 )
 from app.models.student import Student  # noqa: F401
 from app.models.subscription import (  # noqa: F401

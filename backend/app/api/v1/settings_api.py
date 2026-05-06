@@ -538,6 +538,8 @@ async def list_teaching_resources(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
     pagination: Annotated[dict, Depends(get_pagination)],
+    tag: str | None = None,
+    query: str | None = None,
 ) -> PaginatedResponse[TeachingResourceResponse]:
     service = SettingsService(db)
     return await service.get_teaching_resources(
@@ -545,6 +547,8 @@ async def list_teaching_resources(
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
+        tag=tag,
+        query=query,
     )
 
 

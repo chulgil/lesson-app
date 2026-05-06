@@ -57,7 +57,7 @@
 | 2 | Students | StudentRepository | ✅ | ✅ | CRUD + status |
 | 3 | Lessons | LessonRepository | ✅ | ✅ | CRUD + status |
 | 4 | Lessons | FeedbackPresetRepository | ✅ | ✅ | settings 경로 |
-| 5 | Lessons | TeachingResourceRepository | ✅ | ✅ | settings 경로 |
+| 5 | Lessons | TeachingResourceRepository | ✅ | ✅ | settings 경로. tags는 `teaching_resource_tags`로 정규화 |
 | 6 | Practice | PracticeRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
 | 7 | Practice | PracticeGoalRepository | ✅ | ✅ | |
 | 8 | Practice | PracticeStatsRepository | ✅ | ✅ | |
@@ -117,6 +117,7 @@
 |------------|----------|-----------|
 | TipTemplateRepository | `GET /settings/tip-templates`, `POST /settings/tip-templates`, `GET /settings/tip-templates/{id}`, `PUT /settings/tip-templates/{id}`, `PATCH /settings/tip-templates/{id}/usage`, `DELETE /settings/tip-templates/{id}` | 프론트 `RemoteTipTemplateRepository` 추가 및 provider mock-only 제거 |
 | FeedbackTemplateRepository | `GET /settings/feedback-templates`, `POST /settings/feedback-templates`, `GET /settings/feedback-templates/{id}`, `PUT /settings/feedback-templates/{id}`, `PATCH /settings/feedback-templates/{id}/usage`, `DELETE /settings/feedback-templates/{id}` | 프론트 `RemoteFeedbackTemplateRepository` 추가 및 provider mock-only 제거 |
+| TeachingResourceRepository | `GET /settings/teaching-resources?tag=&query=`, `POST /settings/teaching-resources`, `GET /settings/teaching-resources/{id}`, `PUT /settings/teaching-resources/{id}`, `DELETE /settings/teaching-resources/{id}` | 프론트 remote repository의 `getByIds`는 아직 전체 목록 조회 후 client-side filter. 필요 시 batch endpoint 추가 |
 | Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
 
 다음 백엔드 우선순위:
@@ -131,7 +132,8 @@
 |------|------|
 | `FeedbackTemplate.tags` | JSON 배열 저장 대신 `feedback_template_tags(template_id, tag)`로 정규화. 태그 검색/필터와 `(template_id, tag)` 중복 방지에 필요 |
 | `TipTemplate.instrument` | 단일 nullable scope라 별도 테이블 불필요. 다중 악기 지원이 필요해질 때 `tip_template_instruments`로 분리 |
-| `TeachingResource.tags` | 현재 문서/표시 metadata 성격이 강하고 backend tag filter API가 없으므로 유지 가능. 검색/필터 요구가 생기면 정규화 후보 |
+| `TeachingResource.tags` | JSON 배열 저장 대신 `teaching_resource_tags(resource_id, tag)`로 정규화. 교수 자료 라이브러리는 tag/query 필터가 필요한 반복 metadata이고 `(resource_id, tag)` 중복 방지가 필요 |
+| Redis / GraphDB | PostgreSQL 17을 SSOT로 유지. Redis는 TTL 캐시/락/큐에만 사용 후보. GraphDB는 현재 관계 깊이에서 불필요하며 PostgreSQL FK/인덱스/recursive CTE 우선 |
 
 ---
 

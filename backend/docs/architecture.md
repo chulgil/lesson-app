@@ -1,6 +1,6 @@
 # Backend Architecture
 
-> 마지막 업데이트: 2026-05-06
+> 마지막 업데이트: 2026-05-07
 
 ## 개요
 
@@ -15,6 +15,7 @@
 | Framework | FastAPI | 0.115+ | async 지원 |
 | ORM | SQLAlchemy | 2.0+ | async engine |
 | Database | PostgreSQL | 17+ | Docker / codenavi 서버 |
+| Cache / Queue | Redis client | optional | 세션성 캐시/락/작업 큐 후보. 영속 도메인 SSOT 아님 |
 | Schema | Pydantic | v2 | 요청/응답 직렬화 |
 | Auth | 자체 JWT + OAuth2 | - | Google/Kakao/Apple, dev-login |
 | i18n | 자체 구현 | - | ko, en, ja (확장 가능) |
@@ -201,7 +202,10 @@ cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
 - 향후 Lessonaza 앱 사용료 과금은 별도 스펙과 별도 모델/라우터로 분리한다.
 - 수강권 회차별 시간변경은 `/subscriptions/{subscription_id}/events`의 `RequestEvent`가 원격 SSOT다. 단일 회차는 `session_number`, 변경 범위는 `schedule_change_type`으로 식별하고, 변경/수락/거절/역제안은 `scheduleChanged`, `scheduleChangeProposed`, `scheduleChangeAccepted`, `scheduleChangeRejected`, `scheduleChangeCountered` 이벤트로 기록한다. 배지/목록은 `GET /subscriptions/schedule-change-events/pending`에서 현재 사용자가 응답해야 하는 최신 회차 이벤트만 반환한다. `/schedule-changes` 라우트는 레거시 일정 변경 표면이므로 수강권 상세 화면의 회차별 변경 계약을 확장할 때는 우선 subscription event API를 확장한다.
 - 프론트 mock 대체 API는 화면별 mock shape를 그대로 복제하지 않는다. teacher/student/subscription scoped 도메인 API로 제공하고, 프론트 remote repository가 그 API를 조합한다. 선생님 개인 라이브러리는 `/settings/*` 아래에 둔다. 예: `feedback-presets`, `teaching-resources`, `tip-templates`.
-- 정규화가 필요한 반복 값은 JSON 배열로 저장하지 않는다. 검색/필터/중복 제약이 필요한 태그는 별도 테이블로 분리한다. 예: 장문 피드백 템플릿은 `feedback_templates`와 `feedback_template_tags`로 저장하고, API 응답에서 `tags: list[str]`로 조립한다.
+- 정규화가 필요한 반복 값은 JSON 배열로 저장하지 않는다. 검색/필터/중복 제약이 필요한 태그는 별도 테이블로 분리한다. 예: 장문 피드백 템플릿은 `feedback_templates`와 `feedback_template_tags`, 교수 자료는 `teaching_resources`와 `teaching_resource_tags`로 저장하고, API 응답에서 `tags: list[str]`로 조립한다.
+- PostgreSQL JSON/JSONB는 opaque 설정값, 외부 webhook payload, provider별 부가 데이터처럼 필드 단위 무결성/검색/참조가 필요 없는 문서형 데이터에만 사용한다. 도메인 필터, unique 제약, FK, 개별 row lifecycle이 필요한 값은 join table 또는 별도 엔티티로 승격한다.
+- Redis는 도메인 원장으로 쓰지 않는다. 현재 의존성은 있지만, 적용 후보는 짧은 TTL 캐시, rate limit, scheduler/distributed lock, fan-out queue처럼 재생성 가능한 데이터로 제한한다.
+- GraphDB는 현재 기본 인프라에 넣지 않는다. 선생님-학생-부모-팔로우 관계는 PostgreSQL FK와 인덱스, 필요 시 recursive CTE로 우선 해결한다. 깊은 추천/관계 탐색이 제품 요구사항으로 확정되면 PostgreSQL 확장(Apache AGE 등)이나 별도 graph store를 ADR로 비교한다. RedisGraph 계열은 신규 영속 graph store 후보에서 제외한다.
 
 ### DB 무결성 baseline
 

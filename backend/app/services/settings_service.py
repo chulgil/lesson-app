@@ -519,19 +519,50 @@ class SettingsService:
     # -----------------------------------------------------------------------
 
     async def get_teaching_resources(
-        self, teacher_id: str, *, page: int, size: int, offset: int
+        self,
+        teacher_id: str,
+        *,
+        page: int,
+        size: int,
+        offset: int,
+        tag: str | None = None,
+        query: str | None = None,
     ) -> PaginatedResponse:
-        from app.models.settings import TeachingResource
+        from app.models.settings import TeachingResource, TeachingResourceTag
 
-        query = select(TeachingResource).where(TeachingResource.teacher_id == teacher_id)
+        stmt = select(TeachingResource).where(TeachingResource.teacher_id == teacher_id)
+        if tag:
+            stmt = stmt.join(
+                TeachingResourceTag,
+                TeachingResourceTag.resource_id == TeachingResource.id,
+            ).where(TeachingResourceTag.tag == tag)
+        if query:
+            like_query = f"%{query}%"
+            tag_exists = (
+                select(TeachingResourceTag.id)
+                .where(
+                    TeachingResourceTag.resource_id == TeachingResource.id,
+                    TeachingResourceTag.tag.ilike(like_query),
+                )
+                .exists()
+            )
+            stmt = stmt.where(
+                or_(
+                    TeachingResource.title.ilike(like_query),
+                    TeachingResource.description.ilike(like_query),
+                    TeachingResource.instrument.ilike(like_query),
+                    tag_exists,
+                )
+            )
         total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
+            select(func.count()).select_from(stmt.subquery())
         ) or 0
 
         result = await self.db.scalars(
-            query.order_by(TeachingResource.created_at.desc()).offset(offset).limit(size)
+            stmt.order_by(TeachingResource.created_at.desc()).offset(offset).limit(size)
         )
-        return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
+        items = [await self._teaching_resource_response(resource) for resource in result.unique().all()]
+        return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def get_teaching_resources_by_ids(self, ids: list[str]) -> list[Any]:
         from app.models.settings import TeachingResource
@@ -541,7 +572,7 @@ class SettingsService:
         result = await self.db.scalars(
             select(TeachingResource).where(TeachingResource.id.in_(ids))
         )
-        return list(result.all())
+        return [await self._teaching_resource_response(resource) for resource in result.all()]
 
     async def get_teaching_resource(self, resource_id: str, teacher_id: str) -> Any:
         from app.models.settings import TeachingResource
@@ -549,16 +580,58 @@ class SettingsService:
         resource = await self.db.get(TeachingResource, resource_id)
         if resource is None or resource.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
-        return resource
+        return await self._teaching_resource_response(resource)
+
+    async def _teaching_resource_response(self, resource: Any) -> dict:
+        from app.models.settings import TeachingResourceTag
+
+        result = await self.db.scalars(
+            select(TeachingResourceTag.tag)
+            .where(TeachingResourceTag.resource_id == resource.id)
+            .order_by(TeachingResourceTag.tag.asc())
+        )
+        return {
+            "id": resource.id,
+            "teacher_id": resource.teacher_id,
+            "type": resource.type,
+            "title": resource.title,
+            "description": resource.description,
+            "youtube_url": resource.youtube_url,
+            "youtube_video_id": resource.youtube_video_id,
+            "youtube_thumbnail": resource.youtube_thumbnail,
+            "youtube_start_seconds": resource.youtube_start_seconds,
+            "youtube_end_seconds": resource.youtube_end_seconds,
+            "audio_url": resource.audio_url,
+            "audio_duration_seconds": resource.audio_duration_seconds,
+            "external_url": resource.external_url,
+            "instrument": resource.instrument,
+            "tags": list(result.all()),
+            "created_at": resource.created_at,
+            "updated_at": resource.updated_at,
+        }
+
+    async def _replace_teaching_resource_tags(self, resource_id: str, tags: list[str]) -> None:
+        from app.models.settings import TeachingResourceTag
+
+        existing = await self.db.scalars(
+            select(TeachingResourceTag).where(TeachingResourceTag.resource_id == resource_id)
+        )
+        for row in existing.all():
+            await self.db.delete(row)
+        for tag in self._normalize_tags(tags):
+            self.db.add(TeachingResourceTag(resource_id=resource_id, tag=tag))
 
     async def create_teaching_resource(self, teacher_id: str, data: dict) -> Any:
         from app.models.settings import TeachingResource
 
+        tags = data.pop("tags", [])
         resource = TeachingResource(teacher_id=teacher_id, **data)
         self.db.add(resource)
         await self.db.flush()
+        await self._replace_teaching_resource_tags(resource.id, tags)
+        await self.db.flush()
         await self.db.refresh(resource)
-        return resource
+        return await self._teaching_resource_response(resource)
 
     async def update_teaching_resource(self, resource_id: str, data: dict) -> Any:
         from app.models.settings import TeachingResource
@@ -566,12 +639,15 @@ class SettingsService:
         resource = await self.db.get(TeachingResource, resource_id)
         if resource is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
+        tags = data.pop("tags", None)
         for key, value in data.items():
             if value is not None:
                 setattr(resource, key, value)
+        if tags is not None:
+            await self._replace_teaching_resource_tags(resource.id, tags)
         await self.db.flush()
         await self.db.refresh(resource)
-        return resource
+        return await self._teaching_resource_response(resource)
 
     async def delete_teaching_resource(self, resource_id: str) -> None:
         from app.models.settings import TeachingResource

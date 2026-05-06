@@ -449,6 +449,61 @@ async def test_create_teaching_resource(client: AsyncClient, auth_headers, creat
 
 
 @pytest.mark.asyncio
+async def test_teaching_resource_api_uses_normalized_tags(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Teaching resources expose tag lists while storing tags in normalized rows."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/settings/teaching-resources",
+        headers=auth_headers,
+        json={
+            "type": "youtube",
+            "title": "Bach Bowing Etude",
+            "description": "Position shift study",
+            "youtube_video_id": "abc123",
+            "tags": ["bach", "bowing", "bach"],
+        },
+    )
+    assert created.status_code == 201
+    created_body = created.json()
+    assert created_body["tags"] == ["bach", "bowing"]
+
+    by_tag = await client.get(
+        "/api/v1/settings/teaching-resources?tag=bowing",
+        headers=auth_headers,
+    )
+    assert by_tag.status_code == 200
+    assert by_tag.json()["total"] == 1
+    assert by_tag.json()["items"][0]["id"] == created_body["id"]
+
+    by_query = await client.get(
+        "/api/v1/settings/teaching-resources?query=position",
+        headers=auth_headers,
+    )
+    assert by_query.status_code == 200
+    assert by_query.json()["total"] == 1
+
+    updated = await client.put(
+        f"/api/v1/settings/teaching-resources/{created_body['id']}",
+        headers=auth_headers,
+        json={"tags": ["scale"]},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["tags"] == ["scale"]
+
+    old_tag = await client.get(
+        "/api/v1/settings/teaching-resources?tag=bach",
+        headers=auth_headers,
+    )
+    assert old_tag.status_code == 200
+    assert old_tag.json()["total"] == 0
+
+
+@pytest.mark.asyncio
 async def test_list_teaching_resources(client: AsyncClient, auth_headers, create_test_user):
     """GET /settings/teaching-resources should return paginated list."""
     await create_test_user(user_id="test-user-id", role="teacher")

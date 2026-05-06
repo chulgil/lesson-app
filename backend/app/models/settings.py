@@ -206,8 +206,25 @@ class TeachingResource(UUIDMixin, TimestampMixin, Base):
     audio_duration_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
     external_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    tags: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=list)
 
     __table_args__ = (
         Index("idx_resource_teacher", "teacher_id"),
+    )
+
+
+class TeachingResourceTag(UUIDMixin, Base):
+    """Normalized tag row for teaching resource search/filter."""
+
+    __tablename__ = "teaching_resource_tags"
+
+    resource_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("teaching_resources.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    tag: Mapped[str] = mapped_column(String(80), nullable=False)
+
+    __table_args__ = (
+        Index("uk_teaching_resource_tag", "resource_id", "tag", unique=True),
+        Index("idx_teaching_resource_tag_tag", "tag"),
     )
