@@ -177,6 +177,7 @@ Schema    Schema (Pydantic v2)
 - `schemas`는 `app.models` 계층을 import하지 않는다. API 계약은 Pydantic 필드와 validator로 표현하고, ORM enum/모델 변환은 service/model 계층에서 처리한다.
 - `app.models`에 등록된 테이블은 Alembic active migration에서 생성/변경 이력이 있어야 한다. 테스트 fixture의 `Base.metadata.create_all`은 migration 누락을 숨길 수 있으므로, 새 모델을 추가할 때 migration contract test를 함께 둔다.
 - PostgreSQL native enum을 쓰는 모델 enum 값이 늘어나면 Alembic migration과 enum contract test를 함께 추가한다. SQLite 테스트 DB는 enum type 누락을 드러내지 못하므로, `ALTER TYPE` 또는 enum 재생성 패턴을 migration source 계약으로 검증한다.
+- DB 무결성 보강은 `backend/docs/db_integrity_inventory.json`을 기준으로 진행한다. 아직 FK/비즈니스 제약을 걸지 못한 컬럼은 이 인벤토리에 등록하고, 마이그레이션으로 해소하면 해당 항목을 제거한다. `backend/tests/test_db_integrity_inventory.py`가 인벤토리의 테이블/컬럼 오타와 회차별 시간변경 원격 계약 상태를 검증한다.
 - 현행 수강료 정책상 `/api/v1/payments` 라우터를 만들지 않는다.
 - 모든 router decorator는 `status_code`를 명시해야 한다. 기본 200을 쓰는 경우에도 API 문서와 프론트 원격 계약을 위해 `status.HTTP_200_OK`를 적는다.
 - OpenAPI `operationId`는 전체 API에서 유일해야 한다. 동일한 함수명을 여러 라우터에서 쓰거나 레거시/신규 경로를 병행 노출할 때는 명시적 `operation_id`를 지정한다.
@@ -198,6 +199,20 @@ cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
 - `payments` / `tuition_settings` 모델은 레거시 상태 기록용이며 현행 API surface가 아니다.
 - 선생님/학원 수강료는 앱 밖 무통장입금/현금으로 처리한다. PG, 카드, 정산, 영수증, 자동 입금 매칭은 구현 대상이 아니다.
 - 향후 Lessonaza 앱 사용료 과금은 별도 스펙과 별도 모델/라우터로 분리한다.
+- 수강권 회차별 시간변경은 `/subscriptions/{subscription_id}/events`의 `RequestEvent`가 원격 SSOT다. 단일 회차는 `session_number`, 변경 범위는 `schedule_change_type`으로 식별하고, 변경/수락/거절/역제안은 `scheduleChanged`, `scheduleChangeProposed`, `scheduleChangeAccepted`, `scheduleChangeRejected`, `scheduleChangeCountered` 이벤트로 기록한다. `/schedule-changes` 라우트는 레거시 일정 변경 표면이므로 수강권 상세 화면의 회차별 변경 계약을 확장할 때는 우선 subscription event API를 확장한다.
+
+### DB 무결성 baseline
+
+현재 모델은 `subscriptions`, `subscription_usages`, `subscription_templates`, `subscription_proposals`, `request_events.subscription_id`처럼 최근 보강된 수강권 핵심 FK는 갖추고 있다. 반면 오래된 학생/레슨/연습/부모/알림 도메인은 `String(36)` 식별자와 service-level ownership check에 의존하는 곳이 남아 있다.
+
+보강 순서는 다음을 기준으로 한다.
+
+1. 접근권한의 기준이 되는 관계 테이블: `students`, `teacher_student_relations`, `parent_child_relations`
+2. 수강권과 연결되는 레슨/멤버십 테이블: `lesson_classes`, `class_memberships`, `lessons`
+3. 원격 mock 제거와 직접 연결되는 연습/알림/스케줄 테이블: `practice_*`, `notifications`, `teacher_availabilities`
+4. 데이터 정리가 필요한 레거시 상태 기록: `payments`, `tuition_settings`, standalone lesson rows
+
+각 단계는 `db_integrity_inventory.json`의 항목을 하나 이상 제거하는 마이그레이션과 metadata contract test를 함께 포함해야 한다. 데이터 정리가 필요한 nullable legacy 컬럼은 먼저 orphan audit query와 backfill 정책을 문서화한 뒤 FK를 적용한다.
 
 ---
 

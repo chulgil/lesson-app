@@ -1,0 +1,303 @@
+{
+  "version": 1,
+  "last_reviewed": "2026-05-06",
+  "purpose": "Explicit inventory of known backend database integrity gaps. This file is a contract target for tests; remove entries only when a migration and model-level FK or constraint closes the gap.",
+  "canonical_identifier_policy": {
+    "users.id": "Authentication account identifier.",
+    "teachers.id": "Teacher profile identifier. Teacher-owned domain rows must reference teachers.id, not users.id, unless the row is explicitly account-scoped.",
+    "students.id": "Student profile identifier. Student-owned domain rows must reference students.id, not users.id, unless the row is explicitly account-scoped.",
+    "parents.id": "Parent profile identifier. Parent-child and parent-teacher domain rows must reference parents.id.",
+    "subscriptions.id": "Tuition subscription/pass identifier. Schedule-change session events reference this id plus session_number."
+  },
+  "unresolved_foreign_key_gaps": [
+    {
+      "domain": "identity",
+      "table": "students",
+      "column": "user_id",
+      "target": "users.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Student profiles can be linked to app accounts; nullable legacy rows need cleanup before FK enforcement."
+    },
+    {
+      "domain": "identity",
+      "table": "students",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Student rows are teacher-owned, but ownership is currently protected only by service checks."
+    },
+    {
+      "domain": "identity",
+      "table": "parents",
+      "column": "user_id",
+      "target": "users.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Parent profile uniqueness exists, but account linkage is not FK-protected."
+    },
+    {
+      "domain": "relationship",
+      "table": "teacher_student_relations",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Relation rows drive access decisions and must not outlive the teacher profile."
+    },
+    {
+      "domain": "relationship",
+      "table": "teacher_student_relations",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Relation rows drive access decisions and must not outlive the student profile."
+    },
+    {
+      "domain": "lesson",
+      "table": "lesson_classes",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Class ownership is teacher-scoped and used by membership/subscription authorization."
+    },
+    {
+      "domain": "lesson",
+      "table": "class_memberships",
+      "column": "lesson_class_id",
+      "target": "lesson_classes.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Subscriptions already reference memberships, so membership parent class integrity is foundational."
+    },
+    {
+      "domain": "lesson",
+      "table": "class_memberships",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Memberships bind students to class/subscription access."
+    },
+    {
+      "domain": "lesson",
+      "table": "class_memberships",
+      "column": "lesson_location_id",
+      "target": "lesson_locations.id",
+      "status": "missing",
+      "priority": "P1",
+      "reason": "Membership location references can currently point at deleted or unrelated locations."
+    },
+    {
+      "domain": "lesson",
+      "table": "lessons",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Lesson history, practice items, recordings, and subscription usage depend on valid student ownership."
+    },
+    {
+      "domain": "lesson",
+      "table": "lessons",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Teacher-visible lesson history should not be orphaned from teacher profiles."
+    },
+    {
+      "domain": "lesson",
+      "table": "lessons",
+      "column": "subscription_id",
+      "target": "subscriptions.id",
+      "status": "missing",
+      "priority": "P1",
+      "reason": "Some historical lessons are standalone; active subscription-linked lessons need cleanup before FK enforcement."
+    },
+    {
+      "domain": "practice",
+      "table": "practice_repertoires",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Practice library data is student-owned and should be removed or reassigned with the student."
+    },
+    {
+      "domain": "practice",
+      "table": "practice_sections",
+      "column": "repertoire_id",
+      "target": "practice_repertoires.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Sections cannot be meaningful without a repertoire parent."
+    },
+    {
+      "domain": "practice",
+      "table": "practice_recordings",
+      "column": "section_id",
+      "target": "practice_sections.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Practice recordings are section-scoped and currently can become orphaned."
+    },
+    {
+      "domain": "practice",
+      "table": "practice_notes",
+      "column": "section_id",
+      "target": "practice_sections.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Practice notes are section-scoped and currently can become orphaned."
+    },
+    {
+      "domain": "parent",
+      "table": "parent_child_relations",
+      "column": "parent_id",
+      "target": "parents.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Parent visibility and child profile APIs rely on valid parent-child relations."
+    },
+    {
+      "domain": "parent",
+      "table": "parent_child_relations",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Parent visibility and child profile APIs rely on valid parent-child relations."
+    },
+    {
+      "domain": "notification",
+      "table": "notifications",
+      "column": "user_id",
+      "target": "users.id",
+      "status": "missing",
+      "priority": "P1",
+      "reason": "Unread red-dot state is user-scoped and should not survive account removal."
+    },
+    {
+      "domain": "schedule",
+      "table": "teacher_availabilities",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Availability is teacher-owned and feeds booking/schedule-change suggestions."
+    },
+    {
+      "domain": "schedule",
+      "table": "availability_time_slots",
+      "column": "availability_id",
+      "target": "teacher_availabilities.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Time slots cannot be interpreted without their availability parent."
+    },
+    {
+      "domain": "schedule",
+      "table": "lesson_requests",
+      "column": "teacher_id",
+      "target": "teachers.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Lesson request chat and schedule-change events require a valid teacher endpoint."
+    },
+    {
+      "domain": "schedule",
+      "table": "lesson_requests",
+      "column": "student_id",
+      "target": "students.id",
+      "status": "missing",
+      "priority": "P0",
+      "reason": "Lesson request chat and schedule-change events require a valid student endpoint."
+    }
+  ],
+  "business_constraint_gaps": [
+    {
+      "domain": "subscription",
+      "table": "subscriptions",
+      "type": "check",
+      "priority": "P0",
+      "rule": "used_lessons between 0 and total_lessons; used_reschedule_count between 0 and total_reschedule_allowance"
+    },
+    {
+      "domain": "subscription",
+      "table": "subscriptions",
+      "type": "state_machine",
+      "priority": "P0",
+      "rule": "status, deposit_status, payment_confirmed, paid_at, and payment_confirmed_at must transition consistently for manual deposits"
+    },
+    {
+      "domain": "schedule",
+      "table": "teacher_availabilities",
+      "type": "check",
+      "priority": "P0",
+      "rule": "day_of_week in 0..6 and end_time must be after start_time"
+    },
+    {
+      "domain": "schedule",
+      "table": "availability_time_slots",
+      "type": "check",
+      "priority": "P0",
+      "rule": "end_time must be after start_time and slot ranges should not overlap within one availability"
+    },
+    {
+      "domain": "lesson",
+      "table": "lessons",
+      "type": "check",
+      "priority": "P0",
+      "rule": "duration > 0 and cancellation statuses require the matching cancellation timestamp or policy event"
+    },
+    {
+      "domain": "parent",
+      "table": "parent_teacher_connections",
+      "type": "unique",
+      "priority": "P1",
+      "rule": "parent-teacher connection uniqueness may need student_id in the key when multiple children share a teacher"
+    },
+    {
+      "domain": "notification",
+      "table": "notifications",
+      "type": "state_machine",
+      "priority": "P1",
+      "rule": "read_at is the red-dot source of truth; future unread counters must derive from it or an audited aggregate"
+    }
+  ],
+  "schedule_change_remote_contract_audit": {
+    "canonical_event_api": "/api/v1/subscriptions/{subscription_id}/events",
+    "session_scope_field": "session_number",
+    "change_scope_field": "schedule_change_type",
+    "accepted_event_types": [
+      "scheduleChanged",
+      "scheduleChangeProposed",
+      "scheduleChangeAccepted",
+      "scheduleChangeRejected",
+      "scheduleChangeCountered"
+    ],
+    "backend_remote_status": "remote",
+    "backend_routes": [
+      "GET /api/v1/subscriptions/{subscription_id}/events?session_number={n}",
+      "POST /api/v1/subscriptions/{subscription_id}/events",
+      "PATCH /api/v1/subscriptions/{subscription_id}/use-reschedule"
+    ],
+    "backend_notes": [
+      "RequestEvent.subscription_id has a real FK to subscriptions.id.",
+      "RequestEvent.session_number scopes one subscription session.",
+      "SubscriptionService validates turn order for terminal schedule-change responses.",
+      "Parents can read linked child events but cannot create schedule-change events."
+    ],
+    "frontend_remote_status": "mock_only",
+    "frontend_notes": [
+      "SubscriptionSessionEventActions currently writes to an in-memory store in subscription_providers.dart.",
+      "subscriptionSessionEventsProvider and pendingScheduleChangeRequestsProvider are not wired to RemoteSubscriptionRepository yet.",
+      "RemoteSubscriptionRepository exposes useReschedule, but not get/create subscription events."
+    ],
+    "recommended_next_issue": "Add remote subscription session event repository methods and replace the in-memory schedule-change provider branch."
+  }
+}
