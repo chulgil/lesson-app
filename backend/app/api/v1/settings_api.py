@@ -14,6 +14,9 @@ from app.schemas.settings import (
     FeedbackPresetCreate,
     FeedbackPresetResponse,
     FeedbackPresetUpdate,
+    FeedbackTemplateCreate,
+    FeedbackTemplateResponse,
+    FeedbackTemplateUpdate,
     NotificationSettingsResponse,
     NotificationSettingsUpdate,
     ProposalSettingsResponse,
@@ -278,6 +281,126 @@ async def delete_feedback_preset(
 ) -> None:
     service = SettingsService(db)
     await service.delete_feedback_preset(preset_id)
+
+
+# ---------------------------------------------------------------------------
+# Feedback Templates
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/feedback-templates",
+    response_model=list[FeedbackTemplateResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List feedback templates",
+)
+async def list_feedback_templates(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    category: str | None = None,
+    tag: str | None = None,
+    query: str | None = None,
+    frequent: bool = False,
+    limit: int | None = None,
+) -> list[FeedbackTemplateResponse]:
+    service = SettingsService(db)
+    return await service.get_feedback_templates(
+        current_user.id,
+        category=category,
+        tag=tag,
+        query=query,
+        frequent=frequent,
+        limit=limit,
+    )
+
+
+@router.post(
+    "/feedback-templates",
+    response_model=FeedbackTemplateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create feedback template",
+)
+async def create_feedback_template(
+    body: FeedbackTemplateCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackTemplateResponse:
+    service = SettingsService(db)
+    result: FeedbackTemplateResponse = await service.create_feedback_template(
+        current_user.id,
+        body.model_dump(),
+    )
+    return result
+
+
+@router.get(
+    "/feedback-templates/{template_id}",
+    response_model=FeedbackTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get feedback template",
+)
+async def get_feedback_template(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackTemplateResponse:
+    service = SettingsService(db)
+    result: FeedbackTemplateResponse = await service.get_feedback_template(template_id, current_user.id)
+    return result
+
+
+@router.put(
+    "/feedback-templates/{template_id}",
+    response_model=FeedbackTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update feedback template",
+)
+async def update_feedback_template(
+    template_id: str,
+    body: FeedbackTemplateUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackTemplateResponse:
+    service = SettingsService(db)
+    result: FeedbackTemplateResponse = await service.update_feedback_template(
+        template_id,
+        current_user.id,
+        body.model_dump(exclude_none=True),
+    )
+    return result
+
+
+@router.patch(
+    "/feedback-templates/{template_id}/usage",
+    response_model=FeedbackTemplateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Increment feedback template usage",
+)
+async def increment_feedback_template_usage(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackTemplateResponse:
+    service = SettingsService(db)
+    result: FeedbackTemplateResponse = await service.increment_feedback_template_usage(
+        template_id,
+        current_user.id,
+    )
+    return result
+
+
+@router.delete(
+    "/feedback-templates/{template_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete feedback template",
+)
+async def delete_feedback_template(
+    template_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    service = SettingsService(db)
+    await service.delete_feedback_template(template_id, current_user.id)
 
 
 # ---------------------------------------------------------------------------

@@ -97,6 +97,7 @@
 | 37 | Schedule | ScheduleConfirmationCardRepository | ❌ | MEDIUM | 확인 카드 |
 | 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
+| 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |
 | 40 | Subscription | SubscriptionSettingsRepository | ❌ | LOW | **Orphan** — Provider 미연결 |
 
 ### 2-3. 2026-05-06 백엔드 mock replacement 재검토
@@ -115,14 +116,22 @@
 | Repository | 추가 API | 남은 작업 |
 |------------|----------|-----------|
 | TipTemplateRepository | `GET /settings/tip-templates`, `POST /settings/tip-templates`, `GET /settings/tip-templates/{id}`, `PUT /settings/tip-templates/{id}`, `PATCH /settings/tip-templates/{id}/usage`, `DELETE /settings/tip-templates/{id}` | 프론트 `RemoteTipTemplateRepository` 추가 및 provider mock-only 제거 |
+| FeedbackTemplateRepository | `GET /settings/feedback-templates`, `POST /settings/feedback-templates`, `GET /settings/feedback-templates/{id}`, `PUT /settings/feedback-templates/{id}`, `PATCH /settings/feedback-templates/{id}/usage`, `DELETE /settings/feedback-templates/{id}` | 프론트 `RemoteFeedbackTemplateRepository` 추가 및 provider mock-only 제거 |
 | Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
 
 다음 백엔드 우선순위:
 
-1. `FeedbackTemplateRepository`: 현재 `FeedbackPreset`은 짧은 텍스트 preset이고, 프론트 `FeedbackTemplate`은 title/body/tags/category/usage를 가진 별도 장문 템플릿이다. 모델/마이그레이션/API가 필요하다.
-2. `PracticeItemRepository`: provider가 mock 전용이다. 기존 `practice_items` 모델을 재사용해 lesson/student/teacher scoped CRUD와 status update API를 열어야 한다.
-3. `PieceRepository`: `practice_pieces`, `student_practice_pieces` 기반 API는 일부 있지만 프론트 계약 전체를 대체하려면 library CRUD/search + student repertoire assignment/progress API를 하나로 정렬해야 한다.
-4. `PaymentRepository`: 앱 내 결제가 아니므로 별도 PG API가 아니라 `/subscriptions` 입금 상태와 사용 이력으로 대체할지, legacy repository를 제거할지 결정해야 한다.
+1. `PracticeItemRepository`: provider가 mock 전용이다. 기존 `practice_items` 모델을 재사용해 lesson/student/teacher scoped CRUD와 status update API를 열어야 한다.
+2. `PieceRepository`: `practice_pieces`, `student_practice_pieces` 기반 API는 일부 있지만 프론트 계약 전체를 대체하려면 library CRUD/search + student repertoire assignment/progress API를 하나로 정렬해야 한다.
+3. `PaymentRepository`: 앱 내 결제가 아니므로 별도 PG API가 아니라 `/subscriptions` 입금 상태와 사용 이력으로 대체할지, legacy repository를 제거할지 결정해야 한다.
+
+정규화 판단:
+
+| 영역 | 판단 |
+|------|------|
+| `FeedbackTemplate.tags` | JSON 배열 저장 대신 `feedback_template_tags(template_id, tag)`로 정규화. 태그 검색/필터와 `(template_id, tag)` 중복 방지에 필요 |
+| `TipTemplate.instrument` | 단일 nullable scope라 별도 테이블 불필요. 다중 악기 지원이 필요해질 때 `tip_template_instruments`로 분리 |
+| `TeachingResource.tags` | 현재 문서/표시 metadata 성격이 강하고 backend tag filter API가 없으므로 유지 가능. 검색/필터 요구가 생기면 정규화 후보 |
 
 ---
 

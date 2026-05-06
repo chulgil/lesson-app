@@ -269,6 +269,164 @@ class SettingsService:
             await self.db.flush()
 
     # -----------------------------------------------------------------------
+    # Feedback Templates
+    # -----------------------------------------------------------------------
+
+    def _normalize_tags(self, tags: list[str] | None) -> list[str]:
+        seen = set()
+        normalized = []
+        for tag in tags or []:
+            value = tag.strip()
+            if not value or value in seen:
+                continue
+            seen.add(value)
+            normalized.append(value)
+        return normalized
+
+    async def _feedback_template_response(self, template: Any) -> dict:
+        from app.models.settings import FeedbackTemplateTag
+
+        result = await self.db.scalars(
+            select(FeedbackTemplateTag.tag)
+            .where(FeedbackTemplateTag.template_id == template.id)
+            .order_by(FeedbackTemplateTag.tag.asc())
+        )
+        return {
+            "id": template.id,
+            "teacher_id": template.teacher_id,
+            "title": template.title,
+            "body": template.body,
+            "tags": list(result.all()),
+            "category": getattr(template.category, "value", template.category),
+            "usage_count": template.usage_count,
+            "created_at": template.created_at,
+            "last_used_at": template.last_used_at,
+            "updated_at": template.updated_at,
+        }
+
+    async def get_feedback_templates(
+        self,
+        teacher_id: str,
+        *,
+        category: str | None = None,
+        tag: str | None = None,
+        query: str | None = None,
+        frequent: bool = False,
+        limit: int | None = None,
+    ) -> list[dict]:
+        from app.models.settings import FeedbackTemplate, FeedbackTemplateTag
+
+        stmt = select(FeedbackTemplate).where(FeedbackTemplate.teacher_id == teacher_id)
+        if category:
+            stmt = stmt.where(FeedbackTemplate.category == category)
+        if tag:
+            stmt = stmt.join(
+                FeedbackTemplateTag,
+                FeedbackTemplateTag.template_id == FeedbackTemplate.id,
+            ).where(FeedbackTemplateTag.tag == tag)
+        if query:
+            like_query = f"%{query}%"
+            tag_exists = (
+                select(FeedbackTemplateTag.id)
+                .where(
+                    FeedbackTemplateTag.template_id == FeedbackTemplate.id,
+                    FeedbackTemplateTag.tag.ilike(like_query),
+                )
+                .exists()
+            )
+            stmt = stmt.where(
+                or_(
+                    FeedbackTemplate.title.ilike(like_query),
+                    FeedbackTemplate.body.ilike(like_query),
+                    tag_exists,
+                )
+            )
+        if frequent:
+            stmt = stmt.order_by(FeedbackTemplate.usage_count.desc(), FeedbackTemplate.last_used_at.desc().nullslast())
+        else:
+            stmt = stmt.order_by(FeedbackTemplate.created_at.desc())
+        if limit is not None:
+            stmt = stmt.limit(limit)
+
+        result = await self.db.scalars(stmt)
+        return [await self._feedback_template_response(template) for template in result.unique().all()]
+
+    async def get_feedback_template(self, template_id: str, teacher_id: str) -> dict:
+        from app.models.settings import FeedbackTemplate
+
+        template = await self.db.get(FeedbackTemplate, template_id)
+        if template is None or template.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feedback template not found")
+        return await self._feedback_template_response(template)
+
+    async def _replace_feedback_template_tags(self, template_id: str, tags: list[str]) -> None:
+        from app.models.settings import FeedbackTemplateTag
+
+        existing = await self.db.scalars(
+            select(FeedbackTemplateTag).where(FeedbackTemplateTag.template_id == template_id)
+        )
+        for row in existing.all():
+            await self.db.delete(row)
+        for tag in self._normalize_tags(tags):
+            self.db.add(FeedbackTemplateTag(template_id=template_id, tag=tag))
+
+    async def create_feedback_template(self, teacher_id: str, data: dict) -> dict:
+        from app.models.settings import FeedbackCategory, FeedbackTemplate
+
+        template = FeedbackTemplate(
+            teacher_id=teacher_id,
+            title=data["title"],
+            body=data["body"],
+            category=FeedbackCategory(data.get("category") or "general"),
+        )
+        self.db.add(template)
+        await self.db.flush()
+        await self._replace_feedback_template_tags(template.id, data.get("tags") or [])
+        await self.db.flush()
+        await self.db.refresh(template)
+        return await self._feedback_template_response(template)
+
+    async def update_feedback_template(self, template_id: str, teacher_id: str, data: dict) -> dict:
+        from app.models.settings import FeedbackCategory, FeedbackTemplate
+
+        template = await self.db.get(FeedbackTemplate, template_id)
+        if template is None or template.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feedback template not found")
+        tags = data.pop("tags", None)
+        for key, value in data.items():
+            if value is None:
+                continue
+            if key == "category":
+                value = FeedbackCategory(value)
+            setattr(template, key, value)
+        if tags is not None:
+            await self._replace_feedback_template_tags(template.id, tags)
+        await self.db.flush()
+        await self.db.refresh(template)
+        return await self._feedback_template_response(template)
+
+    async def increment_feedback_template_usage(self, template_id: str, teacher_id: str) -> dict:
+        from app.models.settings import FeedbackTemplate
+
+        template = await self.db.get(FeedbackTemplate, template_id)
+        if template is None or template.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feedback template not found")
+        template.usage_count = (template.usage_count or 0) + 1
+        template.last_used_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(template)
+        return await self._feedback_template_response(template)
+
+    async def delete_feedback_template(self, template_id: str, teacher_id: str) -> None:
+        from app.models.settings import FeedbackTemplate
+
+        template = await self.db.get(FeedbackTemplate, template_id)
+        if template is None or template.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feedback template not found")
+        await self.db.delete(template)
+        await self.db.flush()
+
+    # -----------------------------------------------------------------------
     # Tip Templates
     # -----------------------------------------------------------------------
 

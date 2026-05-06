@@ -30,9 +30,11 @@ def upgrade() -> None:
         "teacher_student_relations",
         sa.Column("can_suggest_assignments", sa.Boolean(), nullable=False, server_default=sa.true()),
     )
-    op.alter_column("teacher_student_relations", "can_view_practice", server_default=None)
-    op.alter_column("teacher_student_relations", "can_comment", server_default=None)
-    op.alter_column("teacher_student_relations", "can_suggest_assignments", server_default=None)
+    bind = op.get_bind()
+    if bind.dialect.name != "sqlite":
+        op.alter_column("teacher_student_relations", "can_view_practice", server_default=None)
+        op.alter_column("teacher_student_relations", "can_comment", server_default=None)
+        op.alter_column("teacher_student_relations", "can_suggest_assignments", server_default=None)
 
 
 def downgrade() -> None:

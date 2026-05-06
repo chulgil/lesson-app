@@ -26,46 +26,57 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+
     # 1) Drop 6 PG columns from payments
-    op.drop_column("payments", "pg_failure_reason")
-    op.drop_column("payments", "pg_response")
-    op.drop_column("payments", "pg_payment_key")
-    op.drop_column("payments", "pg_order_id")
-    op.drop_column("payments", "pg_transaction_id")
-    op.drop_column("payments", "pg_provider")
+    existing_columns = {column["name"] for column in sa.inspect(bind).get_columns("payments")}
+    for column_name in [
+        "pg_failure_reason",
+        "pg_response",
+        "pg_payment_key",
+        "pg_order_id",
+        "pg_transaction_id",
+        "pg_provider",
+    ]:
+        if column_name in existing_columns:
+            op.drop_column("payments", column_name)
 
     # 2) Remap PaymentStatus enum: 'paid' → 'studentConfirmed'
     # PostgreSQL enum 변경은 ALTER TYPE 으로만 가능. 안전한 패턴:
     #   a. 새 enum 타입 생성
     #   b. 컬럼 → 새 타입으로 캐스팅 (paid → studentConfirmed)
     #   c. 옛 enum 타입 DROP, 새 타입 RENAME
-    op.execute("ALTER TYPE paymentstatus RENAME TO paymentstatus_old")
-    op.execute(
-        "CREATE TYPE paymentstatus AS ENUM "
-        "('pending', 'studentConfirmed', 'confirmed', 'overdue', 'cancelled', 'refunded')"
-    )
-    op.execute(
-        "ALTER TABLE payments ALTER COLUMN status TYPE paymentstatus USING ("
-        "CASE status::text "
-        "WHEN 'paid' THEN 'studentConfirmed' "
-        "ELSE status::text "
-        "END)::paymentstatus"
-    )
-    op.execute("DROP TYPE paymentstatus_old")
+    if bind.dialect.name == "postgresql":
+        op.execute("ALTER TYPE paymentstatus RENAME TO paymentstatus_old")
+        op.execute(
+            "CREATE TYPE paymentstatus AS ENUM "
+            "('pending', 'studentConfirmed', 'confirmed', 'overdue', 'cancelled', 'refunded')"
+        )
+        op.execute(
+            "ALTER TABLE payments ALTER COLUMN status TYPE paymentstatus USING ("
+            "CASE status::text "
+            "WHEN 'paid' THEN 'studentConfirmed' "
+            "ELSE status::text "
+            "END)::paymentstatus"
+        )
+        op.execute("DROP TYPE paymentstatus_old")
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+
     # 1) Restore 'paid' enum (reverse studentConfirmed)
-    op.execute("ALTER TYPE paymentstatus RENAME TO paymentstatus_new")
-    op.execute("CREATE TYPE paymentstatus AS ENUM ('pending', 'paid', 'confirmed', 'overdue', 'cancelled', 'refunded')")
-    op.execute(
-        "ALTER TABLE payments ALTER COLUMN status TYPE paymentstatus USING ("
-        "CASE status::text "
-        "WHEN 'studentConfirmed' THEN 'paid' "
-        "ELSE status::text "
-        "END)::paymentstatus"
-    )
-    op.execute("DROP TYPE paymentstatus_new")
+    if bind.dialect.name == "postgresql":
+        op.execute("ALTER TYPE paymentstatus RENAME TO paymentstatus_new")
+        op.execute("CREATE TYPE paymentstatus AS ENUM ('pending', 'paid', 'confirmed', 'overdue', 'cancelled', 'refunded')")
+        op.execute(
+            "ALTER TABLE payments ALTER COLUMN status TYPE paymentstatus USING ("
+            "CASE status::text "
+            "WHEN 'studentConfirmed' THEN 'paid' "
+            "ELSE status::text "
+            "END)::paymentstatus"
+        )
+        op.execute("DROP TYPE paymentstatus_new")
 
     # 2) Restore 6 PG columns
     op.add_column("payments", sa.Column("pg_provider", sa.String(length=50), nullable=True))

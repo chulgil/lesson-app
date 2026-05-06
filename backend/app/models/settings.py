@@ -1,6 +1,7 @@
+import enum
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Index, Integer, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -135,6 +136,55 @@ class FeedbackPreset(UUIDMixin, Base):
 
     __table_args__ = (
         Index("idx_feedback_preset_teacher", "teacher_id"),
+    )
+
+
+class FeedbackCategory(str, enum.Enum):
+    technique = "technique"
+    musicality = "musicality"
+    practice = "practice"
+    attitude = "attitude"
+    general = "general"
+
+
+class FeedbackTemplate(UUIDMixin, TimestampMixin, Base):
+    """Reusable long-form lesson feedback template per teacher."""
+
+    __tablename__ = "feedback_templates"
+
+    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    category: Mapped[FeedbackCategory] = mapped_column(
+        Enum(FeedbackCategory, native_enum=True),
+        nullable=False,
+        default=FeedbackCategory.general,
+    )
+    usage_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        Index("idx_feedback_template_teacher", "teacher_id"),
+        Index("idx_feedback_template_category", "teacher_id", "category"),
+        Index("idx_feedback_template_usage", "teacher_id", "usage_count"),
+    )
+
+
+class FeedbackTemplateTag(UUIDMixin, Base):
+    """Normalized tag row for feedback template search/filter."""
+
+    __tablename__ = "feedback_template_tags"
+
+    template_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("feedback_templates.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    tag: Mapped[str] = mapped_column(String(80), nullable=False)
+
+    __table_args__ = (
+        Index("uk_feedback_template_tag", "template_id", "tag", unique=True),
+        Index("idx_feedback_template_tag_tag", "tag"),
     )
 
 

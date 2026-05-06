@@ -194,6 +194,39 @@ class FeedbackPresetUpdate(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Feedback Templates
+# ---------------------------------------------------------------------------
+
+class FeedbackTemplateResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    teacher_id: str
+    title: str
+    body: str
+    tags: list[str] = []
+    category: str
+    usage_count: int
+    created_at: _dt.datetime
+    last_used_at: _dt.datetime | None = None
+    updated_at: _dt.datetime | None = None
+
+
+class FeedbackTemplateCreate(BaseModel):
+    title: str
+    body: str
+    tags: list[str] = []
+    category: str = "general"
+
+
+class FeedbackTemplateUpdate(BaseModel):
+    title: str | None = None
+    body: str | None = None
+    tags: list[str] | None = None
+    category: str | None = None
+
+
+# ---------------------------------------------------------------------------
 # Tip Templates
 # ---------------------------------------------------------------------------
 

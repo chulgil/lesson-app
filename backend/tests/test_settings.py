@@ -346,6 +346,81 @@ async def test_tip_template_api_supports_reusable_teacher_library(
     assert deleted.status_code == 204
 
 
+@pytest.mark.asyncio
+async def test_feedback_template_api_uses_normalized_tags(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Feedback templates expose tag lists while storing tags in a normalized table."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/settings/feedback-templates",
+        headers=auth_headers,
+        json={
+            "title": "음정 집중 피드백",
+            "body": "오늘은 포지션 이동 후 음정을 더 천천히 확인해 주세요.",
+            "category": "technique",
+            "tags": ["음정", "포지션", "음정"],
+        },
+    )
+
+    assert created.status_code == 201
+    created_body = created.json()
+    assert created_body["teacher_id"] == "test-user-id"
+    assert created_body["title"] == "음정 집중 피드백"
+    assert created_body["body"] == "오늘은 포지션 이동 후 음정을 더 천천히 확인해 주세요."
+    assert created_body["category"] == "technique"
+    assert created_body["tags"] == ["음정", "포지션"]
+    assert created_body["usage_count"] == 0
+
+    by_tag = await client.get(
+        "/api/v1/settings/feedback-templates",
+        headers=auth_headers,
+        params={"tag": "음정"},
+    )
+    assert by_tag.status_code == 200
+    assert [item["id"] for item in by_tag.json()] == [created_body["id"]]
+
+    searched = await client.get(
+        "/api/v1/settings/feedback-templates",
+        headers=auth_headers,
+        params={"query": "포지션"},
+    )
+    assert searched.status_code == 200
+    assert [item["id"] for item in searched.json()] == [created_body["id"]]
+
+    used = await client.patch(
+        f"/api/v1/settings/feedback-templates/{created_body['id']}/usage",
+        headers=auth_headers,
+    )
+    assert used.status_code == 200
+    assert used.json()["usage_count"] == 1
+    assert used.json()["last_used_at"] is not None
+
+    updated = await client.put(
+        f"/api/v1/settings/feedback-templates/{created_body['id']}",
+        headers=auth_headers,
+        json={"tags": ["리듬"], "category": "musicality"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["category"] == "musicality"
+    assert updated.json()["tags"] == ["리듬"]
+
+    old_tag = await client.get(
+        "/api/v1/settings/feedback-templates",
+        headers=auth_headers,
+        params={"tag": "음정"},
+    )
+    assert old_tag.status_code == 200
+    assert old_tag.json() == []
+
+    deleted = await client.delete(
+        f"/api/v1/settings/feedback-templates/{created_body['id']}",
+        headers=auth_headers,
+    )
+    assert deleted.status_code == 204
+
+
 # ---------------------------------------------------------------------------
 # Teaching Resources
 # ---------------------------------------------------------------------------

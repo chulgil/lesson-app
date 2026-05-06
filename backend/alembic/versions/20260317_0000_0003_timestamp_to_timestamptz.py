@@ -81,6 +81,10 @@ TABLES_COLUMNS = [
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return
+
     for table, columns in TABLES_COLUMNS:
         for col in columns:
             op.execute(
@@ -89,6 +93,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return
+
     for table, columns in TABLES_COLUMNS:
         for col in columns:
             op.execute(

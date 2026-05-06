@@ -59,7 +59,10 @@ from app.models.schedule_ext import (  # noqa: F401
     ScheduleException,
 )
 from app.models.settings import (  # noqa: F401
+    FeedbackCategory,
     FeedbackPreset,
+    FeedbackTemplate,
+    FeedbackTemplateTag,
     NotificationSettings,
     ParentNotificationSettings,
     ProposalSettings,

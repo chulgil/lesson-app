@@ -47,11 +47,13 @@ def upgrade() -> None:
     op.add_column('teacher_student_relations', sa.Column('terminated_by', sa.String(36), nullable=True))
     op.add_column('teacher_student_relations', sa.Column('termination_reason', sa.Text(), nullable=True))
 
-    # Update RelationStatus enum to include new values
-    # Note: PostgreSQL enum types need ALTER TYPE for new values
-    op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'trialBooked'")
-    op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'expired'")
-    op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'past'")
+    # Update RelationStatus enum to include new values.
+    # PostgreSQL enum types need ALTER TYPE; SQLite stores enum values as text.
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'trialBooked'")
+        op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'expired'")
+        op.execute("ALTER TYPE relationstatus ADD VALUE IF NOT EXISTS 'past'")
 
 
 def downgrade() -> None:
