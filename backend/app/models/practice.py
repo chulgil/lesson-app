@@ -253,3 +253,25 @@ class PracticeItem(UUIDMixin, TimestampMixin, Base):
         Index("idx_item_student", "student_id"),
         Index("idx_item_teacher", "teacher_id"),
     )
+
+
+class PracticeItemResource(UUIDMixin, Base):
+    """Teaching resource attached to a teacher-assigned practice item."""
+
+    __tablename__ = "practice_item_resources"
+
+    item_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("practice_items.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    resource_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("teaching_resources.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    __table_args__ = (
+        Index("uk_practice_item_resource", "item_id", "resource_id", unique=True),
+        Index("idx_practice_item_resource_resource", "resource_id"),
+    )

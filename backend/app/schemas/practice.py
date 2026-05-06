@@ -75,6 +75,71 @@ class StudentPieceRepertoireResponse(BaseModel):
     current_pieces: list[PracticePieceResponse] = []
     completed_pieces: list[PracticePieceResponse] = []
 
+
+# ---------------------------------------------------------------------------
+# Practice item
+# ---------------------------------------------------------------------------
+
+
+class PracticeItemCreate(BaseModel):
+    """Create a teacher-assigned practice item."""
+
+    model_config = CAMEL_MODEL_CONFIG
+
+    lesson_id: str
+    student_id: str
+    type: str = "repertoire"
+    title: str
+    description: str | None = None
+    repertoire_id: str | None = None
+    section_id: str | None = None
+    priority: str = "should"
+    resource_ids: list[str] = []
+
+
+class PracticeItemUpdate(BaseModel):
+    """Update a teacher-assigned practice item."""
+
+    model_config = CAMEL_MODEL_CONFIG
+
+    type: str | None = None
+    title: str | None = None
+    description: str | None = None
+    repertoire_id: str | None = None
+    section_id: str | None = None
+    priority: str | None = None
+    resource_ids: list[str] | None = None
+    is_completed: bool | None = None
+
+
+class PracticeItemResponse(BaseModel):
+    """Practice item response matching Flutter PracticeItem fields."""
+
+    model_config = CAMEL_MODEL_CONFIG
+
+    id: str
+    lesson_id: str
+    student_id: str
+    teacher_id: str
+    type: str
+    title: str
+    description: str | None = None
+    repertoire_id: str | None = None
+    section_id: str | None = None
+    priority: str
+    resource_ids: list[str] = []
+    is_completed: bool
+    practice_count: int
+    completed_at: _dt.datetime | None = None
+    has_like: bool
+    liked_at: _dt.datetime | None = None
+    teacher_reaction: str | None = None
+    teacher_reaction_at: _dt.datetime | None = None
+    student_response: str | None = None
+    student_response_at: _dt.datetime | None = None
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
+
 # ---------------------------------------------------------------------------
 # Practice section
 # ---------------------------------------------------------------------------

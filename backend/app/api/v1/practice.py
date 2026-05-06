@@ -14,6 +14,9 @@ from app.schemas.common import PaginatedResponse
 from app.schemas.practice import (
     PracticeGoalResponse,
     PracticeGoalUpdate,
+    PracticeItemCreate,
+    PracticeItemResponse,
+    PracticeItemUpdate,
     PracticePieceCreate,
     PracticePieceResponse,
     PracticePieceUpdate,
@@ -42,6 +45,195 @@ from app.schemas.practice import (
 from app.services.practice_service import PracticeService
 
 router = APIRouter()
+
+
+# ---------------------------------------------------------------------------
+# Practice items
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/items",
+    response_model=list[PracticeItemResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List practice items",
+)
+async def list_practice_items(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    lesson_id: str | None = None,
+    student_id: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+) -> list[PracticeItemResponse]:
+    """List practice items by lesson, student, or date range."""
+    service = PracticeService(db)
+    return await service.list_practice_items(
+        current_user,
+        lesson_id=lesson_id,
+        student_id=student_id,
+        date_from=date_from,
+        date_to=date_to,
+    )
+
+
+@router.get(
+    "/items/incomplete",
+    response_model=list[PracticeItemResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List incomplete practice items",
+)
+async def list_incomplete_practice_items(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    student_id: str,
+) -> list[PracticeItemResponse]:
+    """List incomplete practice items for a student dashboard."""
+    service = PracticeService(db)
+    return await service.list_practice_items(current_user, student_id=student_id, incomplete=True)
+
+
+@router.get(
+    "/items/awaiting-feedback",
+    response_model=list[PracticeItemResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List practice items awaiting teacher feedback",
+)
+async def list_practice_items_awaiting_feedback(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[PracticeItemResponse]:
+    """List completed items that still need teacher feedback."""
+    service = PracticeService(db)
+    return await service.list_practice_items(current_user, awaiting_feedback=True)
+
+
+@router.post(
+    "/items",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create practice item",
+)
+async def create_practice_item(
+    body: PracticeItemCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Create a teacher-assigned practice item."""
+    service = PracticeService(db)
+    return await service.create_practice_item(body, current_user)
+
+
+@router.get(
+    "/items/{item_id}",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get practice item",
+)
+async def get_practice_item(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Return a practice item."""
+    service = PracticeService(db)
+    return await service.get_practice_item(item_id, current_user)
+
+
+@router.put(
+    "/items/{item_id}",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update practice item",
+)
+async def update_practice_item(
+    item_id: str,
+    body: PracticeItemUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Update a practice item."""
+    service = PracticeService(db)
+    return await service.update_practice_item(item_id, body, current_user)
+
+
+@router.delete(
+    "/items/{item_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete practice item",
+)
+async def delete_practice_item(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete a practice item."""
+    service = PracticeService(db)
+    await service.delete_practice_item(item_id, current_user)
+
+
+@router.patch(
+    "/items/{item_id}/complete",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Toggle practice item completion",
+)
+async def toggle_practice_item_complete(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Toggle completion status."""
+    service = PracticeService(db)
+    return await service.toggle_practice_item_complete(item_id, current_user)
+
+
+@router.patch(
+    "/items/{item_id}/like",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Toggle practice item like",
+)
+async def toggle_practice_item_like(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Toggle teacher like feedback."""
+    service = PracticeService(db)
+    return await service.toggle_practice_item_like(item_id, current_user)
+
+
+@router.patch(
+    "/items/{item_id}/practice-count/increment",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Increment practice item count",
+)
+async def increment_practice_item_count(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Increment practice count."""
+    service = PracticeService(db)
+    return await service.change_practice_item_count(item_id, current_user, delta=1)
+
+
+@router.patch(
+    "/items/{item_id}/practice-count/decrement",
+    response_model=PracticeItemResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Decrement practice item count",
+)
+async def decrement_practice_item_count(
+    item_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> PracticeItemResponse:
+    """Decrement practice count without going below zero."""
+    service = PracticeService(db)
+    return await service.change_practice_item_count(item_id, current_user, delta=-1)
 
 
 # ---------------------------------------------------------------------------

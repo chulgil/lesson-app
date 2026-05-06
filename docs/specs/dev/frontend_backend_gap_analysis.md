@@ -88,7 +88,7 @@
 | 28 | Piece | PieceRepository | ❌ | LOW | "No remote API yet" |
 | 29 | Practice | PracticeRepertoireRepository | ✅ 있음 | **HIGH** | Hive 로컬 → 서버 동기화 설계 필요 |
 | 30 | Practice | PracticeNoteRepository | ❌ | MEDIUM | 섹션 노트 — practice/sections에 포함 가능 |
-| 31 | Practice | PracticeItemRepository | ❌ | LOW | Provider toggle 자체 없음 |
+| 31 | Practice | PracticeItemRepository | ✅ 있음 | LOW | 백엔드 `/practice/items` CRUD/filter/action API 추가. resourceIds는 `practice_item_resources`로 정규화 |
 | 32 | Invite | InviteRepository | ✅ 있음 | **HIGH** | 백엔드에 `/invites` 라우터 존재 |
 | 33 | Lesson | LessonPolicyRepository | ❌ | MEDIUM | 정책 엔드포인트 필요 |
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
@@ -118,6 +118,7 @@
 | TipTemplateRepository | `GET /settings/tip-templates`, `POST /settings/tip-templates`, `GET /settings/tip-templates/{id}`, `PUT /settings/tip-templates/{id}`, `PATCH /settings/tip-templates/{id}/usage`, `DELETE /settings/tip-templates/{id}` | 프론트 `RemoteTipTemplateRepository` 추가 및 provider mock-only 제거 |
 | FeedbackTemplateRepository | `GET /settings/feedback-templates`, `POST /settings/feedback-templates`, `GET /settings/feedback-templates/{id}`, `PUT /settings/feedback-templates/{id}`, `PATCH /settings/feedback-templates/{id}/usage`, `DELETE /settings/feedback-templates/{id}` | 프론트 `RemoteFeedbackTemplateRepository` 추가 및 provider mock-only 제거 |
 | TeachingResourceRepository | `GET /settings/teaching-resources?tag=&query=`, `POST /settings/teaching-resources`, `GET /settings/teaching-resources/{id}`, `PUT /settings/teaching-resources/{id}`, `DELETE /settings/teaching-resources/{id}` | 프론트 remote repository의 `getByIds`는 아직 전체 목록 조회 후 client-side filter. 필요 시 batch endpoint 추가 |
+| PracticeItemRepository | `GET /practice/items?lesson_id=&student_id=&date_from=&date_to=`, `GET /practice/items/incomplete`, `GET /practice/items/awaiting-feedback`, `POST /practice/items`, `GET /practice/items/{id}`, `PUT /practice/items/{id}`, `DELETE /practice/items/{id}`, `PATCH /practice/items/{id}/complete`, `PATCH /practice/items/{id}/like`, `PATCH /practice/items/{id}/practice-count/increment`, `PATCH /practice/items/{id}/practice-count/decrement` | 프론트 `RemotePracticeItemRepository` 추가 및 provider mock-only 제거 |
 | Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
 
 다음 백엔드 우선순위:
@@ -133,6 +134,7 @@
 | `FeedbackTemplate.tags` | JSON 배열 저장 대신 `feedback_template_tags(template_id, tag)`로 정규화. 태그 검색/필터와 `(template_id, tag)` 중복 방지에 필요 |
 | `TipTemplate.instrument` | 단일 nullable scope라 별도 테이블 불필요. 다중 악기 지원이 필요해질 때 `tip_template_instruments`로 분리 |
 | `TeachingResource.tags` | JSON 배열 저장 대신 `teaching_resource_tags(resource_id, tag)`로 정규화. 교수 자료 라이브러리는 tag/query 필터가 필요한 반복 metadata이고 `(resource_id, tag)` 중복 방지가 필요 |
+| `PracticeItem.resourceIds` | JSON 배열 저장 대신 `practice_item_resources(item_id, resource_id)`로 정규화. 연습 항목과 교수 자료는 다대다 관계이고 삭제 cascade/중복 방지가 필요 |
 | Redis / GraphDB | PostgreSQL 17을 SSOT로 유지. Redis는 TTL 캐시/락/큐에만 사용 후보. GraphDB는 현재 관계 깊이에서 불필요하며 PostgreSQL FK/인덱스/recursive CTE 우선 |
 
 ---

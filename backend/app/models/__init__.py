@@ -28,6 +28,7 @@ from app.models.practice import (  # noqa: F401
     DailyPracticeStatus,
     PracticeGoal,
     PracticeItem,
+    PracticeItemResource,
     PracticeNote,
     PracticePiece,
     PracticeRecording,

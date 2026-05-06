@@ -14,6 +14,9 @@ from app.schemas.practice import (
     DailyStat,
     PracticeGoalResponse,
     PracticeGoalUpdate,
+    PracticeItemCreate,
+    PracticeItemResponse,
+    PracticeItemUpdate,
     PracticePieceCreate,
     PracticePieceResponse,
     PracticePieceUpdate,
@@ -45,6 +48,149 @@ class PracticeService:
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    # ------------------------------------------------------------------
+    # Practice items
+    # ------------------------------------------------------------------
+
+    async def list_practice_items(
+        self,
+        current_user: Any,
+        *,
+        lesson_id: str | None = None,
+        student_id: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        incomplete: bool = False,
+        awaiting_feedback: bool = False,
+    ) -> list[PracticeItemResponse]:
+        """List practice items with reusable lesson/student/dashboard filters."""
+        from app.models.practice import PracticeItem
+
+        query = select(PracticeItem)
+        role = self._role(current_user)
+        teacher_id = await self._teacher_profile_id(current_user) if role == "teacher" else None
+
+        if lesson_id:
+            query = query.where(PracticeItem.lesson_id == lesson_id)
+        if student_id:
+            await self._assert_can_read_student(student_id, current_user)
+            query = query.where(PracticeItem.student_id == student_id)
+        elif role == "teacher":
+            query = query.where(PracticeItem.teacher_id == teacher_id)
+        elif role == "student":
+            query = query.where(PracticeItem.student_id.in_(await self._student_identifiers(current_user)))
+        elif role == "parent":
+            query = query.where(PracticeItem.student_id.in_(await self._parent_child_student_ids(current_user)))
+
+        if date_from:
+            query = query.where(PracticeItem.created_at >= datetime.combine(date_from, datetime.min.time(), UTC))
+        if date_to:
+            query = query.where(PracticeItem.created_at <= datetime.combine(date_to, datetime.max.time(), UTC))
+        if incomplete:
+            query = query.where(PracticeItem.is_completed == False)  # noqa: E712
+        if awaiting_feedback:
+            query = query.where(
+                PracticeItem.is_completed == True,  # noqa: E712
+                PracticeItem.has_like == False,  # noqa: E712
+            )
+            if role != "teacher":
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+
+        result = await self.db.scalars(query.order_by(PracticeItem.created_at.desc()))
+        return [await self._practice_item_response(item) for item in result.all()]
+
+    async def create_practice_item(self, data: PracticeItemCreate, current_user: Any) -> PracticeItemResponse:
+        """Create a teacher-assigned practice item."""
+        from app.models.practice import PracticeItem, PracticeItemPriority, PracticeItemType
+
+        if self._role(current_user) != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+        await self._assert_can_manage_student(data.student_id, current_user)
+        teacher_id = await self._teacher_profile_id(current_user)
+        item = PracticeItem(
+            lesson_id=data.lesson_id,
+            student_id=data.student_id,
+            teacher_id=teacher_id,
+            type=PracticeItemType(data.type),
+            title=data.title,
+            description=data.description,
+            repertoire_id=data.repertoire_id,
+            section_id=data.section_id,
+            priority=PracticeItemPriority(data.priority),
+        )
+        self.db.add(item)
+        await self.db.flush()
+        await self._replace_practice_item_resources(item.id, data.resource_ids)
+        await self.db.flush()
+        await self.db.refresh(item)
+        return await self._practice_item_response(item)
+
+    async def get_practice_item(self, item_id: str, current_user: Any) -> PracticeItemResponse:
+        item = await self._get_practice_item_for_user(item_id, current_user)
+        return await self._practice_item_response(item)
+
+    async def update_practice_item(
+        self,
+        item_id: str,
+        data: PracticeItemUpdate,
+        current_user: Any,
+    ) -> PracticeItemResponse:
+        from app.models.practice import PracticeItemPriority, PracticeItemType
+
+        item = await self._get_practice_item_for_user(item_id, current_user, manage=True)
+        update_data = data.model_dump(exclude_unset=True)
+        resource_ids = update_data.pop("resource_ids", None)
+        for key, value in update_data.items():
+            if key == "type" and value is not None:
+                value = PracticeItemType(value)
+            if key == "priority" and value is not None:
+                value = PracticeItemPriority(value)
+            setattr(item, key, value)
+        if resource_ids is not None:
+            await self._replace_practice_item_resources(item.id, resource_ids)
+        await self.db.flush()
+        await self.db.refresh(item)
+        return await self._practice_item_response(item)
+
+    async def delete_practice_item(self, item_id: str, current_user: Any) -> None:
+        item = await self._get_practice_item_for_user(item_id, current_user, manage=True)
+        await self.db.delete(item)
+        await self.db.flush()
+
+    async def toggle_practice_item_complete(self, item_id: str, current_user: Any) -> PracticeItemResponse:
+        item = await self._get_practice_item_for_user(item_id, current_user, manage=True)
+        now = datetime.now(UTC)
+        item.is_completed = not item.is_completed
+        if item.is_completed:
+            item.completed_at = now
+            item.practice_count = max(item.practice_count, 1)
+        else:
+            item.completed_at = None
+        await self.db.flush()
+        await self.db.refresh(item)
+        return await self._practice_item_response(item)
+
+    async def toggle_practice_item_like(self, item_id: str, current_user: Any) -> PracticeItemResponse:
+        item = await self._get_practice_item_for_user(item_id, current_user, manage=True)
+        item.has_like = not item.has_like
+        item.liked_at = datetime.now(UTC) if item.has_like else None
+        await self.db.flush()
+        await self.db.refresh(item)
+        return await self._practice_item_response(item)
+
+    async def change_practice_item_count(
+        self,
+        item_id: str,
+        current_user: Any,
+        *,
+        delta: int,
+    ) -> PracticeItemResponse:
+        item = await self._get_practice_item_for_user(item_id, current_user, manage=True)
+        item.practice_count = max(0, item.practice_count + delta)
+        await self.db.flush()
+        await self.db.refresh(item)
+        return await self._practice_item_response(item)
 
     # ------------------------------------------------------------------
     # Piece library
@@ -875,6 +1021,44 @@ class PracticeService:
         await self._get_section_for_user(note.section_id, current_user, manage=manage)
         return note
 
+    async def _get_practice_item_for_user(self, item_id: str, current_user: Any, *, manage: bool = False) -> Any:
+        from app.models.practice import PracticeItem
+
+        item = await self.db.get(PracticeItem, item_id)
+        if item is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Practice item not found")
+        if manage:
+            await self._assert_can_manage_student(item.student_id, current_user)
+        else:
+            await self._assert_can_read_student(item.student_id, current_user)
+        return item
+
+    async def _replace_practice_item_resources(self, item_id: str, resource_ids: list[str]) -> None:
+        from app.models.practice import PracticeItemResource
+
+        existing = await self.db.scalars(
+            select(PracticeItemResource).where(PracticeItemResource.item_id == item_id)
+        )
+        for row in existing.all():
+            await self.db.delete(row)
+
+        seen = set()
+        for resource_id in resource_ids:
+            if not resource_id or resource_id in seen:
+                continue
+            seen.add(resource_id)
+            self.db.add(PracticeItemResource(item_id=item_id, resource_id=resource_id))
+
+    async def _practice_item_resource_ids(self, item_id: str) -> list[str]:
+        from app.models.practice import PracticeItemResource
+
+        result = await self.db.scalars(
+            select(PracticeItemResource.resource_id)
+            .where(PracticeItemResource.item_id == item_id)
+            .order_by(PracticeItemResource.resource_id.asc())
+        )
+        return list(result.all())
+
     async def _student_id_for_section(self, section_id: str) -> str:
         from app.models.practice import PracticeRepertoire, PracticeSection
 
@@ -993,6 +1177,28 @@ class PracticeService:
             completed_at=assignment.completed_at if assignment is not None else None,
             created_at=piece.created_at,
             updated_at=piece.updated_at,
+        )
+
+    async def _practice_item_response(self, item: Any) -> PracticeItemResponse:
+        return PracticeItemResponse(
+            id=item.id,
+            lesson_id=item.lesson_id,
+            student_id=item.student_id,
+            teacher_id=item.teacher_id,
+            type=getattr(item.type, "value", item.type),
+            title=item.title,
+            description=item.description,
+            repertoire_id=item.repertoire_id,
+            section_id=item.section_id,
+            priority=getattr(item.priority, "value", item.priority),
+            resource_ids=await self._practice_item_resource_ids(item.id),
+            is_completed=item.is_completed,
+            practice_count=item.practice_count,
+            completed_at=item.completed_at,
+            has_like=item.has_like,
+            liked_at=item.liked_at,
+            created_at=item.created_at,
+            updated_at=item.updated_at,
         )
 
     @staticmethod
