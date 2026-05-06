@@ -1,7 +1,6 @@
 // Recording domain entity
 // Moved from lib/features/practice/domain/entities/recording.dart for Clean Architecture
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'recording.g.dart';
@@ -44,7 +43,6 @@ enum StorageStatus {
 
 /// Recording model for practice recordings.
 @HiveType(typeId: 22)
-@immutable
 class Recording {
   const Recording({
     required this.id,
@@ -148,27 +146,4 @@ class Recording {
 
   @override
   int get hashCode => id.hashCode;
-}
-
-/// Extension methods for RecordingType.
-extension RecordingTypeExtension on RecordingType {
-  String get label {
-    return switch (this) {
-      RecordingType.student => '연습 녹음',
-      RecordingType.teacher => '참고 음원',
-      RecordingType.feedback => '피드백',
-    };
-  }
-}
-
-/// Extension methods for StorageStatus.
-extension StorageStatusExtension on StorageStatus {
-  String get label {
-    return switch (this) {
-      StorageStatus.local => '로컬 저장',
-      StorageStatus.active => '서버 저장',
-      StorageStatus.archived => '아카이브',
-      StorageStatus.deleted => '삭제됨',
-    };
-  }
 }

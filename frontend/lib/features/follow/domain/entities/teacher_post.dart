@@ -51,28 +51,4 @@ class TeacherPost {
       _$TeacherPostFromJson(json);
 
   Map<String, dynamic> toJson() => _$TeacherPostToJson(this);
-
-  /// Icon for this post type.
-  String get typeEmoji {
-    switch (postType) {
-      case PostType.performance:
-        return '🎵';
-      case PostType.event:
-        return '🎉';
-      case PostType.notice:
-        return '📢';
-    }
-  }
-
-  /// Display label for this post type.
-  String get typeLabel {
-    switch (postType) {
-      case PostType.performance:
-        return '발표회';
-      case PostType.event:
-        return '이벤트';
-      case PostType.notice:
-        return '공지사항';
-    }
-  }
 }

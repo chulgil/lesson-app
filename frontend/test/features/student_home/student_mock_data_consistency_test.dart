@@ -4,6 +4,7 @@ import 'package:lessonaza/core/mock/mock_lesson_data_ids.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_schedule_confirmation_card_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
+import 'package:lessonaza/features/schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import 'package:lessonaza/features/subscription/data/repositories/mock_subscription_repository.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 

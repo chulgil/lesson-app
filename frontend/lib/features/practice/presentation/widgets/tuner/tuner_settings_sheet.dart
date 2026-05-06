@@ -10,6 +10,7 @@ import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
+import '../../extensions/practice_display_extensions.dart';
 import '../../providers/tuner_provider.dart';
 
 /// Bottom sheet for tuner settings.

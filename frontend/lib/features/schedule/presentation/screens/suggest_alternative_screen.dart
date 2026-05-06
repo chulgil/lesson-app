@@ -15,6 +15,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
 

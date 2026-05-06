@@ -13,6 +13,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/settings/settings_facade.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/weekly_calendar_picker.dart';
 import 'request_completion_screen.dart';

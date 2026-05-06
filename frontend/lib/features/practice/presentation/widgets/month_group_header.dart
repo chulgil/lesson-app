@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../domain/entities/repertoire_timeline.dart';
+import '../extensions/practice_display_extensions.dart';
 
 /// Divider-style header for a month group in the timeline
 class MonthGroupHeader extends StatelessWidget {

@@ -10,6 +10,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import '../screens/suggest_alternative_screen.dart';
 import 'schedule_slot_choice_list.dart';
 

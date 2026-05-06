@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
+import '../../extensions/lesson_visuals.dart';
 
 /// Lesson header with student/teacher info and status
 class LessonHeaderCard extends StatelessWidget {

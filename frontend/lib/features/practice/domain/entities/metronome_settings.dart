@@ -16,18 +16,13 @@ enum BeatType {
 /// Accent pattern for metronome beats.
 enum AccentPattern {
   /// Uniform pattern - all beats same intensity.
-  uniform('균일', '모든 박자 동일'),
+  uniform,
 
   /// First beat only strong, rest weak (강 약 약 약).
-  firstBeatOnly('첫박강조', '첫박만 강조'),
+  firstBeatOnly,
 
   /// Strong-medium-weak pattern (강 약 중 약 for 4/4).
-  strongMediumWeak('강중약', '첫박 강, 3박 중간');
-
-  const AccentPattern(this.label, this.description);
-
-  final String label;
-  final String description;
+  strongMediumWeak,
 }
 
 /// Subdivision pattern for metronome.
@@ -47,10 +42,23 @@ enum Subdivision {
   sixteenth(4, '16분음표', 'Sixteenth', '● ● ● ●', '♬', [true, true, true, true]),
 
   /// Quintuplets - 5 clicks per beat.
-  quintuplet(5, '5연음', 'Quintuplet', '● ● ● ● ●', '⁵', [true, true, true, true, true]),
+  quintuplet(5, '5연음', 'Quintuplet', '● ● ● ● ●', '⁵', [
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]),
 
   /// Sextuplets - 6 clicks per beat.
-  sextuplet(6, '6연음', 'Sextuplet', '● ● ● ● ● ●', '⁶', [true, true, true, true, true, true]),
+  sextuplet(6, '6연음', 'Sextuplet', '● ● ● ● ● ●', '⁶', [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ]),
 
   // === Eighth note variations ===
   /// Off-beat only (and of the beat).
@@ -64,27 +72,65 @@ enum Subdivision {
   tripletLast(3, '셋잇단-끝음', 'Triplet 3rd', '○ ○ ●', '³³', [false, false, true]),
 
   /// Triplet skip first.
-  tripletSkipFirst(3, '셋잇단-첫음빼고', 'Triplet 2-3', '○ ● ●', '³⁻', [false, true, true]),
+  tripletSkipFirst(3, '셋잇단-첫음빼고', 'Triplet 2-3', '○ ● ●', '³⁻', [
+    false,
+    true,
+    true,
+  ]),
 
   // === Sixteenth variations ===
   /// Sixteenth off-beats only.
-  sixteenthOffbeat(4, '16분-엇박', '16th Offbeat', '○ ● ○ ●', '♬⁺', [false, true, false, true]),
+  sixteenthOffbeat(4, '16분-엇박', '16th Offbeat', '○ ● ○ ●', '♬⁺', [
+    false,
+    true,
+    false,
+    true,
+  ]),
 
   /// Sixteenth skip first.
-  sixteenthSkipFirst(4, '16분-1빼고', '16th Skip 1', '○ ● ● ●', '♬⁻', [false, true, true, true]),
+  sixteenthSkipFirst(4, '16분-1빼고', '16th Skip 1', '○ ● ● ●', '♬⁻', [
+    false,
+    true,
+    true,
+    true,
+  ]),
 
   /// Sixteenth first and last only.
-  sixteenthFirstLast(4, '16분-처음끝', '16th 1&4', '● ○ ○ ●', '♬¹⁴', [true, false, false, true]),
+  sixteenthFirstLast(4, '16분-처음끝', '16th 1&4', '● ○ ○ ●', '♬¹⁴', [
+    true,
+    false,
+    false,
+    true,
+  ]),
 
   /// Sixteenth middle only.
-  sixteenthMiddle(4, '16분-중간', '16th 2&3', '○ ● ● ○', '♬²³', [false, true, true, false]),
+  sixteenthMiddle(4, '16분-중간', '16th 2&3', '○ ● ● ○', '♬²³', [
+    false,
+    true,
+    true,
+    false,
+  ]),
 
   // === Sextuplet variations ===
   /// Sextuplet first only.
-  sextupletFirst(6, '6연음-첫음', 'Sext 1st', '● ○ ○ ○ ○ ○', '⁶¹', [true, false, false, false, false, false]),
+  sextupletFirst(6, '6연음-첫음', 'Sext 1st', '● ○ ○ ○ ○ ○', '⁶¹', [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]),
 
   /// Sextuplet 3+3 accent pattern.
-  sextupletAccents(6, '6연음-3+3', 'Sext 3+3', '● ○ ○ ● ○ ○', '⁶⁺', [true, false, false, true, false, false]);
+  sextupletAccents(6, '6연음-3+3', 'Sext 3+3', '● ○ ○ ● ○ ○', '⁶⁺', [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+  ]);
 
   const Subdivision(
     this.divisionsPerBeat,
@@ -173,7 +219,11 @@ enum MetronomeSound {
   silent('무음', '', '', false);
 
   const MetronomeSound(
-      this.label, this.folderName, this.filePrefix, this.singleFile);
+    this.label,
+    this.folderName,
+    this.filePrefix,
+    this.singleFile,
+  );
 
   final String label;
   final String folderName;

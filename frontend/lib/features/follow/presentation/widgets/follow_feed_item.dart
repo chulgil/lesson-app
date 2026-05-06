@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/teacher_post.dart';
+import '../extensions/teacher_post_visuals.dart';
 
 /// A single feed item card in FollowFeedScreen.
 class FollowFeedItem extends StatelessWidget {
@@ -64,10 +65,10 @@ class FollowFeedItem extends StatelessWidget {
           // Type badge + title
           Row(
             children: [
-              Text(post.typeEmoji, style: AppTypography.bodyLarge),
+              Text(post.postType.emoji, style: AppTypography.bodyLarge),
               const SizedBox(width: AppSpacing.space1),
               Text(
-                post.typeLabel,
+                post.postType.label,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,

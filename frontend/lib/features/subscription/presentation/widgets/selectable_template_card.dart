@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/subscription_template_visuals.dart';
 
 /// Maximum number of templates that can be selected.
 const kMaxTemplateSelections = 3;

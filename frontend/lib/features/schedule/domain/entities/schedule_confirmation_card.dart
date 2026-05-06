@@ -19,30 +19,7 @@ enum ScheduleCardType {
   additionalInstrument,
 }
 
-/// Extension for ScheduleCardType
 extension ScheduleCardTypeExtension on ScheduleCardType {
-  String get label {
-    switch (this) {
-      case ScheduleCardType.afterTrial:
-        return '체험 후 등록';
-      case ScheduleCardType.reEnrollment:
-        return '재등록';
-      case ScheduleCardType.additionalInstrument:
-        return '추가 악기';
-    }
-  }
-
-  String get suggestionText {
-    switch (this) {
-      case ScheduleCardType.afterTrial:
-        return '체험 레슨 시간으로 예약할까요?';
-      case ScheduleCardType.reEnrollment:
-        return '이전 스케줄로 예약할까요?';
-      case ScheduleCardType.additionalInstrument:
-        return '레슨 시간을 선택해주세요';
-    }
-  }
-
   /// Whether this card type has a suggested time
   bool get hasSuggestedTime =>
       this == ScheduleCardType.afterTrial ||
@@ -69,21 +46,7 @@ enum ScheduleCardStatus {
   dismissed,
 }
 
-/// Extension for ScheduleCardStatus
 extension ScheduleCardStatusExtension on ScheduleCardStatus {
-  String get label {
-    switch (this) {
-      case ScheduleCardStatus.pending:
-        return '확인 대기';
-      case ScheduleCardStatus.confirmed:
-        return '확정됨';
-      case ScheduleCardStatus.changedTime:
-        return '시간 변경됨';
-      case ScheduleCardStatus.dismissed:
-        return '닫힘';
-    }
-  }
-
   bool get isActive => this == ScheduleCardStatus.pending;
   bool get isResolved =>
       this == ScheduleCardStatus.confirmed ||

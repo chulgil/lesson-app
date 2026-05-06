@@ -10,6 +10,7 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 
 /// Shows teacher's counter-proposed time slots for student to select one.

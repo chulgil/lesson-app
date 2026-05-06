@@ -50,9 +50,6 @@ class MonthGroup {
     required this.repertoires,
   });
 
-  /// Display label (e.g., "2025년 3월")
-  String get label => '$year년 $month월';
-
   /// Whether this group has any in-progress repertoires
   bool get hasInProgress => repertoires.any((r) => r.endDate == null);
 }

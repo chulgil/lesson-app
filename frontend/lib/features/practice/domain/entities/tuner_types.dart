@@ -59,41 +59,34 @@ enum NoteName {
 /// Tuning status for the tuner.
 enum TuningStatus {
   /// No sound detected
-  idle('대기중', '소리를 들려주세요'),
+  idle,
 
   /// Listening but no clear pitch yet
-  listening('감지중', '음을 찾는 중...'),
+  listening,
 
   /// Pitch detected and in tune (within perfect threshold)
-  tuned('정확', '완벽해요!'),
+  tuned,
 
   /// Pitch detected but flat (too low)
-  flat('낮음', '조금 높여주세요'),
+  flat,
 
   /// Pitch detected but sharp (too high)
-  sharp('높음', '조금 낮춰주세요');
-
-  const TuningStatus(this.label, this.description);
-
-  final String label;
-  final String description;
+  sharp,
 }
 
 /// Judgement result for gamification.
 enum JudgementResult {
   /// Excellent tuning (within tight threshold)
-  perfect('Perfect', '완벽해옹!', 0x9090EE90),
+  perfect(0x9090EE90),
 
   /// Good tuning (within moderate threshold)
-  good('Good', '좋아옹!', 0x90FFEB3B),
+  good(0x90FFEB3B),
 
   /// Poor tuning (outside threshold)
-  miss('Miss', '다시 해봐옹~', 0x909E9E9E);
+  miss(0x909E9E9E);
 
-  const JudgementResult(this.label, this.message, this.colorValue);
+  const JudgementResult(this.colorValue);
 
-  final String label;
-  final String message;
   final int colorValue;
 }
 
@@ -101,15 +94,33 @@ enum JudgementResult {
 enum TunerDifficulty {
   /// Beginner: generous thresholds (relaxed for beginners)
   /// 0.5 second grace period, 2 reactivation chances
-  beginner('초보', perfectCent: 20, goodCent: 40, gracePeriodMs: 600, reactivationChances: 2),
+  beginner(
+    '초보',
+    perfectCent: 20,
+    goodCent: 40,
+    gracePeriodMs: 600,
+    reactivationChances: 2,
+  ),
 
   /// Intermediate: moderate thresholds
   /// 0.4 second grace period, 1 reactivation chance
-  intermediate('중급', perfectCent: 15, goodCent: 30, gracePeriodMs: 400, reactivationChances: 1),
+  intermediate(
+    '중급',
+    perfectCent: 15,
+    goodCent: 30,
+    gracePeriodMs: 400,
+    reactivationChances: 1,
+  ),
 
   /// Advanced: strict thresholds (professional level)
   /// 0.2 second grace period, 1 reactivation chance
-  advanced('고급', perfectCent: 5, goodCent: 10, gracePeriodMs: 200, reactivationChances: 1);
+  advanced(
+    '고급',
+    perfectCent: 5,
+    goodCent: 10,
+    gracePeriodMs: 200,
+    reactivationChances: 1,
+  );
 
   const TunerDifficulty(
     this.label, {
@@ -147,24 +158,21 @@ enum TunerDifficulty {
 /// Transposition setting for wind instruments.
 enum Transposition {
   /// Concert pitch (C instruments: piano, violin, flute)
-  c('C', '실음', 0),
+  c(0),
 
   /// Bb instruments (clarinet, trumpet, soprano sax)
-  bb('Bb', 'Bb관', -2),
+  bb(-2),
 
   /// Eb instruments (alto sax, baritone sax)
-  eb('Eb', 'Eb관', -9),
+  eb(-9),
 
   /// F instruments (horn)
-  f('F', 'F관', -7),
+  f(-7),
 
   /// A instruments (clarinet in A)
-  a('A', 'A관', -3);
+  a(-3);
 
-  const Transposition(this.label, this.description, this.semitoneOffset);
-
-  final String label;
-  final String description;
+  const Transposition(this.semitoneOffset);
 
   /// Semitone offset from concert pitch
   final int semitoneOffset;
@@ -211,7 +219,9 @@ class TunerNote {
 
   /// Get tuning status for a specific difficulty level.
   TuningStatus statusForDifficulty(TunerDifficulty difficulty) {
-    if (centDeviation.abs() <= difficulty.perfectCent) return TuningStatus.tuned;
+    if (centDeviation.abs() <= difficulty.perfectCent) {
+      return TuningStatus.tuned;
+    }
     if (centDeviation < 0) return TuningStatus.flat;
     return TuningStatus.sharp;
   }
@@ -395,8 +405,7 @@ class PitchUtils {
 
     // Calculate cent deviation using standard formula
     // cents = 1200 × log₂(f_detected / f_exact)
-    final exactFrequency =
-        referenceA4 * math.pow(2, roundedSemitones / 12);
+    final exactFrequency = referenceA4 * math.pow(2, roundedSemitones / 12);
     var centDeviation =
         1200 * (math.log(frequency / exactFrequency) / math.ln2);
 

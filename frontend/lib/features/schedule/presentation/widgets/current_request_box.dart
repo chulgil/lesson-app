@@ -5,8 +5,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
+import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import 'schedule_slot_choice_list.dart';
 
 /// Current request action box — phase-aware actions.

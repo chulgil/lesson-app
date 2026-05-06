@@ -1,8 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../../core/l10n/app_strings.dart';
-
 part 'subscription_template.g.dart';
 
 /// Owner type for subscription template.
@@ -108,61 +106,6 @@ class SubscriptionTemplate extends HiveObject {
 
   /// Price per lesson
   int get pricePerLesson => totalLessons > 0 ? price ~/ totalLessons : 0;
-
-  /// Formatted price (e.g., "40만원")
-  String get formattedPrice {
-    if (price >= 10000) {
-      final man = price ~/ 10000;
-      final remainder = price % 10000;
-      if (remainder == 0) {
-        return '$man만원';
-      }
-      return '$man만 $remainder원';
-    }
-    return '$price원';
-  }
-
-  /// Formatted price per lesson
-  String get formattedPricePerLesson {
-    final ppl = pricePerLesson;
-    if (ppl >= 10000) {
-      final man = ppl ~/ 10000;
-      final remainder = ppl % 10000;
-      if (remainder == 0) {
-        return '$man만원';
-      }
-      return '$man만 $remainder원';
-    }
-    return '$ppl원';
-  }
-
-  /// Formatted validity period
-  String get formattedValidity {
-    if (validityDays >= 30) {
-      final months = validityDays ~/ 30;
-      return '$months개월';
-    }
-    return '$validityDays일';
-  }
-
-  /// Summary text (e.g., "8회 · 50분 · 40만원")
-  String get summaryText {
-    return '$totalLessons회 · $lessonDurationMinutes분 · $formattedPrice';
-  }
-
-  /// Display label (e.g., "8회권 (50분)")
-  String get displayLabel =>
-      '$name (${AppStrings.durationMinutesValue(lessonDurationMinutes)})';
-
-  /// Owner type display label
-  String get ownerTypeLabel {
-    switch (ownerType) {
-      case SubscriptionTemplateOwnerType.teacher:
-        return AppStrings.individual;
-      case SubscriptionTemplateOwnerType.academy:
-        return AppStrings.academy;
-    }
-  }
 
   SubscriptionTemplate copyWith({
     String? id,

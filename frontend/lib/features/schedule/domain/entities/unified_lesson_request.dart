@@ -1,8 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../../core/l10n/app_strings.dart';
-
 part 'unified_lesson_request.g.dart';
 
 /// Type of lesson being requested
@@ -15,18 +13,7 @@ enum LessonRequestType {
   regular,
 
   @HiveField(2)
-  package;
-
-  String get label {
-    switch (this) {
-      case LessonRequestType.trial:
-        return '체험레슨';
-      case LessonRequestType.regular:
-        return '정규레슨';
-      case LessonRequestType.package:
-        return '회차권';
-    }
-  }
+  package,
 }
 
 /// Goal for the lesson
@@ -42,20 +29,7 @@ enum UnifiedLessonGoal {
   major,
 
   @HiveField(3)
-  other;
-
-  String get label {
-    switch (this) {
-      case UnifiedLessonGoal.hobby:
-        return '취미';
-      case UnifiedLessonGoal.exam:
-        return '입시';
-      case UnifiedLessonGoal.major:
-        return '전공';
-      case UnifiedLessonGoal.other:
-        return '기타';
-    }
-  }
+  other,
 }
 
 /// Experience level of the student
@@ -68,18 +42,7 @@ enum UnifiedExperienceLevel {
   intermediate,
 
   @HiveField(2)
-  advanced;
-
-  String get label {
-    switch (this) {
-      case UnifiedExperienceLevel.beginner:
-        return '초급';
-      case UnifiedExperienceLevel.intermediate:
-        return '중급';
-      case UnifiedExperienceLevel.advanced:
-        return '고급';
-    }
-  }
+  advanced,
 }
 
 /// Status of the unified lesson request
@@ -125,37 +88,6 @@ enum UnifiedRequestStatus {
   // Phase 3: 레슨 진행 (NEW)
   @HiveField(12)
   inProgress;
-
-  String get label {
-    switch (this) {
-      case UnifiedRequestStatus.pending:
-        return AppStrings.statusPending;
-      case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;
-      case UnifiedRequestStatus.negotiating:
-        return AppStrings.statusNegotiatingShort;
-      case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.statusTimeConfirmed;
-      case UnifiedRequestStatus.proposalSent:
-        return AppStrings.statusProposalSent;
-      case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.statusProposalAccepted;
-      case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.statusPaymentDone;
-      case UnifiedRequestStatus.completed:
-        return AppStrings.statusCompleted;
-      case UnifiedRequestStatus.rejected:
-        return AppStrings.statusRejected;
-      case UnifiedRequestStatus.cancelled:
-        return AppStrings.statusCancelled;
-      case UnifiedRequestStatus.expired:
-        return AppStrings.statusExpiredFull;
-      case UnifiedRequestStatus.subscriptionIssued:
-        return AppStrings.statusSubscriptionIssued;
-      case UnifiedRequestStatus.inProgress:
-        return AppStrings.statusInProgress;
-    }
-  }
 
   bool get isActive => [
     UnifiedRequestStatus.pending,
@@ -265,20 +197,6 @@ class TimeSlotOption extends HiveObject {
       date: date ?? this.date,
     );
   }
-
-  /// Day of week label (Korean)
-  String get dayLabel {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
-    return days[dayOfWeek.clamp(0, 6)];
-  }
-
-  /// Display label: "4/5(토) 14:00 ~ 15:00" or "토 14:00 ~ 15:00"
-  String get displayLabel {
-    if (date != null) {
-      return '${date!.month}/${date!.day}($dayLabel) $startTime ~ $endTime';
-    }
-    return '$dayLabel $startTime ~ $endTime';
-  }
 }
 
 /// A negotiation turn (proposal or counter-proposal)
@@ -355,22 +273,6 @@ class PreferredTimeSlot {
       _$PreferredTimeSlotFromJson(json);
 
   Map<String, dynamic> toJson() => _$PreferredTimeSlotToJson(this);
-
-  /// Display label for the selection list.
-  /// date있으면: "3/29(토) 14:00 ~ 15:00"
-  /// dayOfWeek만: "토 14:00 ~ 15:00"
-  String get displayLabel {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
-    if (date != null) {
-      final d = date!;
-      final dayLabel = days[d.weekday - 1];
-      return '${d.month}/${d.day}($dayLabel) $startTime ~ $endTime';
-    }
-    if (dayOfWeek != null) {
-      return '${days[dayOfWeek!.clamp(0, 6)]} $startTime ~ $endTime';
-    }
-    return '$startTime ~ $endTime';
-  }
 }
 
 /// Unified lesson request — replaces separate trial/regular/returning flows
@@ -559,38 +461,6 @@ class UnifiedLessonRequest extends HiveObject {
   /// Last message from the most recent event (for list preview).
   String? get lastMessage => null; // TODO: Populate from RequestEvent list
 
-  /// Status chip label for the list item.
-  String get statusChipLabel {
-    switch (status) {
-      case UnifiedRequestStatus.pending:
-        return AppStrings.statusPending;
-      case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;
-      case UnifiedRequestStatus.negotiating:
-        return AppStrings.statusNegotiating(currentRound);
-      case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.statusTimeConfirmed;
-      case UnifiedRequestStatus.proposalSent:
-        return AppStrings.statusProposalSent;
-      case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.statusProposalAccepted;
-      case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.statusPaymentDone;
-      case UnifiedRequestStatus.completed:
-        return AppStrings.statusCompleted;
-      case UnifiedRequestStatus.rejected:
-        return AppStrings.statusRejected;
-      case UnifiedRequestStatus.cancelled:
-        return AppStrings.statusCancelled;
-      case UnifiedRequestStatus.expired:
-        return AppStrings.statusExpiredFull;
-      case UnifiedRequestStatus.subscriptionIssued:
-        return AppStrings.statusSubscriptionIssued;
-      case UnifiedRequestStatus.inProgress:
-        return AppStrings.statusInProgress;
-    }
-  }
-
   /// Current lifecycle phase for chapter-based UI.
   RequestPhase get currentPhase {
     return switch (status) {
@@ -621,24 +491,8 @@ class UnifiedLessonRequest extends HiveObject {
     return false;
   }
 
-  /// Unified 3-label chip for teacher's list view.
-  /// Matches ScheduleChangeRequestStatus pattern:
-  ///   확인 필요 (my turn) / 응답 대기 (their turn) / 완료 (terminal)
-  String get teacherActionLabel {
-    if (status.isTerminal) return AppStrings.statusCompleted;
-    if (_isTeacherActionRequired) return AppStrings.actionRequired;
-    return AppStrings.responseWaiting;
-  }
-
-  /// Unified 3-label chip for student's list view.
-  String get studentActionLabel {
-    if (status.isTerminal) return AppStrings.statusCompleted;
-    if (_isStudentActionRequired) return AppStrings.actionRequired;
-    return AppStrings.responseWaiting;
-  }
-
   /// Whether teacher needs to act now.
-  bool get _isTeacherActionRequired {
+  bool get isTeacherActionRequired {
     switch (status) {
       case UnifiedRequestStatus.pending:
       case UnifiedRequestStatus.timeConfirmed:
@@ -654,7 +508,7 @@ class UnifiedLessonRequest extends HiveObject {
   }
 
   /// Whether student needs to act now.
-  bool get _isStudentActionRequired {
+  bool get isStudentActionRequired {
     switch (status) {
       case UnifiedRequestStatus.proposalSent:
       case UnifiedRequestStatus.proposalAccepted:
@@ -670,26 +524,11 @@ class UnifiedLessonRequest extends HiveObject {
 
   /// Color key: 'action' (paperAccent) or 'wait' (inkTertiary).
   String get studentActionColorKey =>
-      _isStudentActionRequired ? 'action' : 'wait';
+      isStudentActionRequired ? 'action' : 'wait';
 
   /// Color key: 'action' (paperAccent) or 'wait' (inkTertiary).
   String get teacherActionColorKey =>
-      _isTeacherActionRequired ? 'action' : 'wait';
-
-  /// Type display label (재수강 > 정규 priority).
-  String get typeDisplayLabel {
-    if (isReturningStudent && type == LessonRequestType.regular) {
-      return '재수강';
-    }
-    return type.label;
-  }
-
-  /// Preferred day label (Korean)
-  String? get preferredDayLabel {
-    if (preferredDay == null) return null;
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${days[preferredDay!.clamp(0, 6)]}요일';
-  }
+      isTeacherActionRequired ? 'action' : 'wait';
 
   UnifiedLessonRequest copyWith({
     String? id,

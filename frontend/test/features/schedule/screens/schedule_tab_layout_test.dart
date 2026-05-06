@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
-import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_masthead.dart';
 import 'package:lessonaza/features/lessons/domain/entities/lesson.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/lesson_crud_provider.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/schedule_tab.dart';
@@ -64,7 +64,7 @@ void main() {
     },
   );
 
-  testWidgets('list 모드 — 홈/수강관리와 같은 paper 표면과 ThinRule 헤더를 노출', (tester) async {
+  testWidgets('list 모드 — 홈/수강관리와 같은 paper 표면과 masthead를 노출', (tester) async {
     await pumpScheduleTab(tester);
 
     expect(
@@ -73,12 +73,11 @@ void main() {
       ),
       findsAtLeastNWidgets(1),
     );
-    expect(find.text('Schedule'), findsOneWidget);
-    expect(find.text('스케줄'), findsOneWidget);
-    expect(find.byType(ThinRule), findsOneWidget);
+    expect(find.text('SCHEDULE'), findsOneWidget);
+    expect(find.byType(NotebookMasthead), findsOneWidget);
     expect(find.byTooltip(AppStrings.addLessonTooltip), findsOneWidget);
     expect(find.text('Programme of Schedule'), findsNothing);
-    expect(find.text('SCHEDULE'), findsNothing);
+    expect(find.text('Schedule'), findsNothing);
   });
 
   testWidgets('list 모드 — sticky delegate 가 고정 높이로 등록되어 layout 회귀 가드', (

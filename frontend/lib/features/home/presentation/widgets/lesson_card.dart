@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../../features/lessons/presentation/extensions/lesson_visuals.dart';
 import '../../../subscription/subscription_ui_facade.dart';
 import '../providers/home_lesson_summary_provider.dart';
 

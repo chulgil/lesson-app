@@ -1,8 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../../core/l10n/app_strings.dart';
-
 part 'subscription_settings.g.dart';
 
 /// Discount type for bulk purchase.
@@ -42,16 +40,6 @@ class PackageDiscountPolicy {
       _$PackageDiscountPolicyFromJson(json);
 
   Map<String, dynamic> toJson() => _$PackageDiscountPolicyToJson(this);
-
-  /// Display text for the policy.
-  String get displayText {
-    switch (type) {
-      case DiscountType.discount:
-        return '$minLessons회 이상: $value% 할인';
-      case DiscountType.bonusLessons:
-        return '$minLessons회 이상: +$value회 무료';
-    }
-  }
 
   /// Calculate bonus lessons for given purchase count.
   int calculateBonusLessons(int purchasedLessons) {
@@ -212,14 +200,12 @@ class SubscriptionSettings extends HiveObject {
           minLessons: 10,
           type: DiscountType.bonusLessons,
           value: 1,
-          description: AppStrings.bulkPurchaseBonus,
         ),
         // Default: 16+ lessons = 2 bonus
         PackageDiscountPolicy(
           minLessons: 16,
           type: DiscountType.bonusLessons,
           value: 2,
-          description: AppStrings.bulkPurchaseBonus,
         ),
       ],
       createdAt: DateTime.now(),

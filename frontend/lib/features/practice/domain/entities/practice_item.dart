@@ -1,10 +1,6 @@
 // Practice item domain entities
 // Moved from lib/features/practice/domain/entities/practice_item.dart for Clean Architecture
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-
 import 'package:json_annotation/json_annotation.dart';
 
 // Re-export shared enum for backward compatibility
@@ -16,53 +12,13 @@ part 'practice_item.g.dart';
 enum QuickReaction {
   good, // 👍 잘했어요
   excellent, // ⭐ 훌륭해요
-  tryHarder; // 💪 힘내자
-
-  String get emoji {
-    switch (this) {
-      case QuickReaction.good:
-        return '👍';
-      case QuickReaction.excellent:
-        return '⭐';
-      case QuickReaction.tryHarder:
-        return '💪';
-    }
-  }
-
-  String get label {
-    switch (this) {
-      case QuickReaction.good:
-        return '잘했어요';
-      case QuickReaction.excellent:
-        return '훌륭해요';
-      case QuickReaction.tryHarder:
-        return '힘내자';
-    }
-  }
+  tryHarder, // 💪 힘내자
 }
 
 /// Student response to teacher's feedback
 enum StudentResponse {
   thanks, // 🙏 감사합니다
-  question; // ❓ 질문있어요
-
-  String get emoji {
-    switch (this) {
-      case StudentResponse.thanks:
-        return '🙏';
-      case StudentResponse.question:
-        return '❓';
-    }
-  }
-
-  String get label {
-    switch (this) {
-      case StudentResponse.thanks:
-        return '감사합니다';
-      case StudentResponse.question:
-        return '질문있어요';
-    }
-  }
+  question, // ❓ 질문있어요
 }
 
 /// Practice priority levels for "이번 주 연습"
@@ -70,78 +26,6 @@ enum PracticePriority {
   must, // 🔴 필수 - 꼭 해오기
   should, // 🟡 추천 - 해오면 좋아요
   could; // 🟢 도전 - 도전해볼까?
-
-  /// Display label for teacher UI
-  String get label {
-    switch (this) {
-      case PracticePriority.must:
-        return '필수';
-      case PracticePriority.should:
-        return '추천';
-      case PracticePriority.could:
-        return '도전';
-    }
-  }
-
-  /// Friendly label for child UI
-  String get childLabel {
-    switch (this) {
-      case PracticePriority.must:
-        return '꼭 해와요!';
-      case PracticePriority.should:
-        return '해보면 좋아요~';
-      case PracticePriority.could:
-        return '도전해볼까?';
-    }
-  }
-
-  /// Short label for adult UI
-  String get shortLabel {
-    switch (this) {
-      case PracticePriority.must:
-        return '필수';
-      case PracticePriority.should:
-        return '권장';
-      case PracticePriority.could:
-        return '선택';
-    }
-  }
-
-  /// Priority color
-  Color get color {
-    switch (this) {
-      case PracticePriority.must:
-        return AppColors.paperAccent; // 🔴
-      case PracticePriority.should:
-        return AppColors.practiceNormal; // 🟡
-      case PracticePriority.could:
-        return AppColors.paperOk; // 🟢
-    }
-  }
-
-  /// Priority emoji (for child UI)
-  String get emoji {
-    switch (this) {
-      case PracticePriority.must:
-        return '⭐⭐⭐';
-      case PracticePriority.should:
-        return '⭐⭐';
-      case PracticePriority.could:
-        return '⭐';
-    }
-  }
-
-  /// Priority dot (for student/adult UI)
-  String get dot {
-    switch (this) {
-      case PracticePriority.must:
-        return '🔴';
-      case PracticePriority.should:
-        return '🟡';
-      case PracticePriority.could:
-        return '🟢';
-    }
-  }
 
   /// Sort order (must first, could last)
   int get sortOrder {
@@ -161,33 +45,7 @@ enum PracticeType {
   repertoire, // 레퍼토리에서 선택
   technique, // 테크닉/스케일
   theory, // 이론
-  custom; // 직접 입력
-
-  String get label {
-    switch (this) {
-      case PracticeType.repertoire:
-        return '레퍼토리';
-      case PracticeType.technique:
-        return '테크닉';
-      case PracticeType.theory:
-        return '이론';
-      case PracticeType.custom:
-        return '직접입력';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case PracticeType.repertoire:
-        return Icons.music_note;
-      case PracticeType.technique:
-        return Icons.piano;
-      case PracticeType.theory:
-        return Icons.menu_book;
-      case PracticeType.custom:
-        return Icons.edit_note;
-    }
-  }
+  custom, // 직접 입력
 }
 
 /// Practice item model - 선생님이 레슨에서 할당하는 "이번 주 연습" 항목
@@ -406,7 +264,8 @@ class PracticeItem {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() => 'PracticeItem(id: $id, title: $title, priority: $priority)';
+  String toString() =>
+      'PracticeItem(id: $id, title: $title, priority: $priority)';
 }
 
 /// Extension to group practice items by priority
@@ -421,10 +280,12 @@ extension PracticeItemListExtension on List<PracticeItem> {
   }
 
   /// Get only incomplete items
-  List<PracticeItem> get incomplete => where((item) => !item.isCompleted).toList();
+  List<PracticeItem> get incomplete =>
+      where((item) => !item.isCompleted).toList();
 
   /// Get only completed items
-  List<PracticeItem> get completed => where((item) => item.isCompleted).toList();
+  List<PracticeItem> get completed =>
+      where((item) => item.isCompleted).toList();
 
   /// Get completion rate (0.0 to 1.0)
   double get completionRate {
@@ -440,6 +301,7 @@ extension PracticeItemListExtension on List<PracticeItem> {
 
   /// Sort by priority (must first)
   List<PracticeItem> sortedByPriority() {
-    return [...this]..sort((a, b) => a.priority.sortOrder.compareTo(b.priority.sortOrder));
+    return [...this]
+      ..sort((a, b) => a.priority.sortOrder.compareTo(b.priority.sortOrder));
   }
 }

@@ -20,32 +20,6 @@ enum NoShowPolicy {
   @HiveField(3)
   reschedule; // 보강으로 전환
 
-  String get label {
-    switch (this) {
-      case NoShowPolicy.deductCredit:
-        return '회차 차감';
-      case NoShowPolicy.halfCredit:
-        return '0.5회 차감';
-      case NoShowPolicy.noDeduction:
-        return '차감 없음';
-      case NoShowPolicy.reschedule:
-        return '보강으로 전환';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case NoShowPolicy.deductCredit:
-        return '무단 결석 시 1회 차감됩니다';
-      case NoShowPolicy.halfCredit:
-        return '무단 결석 시 0.5회 차감됩니다';
-      case NoShowPolicy.noDeduction:
-        return '무단 결석 시에도 차감되지 않습니다';
-      case NoShowPolicy.reschedule:
-        return '무단 결석 시 보강 1회로 전환됩니다';
-    }
-  }
-
   /// 차감 비율 (회차권 기준)
   double get deductionRate {
     switch (this) {

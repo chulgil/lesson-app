@@ -15,6 +15,7 @@ import '../../../../../features/practice/practice_facade.dart'
         Subdivision,
         TimeSignature,
         metronomeProvider;
+import '../../extensions/practice_display_extensions.dart';
 import 'cat_beat_indicator.dart';
 
 /// Full screen metronome modal with all controls.

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_unified_lesson_request_repository.dart';
+import 'package:lessonaza/features/schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 
 void main() {
   late MockUnifiedLessonRequestRepository repo;

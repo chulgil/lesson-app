@@ -29,6 +29,46 @@ class AppStrings {
   /// 수강권
   static const subscription = '수강권';
 
+  // ── Schedule Domain Visuals ───────────────────────────────
+
+  static const lessonRequestTypeTrial = '체험레슨';
+  static const lessonRequestTypeRegular = '정규레슨';
+  static const lessonRequestTypePackage = '회차권';
+  static const lessonGoalHobby = '취미';
+  static const lessonGoalExam = '입시';
+  static const lessonGoalMajor = '전공';
+  static const lessonGoalOther = '기타';
+  static const experienceLevelBeginner = '초급';
+  static const experienceLevelIntermediate = '중급';
+  static const experienceLevelAdvanced = '고급';
+  static const makeupStatusPending = '예약 대기';
+  static const makeupStatusScheduled = '예약됨';
+  static const makeupStatusCompleted = '완료';
+  static const makeupStatusExpired = '만료됨';
+  static const makeupStatusWaived = '면제';
+  static const makeupReasonStudentCancellation = '학생 취소';
+  static const makeupReasonTeacherCancellation = '선생님 취소';
+  static const makeupReasonNoShowReschedule = '노쇼 보강';
+  static const makeupReasonOther = '기타';
+  static const noShowPolicyDeductCredit = '회차 차감';
+  static const noShowPolicyHalfCredit = '0.5회 차감';
+  static const noShowPolicyNoDeduction = '차감 없음';
+  static const noShowPolicyReschedule = '보강으로 전환';
+  static const noShowPolicyDeductCreditDescription = '무단 결석 시 1회 차감됩니다';
+  static const noShowPolicyHalfCreditDescription = '무단 결석 시 0.5회 차감됩니다';
+  static const noShowPolicyNoDeductionDescription = '무단 결석 시에도 차감되지 않습니다';
+  static const noShowPolicyRescheduleDescription = '무단 결석 시 보강 1회로 전환됩니다';
+  static const scheduleCardTypeAfterTrial = '체험 후 등록';
+  static const scheduleCardTypeReEnrollment = '재등록';
+  static const scheduleCardTypeAdditionalInstrument = '추가 악기';
+  static const scheduleCardSuggestionAfterTrial = '체험 레슨 시간으로 예약할까요?';
+  static const scheduleCardSuggestionReEnrollment = '이전 스케줄로 예약할까요?';
+  static const scheduleCardSuggestionAdditionalInstrument = '레슨 시간을 선택해주세요';
+  static const scheduleCardStatusPending = '확인 대기';
+  static const scheduleCardStatusConfirmed = '확정됨';
+  static const scheduleCardStatusChangedTime = '시간 변경됨';
+  static const scheduleCardStatusDismissed = '닫힘';
+
   // ── Screen Titles ─────────────────────────────────────────
 
   /// 레슨 요청 목록 화면 제목
@@ -155,6 +195,15 @@ class AppStrings {
 
   /// 학원
   static const academy = '학원';
+
+  /// 발표회 (팔로우 게시글 유형)
+  static const postTypePerformance = '발표회';
+
+  /// 이벤트 (팔로우 게시글 유형)
+  static const postTypeEvent = '이벤트';
+
+  /// 공지사항 (팔로우 게시글 유형)
+  static const postTypeNotice = '공지사항';
 
   /// 재수강
   static const returning = '재수강';
@@ -2102,6 +2151,18 @@ class AppStrings {
   /// 당일 취소 (LessonStatus.cancelledByStudentLate label)
   static const statusSameDayCancel = '당일 취소';
 
+  /// 사전 취소 (LessonStatus.cancelledByStudentAdvance label)
+  static const statusAdvanceCancel = '사전 취소';
+
+  /// 합의 취소 (LessonStatus.cancelledMutual label)
+  static const statusMutualCancel = '합의 취소';
+
+  /// 학생 불참 (LessonStatus.studentAbsent label)
+  static const statusStudentAbsent = '학생 불참';
+
+  /// 변경 대기 (LessonStatus.reschedulePending label)
+  static const statusReschedulePending = '변경 대기';
+
   /// 레슨 노트 (lesson note history AppBar)
   static const lessonNotesTitle = '레슨 노트';
 
@@ -3546,8 +3607,37 @@ class AppStrings {
   // ignore: unnecessary_brace_in_string_interps
   static String amountManwon(String value) => '${value}만원';
 
+  /// N만 M원
+  static String amountManwonWithRemainder(int man, int remainder) =>
+      '$man만 $remainder원';
+
   /// N원
   static String amountWon(int amount) => '$amount원';
+
+  /// N개월
+  static String monthCount(int count) => '$count개월';
+
+  /// N일
+  static String dayCount(int count) => '$count일';
+
+  /// N회 이상: V% 할인
+  static String packageDiscountPolicyText({
+    required int minLessons,
+    required int value,
+  }) => '$minLessons회 이상: $value% 할인';
+
+  /// N회 이상: +V회 무료
+  static String packageBonusPolicyText({
+    required int minLessons,
+    required int value,
+  }) => '$minLessons회 이상: +$value회 무료';
+
+  /// N회 · D분 · 가격
+  static String subscriptionTemplateSummaryText({
+    required int totalLessons,
+    required int durationMinutes,
+    required String priceLabel,
+  }) => '$totalLessons회 · $durationMinutes분 · $priceLabel';
 
   /// 회차 기준 입금 (BillingType.perPackage)
   static const billingTypePerPackage = '회차 기준 입금';

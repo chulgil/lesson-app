@@ -22,31 +22,6 @@ enum LessonStatus {
   // Reschedule pending
   reschedulePending; // Reschedule requested, waiting for confirmation
 
-  String get label {
-    switch (this) {
-      case LessonStatus.scheduled:
-        return '예정';
-      case LessonStatus.completed:
-        return '완료';
-      case LessonStatus.cancelled:
-        return '취소';
-      case LessonStatus.cancelledByStudentAdvance:
-        return '사전 취소';
-      case LessonStatus.cancelledByStudentLate:
-        return '당일 취소';
-      case LessonStatus.cancelledByTeacher:
-        return '선생님 취소';
-      case LessonStatus.cancelledMutual:
-        return '합의 취소';
-      case LessonStatus.noShow:
-        return '결석';
-      case LessonStatus.studentAbsent:
-        return '학생 불참';
-      case LessonStatus.reschedulePending:
-        return '변경 대기';
-    }
-  }
-
   /// Whether this status results in subscription deduction
   bool get isDeducted {
     switch (this) {
@@ -92,13 +67,6 @@ class LessonPiece {
     this.movement,
     this.notes,
   });
-
-  String get displayName {
-    final parts = <String>[name];
-    if (opus != null) parts.add(opus!);
-    if (movement != null) parts.add(movement!);
-    return parts.join(' - ');
-  }
 
   factory LessonPiece.fromJson(Map<String, dynamic> json) =>
       _$LessonPieceFromJson(json);
@@ -189,7 +157,8 @@ class Lesson {
   final LessonLocationInfo? location; // Lesson location
   final String? studentNote; // Student's own memo about the lesson
   final int travelTimeMinutes; // Teacher's travel time after this lesson
-  final String? subscriptionId; // Linked subscription (null for trial-free lessons)
+  final String?
+  subscriptionId; // Linked subscription (null for trial-free lessons)
   final bool isPreview; // Preview lesson (beyond subscription range)
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -260,8 +229,13 @@ class Lesson {
     final parts = startTime.split(':');
     final hour = int.parse(parts[0]);
     final minute = int.parse(parts[1]);
-    return DateTime(date.year, date.month, date.day, hour, minute)
-        .add(Duration(minutes: duration));
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      hour,
+      minute,
+    ).add(Duration(minutes: duration));
   }
 
   /// Get days until/since lesson

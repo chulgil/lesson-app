@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
+import '../extensions/schedule_confirmation_card_visuals.dart';
 import '../providers/schedule_confirmation_card_providers.dart';
 import '../providers/teacher_availability_providers.dart';
 

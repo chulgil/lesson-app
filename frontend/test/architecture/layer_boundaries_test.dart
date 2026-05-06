@@ -503,39 +503,7 @@ const _legacyCoreBookingFlutterFrameworkImportExceptions = <String>{};
 
 const _legacyDomainLocalizationDependencies = <String>{};
 
-const _legacyDomainDisplayGetterDependencies = <String>{
-  'lib/features/follow/domain/entities/teacher_post.dart:68',
-  'lib/features/lessons/domain/entities/lesson.dart:25',
-  'lib/features/practice/domain/entities/metronome_settings.dart:27',
-  'lib/features/practice/domain/entities/piece.dart:11',
-  'lib/features/practice/domain/entities/practice_item.dart:17',
-  'lib/features/practice/domain/entities/practice_item.dart:28',
-  'lib/features/practice/domain/entities/practice_item.dart:45',
-  'lib/features/practice/domain/entities/practice_item.dart:54',
-  'lib/features/practice/domain/entities/practice_item.dart:71',
-  'lib/features/practice/domain/entities/practice_item.dart:119',
-  'lib/features/practice/domain/entities/practice_item.dart:162',
-  'lib/features/practice/domain/entities/recording.dart:153',
-  'lib/features/practice/domain/entities/recording.dart:164',
-  'lib/features/practice/domain/entities/repertoire_timeline.dart:54',
-  'lib/features/practice/domain/entities/tuner_settings.dart:17',
-  'lib/features/practice/domain/entities/tuner_settings.dart:65',
-  'lib/features/practice/domain/entities/tuner_types.dart:76',
-  'lib/features/practice/domain/entities/tuner_types.dart:93',
-  'lib/features/practice/domain/entities/tuner_types.dart:164',
-  'lib/features/schedule/domain/entities/makeup_lesson.dart:27',
-  'lib/features/schedule/domain/entities/makeup_lesson.dart:60',
-  'lib/features/schedule/domain/entities/no_show_policy.dart:23',
-  'lib/features/schedule/domain/entities/schedule_confirmation_card.dart:24',
-  'lib/features/schedule/domain/entities/schedule_confirmation_card.dart:74',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart:18',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart:45',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart:71',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart:243',
-  'lib/features/schedule/domain/entities/unified_lesson_request.dart:329',
-  'lib/features/subscription/domain/entities/subscription_settings.dart:45',
-  'lib/features/subscription/domain/entities/subscription_template.dart:147',
-};
+const _legacyDomainDisplayGetterDependencies = <String>{};
 
 const _legacyDomainHivePersistenceExceptions = <String>{
   'lib/features/lessons/domain/entities/attendance_stats.dart',

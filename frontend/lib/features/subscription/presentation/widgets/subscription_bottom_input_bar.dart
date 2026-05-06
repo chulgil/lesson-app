@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../domain/entities/subscription.dart';
 

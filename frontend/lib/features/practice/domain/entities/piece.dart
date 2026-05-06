@@ -8,19 +8,6 @@ enum PieceProgress {
   polishing,
   completed;
 
-  String get label {
-    switch (this) {
-      case PieceProgress.notStarted:
-        return '시작 전';
-      case PieceProgress.inProgress:
-        return '진행중';
-      case PieceProgress.polishing:
-        return '마무리';
-      case PieceProgress.completed:
-        return '완료';
-    }
-  }
-
   double get progressValue {
     switch (this) {
       case PieceProgress.notStarted:
@@ -66,22 +53,6 @@ class Piece {
     required this.createdAt,
     this.updatedAt,
   });
-
-  /// Get full title with composer
-  String get fullTitle {
-    if (composer != null) {
-      return '$title - $composer';
-    }
-    return title;
-  }
-
-  /// Get display name with movement
-  String get displayName {
-    final parts = <String>[title];
-    if (opus != null) parts.add(opus!);
-    if (movement != null) parts.add(movement!);
-    return parts.join(' ');
-  }
 
   Piece copyWith({
     String? id,
@@ -140,9 +111,10 @@ class Repertoire {
   int get totalPieces => currentPieces.length + completedPieces.length;
 
   /// Get pieces in progress
-  List<Piece> get inProgressPieces => currentPieces
-      .where((p) => p.progress == PieceProgress.inProgress)
-      .toList();
+  List<Piece> get inProgressPieces =>
+      currentPieces
+          .where((p) => p.progress == PieceProgress.inProgress)
+          .toList();
 
   Repertoire copyWith({
     String? studentId,

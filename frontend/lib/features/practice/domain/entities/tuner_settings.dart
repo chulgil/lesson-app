@@ -6,18 +6,13 @@ import 'tuner_types.dart';
 /// Clef type for staff notation display.
 enum ClefType {
   /// Treble clef (G clef) - violin, flute, clarinet, trumpet, piano RH
-  treble('높은음자리', '🎼'),
+  treble,
 
   /// Bass clef (F clef) - cello, bass, trombone, tuba, piano LH
-  bass('낮은음자리', '𝄢'),
+  bass,
 
   /// Alto clef (C clef) - viola
-  alto('가온음자리', '𝄡');
-
-  const ClefType(this.label, this.symbol);
-
-  final String label;
-  final String symbol;
+  alto;
 
   /// Get default clef type for an instrument name.
   /// Returns treble clef as default for unknown instruments.
@@ -54,18 +49,13 @@ enum ClefType {
 /// Enharmonic display mode for accidentals.
 enum EnharmonicMode {
   /// Show only sharp names (C#, D#, F#, G#, A#)
-  sharpOnly('샤프', 'C#, D#, ...'),
+  sharpOnly,
 
   /// Show only flat names (Db, Eb, Gb, Ab, Bb)
-  flatOnly('플랫', 'Db, Eb, ...'),
+  flatOnly,
 
   /// Show both (C#/Db, D#/Eb, ...)
-  both('병기', 'C#/Db, ...');
-
-  const EnharmonicMode(this.label, this.example);
-
-  final String label;
-  final String example;
+  both,
 }
 
 /// Tuner settings with reference frequency, transposition, and display options.

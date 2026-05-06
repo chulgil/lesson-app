@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/selectors/selectors.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_template_providers.dart';
 
 /// Screen for managing subscription templates (teacher app).

@@ -24,22 +24,8 @@ enum MakeupStatus {
   @HiveField(4)
   waived; // 선생님이 면제 처리
 
-  String get label {
-    switch (this) {
-      case MakeupStatus.pending:
-        return '예약 대기';
-      case MakeupStatus.scheduled:
-        return '예약됨';
-      case MakeupStatus.completed:
-        return '완료';
-      case MakeupStatus.expired:
-        return '만료됨';
-      case MakeupStatus.waived:
-        return '면제';
-    }
-  }
-
-  bool get isActive => this == MakeupStatus.pending || this == MakeupStatus.scheduled;
+  bool get isActive =>
+      this == MakeupStatus.pending || this == MakeupStatus.scheduled;
 }
 
 /// 보강 발생 사유
@@ -55,20 +41,7 @@ enum MakeupReason {
   noShowReschedule, // 노쇼 (reschedule 정책)
 
   @HiveField(3)
-  other; // 기타
-
-  String get label {
-    switch (this) {
-      case MakeupReason.studentCancellation:
-        return '학생 취소';
-      case MakeupReason.teacherCancellation:
-        return '선생님 취소';
-      case MakeupReason.noShowReschedule:
-        return '노쇼 보강';
-      case MakeupReason.other:
-        return '기타';
-    }
-  }
+  other, // 기타
 }
 
 /// 보강 레슨 엔티티
