@@ -268,7 +268,7 @@ async def reorder_lesson_classes(
 async def get_lesson_class(
     class_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> LessonClassResponse:
     """Return a single lesson class."""
     service = LessonService(db)

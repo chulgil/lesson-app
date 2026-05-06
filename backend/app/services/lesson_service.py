@@ -320,17 +320,44 @@ class LessonService:
         await self.db.flush()
 
     async def _get_accessible_class(self, class_id: str, current_user: Any) -> Any:
-        """Load a lesson class and enforce the current teacher's ownership boundary."""
-        from app.models.lesson import LessonClass
+        """Load a lesson class and enforce read access for the current user."""
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
 
         lesson_class = await self.db.get(LessonClass, class_id)
         if lesson_class is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
 
-        teacher_id = await resolve_teacher_id(self.db, current_user.id)
-        if lesson_class.teacher_id != teacher_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson class access denied")
-        return lesson_class
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if lesson_class.teacher_id == teacher_id:
+                return lesson_class
+        elif role == "parent":
+            parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == current_user.id))
+            if parent_id is not None:
+                linked_child_class = await self.db.scalar(
+                    select(ClassMembership.id)
+                    .join(ParentChildRelation, ParentChildRelation.student_id == ClassMembership.student_id)
+                    .where(
+                        ClassMembership.lesson_class_id == class_id,
+                        ParentChildRelation.parent_id == parent_id,
+                        ParentChildRelation.status == ParentChildRelationStatus.active,
+                    )
+                )
+                if linked_child_class is not None:
+                    return lesson_class
+        elif role == "student":
+            linked_class = await self.db.scalar(
+                select(ClassMembership.id).where(
+                    ClassMembership.lesson_class_id == class_id,
+                    ClassMembership.student_id == current_user.id,
+                )
+            )
+            if linked_class is not None:
+                return lesson_class
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson class access denied")
 
     # ------------------------------------------------------------------
     # Memberships
@@ -373,6 +400,27 @@ class LessonService:
             )
         elif role == "student":
             query = query.where(ClassMembership.student_id == current_user.id)
+        elif role == "parent":
+            from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+            parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == current_user.id))
+            if parent_id is None:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+            linked_child_ids = select(ParentChildRelation.student_id).where(
+                ParentChildRelation.parent_id == parent_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+            if student_id:
+                linked = await self.db.scalar(
+                    select(ParentChildRelation.id).where(
+                        ParentChildRelation.parent_id == parent_id,
+                        ParentChildRelation.student_id == student_id,
+                        ParentChildRelation.status == ParentChildRelationStatus.active,
+                    )
+                )
+                if linked is None:
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+            query = query.where(ClassMembership.student_id.in_(linked_child_ids))
         else:
             query = query.where(ClassMembership.student_id == current_user.id)
 
