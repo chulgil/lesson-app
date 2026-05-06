@@ -114,6 +114,21 @@ async def get_deposit_summary(
 
 
 @router.get(
+    "/schedule-change-events/pending",
+    response_model=list[RequestEventResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List pending subscription schedule-change events",
+)
+async def get_pending_subscription_schedule_change_events(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[RequestEventResponse]:
+    """Return latest visible subscription session events that need the user's response."""
+    service = SubscriptionService(db)
+    return await service.get_pending_schedule_change_events(current_user)
+
+
+@router.get(
     "/{subscription_id}",
     response_model=SubscriptionResponse,
     status_code=status.HTTP_200_OK,

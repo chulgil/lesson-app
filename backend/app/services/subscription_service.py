@@ -373,6 +373,75 @@ class SubscriptionService:
         result = await self.db.scalars(query)
         return [RequestEventResponse.model_validate(event) for event in result.all()]
 
+    async def get_pending_schedule_change_events(self, current_user: Any) -> list[RequestEventResponse]:
+        """Return latest visible subscription schedule-change events requiring response."""
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.request_event import RequestEvent, RequestEventType
+        from app.models.subscription import Subscription
+
+        role = self._actor_type(current_user)
+        source_types = {
+            RequestEventType.scheduleChanged,
+            RequestEventType.scheduleChangeProposed,
+            RequestEventType.scheduleChangeCountered,
+        }
+        terminal_types = {
+            RequestEventType.scheduleChangeAccepted,
+            RequestEventType.scheduleChangeRejected,
+        }
+        decision_types = source_types | terminal_types
+
+        query = (
+            select(RequestEvent)
+            .join(Subscription, RequestEvent.subscription_id == Subscription.id)
+            .where(
+                RequestEvent.subscription_id.is_not(None),
+                RequestEvent.event_type.in_(decision_types),
+            )
+        )
+
+        if role == "teacher":
+            identifiers = await self._teacher_identifiers(current_user)
+            query = (
+                query.join(
+                    ClassMembership,
+                    Subscription.membership_id == ClassMembership.id,
+                )
+                .join(
+                    LessonClass,
+                    ClassMembership.lesson_class_id == LessonClass.id,
+                )
+                .where(LessonClass.teacher_id.in_(identifiers))
+            )
+        elif role == "student":
+            query = query.where(Subscription.student_id.in_(await self._student_identifiers(current_user)))
+        elif role == "parent":
+            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(current_user)))
+        else:
+            query = query.where(False)
+
+        result = await self.db.scalars(
+            query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc())
+        )
+
+        latest_by_session: dict[tuple[str, int | None], Any] = {}
+        for event in result.all():
+            if event.subscription_id is None:
+                continue
+            key = (event.subscription_id, event.session_number)
+            latest_by_session.setdefault(key, event)
+
+        pending = []
+        for event in latest_by_session.values():
+            if event.event_type not in source_types:
+                continue
+            if role in {"teacher", "student"} and event.actor_type == role:
+                continue
+            pending.append(event)
+
+        pending.sort(key=lambda event: (event.created_at, event.id), reverse=True)
+        return [RequestEventResponse.model_validate(event) for event in pending]
+
     async def add_event(
         self,
         subscription_id: str,

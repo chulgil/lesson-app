@@ -282,6 +282,7 @@
     ],
     "backend_remote_status": "remote",
     "backend_routes": [
+      "GET /api/v1/subscriptions/schedule-change-events/pending",
       "GET /api/v1/subscriptions/{subscription_id}/events?session_number={n}",
       "POST /api/v1/subscriptions/{subscription_id}/events",
       "PATCH /api/v1/subscriptions/{subscription_id}/use-reschedule"
@@ -289,6 +290,7 @@
     "backend_notes": [
       "RequestEvent.subscription_id has a real FK to subscriptions.id.",
       "RequestEvent.session_number scopes one subscription session.",
+      "The pending endpoint returns latest visible session events that require the current teacher or student to respond.",
       "SubscriptionService validates turn order for terminal schedule-change responses.",
       "Parents can read linked child events but cannot create schedule-change events."
     ],
