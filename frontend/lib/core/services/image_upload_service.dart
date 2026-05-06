@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import '../config/environment.dart';
 import '../network/api_client.dart';
 
 /// Service to upload profile/background images to the backend.
@@ -11,8 +10,10 @@ import '../network/api_client.dart';
 /// uploaded to the server when not in mock mode.
 class ImageUploadService {
   final ApiClient _apiClient;
+  final bool _useMockData;
 
-  ImageUploadService(this._apiClient);
+  ImageUploadService(this._apiClient, {required bool useMockData})
+    : _useMockData = useMockData;
 
   /// Upload an image file to the backend.
   ///
@@ -23,7 +24,7 @@ class ImageUploadService {
     String entityType = 'teacher',
     String? entityId,
   }) async {
-    if (EnvironmentConfig.useMockData) return null;
+    if (_useMockData) return null;
 
     try {
       final file = File(filePath);
@@ -56,7 +57,7 @@ class ImageUploadService {
     String entityType = 'teacher',
     String? entityId,
   }) async {
-    if (EnvironmentConfig.useMockData) return;
+    if (_useMockData) return;
 
     try {
       await _apiClient.delete(

@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../auth/auth_state.dart';
-import '../config/environment.dart';
 import '../widgets/notebook/notebook_surfaces.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/extensions/user_role_visuals.dart';
@@ -46,13 +45,13 @@ class AppRouter {
   ///
   /// In mock mode: no redirect (existing behavior).
   /// In remote mode: redirects unauthenticated users to /login.
-  static GoRouter createRouter(WidgetRef ref) {
+  static GoRouter createRouter(WidgetRef ref, {required bool useMockData}) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
       redirect:
-          EnvironmentConfig.useMockData
+          useMockData
               ? null
               : (context, state) {
                 final authState = ref.read(authNotifierProvider);

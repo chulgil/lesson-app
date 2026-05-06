@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/extensions/user_role_visuals.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/providers/user_role_provider.dart';
-import '../config/environment.dart';
+import '../providers/repository_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -107,7 +107,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
         newRole = UserRole.teacher;
     }
 
-    if (!EnvironmentConfig.useMockData) {
+    if (!ref.read(mockDataModeProvider)) {
       // Remote mode: use devLogin for actual account switch
       _devLoginAs(context, ref, newRole);
       return;
@@ -215,6 +215,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
     final currentRole = ref.watch(currentUserRoleProvider);
     final mockStudents = ref.watch(mockStudentsProvider);
     final selectedStudent = ref.watch(selectedMockStudentProvider);
+    final useMockData = ref.watch(mockDataModeProvider);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -273,7 +274,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                         child: InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            if (!EnvironmentConfig.useMockData) {
+                            if (!useMockData) {
                               _devLoginAsFromSheet(context, ref, role);
                             } else {
                               ref.read(currentUserRoleProvider.notifier).state =

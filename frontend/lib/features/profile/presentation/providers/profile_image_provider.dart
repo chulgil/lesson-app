@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
@@ -40,7 +41,10 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
 
     // 5. Upload to server (non-blocking)
     final apiClient = ref.read(apiClientProvider);
-    final uploadService = ImageUploadService(apiClient);
+    final uploadService = ImageUploadService(
+      apiClient,
+      useMockData: ref.read(mockDataModeProvider),
+    );
     await uploadService.uploadImage(
       filePath: savedPath,
       imageType: 'profile',
@@ -60,7 +64,10 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
 
     // Delete from server
     final apiClient = ref.read(apiClientProvider);
-    final uploadService = ImageUploadService(apiClient);
+    final uploadService = ImageUploadService(
+      apiClient,
+      useMockData: ref.read(mockDataModeProvider),
+    );
     await uploadService.deleteImage(
       imageType: 'profile',
       entityType: 'teacher',

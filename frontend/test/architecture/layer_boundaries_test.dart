@@ -509,10 +509,4 @@ const _legacyDomainHivePersistenceExceptions = <String>{};
 
 const _mockDataBranchExceptions = <String>{
   'lib/core/providers/repository_provider.dart',
-
-  // Non-repository bootstrapping or UI gates that still need product decisions.
-  'lib/core/router/app_router.dart',
-  'lib/core/services/image_upload_service.dart',
-  'lib/core/widgets/debug_role_switcher.dart',
-  'lib/main.dart',
 };

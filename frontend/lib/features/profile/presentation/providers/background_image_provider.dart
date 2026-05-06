@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
@@ -36,7 +37,10 @@ class BackgroundImageNotifier extends _$BackgroundImageNotifier {
 
       // Upload to server (non-blocking)
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.uploadImage(
         filePath: savedPath,
         imageType: 'background',
@@ -60,7 +64,10 @@ class BackgroundImageNotifier extends _$BackgroundImageNotifier {
       state = const AsyncData(null);
 
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.deleteImage(
         imageType: 'background',
         entityType: 'teacher',

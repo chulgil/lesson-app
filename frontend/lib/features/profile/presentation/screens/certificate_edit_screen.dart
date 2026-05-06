@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -142,7 +143,10 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
     String? imageUrl = _isEdit ? _existingCertificate!.imageUrl : null;
     if (_localImagePath != null) {
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       final remoteUrl = await uploadService.uploadImage(
         filePath: _localImagePath!,
         imageType: 'certificate',

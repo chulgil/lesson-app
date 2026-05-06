@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'core/config/environment.dart';
+import 'core/providers/repository_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/startup/app_bootstrap.dart';
 import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
-import 'features/practice/presentation/providers/tuner_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
+import 'features/practice/presentation/providers/tuner_provider.dart';
 
 /// Get the startup recovery result.
 startup_recovery.StartupRecoveryResult? getStartupRecoveryResult() =>
@@ -52,10 +52,11 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp> {
   @override
   Widget build(BuildContext context) {
     // Use auth-aware router in remote mode, static router in mock mode
+    final useMockData = ref.watch(mockDataModeProvider);
     final routerConfig =
-        EnvironmentConfig.useMockData
+        useMockData
             ? AppRouter.router
-            : AppRouter.createRouter(ref);
+            : AppRouter.createRouter(ref, useMockData: useMockData);
 
     return MaterialApp.router(
       title: 'Lessonaza',

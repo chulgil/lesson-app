@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
@@ -38,7 +39,10 @@ class StudentProfileImageNotifier extends _$StudentProfileImageNotifier {
 
       // Upload to server
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.uploadImage(
         filePath: savedPath,
         imageType: 'profile',
@@ -63,7 +67,10 @@ class StudentProfileImageNotifier extends _$StudentProfileImageNotifier {
       state = const AsyncData(null);
 
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.deleteImage(
         imageType: 'profile',
         entityType: 'student',
@@ -105,7 +112,10 @@ class StudentBackgroundImageNotifier extends _$StudentBackgroundImageNotifier {
 
       // Upload to server
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.uploadImage(
         filePath: savedPath,
         imageType: 'background',
@@ -130,7 +140,10 @@ class StudentBackgroundImageNotifier extends _$StudentBackgroundImageNotifier {
       state = const AsyncData(null);
 
       final apiClient = ref.read(apiClientProvider);
-      final uploadService = ImageUploadService(apiClient);
+      final uploadService = ImageUploadService(
+        apiClient,
+        useMockData: ref.read(mockDataModeProvider),
+      );
       await uploadService.deleteImage(
         imageType: 'background',
         entityType: 'student',
