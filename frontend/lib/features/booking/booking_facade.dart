@@ -16,7 +16,7 @@
 ///   ref.read(bookingFacadeProvider.notifier).cancel(id, reason)
 library;
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/booking/entities/lesson_booking.dart';
 import '../../core/booking/entities/time_slot.dart';
@@ -26,57 +26,65 @@ import '../lessons/lessons_facade.dart';
 export '../../core/booking/entities/lesson_booking.dart'; // LessonBooking, enums, request types
 export '../../core/booking/entities/time_slot.dart'; // TimeSlot
 
+part 'booking_facade.g.dart';
+
 // =============================================================================
 // QUERY PROVIDERS — use-case named wrappers over raw providers
 // =============================================================================
 
 /// Single booking by ID.
-final bookingByIdProvider = FutureProvider.family<LessonBooking?, String>((
-  ref,
-  id,
-) {
+@riverpod
+Future<LessonBooking?> bookingById(BookingByIdRef ref, String id) {
   return ref.watch(bookingProvider(id).future);
-});
+}
 
 /// All bookings for a student (student home, trial cards).
-final studentBookingListProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, studentId) {
-      return ref.watch(studentBookingsProvider(studentId).future);
-    });
+@riverpod
+Future<List<LessonBooking>> studentBookingList(
+  StudentBookingListRef ref,
+  String studentId,
+) {
+  return ref.watch(studentBookingsProvider(studentId).future);
+}
 
 /// All bookings for a teacher (teacher schedule).
-final teacherBookingListProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-      return ref.watch(teacherBookingsProvider(teacherId).future);
-    });
+@riverpod
+Future<List<LessonBooking>> teacherBookingList(
+  TeacherBookingListRef ref,
+  String teacherId,
+) {
+  return ref.watch(teacherBookingsProvider(teacherId).future);
+}
 
 /// Pending bookings awaiting teacher approval.
-final pendingBookingListProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-      return ref.watch(pendingBookingsProvider(teacherId).future);
-    });
+@riverpod
+Future<List<LessonBooking>> pendingBookingList(
+  PendingBookingListRef ref,
+  String teacherId,
+) {
+  return ref.watch(pendingBookingsProvider(teacherId).future);
+}
 
 /// Badge count for pending bookings.
-final pendingCountProvider = FutureProvider.family<int, String>((
-  ref,
-  teacherId,
-) {
+@riverpod
+Future<int> pendingCount(PendingCountRef ref, String teacherId) {
   return ref.watch(pendingBookingsCountProvider(teacherId).future);
-});
+}
 
 /// Confirmed upcoming bookings.
-final upcomingConfirmedProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) {
-      return ref.watch(upcomingBookingsProvider(teacherId).future);
-    });
+@riverpod
+Future<List<LessonBooking>> upcomingConfirmed(
+  UpcomingConfirmedRef ref,
+  String teacherId,
+) {
+  return ref.watch(upcomingBookingsProvider(teacherId).future);
+}
 
 /// Teacher's available time slots.
-final teacherSlotsProvider = FutureProvider.family<List<TimeSlot>, String>((
-  ref,
-  teacherId,
-) {
+@riverpod
+Future<List<TimeSlot>> teacherSlots(TeacherSlotsRef ref, String teacherId) {
   return ref.watch(teacherAvailabilityProvider(teacherId).future);
-});
+}
 
 // =============================================================================
 // MUTATION NOTIFIER — single class for all write operations
@@ -94,7 +102,8 @@ final teacherSlotsProvider = FutureProvider.family<List<TimeSlot>, String>((
 /// - [complete] — teacher marks lesson done
 /// - [update] — generic update
 /// - [delete] — hard delete
-class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
+@Riverpod(keepAlive: true)
+class BookingFacade extends _$BookingFacade {
   BookingsNotifier get _inner => ref.read(bookingsNotifierProvider.notifier);
 
   @override
@@ -169,11 +178,6 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
 
   Future<void> refresh() => _inner.refresh();
 }
-
-final bookingFacadeProvider =
-    AsyncNotifierProvider<BookingFacadeNotifier, List<LessonBooking>>(
-      BookingFacadeNotifier.new,
-    );
 
 // =============================================================================
 // FORM STATE — re-exported from existing providers for booking flow screens

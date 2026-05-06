@@ -1,9 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../subscription/subscription_facade.dart';
+
+part 'home_dashboard_provider.g.dart';
 
 class HomeDashboardData {
   final AsyncValue<List<Lesson>> lessons;
@@ -21,7 +23,8 @@ class HomeDashboardData {
   });
 }
 
-final homeDashboardProvider = Provider<HomeDashboardData>((ref) {
+@Riverpod(keepAlive: true)
+HomeDashboardData homeDashboard(HomeDashboardRef ref) {
   final teacherId = ref.watch(currentUserIdProvider);
 
   return HomeDashboardData(
@@ -31,14 +34,15 @@ final homeDashboardProvider = Provider<HomeDashboardData>((ref) {
     unpaidSummary: ref.watch(unpaidSummaryProvider(teacherId)),
     needsConfirmation: ref.watch(lessonsNeedingConfirmationProvider),
   );
-});
+}
 
-final homeDashboardRefreshProvider = Provider<HomeDashboardRefresh>(
-  HomeDashboardRefresh.new,
-);
+@Riverpod(keepAlive: true)
+HomeDashboardRefresh homeDashboardRefresh(HomeDashboardRefreshRef ref) {
+  return HomeDashboardRefresh(ref);
+}
 
 class HomeDashboardRefresh {
-  final Ref _ref;
+  final HomeDashboardRefreshRef _ref;
 
   const HomeDashboardRefresh(this._ref);
 
