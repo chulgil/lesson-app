@@ -1,5 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'schedule_view_mode_provider.g.dart';
 
 /// Schedule view mode enum
 enum ScheduleViewMode {
@@ -13,14 +15,14 @@ const _hiveBoxName = 'settings';
 const _hiveKey = 'schedule_view_mode';
 
 /// Provider for schedule view mode with Hive persistence.
-final scheduleViewModeProvider =
-    StateNotifierProvider<ScheduleViewModeNotifier, ScheduleViewMode>((ref) {
-  return ScheduleViewModeNotifier();
-});
+final scheduleViewModeProvider = scheduleViewModeNotifierProvider;
 
-class ScheduleViewModeNotifier extends StateNotifier<ScheduleViewMode> {
-  ScheduleViewModeNotifier() : super(ScheduleViewMode.list) {
+@Riverpod(keepAlive: true)
+class ScheduleViewModeNotifier extends _$ScheduleViewModeNotifier {
+  @override
+  ScheduleViewMode build() {
     _loadFromHive();
+    return ScheduleViewMode.list;
   }
 
   Future<void> _loadFromHive() async {

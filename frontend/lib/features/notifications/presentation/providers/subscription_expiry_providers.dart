@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -47,20 +47,20 @@ SubscriptionExpiryNotificationService subscriptionExpiryNotificationService(
 /// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
 ///
 /// Phase 5b: master + D14/D7/D1/D0 개별 토글 제공.
-final subscriptionExpiryReminderSettingsProvider = StateNotifierProvider<
-  SubscriptionExpiryReminderSettingsNotifier,
-  SubscriptionExpiryReminderSettings
->((ref) => SubscriptionExpiryReminderSettingsNotifier());
+final subscriptionExpiryReminderSettingsProvider =
+    subscriptionExpiryReminderSettingsNotifierProvider;
 
+@Riverpod(keepAlive: true)
 class SubscriptionExpiryReminderSettingsNotifier
-    extends StateNotifier<SubscriptionExpiryReminderSettings> {
-  SubscriptionExpiryReminderSettingsNotifier()
-    : super(SubscriptionExpiryReminderSettings.defaults) {
-    _loadFromHive();
-  }
-
+    extends _$SubscriptionExpiryReminderSettingsNotifier {
   static const _boxName = 'settings';
   static const _hiveKey = 'subscription_expiry_reminder_settings';
+
+  @override
+  SubscriptionExpiryReminderSettings build() {
+    unawaited(_loadFromHive());
+    return SubscriptionExpiryReminderSettings.defaults;
+  }
 
   Future<void> _loadFromHive() async {
     try {
