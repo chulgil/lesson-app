@@ -1,45 +1,59 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../practice/practice_facade.dart';
 import '../../../students/students_facade.dart';
 import 'tip_template_providers.dart' show currentTeacherIdProvider;
 
-final lessonWidgetPracticeItemsProvider =
-    Provider.family<AsyncValue<List<PracticeItem>>, String>((ref, lessonId) {
-      return ref.watch(practiceItemsNotifierProvider(lessonId));
-    });
+part 'lesson_widget_support_provider.g.dart';
 
-final lessonWidgetStudentRepertoiresProvider =
-    Provider.family<AsyncValue<List<PracticeRepertoire>>, String>((
-      ref,
-      studentId,
-    ) {
-      return ref.watch(studentRepertoiresProvider(studentId));
-    });
+@Riverpod(keepAlive: true)
+AsyncValue<List<PracticeItem>> lessonWidgetPracticeItems(
+  LessonWidgetPracticeItemsRef ref,
+  String lessonId,
+) {
+  return ref.watch(practiceItemsNotifierProvider(lessonId));
+}
 
-final lessonWidgetTeacherLocationsProvider =
-    Provider.family<AsyncValue<List<LessonLocation>>, String>((ref, teacherId) {
-      return ref.watch(teacherLocationsProvider(teacherId));
-    });
+@Riverpod(keepAlive: true)
+AsyncValue<List<PracticeRepertoire>> lessonWidgetStudentRepertoires(
+  LessonWidgetStudentRepertoiresRef ref,
+  String studentId,
+) {
+  return ref.watch(studentRepertoiresProvider(studentId));
+}
 
-final lessonWidgetCurrentTeacherIdProvider = Provider<String>((ref) {
+@Riverpod(keepAlive: true)
+AsyncValue<List<LessonLocation>> lessonWidgetTeacherLocations(
+  LessonWidgetTeacherLocationsRef ref,
+  String teacherId,
+) {
+  return ref.watch(teacherLocationsProvider(teacherId));
+}
+
+@Riverpod(keepAlive: true)
+String lessonWidgetCurrentTeacherId(LessonWidgetCurrentTeacherIdRef ref) {
   return ref.watch(currentTeacherIdProvider);
-});
+}
 
-final lessonWidgetRepertoireActionsProvider =
-    Provider<LessonWidgetRepertoireActions>((ref) {
-      return LessonWidgetRepertoireActions(ref);
-    });
+@Riverpod(keepAlive: true)
+LessonWidgetRepertoireActions lessonWidgetRepertoireActions(
+  LessonWidgetRepertoireActionsRef ref,
+) {
+  return LessonWidgetRepertoireActions(ref);
+}
 
-final lessonWidgetPracticeItemActionsProvider =
-    Provider.family<LessonWidgetPracticeItemActions, String>((ref, lessonId) {
-      return LessonWidgetPracticeItemActions(ref, lessonId);
-    });
+@Riverpod(keepAlive: true)
+LessonWidgetPracticeItemActions lessonWidgetPracticeItemActions(
+  LessonWidgetPracticeItemActionsRef ref,
+  String lessonId,
+) {
+  return LessonWidgetPracticeItemActions(ref, lessonId);
+}
 
 class LessonWidgetRepertoireActions {
   LessonWidgetRepertoireActions(this._ref);
 
-  final Ref _ref;
+  final LessonWidgetRepertoireActionsRef _ref;
 
   Future<PracticeRepertoire> createRepertoire({
     required String studentId,
@@ -70,7 +84,7 @@ class LessonWidgetRepertoireActions {
 class LessonWidgetPracticeItemActions {
   LessonWidgetPracticeItemActions(this._ref, this._lessonId);
 
-  final Ref _ref;
+  final LessonWidgetPracticeItemActionsRef _ref;
   final String _lessonId;
 
   void invalidateItems() {
