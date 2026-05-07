@@ -253,11 +253,12 @@ class _AnnouncementCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   ...announcement.affectedLessons.map((lesson) {
-                    // TODO: Check actual schedule change status from subscription events
-                    // ignore: dead_code
-                    final isResolved = false;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+                      decoration: BoxDecoration(
+                        color: AppColors.paper,
+                        border: Border.all(color: AppColors.inkQuaternary),
+                      ),
                       child: InkWell(
                         onTap: lesson.subscriptionId != null
                             ? () => context.push(
@@ -268,44 +269,54 @@ class _AnnouncementCard extends ConsumerWidget {
                                 extra: {'viewerRole': 'teacher'},
                               )
                             : null,
-                        child: Row(
-                          children: [
-                            Icon(
-                              isResolved
-                                  ? Icons.check_circle
-                                  : Icons.warning_amber_rounded,
-                              size: 16,
-                              color: isResolved
-                                  ? AppColors.paperOk
-                                  : AppColors.paperAccent,
-                            ),
-                            const SizedBox(width: AppSpacing.space2),
-                            Expanded(
-                              child: Text(
-                                '${lesson.studentName} · ${lesson.instrument} · ${lesson.startTime}',
-                                style: AppTypography.bodySmall,
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.space3),
+                          child: Row(
+                            children: [
+                              // 학생 정보
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${lesson.studentName} · ${lesson.instrument}',
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      lesson.startTime,
+                                      style: AppTypography.captionSmall.copyWith(
+                                        color: AppColors.inkTertiary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Text(
-                              isResolved
-                                  ? AppStrings.announcementStatusResolved
-                                  : AppStrings.announcementStatusPending,
-                              style: AppTypography.captionSmall.copyWith(
-                                color: isResolved
-                                    ? AppColors.paperOk
-                                    : AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (!isResolved) ...[
-                              const SizedBox(width: AppSpacing.space1),
-                              const Icon(
-                                Icons.chevron_right,
-                                size: 16,
-                                color: AppColors.paperAccent,
-                              ),
+                              // 스케줄 변경 버튼 (크고 명확)
+                              if (lesson.subscriptionId != null)
+                                FilledButton.icon(
+                                  onPressed: () => context.push(
+                                    AppRoutes.subscriptionDetail.replaceFirst(
+                                      ':id',
+                                      lesson.subscriptionId!,
+                                    ),
+                                    extra: {'viewerRole': 'teacher'},
+                                  ),
+                                  icon: const Icon(Icons.swap_horiz, size: 16),
+                                  label: const Text(AppStrings.announcementScheduleChange),
+                                  style: FilledButton.styleFrom(
+                                    minimumSize: const Size(0, 36),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.space3,
+                                    ),
+                                    textStyle: AppTypography.captionSmall.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     );

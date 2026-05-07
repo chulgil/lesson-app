@@ -290,7 +290,11 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
                   _AffectedLessonItem(
                     lesson: affected[i],
                     onScheduleChange: () {
+                      // 시트 닫고 → 공지 이력에서 스케줄 변경 진행
+                      final teacherId = ref.read(currentUserIdProvider);
+                      ref.invalidate(teacherAnnouncementsProvider(teacherId));
                       Navigator.pop(context);
+                      // 수강권 상세(스케줄 변경 챗)로 이동
                       if (affected[i].subscriptionId != null) {
                         context.push(
                           AppRoutes.subscriptionDetail.replaceFirst(
@@ -334,7 +338,12 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
 
         const SizedBox(height: AppSpacing.space4),
         FilledButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // 공지 이력 리스트 즉시 갱신
+            final teacherId = ref.read(currentUserIdProvider);
+            ref.invalidate(teacherAnnouncementsProvider(teacherId));
+            Navigator.pop(context);
+          },
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
           ),
