@@ -96,21 +96,6 @@ class ChildProfilesScreen extends ConsumerWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: AppSpacing.space6),
-            // §7.132 W1.5: foregroundColor white → paper.
-            ElevatedButton.icon(
-              onPressed: () => _navigateToAddChild(context),
-              icon: const Icon(Icons.add),
-              label: const Text(AppStrings.parentHomeAddChild),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                  vertical: AppSpacing.space3,
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -124,11 +109,8 @@ class ChildProfilesScreen extends ConsumerWidget {
   ) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      itemCount: profiles.length + 1, // +1 for add button at end
+      itemCount: profiles.length,
       itemBuilder: (context, index) {
-        if (index == profiles.length) {
-          return _buildAddChildButton(context);
-        }
         return _ChildProfileCard(
           profile: profiles[index],
           onTap: () => _navigateToEditChild(context, profiles[index]),
@@ -136,22 +118,6 @@ class ChildProfilesScreen extends ConsumerWidget {
               () => _switchToChildView(context, ref, profiles[index]),
         );
       },
-    );
-  }
-
-  Widget _buildAddChildButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.space3),
-      child: OutlinedButton.icon(
-        onPressed: () => _navigateToAddChild(context),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.parentHomeAddChild),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.paperAccent,
-          side: BorderSide(color: AppColors.paperAccent),
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-        ),
-      ),
     );
   }
 
