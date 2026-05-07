@@ -78,6 +78,9 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
   late String? _postalCode;
   late String? _address;
   late final TextEditingController _detailController;
+  late final TextEditingController _manualAddressController;
+  late final TextEditingController _manualPostalController;
+  bool _isManualMode = false;
 
   @override
   void initState() {
@@ -87,17 +90,36 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
     _detailController = TextEditingController(
       text: widget.initialAddressDetail,
     );
+    _manualAddressController = TextEditingController(text: _address);
+    _manualPostalController = TextEditingController(text: _postalCode);
     _detailController.addListener(_onDetailChanged);
+    _manualAddressController.addListener(_onManualChanged);
+    _manualPostalController.addListener(_onManualChanged);
   }
 
   @override
   void dispose() {
     _detailController.removeListener(_onDetailChanged);
+    _manualAddressController.removeListener(_onManualChanged);
+    _manualPostalController.removeListener(_onManualChanged);
     _detailController.dispose();
+    _manualAddressController.dispose();
+    _manualPostalController.dispose();
     super.dispose();
   }
 
-  void _onDetailChanged() {
+  void _onDetailChanged() => _notifyParent();
+  void _onManualChanged() {
+    _postalCode = _manualPostalController.text.isEmpty
+        ? null
+        : _manualPostalController.text;
+    _address = _manualAddressController.text.isEmpty
+        ? null
+        : _manualAddressController.text;
+    _notifyParent();
+  }
+
+  void _notifyParent() {
     widget.onChanged(
       AddressResult(
         postalCode: _postalCode,
@@ -107,6 +129,16 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
             : _detailController.text,
       ),
     );
+  }
+
+  void _toggleManualMode() {
+    setState(() {
+      _isManualMode = !_isManualMode;
+      if (_isManualMode) {
+        _manualAddressController.text = _address ?? '';
+        _manualPostalController.text = _postalCode ?? '';
+      }
+    });
   }
 
   Future<void> _openSearchSheet() async {
@@ -137,121 +169,173 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
 
   @override
   Widget build(BuildContext context) {
-    final hasAddress = _address != null && _address!.isNotEmpty;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section label
-        Text(
-          AppStrings.addressLabel,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkTertiary,
-          ),
+        // Section label + 직접 입력 토글
+        Row(
+          children: [
+            Text(
+              AppStrings.addressLabel,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: _toggleManualMode,
+              child: Text(
+                _isManualMode
+                    ? AppStrings.addressSearch
+                    : AppStrings.addressManualInput,
+                style: AppTypography.captionSmall.copyWith(
+                  color: AppColors.paperAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.space2),
 
-        // Main address row (readonly result + search button)
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            border: Border.all(color: AppColors.inkQuaternary),
+        if (_isManualMode) ...[
+          // ── 수기 입력 모드 ──
+          // 우편번호
+          TextField(
+            controller: _manualPostalController,
+            keyboardType: TextInputType.number,
+            maxLength: 5,
+            decoration: _inputDecoration(
+              hintText: AppStrings.addressPostalHint,
+            ),
+            style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space3,
-            vertical: AppSpacing.space2,
+          const SizedBox(height: AppSpacing.space2),
+          // 기본주소
+          TextField(
+            controller: _manualAddressController,
+            decoration: _inputDecoration(
+              hintText: AppStrings.addressManualHint,
+            ),
+            style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           ),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.location_on_outlined,
-                size: AppSpacing.iconSM,
-                color: AppColors.inkTertiary,
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: hasAddress
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_postalCode != null)
-                            Text(
-                              _postalCode!,
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.inkTertiary,
-                              ),
-                            ),
-                          Text(
-                            _address!,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.ink,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Text(
-                        widget.hintText ?? AppStrings.addressSearchHint,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkQuaternary,
-                        ),
-                      ),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              TextButton(
-                onPressed: _openSearchSheet,
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                  minimumSize: Size.zero,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space3,
-                    vertical: AppSpacing.space2,
-                  ),
-                  shape: const RoundedRectangleBorder(),
-                ),
-                child: Text(
-                  AppStrings.addressSearch,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.paperAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space3),
+        ] else ...[
+          // ── 검색 모드 ──
+          _buildSearchRow(),
+        ],
 
-        // Detail address (free text)
+        const SizedBox(height: AppSpacing.space2),
+
+        // 상세주소 (모드 무관 공통)
         TextField(
           controller: _detailController,
-          decoration: InputDecoration(
+          decoration: _inputDecoration(
             hintText: AppStrings.addressDetailHint,
-            hintStyle: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkQuaternary,
-            ),
-            filled: true,
-            fillColor: AppColors.paper,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space3,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.ink),
-            ),
           ),
           style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           textInputAction: TextInputAction.done,
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchRow() {
+    final hasAddress = _address != null && _address!.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.location_on_outlined,
+            size: AppSpacing.iconSM,
+            color: AppColors.inkTertiary,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: hasAddress
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_postalCode != null)
+                        Text(
+                          _postalCode!,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.inkTertiary,
+                          ),
+                        ),
+                      Text(
+                        _address!,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.ink,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    widget.hintText ?? AppStrings.addressSearchHint,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkQuaternary,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          TextButton(
+            onPressed: _openSearchSheet,
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.paperAccent,
+              minimumSize: Size.zero,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              shape: const RoundedRectangleBorder(),
+            ),
+            child: Text(
+              AppStrings.addressSearch,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration({required String hintText}) {
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: AppTypography.bodyMedium.copyWith(
+        color: AppColors.inkQuaternary,
+      ),
+      filled: true,
+      fillColor: AppColors.paper,
+      counterText: '',
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space3,
+      ),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
+      ),
+      enabledBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.inkQuaternary),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.ink),
+      ),
     );
   }
 }
@@ -368,11 +452,27 @@ class _AddressSearchSheetState extends State<_AddressSearchSheet> {
             Expanded(
               child: _results.isEmpty
                   ? Center(
-                      child: Text(
-                        '검색 결과가 없습니다',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkTertiary,
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            AppStrings.addressNoResults,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.inkTertiary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.space3),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              AppStrings.addressManualInputGuide,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.paperAccent,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   : ListView.separated(

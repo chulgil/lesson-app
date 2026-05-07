@@ -174,6 +174,68 @@ app/
 
 **v3 변경: v2의 `POST /lessons/bulk-cancel`은 제거됨. 공지와 레슨 취소가 분리됨.**
 
+### 주소 검색 API 계약 (2026-05-07)
+
+> 상세 스펙: [lesson_location_management_spec.md](../schedule/lesson_location_management_spec.md) §16
+
+프론트엔드는 외부 주소 API(카카오/구글)를 **직접 호출하지 않는다**. 우리 서버가 외부 API를 래핑하여 프론트에게 통일된 응답을 제공한다. 백엔드에서 외부 API 키를 관리하므로 프론트에 키 노출 없음.
+
+| 기능 | 엔드포인트 | 설명 |
+|------|-----------|------|
+| 주소 검색 | `GET /api/v1/address/search` | 키워드 기반 주소 검색 (도로명/지번) |
+| 좌표 → 주소 | `GET /api/v1/address/reverse-geocode` | 좌표 기반 주소 조회 (향후) |
+
+**주소 검색 요청/응답:**
+- Request: `GET /api/v1/address/search?query=역삼동+123&page=1&size=10`
+- Response:
+```json
+{
+  "results": [
+    {
+      "postal_code": "06241",
+      "address": "서울특별시 강남구 역삼동 123-45",
+      "road_address": "서울특별시 강남구 테헤란로 123",
+      "district": "강남구 역삼동",
+      "latitude": 37.5012,
+      "longitude": 127.0396
+    }
+  ],
+  "total_count": 1,
+  "page": 1
+}
+```
+
+**백엔드 아키텍처 (의존성 주입):**
+```
+[Frontend]
+    │
+    └── GET /api/v1/address/search?query=...
+              │
+[Backend: AddressRouter]
+    │
+    └── AddressService.search(query)
+              │
+    ┌─── AddressProvider (interface) ───┐
+    │                                   │
+    ├── KakaoAddressProvider (한국 기본)  │  ← KAKAO_REST_API_KEY 환경변수
+    ├── NaverAddressProvider (한국 대안)  │  ← NAVER_CLIENT_ID/SECRET
+    └── GoogleAddressProvider (글로벌)   │  ← GOOGLE_MAPS_API_KEY
+```
+
+- `AddressProvider`: 추상 인터페이스 (`search(query) → List<AddressResult>`)
+- 환경변수로 활성 provider 선택: `ADDRESS_PROVIDER=kakao` (기본)
+- 한 provider 실패 시 다음 provider로 fallback (kakao → google)
+- API 키는 `.env`에서 관리, 프론트에 노출 안 함
+
+**환경변수:**
+```
+ADDRESS_PROVIDER=kakao          # kakao | naver | google
+KAKAO_REST_API_KEY=xxx          # 카카오 REST API 키
+NAVER_CLIENT_ID=xxx             # 네이버 Client ID (대안)
+NAVER_CLIENT_SECRET=xxx         # 네이버 Client Secret
+GOOGLE_MAPS_API_KEY=xxx         # 구글 Maps API 키 (글로벌)
+```
+
 ### 이동시간 자동 측정 API 계약 (2026-05-07)
 
 > 상세 스펙: [lesson_location_management_spec.md](../schedule/lesson_location_management_spec.md) §12
@@ -186,13 +248,39 @@ app/
 **응답:** `{ estimated_minutes: 25, source: "kakao", distance_km: 8.3 }`
 **실패 시:** `{ estimated_minutes: null, source: "unavailable", distance_km: null }` (200 OK, 에러 아님)
 
+**백엔드 아키텍처 (주소 검색과 동일 의존성 주입 패턴):**
+```
+[Frontend]
+    │
+    └── GET /api/v1/travel-time/estimate?...
+              │
+[Backend: TravelTimeRouter]
+    │
+    └── TravelTimeService.estimate(origin, destination)
+              │
+    ┌─── DirectionsProvider (interface) ───┐
+    │                                      │
+    ├── KakaoDirectionsProvider (한국 기본)  │  ← KAKAO_REST_API_KEY
+    ├── NaverDirectionsProvider (한국 대안)  │  ← NAVER_CLIENT_ID/SECRET
+    └── GoogleDirectionsProvider (글로벌)   │  ← GOOGLE_MAPS_API_KEY
+```
+
 **처리 로직:**
 1. 캐시 확인 (동일 출발지-도착지, 24시간 유효)
-2. Kakao Mobility 길찾기 API 호출 (한국)
-3. 실패 시 → Naver Directions API (한국 대안)
-4. 실패 시 → Google Distance Matrix API (글로벌)
-5. 모두 실패 → `estimated_minutes: null` 반환 (에러 없음)
-6. 5분 단위 올림 (23분 → 25분)
+2. 활성 DirectionsProvider로 호출 (환경변수 `DIRECTIONS_PROVIDER=kakao`)
+3. 실패 시 → fallback chain (kakao → google)
+4. 모두 실패 → `estimated_minutes: null` 반환 (200 OK, 에러 아님)
+5. 5분 단위 올림 (23분 → 25분)
+
+**환경변수 (주소 검색과 동일 키 공유):**
+```
+DIRECTIONS_PROVIDER=kakao       # kakao | naver | google
+# KAKAO_REST_API_KEY 하나로 주소 검색 + 길찾기 모두 가능
+# 별도 키 불필요 (카카오 REST API 키 = 통합 키)
+```
+
+> 주소 검색(`AddressProvider`) + 이동시간(`DirectionsProvider`)은 **동일 외부 API 키**를 공유.
+> 카카오 REST API 키 1개로 주소 검색(Local API) + 길찾기(Mobility API) 모두 호출 가능.
 
 ### 향후 항목
 

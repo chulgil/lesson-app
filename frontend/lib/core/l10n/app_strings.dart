@@ -6426,4 +6426,11 @@ class AppStrings {
 
   /// 주소 섹션 라벨
   static const addressLabel = '주소';
+
+  // 주소 수기 입력 fallback
+  static const addressManualInput = '직접 입력';
+  static const addressPostalHint = '우편번호 (5자리)';
+  static const addressManualHint = '주소를 직접 입력하세요';
+  static const addressNoResults = '검색 결과가 없습니다';
+  static const addressManualInputGuide = '주소를 직접 입력하려면 닫아주세요 →';
 }

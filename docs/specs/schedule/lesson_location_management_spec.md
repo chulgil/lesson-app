@@ -633,9 +633,193 @@ final int? travelSurcharge;  // 이동 추가금 (원, 참고용 기록)
 
 ---
 
-## 15. 변경 이력
+## 15. 주소 검색 API — 서버 경유 설계 (v3, 2026-05-07)
+
+### 15.1 핵심 원칙
+
+> **프론트엔드는 외부 주소 API를 직접 호출하지 않는다.**
+> 우리 서버가 외부 API를 래핑하여 통일된 응답을 제공.
+> API 키는 백엔드 환경변수에서 관리 → 프론트에 키 노출 없음.
+
+### 15.2 프론트엔드 ↔ 백엔드 계약
+
+```
+[프론트: AddressSearchField]
+    │
+    └── GET /api/v1/address/search?query=역삼동+123
+              │
+[백엔드: AddressRouter → AddressService]
+    │
+    └── AddressProvider.search(query)
+              │
+    ┌─── 외부 API (의존성 주입) ────┐
+    │                              │
+    ├── KakaoAddressProvider       │  ← 한국 기본 (Kakao 주소 검색 API)
+    ├── NaverAddressProvider       │  ← 한국 대안
+    └── GoogleAddressProvider      │  ← 글로벌
+```
+
+### 15.3 프론트엔드 API 호출
+
+```dart
+/// 프론트에서 호출하는 유일한 주소 검색 메서드.
+/// 외부 API 키 불필요 — 서버가 처리.
+Future<List<AddressSearchResult>> searchAddress(String query) async {
+  final response = await dio.get('/api/v1/address/search', queryParameters: {
+    'query': query,
+    'page': 1,
+    'size': 10,
+  });
+  return (response.data['results'] as List)
+      .map((e) => AddressSearchResult.fromJson(e))
+      .toList();
+}
+```
+
+### 15.4 응답 모델 (프론트+백엔드 공유)
+
+```dart
+class AddressSearchResult {
+  final String postalCode;      // "06241"
+  final String address;          // "서울특별시 강남구 역삼동 123-45"
+  final String? roadAddress;     // "서울특별시 강남구 테헤란로 123"
+  final String district;         // "강남구 역삼동"
+  final double? latitude;
+  final double? longitude;
+}
+```
+
+### 15.5 백엔드 의존성 주입 설계
+
+```python
+# backend/app/services/address_service.py
+
+class AddressProvider(ABC):
+    """외부 주소 API 추상 인터페이스."""
+    @abstractmethod
+    async def search(self, query: str, page: int, size: int) -> AddressSearchResponse:
+        ...
+
+class KakaoAddressProvider(AddressProvider):
+    """카카오 주소 검색 API (https://developers.kakao.com/docs/latest/ko/local/dev-guide)."""
+    def __init__(self, api_key: str):
+        self._api_key = api_key  # KAKAO_REST_API_KEY
+
+    async def search(self, query, page, size):
+        # GET https://dapi.kakao.com/v2/local/search/address
+        # Authorization: KakaoAK {api_key}
+        ...
+
+class NaverAddressProvider(AddressProvider):
+    """네이버 지역 검색 API (대안)."""
+    ...
+
+class GoogleAddressProvider(AddressProvider):
+    """Google Geocoding API (글로벌)."""
+    ...
+
+class AddressService:
+    """주소 검색 서비스 — provider 체인으로 fallback."""
+    def __init__(self, providers: list[AddressProvider]):
+        self._providers = providers
+
+    async def search(self, query: str, page: int = 1, size: int = 10):
+        for provider in self._providers:
+            try:
+                return await provider.search(query, page, size)
+            except Exception:
+                continue
+        return AddressSearchResponse(results=[], total_count=0, page=page)
+```
+
+### 15.6 환경변수
+
+```bash
+# .env
+ADDRESS_PROVIDER=kakao            # 기본 provider (kakao | naver | google)
+KAKAO_REST_API_KEY=your_key_here  # 카카오 REST API 키
+NAVER_CLIENT_ID=your_id           # 네이버 (대안)
+NAVER_CLIENT_SECRET=your_secret
+GOOGLE_MAPS_API_KEY=your_key      # 구글 (글로벌)
+```
+
+### 15.7 이동시간 API도 동일 패턴
+
+```
+GET /api/v1/travel-time/estimate
+    → TravelTimeService → DirectionsProvider (interface)
+        ├── KakaoDirectionsProvider   ← 카카오 길찾기 API
+        ├── NaverDirectionsProvider   ← 네이버 Directions
+        └── GoogleDirectionsProvider  ← 구글 Distance Matrix
+```
+
+- 주소 검색과 **동일한 API 키** 공유 (카카오 REST API 키로 주소+길찾기 모두 가능)
+- provider 실패 시 fallback chain 동일
+
+### 15.8 수기 입력 Fallback (프론트엔드)
+
+> **원칙**: API가 응답 없거나 결과가 없으면, 수기로 입력할 수 있어야 한다.
+
+`AddressSearchField` UI 모드:
+
+```
+[기본: 검색 모드]                    [직접 입력 →] 토글
+┌──────────────────────────────┐
+│ 📍 서울시 강남구 역삼동 123   [검색] │
+└──────────────────────────────┘
+
+      ↕ 토글
+
+[수기 입력 모드]                     [주소 검색 →] 토글
+┌──────────────────────────────┐
+│ 우편번호: [06241        ]     │
+│ 주소:    [서울시 강남구...  ]  │
+└──────────────────────────────┘
+```
+
+- "직접 입력" 탭 → 우편번호(5자리) + 주소 TextField 직접 타이핑
+- "주소 검색" 탭 → 검색 모드로 복귀
+- 상세주소는 양쪽 모드 모두 자유 입력
+
+검색 바텀시트에서도 결과가 없을 때:
+```
+검색 결과가 없습니다
+[주소를 직접 입력하려면 닫아주세요 →]
+```
+
+이동시간 자동 제안도 동일:
+- API 성공 → 입력박스에 자동기입 (선생님 수정 가능)
+- API 실패 → 아무 표시 없음, 선생님이 수기 입력
+- 에러 메시지 노출 안 함
+
+### 15.9 프론트엔드 AddressSearchField Remote 전환
+
+현재 `core/widgets/address_search_field.dart`는 mock 데이터 사용.
+백엔드 API 준비 후:
+
+```dart
+// Mock → Remote 전환
+class RemoteAddressSearchApi implements AddressSearchApi {
+  final Dio _dio;
+
+  @override
+  Future<List<AddressSearchResult>> search(String query) async {
+    final response = await _dio.get('/api/v1/address/search',
+      queryParameters: {'query': query});
+    return (response.data['results'] as List)
+        .map((e) => AddressSearchResult.fromJson(e)).toList();
+  }
+}
+```
+
+환경변수 `USE_MOCK_DATA=true` 시 mock, `false` 시 remote 자동 전환 (기존 패턴).
+
+---
+
+## 16. 변경 이력
 
 | 날짜 | 내용 |
 |------|------|
-| 2026-05-07 | v2 추가: §11 선생님 주소, §12 이동시간 자동 측정 API (카카오/네이버/구글), §13 이동거리 추가 과금, §14 스케줄 이동시간 표기 |
+| 2026-05-07 | v3 추가: §15 주소 검색 API 서버 경유 설계 (의존성 주입, 환경변수, fallback chain) |
+| 2026-05-07 | v2 추가: §11 선생님 주소, §12 이동시간 자동 측정 API, §13 추가 과금, §14 스케줄 표기 |
 | 2026-03-15 | v1 초판 작성 — 레슨 장소 5종, 학생 주소, 이동시간 수기, 경쟁사 분석 |
