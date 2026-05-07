@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+import '../../../schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 
@@ -28,6 +29,10 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
       pendingScheduleChangeRequestsProvider(teacherId),
     );
     final studentNames = ref.watch(studentNameMapProvider);
+    // v2: 레슨 요청에서 학생별 악기/레벨/소속 정보 매핑 (일관성)
+    final requestsAsync = ref.watch(todayRequestsProvider(teacherId));
+    final studentInfoMap = _buildStudentInfoMap(requestsAsync);
+    final academyNames = ref.watch(academyNameMapProvider);
 
     return pendingAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -67,6 +72,8 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                       studentName:
                           studentNames[displayRequests[i].actorId] ??
                           AppStrings.student,
+                      studentInfo: studentInfoMap[displayRequests[i].actorId],
+                      academyName: academyNames[displayRequests[i].actorId],
                       onTap:
                           displayRequests[i].subscriptionId != null
                               ? () => context.push(
@@ -186,6 +193,41 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
   }
 }
 
+/// Student info extracted from lesson requests for consistent display.
+class _StudentInfo {
+  final String instrument;
+  final String level;
+  final String typeLabel;
+  final bool isAcademy;
+
+  const _StudentInfo({
+    required this.instrument,
+    required this.level,
+    required this.typeLabel,
+    required this.isAcademy,
+  });
+}
+
+/// Build studentId → info map from lesson requests.
+Map<String, _StudentInfo> _buildStudentInfoMap(
+  AsyncValue<List<UnifiedLessonRequest>> requestsAsync,
+) {
+  final requests = requestsAsync.valueOrNull ?? const [];
+  final map = <String, _StudentInfo>{};
+  for (final r in requests) {
+    map.putIfAbsent(
+      r.studentId,
+      () => _StudentInfo(
+        instrument: r.instrument,
+        level: r.experience.label,
+        typeLabel: r.typeDisplayLabel,
+        isAcademy: r.isAcademy,
+      ),
+    );
+  }
+  return map;
+}
+
 String _subscriptionDetailRoute(RequestEvent event) {
   final route = AppRoutes.subscriptionDetail.replaceFirst(
     ':id',
@@ -200,11 +242,15 @@ String _subscriptionDetailRoute(RequestEvent event) {
 class _ScheduleChangeListItem extends StatelessWidget {
   final RequestEvent event;
   final String studentName;
+  final _StudentInfo? studentInfo;
+  final String? academyName;
   final VoidCallback? onTap;
 
   const _ScheduleChangeListItem({
     required this.event,
     required this.studentName,
+    this.studentInfo,
+    this.academyName,
     this.onTap,
   });
 
@@ -270,21 +316,41 @@ class _ScheduleChangeListItem extends StatelessWidget {
   }
 
   /// Info column — unified with RequestListItem (2 lines)
+  /// Line 1: 김민준 · 바이올린 · 초급 (이름 · 악기 · 레벨)
+  /// Line 2: 개인레슨 · 정규레슨 · 3회차 시간변경 (소속 · 타입 · 이벤트)
   Widget _buildInfo() {
+    final info = studentInfo;
+
+    // Line 1: name · instrument · level (레슨 요청과 동일)
+    final line1Parts = [studentName];
+    if (info != null) {
+      line1Parts.add(info.instrument);
+      line1Parts.add(info.level);
+    }
+
+    // Line 2: source · type · event description
+    final line2Parts = <String>[];
+    if (info != null) {
+      final source = info.isAcademy
+          ? (academyName ?? AppStrings.academy)
+          : AppStrings.individualLesson;
+      line2Parts.add(source);
+      line2Parts.add(info.typeLabel);
+    }
+    line2Parts.add(_descriptionText);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Line 1: student name (bodyMedium, w600)
         Text(
-          studentName,
+          line1Parts.join(' · '),
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: AppSpacing.space1),
-        // Line 2: session + type (caption, inkTertiary)
         Text(
-          _descriptionText,
+          line2Parts.join(' · '),
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

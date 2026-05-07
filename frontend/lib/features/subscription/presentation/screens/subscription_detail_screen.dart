@@ -5,16 +5,22 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+import '../../../students/domain/entities/teacher_announcement.dart';
+import '../../../students/presentation/providers/teacher_announcement_providers.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
+import '../../../students/presentation/extensions/student_domain_visuals.dart';
+import '../extensions/subscription_visuals.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/schedule_guide_info_box.dart';
@@ -344,6 +350,11 @@ class _SubscriptionDetailBodyState
                 subscription: subscription,
                 isBulkMode: false,
                 viewerRole: widget.viewerRole,
+              ),
+
+              // §7.119 v2.2: 휴강 상단 배너 (선생님+학생 모두 표시)
+              _TeacherCancelBanner(
+                subscriptionId: subscription.id,
               ),
 
               // Scrollable chat area (schedule change events only)
@@ -811,5 +822,90 @@ class _SubscriptionDetailBodyState
     // No-op: cancellation is already confirmed. This just dismisses the bar.
     // The UI will transition back to default when the next event is checked.
     if (mounted) _showSuccess(AppStrings.cancellationAcknowledge);
+  }
+}
+
+/// v3: 휴강 배너 — TeacherAnnouncement 기반.
+/// 선생님/학생 모두에게 표시. 7일 이내 휴강 공지가 있으면 배너 노출.
+class _TeacherCancelBanner extends ConsumerWidget {
+  final String subscriptionId;
+
+  const _TeacherCancelBanner({required this.subscriptionId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // teacherId는 현재 사용자 또는 수강권의 선생님
+    final teacherId = ref.watch(currentUserIdProvider);
+    final now = DateTime.now();
+    final dayOffsAsync = ref.watch(
+      teacherDayOffsProvider(
+        teacherId: teacherId,
+        from: now.subtract(const Duration(days: 7)),
+        to: now.add(const Duration(days: 30)),
+      ),
+    );
+    final dayOffs = dayOffsAsync.valueOrNull ?? const [];
+    if (dayOffs.isEmpty) return const SizedBox.shrink();
+
+    // 미래 휴강일만 표시
+    final today = DateTime(now.year, now.month, now.day);
+    final futureDayOffs = dayOffs.where(
+      (d) => !DateTime(d.year, d.month, d.day).isBefore(today),
+    ).toList()..sort();
+
+    if (futureDayOffs.isEmpty) return const SizedBox.shrink();
+
+    final dateText = futureDayOffs.length == 1
+        ? formatDateMD(futureDayOffs.first)
+        : '${formatDateMD(futureDayOffs.first)}~${formatDateMD(futureDayOffs.last)}';
+
+    // 공지 메시지 가져오기
+    final announcementsAsync = ref.watch(teacherAnnouncementsProvider(teacherId));
+    final announcements = announcementsAsync.valueOrNull ?? const [];
+    final dayOffAnnouncement = announcements
+        .where((a) => a.type == AnnouncementType.dayOff)
+        .firstOrNull;
+    final message = dayOffAnnouncement?.message;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.event_busy, size: 18, color: AppColors.ink),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: Text(
+                  '$dateText 휴강',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (message != null && message.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              message,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }

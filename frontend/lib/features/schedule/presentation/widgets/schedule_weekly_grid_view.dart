@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../students/presentation/providers/teacher_announcement_providers.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
@@ -85,6 +86,20 @@ class _ScheduleWeeklyGridViewState
     final now = DateTime.now();
     final todayDate = DateTime(now.year, now.month, now.day);
 
+    // v3: 휴강일 조회
+    final weekEnd = _weekStart.add(const Duration(days: 6));
+    final dayOffsAsync = ref.watch(
+      teacherDayOffsProvider(
+        teacherId: 'teacher_1',
+        from: _weekStart,
+        to: weekEnd,
+      ),
+    );
+    final dayOffDates = dayOffsAsync.valueOrNull ?? const [];
+    final dayOffSet = {
+      for (final d in dayOffDates) DateTime(d.year, d.month, d.day),
+    };
+
     // Group lessons by day and time
     final lessonMap = _buildLessonMap(lessons);
 
@@ -131,6 +146,7 @@ class _ScheduleWeeklyGridViewState
                       travelSlotMap: travelSlotMap,
                       todayIndex: todayIndex,
                       now: now,
+                      dayOffSet: dayOffSet,
                     ),
                   ),
                 ),
@@ -155,6 +171,7 @@ class _ScheduleWeeklyGridViewState
     Map<int, Set<int>> travelSlotMap = const {},
     int todayIndex = -1,
     DateTime? now,
+    Set<DateTime> dayOffSet = const {},
   }) {
     // §7.126 — (W − 우측 패딩 16 − 시간 라벨 16) / 7 = (W − 32) / 7.
     // 헤더 CompactWeekStrip 7컬럼 ((W − 32) / 7) 과 동일 너비.
@@ -195,10 +212,15 @@ class _ScheduleWeeklyGridViewState
               final dayDate = _weekStart.add(Duration(days: dayIndex));
               final dayType = _getDayType(dayDate, todayDate);
               final restKind = restKinds[dayIndex] ?? ColumnRestKind.none;
-              final columnBg = weeklyColumnBackground(
-                dayType: _toScheduleDayType(dayType),
-                restKind: restKind,
+              final isDayOff = dayOffSet.contains(
+                DateTime(dayDate.year, dayDate.month, dayDate.day),
               );
+              final columnBg = isDayOff
+                  ? AppColors.paperDark
+                  : weeklyColumnBackground(
+                      dayType: _toScheduleDayType(dayType),
+                      restKind: restKind,
+                    );
 
               // §7.122 — 컬럼 사이 1px 수직 디바이더로 경계 명확화.
               // dayIndex 0(월) 은 시간 라벨과 인접해 디바이더 생략.

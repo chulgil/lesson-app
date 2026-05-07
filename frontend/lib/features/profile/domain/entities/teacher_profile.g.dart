@@ -210,6 +210,9 @@ TeacherProfile _$TeacherProfileFromJson(Map<String, dynamic> json) =>
       career: (json['career'] as List<dynamic>?)
           ?.map((e) => Career.fromJson(e as Map<String, dynamic>))
           .toList(),
+      postalCode: json['postal_code'] as String?,
+      address: json['address'] as String?,
+      addressDetail: json['address_detail'] as String?,
       specialties: (json['specialties'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -257,6 +260,9 @@ Map<String, dynamic> _$TeacherProfileToJson(TeacherProfile instance) =>
       'fee_range': instance.feeRange?.toJson(),
       'education': instance.education?.map((e) => e.toJson()).toList(),
       'career': instance.career?.map((e) => e.toJson()).toList(),
+      'postal_code': instance.postalCode,
+      'address': instance.address,
+      'address_detail': instance.addressDetail,
       'specialties': instance.specialties,
       'teaching_style': instance.teachingStyle,
       'portfolio_video_urls': instance.portfolioVideoUrls,

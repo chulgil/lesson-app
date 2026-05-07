@@ -475,22 +475,6 @@ List<RequestEvent> _mockScheduleChangeEvents() {
       subscriptionId: 'sub_mon_03',
       sessionNumber: 2,
     ),
-    // §7.119 v2: 선생님 휴강 공지 mock (배너 + 챗 버블 확인용)
-    // 오늘 날짜 기준 휴강 — 배너가 7일간 표시됨
-    RequestEvent(
-      id: 'sce_mock_cancel_teacher_1',
-      requestId: 'sub_pkg_01',
-      actorType: ProposerRole.teacher,
-      actorId: 'teacher_1',
-      eventType: RequestEventType.lessonCancelledByTeacher,
-      message: '개인 사정으로 휴강합니다',
-      createdAt: DateTime(now.year, now.month, now.day, 9, 0),
-      subscriptionId: 'sub_pkg_01',
-      sessionNumber: 4,
-      changeCreditUsed: 0,
-      changeCreditRemainingAfter: 2,
-      keepsSessionNumber: true,
-    ),
   ];
 }
 

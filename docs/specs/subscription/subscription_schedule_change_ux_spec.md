@@ -515,10 +515,34 @@
 
 ---
 
+## 선생님 일괄 작업 이벤트 렌더링 (v2, 2026-05-07)
+
+> 상세 스펙: [bulk_teacher_actions_spec.md](../student/bulk_teacher_actions_spec.md)
+
+수강권 상세 챗에 2가지 신규 이벤트 타입이 추가된다:
+
+| 이벤트 타입 | 발생 시점 | 버블 위치 | 아이콘 | 핵심 표시 |
+|------------|----------|----------|--------|----------|
+| `lessonCancelledByTeacher` | 선생님 휴강 공지 (B1) | 선생님 버블 (우측) | ♪ | "N회차 휴강" + 사유 + 변경권 미차감 + 보강 CTA |
+| `teacherAnnouncement` | 선생님 일괄 메시지 (B2) | 선생님 버블 (우측) | 📋 | 제목 + 본문 |
+
+**기존 `lessonCancelled` 이벤트와의 차이:**
+- `lessonCancelled`: **학생** 사유 취소 → 변경권 차감, 좌측 버블
+- `lessonCancelledByTeacher`: **선생님** 사유 휴강 → 변경권 미차감, 우측 버블, 보강 CTA
+
+**렌더링 규칙:**
+- 선생님 사유 휴강은 `paperDark` 배경 (강조 — 중요 안내이므로)
+- 공지는 `paper` 배경 (일반)
+- 두 타입 모두 `request_history_chat.dart`의 기존 버블 구조 재사용
+- `actorType == 'teacher'` → viewer가 학생이면 좌측에 선생님 아바타 표시
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-05-07 | 선생님 일괄 작업 이벤트(lessonCancelledByTeacher, teacherAnnouncement) 챗 렌더링 규칙 추가 |
 | 2026-04-05 | 초안 작성 |
 | 2026-04-14 | UI 일관성 패치: request_detail과 pixel-exact 통일. 프로그레스바 색상(success→primary), 커넥터(Expanded), AppBar(학원+학생+타입), 하단바(메시지전송+일정변경), 챗(수강권 발급 카드 제거) |
 | 2026-05-04 | 일정변경 목록/상세 SSOT, deep-link 회차 표시, 취소/변경권 문구, 하단 액션바 수락/응답대기/결정변경 계약, mock 경계 테스트 기준 보강 |

@@ -3739,6 +3739,36 @@ class AppStrings {
   /// 스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다 (travel time helper)
   static const travelTimeDescription = '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다';
 
+  /// 이동시간 입력 필드 레이블
+  static const travelTimeInputLabel = '이동시간';
+
+  /// 분 접미사
+  static const travelTimeMinutesSuffix = '분';
+
+  /// API 제안 힌트: (카카오 기준 약 N분)
+  static String travelTimeSuggestion(int minutes, String source) =>
+      '($source 기준 약 $minutes분)';
+
+  /// 추가금 참고 표시: 참고 추가금: +N,000원/회
+  static String travelSurchargeReference(int amount) {
+    final formatted = _formatWithComma(amount);
+    return '참고 추가금: +$formatted원/회';
+  }
+
+  /// 추가금 자동 계산 설명
+  static const travelSurchargeDescription = '선생님 시급 기준 자동 계산';
+
+  /// 숫자를 천단위 쉼표 포맷으로 변환 (intl 없이 경량 구현)
+  static String _formatWithComma(int value) {
+    final s = value.abs().toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return value < 0 ? '-${buf.toString()}' : buf.toString();
+  }
+
   // -- Expiring Subscriptions Screen (수강권 임박 화면 5-3b-6) --
 
   /// N명의 학생 (subtitle: count of students with expiring subscriptions)
@@ -6382,4 +6412,18 @@ class AppStrings {
   static const studentNotesHint = '레슨 시 참고할 내용 (악기 상태, 연습 환경, 특이사항 등)';
   static const studentScheduleChange = '변경';
   static const studentAddMethodQuestion = '어떤 방법으로 학생을 등록할까요?';
+
+  // ── Address Search Widget (공통) ──────────────────────────
+
+  /// 주소 검색 버튼
+  static const addressSearch = '주소 검색';
+
+  /// 주소 검색 입력 힌트
+  static const addressSearchHint = '도로명 또는 지번 주소를 검색하세요';
+
+  /// 상세주소 입력 힌트
+  static const addressDetailHint = '상세주소 (동/호수)';
+
+  /// 주소 섹션 라벨
+  static const addressLabel = '주소';
 }

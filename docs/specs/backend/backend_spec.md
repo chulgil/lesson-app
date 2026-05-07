@@ -156,6 +156,44 @@ app/
 
 상태 판별은 `payment_confirmed`와 `paid_at`만 사용한다. `payment_confirmed=false && paid_at=null`은 `unpaid`, `payment_confirmed=false && paid_at!=null`은 `needsConfirmation`, `payment_confirmed=true`는 `confirmed`이다.
 
+### 선생님 공지 시스템 API 계약 (2026-05-07, v3)
+
+> 상세 스펙: [bulk_teacher_actions_spec.md](../student/bulk_teacher_actions_spec.md) §4
+
+| 기능 | 엔드포인트 | 설명 |
+|------|-----------|------|
+| 공지 생성 | `POST /api/v1/announcements` | 휴강/일반 공지 → 전체 활성 학생 알림 + 휴강일 마킹 |
+| 공지 목록 | `GET /api/v1/announcements` | 선생님의 공지 목록 |
+| 휴강일 조회 | `GET /api/v1/announcements/day-offs` | 기간별 휴강일 목록 (스케줄 표시용) |
+
+**공지 생성 요청/응답:**
+- Request: `{ teacher_id, type("dayOff"|"general"), dates?[], message }`
+- Response: `{ id, notified_count, affected_lessons[{student_id, student_name, instrument, start_time, session_number}] }`
+- 휴강 타입: 해당 날짜에 수업 있는 학생 목록을 `affected_lessons`로 반환 (레슨 자동 취소 안 함)
+- 일반 타입: 전체 활성 학생에게 알림만
+
+**v3 변경: v2의 `POST /lessons/bulk-cancel`은 제거됨. 공지와 레슨 취소가 분리됨.**
+
+### 이동시간 자동 측정 API 계약 (2026-05-07)
+
+> 상세 스펙: [lesson_location_management_spec.md](../schedule/lesson_location_management_spec.md) §12
+
+| 기능 | 엔드포인트 | 설명 |
+|------|-----------|------|
+| 이동시간 추정 | `GET /api/v1/travel-time/estimate` | 출발지-도착지 주소 기반 이동시간 자동 측정 |
+
+**요청:** `?origin_address=서울시+강남구+역삼동&destination_address=서울시+서초구+반포동`
+**응답:** `{ estimated_minutes: 25, source: "kakao", distance_km: 8.3 }`
+**실패 시:** `{ estimated_minutes: null, source: "unavailable", distance_km: null }` (200 OK, 에러 아님)
+
+**처리 로직:**
+1. 캐시 확인 (동일 출발지-도착지, 24시간 유효)
+2. Kakao Mobility 길찾기 API 호출 (한국)
+3. 실패 시 → Naver Directions API (한국 대안)
+4. 실패 시 → Google Distance Matrix API (글로벌)
+5. 모두 실패 → `estimated_minutes: null` 반환 (에러 없음)
+6. 5분 단위 올림 (23분 → 25분)
+
 ### 향후 항목
 
 1. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환) — 프론트엔드 작업

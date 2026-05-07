@@ -14,10 +14,9 @@ import 'package:lessonaza/features/students/domain/services/bulk_teacher_action_
 import 'package:lessonaza/features/students/presentation/providers/bulk_teacher_action_providers.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 import 'package:lessonaza/features/subscription/domain/repositories/subscription_repository.dart';
-import 'package:lessonaza/features/students/presentation/screens/bulk_cancel_screen.dart';
 import 'package:lessonaza/features/students/presentation/widgets/bulk_message_sheet.dart';
 
-/// §7.119 layout smoke tests — BulkCancelScreen + BulkMessageSheet.
+/// §7.119 v3 layout smoke tests — BulkMessageSheet.
 ///
 /// 회귀 가드: 테마 `FilledButton.minimumSize = Size(∞, h)` × 다양한 Sliver/Sheet
 /// 컨테이너에서 BoxConstraints 크래시가 일어나지 않는지 확인. flutter analyze 가
@@ -155,43 +154,6 @@ List<Override> _commonOverrides() => [
 ];
 
 void main() {
-  testWidgets('BulkCancelScreen 은 빈 학생 리스트에서도 크래시 없이 렌더된다', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: _commonOverrides(),
-        child: MaterialApp(
-          theme: AppTheme.light,
-          home: const BulkCancelScreen(studentIds: ['s1', 's2']),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('휴강 공지'), findsOneWidget);
-    expect(find.text('2명 선택됨'), findsOneWidget);
-    expect(find.text('휴강 날짜 선택'), findsOneWidget);
-    expect(find.text('휴강할 날짜를 먼저 선택하세요'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('BulkCancelScreen 의 발송 버튼은 초기 상태에서 비활성화된다', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: _commonOverrides(),
-        child: MaterialApp(
-          theme: AppTheme.light,
-          home: const BulkCancelScreen(studentIds: ['s1']),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // 0건 휴강 공지 발송 버튼은 disabled
-    final button = tester.widget<FilledButton>(find.byType(FilledButton).first);
-    expect(button.onPressed, isNull);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('BulkMessageSheet 은 키보드 인셋·DraggableSheet 에서도 크래시 없이 렌더된다', (
     tester,
   ) async {

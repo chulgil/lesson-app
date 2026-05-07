@@ -1,4 +1,7 @@
+import 'dart:math' show max;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -49,9 +52,6 @@ const _locationOptions = [
   ),
 ];
 
-/// Travel time dropdown values in minutes.
-const _travelTimeValues = [0, 10, 20, 30, 45, 60];
-
 /// Widget for selecting lesson location type and travel time for a membership.
 ///
 /// Like choosing a delivery method for a package: the teacher picks where
@@ -64,6 +64,18 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
   final ValueChanged<String?> onLocationChanged;
   final ValueChanged<int> onTravelTimeChanged;
 
+  /// Optional: API-suggested travel time in minutes (e.g. from Kakao Maps).
+  final int? suggestedTravelTimeMinutes;
+
+  /// Optional: source label for the suggestion (e.g. '카카오').
+  final String? suggestionSource;
+
+  /// Optional: base lesson fee in KRW for surcharge calculation.
+  final int? baseLessonFee;
+
+  /// Optional: lesson duration in minutes for surcharge calculation.
+  final int? lessonDurationMinutes;
+
   const LocationTravelSelector({
     super.key,
     required this.membershipId,
@@ -72,6 +84,10 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
     required this.currentTravelTime,
     required this.onLocationChanged,
     required this.onTravelTimeChanged,
+    this.suggestedTravelTimeMinutes,
+    this.suggestionSource,
+    this.baseLessonFee,
+    this.lessonDurationMinutes,
   });
 
   @override
@@ -83,17 +99,22 @@ class _LocationTravelSelectorState
     extends ConsumerState<LocationTravelSelector> {
   LocationType? _selectedType;
   final _externalAddressController = TextEditingController();
+  final _travelTimeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     // Derive initial type from currentLocationId if provided
     _selectedType = _inferTypeFromLocationId(widget.currentLocationId);
+    // Initialise travel time text field
+    final initial = widget.currentTravelTime;
+    _travelTimeController.text = initial > 0 ? initial.toString() : '';
   }
 
   @override
   void dispose() {
     _externalAddressController.dispose();
+    _travelTimeController.dispose();
     super.dispose();
   }
 
@@ -323,63 +344,146 @@ class _LocationTravelSelectorState
   }
 
   Widget _buildTravelTimeSection() {
-    // Determine if travel time should be locked to 0
+    // Travel time is locked to 0 for teacher studio (student travels to teacher)
     final isLocked = _selectedType == LocationType.teacherStudio;
-    final effectiveValue = isLocked ? 0 : widget.currentTravelTime;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
-        // 로 통일 (§7.17).
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
         Text(
           AppStrings.travelTimeLabel,
           style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space2),
-        DropdownButtonFormField<int>(
-          initialValue:
-              _travelTimeValues.contains(effectiveValue) ? effectiveValue : 0,
-          items:
-              _travelTimeValues.map((minutes) {
-                return DropdownMenuItem<int>(
-                  value: minutes,
-                  child: Text(
-                    minutes == 0
-                        ? AppStrings.travelTimeNone
-                        : AppStrings.durationMinutesValue(minutes),
-                    style: AppTypography.bodyMedium,
-                  ),
-                );
-              }).toList(),
-          onChanged:
-              isLocked
-                  ? null
-                  : (value) {
-                    if (value != null) {
-                      widget.onTravelTimeChanged(value);
-                    }
-                  },
+        TextField(
+          controller: _travelTimeController,
+          enabled: !isLocked,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          style: AppTypography.bodyMedium,
           decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.inkQuaternary),
+            hintText: '0',
+            suffixText: AppStrings.travelTimeMinutesSuffix,
+            suffixStyle: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: AppColors.paperAccent),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+            enabledBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: AppColors.paperAccent),
+            ),
+            disabledBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space3,
               vertical: AppSpacing.space3,
             ),
           ),
+          onChanged: (raw) {
+            final parsed = int.tryParse(raw) ?? 0;
+            widget.onTravelTimeChanged(parsed);
+          },
         ),
+
+        // API suggestion hint
+        if (!isLocked &&
+            widget.suggestedTravelTimeMinutes != null &&
+            widget.suggestionSource != null) ...[
+          const SizedBox(height: AppSpacing.space1),
+          GestureDetector(
+            onTap: () {
+              final suggested = widget.suggestedTravelTimeMinutes!;
+              _travelTimeController.text = suggested.toString();
+              widget.onTravelTimeChanged(suggested);
+            },
+            child: Text(
+              AppStrings.travelTimeSuggestion(
+                widget.suggestedTravelTimeMinutes!,
+                widget.suggestionSource!,
+              ),
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+          ),
+        ],
+
         const SizedBox(height: AppSpacing.space1),
         Text(
           AppStrings.travelTimeDescription,
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
+
+        // Surcharge reference display
+        if (!isLocked) ...[
+          const SizedBox(height: AppSpacing.space2),
+          _buildSurchargeReference(),
+        ],
       ],
+    );
+  }
+
+  /// Calculates and displays the approximate surcharge for travel time.
+  ///
+  /// Formula: surcharge = ceil((baseFee / (duration / 60)) * (travelTime / 60) / 1000) * 1000
+  Widget _buildSurchargeReference() {
+    final baseFee = widget.baseLessonFee;
+    final duration = widget.lessonDurationMinutes;
+    final travelTime =
+        int.tryParse(_travelTimeController.text) ?? widget.currentTravelTime;
+
+    if (baseFee == null || duration == null || duration == 0 || travelTime <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final hourlyRate = baseFee / (duration / 60.0);
+    final travelCost = hourlyRate * (travelTime / 60.0);
+    final surcharge = max(1000, (travelCost / 1000).ceil() * 1000);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Row(
+        children: [
+          const Text('💡', style: TextStyle(fontSize: 14)),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.travelSurchargeReference(surcharge),
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+                Text(
+                  AppStrings.travelSurchargeDescription,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

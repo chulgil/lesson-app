@@ -1,4 +1,46 @@
-# 백엔드 갭 분석 + 결제 정책 명시 + Phase 0~1 계획
+# 현재 계획: 선생님 공지 시스템 v3 (공지 중심 재설계)
+
+> 생성: 2026-05-07
+> 스펙: `docs/specs/student/bulk_teacher_actions_spec.md` (v3)
+
+## Phase A: 스펙 전면 재작성 ✅
+
+- [x] `bulk_teacher_actions_spec.md` v3 전면 재작성 — 공지 중심 (자동 취소 분리)
+- [x] `backend_spec.md` API 계약 v3 (announcements 엔드포인트)
+
+## Phase B: 엔티티 + Provider ✅
+
+- [x] `TeacherAnnouncement` 엔티티 + `AnnouncementType` enum + `AffectedLesson`
+- [x] `TeacherAnnouncementRepository` 인터페이스 (create/getByTeacherId/getDayOffs)
+- [x] `MockTeacherAnnouncementRepository` — 영향 레슨 조회 + 알림 발송
+- [x] `teacherAnnouncementRepositoryProvider` + `teacherDayOffsProvider` + `teacherAnnouncementsProvider`
+
+## Phase C: 공지 UI ✅
+
+- [x] Masthead 📢 공지 아이콘 추가 (students_tab.dart)
+- [x] `AnnouncementSheet` — 타입(휴강/일반) + 날짜 + 메시지 → 발송
+- [x] 결과 화면 — 영향 학생 목록 + [스케줄 변경 →] 딥링크
+- [x] 하단 액션바에서 [휴강 공지] 버튼 제거 (메시지 보내기만 유지)
+- [x] AppStrings 공지 관련 상수 14개 추가
+
+## Phase D: 휴강일 전역 표시 ✅
+
+- [x] 선생님 스케줄 탭 (주간 그리드) — 휴강일 셀 `paperDark` grey-out
+- [x] 수강권 상세 배너 — `TeacherAnnouncement` 기반으로 데이터 소스 변경
+- [x] 학생 레슨 카드 — `cancelledByTeacher` 상태 시 "휴강" 배지 표시
+- [x] 스케줄 재조절 시간 선택 (WeeklyCalendarPicker) — 휴강일 비활성화
+
+## Phase E: v2 정리 ✅
+
+- [x] 하단 액션바에서 [휴강 공지] 버튼 제거 (메시지 보내기만 유지)
+- [x] mock 데이터에서 `lessonCancelledByTeacher` 이벤트 제거
+- [x] `BulkCancelScreen` 파일 삭제 + import/테스트 정리
+
+---
+
+## 이전 계획
+
+### 백엔드 갭 분석 + 결제 정책 명시 + Phase 0~1 (2026-05-01)
 
 > 작성일: 2026-05-01
 > 모드: `/plan` + adaptive-quality **balanced** (스펙 보강은 fast / 백엔드 코드 변경은 별도 ultra)

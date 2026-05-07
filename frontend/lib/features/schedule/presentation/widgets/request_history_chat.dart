@@ -9,6 +9,8 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/request_event_visuals.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import 'proposal_chat_card.dart';
 
 /// Chat-style history of all events in a lesson request.
@@ -65,6 +67,11 @@ class RequestHistoryChat extends StatelessWidget {
       chronological,
     );
 
+    // 휴강 배너 표시 여부 판단 (§7.119 v2.2)
+    final cancelBanner = _buildTeacherCancelBanner(chronological);
+    final hasBanner = cancelBanner != null;
+    final headerCount = (showGuide ? 1 : 0) + (hasBanner ? 1 : 0);
+
     return ListView.builder(
       shrinkWrap: shrinkWrap,
       physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
@@ -72,14 +79,19 @@ class RequestHistoryChat extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space4,
       ),
-      itemCount: showGuide ? chronological.length + 1 : chronological.length,
+      itemCount: chronological.length + headerCount,
       itemBuilder: (context, index) {
         // First item: system guide message (only when showGuide is true)
         if (showGuide && index == 0) {
           return _buildSystemGuide();
         }
 
-        final eventIndex = showGuide ? index - 1 : index;
+        // 휴강 상단 배너 (guide 바로 다음)
+        if (hasBanner && index == (showGuide ? 1 : 0)) {
+          return cancelBanner;
+        }
+
+        final eventIndex = index - headerCount;
         final event = chronological[eventIndex];
 
         // Skip withdraw events where the same slot was re-approved
@@ -285,6 +297,14 @@ class RequestHistoryChat extends StatelessWidget {
 
   /// Bubble inner content: status text + optional slots + optional message
   Widget _buildBubbleContent(RequestEvent event, {bool isMessageOnly = false}) {
+    // §7.119 v2: 선생님 휴강/공지 이벤트는 전용 버블로 렌더링
+    if (event.eventType == RequestEventType.lessonCancelledByTeacher) {
+      return _buildTeacherCancelContent(event);
+    }
+    if (event.eventType == RequestEventType.teacherAnnouncement) {
+      return _buildTeacherAnnouncementContent(event);
+    }
+
     // For approve/acceptAlternative/scheduleChangeAccepted: resolve the confirmed slot
     final isAcceptEvent =
         event.eventType == RequestEventType.approve ||
@@ -372,6 +392,222 @@ class RequestHistoryChat extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             event.message!,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// §7.119 v2: 선생님 사유 휴강 버블 — 회차 + 사유 + 변경권 메타 + 보강 CTA.
+  /// §7.119 v2.2: 상단 휴강 배너 — 미래 휴강이 있으면 표시, 지나면 자동 숨김.
+  Widget? _buildTeacherCancelBanner(List<RequestEvent> chronological) {
+    final cancelEvents = chronological.where(
+      (e) => e.eventType == RequestEventType.lessonCancelledByTeacher,
+    ).toList();
+    if (cancelEvents.isEmpty) return null;
+
+    // 이벤트의 createdAt 기준으로 휴강 날짜 추출 (session별 날짜)
+    // 미래 날짜가 1개 이상이면 배너 표시
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final futureCancels = cancelEvents.where(
+      (e) => !e.createdAt.isBefore(today.subtract(const Duration(days: 1))),
+    ).toList();
+    if (futureCancels.isEmpty) return null;
+
+    // 날짜 범위 계산
+    final dates = futureCancels.map((e) => e.createdAt).toList()..sort();
+    final dateText = dates.length == 1
+        ? formatDateMD(dates.first)
+        : '${formatDateMD(dates.first)}~${formatDateMD(dates.last)}';
+
+    // 사유 (첫 이벤트 기준)
+    final reason = futureCancels.first.message;
+
+    // 회차 정보
+    final sessions = futureCancels
+        .where((e) => e.sessionNumber != null)
+        .map((e) => '${e.sessionNumber}회차')
+        .toList();
+    final sessionText = sessions.isNotEmpty ? sessions.join(', ') : null;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paperDark,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                const Icon(Icons.event_busy, size: 18, color: AppColors.ink),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  '$dateText 휴강',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ],
+            ),
+            // Session info
+            if (sessionText != null) ...[
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                sessionText,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ],
+            // Reason
+            if (reason != null && reason.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '사유: $reason',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ],
+            // Meta
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              AppStrings.bulkCancelNoCreditDeduction,
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+            // CTA
+            const SizedBox(height: AppSpacing.space3),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  // TODO: Navigate to reschedule request
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                  ),
+                ),
+                child: const Text('보강 일정 요청하기'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherCancelContent(RequestEvent event) {
+    final session = event.sessionNumber;
+    final remaining = event.changeCreditRemainingAfter;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header: "N회차 휴강"
+        Text(
+          session != null
+              ? AppStrings.bulkCancelSessionLabel(session)
+              : AppStrings.eventLessonCancelledByTeacher,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        // Body
+        Text(
+          AppStrings.chatLessonCancelledByTeacher,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+        ),
+        // Reason
+        if (event.message != null && event.message!.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '사유: ${event.message}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+        // Meta: credit info
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          remaining != null
+              ? AppStrings.bulkCancelCreditRemaining(remaining)
+              : AppStrings.bulkCancelNoCreditDeduction,
+          style: AppTypography.captionSmall.copyWith(
+            color: AppColors.inkTertiary,
+          ),
+        ),
+        if (event.keepsSessionNumber == true)
+          Text(
+            AppStrings.bulkCancelKeepsSession,
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
+        // CTA: reschedule
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          AppStrings.bulkCancelRescheduleCta,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.paperAccent,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// §7.119 v2: 선생님 공지 버블 — 제목 + 본문.
+  Widget _buildTeacherAnnouncementContent(RequestEvent event) {
+    final fullMessage = event.message ?? '';
+    final newlineIndex = fullMessage.indexOf('\n');
+    final title =
+        newlineIndex > 0 ? fullMessage.substring(0, newlineIndex) : fullMessage;
+    final body =
+        newlineIndex > 0 ? fullMessage.substring(newlineIndex + 1).trim() : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Text(
+          AppStrings.eventTeacherAnnouncement,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        // Title
+        Text(
+          title,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        // Body
+        if (body.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            body,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),

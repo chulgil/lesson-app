@@ -163,6 +163,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       // scheduleChanged is used as "requested" in this context
       RequestEventType.scheduleChanged => _buildRequestedContent(),
       RequestEventType.lessonCancelled => _buildCancelledContent(),
+      RequestEventType.lessonCancelledByTeacher =>
+        _buildTeacherCancelledContent(),
+      RequestEventType.teacherAnnouncement => _buildAnnouncementContent(),
       RequestEventType.withdrawApproval => _buildWithdrawContent(),
       _ => _buildGenericContent(),
     };
@@ -252,6 +255,106 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '${AppStrings.reasonPrefix}${event.message}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// §7.119 v2: 선생님 사유 휴강 버블
+  Widget _buildTeacherCancelledContent() {
+    final session = event.sessionNumber;
+    final remaining = event.changeCreditRemainingAfter;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          session != null
+              ? AppStrings.bulkCancelSessionLabel(session)
+              : AppStrings.eventLessonCancelledByTeacher,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        Text(
+          AppStrings.chatLessonCancelledByTeacher,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+        ),
+        if (event.message != null && event.message!.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '사유: ${event.message}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          remaining != null
+              ? AppStrings.bulkCancelCreditRemaining(remaining)
+              : AppStrings.bulkCancelNoCreditDeduction,
+          style: AppTypography.captionSmall.copyWith(
+            color: AppColors.inkTertiary,
+          ),
+        ),
+        if (event.keepsSessionNumber == true)
+          Text(
+            AppStrings.bulkCancelKeepsSession,
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          AppStrings.bulkCancelRescheduleCta,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.paperAccent,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// §7.119 v2: 선생님 공지 메시지 버블
+  Widget _buildAnnouncementContent() {
+    final fullMessage = event.message ?? '';
+    final newlineIndex = fullMessage.indexOf('\n');
+    final title =
+        newlineIndex > 0 ? fullMessage.substring(0, newlineIndex) : fullMessage;
+    final body =
+        newlineIndex > 0 ? fullMessage.substring(newlineIndex + 1).trim() : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppStrings.eventTeacherAnnouncement,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        Text(
+          title,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        if (body.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            body,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),

@@ -22,10 +22,10 @@ import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../widgets/announcement_sheet.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
-import 'bulk_cancel_screen.dart';
 
 /// Students management tab with Riverpod state management
 class StudentsTab extends ConsumerStatefulWidget {
@@ -181,6 +181,35 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     });
   }
 
+  /// 전체 학생 ID set (현재 필터 적용된 그룹 기준).
+  Set<String> get _allStudentIds {
+    final teacherId = ref.read(currentUserIdProvider);
+    final groupedAsync = ref.read(filteredGroupedStudentsProvider(teacherId));
+    final summaryAsync = ref.read(studentRosterSummaryProvider);
+    final groups = groupedAsync.valueOrNull ?? const [];
+    final filtered = _applyPracticeFilter(groups, summaryAsync.value);
+    return {
+      for (final group in filtered)
+        for (final swm in group.students) swm.studentId,
+    };
+  }
+
+  bool get _isAllSelected {
+    final all = _allStudentIds;
+    return all.isNotEmpty && _selectedStudentIds.containsAll(all);
+  }
+
+  void _selectAllStudents() {
+    setState(() {
+      final all = _allStudentIds;
+      if (_selectedStudentIds.containsAll(all)) {
+        _selectedStudentIds.clear();
+      } else {
+        _selectedStudentIds.addAll(all);
+      }
+    });
+  }
+
   /// Maps current StudentFilter to RosterTriageCategory for banner highlight.
   RosterTriageCategory? get _selectedTriageCategory {
     return switch (_currentFilter) {
@@ -213,12 +242,25 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '${_selectedStudentIds.length}명 선택됨',
               style: AppTypography.headingLarge,
             ),
+            const Spacer(),
+            TextButton(
+              onPressed: _selectAllStudents,
+              child: Text(
+                _isAllSelected
+                    ? AppStrings.deselectAll
+                    : AppStrings.selectAll,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
             TextButton(
               onPressed: _exitSelectionMode,
               child: Text(
@@ -247,6 +289,23 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // 📢 공지 아이콘 (v3)
+                IconButton(
+                  onPressed: () => _showAnnouncementSheet(context),
+                  icon: const Icon(
+                    Icons.campaign,
+                    color: AppColors.ink,
+                    size: 22,
+                  ),
+                  tooltip: AppStrings.announcementTitle,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                // ☑ 선택 모드
                 IconButton(
                   onPressed: () {
                     setState(() {
@@ -267,6 +326,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
+                // + 학생 추가
                 IconButton(
                   onPressed: () => context.push(AppRoutes.addStudentMethod),
                   icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
@@ -587,8 +647,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   Widget _buildBottomActionBar() {
-    // §7.119 선생님 일괄 작업: 휴강 공지(B1) + 일괄 메시지(B2).
-    // "수강권 발급" 경로는 제거됨 — studentIds.first silent drop 버그 + 수강권은 학생별 개별 설계 필요.
+    // v3: 선택 모드는 일괄 메시지만. 휴강 공지는 Masthead 공지 아이콘으로 이동.
     final hasSelection = _selectedStudentIds.isNotEmpty;
 
     return Positioned(
@@ -616,34 +675,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: hasSelection ? _onBulkCancel : null,
-                      icon: const Icon(Icons.event_busy, size: 18),
-                      label: const Text(AppStrings.studentBulkCancelLabel),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(
-                          AppSpacing.buttonHeight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: hasSelection ? _onBulkMessage : null,
-                      icon: const Icon(Icons.send, size: 18),
-                      label: const Text(AppStrings.studentSendMessage),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(
-                          AppSpacing.buttonHeight,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              FilledButton.icon(
+                onPressed: hasSelection ? _onBulkMessage : null,
+                icon: const Icon(Icons.send, size: 18),
+                label: const Text(AppStrings.studentSendMessage),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
+                ),
               ),
             ],
           ),
@@ -652,19 +690,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
-  void _onBulkCancel() async {
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder:
-            (_) => BulkCancelScreen(studentIds: _selectedStudentIds.toList()),
-      ),
-    );
-    if (result == true && mounted) {
-      setState(() {
-        _isSelectionMode = false;
-        _selectedStudentIds.clear();
-      });
-    }
+  /// v3: Masthead 📢 → 공지 작성 시트
+  void _showAnnouncementSheet(BuildContext context) {
+    AnnouncementSheet.show(context, ref: ref);
   }
 
   void _onBulkMessage() async {

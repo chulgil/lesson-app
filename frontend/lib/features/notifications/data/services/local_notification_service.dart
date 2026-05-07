@@ -39,9 +39,15 @@ class LocalNotificationService implements NotificationService {
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
+    const macOSSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
     const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
+      macOS: macOSSettings,
     );
 
     await _localNotifications.initialize(

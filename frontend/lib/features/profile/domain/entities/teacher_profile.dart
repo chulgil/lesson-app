@@ -411,6 +411,11 @@ class TeacherProfile {
   final List<Education>? education;
   final List<Career>? career;
 
+  // Location info (optional, used for visit lessons and profile display)
+  final String? postalCode; // 우편번호 (5자리)
+  final String? address; // 기본주소 (시/구/동)
+  final String? addressDetail; // 상세주소 (비공개)
+
   // Complete info
   final List<String>? specialties;
   final String? teachingStyle;
@@ -460,6 +465,9 @@ class TeacherProfile {
     this.feeRange,
     this.education,
     this.career,
+    this.postalCode,
+    this.address,
+    this.addressDetail,
     this.specialties,
     this.teachingStyle,
     this.portfolioVideoUrls,
@@ -622,6 +630,9 @@ class TeacherProfile {
     FeeRange? feeRange,
     List<Education>? education,
     List<Career>? career,
+    String? postalCode,
+    String? address,
+    String? addressDetail,
     List<String>? specialties,
     String? teachingStyle,
     List<String>? portfolioVideoUrls,
@@ -648,6 +659,9 @@ class TeacherProfile {
       feeRange: feeRange ?? this.feeRange,
       education: education ?? this.education,
       career: career ?? this.career,
+      postalCode: postalCode ?? this.postalCode,
+      address: address ?? this.address,
+      addressDetail: addressDetail ?? this.addressDetail,
       specialties: specialties ?? this.specialties,
       teachingStyle: teachingStyle ?? this.teachingStyle,
       portfolioVideoUrls: portfolioVideoUrls ?? this.portfolioVideoUrls,

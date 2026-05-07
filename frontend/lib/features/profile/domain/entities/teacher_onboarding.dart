@@ -1,5 +1,3 @@
-import '../../../../core/l10n/app_strings.dart';
-
 // Teacher onboarding domain entity
 // Moved from lib/features/profile/domain/entities/teacher_onboarding.dart for Clean Architecture
 
@@ -255,59 +253,5 @@ class TeacherOnboardingProfile {
       instruments: instruments ?? this.instruments,
       introduction: introduction ?? this.introduction,
     );
-  }
-}
-
-/// Tutorial step content
-class TutorialStepContent {
-  final TutorialStep step;
-  final String title;
-  final String description;
-  final String? imageAsset;
-  final String? animationAsset;
-
-  const TutorialStepContent({
-    required this.step,
-    required this.title,
-    required this.description,
-    this.imageAsset,
-    this.animationAsset,
-  });
-
-  static const List<TutorialStepContent> allSteps = [
-    TutorialStepContent(
-      step: TutorialStep.welcome,
-      title: AppStrings.onboardingWelcomeTitle,
-      description: '레슨앱에서 학생을 관리하고\n효과적인 레슨을 진행해보세요',
-      imageAsset: 'assets/images/onboarding/welcome.png',
-    ),
-    TutorialStepContent(
-      step: TutorialStep.inviteStudent,
-      title: AppStrings.onboardingInviteStudentTitle,
-      description: 'QR 코드나 링크를 통해\n학생을 쉽게 초대할 수 있어요',
-      imageAsset: 'assets/images/onboarding/invite.png',
-    ),
-    TutorialStepContent(
-      step: TutorialStep.createLesson,
-      title: AppStrings.onboardingCreateLessonTitle,
-      description: '캘린더에서 간편하게\n레슨 일정을 관리하세요',
-      imageAsset: 'assets/images/onboarding/calendar.png',
-    ),
-    TutorialStepContent(
-      step: TutorialStep.writeFeedback,
-      title: AppStrings.onboardingWriteFeedbackTitle,
-      description: '레슨 후 피드백을 남기고\n학생의 성장을 기록하세요',
-      imageAsset: 'assets/images/onboarding/feedback.png',
-    ),
-    TutorialStepContent(
-      step: TutorialStep.completed,
-      title: AppStrings.onboardingCompletedTitle,
-      description: '이제 레슨앱을 시작할\n모든 준비가 되었어요',
-      imageAsset: 'assets/images/onboarding/complete.png',
-    ),
-  ];
-
-  static TutorialStepContent getContent(TutorialStep step) {
-    return allSteps.firstWhere((c) => c.step == step);
   }
 }

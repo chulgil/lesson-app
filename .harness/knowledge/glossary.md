@@ -28,7 +28,7 @@
 | 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
 |------|------|-----------|-----------|------|
 | 레슨 | Lesson | `Lesson` | `Lesson` | 1회 수업 기록 |
-| 체험 레슨 | Trial Lesson | `LessonBooking(type: trial)` | `LessonBooking(lesson_type: trial)` | 정규 등록 전 시험 레슨 |
+| 체험 레슨 | Trial Lesson | `LessonBooking(type: trial)` | `LessonBooking(lesson_type: trial)` | 정규 등록 전 시험 레슨. **수강권 필수** (유료 기본, 선생님 설정으로 무료 전환 가능). 변경/취소 정책 동일 적용 |
 | 정기 레슨 | Regular Lesson | `LessonBooking(type: regular)` | `LessonBooking(lesson_type: regular)` | 수강권 기반 정기 수업 |
 | 보강 레슨 | Makeup Lesson | `LessonBooking(type: makeup)` | `LessonBooking(lesson_type: makeup)` | 노쇼/취소 보충 |
 | 레슨 노트 | Lesson Note | `Lesson.teacherNotes` | `Lesson.teacher_notes` | 선생님 수업 기록 |
@@ -92,6 +92,11 @@
 |------|------|-----------|-----------|------|
 | 알림 | Notification | `AppNotification` | `Notification` | ⚠️ FE-BE 불일치. 인앱/푸시 알림 |
 | 만료 알림 설정 | Expiry Reminder Settings | `SubscriptionExpiryReminderSettings` | `SubscriptionSettings.renewal_alert_days_set` | D-14/D-7/D-1/D-0 토글 |
+| 선생님 휴강 이벤트 | Lesson Cancelled By Teacher | `RequestEventType.lessonCancelledByTeacher` | `lessonCancelledByTeacher` | 선생님 사유 휴강 → 수강권 챗에 이벤트 기록 (변경권 미차감) |
+| 선생님 공지 이벤트 | Teacher Announcement | `RequestEventType.teacherAnnouncement` | `teacherAnnouncement` | 선생님 일괄 메시지 → 수강권 챗에 공지 기록 |
+| 이동시간 | Travel Time | `ClassMembership.travelTimeMinutes` | `travel_time_minutes` | 선생님→학생 이동 소요시간 (분). 스케줄 버퍼 계산에 사용 |
+| 이동시간 자동 측정 | Travel Time Estimate | `TravelTimeApi.estimate()` | `GET /travel-time/estimate` | 카카오/네이버/구글 API 기반 출발지-도착지 이동시간 자동 측정. 실패 시 수기 입력 |
+| 이동 추가금 | Travel Surcharge | `Subscription.travelSurcharge` | `travel_surcharge` | 이동시간 기반 참고용 추가금. 최종 금액은 선생님이 결정 |
 
 ---
 
@@ -103,6 +108,12 @@
 | 원클릭 | One Click | 한 번 탭으로 동작 완료 |
 | 원샷 UX | One-Shot UX | 한 번 탭으로 모든 연관 작업 완료 |
 | 노트북 | Notebook | 디자인 시스템 메타포 (종이+잉크+연필) |
+| 퀘스트 | Quest | 온보딩 미션. 실제 앱 사용 행동을 유도하는 진행형 과제 |
+| 퀘스트 보드 | Quest Board | 홈 화면의 퀘스트 진행 카드 (Getting Started Card v2) |
+| 코치마크 | Coach Mark | 화면 오버레이로 특정 UI 요소를 하이라이트하며 안내하는 UI 패턴 |
+| 워크스루 | Walkthrough | 인터랙티브 온보딩 — 실제 화면에서 직접 탭하며 배우는 체험 |
+| 셀레브레이션 | Celebration | 퀘스트 완료 시 축하 피드백 (애니메이션 + 메시지) |
+| 프로필 완성도 | Profile Completeness | 프로필 입력 항목 기반 0-100% 게이지 |
 
 ---
 
@@ -125,4 +136,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-05-07 | §7 알림: lessonCancelledByTeacher, teacherAnnouncement 이벤트 타입 추가 (일괄 작업 v2) |
+| 2026-05-07 | §2 체험레슨: 수강권 필수 명시 (유료 기본, 무료 선택), 변경/취소 정책 동일 적용 |
+| 2026-05-07 | §8 UX 용어: 퀘스트/코치마크/워크스루/셀레브레이션/프로필완성도 추가 (온보딩 v2) |
 | 2026-05-04 | 초판 작성 — `docs/specs/glossary.md` 기반 + 전 도메인 확장 + FE-BE 매핑 |

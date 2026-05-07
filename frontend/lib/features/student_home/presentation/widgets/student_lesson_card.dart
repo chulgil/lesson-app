@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../../features/lessons/presentation/extensions/lesson_visuals.dart';
 
 /// Lesson card widget for student view
 class StudentLessonCard extends StatelessWidget {
@@ -157,8 +158,26 @@ class StudentLessonCard extends StatelessWidget {
                     ),
                   ),
 
-                  // D-day or status
-                  if (isUpcoming && daysUntil >= 0)
+                  // Status badge: 휴강 > D-day > chevron
+                  if (lesson.status == LessonStatus.cancelledByTeacher)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.paperAccentSoft,
+                        border: Border.all(color: AppColors.paperAccent),
+                      ),
+                      child: Text(
+                        '휴강',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    )
+                  else if (isUpcoming && daysUntil >= 0)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,

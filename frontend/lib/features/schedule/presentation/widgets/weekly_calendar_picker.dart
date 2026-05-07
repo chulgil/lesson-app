@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../students/presentation/providers/teacher_announcement_providers.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/teacher_availability_providers.dart' hide SelectedSlot;
@@ -120,6 +121,12 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     return slotDateTime.isBefore(_now);
   }
 
+  /// v3: 휴강일인지 확인 (TeacherAnnouncement 기반)
+  bool _isDayOff(int dayIndex, Set<DateTime> dayOffSet) {
+    final date = _weekStart.add(Duration(days: dayIndex));
+    return dayOffSet.contains(DateTime(date.year, date.month, date.day));
+  }
+
   void _onSlotTapped(int dayIndex, int hour) {
     final date = _weekStart.add(Duration(days: dayIndex));
     final startTime = '${hour.toString().padLeft(2, '0')}:00';
@@ -221,6 +228,20 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
 
     final isRegular = widget.lessonType == LessonRequestType.regular;
 
+    // v3: 휴강일 조회
+    final weekEnd = _weekStart.add(const Duration(days: 6));
+    final dayOffsAsync = ref.watch(
+      teacherDayOffsProvider(
+        teacherId: widget.teacherId,
+        from: _weekStart,
+        to: weekEnd,
+      ),
+    );
+    final dayOffSet = {
+      for (final d in dayOffsAsync.valueOrNull ?? const <DateTime>[])
+        DateTime(d.year, d.month, d.day),
+    };
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -228,7 +249,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         if (!isRegular) _buildWeekNavigation(),
         _buildDayHeaders(showDate: !isRegular),
         const Divider(height: 1, color: AppColors.scheduleGridLine),
-        ..._buildHourRows(availability),
+        ..._buildHourRows(availability, dayOffSet: dayOffSet),
         const SizedBox(height: AppSpacing.space3),
         _buildSelectionList(),
       ],
@@ -332,7 +353,10 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     );
   }
 
-  List<Widget> _buildHourRows(TeacherAvailability availability) {
+  List<Widget> _buildHourRows(
+    TeacherAvailability availability, {
+    Set<DateTime> dayOffSet = const {},
+  }) {
     final hours = List.generate(
       widget.endHour - widget.startHour,
       (i) => widget.startHour + i,
@@ -361,7 +385,14 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
               ),
             ),
             ...List.generate(7, (dayIndex) {
-              return Expanded(child: _buildCell(dayIndex, hour, availability));
+              return Expanded(
+                child: _buildCell(
+                  dayIndex,
+                  hour,
+                  availability,
+                  dayOffSet: dayOffSet,
+                ),
+              );
             }),
           ],
         ),
@@ -369,15 +400,22 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     }).toList();
   }
 
-  Widget _buildCell(int dayIndex, int hour, TeacherAvailability availability) {
+  Widget _buildCell(
+    int dayIndex,
+    int hour,
+    TeacherAvailability availability, {
+    Set<DateTime> dayOffSet = const {},
+  }) {
     final startTime = '${hour.toString().padLeft(2, '0')}:00';
     // Regular lessons: no past-date restriction (weekday-only selection)
     final isPast =
         widget.lessonType == LessonRequestType.regular
             ? false
             : _isPastSlot(dayIndex, hour);
+    // v3: 휴강일 비활성화
+    final isDayOff = _isDayOff(dayIndex, dayOffSet);
     final isAvailable =
-        _isSlotAvailable(dayIndex, hour, availability) && !isPast;
+        _isSlotAvailable(dayIndex, hour, availability) && !isPast && !isDayOff;
     final priority = _selectionLogic.priorityFor(dayIndex, startTime);
 
     if (!isAvailable && priority == 0) {

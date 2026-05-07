@@ -134,7 +134,11 @@
 | 7 | metronome_master.md | 5종 | 참조 | - | 완료 |
 | 8 | notification_master.md | - | 14개 파일 | - | 완료 |
 | 9 | calendar_master.md | 2종 | 3개 파일 | - | 완료 |
-| 10 | onboarding_master.md | 2종 | 9개 파일 | - | 완료 |
+| 10 | onboarding_master.md (v1) | 2종 | 9개 파일 | - | 완료 |
+| 10-b | onboarding_quest_v2.md | - | 재설계 | - | 설계 완료 |
+| 10-c | help_manual_spec.md | - | 신규 | - | 설계 완료 |
+| 6-b | lesson_location_management_spec.md v2 | - | 보강 | - | 설계 완료 |
+| 6-c | travel_time_spec.md v2 | - | 보강 | - | 설계 완료 |
 | 11 | student_home_master.md | 1종 | 15개 파일 | - | 완료 |
 | 12 | follow_master.md | - | Phase 3 | - | 완료 |
 | 13 | settings_master.md | - | 13개 파일 | - | 완료 |

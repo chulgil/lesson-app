@@ -195,3 +195,21 @@ for (final exception in availability.exceptions) {
 - 둘 다 set → 슬롯의 `effectiveRange = [slotStart - incomingTravelTime, slotEnd]` 가 차단 윈도우와 겹치는 경우만 제외.
   - 경계 접합(`slot.end == block.start` 또는 `slot.effectiveStart == block.end`)은 **non-overlap** 으로 처리하여 인접 슬롯 사용 가능.
 - `incomingTravelTime` 은 `currentStudentId` 가 주어지면 `_studentTravelTimes[studentId]` 에서 조회 (기존 `_findConflictingSlot` 과 동일 소스).
+
+---
+
+## 8. 이동시간 자동 측정 + 추가 과금 (v2 참조)
+
+> 상세 스펙: [lesson_location_management_spec.md](./lesson_location_management_spec.md) §12~§14
+>
+> - §12: 카카오/네이버/구글 Distance API 기반 이동시간 자동 측정
+> - §13: 이동시간 기반 추가 과금 (선생님 시급 기준 참고용 제안)
+> - §14: 스케줄 타임라인/주간그리드에 이동 블록 시각화
+
+### 변경 이력
+
+| 날짜 | 내용 |
+|------|------|
+| 2026-05-07 | §8 자동 측정 + 추가 과금 참조 추가 (lesson_location_management_spec.md v2) |
+| 2026-04-28 | §7.4 Phase 3.4 패치: TimeException × 이동시간 부분 차단 |
+| 2026-03-15 | v1 초판 작성 |

@@ -58,6 +58,19 @@
 | `.harness/spec/{feature}.md` | feature 작업 스펙 (Phase 6 PASS 후 마스터에 머지) |
 | `.harness/knowledge/glossary.md` | 유비쿼터스 언어 SSOT |
 
+## 스펙 독립 승격 규칙 (2026-05-07)
+
+> 마스터 스펙의 특정 섹션이 독립 기능으로 성장하면 별도 스펙으로 분리한다.
+
+| 기준 | 행동 |
+|------|------|
+| 섹션이 100줄+ OR 백엔드 API 계약 포함 | 독립 스펙 파일로 분리 |
+| 분리 시 원본 | 레거시 표시 + 독립 스펙 링크 추가 |
+| 관련 스펙 | 이벤트 렌더링 등 교차 영향 스펙도 동시 업데이트 |
+| 백엔드 | `backend_spec.md` API 계약에도 반영 |
+
+예시: `enrollment_management_ux_spec.md` §10 → `bulk_teacher_actions_spec.md` 독립 승격
+
 ## 검증 순서 (mechanical.toml 기준)
 
 > 빠른 게이트 우선: lint → test → build (실패 가능성 큰 것부터)
