@@ -1,14 +1,18 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_repository.dart';
 import '../../data/repositories/remote_practice_repository.dart';
 import '../../domain/repositories/practice_repository.dart';
 
+part 'practice_repository_provider.g.dart';
+
 /// Practice repository provider - switches between Mock and Remote.
-final practiceRepositoryProvider = Provider<PracticeRepository>((ref) =>
-    createRepository<PracticeRepository>(
-      ref: ref,
-      mock: () => MockPracticeRepository(),
-      remote: (api) => RemotePracticeRepository(api),
-    ));
+@Riverpod(keepAlive: true)
+PracticeRepository practiceRepository(PracticeRepositoryRef ref) {
+  return createRepository<PracticeRepository>(
+    ref: ref,
+    mock: () => MockPracticeRepository(),
+    remote: (api) => RemotePracticeRepository(api),
+  );
+}

@@ -244,7 +244,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     return PopupMenuButton<RepertoireSortType>(
       initialValue: sortType,
       onSelected: (type) {
-        ref.read(repertoireSortTypeProvider.notifier).state = type;
+        ref.read(repertoireSortTypeProvider.notifier).setSortType(type);
       },
       itemBuilder:
           (context) =>

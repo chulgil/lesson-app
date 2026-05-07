@@ -1,27 +1,41 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../domain/entities/entities.dart';
+import '../../domain/entities/entities.dart' as entities;
 import 'practice_repertoire_crud_provider.dart';
 import 'practice_repertoire_repository_provider.dart';
 
+part 'section_sort_provider.g.dart';
+
 /// Current section sort type provider
-final sectionSortTypeProvider = StateProvider<SectionSortType>((ref) {
-  return SectionSortType.createdDesc;
-});
+@Riverpod(keepAlive: true)
+class SectionSortTypeState extends _$SectionSortTypeState {
+  @override
+  entities.SectionSortType build() => entities.SectionSortType.createdDesc;
+
+  void setSortType(entities.SectionSortType type) {
+    state = type;
+  }
+}
+
+final sectionSortTypeProvider = sectionSortTypeStateProvider;
 
 /// Sorted sections provider for a repertoire
-final sortedSectionsProvider =
-    Provider.family<List<PracticeSection>, String>((ref, repertoireId) {
+@Riverpod(keepAlive: true)
+List<entities.PracticeSection> sortedSections(
+  SortedSectionsRef ref,
+  String repertoireId,
+) {
   // Use the same repertoireProvider as the detail screen
   final repertoire = ref.watch(repertoireProvider(repertoireId)).valueOrNull;
   final sortType = ref.watch(sectionSortTypeProvider);
 
   if (repertoire == null) return [];
-  return repertoire.sections.sortBy(sortType);
-});
+  return entities.SectionSorting(repertoire.sections).sortBy(sortType);
+}
 
 /// Section order notifier for drag and drop
-class SectionOrderNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class SectionOrderNotifier extends _$SectionOrderNotifier {
   @override
   Future<void> build() async {}
 
@@ -39,7 +53,9 @@ class SectionOrderNotifier extends AsyncNotifier<void> {
 
       // Get current sorted sections
       final sortType = ref.read(sectionSortTypeProvider);
-      final sections = repertoire.sections.sortBy(sortType);
+      final sections = entities.SectionSorting(
+        repertoire.sections,
+      ).sortBy(sortType);
 
       // Create new order
       final sectionIds = sections.map((s) => s.id).toList();
@@ -62,9 +78,9 @@ class SectionOrderNotifier extends AsyncNotifier<void> {
   /// Apply sort order when sort type changes to custom
   Future<void> applySortOrder(
     String repertoireId,
-    SectionSortType type,
+    entities.SectionSortType type,
   ) async {
-    if (type != SectionSortType.custom) return;
+    if (type != entities.SectionSortType.custom) return;
 
     state = const AsyncLoading();
     try {
@@ -88,8 +104,3 @@ class SectionOrderNotifier extends AsyncNotifier<void> {
     }
   }
 }
-
-final sectionOrderNotifierProvider =
-    AsyncNotifierProvider<SectionOrderNotifier, void>(
-  SectionOrderNotifier.new,
-);

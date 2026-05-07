@@ -11,17 +11,17 @@ import '../../providers/section_sort_provider.dart';
 class SectionSortDropdown extends ConsumerWidget {
   final String? repertoireId;
 
-  const SectionSortDropdown({
-    super.key,
-    this.repertoireId,
-  });
+  const SectionSortDropdown({super.key, this.repertoireId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSort = ref.watch(sectionSortTypeProvider);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space1,
+      ),
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
@@ -32,45 +32,48 @@ class SectionSortDropdown extends ConsumerWidget {
           icon: Icon(Icons.arrow_drop_down, color: AppColors.inkSecondary),
           isDense: true,
           style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
-          items: SectionSortType.values.map((type) {
-            return DropdownMenuItem<SectionSortType>(
-              value: type,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _getIcon(type),
-                    size: 16,
-                    color: currentSort == type
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
+          items:
+              SectionSortType.values.map((type) {
+                return DropdownMenuItem<SectionSortType>(
+                  value: type,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _getIcon(type),
+                        size: 16,
+                        color:
+                            currentSort == type
+                                ? AppColors.paperAccent
+                                : AppColors.inkSecondary,
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Text(
+                        type.displayName,
+                        style: TextStyle(
+                          color:
+                              currentSort == type
+                                  ? AppColors.paperAccent
+                                  : AppColors.ink,
+                          fontWeight:
+                              currentSort == type
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    type.displayName,
-                    style: TextStyle(
-                      color: currentSort == type
-                          ? AppColors.paperAccent
-                          : AppColors.ink,
-                      fontWeight: currentSort == type
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
           onChanged: (newType) {
             if (newType != null) {
-              ref.read(sectionSortTypeProvider.notifier).state = newType;
+              ref.read(sectionSortTypeProvider.notifier).setSortType(newType);
 
               // If switching to custom, apply current order
               if (newType == SectionSortType.custom && repertoireId != null) {
-                ref.read(sectionOrderNotifierProvider.notifier).applySortOrder(
-                      repertoireId!,
-                      newType,
-                    );
+                ref
+                    .read(sectionOrderNotifierProvider.notifier)
+                    .applySortOrder(repertoireId!, newType);
               }
             }
           },
