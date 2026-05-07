@@ -11,6 +11,9 @@ from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.user import (
     LocaleUpdate,
+    OnboardingProgressResponse,
+    OnboardingProgressUpdate,
+    OnboardingQuestListResponse,
     RoleUpdate,
     SupportedLocalesResponse,
     UserResponse,
@@ -99,6 +102,68 @@ async def complete_onboarding(
     service = UserService(db)
     user = await service.complete_onboarding(current_user.id)
     return UserResponse.model_validate(user)
+
+
+@router.get(
+    "/me/onboarding-progress",
+    response_model=OnboardingProgressResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get onboarding progress",
+)
+async def get_onboarding_progress(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> OnboardingProgressResponse:
+    """Return onboarding quest v2 progress for the current user."""
+    service = UserService(db)
+    return await service.get_onboarding_progress(current_user)
+
+
+@router.patch(
+    "/me/onboarding-progress",
+    response_model=OnboardingProgressResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update onboarding progress",
+)
+async def update_onboarding_progress(
+    body: OnboardingProgressUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> OnboardingProgressResponse:
+    """Patch onboarding quest v2 progress fields."""
+    service = UserService(db)
+    return await service.update_onboarding_progress(current_user, body)
+
+
+@router.get(
+    "/me/quests",
+    response_model=OnboardingQuestListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List onboarding quests",
+)
+async def get_onboarding_quests(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> OnboardingQuestListResponse:
+    """Return role-specific onboarding quests for the current user."""
+    service = UserService(db)
+    return await service.get_onboarding_quests(current_user)
+
+
+@router.post(
+    "/me/quests/{quest_id}/complete",
+    response_model=OnboardingProgressResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Complete onboarding quest",
+)
+async def complete_onboarding_quest(
+    quest_id: str,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> OnboardingProgressResponse:
+    """Mark an onboarding quest complete for the current user."""
+    service = UserService(db)
+    return await service.complete_onboarding_quest(current_user, quest_id)
 
 
 @router.get(
