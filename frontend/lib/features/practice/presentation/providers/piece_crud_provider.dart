@@ -1,26 +1,38 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/piece.dart';
 import '../../domain/repositories/piece_repository.dart';
 import 'piece_repository_provider.dart';
 
+part 'piece_crud_provider.g.dart';
+
 /// All pieces provider (library)
-final piecesProvider = FutureProvider<List<Piece>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<Piece>> pieces(PiecesRef ref) async {
   final repository = ref.watch(pieceRepositoryProvider);
   return repository.getAllPieces();
-});
+}
 
 /// Single piece provider
-final pieceProvider =
-    FutureProvider.family<Piece?, String>((ref, id) async {
+@Riverpod(keepAlive: true)
+Future<Piece?> piece(PieceRef ref, String id) async {
   final repository = ref.watch(pieceRepositoryProvider);
   return repository.getPiece(id);
-});
+}
 
 /// Search pieces provider
-final pieceSearchQueryProvider = StateProvider<String>((ref) => '');
+@Riverpod(keepAlive: true)
+class PieceSearchQuery extends _$PieceSearchQuery {
+  @override
+  String build() => '';
 
-final filteredPiecesProvider = FutureProvider<List<Piece>>((ref) async {
+  void setQuery(String query) {
+    state = query;
+  }
+}
+
+@Riverpod(keepAlive: true)
+Future<List<Piece>> filteredPieces(FilteredPiecesRef ref) async {
   final query = ref.watch(pieceSearchQueryProvider);
   final repository = ref.watch(pieceRepositoryProvider);
 
@@ -28,17 +40,21 @@ final filteredPiecesProvider = FutureProvider<List<Piece>>((ref) async {
     return repository.getAllPieces();
   }
   return repository.searchPieces(query);
-});
+}
 
 /// Student repertoire provider
-final studentRepertoireProvider =
-    FutureProvider.family<Repertoire, String>((ref, studentId) async {
+@Riverpod(keepAlive: true)
+Future<Repertoire> studentRepertoire(
+  StudentRepertoireRef ref,
+  String studentId,
+) async {
   final repository = ref.watch(pieceRepositoryProvider);
   return repository.getStudentRepertoire(studentId);
-});
+}
 
 /// Piece library notifier for CRUD operations
-class PiecesNotifier extends AsyncNotifier<List<Piece>> {
+@Riverpod(keepAlive: true)
+class PiecesNotifier extends _$PiecesNotifier {
   PieceRepository get _repository => ref.read(pieceRepositoryProvider);
 
   @override
@@ -87,14 +103,9 @@ class PiecesNotifier extends AsyncNotifier<List<Piece>> {
   }
 }
 
-final piecesNotifierProvider =
-    AsyncNotifierProvider<PiecesNotifier, List<Piece>>(
-  PiecesNotifier.new,
-);
-
 /// Student repertoire notifier
-class StudentRepertoireNotifier
-    extends FamilyAsyncNotifier<Repertoire, String> {
+@Riverpod(keepAlive: true)
+class StudentRepertoireNotifier extends _$StudentRepertoireNotifier {
   PieceRepository get _repository => ref.read(pieceRepositoryProvider);
 
   @override
@@ -105,9 +116,10 @@ class StudentRepertoireNotifier
   Future<void> assignPiece(String pieceId) async {
     state = const AsyncValue.loading();
     try {
-      await _repository.assignPieceToStudent(pieceId, arg);
+      await _repository.assignPieceToStudent(pieceId, studentId);
       state = await AsyncValue.guard(
-          () => _repository.getStudentRepertoire(arg));
+        () => _repository.getStudentRepertoire(studentId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -116,9 +128,10 @@ class StudentRepertoireNotifier
   Future<void> removePiece(String pieceId) async {
     state = const AsyncValue.loading();
     try {
-      await _repository.removePieceFromStudent(pieceId, arg);
+      await _repository.removePieceFromStudent(pieceId, studentId);
       state = await AsyncValue.guard(
-          () => _repository.getStudentRepertoire(arg));
+        () => _repository.getStudentRepertoire(studentId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -127,9 +140,10 @@ class StudentRepertoireNotifier
   Future<void> updateProgress(String pieceId, PieceProgress progress) async {
     state = const AsyncValue.loading();
     try {
-      await _repository.updatePieceProgress(pieceId, arg, progress);
+      await _repository.updatePieceProgress(pieceId, studentId, progress);
       state = await AsyncValue.guard(
-          () => _repository.getStudentRepertoire(arg));
+        () => _repository.getStudentRepertoire(studentId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -138,11 +152,7 @@ class StudentRepertoireNotifier
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-        () => _repository.getStudentRepertoire(arg));
+      () => _repository.getStudentRepertoire(studentId),
+    );
   }
 }
-
-final studentRepertoireNotifierProvider = AsyncNotifierProvider.family<
-    StudentRepertoireNotifier, Repertoire, String>(
-  StudentRepertoireNotifier.new,
-);

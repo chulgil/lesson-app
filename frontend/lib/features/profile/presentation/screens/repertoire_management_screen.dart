@@ -50,7 +50,7 @@ class _RepertoireManagementScreenState
           RepertoireSearchAndFilter(
             onSearchChanged:
                 (value) =>
-                    ref.read(pieceSearchQueryProvider.notifier).state = value,
+                    ref.read(pieceSearchQueryProvider.notifier).setQuery(value),
             selectedDifficulty: _selectedDifficulty,
             selectedComposer: _selectedComposer,
             onDifficultyTap: _showDifficultyFilter,
