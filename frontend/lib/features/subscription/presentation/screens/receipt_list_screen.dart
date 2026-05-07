@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../domain/entities/payment_receipt.dart';
@@ -220,12 +221,27 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: AppColors.paper,
-      title: Text(
-        '월 선택',
-        style: NotebookTypography.sectionTitle,
+    return NotebookAlertDialog(
+      title: '월 선택',
+      titlePadding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space2,
       ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        0,
+        AppSpacing.space4,
+        AppSpacing.space1,
+      ),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.space3,
+        AppSpacing.space1,
+        AppSpacing.space3,
+        AppSpacing.space3,
+      ),
+      actionsAlignment: MainAxisAlignment.end,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -282,6 +298,7 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
               );
             },
           ),
+          const SizedBox(height: AppSpacing.space4),
         ],
       ),
       actions: [
@@ -292,13 +309,12 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
             style: TextStyle(color: AppColors.inkSecondary),
           ),
         ),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-            minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-          ),
+        TextButton(
           onPressed: () => Navigator.of(context).pop((_year, _month)),
-          child: Text(AppStrings.confirm),
+          child: Text(
+            AppStrings.confirm,
+            style: TextStyle(color: AppColors.ink),
+          ),
         ),
       ],
     );

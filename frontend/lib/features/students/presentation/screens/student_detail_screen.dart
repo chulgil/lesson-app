@@ -16,6 +16,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/students_facade.dart'
     show
@@ -281,15 +282,13 @@ class _StudentDetailContent extends ConsumerWidget {
                 hint: 'CSV · PDF',
                 onTap: () {
                   Navigator.pop(context);
-                  showModalBottomSheet<void>(
+                  showNotebookModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder:
-                        (_) => LessonExportSheet(
-                          studentId: student.id,
-                          studentName: student.name,
-                        ),
+                    builder: (_) => LessonExportSheet(
+                      studentId: student.id,
+                      studentName: student.name,
+                    ),
                   );
                 },
               ),

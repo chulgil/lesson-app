@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/teacher_announcement.dart';
@@ -92,26 +93,21 @@ class _AnnouncementCard extends ConsumerWidget {
 
   void _editAnnouncement(BuildContext context, WidgetRef ref) async {
     final controller = TextEditingController(text: announcement.message);
-    final result = await showDialog<String>(
+    final result = await showNotebookDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('공지 수정'),
-        content: TextField(
-          controller: controller,
-          maxLines: 4,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: '공지 내용을 수정하세요',
-          ),
+      title: '공지 수정',
+      content: TextField(
+        controller: controller,
+        maxLines: 4,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: '공지 내용을 수정하세요',
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('취소')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('저장'),
-          ),
-        ],
       ),
+      confirmLabel: '저장',
+      onConfirm: () => Navigator.pop(context, controller.text.trim()),
+      cancelLabel: '취소',
+      onCancel: () => Navigator.pop(context),
     );
     controller.dispose();
 
@@ -131,20 +127,17 @@ class _AnnouncementCard extends ConsumerWidget {
   }
 
   void _deleteAnnouncement(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('공지 삭제'),
-        content: const Text('이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
-            child: const Text('삭제'),
-          ),
-        ],
+      title: '공지 삭제',
+      content: const Text(
+        '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.',
       ),
+      confirmLabel: '삭제',
+      onConfirm: () => Navigator.pop(context, true),
+      cancelLabel: '취소',
+      onCancel: () => Navigator.pop(context, false),
+      isDestructive: true,
     );
 
     if (confirmed == true) {
