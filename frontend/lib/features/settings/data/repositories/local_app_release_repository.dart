@@ -1,19 +1,28 @@
+import 'package:package_info_plus/package_info_plus.dart';
+
 import '../../../../core/config/environment.dart';
 import '../../domain/entities/app_release.dart';
 import '../../domain/repositories/app_release_repository.dart';
 
 class LocalAppReleaseRepository implements AppReleaseRepository {
-  const LocalAppReleaseRepository({
-    this.currentVersion = EnvironmentConfig.appVersion,
-  });
+  const LocalAppReleaseRepository({this.currentVersion});
 
-  final String currentVersion;
+  final String? currentVersion;
 
   @override
   Future<AppReleaseSnapshot> fetchReleaseSnapshot() async {
+    final resolved = currentVersion;
+    final packageVersion = (await PackageInfo.fromPlatform()).version;
+    final current =
+        (resolved != null && resolved.isNotEmpty)
+            ? resolved
+            : (packageVersion.isNotEmpty
+                ? packageVersion
+                : EnvironmentConfig.appVersion);
+
     return AppReleaseSnapshot(
       version: AppVersionSnapshot(
-        currentVersion: currentVersion,
+        currentVersion: current,
         buildNumber: '1',
         latestVersion: '1.1.0',
         checkedAt: DateTime.now().toUtc(),

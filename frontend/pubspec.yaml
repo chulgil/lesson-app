@@ -67,6 +67,8 @@ dependencies:
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.1.4
   json_annotation: ^4.9.0
+  package_info_plus: ^8.0.0
+  in_app_review: ^2.0.9
 
 dev_dependencies:
   flutter_test:

@@ -7,17 +7,16 @@ part of 'app_release_provider.dart';
 // **************************************************************************
 
 String _$appReleaseRepositoryHash() =>
-    r'f0f49a6b28a0d9936c9d9a2ac471b1aa74feb03c';
+    r'6611a16f6cdc3d5628698d5211c722fad103f0cd';
 
 /// See also [appReleaseRepository].
 @ProviderFor(appReleaseRepository)
 final appReleaseRepositoryProvider = Provider<AppReleaseRepository>.internal(
   appReleaseRepository,
   name: r'appReleaseRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$appReleaseRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appReleaseRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -31,10 +30,9 @@ String _$appReleaseSnapshotHash() =>
 final appReleaseSnapshotProvider = FutureProvider<AppReleaseSnapshot>.internal(
   appReleaseSnapshot,
   name: r'appReleaseSnapshotProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$appReleaseSnapshotHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appReleaseSnapshotHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -48,10 +46,9 @@ String _$appVersionSnapshotHash() =>
 final appVersionSnapshotProvider = FutureProvider<AppVersionSnapshot>.internal(
   appVersionSnapshot,
   name: r'appVersionSnapshotProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$appVersionSnapshotHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appVersionSnapshotHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -78,10 +75,9 @@ String _$appRoadmapFeedHash() => r'fb79040b0956d152f32ef892d2ae43494f742884';
 final appRoadmapFeedProvider = FutureProvider<List<AppRoadmapItem>>.internal(
   appRoadmapFeed,
   name: r'appRoadmapFeedProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$appRoadmapFeedHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appRoadmapFeedHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -94,10 +90,9 @@ String _$appReviewClientHash() => r'db62f60d95ab9fdea9af3b20d2eb4dc4e3f3e6e6';
 final appReviewClientProvider = Provider<AppReviewClient>.internal(
   appReviewClient,
   name: r'appReviewClientProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$appReviewClientHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appReviewClientHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -111,10 +106,9 @@ String _$reviewPromptPolicyHash() =>
 final reviewPromptPolicyProvider = Provider<ReviewPromptPolicy>.internal(
   reviewPromptPolicy,
   name: r'reviewPromptPolicyProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$reviewPromptPolicyHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$reviewPromptPolicyHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -154,15 +148,21 @@ class ShouldPromptForReviewFamily extends Family<bool> {
   const ShouldPromptForReviewFamily();
 
   /// See also [shouldPromptForReview].
-  ShouldPromptForReviewProvider call(int completedLessonCount) {
-    return ShouldPromptForReviewProvider(completedLessonCount);
+  ShouldPromptForReviewProvider call(
+    int completedLessonCount,
+  ) {
+    return ShouldPromptForReviewProvider(
+      completedLessonCount,
+    );
   }
 
   @override
   ShouldPromptForReviewProvider getProviderOverride(
     covariant ShouldPromptForReviewProvider provider,
   ) {
-    return call(provider.completedLessonCount);
+    return call(
+      provider.completedLessonCount,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -183,23 +183,24 @@ class ShouldPromptForReviewFamily extends Family<bool> {
 /// See also [shouldPromptForReview].
 class ShouldPromptForReviewProvider extends Provider<bool> {
   /// See also [shouldPromptForReview].
-  ShouldPromptForReviewProvider(int completedLessonCount)
-    : this._internal(
-        (ref) => shouldPromptForReview(
-          ref as ShouldPromptForReviewRef,
-          completedLessonCount,
-        ),
-        from: shouldPromptForReviewProvider,
-        name: r'shouldPromptForReviewProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$shouldPromptForReviewHash,
-        dependencies: ShouldPromptForReviewFamily._dependencies,
-        allTransitiveDependencies:
-            ShouldPromptForReviewFamily._allTransitiveDependencies,
-        completedLessonCount: completedLessonCount,
-      );
+  ShouldPromptForReviewProvider(
+    int completedLessonCount,
+  ) : this._internal(
+          (ref) => shouldPromptForReview(
+            ref as ShouldPromptForReviewRef,
+            completedLessonCount,
+          ),
+          from: shouldPromptForReviewProvider,
+          name: r'shouldPromptForReviewProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$shouldPromptForReviewHash,
+          dependencies: ShouldPromptForReviewFamily._dependencies,
+          allTransitiveDependencies:
+              ShouldPromptForReviewFamily._allTransitiveDependencies,
+          completedLessonCount: completedLessonCount,
+        );
 
   ShouldPromptForReviewProvider._internal(
     super._createNotifier, {
@@ -264,6 +265,5 @@ class _ShouldPromptForReviewProviderElement extends ProviderElement<bool>
   int get completedLessonCount =>
       (origin as ShouldPromptForReviewProvider).completedLessonCount;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
