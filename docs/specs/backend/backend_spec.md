@@ -86,6 +86,8 @@ app/
 
 ### 패턴
 
+자세한 아키텍처 가드레일은 [backend_architecture.md](backend_architecture.md)을 참고.
+
 - **Service Layer**: 라우터 → 서비스 → DB. 비즈니스 로직은 서비스에만.
 - **FK 컨벤션**: String(36) 기반, ORM relationship() 미사용, 서비스에서 수동 조인
 - **UUID PK**: UUIDMixin (String(36), uuid4)
