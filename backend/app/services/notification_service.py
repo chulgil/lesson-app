@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, or_, select, update
+from sqlalchemy import and_, func, or_, select, true, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import NotificationPriority
@@ -21,6 +21,74 @@ logger = logging.getLogger(__name__)
 # Module-level singleton for FCM service
 _fcm_service = FcmService()
 
+TEACHER_NOTIFICATION_TYPES = frozenset(
+    {
+        "newStudentRegistered",
+        "trialBookingRequest",
+        "studentPracticeReport",
+        "reviewReceived",
+        "paymentReceived",
+        "proposalAccepted",
+        "rescheduleAllowanceUsed",
+        "rescheduleAllowanceDepleted",
+        "generalAnnouncement",
+        "paymentReminderSentNotice",
+        "renewalReminderSentNotice",
+    }
+)
+STUDENT_NOTIFICATION_TYPES = frozenset(
+    {
+        "practiceReminder",
+        "practiceAssigned",
+        "streakWarning",
+        "streakMilestone",
+        "weeklyGoalAchieved",
+        "recordingFeedbackReceived",
+        "proposalReceived",
+        "proposalReminder24h",
+        "proposalReminder48h",
+        "proposalReminder72h",
+        "proposalExpired",
+        "paymentRequested",
+        "paymentReminder",
+        "paymentConfirmed",
+        "lessonsRunningLow",
+        "teacherNoshow",
+        "compensationApplied",
+        "lessonNoteShared",
+    }
+)
+BOTH_ROLE_NOTIFICATION_TYPES = frozenset(
+    {
+        "lessonBooked",
+        "lessonReminder",
+        "lessonCancelled",
+        "lessonRescheduled",
+        "lessonStarting",
+        "lessonCompleted",
+        "noshowWarning",
+        "noshowConfirmed",
+        "cancellationDeadline",
+        "connectionRequestReceived",
+        "connectionRequestAccepted",
+        "connectionRequestRejected",
+        "connectionEstablished",
+        "connectionDisconnected",
+        "makeupLessonCreated",
+        "makeupLessonExpiring",
+        "makeupLessonExpired",
+        "scheduleChangeRequested",
+        "scheduleChangeApproved",
+        "scheduleChangeRejected",
+        "scheduleChangeAlternative",
+        "subscriptionExpiringSoon",
+        "subscriptionExpired",
+    }
+)
+KNOWN_ROLE_TARGETED_TYPES = (
+    TEACHER_NOTIFICATION_TYPES | STUDENT_NOTIFICATION_TYPES | BOTH_ROLE_NOTIFICATION_TYPES
+)
+
 
 class NotificationService:
     """Handle notification listing, read marking, unread counting, and push sending."""
@@ -32,6 +100,7 @@ class NotificationService:
         self,
         *,
         user_id: str,
+        user_role: Any = None,
         page: int,
         size: int,
         offset: int,
@@ -45,6 +114,7 @@ class NotificationService:
         query = select(Notification).where(
             Notification.user_id == user_id,
             visible_filter,
+            self._recipient_role_filter(Notification, user_role),
         )
         if is_read is not None:
             if is_read:
@@ -76,23 +146,25 @@ class NotificationService:
             notif.read_at = datetime.now(UTC)
         await self.db.flush()
 
-    async def mark_all_read(self, user_id: str) -> None:
+    async def mark_all_read(self, user_id: str, user_role: Any = None) -> None:
         """Mark all notifications as read for a user."""
         from app.models.notification import Notification
 
         visible_filter = self._visible_in_app_filter(Notification)
+        role_filter = self._recipient_role_filter(Notification, user_role)
         await self.db.execute(
             update(Notification)
             .where(
                 Notification.user_id == user_id,
                 visible_filter,
+                role_filter,
                 Notification.read_at.is_(None),
             )
             .values(read_at=datetime.now(UTC))
         )
         await self.db.flush()
 
-    async def get_unread_count(self, user_id: str) -> int:
+    async def get_unread_count(self, user_id: str, user_role: Any = None) -> int:
         """Return the number of unread notifications."""
         from app.models.notification import Notification
 
@@ -101,10 +173,26 @@ class NotificationService:
             select(func.count()).where(
                 Notification.user_id == user_id,
                 visible_filter,
+                self._recipient_role_filter(Notification, user_role),
                 Notification.read_at.is_(None),
             )
         )
         return count or 0
+
+    def _recipient_role_filter(self, notification_model: Any, user_role: Any) -> Any:
+        """Return the predicate matching frontend notification target-role policy."""
+        role = getattr(user_role, "value", user_role)
+        if role == "teacher":
+            allowed_types = TEACHER_NOTIFICATION_TYPES | BOTH_ROLE_NOTIFICATION_TYPES
+        elif role in {"student", "parent"}:
+            allowed_types = STUDENT_NOTIFICATION_TYPES | BOTH_ROLE_NOTIFICATION_TYPES
+        else:
+            return true()
+
+        return or_(
+            notification_model.type.not_in(KNOWN_ROLE_TARGETED_TYPES),
+            notification_model.type.in_(allowed_types),
+        )
 
     def _visible_in_app_filter(self, notification_model: Any) -> Any:
         """Return the predicate for notifications visible in the in-app inbox."""

@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import create_access_token
 from app.models.notification import Notification, NotificationPriority
 
 
@@ -355,3 +356,100 @@ async def test_mark_all_read_only_updates_current_user_unread_notifications(
     assert count_response.status_code == 200
     assert count_response.json() == {"count": 0}
     assert other_notification.read_at is None
+
+
+@pytest.mark.asyncio
+async def test_notification_list_count_and_read_all_follow_recipient_role_policy(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Remote notification inbox matches mock role-target filtering for red-dot state."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    teacher_only = Notification(
+        user_id="test-user-id",
+        type="trialBookingRequest",
+        priority=NotificationPriority.high,
+        title="교사용 알림",
+        body="표시 대상",
+    )
+    both = Notification(
+        user_id="test-user-id",
+        type="lessonReminder",
+        priority=NotificationPriority.normal,
+        title="공통 알림",
+        body="표시 대상",
+    )
+    student_only = Notification(
+        user_id="test-user-id",
+        type="practiceReminder",
+        priority=NotificationPriority.normal,
+        title="학생용 알림",
+        body="교사에게 숨김",
+    )
+    db_session.add_all([teacher_only, both, student_only])
+    await db_session.flush()
+
+    list_response = await client.get("/api/v1/notifications", headers=auth_headers)
+    count_response = await client.get("/api/v1/notifications/unread-count", headers=auth_headers)
+    read_all_response = await client.patch("/api/v1/notifications/read-all", headers=auth_headers)
+    await db_session.refresh(teacher_only)
+    await db_session.refresh(both)
+    await db_session.refresh(student_only)
+
+    assert list_response.status_code == 200
+    assert {item["type"] for item in list_response.json()["items"]} == {
+        "lessonReminder",
+        "trialBookingRequest",
+    }
+    assert count_response.status_code == 200
+    assert count_response.json() == {"count": 2}
+    assert read_all_response.status_code == 200
+    assert teacher_only.read_at is not None
+    assert both.read_at is not None
+    assert student_only.read_at is None
+
+
+@pytest.mark.asyncio
+async def test_parent_notifications_use_student_and_common_targets(
+    client: AsyncClient,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Parents receive student-side child/payment notices plus common lesson notices."""
+    await create_test_user(user_id="test-parent-id", role="parent", email="parent-notification@test.com")
+    parent_auth_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'test-parent-id', 'role': 'parent'})}"
+    }
+    student_only = Notification(
+        user_id="test-parent-id",
+        type="paymentReminder",
+        priority=NotificationPriority.high,
+        title="자녀 수강료 알림",
+        body="학부모 표시 대상",
+    )
+    both = Notification(
+        user_id="test-parent-id",
+        type="lessonCancelled",
+        priority=NotificationPriority.high,
+        title="공통 일정 알림",
+        body="학부모 표시 대상",
+    )
+    teacher_only = Notification(
+        user_id="test-parent-id",
+        type="paymentReceived",
+        priority=NotificationPriority.normal,
+        title="교사용 입금 확인",
+        body="학부모에게 숨김",
+    )
+    db_session.add_all([student_only, both, teacher_only])
+    await db_session.flush()
+
+    response = await client.get("/api/v1/notifications", headers=parent_auth_headers)
+
+    assert response.status_code == 200
+    assert {item["type"] for item in response.json()["items"]} == {
+        "lessonCancelled",
+        "paymentReminder",
+    }

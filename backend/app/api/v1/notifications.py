@@ -33,6 +33,7 @@ async def list_notifications(
     service = NotificationService(db)
     return await service.get_all(
         user_id=current_user.id,
+        user_role=current_user.role,
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
@@ -70,7 +71,7 @@ async def mark_all_read(
 ) -> SuccessResponse:
     """Mark all notifications for the current user as read."""
     service = NotificationService(db)
-    await service.mark_all_read(current_user.id)
+    await service.mark_all_read(current_user.id, current_user.role)
     return SuccessResponse(message="All notifications marked as read")
 
 
@@ -86,5 +87,5 @@ async def unread_count(
 ) -> UnreadCountResponse:
     """Return the number of unread notifications."""
     service = NotificationService(db)
-    count = await service.get_unread_count(current_user.id)
+    count = await service.get_unread_count(current_user.id, current_user.role)
     return UnreadCountResponse(count=count)
