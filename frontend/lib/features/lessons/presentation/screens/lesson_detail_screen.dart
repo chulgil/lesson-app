@@ -40,7 +40,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   late TabController _tabController;
   Timer? _feedbackDebounce;
   String? _pendingFeedbackText;
-  bool _proposalBannerDismissed = false;
+  // _proposalBannerDismissed removed — 정규레슨 제안은 학생 상세 수강권 현황에서 표시
 
   @override
   void initState() {
@@ -412,11 +412,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Regular lesson proposal banner (shown after feedback is written,
           // when no active subscription exists with this student)
-          if (widget.isTeacher &&
-              lesson.displayStatus == LessonStatus.completed &&
-              !needsFeedback &&
-              !_proposalBannerDismissed)
-            _buildRegularLessonProposalBanner(lesson),
+          // 정규레슨 제안 배너는 학생 상세 > 수강권 현황에서 표시 (레슨노트에서 제거)
 
           // Teacher notes section
           if (widget.isTeacher) ...[
@@ -526,102 +522,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     } catch (_) {
       // Silent fail — auto proposal is best-effort
     }
-  }
-
-  /// Banner prompting teacher to propose regular lessons after a completed lesson.
-  /// Only shows when no active subscription exists for this student.
-  Widget _buildRegularLessonProposalBanner(Lesson lesson) {
-    if (lesson.teacherId == null) return const SizedBox.shrink();
-
-    final subscriptionAsync = ref.watch(
-      activeSubscriptionBetweenProvider(
-        studentId: lesson.studentId,
-        teacherId: lesson.teacherId!,
-      ),
-    );
-
-    return subscriptionAsync.when(
-      data: (subscription) {
-        // Has active subscription — no need to propose
-        if (subscription != null && (subscription.remainingLessons ?? 0) > 0) {
-          return const SizedBox.shrink();
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.paperAccentSoft, AppColors.paperAccentSoft],
-              ),
-              border: Border.all(color: AppColors.paperAccent),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.school_outlined,
-                      color: AppColors.paperAccent,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Text(
-                        AppStrings.regularLessonProposalTitle,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.paperAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap:
-                          () => setState(() => _proposalBannerDismissed = true),
-                      child: Icon(
-                        Icons.close,
-                        size: 18,
-                        color: AppColors.inkTertiary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.space2),
-                Text(
-                  AppStrings.regularLessonProposalDescription,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      context.push(
-                        '${AppRoutes.issueSubscription}?studentId=${lesson.studentId}',
-                      );
-                    },
-                    icon: const Icon(Icons.card_membership, size: 18),
-                    label: const Text(AppStrings.issueSubscriptionButton),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.paperAccent,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.space3,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
   }
 
   Widget _buildAssignmentsTab(Lesson lesson) {

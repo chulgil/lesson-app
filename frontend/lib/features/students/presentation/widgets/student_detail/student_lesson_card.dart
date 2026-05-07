@@ -10,6 +10,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../../../features/lessons/presentation/extensions/lesson_visuals.dart';
 
 /// Lesson card for student detail screen
 class StudentLessonCard extends StatelessWidget {
@@ -29,10 +30,7 @@ class StudentLessonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(
-          color:
-              isUpcoming
-                  ? AppColors.paperAccent
-                  : AppColors.inkQuaternary,
+          color: isUpcoming ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
       ),
       child: InkWell(
@@ -43,12 +41,11 @@ class StudentLessonCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
             children: [
-              // Date badge
+              // Date badge — fixed size for consistent card height
               Container(
                 width: 48,
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.space2,
-                ),
+                height: 48,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color:
                       isUpcoming
