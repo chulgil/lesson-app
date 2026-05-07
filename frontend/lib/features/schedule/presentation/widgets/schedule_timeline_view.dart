@@ -557,51 +557,93 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
   void _showLessonActions(Lesson lesson) {
+    final hasSubscription = lesson.subscriptionId != null;
+    final isUpcoming = lesson.isUpcoming;
+
     showNotebookBottomSheet<void>(
       context: context,
       padding: EdgeInsets.zero,
       showHandle: false,
       builder:
           (ctx) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(
-                    Icons.check_circle,
-                    color: AppColors.paperOk,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                      decoration: BoxDecoration(color: AppColors.inkQuaternary),
+                    ),
                   ),
-                  title: const Text(AppStrings.scheduleMarkComplete),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    _completeLesson(lesson);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.edit_calendar,
-                    color: AppColors.ink,
+                  // 학생 이름 + 시간
+                  Text(
+                    '${lesson.studentName} · ${lesson.startTime}',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  title: const Text(AppStrings.scheduleChangeSchedule),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    context.push(
-                      AppRoutes.editLesson.replaceFirst(':id', lesson.id),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.cancel,
-                    color: AppColors.paperAccent,
+                  const SizedBox(height: AppSpacing.space4),
+                  // 액션 카드들 (Notebook × Score: 각진 네모 박스)
+                  _ActionCard(
+                    icon: Icons.check_circle_outline,
+                    iconColor: AppColors.paperOk,
+                    label: AppStrings.scheduleMarkComplete,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      _completeLesson(lesson);
+                    },
                   ),
-                  title: const Text(AppStrings.cancel),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    _cancelLesson(lesson);
-                  },
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.space2),
+                  // 수강권 + 미래 레슨 → 스케줄 변경(챗)
+                  if (hasSubscription && isUpcoming)
+                    _ActionCard(
+                      icon: Icons.swap_horiz,
+                      iconColor: AppColors.ink,
+                      label: AppStrings.scheduleChangeSchedule,
+                      subtitle: '수강권 스케줄 조절 (챗)',
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        context.push(
+                          AppRoutes.subscriptionDetail.replaceFirst(
+                            ':id',
+                            lesson.subscriptionId!,
+                          ),
+                          extra: {'viewerRole': 'teacher'},
+                        );
+                      },
+                    ),
+                  // 수기 레슨 (수강권 없음) → 편집 화면
+                  if (!hasSubscription)
+                    _ActionCard(
+                      icon: Icons.edit_calendar,
+                      iconColor: AppColors.ink,
+                      label: '일정 수정',
+                      subtitle: '수기 등록 레슨 편집',
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        context.push(
+                          AppRoutes.editLesson.replaceFirst(':id', lesson.id),
+                        );
+                      },
+                    ),
+                  const SizedBox(height: AppSpacing.space2),
+                  _ActionCard(
+                    icon: Icons.close,
+                    iconColor: AppColors.paperAccent,
+                    label: AppStrings.cancel,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      _cancelLesson(lesson);
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                ],
+              ),
             ),
           ),
     );
@@ -661,6 +703,76 @@ class _TravelTimeBlock extends StatelessWidget {
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+/// Notebook × Score 액션 카드 — 각진 네모 박스, 클래식한 느낌.
+class _ActionCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String? subtitle;
+  final VoidCallback onTap;
+
+  const _ActionCard({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+              ),
+              child: Icon(icon, size: 20, color: iconColor),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: AppTypography.captionSmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
+          ],
+        ),
       ),
     );
   }
