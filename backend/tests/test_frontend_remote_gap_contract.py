@@ -55,3 +55,22 @@ async def test_openapi_exposes_frontend_remote_contract_routes(client) -> None:
 
     for path, methods in expected_routes.items():
         _assert_path_methods(routes, path, methods)
+
+
+@pytest.mark.asyncio
+async def test_openapi_does_not_expose_app_managed_payment_endpoints(client) -> None:
+    """Manual tuition-deposit model does not include app-managed payment routes."""
+    response = await client.get("/openapi.json")
+    assert response.status_code == 200
+    routes = response.json()["paths"]
+
+    prohibited_routes = {
+        "/api/v1/payments",
+        "/api/v1/payments/{payment_id}",
+        "/api/v1/payments/summary",
+        "/api/v1/payments/overdue",
+        "/api/v1/payments/tuition-settings/{student_id}",
+        "/api/v1/payments/tuition-settings/{student_id}/",
+    }
+    for path in prohibited_routes:
+        assert path not in routes, f"Unexpected app-managed payment route should stay absent: {path}"

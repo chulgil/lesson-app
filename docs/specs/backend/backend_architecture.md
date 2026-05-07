@@ -34,6 +34,8 @@
 - `generalAnnouncement`는 교사/학생/부모 공통 알림으로 처리되며, 인앱 알림 가시성 필터에 포함됨
 - 선생님 공지 API (`/api/v1/announcements*`)는 인증 주체에서 `teacher_id`를 유추해 동작하도록 보완
 - 휴강 공지는 `teacher_announcements + teacher_announcement_dates` 정규화 조인 테이블 기반으로 저장
+- 결제/과금 범위는 `/subscriptions` 기반의 수동 수강료 입금 상태로 제한한다.
+  - `/api/v1/payments` 계열 라우트는 앱 결제/PG 라우트로 간주하여 현재 미노출 상태를 유지한다.
 
 ## 신규 계약 완료 상태 (요약)
 
