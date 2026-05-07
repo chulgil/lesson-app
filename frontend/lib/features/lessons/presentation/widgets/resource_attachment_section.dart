@@ -13,7 +13,6 @@ import '../../domain/entities/teaching_resource.dart';
 import '../extensions/teaching_resource_visuals.dart';
 import '../providers/teaching_resource_providers.dart';
 import 'add_recording_resource_sheet.dart';
-import 'add_youtube_resource_sheet.dart';
 import 'youtube_search_sheet.dart';
 
 /// Displays attached teaching resources on a practice item card (read-only)
@@ -341,27 +340,15 @@ class _AddResourceButton extends ConsumerWidget {
                     },
                   ),
 
-                  // YouTube search (new — first YouTube entry point)
+                  // 유튜브 (검색 + URL 통합 입력)
                   _buildOption(
                     ctx,
-                    icon: Icons.search,
+                    icon: Icons.play_circle_outline,
                     label: AppStrings.youtubeSearch,
                     color: AppColors.youtubeRed,
                     onTap: () {
                       Navigator.pop(ctx);
                       _showYoutubeSearch(context);
-                    },
-                  ),
-
-                  // URL 직접 입력 (second YouTube option)
-                  _buildOption(
-                    ctx,
-                    icon: Icons.play_circle_outline,
-                    label: AppStrings.addYoutubeLink,
-                    color: AppColors.youtubeRed,
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _showAddYoutube(context);
                     },
                   ),
 
@@ -508,15 +495,6 @@ class _AddResourceButton extends ConsumerWidget {
       isScrollControlled: true,
       builder:
           (_) => YoutubeSearchSheet(onResourceCreated: onResourceSelected),
-    );
-  }
-
-  void _showAddYoutube(BuildContext context) {
-    showNotebookModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder:
-          (_) => AddYoutubeResourceSheet(onResourceCreated: onResourceSelected),
     );
   }
 
