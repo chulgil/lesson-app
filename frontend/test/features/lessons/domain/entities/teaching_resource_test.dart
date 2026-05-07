@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/lessons/domain/entities/teaching_resource.dart';
+import 'package:lessonaza/features/lessons/presentation/extensions/teaching_resource_visuals.dart';
 
 import '../../../../helpers/helpers.dart';
 
@@ -157,9 +158,7 @@ void main() {
     });
 
     test('start만 → "1:32~" 형식', () {
-      final resource = createTeachingResource(
-        youtubeStartSeconds: 92,
-      );
+      final resource = createTeachingResource(youtubeStartSeconds: 92);
       expect(resource.segmentDurationText, '1:32~');
     });
 
@@ -193,9 +192,7 @@ void main() {
     });
 
     test('start만 → "1:32부터" 형식', () {
-      final resource = createTeachingResource(
-        youtubeStartSeconds: 92,
-      );
+      final resource = createTeachingResource(youtubeStartSeconds: 92);
       expect(resource.timestampText, '1:32부터');
     });
 

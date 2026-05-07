@@ -41,15 +41,21 @@ class StudentLessonProgressFamily
   const StudentLessonProgressFamily();
 
   /// See also [studentLessonProgress].
-  StudentLessonProgressProvider call(String studentId) {
-    return StudentLessonProgressProvider(studentId);
+  StudentLessonProgressProvider call(
+    String studentId,
+  ) {
+    return StudentLessonProgressProvider(
+      studentId,
+    );
   }
 
   @override
   StudentLessonProgressProvider getProviderOverride(
     covariant StudentLessonProgressProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -71,21 +77,24 @@ class StudentLessonProgressFamily
 class StudentLessonProgressProvider
     extends FutureProvider<List<StudentLessonProgressItem>> {
   /// See also [studentLessonProgress].
-  StudentLessonProgressProvider(String studentId)
-    : this._internal(
-        (ref) =>
-            studentLessonProgress(ref as StudentLessonProgressRef, studentId),
-        from: studentLessonProgressProvider,
-        name: r'studentLessonProgressProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentLessonProgressHash,
-        dependencies: StudentLessonProgressFamily._dependencies,
-        allTransitiveDependencies:
-            StudentLessonProgressFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentLessonProgressProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentLessonProgress(
+            ref as StudentLessonProgressRef,
+            studentId,
+          ),
+          from: studentLessonProgressProvider,
+          name: r'studentLessonProgressProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentLessonProgressHash,
+          dependencies: StudentLessonProgressFamily._dependencies,
+          allTransitiveDependencies:
+              StudentLessonProgressFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentLessonProgressProvider._internal(
     super._createNotifier, {
@@ -102,9 +111,8 @@ class StudentLessonProgressProvider
   @override
   Override overrideWith(
     FutureOr<List<StudentLessonProgressItem>> Function(
-      StudentLessonProgressRef provider,
-    )
-    create,
+            StudentLessonProgressRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -154,6 +162,5 @@ class _StudentLessonProgressProviderElement
   @override
   String get studentId => (origin as StudentLessonProgressProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

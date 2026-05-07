@@ -16,10 +16,9 @@ String _$selectedDateLessonsHash() =>
 final selectedDateLessonsProvider = FutureProvider<List<Lesson>>.internal(
   selectedDateLessons,
   name: r'selectedDateLessonsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$selectedDateLessonsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedDateLessonsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -47,15 +46,13 @@ String _$lessonsMapHash() => r'973ebf1b8281f5f26bda29d9962e71c263e667be';
 @ProviderFor(lessonsMap)
 final lessonsMapProvider =
     Provider<AsyncValue<Map<DateTime, List<Lesson>>>>.internal(
-      lessonsMap,
-      name: r'lessonsMapProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$lessonsMapHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  lessonsMap,
+  name: r'lessonsMapProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$lessonsMapHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef LessonsMapRef = ProviderRef<AsyncValue<Map<DateTime, List<Lesson>>>>;
 String _$weekLessonsHash() => r'0ddf6a7b9f1811d6f9cd93e3ce3676b4e4a49a9d';
@@ -82,15 +79,14 @@ String _$weekLessonsMapHash() => r'ea3a4b7b7468f11b24e4a107f8fedf3fcc14475f';
 @ProviderFor(weekLessonsMap)
 final weekLessonsMapProvider =
     Provider<AsyncValue<Map<int, List<Lesson>>>>.internal(
-      weekLessonsMap,
-      name: r'weekLessonsMapProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$weekLessonsMapHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  weekLessonsMap,
+  name: r'weekLessonsMapProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$weekLessonsMapHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef WeekLessonsMapRef = ProviderRef<AsyncValue<Map<int, List<Lesson>>>>;
 String _$selectedDateHash() => r'6c5aaff4ab7a60d19b71fad710e7ae68079b053d';
@@ -117,15 +113,14 @@ String _$calendarMonthHash() => r'f55a33381fa28ec7e84bbfb20b33420daa30c275';
 @ProviderFor(CalendarMonth)
 final calendarMonthProvider =
     NotifierProvider<CalendarMonth, DateTime>.internal(
-      CalendarMonth.new,
-      name: r'calendarMonthProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$calendarMonthHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  CalendarMonth.new,
+  name: r'calendarMonthProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$calendarMonthHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$CalendarMonth = Notifier<DateTime>;
 String _$selectedWeekStartHash() => r'47fbf9f92698151f2ce6d03b50303e9a246bcc29';
@@ -136,15 +131,14 @@ String _$selectedWeekStartHash() => r'47fbf9f92698151f2ce6d03b50303e9a246bcc29';
 @ProviderFor(SelectedWeekStart)
 final selectedWeekStartProvider =
     NotifierProvider<SelectedWeekStart, DateTime>.internal(
-      SelectedWeekStart.new,
-      name: r'selectedWeekStartProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$selectedWeekStartHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SelectedWeekStart.new,
+  name: r'selectedWeekStartProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedWeekStartHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SelectedWeekStart = Notifier<DateTime>;
 String _$selectedDayIndexHash() => r'd782c1806bec190a2e44079b72f355ed19a8990a';
@@ -155,15 +149,14 @@ String _$selectedDayIndexHash() => r'd782c1806bec190a2e44079b72f355ed19a8990a';
 @ProviderFor(SelectedDayIndex)
 final selectedDayIndexProvider =
     NotifierProvider<SelectedDayIndex, int>.internal(
-      SelectedDayIndex.new,
-      name: r'selectedDayIndexProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$selectedDayIndexHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SelectedDayIndex.new,
+  name: r'selectedDayIndexProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedDayIndexHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SelectedDayIndex = Notifier<int>;
 // ignore_for_file: type=lint

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 
 /// List item for lesson requests — triage card layout.
 ///
@@ -144,9 +145,7 @@ class RequestListItem extends StatelessWidget {
             horizontal: AppSpacing.space2,
             vertical: AppSpacing.space1,
           ),
-          decoration: BoxDecoration(
-            border: Border.all(color: color, width: 1),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: color, width: 1)),
           child: Text(
             label,
             style: AppTypography.caption.copyWith(

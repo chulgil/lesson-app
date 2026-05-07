@@ -63,13 +63,21 @@ class PieceFamily extends Family<AsyncValue<Piece?>> {
   /// Single piece provider
   ///
   /// Copied from [piece].
-  PieceProvider call(String id) {
-    return PieceProvider(id);
+  PieceProvider call(
+    String id,
+  ) {
+    return PieceProvider(
+      id,
+    );
   }
 
   @override
-  PieceProvider getProviderOverride(covariant PieceProvider provider) {
-    return call(provider.id);
+  PieceProvider getProviderOverride(
+    covariant PieceProvider provider,
+  ) {
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -94,17 +102,23 @@ class PieceProvider extends FutureProvider<Piece?> {
   /// Single piece provider
   ///
   /// Copied from [piece].
-  PieceProvider(String id)
-    : this._internal(
-        (ref) => piece(ref as PieceRef, id),
-        from: pieceProvider,
-        name: r'pieceProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product') ? null : _$pieceHash,
-        dependencies: PieceFamily._dependencies,
-        allTransitiveDependencies: PieceFamily._allTransitiveDependencies,
-        id: id,
-      );
+  PieceProvider(
+    String id,
+  ) : this._internal(
+          (ref) => piece(
+            ref as PieceRef,
+            id,
+          ),
+          from: pieceProvider,
+          name: r'pieceProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pieceHash,
+          dependencies: PieceFamily._dependencies,
+          allTransitiveDependencies: PieceFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   PieceProvider._internal(
     super._createNotifier, {
@@ -119,7 +133,9 @@ class PieceProvider extends FutureProvider<Piece?> {
   final String id;
 
   @override
-  Override overrideWith(FutureOr<Piece?> Function(PieceRef provider) create) {
+  Override overrideWith(
+    FutureOr<Piece?> Function(PieceRef provider) create,
+  ) {
     return ProviderOverride(
       origin: this,
       override: PieceProvider._internal(
@@ -173,10 +189,9 @@ String _$filteredPiecesHash() => r'65d594d2beba246e45bbb4de322c314b5f70bc49';
 final filteredPiecesProvider = FutureProvider<List<Piece>>.internal(
   filteredPieces,
   name: r'filteredPiecesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$filteredPiecesHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$filteredPiecesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -202,15 +217,21 @@ class StudentRepertoireFamily extends Family<AsyncValue<Repertoire>> {
   /// Student repertoire provider
   ///
   /// Copied from [studentRepertoire].
-  StudentRepertoireProvider call(String studentId) {
-    return StudentRepertoireProvider(studentId);
+  StudentRepertoireProvider call(
+    String studentId,
+  ) {
+    return StudentRepertoireProvider(
+      studentId,
+    );
   }
 
   @override
   StudentRepertoireProvider getProviderOverride(
     covariant StudentRepertoireProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -235,20 +256,24 @@ class StudentRepertoireProvider extends FutureProvider<Repertoire> {
   /// Student repertoire provider
   ///
   /// Copied from [studentRepertoire].
-  StudentRepertoireProvider(String studentId)
-    : this._internal(
-        (ref) => studentRepertoire(ref as StudentRepertoireRef, studentId),
-        from: studentRepertoireProvider,
-        name: r'studentRepertoireProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentRepertoireHash,
-        dependencies: StudentRepertoireFamily._dependencies,
-        allTransitiveDependencies:
-            StudentRepertoireFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentRepertoireProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentRepertoire(
+            ref as StudentRepertoireRef,
+            studentId,
+          ),
+          from: studentRepertoireProvider,
+          name: r'studentRepertoireProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentRepertoireHash,
+          dependencies: StudentRepertoireFamily._dependencies,
+          allTransitiveDependencies:
+              StudentRepertoireFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentRepertoireProvider._internal(
     super._createNotifier, {
@@ -305,8 +330,7 @@ mixin StudentRepertoireRef on FutureProviderRef<Repertoire> {
 }
 
 class _StudentRepertoireProviderElement
-    extends FutureProviderElement<Repertoire>
-    with StudentRepertoireRef {
+    extends FutureProviderElement<Repertoire> with StudentRepertoireRef {
   _StudentRepertoireProviderElement(super.provider);
 
   @override
@@ -321,15 +345,14 @@ String _$pieceSearchQueryHash() => r'55769e6c42264a7e032dca0a683d6f43565c5bed';
 @ProviderFor(PieceSearchQuery)
 final pieceSearchQueryProvider =
     NotifierProvider<PieceSearchQuery, String>.internal(
-      PieceSearchQuery.new,
-      name: r'pieceSearchQueryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$pieceSearchQueryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PieceSearchQuery.new,
+  name: r'pieceSearchQueryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pieceSearchQueryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PieceSearchQuery = Notifier<String>;
 String _$piecesNotifierHash() => r'309b095366713ebb66a8123d9acbe7115bd8ec60';
@@ -340,15 +363,14 @@ String _$piecesNotifierHash() => r'309b095366713ebb66a8123d9acbe7115bd8ec60';
 @ProviderFor(PiecesNotifier)
 final piecesNotifierProvider =
     AsyncNotifierProvider<PiecesNotifier, List<Piece>>.internal(
-      PiecesNotifier.new,
-      name: r'piecesNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$piecesNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PiecesNotifier.new,
+  name: r'piecesNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$piecesNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PiecesNotifier = AsyncNotifier<List<Piece>>;
 String _$studentRepertoireNotifierHash() =>
@@ -358,7 +380,9 @@ abstract class _$StudentRepertoireNotifier
     extends BuildlessAsyncNotifier<Repertoire> {
   late final String studentId;
 
-  FutureOr<Repertoire> build(String studentId);
+  FutureOr<Repertoire> build(
+    String studentId,
+  );
 }
 
 /// Student repertoire notifier
@@ -379,15 +403,21 @@ class StudentRepertoireNotifierFamily extends Family<AsyncValue<Repertoire>> {
   /// Student repertoire notifier
   ///
   /// Copied from [StudentRepertoireNotifier].
-  StudentRepertoireNotifierProvider call(String studentId) {
-    return StudentRepertoireNotifierProvider(studentId);
+  StudentRepertoireNotifierProvider call(
+    String studentId,
+  ) {
+    return StudentRepertoireNotifierProvider(
+      studentId,
+    );
   }
 
   @override
   StudentRepertoireNotifierProvider getProviderOverride(
     covariant StudentRepertoireNotifierProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -413,20 +443,21 @@ class StudentRepertoireNotifierProvider
   /// Student repertoire notifier
   ///
   /// Copied from [StudentRepertoireNotifier].
-  StudentRepertoireNotifierProvider(String studentId)
-    : this._internal(
-        () => StudentRepertoireNotifier()..studentId = studentId,
-        from: studentRepertoireNotifierProvider,
-        name: r'studentRepertoireNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentRepertoireNotifierHash,
-        dependencies: StudentRepertoireNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            StudentRepertoireNotifierFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentRepertoireNotifierProvider(
+    String studentId,
+  ) : this._internal(
+          () => StudentRepertoireNotifier()..studentId = studentId,
+          from: studentRepertoireNotifierProvider,
+          name: r'studentRepertoireNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentRepertoireNotifierHash,
+          dependencies: StudentRepertoireNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              StudentRepertoireNotifierFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentRepertoireNotifierProvider._internal(
     super._createNotifier, {
@@ -444,7 +475,9 @@ class StudentRepertoireNotifierProvider
   FutureOr<Repertoire> runNotifierBuild(
     covariant StudentRepertoireNotifier notifier,
   ) {
-    return notifier.build(studentId);
+    return notifier.build(
+      studentId,
+    );
   }
 
   @override
@@ -465,7 +498,7 @@ class StudentRepertoireNotifierProvider
 
   @override
   AsyncNotifierProviderElement<StudentRepertoireNotifier, Repertoire>
-  createElement() {
+      createElement() {
     return _StudentRepertoireNotifierProviderElement(this);
   }
 
@@ -498,6 +531,5 @@ class _StudentRepertoireNotifierProviderElement
   String get studentId =>
       (origin as StudentRepertoireNotifierProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

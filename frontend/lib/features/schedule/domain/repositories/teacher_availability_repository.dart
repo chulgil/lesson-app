@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../entities/availability_slot.dart';
 import '../entities/teacher_availability.dart';
 
@@ -13,7 +12,9 @@ abstract class TeacherAvailabilityRepository {
   Future<TeacherAvailability?> getAvailability(String teacherId);
 
   /// Create or update teacher's availability settings
-  Future<TeacherAvailability> saveAvailability(TeacherAvailability availability);
+  Future<TeacherAvailability> saveAvailability(
+    TeacherAvailability availability,
+  );
 
   /// Delete teacher's availability settings
   Future<void> deleteAvailability(String teacherId);
@@ -131,7 +132,7 @@ abstract class TeacherAvailabilityRepository {
   Future<void> toggleTimeBlock(
     String teacherId,
     DateTime date,
-    TimeOfDay time,
+    ClockTime time,
     bool isAvailable,
   );
 
@@ -141,7 +142,7 @@ abstract class TeacherAvailabilityRepository {
   Future<void> setTimeBlocks(
     String teacherId,
     DateTime date,
-    List<TimeOfDay> times,
+    List<ClockTime> times,
     bool isAvailable,
   );
 }

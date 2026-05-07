@@ -15,10 +15,9 @@ String _$lessonRepositoryHash() => r'a00d2673f2158ba782028bd2a64e1bdc4937662c';
 final lessonRepositoryProvider = Provider<LessonRepository>.internal(
   lessonRepository,
   name: r'lessonRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$lessonRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lessonRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

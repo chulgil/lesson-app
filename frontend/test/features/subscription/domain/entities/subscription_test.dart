@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/features/subscription/presentation/extensions/subscription_visuals.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 
 void main() {

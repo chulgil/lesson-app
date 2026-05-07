@@ -41,15 +41,21 @@ class StudentHomePracticeLogsFamily
   const StudentHomePracticeLogsFamily();
 
   /// See also [studentHomePracticeLogs].
-  StudentHomePracticeLogsProvider call(String studentId) {
-    return StudentHomePracticeLogsProvider(studentId);
+  StudentHomePracticeLogsProvider call(
+    String studentId,
+  ) {
+    return StudentHomePracticeLogsProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomePracticeLogsProvider getProviderOverride(
     covariant StudentHomePracticeLogsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -71,23 +77,24 @@ class StudentHomePracticeLogsFamily
 class StudentHomePracticeLogsProvider
     extends AutoDisposeFutureProvider<List<PracticeLog>> {
   /// See also [studentHomePracticeLogs].
-  StudentHomePracticeLogsProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomePracticeLogs(
-          ref as StudentHomePracticeLogsRef,
-          studentId,
-        ),
-        from: studentHomePracticeLogsProvider,
-        name: r'studentHomePracticeLogsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomePracticeLogsHash,
-        dependencies: StudentHomePracticeLogsFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomePracticeLogsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomePracticeLogsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomePracticeLogs(
+            ref as StudentHomePracticeLogsRef,
+            studentId,
+          ),
+          from: studentHomePracticeLogsProvider,
+          name: r'studentHomePracticeLogsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomePracticeLogsHash,
+          dependencies: StudentHomePracticeLogsFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomePracticeLogsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomePracticeLogsProvider._internal(
     super._createNotifier, {
@@ -104,7 +111,7 @@ class StudentHomePracticeLogsProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeLog>> Function(StudentHomePracticeLogsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -154,6 +161,5 @@ class _StudentHomePracticeLogsProviderElement
   @override
   String get studentId => (origin as StudentHomePracticeLogsProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

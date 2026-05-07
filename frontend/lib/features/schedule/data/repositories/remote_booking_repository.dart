@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
 import '../../../../core/booking/repositories/booking_repository.dart';
@@ -104,8 +103,8 @@ class RemoteBookingRepository implements BookingRepository {
         'experience_level': request.experience.name,
         'message': request.message,
         'lesson_date': request.effectiveDate.toIso8601String(),
-        'start_time': _timeOfDayToString(request.effectiveStartTime),
-        'end_time': _timeOfDayToString(request.effectiveEndTime),
+        'start_time': _clockTimeToString(request.effectiveStartTime),
+        'end_time': _clockTimeToString(request.effectiveEndTime),
         'fee': fee,
       },
     );
@@ -280,16 +279,9 @@ class RemoteBookingRepository implements BookingRepository {
 
   // --- Manual JSON helpers (LessonBooking has no @JsonSerializable) ---
 
-  static String _timeOfDayToString(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
+  static String _clockTimeToString(ClockTime time) => time.format24Hour();
 
-  static TimeOfDay _timeOfDayFromString(String time) {
-    final parts = time.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-  }
+  static ClockTime _clockTimeFromString(String time) => ClockTime.parse(time);
 
   static LessonBooking _bookingFromJson(Map<String, dynamic> json) {
     return LessonBooking(
@@ -306,8 +298,8 @@ class RemoteBookingRepository implements BookingRepository {
         json['status'] as String? ?? 'pending',
       ),
       lessonDate: DateTime.parse(json['lesson_date'] as String),
-      startTime: _timeOfDayFromString(json['start_time'] as String? ?? '14:00'),
-      endTime: _timeOfDayFromString(json['end_time'] as String? ?? '15:00'),
+      startTime: _clockTimeFromString(json['start_time'] as String? ?? '14:00'),
+      endTime: _clockTimeFromString(json['end_time'] as String? ?? '15:00'),
       durationMinutes: json['duration_minutes'] as int? ?? 60,
       fee: json['fee'] as int? ?? 0,
       scheduleType:
@@ -366,8 +358,8 @@ class RemoteBookingRepository implements BookingRepository {
       'lesson_type': booking.lessonType.name,
       'status': booking.status.name,
       'lesson_date': booking.lessonDate.toIso8601String(),
-      'start_time': _timeOfDayToString(booking.startTime),
-      'end_time': _timeOfDayToString(booking.endTime),
+      'start_time': _clockTimeToString(booking.startTime),
+      'end_time': _clockTimeToString(booking.endTime),
       'duration_minutes': booking.durationMinutes,
       'fee': booking.fee,
       'schedule_type': booking.scheduleType?.name,
@@ -384,8 +376,8 @@ class RemoteBookingRepository implements BookingRepository {
     return TimeSlot(
       id: json['id'] as String? ?? '',
       dayOfWeek: json['day_of_week'] as int? ?? 1,
-      startTime: _timeOfDayFromString(json['start_time'] as String? ?? '09:00'),
-      endTime: _timeOfDayFromString(json['end_time'] as String? ?? '18:00'),
+      startTime: ClockTime.parse(json['start_time'] as String? ?? '09:00'),
+      endTime: ClockTime.parse(json['end_time'] as String? ?? '18:00'),
     );
   }
 }

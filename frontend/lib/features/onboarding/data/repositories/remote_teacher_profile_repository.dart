@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
 import '../../../../core/network/api_client.dart';
 import '../../../profile/domain/repositories/teacher_profile_repository.dart';
@@ -22,7 +22,7 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       final response = await _apiClient.get('/teachers/$id');
       return _profileFromJson(response.data as Map<String, dynamic>);
     } catch (e) {
-      debugPrint('[TeacherProfile] getProfileById failed: $e');
+      developer.log('[TeacherProfile] getProfileById failed: $e');
       return null;
     }
   }
@@ -33,7 +33,7 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       final response = await _apiClient.get('/teachers/me/profile');
       return _profileFromJson(response.data as Map<String, dynamic>);
     } catch (e) {
-      debugPrint('[TeacherProfile] getProfileByUserId failed: $e');
+      developer.log('[TeacherProfile] getProfileByUserId failed: $e');
       return null;
     }
   }

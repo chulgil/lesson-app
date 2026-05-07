@@ -13,15 +13,14 @@ String _$studentHomeCurrentStudentIdHash() =>
 @ProviderFor(studentHomeCurrentStudentId)
 final studentHomeCurrentStudentIdProvider =
     AutoDisposeProvider<String>.internal(
-      studentHomeCurrentStudentId,
-      name: r'studentHomeCurrentStudentIdProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeCurrentStudentIdHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeCurrentStudentId,
+  name: r'studentHomeCurrentStudentIdProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeCurrentStudentIdHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef StudentHomeCurrentStudentIdRef = AutoDisposeProviderRef<String>;
 String _$studentHomeSessionActionsHash() =>
@@ -31,17 +30,16 @@ String _$studentHomeSessionActionsHash() =>
 @ProviderFor(studentHomeSessionActions)
 final studentHomeSessionActionsProvider =
     AutoDisposeProvider<StudentHomeSessionActions>.internal(
-      studentHomeSessionActions,
-      name: r'studentHomeSessionActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeSessionActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeSessionActions,
+  name: r'studentHomeSessionActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeSessionActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef StudentHomeSessionActionsRef =
-    AutoDisposeProviderRef<StudentHomeSessionActions>;
+typedef StudentHomeSessionActionsRef
+    = AutoDisposeProviderRef<StudentHomeSessionActions>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -15,10 +15,9 @@ String _$bookingRepositoryHash() => r'61d763b9740e218053ff21f58a8bcd0024390f02';
 final bookingRepositoryProvider = Provider<BookingRepository>.internal(
   bookingRepository,
   name: r'bookingRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$bookingRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$bookingRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

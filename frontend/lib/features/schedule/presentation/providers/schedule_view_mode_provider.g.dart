@@ -13,15 +13,14 @@ String _$scheduleViewModeNotifierHash() =>
 @ProviderFor(ScheduleViewModeNotifier)
 final scheduleViewModeNotifierProvider =
     NotifierProvider<ScheduleViewModeNotifier, ScheduleViewMode>.internal(
-      ScheduleViewModeNotifier.new,
-      name: r'scheduleViewModeNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$scheduleViewModeNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  ScheduleViewModeNotifier.new,
+  name: r'scheduleViewModeNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$scheduleViewModeNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$ScheduleViewModeNotifier = Notifier<ScheduleViewMode>;
 // ignore_for_file: type=lint

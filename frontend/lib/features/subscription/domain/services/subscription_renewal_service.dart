@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
-import '../../../../core/l10n/app_strings.dart';
 import '../entities/subscription.dart';
 import '../entities/subscription_proposal.dart';
 import '../entities/subscription_template.dart';
@@ -21,6 +20,7 @@ typedef CreateRenewalProposal =
       required String previousSubscriptionId,
       required RenewalInitiator renewalInitiator,
     });
+typedef BuildRenewalMessage = String Function(Subscription subscription);
 
 /// Service that creates renewal proposals when subscriptions are running low.
 ///
@@ -31,14 +31,17 @@ class SubscriptionRenewalService {
   final LoadActiveRenewalProposal _loadActiveProposal;
   final LoadRenewalTemplates _loadRenewalTemplates;
   final CreateRenewalProposal _createRenewalProposal;
+  final BuildRenewalMessage _buildRenewalMessage;
 
   const SubscriptionRenewalService({
     required LoadActiveRenewalProposal loadActiveProposal,
     required LoadRenewalTemplates loadRenewalTemplates,
     required CreateRenewalProposal createRenewalProposal,
+    required BuildRenewalMessage buildRenewalMessage,
   }) : _loadActiveProposal = loadActiveProposal,
        _loadRenewalTemplates = loadRenewalTemplates,
-       _createRenewalProposal = createRenewalProposal;
+       _createRenewalProposal = createRenewalProposal,
+       _buildRenewalMessage = buildRenewalMessage;
 
   /// Trigger renewal proposal for a subscription that is running low.
   ///
@@ -59,7 +62,7 @@ class SubscriptionRenewalService {
       );
 
       if (existingProposal != null) {
-        debugPrint(
+        developer.log(
           '[RenewalService] Active proposal already exists for student ${subscription.studentId}',
         );
         return null;
@@ -69,7 +72,7 @@ class SubscriptionRenewalService {
       final templates = await _loadRenewalTemplates(teacherId);
 
       if (templates.isEmpty) {
-        debugPrint('[RenewalService] No auto-proposal templates available');
+        developer.log('[RenewalService] No auto-proposal templates available');
         return null;
       }
 
@@ -90,31 +93,15 @@ class SubscriptionRenewalService {
         renewalInitiator: initiator,
       );
 
-      debugPrint(
+      developer.log(
         '[RenewalService] Renewal proposal created: ${proposal.id} '
         'for student ${subscription.studentId}',
       );
 
       return proposal;
     } catch (e) {
-      debugPrint('[RenewalService] Error creating renewal proposal: $e');
+      developer.log('[RenewalService] Error creating renewal proposal: $e');
       return null;
     }
-  }
-
-  String _buildRenewalMessage(Subscription sub) {
-    final remaining = sub.remainingLessons ?? 0;
-    final buffer = StringBuffer();
-
-    if (remaining <= 0) {
-      buffer.write(AppStrings.renewalMessageDepleted);
-    } else if (remaining == 1) {
-      buffer.write(AppStrings.renewalMessageLastOne);
-    } else {
-      buffer.write(AppStrings.renewalMessageRemaining(remaining));
-    }
-
-    buffer.write(AppStrings.renewalMessageContinue);
-    return buffer.toString();
   }
 }

@@ -15,15 +15,14 @@ String _$feedbackTemplateRepositoryHash() =>
 @ProviderFor(feedbackTemplateRepository)
 final feedbackTemplateRepositoryProvider =
     Provider<FeedbackTemplateRepository>.internal(
-      feedbackTemplateRepository,
-      name: r'feedbackTemplateRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$feedbackTemplateRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  feedbackTemplateRepository,
+  name: r'feedbackTemplateRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedbackTemplateRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef FeedbackTemplateRepositoryRef = ProviderRef<FeedbackTemplateRepository>;
 String _$currentTeacherIdHash() => r'197a10e6bca401eb00d313b721e64665ed93e49c';
@@ -33,10 +32,9 @@ String _$currentTeacherIdHash() => r'197a10e6bca401eb00d313b721e64665ed93e49c';
 final _currentTeacherIdProvider = Provider<String>.internal(
   _currentTeacherId,
   name: r'_currentTeacherIdProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$currentTeacherIdHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentTeacherIdHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -50,15 +48,14 @@ String _$feedbackTemplatesHash() => r'4a4c585a529b44ef5a55ca641aaa3de7e3108ef7';
 @ProviderFor(feedbackTemplates)
 final feedbackTemplatesProvider =
     FutureProvider<List<FeedbackTemplate>>.internal(
-      feedbackTemplates,
-      name: r'feedbackTemplatesProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$feedbackTemplatesHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  feedbackTemplates,
+  name: r'feedbackTemplatesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedbackTemplatesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef FeedbackTemplatesRef = FutureProviderRef<List<FeedbackTemplate>>;
 String _$feedbackTemplatesByCategoryHash() =>
@@ -104,15 +101,21 @@ class FeedbackTemplatesByCategoryFamily
   /// Templates filtered by category.
   ///
   /// Copied from [feedbackTemplatesByCategory].
-  FeedbackTemplatesByCategoryProvider call(FeedbackCategory category) {
-    return FeedbackTemplatesByCategoryProvider(category);
+  FeedbackTemplatesByCategoryProvider call(
+    FeedbackCategory category,
+  ) {
+    return FeedbackTemplatesByCategoryProvider(
+      category,
+    );
   }
 
   @override
   FeedbackTemplatesByCategoryProvider getProviderOverride(
     covariant FeedbackTemplatesByCategoryProvider provider,
   ) {
-    return call(provider.category);
+    return call(
+      provider.category,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -138,23 +141,24 @@ class FeedbackTemplatesByCategoryProvider
   /// Templates filtered by category.
   ///
   /// Copied from [feedbackTemplatesByCategory].
-  FeedbackTemplatesByCategoryProvider(FeedbackCategory category)
-    : this._internal(
-        (ref) => feedbackTemplatesByCategory(
-          ref as FeedbackTemplatesByCategoryRef,
-          category,
-        ),
-        from: feedbackTemplatesByCategoryProvider,
-        name: r'feedbackTemplatesByCategoryProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$feedbackTemplatesByCategoryHash,
-        dependencies: FeedbackTemplatesByCategoryFamily._dependencies,
-        allTransitiveDependencies:
-            FeedbackTemplatesByCategoryFamily._allTransitiveDependencies,
-        category: category,
-      );
+  FeedbackTemplatesByCategoryProvider(
+    FeedbackCategory category,
+  ) : this._internal(
+          (ref) => feedbackTemplatesByCategory(
+            ref as FeedbackTemplatesByCategoryRef,
+            category,
+          ),
+          from: feedbackTemplatesByCategoryProvider,
+          name: r'feedbackTemplatesByCategoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$feedbackTemplatesByCategoryHash,
+          dependencies: FeedbackTemplatesByCategoryFamily._dependencies,
+          allTransitiveDependencies:
+              FeedbackTemplatesByCategoryFamily._allTransitiveDependencies,
+          category: category,
+        );
 
   FeedbackTemplatesByCategoryProvider._internal(
     super._createNotifier, {
@@ -171,9 +175,8 @@ class FeedbackTemplatesByCategoryProvider
   @override
   Override overrideWith(
     FutureOr<List<FeedbackTemplate>> Function(
-      FeedbackTemplatesByCategoryRef provider,
-    )
-    create,
+            FeedbackTemplatesByCategoryRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -234,18 +237,17 @@ String _$frequentFeedbackTemplatesHash() =>
 @ProviderFor(frequentFeedbackTemplates)
 final frequentFeedbackTemplatesProvider =
     FutureProvider<List<FeedbackTemplate>>.internal(
-      frequentFeedbackTemplates,
-      name: r'frequentFeedbackTemplatesProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$frequentFeedbackTemplatesHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  frequentFeedbackTemplates,
+  name: r'frequentFeedbackTemplatesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$frequentFeedbackTemplatesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef FrequentFeedbackTemplatesRef =
-    FutureProviderRef<List<FeedbackTemplate>>;
+typedef FrequentFeedbackTemplatesRef
+    = FutureProviderRef<List<FeedbackTemplate>>;
 String _$feedbackTemplateSearchHash() =>
     r'5fee31d3fd6654c5de8c48e09e91272b3fee177e';
 
@@ -268,15 +270,21 @@ class FeedbackTemplateSearchFamily
   /// Search by title/body/tags.
   ///
   /// Copied from [feedbackTemplateSearch].
-  FeedbackTemplateSearchProvider call(String query) {
-    return FeedbackTemplateSearchProvider(query);
+  FeedbackTemplateSearchProvider call(
+    String query,
+  ) {
+    return FeedbackTemplateSearchProvider(
+      query,
+    );
   }
 
   @override
   FeedbackTemplateSearchProvider getProviderOverride(
     covariant FeedbackTemplateSearchProvider provider,
   ) {
-    return call(provider.query);
+    return call(
+      provider.query,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -302,21 +310,24 @@ class FeedbackTemplateSearchProvider
   /// Search by title/body/tags.
   ///
   /// Copied from [feedbackTemplateSearch].
-  FeedbackTemplateSearchProvider(String query)
-    : this._internal(
-        (ref) =>
-            feedbackTemplateSearch(ref as FeedbackTemplateSearchRef, query),
-        from: feedbackTemplateSearchProvider,
-        name: r'feedbackTemplateSearchProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$feedbackTemplateSearchHash,
-        dependencies: FeedbackTemplateSearchFamily._dependencies,
-        allTransitiveDependencies:
-            FeedbackTemplateSearchFamily._allTransitiveDependencies,
-        query: query,
-      );
+  FeedbackTemplateSearchProvider(
+    String query,
+  ) : this._internal(
+          (ref) => feedbackTemplateSearch(
+            ref as FeedbackTemplateSearchRef,
+            query,
+          ),
+          from: feedbackTemplateSearchProvider,
+          name: r'feedbackTemplateSearchProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$feedbackTemplateSearchHash,
+          dependencies: FeedbackTemplateSearchFamily._dependencies,
+          allTransitiveDependencies:
+              FeedbackTemplateSearchFamily._allTransitiveDependencies,
+          query: query,
+        );
 
   FeedbackTemplateSearchProvider._internal(
     super._createNotifier, {
@@ -333,9 +344,8 @@ class FeedbackTemplateSearchProvider
   @override
   Override overrideWith(
     FutureOr<List<FeedbackTemplate>> Function(
-      FeedbackTemplateSearchRef provider,
-    )
-    create,
+            FeedbackTemplateSearchRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -392,15 +402,12 @@ String _$feedbackTemplatesNotifierHash() =>
 /// Copied from [FeedbackTemplatesNotifier].
 @ProviderFor(FeedbackTemplatesNotifier)
 final feedbackTemplatesNotifierProvider = AsyncNotifierProvider<
-  FeedbackTemplatesNotifier,
-  List<FeedbackTemplate>
->.internal(
+    FeedbackTemplatesNotifier, List<FeedbackTemplate>>.internal(
   FeedbackTemplatesNotifier.new,
   name: r'feedbackTemplatesNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$feedbackTemplatesNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedbackTemplatesNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

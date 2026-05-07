@@ -63,13 +63,21 @@ class LessonFamily extends Family<AsyncValue<Lesson?>> {
   /// Single lesson provider
   ///
   /// Copied from [lesson].
-  LessonProvider call(String id) {
-    return LessonProvider(id);
+  LessonProvider call(
+    String id,
+  ) {
+    return LessonProvider(
+      id,
+    );
   }
 
   @override
-  LessonProvider getProviderOverride(covariant LessonProvider provider) {
-    return call(provider.id);
+  LessonProvider getProviderOverride(
+    covariant LessonProvider provider,
+  ) {
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -94,17 +102,23 @@ class LessonProvider extends FutureProvider<Lesson?> {
   /// Single lesson provider
   ///
   /// Copied from [lesson].
-  LessonProvider(String id)
-    : this._internal(
-        (ref) => lesson(ref as LessonRef, id),
-        from: lessonProvider,
-        name: r'lessonProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product') ? null : _$lessonHash,
-        dependencies: LessonFamily._dependencies,
-        allTransitiveDependencies: LessonFamily._allTransitiveDependencies,
-        id: id,
-      );
+  LessonProvider(
+    String id,
+  ) : this._internal(
+          (ref) => lesson(
+            ref as LessonRef,
+            id,
+          ),
+          from: lessonProvider,
+          name: r'lessonProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonHash,
+          dependencies: LessonFamily._dependencies,
+          allTransitiveDependencies: LessonFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   LessonProvider._internal(
     super._createNotifier, {
@@ -119,7 +133,9 @@ class LessonProvider extends FutureProvider<Lesson?> {
   final String id;
 
   @override
-  Override overrideWith(FutureOr<Lesson?> Function(LessonRef provider) create) {
+  Override overrideWith(
+    FutureOr<Lesson?> Function(LessonRef provider) create,
+  ) {
     return ProviderOverride(
       origin: this,
       override: LessonProvider._internal(
@@ -186,15 +202,21 @@ class LessonsByStudentFamily extends Family<AsyncValue<List<Lesson>>> {
   /// Lessons by student provider
   ///
   /// Copied from [lessonsByStudent].
-  LessonsByStudentProvider call(String studentId) {
-    return LessonsByStudentProvider(studentId);
+  LessonsByStudentProvider call(
+    String studentId,
+  ) {
+    return LessonsByStudentProvider(
+      studentId,
+    );
   }
 
   @override
   LessonsByStudentProvider getProviderOverride(
     covariant LessonsByStudentProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -219,20 +241,24 @@ class LessonsByStudentProvider extends FutureProvider<List<Lesson>> {
   /// Lessons by student provider
   ///
   /// Copied from [lessonsByStudent].
-  LessonsByStudentProvider(String studentId)
-    : this._internal(
-        (ref) => lessonsByStudent(ref as LessonsByStudentRef, studentId),
-        from: lessonsByStudentProvider,
-        name: r'lessonsByStudentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonsByStudentHash,
-        dependencies: LessonsByStudentFamily._dependencies,
-        allTransitiveDependencies:
-            LessonsByStudentFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  LessonsByStudentProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => lessonsByStudent(
+            ref as LessonsByStudentRef,
+            studentId,
+          ),
+          from: lessonsByStudentProvider,
+          name: r'lessonsByStudentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonsByStudentHash,
+          dependencies: LessonsByStudentFamily._dependencies,
+          allTransitiveDependencies:
+              LessonsByStudentFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   LessonsByStudentProvider._internal(
     super._createNotifier, {
@@ -289,8 +315,7 @@ mixin LessonsByStudentRef on FutureProviderRef<List<Lesson>> {
 }
 
 class _LessonsByStudentProviderElement
-    extends FutureProviderElement<List<Lesson>>
-    with LessonsByStudentRef {
+    extends FutureProviderElement<List<Lesson>> with LessonsByStudentRef {
   _LessonsByStudentProviderElement(super.provider);
 
   @override
@@ -317,15 +342,21 @@ class LessonsByDateFamily extends Family<AsyncValue<List<Lesson>>> {
   /// Lessons by date provider
   ///
   /// Copied from [lessonsByDate].
-  LessonsByDateProvider call(DateTime date) {
-    return LessonsByDateProvider(date);
+  LessonsByDateProvider call(
+    DateTime date,
+  ) {
+    return LessonsByDateProvider(
+      date,
+    );
   }
 
   @override
   LessonsByDateProvider getProviderOverride(
     covariant LessonsByDateProvider provider,
   ) {
-    return call(provider.date);
+    return call(
+      provider.date,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -350,20 +381,24 @@ class LessonsByDateProvider extends FutureProvider<List<Lesson>> {
   /// Lessons by date provider
   ///
   /// Copied from [lessonsByDate].
-  LessonsByDateProvider(DateTime date)
-    : this._internal(
-        (ref) => lessonsByDate(ref as LessonsByDateRef, date),
-        from: lessonsByDateProvider,
-        name: r'lessonsByDateProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonsByDateHash,
-        dependencies: LessonsByDateFamily._dependencies,
-        allTransitiveDependencies:
-            LessonsByDateFamily._allTransitiveDependencies,
-        date: date,
-      );
+  LessonsByDateProvider(
+    DateTime date,
+  ) : this._internal(
+          (ref) => lessonsByDate(
+            ref as LessonsByDateRef,
+            date,
+          ),
+          from: lessonsByDateProvider,
+          name: r'lessonsByDateProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonsByDateHash,
+          dependencies: LessonsByDateFamily._dependencies,
+          allTransitiveDependencies:
+              LessonsByDateFamily._allTransitiveDependencies,
+          date: date,
+        );
 
   LessonsByDateProvider._internal(
     super._createNotifier, {
@@ -436,10 +471,9 @@ String _$upcomingLessonsHash() => r'b7e6482f8dcab4d3eaa97b963eb0fc8d12dd3a65';
 final upcomingLessonsProvider = FutureProvider<List<Lesson>>.internal(
   upcomingLessons,
   name: r'upcomingLessonsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$upcomingLessonsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$upcomingLessonsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -454,10 +488,9 @@ String _$recentLessonsHash() => r'4506dbef275f6f7fd61645fd24b11626d6f42da7';
 final recentLessonsProvider = FutureProvider<List<Lesson>>.internal(
   recentLessons,
   name: r'recentLessonsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$recentLessonsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$recentLessonsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -487,15 +520,14 @@ String _$lessonsNotifierHash() => r'703437b5751ff16e2a5441b83758a0c004a47051';
 @ProviderFor(LessonsNotifier)
 final lessonsNotifierProvider =
     AsyncNotifierProvider<LessonsNotifier, List<Lesson>>.internal(
-      LessonsNotifier.new,
-      name: r'lessonsNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$lessonsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  LessonsNotifier.new,
+  name: r'lessonsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lessonsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$LessonsNotifier = AsyncNotifier<List<Lesson>>;
 // ignore_for_file: type=lint

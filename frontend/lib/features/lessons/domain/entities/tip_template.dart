@@ -12,38 +12,6 @@ enum TipCategory {
   general, // General tips
 }
 
-extension TipCategoryExtension on TipCategory {
-  String get label {
-    switch (this) {
-      case TipCategory.technique:
-        return '테크닉';
-      case TipCategory.musicality:
-        return '음악성';
-      case TipCategory.practice:
-        return '연습법';
-      case TipCategory.mindset:
-        return '마인드셋';
-      case TipCategory.general:
-        return '일반';
-    }
-  }
-
-  String get icon {
-    switch (this) {
-      case TipCategory.technique:
-        return 'build';
-      case TipCategory.musicality:
-        return 'music_note';
-      case TipCategory.practice:
-        return 'repeat';
-      case TipCategory.mindset:
-        return 'psychology';
-      case TipCategory.general:
-        return 'lightbulb';
-    }
-  }
-}
-
 /// Template for frequently used tips
 @JsonSerializable()
 class TipTemplate {
@@ -96,10 +64,7 @@ class TipTemplate {
 
   /// Increment usage count
   TipTemplate incrementUsage() {
-    return copyWith(
-      usageCount: usageCount + 1,
-      lastUsedAt: DateTime.now(),
-    );
+    return copyWith(usageCount: usageCount + 1, lastUsedAt: DateTime.now());
   }
 
   @override

@@ -18,10 +18,9 @@ String _$currentUserRoleHash() => r'7b375133759728d30f8ec2ee7a426734bf4b63b7';
 final currentUserRoleProvider = Provider<UserRole>.internal(
   currentUserRole,
   name: r'currentUserRoleProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$currentUserRoleHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserRoleHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -34,15 +33,14 @@ String _$currentUserRoleStateHandleHash() =>
 @ProviderFor(currentUserRoleStateHandle)
 final currentUserRoleStateHandleProvider =
     Provider<CurrentUserRoleStateHandle>.internal(
-      currentUserRoleStateHandle,
-      name: r'currentUserRoleStateHandleProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$currentUserRoleStateHandleHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  currentUserRoleStateHandle,
+  name: r'currentUserRoleStateHandleProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserRoleStateHandleHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef CurrentUserRoleStateHandleRef = ProviderRef<CurrentUserRoleStateHandle>;
 String _$currentUserIdHash() => r'54acdde57b5f270677d25087fe2d50b4470665a8';
@@ -57,10 +55,9 @@ String _$currentUserIdHash() => r'54acdde57b5f270677d25087fe2d50b4470665a8';
 final currentUserIdProvider = Provider<String>.internal(
   currentUserId,
   name: r'currentUserIdProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$currentUserIdHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserIdHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -89,15 +86,14 @@ String _$currentUserRoleControllerHash() =>
 @ProviderFor(CurrentUserRoleController)
 final currentUserRoleControllerProvider =
     NotifierProvider<CurrentUserRoleController, UserRole>.internal(
-      CurrentUserRoleController.new,
-      name: r'currentUserRoleControllerProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$currentUserRoleControllerHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  CurrentUserRoleController.new,
+  name: r'currentUserRoleControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserRoleControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$CurrentUserRoleController = Notifier<UserRole>;
 String _$selectedMockStudentHash() =>
@@ -109,15 +105,14 @@ String _$selectedMockStudentHash() =>
 @ProviderFor(SelectedMockStudent)
 final selectedMockStudentProvider =
     NotifierProvider<SelectedMockStudent, MockStudentInfo>.internal(
-      SelectedMockStudent.new,
-      name: r'selectedMockStudentProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$selectedMockStudentHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SelectedMockStudent.new,
+  name: r'selectedMockStudentProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedMockStudentHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SelectedMockStudent = Notifier<MockStudentInfo>;
 // ignore_for_file: type=lint

@@ -11,6 +11,8 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../search/search_facade.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/subscription_proposal_visuals.dart';
+import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/proposal_card_widgets.dart';

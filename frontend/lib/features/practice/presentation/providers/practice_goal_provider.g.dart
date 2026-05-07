@@ -15,15 +15,14 @@ String _$practiceGoalRepositoryHash() =>
 @ProviderFor(practiceGoalRepository)
 final practiceGoalRepositoryProvider =
     Provider<PracticeGoalRepository>.internal(
-      practiceGoalRepository,
-      name: r'practiceGoalRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceGoalRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  practiceGoalRepository,
+  name: r'practiceGoalRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceGoalRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef PracticeGoalRepositoryRef = ProviderRef<PracticeGoalRepository>;
 String _$practiceGoalHash() => r'060fd0aefdf1dfebc6794cb69e9cfc9fb80a65be';
@@ -67,15 +66,21 @@ class PracticeGoalFamily extends Family<AsyncValue<PracticeGoal?>> {
   /// Student's current active goal
   ///
   /// Copied from [practiceGoal].
-  PracticeGoalProvider call(String studentId) {
-    return PracticeGoalProvider(studentId);
+  PracticeGoalProvider call(
+    String studentId,
+  ) {
+    return PracticeGoalProvider(
+      studentId,
+    );
   }
 
   @override
   PracticeGoalProvider getProviderOverride(
     covariant PracticeGoalProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -100,20 +105,24 @@ class PracticeGoalProvider extends FutureProvider<PracticeGoal?> {
   /// Student's current active goal
   ///
   /// Copied from [practiceGoal].
-  PracticeGoalProvider(String studentId)
-    : this._internal(
-        (ref) => practiceGoal(ref as PracticeGoalRef, studentId),
-        from: practiceGoalProvider,
-        name: r'practiceGoalProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$practiceGoalHash,
-        dependencies: PracticeGoalFamily._dependencies,
-        allTransitiveDependencies:
-            PracticeGoalFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  PracticeGoalProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => practiceGoal(
+            ref as PracticeGoalRef,
+            studentId,
+          ),
+          from: practiceGoalProvider,
+          name: r'practiceGoalProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceGoalHash,
+          dependencies: PracticeGoalFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeGoalFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   PracticeGoalProvider._internal(
     super._createNotifier, {
@@ -197,15 +206,21 @@ class TodayProgressFamily extends Family<AsyncValue<DailyPracticeProgress>> {
   /// Today's progress
   ///
   /// Copied from [todayProgress].
-  TodayProgressProvider call(String studentId) {
-    return TodayProgressProvider(studentId);
+  TodayProgressProvider call(
+    String studentId,
+  ) {
+    return TodayProgressProvider(
+      studentId,
+    );
   }
 
   @override
   TodayProgressProvider getProviderOverride(
     covariant TodayProgressProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -230,20 +245,24 @@ class TodayProgressProvider extends FutureProvider<DailyPracticeProgress> {
   /// Today's progress
   ///
   /// Copied from [todayProgress].
-  TodayProgressProvider(String studentId)
-    : this._internal(
-        (ref) => todayProgress(ref as TodayProgressRef, studentId),
-        from: todayProgressProvider,
-        name: r'todayProgressProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$todayProgressHash,
-        dependencies: TodayProgressFamily._dependencies,
-        allTransitiveDependencies:
-            TodayProgressFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  TodayProgressProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => todayProgress(
+            ref as TodayProgressRef,
+            studentId,
+          ),
+          from: todayProgressProvider,
+          name: r'todayProgressProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$todayProgressHash,
+          dependencies: TodayProgressFamily._dependencies,
+          allTransitiveDependencies:
+              TodayProgressFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   TodayProgressProvider._internal(
     super._createNotifier, {
@@ -300,8 +319,7 @@ mixin TodayProgressRef on FutureProviderRef<DailyPracticeProgress> {
 }
 
 class _TodayProgressProviderElement
-    extends FutureProviderElement<DailyPracticeProgress>
-    with TodayProgressRef {
+    extends FutureProviderElement<DailyPracticeProgress> with TodayProgressRef {
   _TodayProgressProviderElement(super.provider);
 
   @override
@@ -328,15 +346,21 @@ class WeeklyProgressFamily extends Family<AsyncValue<WeeklyPracticeProgress>> {
   /// This week's progress
   ///
   /// Copied from [weeklyProgress].
-  WeeklyProgressProvider call(String studentId) {
-    return WeeklyProgressProvider(studentId);
+  WeeklyProgressProvider call(
+    String studentId,
+  ) {
+    return WeeklyProgressProvider(
+      studentId,
+    );
   }
 
   @override
   WeeklyProgressProvider getProviderOverride(
     covariant WeeklyProgressProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -361,20 +385,24 @@ class WeeklyProgressProvider extends FutureProvider<WeeklyPracticeProgress> {
   /// This week's progress
   ///
   /// Copied from [weeklyProgress].
-  WeeklyProgressProvider(String studentId)
-    : this._internal(
-        (ref) => weeklyProgress(ref as WeeklyProgressRef, studentId),
-        from: weeklyProgressProvider,
-        name: r'weeklyProgressProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$weeklyProgressHash,
-        dependencies: WeeklyProgressFamily._dependencies,
-        allTransitiveDependencies:
-            WeeklyProgressFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  WeeklyProgressProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => weeklyProgress(
+            ref as WeeklyProgressRef,
+            studentId,
+          ),
+          from: weeklyProgressProvider,
+          name: r'weeklyProgressProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$weeklyProgressHash,
+          dependencies: WeeklyProgressFamily._dependencies,
+          allTransitiveDependencies:
+              WeeklyProgressFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   WeeklyProgressProvider._internal(
     super._createNotifier, {
@@ -391,7 +419,7 @@ class WeeklyProgressProvider extends FutureProvider<WeeklyPracticeProgress> {
   @override
   Override overrideWith(
     FutureOr<WeeklyPracticeProgress> Function(WeeklyProgressRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -460,15 +488,21 @@ class GoalStatusFamily extends Family<AsyncValue<GoalStatus>> {
   /// Combined goal status provider for widgets
   ///
   /// Copied from [goalStatus].
-  GoalStatusProvider call(String studentId) {
-    return GoalStatusProvider(studentId);
+  GoalStatusProvider call(
+    String studentId,
+  ) {
+    return GoalStatusProvider(
+      studentId,
+    );
   }
 
   @override
   GoalStatusProvider getProviderOverride(
     covariant GoalStatusProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -493,19 +527,24 @@ class GoalStatusProvider extends FutureProvider<GoalStatus> {
   /// Combined goal status provider for widgets
   ///
   /// Copied from [goalStatus].
-  GoalStatusProvider(String studentId)
-    : this._internal(
-        (ref) => goalStatus(ref as GoalStatusRef, studentId),
-        from: goalStatusProvider,
-        name: r'goalStatusProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$goalStatusHash,
-        dependencies: GoalStatusFamily._dependencies,
-        allTransitiveDependencies: GoalStatusFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  GoalStatusProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => goalStatus(
+            ref as GoalStatusRef,
+            studentId,
+          ),
+          from: goalStatusProvider,
+          name: r'goalStatusProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$goalStatusHash,
+          dependencies: GoalStatusFamily._dependencies,
+          allTransitiveDependencies:
+              GoalStatusFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   GoalStatusProvider._internal(
     super._createNotifier, {
@@ -577,15 +616,14 @@ String _$practiceGoalCrudHash() => r'ed9a99443a5be8d0dcfe7acaba51c5722d8810ff';
 @ProviderFor(PracticeGoalCrud)
 final practiceGoalCrudProvider =
     AsyncNotifierProvider<PracticeGoalCrud, void>.internal(
-      PracticeGoalCrud.new,
-      name: r'practiceGoalCrudProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceGoalCrudHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PracticeGoalCrud.new,
+  name: r'practiceGoalCrudProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceGoalCrudHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PracticeGoalCrud = AsyncNotifier<void>;
 // ignore_for_file: type=lint

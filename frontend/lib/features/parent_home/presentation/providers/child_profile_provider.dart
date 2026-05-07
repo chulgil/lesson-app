@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_child_profile_repository.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../domain/repositories/child_profile_repository.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 
 part 'child_profile_provider.g.dart';
 
 /// Provider for the child profile repository - switches between Mock and Remote.
 @riverpod
-ChildProfileRepository childProfileRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockChildProfileRepository();
-  }
-  // No remote API yet — use empty mock to avoid dummy data
-  return MockChildProfileRepository(empty: true);
-}
+ChildProfileRepository childProfileRepository(Ref ref) =>
+    createLocalFallbackRepository<ChildProfileRepository>(
+      mock: MockChildProfileRepository.new,
+      // No remote API yet — use empty mock to avoid dummy data
+      fallback: () => MockChildProfileRepository(empty: true),
+    );
 
 /// Provider for child profiles of a specific parent
 @riverpod
@@ -74,7 +74,7 @@ class ChildProfileManager extends _$ChildProfileManager {
         birthYear: birthYear,
         instrument: instrument,
         level: level,
-        profileColor: profileColor,
+        profileColorKey: parentHomeColorKeyForColor(profileColor),
         createdAt: DateTime.now(),
       );
 

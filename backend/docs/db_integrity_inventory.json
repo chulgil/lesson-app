@@ -173,15 +173,6 @@
       "reason": "Parent visibility and child profile APIs rely on valid parent-child relations."
     },
     {
-      "domain": "notification",
-      "table": "notifications",
-      "column": "user_id",
-      "target": "users.id",
-      "status": "missing",
-      "priority": "P1",
-      "reason": "Unread red-dot state is user-scoped and should not survive account removal."
-    },
-    {
       "domain": "schedule",
       "table": "teacher_availabilities",
       "column": "teacher_id",

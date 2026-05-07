@@ -16,10 +16,9 @@ String _$practiceRepositoryHash() =>
 final practiceRepositoryProvider = Provider<PracticeRepository>.internal(
   practiceRepository,
   name: r'practiceRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$practiceRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

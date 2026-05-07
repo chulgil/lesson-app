@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../entities/subscription.dart';
 
@@ -15,14 +14,17 @@ class SubscriptionExpiryMonitor {
   final LoadExpiringSubscriptions _loadExpiringSoonSubscriptions;
   final LoadExpiringSubscriptions _loadExpiredSubscriptions;
   final TriggerSubscriptionRenewal _triggerSubscriptionRenewal;
+  final SubscriptionExpiryCopy _copy;
 
   const SubscriptionExpiryMonitor({
     required LoadExpiringSubscriptions loadExpiringSoonSubscriptions,
     required LoadExpiringSubscriptions loadExpiredSubscriptions,
     required TriggerSubscriptionRenewal triggerSubscriptionRenewal,
+    required SubscriptionExpiryCopy copy,
   }) : _loadExpiringSoonSubscriptions = loadExpiringSoonSubscriptions,
        _loadExpiredSubscriptions = loadExpiredSubscriptions,
-       _triggerSubscriptionRenewal = triggerSubscriptionRenewal;
+       _triggerSubscriptionRenewal = triggerSubscriptionRenewal,
+       _copy = copy;
 
   /// Check all subscriptions and return notifications that should be shown.
   /// Called on app startup and periodically.
@@ -56,7 +58,7 @@ class SubscriptionExpiryMonitor {
         alerts.add(_createExpiredAlert(sub));
       }
     } catch (e) {
-      debugPrint(
+      developer.log(
         '[SubscriptionExpiryMonitor] Error checking subscriptions: $e',
       );
     }
@@ -73,12 +75,12 @@ class SubscriptionExpiryMonitor {
           daysLeft <= 1
               ? NotificationPriority.urgent
               : NotificationPriority.high,
-      title: AppStrings.subscriptionExpiringTitle(daysLeft),
-      body: AppStrings.subscriptionExpiringBody(sub.remainingLessons ?? 0),
+      title: _copy.expiringTitle(daysLeft),
+      body: _copy.expiringBody(sub.remainingLessons ?? 0),
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: AppStrings.subscriptionViewAction,
+      actionLabel: _copy.viewActionLabel,
       data: {
         'subscriptionId': sub.id,
         'daysLeft': daysLeft,
@@ -94,14 +96,12 @@ class SubscriptionExpiryMonitor {
       type: NotificationType.lessonsRunningLow,
       priority: NotificationPriority.high,
       title:
-          remaining == 0
-              ? AppStrings.subscriptionLessonsExhaustedTitle
-              : AppStrings.subscriptionLastLessonTitle,
-      body: AppStrings.subscriptionRenewalRequestBody,
+          remaining == 0 ? _copy.lessonsExhaustedTitle : _copy.lastLessonTitle,
+      body: _copy.renewalRequestBody,
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: AppStrings.subscriptionRenewalAction,
+      actionLabel: _copy.renewalActionLabel,
       data: {
         'subscriptionId': sub.id,
         'remainingLessons': remaining,
@@ -116,7 +116,7 @@ class SubscriptionExpiryMonitor {
     try {
       _triggerSubscriptionRenewal(sub);
     } catch (e) {
-      debugPrint('[ExpiryMonitor] Renewal trigger failed: $e');
+      developer.log('[ExpiryMonitor] Renewal trigger failed: $e');
     }
   }
 
@@ -126,13 +126,35 @@ class SubscriptionExpiryMonitor {
       userId: sub.studentId,
       type: NotificationType.subscriptionExpired,
       priority: NotificationPriority.high,
-      title: AppStrings.subscriptionExpiredTitle,
-      body: AppStrings.subscriptionRenewalRequestBody,
+      title: _copy.expiredTitle,
+      body: _copy.renewalRequestBody,
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
-      actionLabel: AppStrings.subscriptionRenewalAction,
+      actionLabel: _copy.renewalActionLabel,
       data: {'subscriptionId': sub.id, 'studentId': sub.studentId},
     );
   }
+}
+
+class SubscriptionExpiryCopy {
+  final String Function(int daysLeft) expiringTitle;
+  final String Function(int remaining) expiringBody;
+  final String viewActionLabel;
+  final String lessonsExhaustedTitle;
+  final String lastLessonTitle;
+  final String renewalRequestBody;
+  final String renewalActionLabel;
+  final String expiredTitle;
+
+  const SubscriptionExpiryCopy({
+    required this.expiringTitle,
+    required this.expiringBody,
+    required this.viewActionLabel,
+    required this.lessonsExhaustedTitle,
+    required this.lastLessonTitle,
+    required this.renewalRequestBody,
+    required this.renewalActionLabel,
+    required this.expiredTitle,
+  });
 }

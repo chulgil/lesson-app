@@ -15,15 +15,14 @@ String _$subscriptionRepositoryHash() =>
 @ProviderFor(subscriptionRepository)
 final subscriptionRepositoryProvider =
     Provider<SubscriptionRepository>.internal(
-      subscriptionRepository,
-      name: r'subscriptionRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionRepository,
+  name: r'subscriptionRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef SubscriptionRepositoryRef = ProviderRef<SubscriptionRepository>;
 String _$studentSubscriptionsHash() =>
@@ -69,15 +68,21 @@ class StudentSubscriptionsFamily
   /// Get all subscriptions for a student.
   ///
   /// Copied from [studentSubscriptions].
-  StudentSubscriptionsProvider call(String studentId) {
-    return StudentSubscriptionsProvider(studentId);
+  StudentSubscriptionsProvider call(
+    String studentId,
+  ) {
+    return StudentSubscriptionsProvider(
+      studentId,
+    );
   }
 
   @override
   StudentSubscriptionsProvider getProviderOverride(
     covariant StudentSubscriptionsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -103,21 +108,24 @@ class StudentSubscriptionsProvider
   /// Get all subscriptions for a student.
   ///
   /// Copied from [studentSubscriptions].
-  StudentSubscriptionsProvider(String studentId)
-    : this._internal(
-        (ref) =>
-            studentSubscriptions(ref as StudentSubscriptionsRef, studentId),
-        from: studentSubscriptionsProvider,
-        name: r'studentSubscriptionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentSubscriptionsHash,
-        dependencies: StudentSubscriptionsFamily._dependencies,
-        allTransitiveDependencies:
-            StudentSubscriptionsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentSubscriptionsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentSubscriptions(
+            ref as StudentSubscriptionsRef,
+            studentId,
+          ),
+          from: studentSubscriptionsProvider,
+          name: r'studentSubscriptionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentSubscriptionsHash,
+          dependencies: StudentSubscriptionsFamily._dependencies,
+          allTransitiveDependencies:
+              StudentSubscriptionsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentSubscriptionsProvider._internal(
     super._createNotifier, {
@@ -134,7 +142,7 @@ class StudentSubscriptionsProvider
   @override
   Override overrideWith(
     FutureOr<List<Subscription>> Function(StudentSubscriptionsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -207,15 +215,21 @@ class ActiveStudentSubscriptionsFamily
   /// Get active subscriptions for a student (active or expiring soon).
   ///
   /// Copied from [activeStudentSubscriptions].
-  ActiveStudentSubscriptionsProvider call(String studentId) {
-    return ActiveStudentSubscriptionsProvider(studentId);
+  ActiveStudentSubscriptionsProvider call(
+    String studentId,
+  ) {
+    return ActiveStudentSubscriptionsProvider(
+      studentId,
+    );
   }
 
   @override
   ActiveStudentSubscriptionsProvider getProviderOverride(
     covariant ActiveStudentSubscriptionsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -241,23 +255,24 @@ class ActiveStudentSubscriptionsProvider
   /// Get active subscriptions for a student (active or expiring soon).
   ///
   /// Copied from [activeStudentSubscriptions].
-  ActiveStudentSubscriptionsProvider(String studentId)
-    : this._internal(
-        (ref) => activeStudentSubscriptions(
-          ref as ActiveStudentSubscriptionsRef,
-          studentId,
-        ),
-        from: activeStudentSubscriptionsProvider,
-        name: r'activeStudentSubscriptionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$activeStudentSubscriptionsHash,
-        dependencies: ActiveStudentSubscriptionsFamily._dependencies,
-        allTransitiveDependencies:
-            ActiveStudentSubscriptionsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  ActiveStudentSubscriptionsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => activeStudentSubscriptions(
+            ref as ActiveStudentSubscriptionsRef,
+            studentId,
+          ),
+          from: activeStudentSubscriptionsProvider,
+          name: r'activeStudentSubscriptionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeStudentSubscriptionsHash,
+          dependencies: ActiveStudentSubscriptionsFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveStudentSubscriptionsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   ActiveStudentSubscriptionsProvider._internal(
     super._createNotifier, {
@@ -274,9 +289,8 @@ class ActiveStudentSubscriptionsProvider
   @override
   Override overrideWith(
     FutureOr<List<Subscription>> Function(
-      ActiveStudentSubscriptionsRef provider,
-    )
-    create,
+            ActiveStudentSubscriptionsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -349,15 +363,21 @@ class MembershipSubscriptionFamily extends Family<AsyncValue<Subscription?>> {
   /// Get active subscription for a membership.
   ///
   /// Copied from [membershipSubscription].
-  MembershipSubscriptionProvider call(String membershipId) {
-    return MembershipSubscriptionProvider(membershipId);
+  MembershipSubscriptionProvider call(
+    String membershipId,
+  ) {
+    return MembershipSubscriptionProvider(
+      membershipId,
+    );
   }
 
   @override
   MembershipSubscriptionProvider getProviderOverride(
     covariant MembershipSubscriptionProvider provider,
   ) {
-    return call(provider.membershipId);
+    return call(
+      provider.membershipId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -383,23 +403,24 @@ class MembershipSubscriptionProvider
   /// Get active subscription for a membership.
   ///
   /// Copied from [membershipSubscription].
-  MembershipSubscriptionProvider(String membershipId)
-    : this._internal(
-        (ref) => membershipSubscription(
-          ref as MembershipSubscriptionRef,
-          membershipId,
-        ),
-        from: membershipSubscriptionProvider,
-        name: r'membershipSubscriptionProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$membershipSubscriptionHash,
-        dependencies: MembershipSubscriptionFamily._dependencies,
-        allTransitiveDependencies:
-            MembershipSubscriptionFamily._allTransitiveDependencies,
-        membershipId: membershipId,
-      );
+  MembershipSubscriptionProvider(
+    String membershipId,
+  ) : this._internal(
+          (ref) => membershipSubscription(
+            ref as MembershipSubscriptionRef,
+            membershipId,
+          ),
+          from: membershipSubscriptionProvider,
+          name: r'membershipSubscriptionProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$membershipSubscriptionHash,
+          dependencies: MembershipSubscriptionFamily._dependencies,
+          allTransitiveDependencies:
+              MembershipSubscriptionFamily._allTransitiveDependencies,
+          membershipId: membershipId,
+        );
 
   MembershipSubscriptionProvider._internal(
     super._createNotifier, {
@@ -486,15 +507,21 @@ class SubscriptionFamily extends Family<AsyncValue<Subscription?>> {
   /// Get a single subscription by ID.
   ///
   /// Copied from [subscription].
-  SubscriptionProvider call(String id) {
-    return SubscriptionProvider(id);
+  SubscriptionProvider call(
+    String id,
+  ) {
+    return SubscriptionProvider(
+      id,
+    );
   }
 
   @override
   SubscriptionProvider getProviderOverride(
     covariant SubscriptionProvider provider,
   ) {
-    return call(provider.id);
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -519,20 +546,24 @@ class SubscriptionProvider extends AutoDisposeFutureProvider<Subscription?> {
   /// Get a single subscription by ID.
   ///
   /// Copied from [subscription].
-  SubscriptionProvider(String id)
-    : this._internal(
-        (ref) => subscription(ref as SubscriptionRef, id),
-        from: subscriptionProvider,
-        name: r'subscriptionProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionHash,
-        dependencies: SubscriptionFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionFamily._allTransitiveDependencies,
-        id: id,
-      );
+  SubscriptionProvider(
+    String id,
+  ) : this._internal(
+          (ref) => subscription(
+            ref as SubscriptionRef,
+            id,
+          ),
+          from: subscriptionProvider,
+          name: r'subscriptionProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionHash,
+          dependencies: SubscriptionFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   SubscriptionProvider._internal(
     super._createNotifier, {
@@ -606,18 +637,17 @@ String _$expiringSoonSubscriptionsHash() =>
 @ProviderFor(expiringSoonSubscriptions)
 final expiringSoonSubscriptionsProvider =
     AutoDisposeFutureProvider<List<Subscription>>.internal(
-      expiringSoonSubscriptions,
-      name: r'expiringSoonSubscriptionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$expiringSoonSubscriptionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  expiringSoonSubscriptions,
+  name: r'expiringSoonSubscriptionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$expiringSoonSubscriptionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef ExpiringSoonSubscriptionsRef =
-    AutoDisposeFutureProviderRef<List<Subscription>>;
+typedef ExpiringSoonSubscriptionsRef
+    = AutoDisposeFutureProviderRef<List<Subscription>>;
 String _$expiredSubscriptionsHash() =>
     r'6535e899d0b3f1c56f7a6f0131011218aad42e2c';
 
@@ -627,18 +657,17 @@ String _$expiredSubscriptionsHash() =>
 @ProviderFor(expiredSubscriptions)
 final expiredSubscriptionsProvider =
     AutoDisposeFutureProvider<List<Subscription>>.internal(
-      expiredSubscriptions,
-      name: r'expiredSubscriptionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$expiredSubscriptionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  expiredSubscriptions,
+  name: r'expiredSubscriptionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$expiredSubscriptionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef ExpiredSubscriptionsRef =
-    AutoDisposeFutureProviderRef<List<Subscription>>;
+typedef ExpiredSubscriptionsRef
+    = AutoDisposeFutureProviderRef<List<Subscription>>;
 String _$subscriptionUsageHistoryHash() =>
     r'6a391a951c5487c9d05abe777cfdbb49a456a07c';
 
@@ -661,15 +690,21 @@ class SubscriptionUsageHistoryFamily
   /// Get usage history for a subscription.
   ///
   /// Copied from [subscriptionUsageHistory].
-  SubscriptionUsageHistoryProvider call(String subscriptionId) {
-    return SubscriptionUsageHistoryProvider(subscriptionId);
+  SubscriptionUsageHistoryProvider call(
+    String subscriptionId,
+  ) {
+    return SubscriptionUsageHistoryProvider(
+      subscriptionId,
+    );
   }
 
   @override
   SubscriptionUsageHistoryProvider getProviderOverride(
     covariant SubscriptionUsageHistoryProvider provider,
   ) {
-    return call(provider.subscriptionId);
+    return call(
+      provider.subscriptionId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -695,23 +730,24 @@ class SubscriptionUsageHistoryProvider
   /// Get usage history for a subscription.
   ///
   /// Copied from [subscriptionUsageHistory].
-  SubscriptionUsageHistoryProvider(String subscriptionId)
-    : this._internal(
-        (ref) => subscriptionUsageHistory(
-          ref as SubscriptionUsageHistoryRef,
-          subscriptionId,
-        ),
-        from: subscriptionUsageHistoryProvider,
-        name: r'subscriptionUsageHistoryProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionUsageHistoryHash,
-        dependencies: SubscriptionUsageHistoryFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionUsageHistoryFamily._allTransitiveDependencies,
-        subscriptionId: subscriptionId,
-      );
+  SubscriptionUsageHistoryProvider(
+    String subscriptionId,
+  ) : this._internal(
+          (ref) => subscriptionUsageHistory(
+            ref as SubscriptionUsageHistoryRef,
+            subscriptionId,
+          ),
+          from: subscriptionUsageHistoryProvider,
+          name: r'subscriptionUsageHistoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionUsageHistoryHash,
+          dependencies: SubscriptionUsageHistoryFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionUsageHistoryFamily._allTransitiveDependencies,
+          subscriptionId: subscriptionId,
+        );
 
   SubscriptionUsageHistoryProvider._internal(
     super._createNotifier, {
@@ -728,9 +764,8 @@ class SubscriptionUsageHistoryProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionUsage>> Function(
-      SubscriptionUsageHistoryRef provider,
-    )
-    create,
+            SubscriptionUsageHistoryRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -804,15 +839,21 @@ class TeacherStudentSubscriptionsFamily
   /// Get all subscriptions for a teacher's students.
   ///
   /// Copied from [teacherStudentSubscriptions].
-  TeacherStudentSubscriptionsProvider call(String teacherId) {
-    return TeacherStudentSubscriptionsProvider(teacherId);
+  TeacherStudentSubscriptionsProvider call(
+    String teacherId,
+  ) {
+    return TeacherStudentSubscriptionsProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherStudentSubscriptionsProvider getProviderOverride(
     covariant TeacherStudentSubscriptionsProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -838,23 +879,24 @@ class TeacherStudentSubscriptionsProvider
   /// Get all subscriptions for a teacher's students.
   ///
   /// Copied from [teacherStudentSubscriptions].
-  TeacherStudentSubscriptionsProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherStudentSubscriptions(
-          ref as TeacherStudentSubscriptionsRef,
-          teacherId,
-        ),
-        from: teacherStudentSubscriptionsProvider,
-        name: r'teacherStudentSubscriptionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherStudentSubscriptionsHash,
-        dependencies: TeacherStudentSubscriptionsFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherStudentSubscriptionsFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherStudentSubscriptionsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherStudentSubscriptions(
+            ref as TeacherStudentSubscriptionsRef,
+            teacherId,
+          ),
+          from: teacherStudentSubscriptionsProvider,
+          name: r'teacherStudentSubscriptionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherStudentSubscriptionsHash,
+          dependencies: TeacherStudentSubscriptionsFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherStudentSubscriptionsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherStudentSubscriptionsProvider._internal(
     super._createNotifier, {
@@ -871,9 +913,8 @@ class TeacherStudentSubscriptionsProvider
   @override
   Override overrideWith(
     FutureOr<List<Subscription>> Function(
-      TeacherStudentSubscriptionsRef provider,
-    )
-    create,
+            TeacherStudentSubscriptionsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -946,15 +987,21 @@ class UnpaidSubscriptionsFamily extends Family<AsyncValue<List<Subscription>>> {
   /// Get unpaid subscriptions for a teacher.
   ///
   /// Copied from [unpaidSubscriptions].
-  UnpaidSubscriptionsProvider call(String teacherId) {
-    return UnpaidSubscriptionsProvider(teacherId);
+  UnpaidSubscriptionsProvider call(
+    String teacherId,
+  ) {
+    return UnpaidSubscriptionsProvider(
+      teacherId,
+    );
   }
 
   @override
   UnpaidSubscriptionsProvider getProviderOverride(
     covariant UnpaidSubscriptionsProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -980,20 +1027,24 @@ class UnpaidSubscriptionsProvider
   /// Get unpaid subscriptions for a teacher.
   ///
   /// Copied from [unpaidSubscriptions].
-  UnpaidSubscriptionsProvider(String teacherId)
-    : this._internal(
-        (ref) => unpaidSubscriptions(ref as UnpaidSubscriptionsRef, teacherId),
-        from: unpaidSubscriptionsProvider,
-        name: r'unpaidSubscriptionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$unpaidSubscriptionsHash,
-        dependencies: UnpaidSubscriptionsFamily._dependencies,
-        allTransitiveDependencies:
-            UnpaidSubscriptionsFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  UnpaidSubscriptionsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => unpaidSubscriptions(
+            ref as UnpaidSubscriptionsRef,
+            teacherId,
+          ),
+          from: unpaidSubscriptionsProvider,
+          name: r'unpaidSubscriptionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$unpaidSubscriptionsHash,
+          dependencies: UnpaidSubscriptionsFamily._dependencies,
+          allTransitiveDependencies:
+              UnpaidSubscriptionsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   UnpaidSubscriptionsProvider._internal(
     super._createNotifier, {
@@ -1010,7 +1061,7 @@ class UnpaidSubscriptionsProvider
   @override
   Override overrideWith(
     FutureOr<List<Subscription>> Function(UnpaidSubscriptionsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1081,15 +1132,21 @@ class UnpaidSummaryFamily
   /// Get unpaid summary (total amount + student count) for a teacher.
   ///
   /// Copied from [unpaidSummary].
-  UnpaidSummaryProvider call(String teacherId) {
-    return UnpaidSummaryProvider(teacherId);
+  UnpaidSummaryProvider call(
+    String teacherId,
+  ) {
+    return UnpaidSummaryProvider(
+      teacherId,
+    );
   }
 
   @override
   UnpaidSummaryProvider getProviderOverride(
     covariant UnpaidSummaryProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1115,20 +1172,24 @@ class UnpaidSummaryProvider
   /// Get unpaid summary (total amount + student count) for a teacher.
   ///
   /// Copied from [unpaidSummary].
-  UnpaidSummaryProvider(String teacherId)
-    : this._internal(
-        (ref) => unpaidSummary(ref as UnpaidSummaryRef, teacherId),
-        from: unpaidSummaryProvider,
-        name: r'unpaidSummaryProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$unpaidSummaryHash,
-        dependencies: UnpaidSummaryFamily._dependencies,
-        allTransitiveDependencies:
-            UnpaidSummaryFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  UnpaidSummaryProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => unpaidSummary(
+            ref as UnpaidSummaryRef,
+            teacherId,
+          ),
+          from: unpaidSummaryProvider,
+          name: r'unpaidSummaryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$unpaidSummaryHash,
+          dependencies: UnpaidSummaryFamily._dependencies,
+          allTransitiveDependencies:
+              UnpaidSummaryFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   UnpaidSummaryProvider._internal(
     super._createNotifier, {
@@ -1145,9 +1206,8 @@ class UnpaidSummaryProvider
   @override
   Override overrideWith(
     FutureOr<({int totalAmount, int studentCount})> Function(
-      UnpaidSummaryRef provider,
-    )
-    create,
+            UnpaidSummaryRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1165,7 +1225,7 @@ class UnpaidSummaryProvider
 
   @override
   AutoDisposeFutureProviderElement<({int totalAmount, int studentCount})>
-  createElement() {
+      createElement() {
     return _UnpaidSummaryProviderElement(this);
   }
 
@@ -1189,10 +1249,8 @@ mixin UnpaidSummaryRef
   String get teacherId;
 }
 
-class _UnpaidSummaryProviderElement
-    extends
-        AutoDisposeFutureProviderElement<({int totalAmount, int studentCount})>
-    with UnpaidSummaryRef {
+class _UnpaidSummaryProviderElement extends AutoDisposeFutureProviderElement<
+    ({int totalAmount, int studentCount})> with UnpaidSummaryRef {
   _UnpaidSummaryProviderElement(super.provider);
 
   @override
@@ -1239,7 +1297,10 @@ class ActiveSubscriptionBetweenFamily
   ActiveSubscriptionBetweenProvider getProviderOverride(
     covariant ActiveSubscriptionBetweenProvider provider,
   ) {
-    return call(studentId: provider.studentId, teacherId: provider.teacherId);
+    return call(
+      studentId: provider.studentId,
+      teacherId: provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1271,23 +1332,23 @@ class ActiveSubscriptionBetweenProvider
     required String studentId,
     required String teacherId,
   }) : this._internal(
-         (ref) => activeSubscriptionBetween(
-           ref as ActiveSubscriptionBetweenRef,
-           studentId: studentId,
-           teacherId: teacherId,
-         ),
-         from: activeSubscriptionBetweenProvider,
-         name: r'activeSubscriptionBetweenProvider',
-         debugGetCreateSourceHash:
-             const bool.fromEnvironment('dart.vm.product')
-                 ? null
-                 : _$activeSubscriptionBetweenHash,
-         dependencies: ActiveSubscriptionBetweenFamily._dependencies,
-         allTransitiveDependencies:
-             ActiveSubscriptionBetweenFamily._allTransitiveDependencies,
-         studentId: studentId,
-         teacherId: teacherId,
-       );
+          (ref) => activeSubscriptionBetween(
+            ref as ActiveSubscriptionBetweenRef,
+            studentId: studentId,
+            teacherId: teacherId,
+          ),
+          from: activeSubscriptionBetweenProvider,
+          name: r'activeSubscriptionBetweenProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeSubscriptionBetweenHash,
+          dependencies: ActiveSubscriptionBetweenFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveSubscriptionBetweenFamily._allTransitiveDependencies,
+          studentId: studentId,
+          teacherId: teacherId,
+        );
 
   ActiveSubscriptionBetweenProvider._internal(
     super._createNotifier, {
@@ -1306,7 +1367,7 @@ class ActiveSubscriptionBetweenProvider
   @override
   Override overrideWith(
     FutureOr<Subscription?> Function(ActiveSubscriptionBetweenRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1455,25 +1516,25 @@ class CanBookLessonProvider extends AutoDisposeFutureProvider<bool> {
     required String teacherId,
     required bool isTrialLesson,
   }) : this._internal(
-         (ref) => canBookLesson(
-           ref as CanBookLessonRef,
-           studentId: studentId,
-           teacherId: teacherId,
-           isTrialLesson: isTrialLesson,
-         ),
-         from: canBookLessonProvider,
-         name: r'canBookLessonProvider',
-         debugGetCreateSourceHash:
-             const bool.fromEnvironment('dart.vm.product')
-                 ? null
-                 : _$canBookLessonHash,
-         dependencies: CanBookLessonFamily._dependencies,
-         allTransitiveDependencies:
-             CanBookLessonFamily._allTransitiveDependencies,
-         studentId: studentId,
-         teacherId: teacherId,
-         isTrialLesson: isTrialLesson,
-       );
+          (ref) => canBookLesson(
+            ref as CanBookLessonRef,
+            studentId: studentId,
+            teacherId: teacherId,
+            isTrialLesson: isTrialLesson,
+          ),
+          from: canBookLessonProvider,
+          name: r'canBookLessonProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$canBookLessonHash,
+          dependencies: CanBookLessonFamily._dependencies,
+          allTransitiveDependencies:
+              CanBookLessonFamily._allTransitiveDependencies,
+          studentId: studentId,
+          teacherId: teacherId,
+          isTrialLesson: isTrialLesson,
+        );
 
   CanBookLessonProvider._internal(
     super._createNotifier, {
@@ -1547,8 +1608,7 @@ mixin CanBookLessonRef on AutoDisposeFutureProviderRef<bool> {
 }
 
 class _CanBookLessonProviderElement
-    extends AutoDisposeFutureProviderElement<bool>
-    with CanBookLessonRef {
+    extends AutoDisposeFutureProviderElement<bool> with CanBookLessonRef {
   _CanBookLessonProviderElement(super.provider);
 
   @override
@@ -1566,18 +1626,17 @@ String _$subscriptionSessionEventActionsHash() =>
 @ProviderFor(subscriptionSessionEventActions)
 final subscriptionSessionEventActionsProvider =
     Provider<SubscriptionSessionEventActions>.internal(
-      subscriptionSessionEventActions,
-      name: r'subscriptionSessionEventActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionSessionEventActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionSessionEventActions,
+  name: r'subscriptionSessionEventActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionSessionEventActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef SubscriptionSessionEventActionsRef =
-    ProviderRef<SubscriptionSessionEventActions>;
+typedef SubscriptionSessionEventActionsRef
+    = ProviderRef<SubscriptionSessionEventActions>;
 String _$subscriptionSessionEventsHash() =>
     r'38705742aa72cd20d64eb1c3d80b2402f475edf7';
 
@@ -1647,23 +1706,23 @@ class SubscriptionSessionEventsProvider
     required String subscriptionId,
     required int sessionNumber,
   }) : this._internal(
-         (ref) => subscriptionSessionEvents(
-           ref as SubscriptionSessionEventsRef,
-           subscriptionId: subscriptionId,
-           sessionNumber: sessionNumber,
-         ),
-         from: subscriptionSessionEventsProvider,
-         name: r'subscriptionSessionEventsProvider',
-         debugGetCreateSourceHash:
-             const bool.fromEnvironment('dart.vm.product')
-                 ? null
-                 : _$subscriptionSessionEventsHash,
-         dependencies: SubscriptionSessionEventsFamily._dependencies,
-         allTransitiveDependencies:
-             SubscriptionSessionEventsFamily._allTransitiveDependencies,
-         subscriptionId: subscriptionId,
-         sessionNumber: sessionNumber,
-       );
+          (ref) => subscriptionSessionEvents(
+            ref as SubscriptionSessionEventsRef,
+            subscriptionId: subscriptionId,
+            sessionNumber: sessionNumber,
+          ),
+          from: subscriptionSessionEventsProvider,
+          name: r'subscriptionSessionEventsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionSessionEventsHash,
+          dependencies: SubscriptionSessionEventsFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionSessionEventsFamily._allTransitiveDependencies,
+          subscriptionId: subscriptionId,
+          sessionNumber: sessionNumber,
+        );
 
   SubscriptionSessionEventsProvider._internal(
     super._createNotifier, {
@@ -1682,7 +1741,7 @@ class SubscriptionSessionEventsProvider
   @override
   Override overrideWith(
     FutureOr<List<RequestEvent>> Function(SubscriptionSessionEventsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1744,7 +1803,7 @@ class _SubscriptionSessionEventsProviderElement
 }
 
 String _$pendingScheduleChangeRequestsHash() =>
-    r'e576a00789e345f9154de3cb13367b25038cc7a5';
+    r'dbf638dcca231543af7690fc1d13d26a7f9d081b';
 
 /// Get pending schedule change requests for badge count.
 ///
@@ -1766,15 +1825,21 @@ class PendingScheduleChangeRequestsFamily
   /// Get pending schedule change requests for badge count.
   ///
   /// Copied from [pendingScheduleChangeRequests].
-  PendingScheduleChangeRequestsProvider call(String teacherId) {
-    return PendingScheduleChangeRequestsProvider(teacherId);
+  PendingScheduleChangeRequestsProvider call(
+    String teacherId,
+  ) {
+    return PendingScheduleChangeRequestsProvider(
+      teacherId,
+    );
   }
 
   @override
   PendingScheduleChangeRequestsProvider getProviderOverride(
     covariant PendingScheduleChangeRequestsProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1800,23 +1865,24 @@ class PendingScheduleChangeRequestsProvider
   /// Get pending schedule change requests for badge count.
   ///
   /// Copied from [pendingScheduleChangeRequests].
-  PendingScheduleChangeRequestsProvider(String teacherId)
-    : this._internal(
-        (ref) => pendingScheduleChangeRequests(
-          ref as PendingScheduleChangeRequestsRef,
-          teacherId,
-        ),
-        from: pendingScheduleChangeRequestsProvider,
-        name: r'pendingScheduleChangeRequestsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$pendingScheduleChangeRequestsHash,
-        dependencies: PendingScheduleChangeRequestsFamily._dependencies,
-        allTransitiveDependencies:
-            PendingScheduleChangeRequestsFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  PendingScheduleChangeRequestsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingScheduleChangeRequests(
+            ref as PendingScheduleChangeRequestsRef,
+            teacherId,
+          ),
+          from: pendingScheduleChangeRequestsProvider,
+          name: r'pendingScheduleChangeRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingScheduleChangeRequestsHash,
+          dependencies: PendingScheduleChangeRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              PendingScheduleChangeRequestsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   PendingScheduleChangeRequestsProvider._internal(
     super._createNotifier, {
@@ -1833,9 +1899,8 @@ class PendingScheduleChangeRequestsProvider
   @override
   Override overrideWith(
     FutureOr<List<RequestEvent>> Function(
-      PendingScheduleChangeRequestsRef provider,
-    )
-    create,
+            PendingScheduleChangeRequestsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1894,7 +1959,9 @@ abstract class _$SubscriptionNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<Subscription>> {
   late final String studentId;
 
-  FutureOr<List<Subscription>> build(String studentId);
+  FutureOr<List<Subscription>> build(
+    String studentId,
+  );
 }
 
 /// Notifier for managing Subscription CRUD operations for a student.
@@ -1916,15 +1983,21 @@ class SubscriptionNotifierFamily
   /// Notifier for managing Subscription CRUD operations for a student.
   ///
   /// Copied from [SubscriptionNotifier].
-  SubscriptionNotifierProvider call(String studentId) {
-    return SubscriptionNotifierProvider(studentId);
+  SubscriptionNotifierProvider call(
+    String studentId,
+  ) {
+    return SubscriptionNotifierProvider(
+      studentId,
+    );
   }
 
   @override
   SubscriptionNotifierProvider getProviderOverride(
     covariant SubscriptionNotifierProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1945,29 +2018,26 @@ class SubscriptionNotifierFamily
 /// Notifier for managing Subscription CRUD operations for a student.
 ///
 /// Copied from [SubscriptionNotifier].
-class SubscriptionNotifierProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<
-          SubscriptionNotifier,
-          List<Subscription>
-        > {
+class SubscriptionNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
+    SubscriptionNotifier, List<Subscription>> {
   /// Notifier for managing Subscription CRUD operations for a student.
   ///
   /// Copied from [SubscriptionNotifier].
-  SubscriptionNotifierProvider(String studentId)
-    : this._internal(
-        () => SubscriptionNotifier()..studentId = studentId,
-        from: subscriptionNotifierProvider,
-        name: r'subscriptionNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionNotifierHash,
-        dependencies: SubscriptionNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionNotifierFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  SubscriptionNotifierProvider(
+    String studentId,
+  ) : this._internal(
+          () => SubscriptionNotifier()..studentId = studentId,
+          from: subscriptionNotifierProvider,
+          name: r'subscriptionNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionNotifierHash,
+          dependencies: SubscriptionNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionNotifierFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   SubscriptionNotifierProvider._internal(
     super._createNotifier, {
@@ -1985,7 +2055,9 @@ class SubscriptionNotifierProvider
   FutureOr<List<Subscription>> runNotifierBuild(
     covariant SubscriptionNotifier notifier,
   ) {
-    return notifier.build(studentId);
+    return notifier.build(
+      studentId,
+    );
   }
 
   @override
@@ -2005,11 +2077,8 @@ class SubscriptionNotifierProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<
-    SubscriptionNotifier,
-    List<Subscription>
-  >
-  createElement() {
+  AutoDisposeAsyncNotifierProviderElement<SubscriptionNotifier,
+      List<Subscription>> createElement() {
     return _SubscriptionNotifierProviderElement(this);
   }
 
@@ -2035,12 +2104,8 @@ mixin SubscriptionNotifierRef
 }
 
 class _SubscriptionNotifierProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<
-          SubscriptionNotifier,
-          List<Subscription>
-        >
-    with SubscriptionNotifierRef {
+    extends AutoDisposeAsyncNotifierProviderElement<SubscriptionNotifier,
+        List<Subscription>> with SubscriptionNotifierRef {
   _SubscriptionNotifierProviderElement(super.provider);
 
   @override
@@ -2054,7 +2119,9 @@ abstract class _$MembershipSubscriptionNotifier
     extends BuildlessAutoDisposeAsyncNotifier<Subscription?> {
   late final String membershipId;
 
-  FutureOr<Subscription?> build(String membershipId);
+  FutureOr<Subscription?> build(
+    String membershipId,
+  );
 }
 
 /// Notifier for managing a single subscription (for membership).
@@ -2077,15 +2144,21 @@ class MembershipSubscriptionNotifierFamily
   /// Notifier for managing a single subscription (for membership).
   ///
   /// Copied from [MembershipSubscriptionNotifier].
-  MembershipSubscriptionNotifierProvider call(String membershipId) {
-    return MembershipSubscriptionNotifierProvider(membershipId);
+  MembershipSubscriptionNotifierProvider call(
+    String membershipId,
+  ) {
+    return MembershipSubscriptionNotifierProvider(
+      membershipId,
+    );
   }
 
   @override
   MembershipSubscriptionNotifierProvider getProviderOverride(
     covariant MembershipSubscriptionNotifierProvider provider,
   ) {
-    return call(provider.membershipId);
+    return call(
+      provider.membershipId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -2107,28 +2180,26 @@ class MembershipSubscriptionNotifierFamily
 ///
 /// Copied from [MembershipSubscriptionNotifier].
 class MembershipSubscriptionNotifierProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<
-          MembershipSubscriptionNotifier,
-          Subscription?
-        > {
+    extends AutoDisposeAsyncNotifierProviderImpl<MembershipSubscriptionNotifier,
+        Subscription?> {
   /// Notifier for managing a single subscription (for membership).
   ///
   /// Copied from [MembershipSubscriptionNotifier].
-  MembershipSubscriptionNotifierProvider(String membershipId)
-    : this._internal(
-        () => MembershipSubscriptionNotifier()..membershipId = membershipId,
-        from: membershipSubscriptionNotifierProvider,
-        name: r'membershipSubscriptionNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$membershipSubscriptionNotifierHash,
-        dependencies: MembershipSubscriptionNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            MembershipSubscriptionNotifierFamily._allTransitiveDependencies,
-        membershipId: membershipId,
-      );
+  MembershipSubscriptionNotifierProvider(
+    String membershipId,
+  ) : this._internal(
+          () => MembershipSubscriptionNotifier()..membershipId = membershipId,
+          from: membershipSubscriptionNotifierProvider,
+          name: r'membershipSubscriptionNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$membershipSubscriptionNotifierHash,
+          dependencies: MembershipSubscriptionNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              MembershipSubscriptionNotifierFamily._allTransitiveDependencies,
+          membershipId: membershipId,
+        );
 
   MembershipSubscriptionNotifierProvider._internal(
     super._createNotifier, {
@@ -2146,7 +2217,9 @@ class MembershipSubscriptionNotifierProvider
   FutureOr<Subscription?> runNotifierBuild(
     covariant MembershipSubscriptionNotifier notifier,
   ) {
-    return notifier.build(membershipId);
+    return notifier.build(
+      membershipId,
+    );
   }
 
   @override
@@ -2166,11 +2239,8 @@ class MembershipSubscriptionNotifierProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<
-    MembershipSubscriptionNotifier,
-    Subscription?
-  >
-  createElement() {
+  AutoDisposeAsyncNotifierProviderElement<MembershipSubscriptionNotifier,
+      Subscription?> createElement() {
     return _MembershipSubscriptionNotifierProviderElement(this);
   }
 
@@ -2196,18 +2266,14 @@ mixin MembershipSubscriptionNotifierRef
 }
 
 class _MembershipSubscriptionNotifierProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<
-          MembershipSubscriptionNotifier,
-          Subscription?
-        >
-    with MembershipSubscriptionNotifierRef {
+    extends AutoDisposeAsyncNotifierProviderElement<
+        MembershipSubscriptionNotifier,
+        Subscription?> with MembershipSubscriptionNotifierRef {
   _MembershipSubscriptionNotifierProviderElement(super.provider);
 
   @override
   String get membershipId =>
       (origin as MembershipSubscriptionNotifierProvider).membershipId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

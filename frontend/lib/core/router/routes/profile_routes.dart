@@ -13,7 +13,7 @@ import '../../../features/profile/presentation/screens/career_edit_screen.dart';
 import '../../../features/profile/presentation/screens/basic_info_edit_screen.dart';
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
-import '../../../features/analytics/presentation/screens/teacher_dashboard_screen.dart';
+import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
@@ -131,11 +131,11 @@ List<GoRoute> profileRoutes = [
     builder: (context, state) => const OutstandingPaymentsScreen(),
   ),
 
-  // Analytics Dashboard
+  // Analytics Dashboard (Refs #354 — 3-tab: 월간요약/학생성장/수입분석)
   GoRoute(
     path: AppRoutes.analytics,
     name: 'analytics',
-    builder: (context, state) => const TeacherDashboardScreen(),
+    builder: (context, state) => const AnalyticsDashboardScreen(),
   ),
 
   // Teacher Attendance Overview

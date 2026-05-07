@@ -13,15 +13,14 @@ String _$subscriptionIssueStudentsHash() =>
 @ProviderFor(subscriptionIssueStudents)
 final subscriptionIssueStudentsProvider =
     FutureProvider<List<Student>>.internal(
-      subscriptionIssueStudents,
-      name: r'subscriptionIssueStudentsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionIssueStudentsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionIssueStudents,
+  name: r'subscriptionIssueStudentsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionIssueStudentsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef SubscriptionIssueStudentsRef = FutureProviderRef<List<Student>>;
 String _$subscriptionIssueStudentHash() =>
@@ -58,15 +57,21 @@ class SubscriptionIssueStudentFamily extends Family<AsyncValue<Student?>> {
   const SubscriptionIssueStudentFamily();
 
   /// See also [subscriptionIssueStudent].
-  SubscriptionIssueStudentProvider call(String studentId) {
-    return SubscriptionIssueStudentProvider(studentId);
+  SubscriptionIssueStudentProvider call(
+    String studentId,
+  ) {
+    return SubscriptionIssueStudentProvider(
+      studentId,
+    );
   }
 
   @override
   SubscriptionIssueStudentProvider getProviderOverride(
     covariant SubscriptionIssueStudentProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -87,23 +92,24 @@ class SubscriptionIssueStudentFamily extends Family<AsyncValue<Student?>> {
 /// See also [subscriptionIssueStudent].
 class SubscriptionIssueStudentProvider extends FutureProvider<Student?> {
   /// See also [subscriptionIssueStudent].
-  SubscriptionIssueStudentProvider(String studentId)
-    : this._internal(
-        (ref) => subscriptionIssueStudent(
-          ref as SubscriptionIssueStudentRef,
-          studentId,
-        ),
-        from: subscriptionIssueStudentProvider,
-        name: r'subscriptionIssueStudentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionIssueStudentHash,
-        dependencies: SubscriptionIssueStudentFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionIssueStudentFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  SubscriptionIssueStudentProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => subscriptionIssueStudent(
+            ref as SubscriptionIssueStudentRef,
+            studentId,
+          ),
+          from: subscriptionIssueStudentProvider,
+          name: r'subscriptionIssueStudentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionIssueStudentHash,
+          dependencies: SubscriptionIssueStudentFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionIssueStudentFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   SubscriptionIssueStudentProvider._internal(
     super._createNotifier, {
@@ -161,8 +167,7 @@ mixin SubscriptionIssueStudentRef on FutureProviderRef<Student?> {
 }
 
 class _SubscriptionIssueStudentProviderElement
-    extends FutureProviderElement<Student?>
-    with SubscriptionIssueStudentRef {
+    extends FutureProviderElement<Student?> with SubscriptionIssueStudentRef {
   _SubscriptionIssueStudentProviderElement(super.provider);
 
   @override
@@ -185,15 +190,21 @@ class SubscriptionIssueMembershipsFamily
   const SubscriptionIssueMembershipsFamily();
 
   /// See also [subscriptionIssueMemberships].
-  SubscriptionIssueMembershipsProvider call(String studentId) {
-    return SubscriptionIssueMembershipsProvider(studentId);
+  SubscriptionIssueMembershipsProvider call(
+    String studentId,
+  ) {
+    return SubscriptionIssueMembershipsProvider(
+      studentId,
+    );
   }
 
   @override
   SubscriptionIssueMembershipsProvider getProviderOverride(
     covariant SubscriptionIssueMembershipsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -215,23 +226,24 @@ class SubscriptionIssueMembershipsFamily
 class SubscriptionIssueMembershipsProvider
     extends FutureProvider<List<ClassMembership>> {
   /// See also [subscriptionIssueMemberships].
-  SubscriptionIssueMembershipsProvider(String studentId)
-    : this._internal(
-        (ref) => subscriptionIssueMemberships(
-          ref as SubscriptionIssueMembershipsRef,
-          studentId,
-        ),
-        from: subscriptionIssueMembershipsProvider,
-        name: r'subscriptionIssueMembershipsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionIssueMembershipsHash,
-        dependencies: SubscriptionIssueMembershipsFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionIssueMembershipsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  SubscriptionIssueMembershipsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => subscriptionIssueMemberships(
+            ref as SubscriptionIssueMembershipsRef,
+            studentId,
+          ),
+          from: subscriptionIssueMembershipsProvider,
+          name: r'subscriptionIssueMembershipsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionIssueMembershipsHash,
+          dependencies: SubscriptionIssueMembershipsFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionIssueMembershipsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   SubscriptionIssueMembershipsProvider._internal(
     super._createNotifier, {
@@ -248,9 +260,8 @@ class SubscriptionIssueMembershipsProvider
   @override
   Override overrideWith(
     FutureOr<List<ClassMembership>> Function(
-      SubscriptionIssueMembershipsRef provider,
-    )
-    create,
+            SubscriptionIssueMembershipsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -317,15 +328,21 @@ class SubscriptionIssueEffectivePolicyFamily
   const SubscriptionIssueEffectivePolicyFamily();
 
   /// See also [subscriptionIssueEffectivePolicy].
-  SubscriptionIssueEffectivePolicyProvider call(ClassMembership membership) {
-    return SubscriptionIssueEffectivePolicyProvider(membership);
+  SubscriptionIssueEffectivePolicyProvider call(
+    ClassMembership membership,
+  ) {
+    return SubscriptionIssueEffectivePolicyProvider(
+      membership,
+    );
   }
 
   @override
   SubscriptionIssueEffectivePolicyProvider getProviderOverride(
     covariant SubscriptionIssueEffectivePolicyProvider provider,
   ) {
-    return call(provider.membership);
+    return call(
+      provider.membership,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -347,23 +364,24 @@ class SubscriptionIssueEffectivePolicyFamily
 class SubscriptionIssueEffectivePolicyProvider
     extends FutureProvider<LessonPolicy?> {
   /// See also [subscriptionIssueEffectivePolicy].
-  SubscriptionIssueEffectivePolicyProvider(ClassMembership membership)
-    : this._internal(
-        (ref) => subscriptionIssueEffectivePolicy(
-          ref as SubscriptionIssueEffectivePolicyRef,
-          membership,
-        ),
-        from: subscriptionIssueEffectivePolicyProvider,
-        name: r'subscriptionIssueEffectivePolicyProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionIssueEffectivePolicyHash,
-        dependencies: SubscriptionIssueEffectivePolicyFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionIssueEffectivePolicyFamily._allTransitiveDependencies,
-        membership: membership,
-      );
+  SubscriptionIssueEffectivePolicyProvider(
+    ClassMembership membership,
+  ) : this._internal(
+          (ref) => subscriptionIssueEffectivePolicy(
+            ref as SubscriptionIssueEffectivePolicyRef,
+            membership,
+          ),
+          from: subscriptionIssueEffectivePolicyProvider,
+          name: r'subscriptionIssueEffectivePolicyProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionIssueEffectivePolicyHash,
+          dependencies: SubscriptionIssueEffectivePolicyFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionIssueEffectivePolicyFamily._allTransitiveDependencies,
+          membership: membership,
+        );
 
   SubscriptionIssueEffectivePolicyProvider._internal(
     super._createNotifier, {
@@ -380,9 +398,8 @@ class SubscriptionIssueEffectivePolicyProvider
   @override
   Override overrideWith(
     FutureOr<LessonPolicy?> Function(
-      SubscriptionIssueEffectivePolicyRef provider,
-    )
-    create,
+            SubscriptionIssueEffectivePolicyRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -440,17 +457,16 @@ String _$subscriptionIssueFlowControllerHash() =>
 @ProviderFor(subscriptionIssueFlowController)
 final subscriptionIssueFlowControllerProvider =
     Provider<SubscriptionIssueFlowController>.internal(
-      subscriptionIssueFlowController,
-      name: r'subscriptionIssueFlowControllerProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionIssueFlowControllerHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionIssueFlowController,
+  name: r'subscriptionIssueFlowControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionIssueFlowControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef SubscriptionIssueFlowControllerRef =
-    ProviderRef<SubscriptionIssueFlowController>;
+typedef SubscriptionIssueFlowControllerRef
+    = ProviderRef<SubscriptionIssueFlowController>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

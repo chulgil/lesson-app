@@ -8,23 +8,6 @@ part 'feedback_template.g.dart';
 /// Category for feedback templates. Aligned with TipCategory naming for UX consistency.
 enum FeedbackCategory { technique, musicality, practice, attitude, general }
 
-extension FeedbackCategoryExtension on FeedbackCategory {
-  String get label {
-    switch (this) {
-      case FeedbackCategory.technique:
-        return '테크닉';
-      case FeedbackCategory.musicality:
-        return '음악성';
-      case FeedbackCategory.practice:
-        return '연습';
-      case FeedbackCategory.attitude:
-        return '태도';
-      case FeedbackCategory.general:
-        return '일반';
-    }
-  }
-}
-
 /// Feedback template — a reusable lesson feedback body with metadata tags.
 ///
 /// Tags are metadata only (used for search/filter), not auto-prepended to body.

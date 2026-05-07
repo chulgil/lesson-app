@@ -15,15 +15,14 @@ String _$teachingResourceRepositoryHash() =>
 @ProviderFor(teachingResourceRepository)
 final teachingResourceRepositoryProvider =
     Provider<TeachingResourceRepository>.internal(
-      teachingResourceRepository,
-      name: r'teachingResourceRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teachingResourceRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  teachingResourceRepository,
+  name: r'teachingResourceRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teachingResourceRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef TeachingResourceRepositoryRef = ProviderRef<TeachingResourceRepository>;
 String _$teacherResourcesHash() => r'059a8403031564ff5a14a121aaa6528cbefb7d9c';
@@ -68,15 +67,21 @@ class TeacherResourcesFamily
   /// All resources for current teacher
   ///
   /// Copied from [teacherResources].
-  TeacherResourcesProvider call(String teacherId) {
-    return TeacherResourcesProvider(teacherId);
+  TeacherResourcesProvider call(
+    String teacherId,
+  ) {
+    return TeacherResourcesProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherResourcesProvider getProviderOverride(
     covariant TeacherResourcesProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -101,20 +106,24 @@ class TeacherResourcesProvider extends FutureProvider<List<TeachingResource>> {
   /// All resources for current teacher
   ///
   /// Copied from [teacherResources].
-  TeacherResourcesProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherResources(ref as TeacherResourcesRef, teacherId),
-        from: teacherResourcesProvider,
-        name: r'teacherResourcesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherResourcesHash,
-        dependencies: TeacherResourcesFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherResourcesFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherResourcesProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherResources(
+            ref as TeacherResourcesRef,
+            teacherId,
+          ),
+          from: teacherResourcesProvider,
+          name: r'teacherResourcesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherResourcesHash,
+          dependencies: TeacherResourcesFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherResourcesFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherResourcesProvider._internal(
     super._createNotifier, {
@@ -131,7 +140,7 @@ class TeacherResourcesProvider extends FutureProvider<List<TeachingResource>> {
   @override
   Override overrideWith(
     FutureOr<List<TeachingResource>> Function(TeacherResourcesRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -200,15 +209,21 @@ class ResourcesByIdsFamily extends Family<AsyncValue<List<TeachingResource>>> {
   /// Resources by IDs (for displaying attached resources on practice items)
   ///
   /// Copied from [resourcesByIds].
-  ResourcesByIdsProvider call(List<String> ids) {
-    return ResourcesByIdsProvider(ids);
+  ResourcesByIdsProvider call(
+    List<String> ids,
+  ) {
+    return ResourcesByIdsProvider(
+      ids,
+    );
   }
 
   @override
   ResourcesByIdsProvider getProviderOverride(
     covariant ResourcesByIdsProvider provider,
   ) {
-    return call(provider.ids);
+    return call(
+      provider.ids,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -233,20 +248,24 @@ class ResourcesByIdsProvider extends FutureProvider<List<TeachingResource>> {
   /// Resources by IDs (for displaying attached resources on practice items)
   ///
   /// Copied from [resourcesByIds].
-  ResourcesByIdsProvider(List<String> ids)
-    : this._internal(
-        (ref) => resourcesByIds(ref as ResourcesByIdsRef, ids),
-        from: resourcesByIdsProvider,
-        name: r'resourcesByIdsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$resourcesByIdsHash,
-        dependencies: ResourcesByIdsFamily._dependencies,
-        allTransitiveDependencies:
-            ResourcesByIdsFamily._allTransitiveDependencies,
-        ids: ids,
-      );
+  ResourcesByIdsProvider(
+    List<String> ids,
+  ) : this._internal(
+          (ref) => resourcesByIds(
+            ref as ResourcesByIdsRef,
+            ids,
+          ),
+          from: resourcesByIdsProvider,
+          name: r'resourcesByIdsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$resourcesByIdsHash,
+          dependencies: ResourcesByIdsFamily._dependencies,
+          allTransitiveDependencies:
+              ResourcesByIdsFamily._allTransitiveDependencies,
+          ids: ids,
+        );
 
   ResourcesByIdsProvider._internal(
     super._createNotifier, {
@@ -263,7 +282,7 @@ class ResourcesByIdsProvider extends FutureProvider<List<TeachingResource>> {
   @override
   Override overrideWith(
     FutureOr<List<TeachingResource>> Function(ResourcesByIdsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -320,15 +339,12 @@ String _$teachingResourceNotifierHash() =>
 /// Copied from [TeachingResourceNotifier].
 @ProviderFor(TeachingResourceNotifier)
 final teachingResourceNotifierProvider = AsyncNotifierProvider<
-  TeachingResourceNotifier,
-  List<TeachingResource>
->.internal(
+    TeachingResourceNotifier, List<TeachingResource>>.internal(
   TeachingResourceNotifier.new,
   name: r'teachingResourceNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teachingResourceNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teachingResourceNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

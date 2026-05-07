@@ -270,17 +270,17 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
           return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
         }).toList();
 
-    // Generate random profile color
-    final profileColors = [
-      AppColors.paperAccent,
-      AppColors.paperAccent,
-      AppColors.paperOk,
-      AppColors.profilePurple,
-      AppColors.profileRed,
-      AppColors.profileBlue,
+    // Generate random semantic profile color.
+    const profileColorKeys = [
+      'paperAccent',
+      'paperAccent',
+      'paperOk',
+      'profilePurple',
+      'profileRed',
+      'profileBlue',
     ];
-    final profileColor =
-        profileColors[DateTime.now().millisecond % profileColors.length];
+    final profileColorKey =
+        profileColorKeys[DateTime.now().millisecond % profileColorKeys.length];
 
     // Create Student object
     final student = Student(
@@ -307,7 +307,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
           _emailController.text.isNotEmpty
               ? _emailController.text.trim()
               : null,
-      profileColor: profileColor,
+      profileColorKey: profileColorKey,
       lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
       notes:

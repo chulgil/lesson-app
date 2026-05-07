@@ -41,10 +41,9 @@ String _$homeHasLessonsHash() => r'fc52bc8030dda6c7c91f43b7316551687627866a';
 final homeHasLessonsProvider = Provider<bool>.internal(
   homeHasLessons,
   name: r'homeHasLessonsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeHasLessonsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeHasLessonsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -58,10 +57,9 @@ String _$homeHasCompletedLessonHash() =>
 final homeHasCompletedLessonProvider = Provider<bool>.internal(
   homeHasCompletedLesson,
   name: r'homeHasCompletedLessonProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeHasCompletedLessonHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeHasCompletedLessonHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -75,10 +73,9 @@ String _$homeHasLessonNotesHash() =>
 final homeHasLessonNotesProvider = Provider<bool>.internal(
   homeHasLessonNotes,
   name: r'homeHasLessonNotesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeHasLessonNotesHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeHasLessonNotesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -92,10 +89,9 @@ String _$homeTeacherPhoneVerifiedHash() =>
 final homeTeacherPhoneVerifiedProvider = Provider<bool>.internal(
   homeTeacherPhoneVerified,
   name: r'homeTeacherPhoneVerifiedProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeTeacherPhoneVerifiedHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeTeacherPhoneVerifiedHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -108,10 +104,9 @@ String _$homeFirstLessonIdHash() => r'7eb7a8abedae32878060365475385c68a78da63e';
 final homeFirstLessonIdProvider = Provider<String?>.internal(
   homeFirstLessonId,
   name: r'homeFirstLessonIdProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeFirstLessonIdHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeFirstLessonIdHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -153,15 +148,21 @@ class HomeActiveStudentMembershipsFamily
   const HomeActiveStudentMembershipsFamily();
 
   /// See also [homeActiveStudentMemberships].
-  HomeActiveStudentMembershipsProvider call(String studentId) {
-    return HomeActiveStudentMembershipsProvider(studentId);
+  HomeActiveStudentMembershipsProvider call(
+    String studentId,
+  ) {
+    return HomeActiveStudentMembershipsProvider(
+      studentId,
+    );
   }
 
   @override
   HomeActiveStudentMembershipsProvider getProviderOverride(
     covariant HomeActiveStudentMembershipsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -183,23 +184,24 @@ class HomeActiveStudentMembershipsFamily
 class HomeActiveStudentMembershipsProvider
     extends FutureProvider<List<ClassMembership>> {
   /// See also [homeActiveStudentMemberships].
-  HomeActiveStudentMembershipsProvider(String studentId)
-    : this._internal(
-        (ref) => homeActiveStudentMemberships(
-          ref as HomeActiveStudentMembershipsRef,
-          studentId,
-        ),
-        from: homeActiveStudentMembershipsProvider,
-        name: r'homeActiveStudentMembershipsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$homeActiveStudentMembershipsHash,
-        dependencies: HomeActiveStudentMembershipsFamily._dependencies,
-        allTransitiveDependencies:
-            HomeActiveStudentMembershipsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  HomeActiveStudentMembershipsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => homeActiveStudentMemberships(
+            ref as HomeActiveStudentMembershipsRef,
+            studentId,
+          ),
+          from: homeActiveStudentMembershipsProvider,
+          name: r'homeActiveStudentMembershipsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$homeActiveStudentMembershipsHash,
+          dependencies: HomeActiveStudentMembershipsFamily._dependencies,
+          allTransitiveDependencies:
+              HomeActiveStudentMembershipsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   HomeActiveStudentMembershipsProvider._internal(
     super._createNotifier, {
@@ -216,9 +218,8 @@ class HomeActiveStudentMembershipsProvider
   @override
   Override overrideWith(
     FutureOr<List<ClassMembership>> Function(
-      HomeActiveStudentMembershipsRef provider,
-    )
-    create,
+            HomeActiveStudentMembershipsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -285,15 +286,21 @@ class HomeActiveStudentSubscriptionsFamily
   const HomeActiveStudentSubscriptionsFamily();
 
   /// See also [homeActiveStudentSubscriptions].
-  HomeActiveStudentSubscriptionsProvider call(String studentId) {
-    return HomeActiveStudentSubscriptionsProvider(studentId);
+  HomeActiveStudentSubscriptionsProvider call(
+    String studentId,
+  ) {
+    return HomeActiveStudentSubscriptionsProvider(
+      studentId,
+    );
   }
 
   @override
   HomeActiveStudentSubscriptionsProvider getProviderOverride(
     covariant HomeActiveStudentSubscriptionsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -315,23 +322,24 @@ class HomeActiveStudentSubscriptionsFamily
 class HomeActiveStudentSubscriptionsProvider
     extends FutureProvider<List<Subscription>> {
   /// See also [homeActiveStudentSubscriptions].
-  HomeActiveStudentSubscriptionsProvider(String studentId)
-    : this._internal(
-        (ref) => homeActiveStudentSubscriptions(
-          ref as HomeActiveStudentSubscriptionsRef,
-          studentId,
-        ),
-        from: homeActiveStudentSubscriptionsProvider,
-        name: r'homeActiveStudentSubscriptionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$homeActiveStudentSubscriptionsHash,
-        dependencies: HomeActiveStudentSubscriptionsFamily._dependencies,
-        allTransitiveDependencies:
-            HomeActiveStudentSubscriptionsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  HomeActiveStudentSubscriptionsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => homeActiveStudentSubscriptions(
+            ref as HomeActiveStudentSubscriptionsRef,
+            studentId,
+          ),
+          from: homeActiveStudentSubscriptionsProvider,
+          name: r'homeActiveStudentSubscriptionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$homeActiveStudentSubscriptionsHash,
+          dependencies: HomeActiveStudentSubscriptionsFamily._dependencies,
+          allTransitiveDependencies:
+              HomeActiveStudentSubscriptionsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   HomeActiveStudentSubscriptionsProvider._internal(
     super._createNotifier, {
@@ -348,9 +356,8 @@ class HomeActiveStudentSubscriptionsProvider
   @override
   Override overrideWith(
     FutureOr<List<Subscription>> Function(
-      HomeActiveStudentSubscriptionsRef provider,
-    )
-    create,
+            HomeActiveStudentSubscriptionsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -416,15 +423,21 @@ class HomeLessonClassContextFamily
   const HomeLessonClassContextFamily();
 
   /// See also [homeLessonClassContext].
-  HomeLessonClassContextProvider call(String classId) {
-    return HomeLessonClassContextProvider(classId);
+  HomeLessonClassContextProvider call(
+    String classId,
+  ) {
+    return HomeLessonClassContextProvider(
+      classId,
+    );
   }
 
   @override
   HomeLessonClassContextProvider getProviderOverride(
     covariant HomeLessonClassContextProvider provider,
   ) {
-    return call(provider.classId);
+    return call(
+      provider.classId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -446,21 +459,24 @@ class HomeLessonClassContextFamily
 class HomeLessonClassContextProvider
     extends FutureProvider<HomeLessonClassContext?> {
   /// See also [homeLessonClassContext].
-  HomeLessonClassContextProvider(String classId)
-    : this._internal(
-        (ref) =>
-            homeLessonClassContext(ref as HomeLessonClassContextRef, classId),
-        from: homeLessonClassContextProvider,
-        name: r'homeLessonClassContextProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$homeLessonClassContextHash,
-        dependencies: HomeLessonClassContextFamily._dependencies,
-        allTransitiveDependencies:
-            HomeLessonClassContextFamily._allTransitiveDependencies,
-        classId: classId,
-      );
+  HomeLessonClassContextProvider(
+    String classId,
+  ) : this._internal(
+          (ref) => homeLessonClassContext(
+            ref as HomeLessonClassContextRef,
+            classId,
+          ),
+          from: homeLessonClassContextProvider,
+          name: r'homeLessonClassContextProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$homeLessonClassContextHash,
+          dependencies: HomeLessonClassContextFamily._dependencies,
+          allTransitiveDependencies:
+              HomeLessonClassContextFamily._allTransitiveDependencies,
+          classId: classId,
+        );
 
   HomeLessonClassContextProvider._internal(
     super._createNotifier, {
@@ -477,9 +493,8 @@ class HomeLessonClassContextProvider
   @override
   Override overrideWith(
     FutureOr<HomeLessonClassContext?> Function(
-      HomeLessonClassContextRef provider,
-    )
-    create,
+            HomeLessonClassContextRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -527,6 +542,5 @@ class _HomeLessonClassContextProviderElement
   @override
   String get classId => (origin as HomeLessonClassContextProvider).classId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

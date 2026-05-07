@@ -7,19 +7,18 @@ part of 'practice_goal.dart';
 // **************************************************************************
 
 PracticeGoal _$PracticeGoalFromJson(Map<String, dynamic> json) => PracticeGoal(
-  id: json['id'] as String,
-  studentId: json['student_id'] as String,
-  dailyTimeMinutes: (json['daily_time_minutes'] as num?)?.toInt(),
-  dailySectionCount: (json['daily_section_count'] as num?)?.toInt(),
-  weeklyTimeMinutes: (json['weekly_time_minutes'] as num?)?.toInt(),
-  weeklyDayCount: (json['weekly_day_count'] as num?)?.toInt(),
-  isActive: json['is_active'] as bool? ?? true,
-  createdAt: DateTime.parse(json['created_at'] as String),
-  updatedAt:
-      json['updated_at'] == null
+      id: json['id'] as String,
+      studentId: json['student_id'] as String,
+      dailyTimeMinutes: (json['daily_time_minutes'] as num?)?.toInt(),
+      dailySectionCount: (json['daily_section_count'] as num?)?.toInt(),
+      weeklyTimeMinutes: (json['weekly_time_minutes'] as num?)?.toInt(),
+      weeklyDayCount: (json['weekly_day_count'] as num?)?.toInt(),
+      isActive: json['is_active'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-);
+    );
 
 Map<String, dynamic> _$PracticeGoalToJson(PracticeGoal instance) =>
     <String, dynamic>{

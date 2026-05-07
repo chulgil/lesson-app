@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 
 /// Chapter 2: Payment info (method, date, confirmation status).
 class SubscriptionChapterPayment extends StatelessWidget {

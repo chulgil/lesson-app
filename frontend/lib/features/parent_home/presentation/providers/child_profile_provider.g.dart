@@ -7,7 +7,7 @@ part of 'child_profile_provider.dart';
 // **************************************************************************
 
 String _$childProfileRepositoryHash() =>
-    r'99d386c54b83a5c17ee7cd239997298def902f16';
+    r'0c96ff54e693c3aaa7cf1fca27dc909b6d6a9912';
 
 /// Provider for the child profile repository - switches between Mock and Remote.
 ///
@@ -350,7 +350,7 @@ final selectedChildProfileProvider =
 
 typedef _$SelectedChildProfile = AutoDisposeNotifier<ChildProfile?>;
 String _$childProfileManagerHash() =>
-    r'21b78e07849b61cb34a65df397aa2ed65937c529';
+    r'dd5678916d9f7a8f5e45333a5beeaf359a664534';
 
 /// Notifier for managing child profiles (add, update, delete)
 ///

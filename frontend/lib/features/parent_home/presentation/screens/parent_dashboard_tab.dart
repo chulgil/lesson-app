@@ -14,13 +14,12 @@ import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/child_profile.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
+import '../providers/parent_dashboard_state_provider.dart';
 import '../widgets/assignment_item.dart';
 import '../widgets/section_card.dart';
 import '../widgets/stat_card.dart';
-
-/// Selected child provider for parent dashboard
-final selectedChildIdProvider = StateProvider<String?>((ref) => null);
 
 /// Parent dashboard tab showing child overview
 class ParentDashboardTab extends ConsumerWidget {

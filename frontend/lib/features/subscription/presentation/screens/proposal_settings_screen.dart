@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/proposal_settings.dart';
+import '../extensions/subscription_template_visuals.dart';
 import '../providers/proposal_settings_providers.dart';
 import '../providers/subscription_template_providers.dart';
 

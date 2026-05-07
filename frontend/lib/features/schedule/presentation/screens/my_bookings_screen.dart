@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -350,7 +351,7 @@ class MyBookingsScreen extends ConsumerWidget {
               studentName: studentName,
               currentBookingId: booking.id,
               currentDate: booking.date,
-              currentStartTime: booking.startTime,
+              currentStartTime: booking.startTime.toFlutterTimeOfDay(),
               remainingReschedules: remainingReschedules,
               totalReschedules: totalReschedules,
               instrument: instrument,
@@ -371,7 +372,7 @@ class MyBookingsScreen extends ConsumerWidget {
               teacherName: teacherName,
               teacherId: teacherId,
               bookingDate: booking.date,
-              startTime: booking.startTime,
+              startTime: booking.startTime.toFlutterTimeOfDay(),
               remainingReschedules: remainingReschedules,
               totalReschedules: totalReschedules,
               instrument: instrument,

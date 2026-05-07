@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -308,8 +309,8 @@ class RegularLessonTimeSelector extends StatelessWidget {
           () => TimeSlot(
             id: 'default',
             dayOfWeek: dayOfWeek,
-            startTime: const TimeOfDay(hour: 14, minute: 0),
-            endTime: const TimeOfDay(hour: 18, minute: 0),
+            startTime: const TimeOfDay(hour: 14, minute: 0).toClockTime(),
+            endTime: const TimeOfDay(hour: 18, minute: 0).toClockTime(),
           ),
     );
 
@@ -350,7 +351,7 @@ class RegularLessonTimeSelector extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Text(
-                  '${formatTimeOfDay(daySlot.startTime)}-${formatTimeOfDay(daySlot.endTime)} 가능',
+                  '${formatTimeOfDay(daySlot.startTime.toFlutterTimeOfDay())}-${formatTimeOfDay(daySlot.endTime.toFlutterTimeOfDay())} 가능',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -364,8 +365,8 @@ class RegularLessonTimeSelector extends StatelessWidget {
           TimeSlotSelector(
             selectedTime: selectedTime,
             onTimeSelected: onTimeSelected,
-            availableStart: daySlot.startTime,
-            availableEnd: daySlot.endTime,
+            availableStart: daySlot.startTime.toFlutterTimeOfDay(),
+            availableEnd: daySlot.endTime.toFlutterTimeOfDay(),
             lessonDurationMinutes: lessonDuration,
             bookedSlots:
                 const [], // TODO: Get from provider when backend is ready

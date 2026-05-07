@@ -2,31 +2,37 @@
 
 part of 'lesson_policy.dart';
 
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
 LessonPolicy _$LessonPolicyFromJson(Map<String, dynamic> json) => LessonPolicy(
-  id: json['id'] as String,
-  lessonClassId: json['lesson_class_id'] as String?,
-  teacherId: json['teacher_id'] as String,
-  minCancelHours: (json['min_cancel_hours'] as num?)?.toInt() ?? 4,
-  maxChangesPerMonth: (json['max_changes_per_month'] as num?)?.toInt() ?? 2,
-  allowSameDayCancel: json['allow_same_day_cancel'] as bool? ?? false,
-  lateCancelDeadline: json['late_cancel_deadline'] as String?,
-  deductLessonOnNoShow: json['deduct_lesson_on_no_show'] as bool? ?? true,
-  gracePeriodMinutes: (json['grace_period_minutes'] as num?)?.toInt() ?? 15,
-  allowCarryover: json['allow_carryover'] as bool? ?? true,
-  maxCarryoverLessons: (json['max_carryover_lessons'] as num?)?.toInt() ?? 1,
-  carryoverPeriodMonths:
-      (json['carryover_period_months'] as num?)?.toInt() ?? 1,
-  fullRefundDays: (json['full_refund_days'] as num?)?.toInt() ?? 1,
-  partialRefundRatio:
-      (json['partial_refund_ratio'] as num?)?.toDouble() ?? 0.67,
-  halfwayRefundRatio: (json['halfway_refund_ratio'] as num?)?.toDouble() ?? 0.0,
-  noShowRefundRatio: (json['no_show_refund_ratio'] as num?)?.toDouble() ?? 0.67,
-  createdAt: DateTime.parse(json['created_at'] as String),
-  updatedAt:
-      json['updated_at'] == null
+      id: json['id'] as String,
+      lessonClassId: json['lesson_class_id'] as String?,
+      teacherId: json['teacher_id'] as String,
+      minCancelHours: (json['min_cancel_hours'] as num?)?.toInt() ?? 4,
+      maxChangesPerMonth: (json['max_changes_per_month'] as num?)?.toInt() ?? 2,
+      allowSameDayCancel: json['allow_same_day_cancel'] as bool? ?? false,
+      lateCancelDeadline: json['late_cancel_deadline'] as String?,
+      deductLessonOnNoShow: json['deduct_lesson_on_no_show'] as bool? ?? true,
+      gracePeriodMinutes: (json['grace_period_minutes'] as num?)?.toInt() ?? 15,
+      allowCarryover: json['allow_carryover'] as bool? ?? true,
+      maxCarryoverLessons:
+          (json['max_carryover_lessons'] as num?)?.toInt() ?? 1,
+      carryoverPeriodMonths:
+          (json['carryover_period_months'] as num?)?.toInt() ?? 1,
+      fullRefundDays: (json['full_refund_days'] as num?)?.toInt() ?? 1,
+      partialRefundRatio:
+          (json['partial_refund_ratio'] as num?)?.toDouble() ?? 0.67,
+      halfwayRefundRatio:
+          (json['halfway_refund_ratio'] as num?)?.toDouble() ?? 0.0,
+      noShowRefundRatio:
+          (json['no_show_refund_ratio'] as num?)?.toDouble() ?? 0.67,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-);
+    );
 
 Map<String, dynamic> _$LessonPolicyToJson(LessonPolicy instance) =>
     <String, dynamic>{

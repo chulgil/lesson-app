@@ -7,14 +7,14 @@ part of 'teacher_post.dart';
 // **************************************************************************
 
 TeacherPost _$TeacherPostFromJson(Map<String, dynamic> json) => TeacherPost(
-  id: json['id'] as String,
-  authorId: json['author_id'] as String,
-  authorName: json['author_name'] as String,
-  postType: $enumDecode(_$PostTypeEnumMap, json['post_type']),
-  title: json['title'] as String,
-  content: json['content'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
-);
+      id: json['id'] as String,
+      authorId: json['author_id'] as String,
+      authorName: json['author_name'] as String,
+      postType: $enumDecode(_$PostTypeEnumMap, json['post_type']),
+      title: json['title'] as String,
+      content: json['content'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
 
 Map<String, dynamic> _$TeacherPostToJson(TeacherPost instance) =>
     <String, dynamic>{

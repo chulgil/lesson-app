@@ -7,7 +7,7 @@ part of 'repertoire_sort_provider.dart';
 // **************************************************************************
 
 String _$sortedRepertoiresForDateHash() =>
-    r'7893bbc6733a74712fc2c70ad5c2d0118858bafd';
+    r'523cffdb97772d7c7d9206f8af35dba072a5438e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -49,15 +49,21 @@ class SortedRepertoiresForDateFamily
   /// Sorted repertoires provider for a date
   ///
   /// Copied from [sortedRepertoiresForDate].
-  SortedRepertoiresForDateProvider call(RepertoiresForDateParams params) {
-    return SortedRepertoiresForDateProvider(params);
+  SortedRepertoiresForDateProvider call(
+    RepertoiresForDateParams params,
+  ) {
+    return SortedRepertoiresForDateProvider(
+      params,
+    );
   }
 
   @override
   SortedRepertoiresForDateProvider getProviderOverride(
     covariant SortedRepertoiresForDateProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -83,23 +89,24 @@ class SortedRepertoiresForDateProvider
   /// Sorted repertoires provider for a date
   ///
   /// Copied from [sortedRepertoiresForDate].
-  SortedRepertoiresForDateProvider(RepertoiresForDateParams params)
-    : this._internal(
-        (ref) => sortedRepertoiresForDate(
-          ref as SortedRepertoiresForDateRef,
-          params,
-        ),
-        from: sortedRepertoiresForDateProvider,
-        name: r'sortedRepertoiresForDateProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$sortedRepertoiresForDateHash,
-        dependencies: SortedRepertoiresForDateFamily._dependencies,
-        allTransitiveDependencies:
-            SortedRepertoiresForDateFamily._allTransitiveDependencies,
-        params: params,
-      );
+  SortedRepertoiresForDateProvider(
+    RepertoiresForDateParams params,
+  ) : this._internal(
+          (ref) => sortedRepertoiresForDate(
+            ref as SortedRepertoiresForDateRef,
+            params,
+          ),
+          from: sortedRepertoiresForDateProvider,
+          name: r'sortedRepertoiresForDateProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sortedRepertoiresForDateHash,
+          dependencies: SortedRepertoiresForDateFamily._dependencies,
+          allTransitiveDependencies:
+              SortedRepertoiresForDateFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   SortedRepertoiresForDateProvider._internal(
     super._createNotifier, {
@@ -116,9 +123,8 @@ class SortedRepertoiresForDateProvider
   @override
   Override overrideWith(
     List<practice.PracticeRepertoire> Function(
-      SortedRepertoiresForDateRef provider,
-    )
-    create,
+            SortedRepertoiresForDateRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -177,15 +183,12 @@ String _$repertoireSortTypeStateHash() =>
 /// Copied from [RepertoireSortTypeState].
 @ProviderFor(RepertoireSortTypeState)
 final repertoireSortTypeStateProvider = NotifierProvider<
-  RepertoireSortTypeState,
-  domain.RepertoireSortType
->.internal(
+    RepertoireSortTypeState, domain.RepertoireSortType>.internal(
   RepertoireSortTypeState.new,
   name: r'repertoireSortTypeStateProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$repertoireSortTypeStateHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$repertoireSortTypeStateHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -200,15 +203,14 @@ String _$repertoireOrderNotifierHash() =>
 @ProviderFor(RepertoireOrderNotifier)
 final repertoireOrderNotifierProvider =
     AsyncNotifierProvider<RepertoireOrderNotifier, void>.internal(
-      RepertoireOrderNotifier.new,
-      name: r'repertoireOrderNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$repertoireOrderNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  RepertoireOrderNotifier.new,
+  name: r'repertoireOrderNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$repertoireOrderNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$RepertoireOrderNotifier = AsyncNotifier<void>;
 // ignore_for_file: type=lint

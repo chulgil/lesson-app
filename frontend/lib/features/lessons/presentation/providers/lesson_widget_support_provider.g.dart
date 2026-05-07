@@ -41,15 +41,21 @@ class LessonWidgetPracticeItemsFamily
   const LessonWidgetPracticeItemsFamily();
 
   /// See also [lessonWidgetPracticeItems].
-  LessonWidgetPracticeItemsProvider call(String lessonId) {
-    return LessonWidgetPracticeItemsProvider(lessonId);
+  LessonWidgetPracticeItemsProvider call(
+    String lessonId,
+  ) {
+    return LessonWidgetPracticeItemsProvider(
+      lessonId,
+    );
   }
 
   @override
   LessonWidgetPracticeItemsProvider getProviderOverride(
     covariant LessonWidgetPracticeItemsProvider provider,
   ) {
-    return call(provider.lessonId);
+    return call(
+      provider.lessonId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -71,23 +77,24 @@ class LessonWidgetPracticeItemsFamily
 class LessonWidgetPracticeItemsProvider
     extends Provider<AsyncValue<List<PracticeItem>>> {
   /// See also [lessonWidgetPracticeItems].
-  LessonWidgetPracticeItemsProvider(String lessonId)
-    : this._internal(
-        (ref) => lessonWidgetPracticeItems(
-          ref as LessonWidgetPracticeItemsRef,
-          lessonId,
-        ),
-        from: lessonWidgetPracticeItemsProvider,
-        name: r'lessonWidgetPracticeItemsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonWidgetPracticeItemsHash,
-        dependencies: LessonWidgetPracticeItemsFamily._dependencies,
-        allTransitiveDependencies:
-            LessonWidgetPracticeItemsFamily._allTransitiveDependencies,
-        lessonId: lessonId,
-      );
+  LessonWidgetPracticeItemsProvider(
+    String lessonId,
+  ) : this._internal(
+          (ref) => lessonWidgetPracticeItems(
+            ref as LessonWidgetPracticeItemsRef,
+            lessonId,
+          ),
+          from: lessonWidgetPracticeItemsProvider,
+          name: r'lessonWidgetPracticeItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonWidgetPracticeItemsHash,
+          dependencies: LessonWidgetPracticeItemsFamily._dependencies,
+          allTransitiveDependencies:
+              LessonWidgetPracticeItemsFamily._allTransitiveDependencies,
+          lessonId: lessonId,
+        );
 
   LessonWidgetPracticeItemsProvider._internal(
     super._createNotifier, {
@@ -104,9 +111,8 @@ class LessonWidgetPracticeItemsProvider
   @override
   Override overrideWith(
     AsyncValue<List<PracticeItem>> Function(
-      LessonWidgetPracticeItemsRef provider,
-    )
-    create,
+            LessonWidgetPracticeItemsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -172,15 +178,21 @@ class LessonWidgetStudentRepertoiresFamily
   const LessonWidgetStudentRepertoiresFamily();
 
   /// See also [lessonWidgetStudentRepertoires].
-  LessonWidgetStudentRepertoiresProvider call(String studentId) {
-    return LessonWidgetStudentRepertoiresProvider(studentId);
+  LessonWidgetStudentRepertoiresProvider call(
+    String studentId,
+  ) {
+    return LessonWidgetStudentRepertoiresProvider(
+      studentId,
+    );
   }
 
   @override
   LessonWidgetStudentRepertoiresProvider getProviderOverride(
     covariant LessonWidgetStudentRepertoiresProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -202,23 +214,24 @@ class LessonWidgetStudentRepertoiresFamily
 class LessonWidgetStudentRepertoiresProvider
     extends Provider<AsyncValue<List<PracticeRepertoire>>> {
   /// See also [lessonWidgetStudentRepertoires].
-  LessonWidgetStudentRepertoiresProvider(String studentId)
-    : this._internal(
-        (ref) => lessonWidgetStudentRepertoires(
-          ref as LessonWidgetStudentRepertoiresRef,
-          studentId,
-        ),
-        from: lessonWidgetStudentRepertoiresProvider,
-        name: r'lessonWidgetStudentRepertoiresProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonWidgetStudentRepertoiresHash,
-        dependencies: LessonWidgetStudentRepertoiresFamily._dependencies,
-        allTransitiveDependencies:
-            LessonWidgetStudentRepertoiresFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  LessonWidgetStudentRepertoiresProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => lessonWidgetStudentRepertoires(
+            ref as LessonWidgetStudentRepertoiresRef,
+            studentId,
+          ),
+          from: lessonWidgetStudentRepertoiresProvider,
+          name: r'lessonWidgetStudentRepertoiresProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonWidgetStudentRepertoiresHash,
+          dependencies: LessonWidgetStudentRepertoiresFamily._dependencies,
+          allTransitiveDependencies:
+              LessonWidgetStudentRepertoiresFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   LessonWidgetStudentRepertoiresProvider._internal(
     super._createNotifier, {
@@ -235,9 +248,8 @@ class LessonWidgetStudentRepertoiresProvider
   @override
   Override overrideWith(
     AsyncValue<List<PracticeRepertoire>> Function(
-      LessonWidgetStudentRepertoiresRef provider,
-    )
-    create,
+            LessonWidgetStudentRepertoiresRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -304,15 +316,21 @@ class LessonWidgetTeacherLocationsFamily
   const LessonWidgetTeacherLocationsFamily();
 
   /// See also [lessonWidgetTeacherLocations].
-  LessonWidgetTeacherLocationsProvider call(String teacherId) {
-    return LessonWidgetTeacherLocationsProvider(teacherId);
+  LessonWidgetTeacherLocationsProvider call(
+    String teacherId,
+  ) {
+    return LessonWidgetTeacherLocationsProvider(
+      teacherId,
+    );
   }
 
   @override
   LessonWidgetTeacherLocationsProvider getProviderOverride(
     covariant LessonWidgetTeacherLocationsProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -334,23 +352,24 @@ class LessonWidgetTeacherLocationsFamily
 class LessonWidgetTeacherLocationsProvider
     extends Provider<AsyncValue<List<LessonLocation>>> {
   /// See also [lessonWidgetTeacherLocations].
-  LessonWidgetTeacherLocationsProvider(String teacherId)
-    : this._internal(
-        (ref) => lessonWidgetTeacherLocations(
-          ref as LessonWidgetTeacherLocationsRef,
-          teacherId,
-        ),
-        from: lessonWidgetTeacherLocationsProvider,
-        name: r'lessonWidgetTeacherLocationsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonWidgetTeacherLocationsHash,
-        dependencies: LessonWidgetTeacherLocationsFamily._dependencies,
-        allTransitiveDependencies:
-            LessonWidgetTeacherLocationsFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  LessonWidgetTeacherLocationsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => lessonWidgetTeacherLocations(
+            ref as LessonWidgetTeacherLocationsRef,
+            teacherId,
+          ),
+          from: lessonWidgetTeacherLocationsProvider,
+          name: r'lessonWidgetTeacherLocationsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonWidgetTeacherLocationsHash,
+          dependencies: LessonWidgetTeacherLocationsFamily._dependencies,
+          allTransitiveDependencies:
+              LessonWidgetTeacherLocationsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   LessonWidgetTeacherLocationsProvider._internal(
     super._createNotifier, {
@@ -367,9 +386,8 @@ class LessonWidgetTeacherLocationsProvider
   @override
   Override overrideWith(
     AsyncValue<List<LessonLocation>> Function(
-      LessonWidgetTeacherLocationsRef provider,
-    )
-    create,
+            LessonWidgetTeacherLocationsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -429,10 +447,9 @@ String _$lessonWidgetCurrentTeacherIdHash() =>
 final lessonWidgetCurrentTeacherIdProvider = Provider<String>.internal(
   lessonWidgetCurrentTeacherId,
   name: r'lessonWidgetCurrentTeacherIdProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$lessonWidgetCurrentTeacherIdHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lessonWidgetCurrentTeacherIdHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -445,18 +462,17 @@ String _$lessonWidgetRepertoireActionsHash() =>
 @ProviderFor(lessonWidgetRepertoireActions)
 final lessonWidgetRepertoireActionsProvider =
     Provider<LessonWidgetRepertoireActions>.internal(
-      lessonWidgetRepertoireActions,
-      name: r'lessonWidgetRepertoireActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$lessonWidgetRepertoireActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  lessonWidgetRepertoireActions,
+  name: r'lessonWidgetRepertoireActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lessonWidgetRepertoireActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef LessonWidgetRepertoireActionsRef =
-    ProviderRef<LessonWidgetRepertoireActions>;
+typedef LessonWidgetRepertoireActionsRef
+    = ProviderRef<LessonWidgetRepertoireActions>;
 String _$lessonWidgetPracticeItemActionsHash() =>
     r'04cdaf2896464608558ca3d60dd82553842c54ce';
 
@@ -472,15 +488,21 @@ class LessonWidgetPracticeItemActionsFamily
   const LessonWidgetPracticeItemActionsFamily();
 
   /// See also [lessonWidgetPracticeItemActions].
-  LessonWidgetPracticeItemActionsProvider call(String lessonId) {
-    return LessonWidgetPracticeItemActionsProvider(lessonId);
+  LessonWidgetPracticeItemActionsProvider call(
+    String lessonId,
+  ) {
+    return LessonWidgetPracticeItemActionsProvider(
+      lessonId,
+    );
   }
 
   @override
   LessonWidgetPracticeItemActionsProvider getProviderOverride(
     covariant LessonWidgetPracticeItemActionsProvider provider,
   ) {
-    return call(provider.lessonId);
+    return call(
+      provider.lessonId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -502,23 +524,24 @@ class LessonWidgetPracticeItemActionsFamily
 class LessonWidgetPracticeItemActionsProvider
     extends Provider<LessonWidgetPracticeItemActions> {
   /// See also [lessonWidgetPracticeItemActions].
-  LessonWidgetPracticeItemActionsProvider(String lessonId)
-    : this._internal(
-        (ref) => lessonWidgetPracticeItemActions(
-          ref as LessonWidgetPracticeItemActionsRef,
-          lessonId,
-        ),
-        from: lessonWidgetPracticeItemActionsProvider,
-        name: r'lessonWidgetPracticeItemActionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$lessonWidgetPracticeItemActionsHash,
-        dependencies: LessonWidgetPracticeItemActionsFamily._dependencies,
-        allTransitiveDependencies:
-            LessonWidgetPracticeItemActionsFamily._allTransitiveDependencies,
-        lessonId: lessonId,
-      );
+  LessonWidgetPracticeItemActionsProvider(
+    String lessonId,
+  ) : this._internal(
+          (ref) => lessonWidgetPracticeItemActions(
+            ref as LessonWidgetPracticeItemActionsRef,
+            lessonId,
+          ),
+          from: lessonWidgetPracticeItemActionsProvider,
+          name: r'lessonWidgetPracticeItemActionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonWidgetPracticeItemActionsHash,
+          dependencies: LessonWidgetPracticeItemActionsFamily._dependencies,
+          allTransitiveDependencies:
+              LessonWidgetPracticeItemActionsFamily._allTransitiveDependencies,
+          lessonId: lessonId,
+        );
 
   LessonWidgetPracticeItemActionsProvider._internal(
     super._createNotifier, {
@@ -535,9 +558,8 @@ class LessonWidgetPracticeItemActionsProvider
   @override
   Override overrideWith(
     LessonWidgetPracticeItemActions Function(
-      LessonWidgetPracticeItemActionsRef provider,
-    )
-    create,
+            LessonWidgetPracticeItemActionsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -588,6 +610,5 @@ class _LessonWidgetPracticeItemActionsProviderElement
   String get lessonId =>
       (origin as LessonWidgetPracticeItemActionsProvider).lessonId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

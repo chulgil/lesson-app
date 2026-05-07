@@ -11,6 +11,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';

@@ -16,10 +16,9 @@ String _$tipTemplateRepositoryHash() =>
 final tipTemplateRepositoryProvider = Provider<TipTemplateRepository>.internal(
   tipTemplateRepository,
   name: r'tipTemplateRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$tipTemplateRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$tipTemplateRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -34,10 +33,9 @@ String _$currentTeacherIdHash() => r'7a11ed00390260955da3b0cfbb0ce5a4f11351b3';
 final currentTeacherIdProvider = Provider<String>.internal(
   currentTeacherId,
   name: r'currentTeacherIdProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$currentTeacherIdHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentTeacherIdHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -102,15 +100,21 @@ class TipTemplatesByCategoryFamily
   /// Templates by category
   ///
   /// Copied from [tipTemplatesByCategory].
-  TipTemplatesByCategoryProvider call(TipCategory category) {
-    return TipTemplatesByCategoryProvider(category);
+  TipTemplatesByCategoryProvider call(
+    TipCategory category,
+  ) {
+    return TipTemplatesByCategoryProvider(
+      category,
+    );
   }
 
   @override
   TipTemplatesByCategoryProvider getProviderOverride(
     covariant TipTemplatesByCategoryProvider provider,
   ) {
-    return call(provider.category);
+    return call(
+      provider.category,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -135,21 +139,24 @@ class TipTemplatesByCategoryProvider extends FutureProvider<List<TipTemplate>> {
   /// Templates by category
   ///
   /// Copied from [tipTemplatesByCategory].
-  TipTemplatesByCategoryProvider(TipCategory category)
-    : this._internal(
-        (ref) =>
-            tipTemplatesByCategory(ref as TipTemplatesByCategoryRef, category),
-        from: tipTemplatesByCategoryProvider,
-        name: r'tipTemplatesByCategoryProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$tipTemplatesByCategoryHash,
-        dependencies: TipTemplatesByCategoryFamily._dependencies,
-        allTransitiveDependencies:
-            TipTemplatesByCategoryFamily._allTransitiveDependencies,
-        category: category,
-      );
+  TipTemplatesByCategoryProvider(
+    TipCategory category,
+  ) : this._internal(
+          (ref) => tipTemplatesByCategory(
+            ref as TipTemplatesByCategoryRef,
+            category,
+          ),
+          from: tipTemplatesByCategoryProvider,
+          name: r'tipTemplatesByCategoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tipTemplatesByCategoryHash,
+          dependencies: TipTemplatesByCategoryFamily._dependencies,
+          allTransitiveDependencies:
+              TipTemplatesByCategoryFamily._allTransitiveDependencies,
+          category: category,
+        );
 
   TipTemplatesByCategoryProvider._internal(
     super._createNotifier, {
@@ -166,7 +173,7 @@ class TipTemplatesByCategoryProvider extends FutureProvider<List<TipTemplate>> {
   @override
   Override overrideWith(
     FutureOr<List<TipTemplate>> Function(TipTemplatesByCategoryRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -239,15 +246,21 @@ class TipTemplatesByInstrumentFamily
   /// Templates for specific instrument (includes general tips)
   ///
   /// Copied from [tipTemplatesByInstrument].
-  TipTemplatesByInstrumentProvider call(String? instrument) {
-    return TipTemplatesByInstrumentProvider(instrument);
+  TipTemplatesByInstrumentProvider call(
+    String? instrument,
+  ) {
+    return TipTemplatesByInstrumentProvider(
+      instrument,
+    );
   }
 
   @override
   TipTemplatesByInstrumentProvider getProviderOverride(
     covariant TipTemplatesByInstrumentProvider provider,
   ) {
-    return call(provider.instrument);
+    return call(
+      provider.instrument,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -273,23 +286,24 @@ class TipTemplatesByInstrumentProvider
   /// Templates for specific instrument (includes general tips)
   ///
   /// Copied from [tipTemplatesByInstrument].
-  TipTemplatesByInstrumentProvider(String? instrument)
-    : this._internal(
-        (ref) => tipTemplatesByInstrument(
-          ref as TipTemplatesByInstrumentRef,
-          instrument,
-        ),
-        from: tipTemplatesByInstrumentProvider,
-        name: r'tipTemplatesByInstrumentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$tipTemplatesByInstrumentHash,
-        dependencies: TipTemplatesByInstrumentFamily._dependencies,
-        allTransitiveDependencies:
-            TipTemplatesByInstrumentFamily._allTransitiveDependencies,
-        instrument: instrument,
-      );
+  TipTemplatesByInstrumentProvider(
+    String? instrument,
+  ) : this._internal(
+          (ref) => tipTemplatesByInstrument(
+            ref as TipTemplatesByInstrumentRef,
+            instrument,
+          ),
+          from: tipTemplatesByInstrumentProvider,
+          name: r'tipTemplatesByInstrumentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tipTemplatesByInstrumentHash,
+          dependencies: TipTemplatesByInstrumentFamily._dependencies,
+          allTransitiveDependencies:
+              TipTemplatesByInstrumentFamily._allTransitiveDependencies,
+          instrument: instrument,
+        );
 
   TipTemplatesByInstrumentProvider._internal(
     super._createNotifier, {
@@ -306,7 +320,7 @@ class TipTemplatesByInstrumentProvider
   @override
   Override overrideWith(
     FutureOr<List<TipTemplate>> Function(TipTemplatesByInstrumentRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -367,10 +381,9 @@ String _$frequentTipTemplatesHash() =>
 final frequentTipTemplatesProvider = FutureProvider<List<TipTemplate>>.internal(
   frequentTipTemplates,
   name: r'frequentTipTemplatesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$frequentTipTemplatesHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$frequentTipTemplatesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -396,15 +409,21 @@ class TipTemplateSearchFamily extends Family<AsyncValue<List<TipTemplate>>> {
   /// Search templates
   ///
   /// Copied from [tipTemplateSearch].
-  TipTemplateSearchProvider call(String query) {
-    return TipTemplateSearchProvider(query);
+  TipTemplateSearchProvider call(
+    String query,
+  ) {
+    return TipTemplateSearchProvider(
+      query,
+    );
   }
 
   @override
   TipTemplateSearchProvider getProviderOverride(
     covariant TipTemplateSearchProvider provider,
   ) {
-    return call(provider.query);
+    return call(
+      provider.query,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -429,20 +448,24 @@ class TipTemplateSearchProvider extends FutureProvider<List<TipTemplate>> {
   /// Search templates
   ///
   /// Copied from [tipTemplateSearch].
-  TipTemplateSearchProvider(String query)
-    : this._internal(
-        (ref) => tipTemplateSearch(ref as TipTemplateSearchRef, query),
-        from: tipTemplateSearchProvider,
-        name: r'tipTemplateSearchProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$tipTemplateSearchHash,
-        dependencies: TipTemplateSearchFamily._dependencies,
-        allTransitiveDependencies:
-            TipTemplateSearchFamily._allTransitiveDependencies,
-        query: query,
-      );
+  TipTemplateSearchProvider(
+    String query,
+  ) : this._internal(
+          (ref) => tipTemplateSearch(
+            ref as TipTemplateSearchRef,
+            query,
+          ),
+          from: tipTemplateSearchProvider,
+          name: r'tipTemplateSearchProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tipTemplateSearchHash,
+          dependencies: TipTemplateSearchFamily._dependencies,
+          allTransitiveDependencies:
+              TipTemplateSearchFamily._allTransitiveDependencies,
+          query: query,
+        );
 
   TipTemplateSearchProvider._internal(
     super._createNotifier, {
@@ -499,8 +522,7 @@ mixin TipTemplateSearchRef on FutureProviderRef<List<TipTemplate>> {
 }
 
 class _TipTemplateSearchProviderElement
-    extends FutureProviderElement<List<TipTemplate>>
-    with TipTemplateSearchRef {
+    extends FutureProviderElement<List<TipTemplate>> with TipTemplateSearchRef {
   _TipTemplateSearchProviderElement(super.provider);
 
   @override
@@ -516,15 +538,14 @@ String _$tipTemplatesNotifierHash() =>
 @ProviderFor(TipTemplatesNotifier)
 final tipTemplatesNotifierProvider =
     AsyncNotifierProvider<TipTemplatesNotifier, List<TipTemplate>>.internal(
-      TipTemplatesNotifier.new,
-      name: r'tipTemplatesNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$tipTemplatesNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  TipTemplatesNotifier.new,
+  name: r'tipTemplatesNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$tipTemplatesNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$TipTemplatesNotifier = AsyncNotifier<List<TipTemplate>>;
 // ignore_for_file: type=lint

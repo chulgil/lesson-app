@@ -361,7 +361,7 @@ final trialStudentsProvider = FutureProvider<List<Student>>.internal(
 
 typedef TrialStudentsRef = FutureProviderRef<List<Student>>;
 String _$studentSearchQueryHash() =>
-    r'1e486155319bc9781b582049c15484e84aef92f1';
+    r'3df8a57041ca72e0b97bcc82d918dbef7e079860';
 
 /// Search students provider
 ///

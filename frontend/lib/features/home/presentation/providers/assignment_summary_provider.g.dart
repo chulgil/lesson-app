@@ -15,15 +15,14 @@ String _$weeklyAssignmentSummaryHash() =>
 @ProviderFor(weeklyAssignmentSummary)
 final weeklyAssignmentSummaryProvider =
     FutureProvider<WeeklyAssignmentSummary>.internal(
-      weeklyAssignmentSummary,
-      name: r'weeklyAssignmentSummaryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$weeklyAssignmentSummaryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  weeklyAssignmentSummary,
+  name: r'weeklyAssignmentSummaryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$weeklyAssignmentSummaryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef WeeklyAssignmentSummaryRef = FutureProviderRef<WeeklyAssignmentSummary>;
 // ignore_for_file: type=lint

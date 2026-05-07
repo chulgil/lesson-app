@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../entities/availability_slot.dart';
 
@@ -28,12 +27,13 @@ class SlotRecommendationService {
     );
 
     // Filter lessons within analysis window and for specific teacher
-    final relevantLessons = lessons.where((lesson) {
-      return lesson.teacherId == teacherId &&
-          lesson.date.isAfter(cutoffDate) &&
-          (lesson.status == LessonStatus.completed ||
-              lesson.status == LessonStatus.scheduled);
-    }).toList();
+    final relevantLessons =
+        lessons.where((lesson) {
+          return lesson.teacherId == teacherId &&
+              lesson.date.isAfter(cutoffDate) &&
+              (lesson.status == LessonStatus.completed ||
+                  lesson.status == LessonStatus.scheduled);
+        }).toList();
 
     if (relevantLessons.isEmpty) return [];
 
@@ -43,16 +43,18 @@ class SlotRecommendationService {
     for (final lesson in relevantLessons) {
       final timeParts = lesson.startTime.split(':');
       final hour = int.tryParse(timeParts[0]) ?? 0;
-      final minute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
+      final minute =
+          int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
 
       final key = '${lesson.date.weekday}_${hour}_$minute';
 
       if (patternMap.containsKey(key)) {
         patternMap[key] = patternMap[key]!.copyWith(
           count: patternMap[key]!.count + 1,
-          lastLessonDate: lesson.date.isAfter(patternMap[key]!.lastLessonDate)
-              ? lesson.date
-              : patternMap[key]!.lastLessonDate,
+          lastLessonDate:
+              lesson.date.isAfter(patternMap[key]!.lastLessonDate)
+                  ? lesson.date
+                  : patternMap[key]!.lastLessonDate,
         );
       } else {
         patternMap[key] = LessonTimePattern(
@@ -66,9 +68,7 @@ class SlotRecommendationService {
     }
 
     // Filter patterns with minimum count and sort by frequency
-    return patternMap.values
-        .where((p) => p.count >= minPatternCount)
-        .toList()
+    return patternMap.values.where((p) => p.count >= minPatternCount).toList()
       ..sort((a, b) {
         // Sort by count descending, then by recency
         final countCompare = b.count.compareTo(a.count);
@@ -88,10 +88,12 @@ class SlotRecommendationService {
     if (patterns.isEmpty) return slots;
 
     return slots.map((slot) {
-      final isRecommended = patterns.any((pattern) =>
-          slot.date.weekday == pattern.dayOfWeek &&
-          slot.startTime.hour == pattern.hour &&
-          slot.startTime.minute == pattern.minute);
+      final isRecommended = patterns.any(
+        (pattern) =>
+            slot.date.weekday == pattern.dayOfWeek &&
+            slot.startTime.hour == pattern.hour &&
+            slot.startTime.minute == pattern.minute,
+      );
 
       if (isRecommended && slot.status == AvailabilitySlotStatus.available) {
         return slot.copyWith(isRecommended: true);
@@ -124,9 +126,7 @@ class SlotRecommendationService {
       );
 
       if (matchingPattern.count > 0) {
-        recommended.add(slot.copyWith(
-          isRecommended: true,
-        ));
+        recommended.add(slot.copyWith(isRecommended: true));
       }
 
       if (recommended.length >= limit) break;
@@ -160,8 +160,7 @@ class SlotRecommendationService {
     // Recency bonus (max 30 points, decreases over 30 days)
     final daysSinceLastLesson =
         DateTime.now().difference(matchingPattern.lastLessonDate).inDays;
-    final recencyScore =
-        ((30 - daysSinceLastLesson) / 30).clamp(0.0, 1.0) * 30;
+    final recencyScore = ((30 - daysSinceLastLesson) / 30).clamp(0.0, 1.0) * 30;
 
     // Day proximity bonus (max 20 points for closer dates)
     final daysUntilSlot = slot.date.difference(DateTime.now()).inDays;
@@ -198,15 +197,15 @@ class LessonTimePattern {
 
   /// Empty pattern (for null safety)
   factory LessonTimePattern.empty() => LessonTimePattern(
-        dayOfWeek: 0,
-        hour: 0,
-        minute: 0,
-        count: 0,
-        lastLessonDate: DateTime(1970),
-      );
+    dayOfWeek: 0,
+    hour: 0,
+    minute: 0,
+    count: 0,
+    lastLessonDate: DateTime(1970),
+  );
 
-  /// Get TimeOfDay representation
-  TimeOfDay get timeOfDay => TimeOfDay(hour: hour, minute: minute);
+  /// Get domain time representation.
+  ClockTime get timeOfDay => ClockTime(hour: hour, minute: minute);
 
   /// Get weekday name in Korean
   String get weekdayName {

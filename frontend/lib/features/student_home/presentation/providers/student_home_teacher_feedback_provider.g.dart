@@ -42,15 +42,21 @@ class StudentHomeLatestTeacherFeedbackFamily
   const StudentHomeLatestTeacherFeedbackFamily();
 
   /// See also [studentHomeLatestTeacherFeedback].
-  StudentHomeLatestTeacherFeedbackProvider call(String studentId) {
-    return StudentHomeLatestTeacherFeedbackProvider(studentId);
+  StudentHomeLatestTeacherFeedbackProvider call(
+    String studentId,
+  ) {
+    return StudentHomeLatestTeacherFeedbackProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeLatestTeacherFeedbackProvider getProviderOverride(
     covariant StudentHomeLatestTeacherFeedbackProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -72,23 +78,24 @@ class StudentHomeLatestTeacherFeedbackFamily
 class StudentHomeLatestTeacherFeedbackProvider
     extends AutoDisposeFutureProvider<Lesson?> {
   /// See also [studentHomeLatestTeacherFeedback].
-  StudentHomeLatestTeacherFeedbackProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeLatestTeacherFeedback(
-          ref as StudentHomeLatestTeacherFeedbackRef,
-          studentId,
-        ),
-        from: studentHomeLatestTeacherFeedbackProvider,
-        name: r'studentHomeLatestTeacherFeedbackProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeLatestTeacherFeedbackHash,
-        dependencies: StudentHomeLatestTeacherFeedbackFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeLatestTeacherFeedbackFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeLatestTeacherFeedbackProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeLatestTeacherFeedback(
+            ref as StudentHomeLatestTeacherFeedbackRef,
+            studentId,
+          ),
+          from: studentHomeLatestTeacherFeedbackProvider,
+          name: r'studentHomeLatestTeacherFeedbackProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeLatestTeacherFeedbackHash,
+          dependencies: StudentHomeLatestTeacherFeedbackFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeLatestTeacherFeedbackFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeLatestTeacherFeedbackProvider._internal(
     super._createNotifier, {
@@ -105,7 +112,7 @@ class StudentHomeLatestTeacherFeedbackProvider
   @override
   Override overrideWith(
     FutureOr<Lesson?> Function(StudentHomeLatestTeacherFeedbackRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -156,6 +163,5 @@ class _StudentHomeLatestTeacherFeedbackProviderElement
   String get studentId =>
       (origin as StudentHomeLatestTeacherFeedbackProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

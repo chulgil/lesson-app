@@ -42,7 +42,8 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
     expect(scaffold.backgroundColor, AppColors.paper);

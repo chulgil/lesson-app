@@ -7,7 +7,7 @@ part of 'teacher_extended_profile_provider.dart';
 // **************************************************************************
 
 String _$teacherExtendedProfileHash() =>
-    r'f687133201039ee81e04e44a00e659b4b4eb75cd';
+    r'3020bb85e7bb6beb9b307283abb519bd4b472c23';
 
 /// Current teacher profile state
 ///

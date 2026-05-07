@@ -63,13 +63,21 @@ class PaymentFamily extends Family<AsyncValue<Payment?>> {
   /// Single payment provider
   ///
   /// Copied from [payment].
-  PaymentProvider call(String paymentId) {
-    return PaymentProvider(paymentId);
+  PaymentProvider call(
+    String paymentId,
+  ) {
+    return PaymentProvider(
+      paymentId,
+    );
   }
 
   @override
-  PaymentProvider getProviderOverride(covariant PaymentProvider provider) {
-    return call(provider.paymentId);
+  PaymentProvider getProviderOverride(
+    covariant PaymentProvider provider,
+  ) {
+    return call(
+      provider.paymentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -94,19 +102,23 @@ class PaymentProvider extends FutureProvider<Payment?> {
   /// Single payment provider
   ///
   /// Copied from [payment].
-  PaymentProvider(String paymentId)
-    : this._internal(
-        (ref) => payment(ref as PaymentRef, paymentId),
-        from: paymentProvider,
-        name: r'paymentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$paymentHash,
-        dependencies: PaymentFamily._dependencies,
-        allTransitiveDependencies: PaymentFamily._allTransitiveDependencies,
-        paymentId: paymentId,
-      );
+  PaymentProvider(
+    String paymentId,
+  ) : this._internal(
+          (ref) => payment(
+            ref as PaymentRef,
+            paymentId,
+          ),
+          from: paymentProvider,
+          name: r'paymentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$paymentHash,
+          dependencies: PaymentFamily._dependencies,
+          allTransitiveDependencies: PaymentFamily._allTransitiveDependencies,
+          paymentId: paymentId,
+        );
 
   PaymentProvider._internal(
     super._createNotifier, {
@@ -190,15 +202,21 @@ class StudentPaymentsFamily extends Family<AsyncValue<List<Payment>>> {
   /// Payments by student provider
   ///
   /// Copied from [studentPayments].
-  StudentPaymentsProvider call(String studentId) {
-    return StudentPaymentsProvider(studentId);
+  StudentPaymentsProvider call(
+    String studentId,
+  ) {
+    return StudentPaymentsProvider(
+      studentId,
+    );
   }
 
   @override
   StudentPaymentsProvider getProviderOverride(
     covariant StudentPaymentsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -223,20 +241,24 @@ class StudentPaymentsProvider extends FutureProvider<List<Payment>> {
   /// Payments by student provider
   ///
   /// Copied from [studentPayments].
-  StudentPaymentsProvider(String studentId)
-    : this._internal(
-        (ref) => studentPayments(ref as StudentPaymentsRef, studentId),
-        from: studentPaymentsProvider,
-        name: r'studentPaymentsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentPaymentsHash,
-        dependencies: StudentPaymentsFamily._dependencies,
-        allTransitiveDependencies:
-            StudentPaymentsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentPaymentsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentPayments(
+            ref as StudentPaymentsRef,
+            studentId,
+          ),
+          from: studentPaymentsProvider,
+          name: r'studentPaymentsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentPaymentsHash,
+          dependencies: StudentPaymentsFamily._dependencies,
+          allTransitiveDependencies:
+              StudentPaymentsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentPaymentsProvider._internal(
     super._createNotifier, {
@@ -293,8 +315,7 @@ mixin StudentPaymentsRef on FutureProviderRef<List<Payment>> {
 }
 
 class _StudentPaymentsProviderElement
-    extends FutureProviderElement<List<Payment>>
-    with StudentPaymentsRef {
+    extends FutureProviderElement<List<Payment>> with StudentPaymentsRef {
   _StudentPaymentsProviderElement(super.provider);
 
   @override
@@ -321,15 +342,21 @@ class PaymentsByStatusFamily extends Family<AsyncValue<List<Payment>>> {
   /// Payments by status provider
   ///
   /// Copied from [paymentsByStatus].
-  PaymentsByStatusProvider call(PaymentStatus status) {
-    return PaymentsByStatusProvider(status);
+  PaymentsByStatusProvider call(
+    PaymentStatus status,
+  ) {
+    return PaymentsByStatusProvider(
+      status,
+    );
   }
 
   @override
   PaymentsByStatusProvider getProviderOverride(
     covariant PaymentsByStatusProvider provider,
   ) {
-    return call(provider.status);
+    return call(
+      provider.status,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -354,20 +381,24 @@ class PaymentsByStatusProvider extends FutureProvider<List<Payment>> {
   /// Payments by status provider
   ///
   /// Copied from [paymentsByStatus].
-  PaymentsByStatusProvider(PaymentStatus status)
-    : this._internal(
-        (ref) => paymentsByStatus(ref as PaymentsByStatusRef, status),
-        from: paymentsByStatusProvider,
-        name: r'paymentsByStatusProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$paymentsByStatusHash,
-        dependencies: PaymentsByStatusFamily._dependencies,
-        allTransitiveDependencies:
-            PaymentsByStatusFamily._allTransitiveDependencies,
-        status: status,
-      );
+  PaymentsByStatusProvider(
+    PaymentStatus status,
+  ) : this._internal(
+          (ref) => paymentsByStatus(
+            ref as PaymentsByStatusRef,
+            status,
+          ),
+          from: paymentsByStatusProvider,
+          name: r'paymentsByStatusProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$paymentsByStatusHash,
+          dependencies: PaymentsByStatusFamily._dependencies,
+          allTransitiveDependencies:
+              PaymentsByStatusFamily._allTransitiveDependencies,
+          status: status,
+        );
 
   PaymentsByStatusProvider._internal(
     super._createNotifier, {
@@ -424,8 +455,7 @@ mixin PaymentsByStatusRef on FutureProviderRef<List<Payment>> {
 }
 
 class _PaymentsByStatusProviderElement
-    extends FutureProviderElement<List<Payment>>
-    with PaymentsByStatusRef {
+    extends FutureProviderElement<List<Payment>> with PaymentsByStatusRef {
   _PaymentsByStatusProviderElement(super.provider);
 
   @override
@@ -441,10 +471,9 @@ String _$pendingPaymentsHash() => r'd62dbd26f2560b6207fe84823a84c48e608b5a25';
 final pendingPaymentsProvider = FutureProvider<List<Payment>>.internal(
   pendingPayments,
   name: r'pendingPaymentsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$pendingPaymentsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pendingPaymentsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -459,10 +488,9 @@ String _$overduePaymentsHash() => r'3ad045c65ed4a26293ee5f54969fa07188f28204';
 final overduePaymentsProvider = FutureProvider<List<Payment>>.internal(
   overduePayments,
   name: r'overduePaymentsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$overduePaymentsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$overduePaymentsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -477,10 +505,9 @@ String _$paymentSummaryHash() => r'29543f6f757c91f25f6c838d9404edc5c872b909';
 final paymentSummaryProvider = FutureProvider<PaymentSummary>.internal(
   paymentSummary,
   name: r'paymentSummaryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$paymentSummaryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$paymentSummaryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -507,15 +534,21 @@ class MonthlyPaymentSummaryFamily extends Family<AsyncValue<PaymentSummary>> {
   /// Monthly payment summary provider
   ///
   /// Copied from [monthlyPaymentSummary].
-  MonthlyPaymentSummaryProvider call(({int month, int year}) params) {
-    return MonthlyPaymentSummaryProvider(params);
+  MonthlyPaymentSummaryProvider call(
+    ({int month, int year}) params,
+  ) {
+    return MonthlyPaymentSummaryProvider(
+      params,
+    );
   }
 
   @override
   MonthlyPaymentSummaryProvider getProviderOverride(
     covariant MonthlyPaymentSummaryProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -540,20 +573,24 @@ class MonthlyPaymentSummaryProvider extends FutureProvider<PaymentSummary> {
   /// Monthly payment summary provider
   ///
   /// Copied from [monthlyPaymentSummary].
-  MonthlyPaymentSummaryProvider(({int month, int year}) params)
-    : this._internal(
-        (ref) => monthlyPaymentSummary(ref as MonthlyPaymentSummaryRef, params),
-        from: monthlyPaymentSummaryProvider,
-        name: r'monthlyPaymentSummaryProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$monthlyPaymentSummaryHash,
-        dependencies: MonthlyPaymentSummaryFamily._dependencies,
-        allTransitiveDependencies:
-            MonthlyPaymentSummaryFamily._allTransitiveDependencies,
-        params: params,
-      );
+  MonthlyPaymentSummaryProvider(
+    ({int month, int year}) params,
+  ) : this._internal(
+          (ref) => monthlyPaymentSummary(
+            ref as MonthlyPaymentSummaryRef,
+            params,
+          ),
+          from: monthlyPaymentSummaryProvider,
+          name: r'monthlyPaymentSummaryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$monthlyPaymentSummaryHash,
+          dependencies: MonthlyPaymentSummaryFamily._dependencies,
+          allTransitiveDependencies:
+              MonthlyPaymentSummaryFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   MonthlyPaymentSummaryProvider._internal(
     super._createNotifier, {
@@ -639,15 +676,21 @@ class TuitionSettingsFamily extends Family<AsyncValue<TuitionSettings?>> {
   /// Tuition settings provider
   ///
   /// Copied from [tuitionSettings].
-  TuitionSettingsProvider call(String studentId) {
-    return TuitionSettingsProvider(studentId);
+  TuitionSettingsProvider call(
+    String studentId,
+  ) {
+    return TuitionSettingsProvider(
+      studentId,
+    );
   }
 
   @override
   TuitionSettingsProvider getProviderOverride(
     covariant TuitionSettingsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -672,20 +715,24 @@ class TuitionSettingsProvider extends FutureProvider<TuitionSettings?> {
   /// Tuition settings provider
   ///
   /// Copied from [tuitionSettings].
-  TuitionSettingsProvider(String studentId)
-    : this._internal(
-        (ref) => tuitionSettings(ref as TuitionSettingsRef, studentId),
-        from: tuitionSettingsProvider,
-        name: r'tuitionSettingsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$tuitionSettingsHash,
-        dependencies: TuitionSettingsFamily._dependencies,
-        allTransitiveDependencies:
-            TuitionSettingsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  TuitionSettingsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => tuitionSettings(
+            ref as TuitionSettingsRef,
+            studentId,
+          ),
+          from: tuitionSettingsProvider,
+          name: r'tuitionSettingsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tuitionSettingsHash,
+          dependencies: TuitionSettingsFamily._dependencies,
+          allTransitiveDependencies:
+              TuitionSettingsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   TuitionSettingsProvider._internal(
     super._createNotifier, {
@@ -742,8 +789,7 @@ mixin TuitionSettingsRef on FutureProviderRef<TuitionSettings?> {
 }
 
 class _TuitionSettingsProviderElement
-    extends FutureProviderElement<TuitionSettings?>
-    with TuitionSettingsRef {
+    extends FutureProviderElement<TuitionSettings?> with TuitionSettingsRef {
   _TuitionSettingsProviderElement(super.provider);
 
   @override
@@ -758,15 +804,14 @@ String _$paymentsNotifierHash() => r'9f3c42acb74ee488ffa3d3cf014f0b5c9474eedf';
 @ProviderFor(PaymentsNotifier)
 final paymentsNotifierProvider =
     AsyncNotifierProvider<PaymentsNotifier, List<Payment>>.internal(
-      PaymentsNotifier.new,
-      name: r'paymentsNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$paymentsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PaymentsNotifier.new,
+  name: r'paymentsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$paymentsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PaymentsNotifier = AsyncNotifier<List<Payment>>;
 String _$tuitionSettingsNotifierHash() =>
@@ -776,7 +821,9 @@ abstract class _$TuitionSettingsNotifier
     extends BuildlessAsyncNotifier<TuitionSettings?> {
   late final String studentId;
 
-  FutureOr<TuitionSettings?> build(String studentId);
+  FutureOr<TuitionSettings?> build(
+    String studentId,
+  );
 }
 
 /// Tuition settings notifier
@@ -798,15 +845,21 @@ class TuitionSettingsNotifierFamily
   /// Tuition settings notifier
   ///
   /// Copied from [TuitionSettingsNotifier].
-  TuitionSettingsNotifierProvider call(String studentId) {
-    return TuitionSettingsNotifierProvider(studentId);
+  TuitionSettingsNotifierProvider call(
+    String studentId,
+  ) {
+    return TuitionSettingsNotifierProvider(
+      studentId,
+    );
   }
 
   @override
   TuitionSettingsNotifierProvider getProviderOverride(
     covariant TuitionSettingsNotifierProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -827,26 +880,26 @@ class TuitionSettingsNotifierFamily
 /// Tuition settings notifier
 ///
 /// Copied from [TuitionSettingsNotifier].
-class TuitionSettingsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<TuitionSettingsNotifier, TuitionSettings?> {
+class TuitionSettingsNotifierProvider extends AsyncNotifierProviderImpl<
+    TuitionSettingsNotifier, TuitionSettings?> {
   /// Tuition settings notifier
   ///
   /// Copied from [TuitionSettingsNotifier].
-  TuitionSettingsNotifierProvider(String studentId)
-    : this._internal(
-        () => TuitionSettingsNotifier()..studentId = studentId,
-        from: tuitionSettingsNotifierProvider,
-        name: r'tuitionSettingsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$tuitionSettingsNotifierHash,
-        dependencies: TuitionSettingsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            TuitionSettingsNotifierFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  TuitionSettingsNotifierProvider(
+    String studentId,
+  ) : this._internal(
+          () => TuitionSettingsNotifier()..studentId = studentId,
+          from: tuitionSettingsNotifierProvider,
+          name: r'tuitionSettingsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tuitionSettingsNotifierHash,
+          dependencies: TuitionSettingsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              TuitionSettingsNotifierFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   TuitionSettingsNotifierProvider._internal(
     super._createNotifier, {
@@ -864,7 +917,9 @@ class TuitionSettingsNotifierProvider
   FutureOr<TuitionSettings?> runNotifierBuild(
     covariant TuitionSettingsNotifier notifier,
   ) {
-    return notifier.build(studentId);
+    return notifier.build(
+      studentId,
+    );
   }
 
   @override
@@ -885,7 +940,7 @@ class TuitionSettingsNotifierProvider
 
   @override
   AsyncNotifierProviderElement<TuitionSettingsNotifier, TuitionSettings?>
-  createElement() {
+      createElement() {
     return _TuitionSettingsNotifierProviderElement(this);
   }
 
@@ -910,14 +965,12 @@ mixin TuitionSettingsNotifierRef on AsyncNotifierProviderRef<TuitionSettings?> {
 }
 
 class _TuitionSettingsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<TuitionSettingsNotifier, TuitionSettings?>
-    with TuitionSettingsNotifierRef {
+    extends AsyncNotifierProviderElement<TuitionSettingsNotifier,
+        TuitionSettings?> with TuitionSettingsNotifierRef {
   _TuitionSettingsNotifierProviderElement(super.provider);
 
   @override
   String get studentId => (origin as TuitionSettingsNotifierProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

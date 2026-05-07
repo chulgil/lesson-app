@@ -41,6 +41,7 @@ Future<StartupRecoveryResult> bootstrapApp() async {
     'practice_recordings',
   );
   await Hive.openBox('notification_settings');
+  await Hive.openBox<String>('app_review_state');
 
   final recoveryResult = await recoverStartupRecordingPaths(
     recordingsBox: recordingsBox,

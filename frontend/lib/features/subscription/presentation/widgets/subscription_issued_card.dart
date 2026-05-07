@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 
 /// Chat bubble card displayed when a subscription is first issued.
 ///

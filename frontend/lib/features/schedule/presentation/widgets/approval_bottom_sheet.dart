@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../lessons/lessons_facade.dart';
 import 'schedule_option_card.dart';
 import 'decline_bottom_sheet.dart';

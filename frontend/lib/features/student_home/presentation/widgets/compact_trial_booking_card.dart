@@ -5,10 +5,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/utils/date_format_utils.dart' show formatDateYMDWithDay;
+import '../../../../core/utils/date_format_utils.dart'
+    show formatDateYMDWithDay;
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 
 /// Compact trial booking card for dashboard
 class CompactTrialBookingCard extends StatelessWidget {
@@ -140,33 +142,21 @@ class CompactTrialBookingCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.space4),
 
               // Teacher
-              _detailRow(
-                AppStrings.teacher,
-                booking.teacherName,
-              ),
+              _detailRow(AppStrings.teacher, booking.teacherName),
 
               // Instrument
               if (booking.instrument != null)
-                _detailRow(
-                  AppStrings.instrumentLabel,
-                  booking.instrument!,
-                ),
+                _detailRow(AppStrings.instrumentLabel, booking.instrument!),
 
               // Date & Time
               _detailRow(
                 AppStrings.lessonDate,
                 formatDateYMDWithDay(booking.lessonDate),
               ),
-              _detailRow(
-                AppStrings.lessonTime,
-                booking.timeRange,
-              ),
+              _detailRow(AppStrings.lessonTime, booking.timeRange),
 
               // Status
-              _detailRow(
-                AppStrings.statusLabel,
-                booking.status.label,
-              ),
+              _detailRow(AppStrings.statusLabel, booking.status.label),
 
               // Message
               if (booking.studentMessage != null &&
@@ -232,9 +222,7 @@ class CompactTrialBookingCard extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Text(value, style: AppTypography.bodySmall),
-          ),
+          Expanded(child: Text(value, style: AppTypography.bodySmall)),
         ],
       ),
     );

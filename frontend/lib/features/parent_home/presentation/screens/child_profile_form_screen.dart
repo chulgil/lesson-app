@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/child_profile.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
 
 /// Screen for adding or editing a child profile
@@ -99,7 +100,7 @@ class _ChildProfileFormScreenState
             birthYear: _selectedBirthYear,
             instrument: _selectedInstrument,
             level: _selectedLevel,
-            profileColor: _selectedColor,
+            profileColorKey: parentHomeColorKeyForColor(_selectedColor),
           ),
         );
       } else {

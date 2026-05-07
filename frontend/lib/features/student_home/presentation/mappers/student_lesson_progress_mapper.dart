@@ -3,6 +3,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/student_lesson_progress_item.dart';
 

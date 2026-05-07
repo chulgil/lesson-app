@@ -15,15 +15,14 @@ String _$practiceNoteRepositoryHash() =>
 @ProviderFor(practiceNoteRepository)
 final practiceNoteRepositoryProvider =
     Provider<PracticeNoteRepository>.internal(
-      practiceNoteRepository,
-      name: r'practiceNoteRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceNoteRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  practiceNoteRepository,
+  name: r'practiceNoteRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceNoteRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef PracticeNoteRepositoryRef = ProviderRef<PracticeNoteRepository>;
 String _$sectionNotesHash() => r'd9587c2dbc3081d96b41efa9cb444dc786e3f67b';
@@ -67,15 +66,21 @@ class SectionNotesFamily extends Family<AsyncValue<List<PracticeNote>>> {
   /// Section notes provider - gets all notes for a section
   ///
   /// Copied from [sectionNotes].
-  SectionNotesProvider call(String sectionId) {
-    return SectionNotesProvider(sectionId);
+  SectionNotesProvider call(
+    String sectionId,
+  ) {
+    return SectionNotesProvider(
+      sectionId,
+    );
   }
 
   @override
   SectionNotesProvider getProviderOverride(
     covariant SectionNotesProvider provider,
   ) {
-    return call(provider.sectionId);
+    return call(
+      provider.sectionId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -100,20 +105,24 @@ class SectionNotesProvider extends FutureProvider<List<PracticeNote>> {
   /// Section notes provider - gets all notes for a section
   ///
   /// Copied from [sectionNotes].
-  SectionNotesProvider(String sectionId)
-    : this._internal(
-        (ref) => sectionNotes(ref as SectionNotesRef, sectionId),
-        from: sectionNotesProvider,
-        name: r'sectionNotesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$sectionNotesHash,
-        dependencies: SectionNotesFamily._dependencies,
-        allTransitiveDependencies:
-            SectionNotesFamily._allTransitiveDependencies,
-        sectionId: sectionId,
-      );
+  SectionNotesProvider(
+    String sectionId,
+  ) : this._internal(
+          (ref) => sectionNotes(
+            ref as SectionNotesRef,
+            sectionId,
+          ),
+          from: sectionNotesProvider,
+          name: r'sectionNotesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sectionNotesHash,
+          dependencies: SectionNotesFamily._dependencies,
+          allTransitiveDependencies:
+              SectionNotesFamily._allTransitiveDependencies,
+          sectionId: sectionId,
+        );
 
   SectionNotesProvider._internal(
     super._createNotifier, {
@@ -170,8 +179,7 @@ mixin SectionNotesRef on FutureProviderRef<List<PracticeNote>> {
 }
 
 class _SectionNotesProviderElement
-    extends FutureProviderElement<List<PracticeNote>>
-    with SectionNotesRef {
+    extends FutureProviderElement<List<PracticeNote>> with SectionNotesRef {
   _SectionNotesProviderElement(super.provider);
 
   @override
@@ -186,15 +194,14 @@ String _$practiceNoteCrudHash() => r'2188b581b8f25287717b1121bebf679a0cee964c';
 @ProviderFor(PracticeNoteCrud)
 final practiceNoteCrudProvider =
     AsyncNotifierProvider<PracticeNoteCrud, void>.internal(
-      PracticeNoteCrud.new,
-      name: r'practiceNoteCrudProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceNoteCrudHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PracticeNoteCrud.new,
+  name: r'practiceNoteCrudProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceNoteCrudHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PracticeNoteCrud = AsyncNotifier<void>;
 // ignore_for_file: type=lint

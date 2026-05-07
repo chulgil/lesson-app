@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../schedule/schedule_facade.dart';
+import '../../../subscription/presentation/extensions/subscription_usage_visuals.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_confirmation_dialog.dart';
 import 'lesson_crud_provider.dart';

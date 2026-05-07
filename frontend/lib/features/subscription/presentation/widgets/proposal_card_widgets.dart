@@ -9,6 +9,8 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/subscription_proposal_visuals.dart';
+import '../extensions/subscription_template_visuals.dart';
 
 /// Status banner showing proposal status (paymentNotified, confirmed, rejected, expired, cancelled)
 class ProposalStatusBanner extends StatelessWidget {

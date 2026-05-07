@@ -40,15 +40,21 @@ class StudentHomeNextLessonFamily extends Family<AsyncValue<LessonBooking?>> {
   const StudentHomeNextLessonFamily();
 
   /// See also [studentHomeNextLesson].
-  StudentHomeNextLessonProvider call(String studentId) {
-    return StudentHomeNextLessonProvider(studentId);
+  StudentHomeNextLessonProvider call(
+    String studentId,
+  ) {
+    return StudentHomeNextLessonProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeNextLessonProvider getProviderOverride(
     covariant StudentHomeNextLessonProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -70,21 +76,24 @@ class StudentHomeNextLessonFamily extends Family<AsyncValue<LessonBooking?>> {
 class StudentHomeNextLessonProvider
     extends AutoDisposeFutureProvider<LessonBooking?> {
   /// See also [studentHomeNextLesson].
-  StudentHomeNextLessonProvider(String studentId)
-    : this._internal(
-        (ref) =>
-            studentHomeNextLesson(ref as StudentHomeNextLessonRef, studentId),
-        from: studentHomeNextLessonProvider,
-        name: r'studentHomeNextLessonProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeNextLessonHash,
-        dependencies: StudentHomeNextLessonFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeNextLessonFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeNextLessonProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeNextLesson(
+            ref as StudentHomeNextLessonRef,
+            studentId,
+          ),
+          from: studentHomeNextLessonProvider,
+          name: r'studentHomeNextLessonProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeNextLessonHash,
+          dependencies: StudentHomeNextLessonFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeNextLessonFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeNextLessonProvider._internal(
     super._createNotifier, {
@@ -164,15 +173,21 @@ class StudentHomeTrialBookingsFamily
   const StudentHomeTrialBookingsFamily();
 
   /// See also [studentHomeTrialBookings].
-  StudentHomeTrialBookingsProvider call(String studentId) {
-    return StudentHomeTrialBookingsProvider(studentId);
+  StudentHomeTrialBookingsProvider call(
+    String studentId,
+  ) {
+    return StudentHomeTrialBookingsProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeTrialBookingsProvider getProviderOverride(
     covariant StudentHomeTrialBookingsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -194,23 +209,24 @@ class StudentHomeTrialBookingsFamily
 class StudentHomeTrialBookingsProvider
     extends AutoDisposeFutureProvider<List<LessonBooking>> {
   /// See also [studentHomeTrialBookings].
-  StudentHomeTrialBookingsProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeTrialBookings(
-          ref as StudentHomeTrialBookingsRef,
-          studentId,
-        ),
-        from: studentHomeTrialBookingsProvider,
-        name: r'studentHomeTrialBookingsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeTrialBookingsHash,
-        dependencies: StudentHomeTrialBookingsFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeTrialBookingsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeTrialBookingsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeTrialBookings(
+            ref as StudentHomeTrialBookingsRef,
+            studentId,
+          ),
+          from: studentHomeTrialBookingsProvider,
+          name: r'studentHomeTrialBookingsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeTrialBookingsHash,
+          dependencies: StudentHomeTrialBookingsFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeTrialBookingsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeTrialBookingsProvider._internal(
     super._createNotifier, {
@@ -227,7 +243,7 @@ class StudentHomeTrialBookingsProvider
   @override
   Override overrideWith(
     FutureOr<List<LessonBooking>> Function(StudentHomeTrialBookingsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -292,15 +308,21 @@ class StudentHomeHasAnyBookingFamily extends Family<AsyncValue<bool>> {
   const StudentHomeHasAnyBookingFamily();
 
   /// See also [studentHomeHasAnyBooking].
-  StudentHomeHasAnyBookingProvider call(String studentId) {
-    return StudentHomeHasAnyBookingProvider(studentId);
+  StudentHomeHasAnyBookingProvider call(
+    String studentId,
+  ) {
+    return StudentHomeHasAnyBookingProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeHasAnyBookingProvider getProviderOverride(
     covariant StudentHomeHasAnyBookingProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -321,23 +343,24 @@ class StudentHomeHasAnyBookingFamily extends Family<AsyncValue<bool>> {
 /// See also [studentHomeHasAnyBooking].
 class StudentHomeHasAnyBookingProvider extends AutoDisposeFutureProvider<bool> {
   /// See also [studentHomeHasAnyBooking].
-  StudentHomeHasAnyBookingProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeHasAnyBooking(
-          ref as StudentHomeHasAnyBookingRef,
-          studentId,
-        ),
-        from: studentHomeHasAnyBookingProvider,
-        name: r'studentHomeHasAnyBookingProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeHasAnyBookingHash,
-        dependencies: StudentHomeHasAnyBookingFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeHasAnyBookingFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeHasAnyBookingProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeHasAnyBooking(
+            ref as StudentHomeHasAnyBookingRef,
+            studentId,
+          ),
+          from: studentHomeHasAnyBookingProvider,
+          name: r'studentHomeHasAnyBookingProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeHasAnyBookingHash,
+          dependencies: StudentHomeHasAnyBookingFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeHasAnyBookingFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeHasAnyBookingProvider._internal(
     super._createNotifier, {
@@ -418,15 +441,21 @@ class StudentHomeLessonsScheduleFamily
   const StudentHomeLessonsScheduleFamily();
 
   /// See also [studentHomeLessonsSchedule].
-  StudentHomeLessonsScheduleProvider call(String studentId) {
-    return StudentHomeLessonsScheduleProvider(studentId);
+  StudentHomeLessonsScheduleProvider call(
+    String studentId,
+  ) {
+    return StudentHomeLessonsScheduleProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeLessonsScheduleProvider getProviderOverride(
     covariant StudentHomeLessonsScheduleProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -448,23 +477,24 @@ class StudentHomeLessonsScheduleFamily
 class StudentHomeLessonsScheduleProvider
     extends AutoDisposeFutureProvider<StudentHomeLessonsSchedule> {
   /// See also [studentHomeLessonsSchedule].
-  StudentHomeLessonsScheduleProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeLessonsSchedule(
-          ref as StudentHomeLessonsScheduleRef,
-          studentId,
-        ),
-        from: studentHomeLessonsScheduleProvider,
-        name: r'studentHomeLessonsScheduleProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeLessonsScheduleHash,
-        dependencies: StudentHomeLessonsScheduleFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeLessonsScheduleFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeLessonsScheduleProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeLessonsSchedule(
+            ref as StudentHomeLessonsScheduleRef,
+            studentId,
+          ),
+          from: studentHomeLessonsScheduleProvider,
+          name: r'studentHomeLessonsScheduleProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeLessonsScheduleHash,
+          dependencies: StudentHomeLessonsScheduleFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeLessonsScheduleFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeLessonsScheduleProvider._internal(
     super._createNotifier, {
@@ -481,9 +511,8 @@ class StudentHomeLessonsScheduleProvider
   @override
   Override overrideWith(
     FutureOr<StudentHomeLessonsSchedule> Function(
-      StudentHomeLessonsScheduleRef provider,
-    )
-    create,
+            StudentHomeLessonsScheduleRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -542,17 +571,16 @@ String _$studentHomeBookingActionsHash() =>
 @ProviderFor(studentHomeBookingActions)
 final studentHomeBookingActionsProvider =
     AutoDisposeProvider<StudentHomeBookingActions>.internal(
-      studentHomeBookingActions,
-      name: r'studentHomeBookingActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeBookingActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeBookingActions,
+  name: r'studentHomeBookingActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeBookingActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef StudentHomeBookingActionsRef =
-    AutoDisposeProviderRef<StudentHomeBookingActions>;
+typedef StudentHomeBookingActionsRef
+    = AutoDisposeProviderRef<StudentHomeBookingActions>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

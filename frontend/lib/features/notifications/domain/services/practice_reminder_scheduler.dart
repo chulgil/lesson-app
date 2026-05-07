@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../entities/notification.dart';
 import '../entities/notification_settings.dart';
 import 'notification_service.dart';
@@ -15,7 +15,7 @@ class PracticeReminderScheduler {
   /// Schedule daily practice reminder for a user
   Future<void> scheduleDailyReminder({
     required String userId,
-    required TimeOfDay reminderTime,
+    required ClockTime reminderTime,
     String? customMessage,
   }) async {
     final now = DateTime.now();
@@ -50,7 +50,7 @@ class PracticeReminderScheduler {
   /// Only sends if user hasn't practiced today
   Future<void> scheduleStreakWarning({
     required String userId,
-    required TimeOfDay warningTime,
+    required ClockTime warningTime,
     required int currentStreak,
   }) async {
     final now = DateTime.now();
@@ -68,9 +68,8 @@ class PracticeReminderScheduler {
     }
 
     final nextStreak = currentStreak + 1;
-    final message = currentStreak == 0
-        ? '오늘 연습을 시작하세요!'
-        : '오늘 연습하면 $nextStreak일 스트릭 달성!';
+    final message =
+        currentStreak == 0 ? '오늘 연습을 시작하세요!' : '오늘 연습하면 $nextStreak일 스트릭 달성!';
 
     final notification = AppNotification(
       id: 'streak_warning_${userId}_${scheduledDate.toIso8601String()}',
@@ -161,7 +160,8 @@ class PracticeReminderScheduler {
   /// Cancel all daily reminders for a user
   Future<void> cancelDailyReminders(String userId) async {
     final today = DateTime.now();
-    final dateStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
     // Cancel practice reminder
     await _notificationService.cancelNotification(

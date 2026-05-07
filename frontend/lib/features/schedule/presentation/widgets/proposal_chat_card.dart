@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
+import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 
 /// Compact proposal card rendered inside a chat bubble.
 ///

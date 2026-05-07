@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
 import '../../../../core/network/api_client.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../domain/repositories/parent_repository.dart';
 import '../../domain/entities/parent.dart';
 import '../../domain/entities/parent_child_relation.dart';
@@ -276,7 +273,7 @@ class RemoteParentRepository implements ParentRepository {
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
-      profileColor: _parseColor(json['profile_color'] as String?),
+      profileColorKey: _parseProfileColorKey(json['profile_color'] as String?),
       status: _parseParentStatus(json['status'] as String?),
       createdAt:
           json['created_at'] != null
@@ -295,7 +292,7 @@ class RemoteParentRepository implements ParentRepository {
       'phone': parent.phone,
       'email': parent.email,
       'profile_image_url': parent.profileImageUrl,
-      'profile_color': parent.profileColor.toARGB32().toRadixString(16),
+      'profile_color': parent.profileColorKey,
     };
   }
 
@@ -448,12 +445,33 @@ class RemoteParentRepository implements ParentRepository {
     };
   }
 
-  Color _parseColor(String? value) {
-    if (value == null) return AppColors.paperAccent;
-    try {
-      return Color(int.parse(value, radix: 16));
-    } catch (_) {
-      return AppColors.paperAccent;
+  String _parseProfileColorKey(String? value) {
+    final normalized = value?.toLowerCase().replaceFirst('0x', '');
+    switch (normalized) {
+      case 'paperaccent':
+        return 'paperAccent';
+      case 'paperok':
+        return 'paperOk';
+      case 'inktertiary':
+        return 'inkTertiary';
+      case 'ink':
+        return 'ink';
+      case 'profileblue':
+        return 'profileBlue';
+      case 'profilepink':
+        return 'profilePink';
+      case 'profilegreen':
+        return 'profileGreen';
+      case 'ff9b1b12':
+        return 'paperAccent';
+      case 'ff3f5d2f':
+        return 'paperOk';
+      case '8c14161c':
+        return 'inkTertiary';
+      case 'ff14161c':
+        return 'ink';
+      default:
+        return 'paperAccent';
     }
   }
 

@@ -13,15 +13,14 @@ String _$studentHomeProfileHash() =>
 @ProviderFor(studentHomeProfile)
 final studentHomeProfileProvider =
     AutoDisposeProvider<StudentHomeProfileState>.internal(
-      studentHomeProfile,
-      name: r'studentHomeProfileProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeProfileHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeProfile,
+  name: r'studentHomeProfileProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeProfileHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef StudentHomeProfileRef = AutoDisposeProviderRef<StudentHomeProfileState>;
 String _$studentHomeProfileActionsHash() =>
@@ -31,15 +30,14 @@ String _$studentHomeProfileActionsHash() =>
 @ProviderFor(studentHomeProfileActions)
 final studentHomeProfileActionsProvider =
     Provider<StudentHomeProfileActions>.internal(
-      studentHomeProfileActions,
-      name: r'studentHomeProfileActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeProfileActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeProfileActions,
+  name: r'studentHomeProfileActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeProfileActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef StudentHomeProfileActionsRef = ProviderRef<StudentHomeProfileActions>;
 // ignore_for_file: type=lint

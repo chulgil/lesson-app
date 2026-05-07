@@ -13,6 +13,7 @@ import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 import '../providers/subscription_providers.dart';
 
 enum ScheduleChangeRequestStatus { needsResponse, waitingResponse, completed }

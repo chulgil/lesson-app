@@ -6,7 +6,7 @@ part of 'section_sort_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sortedSectionsHash() => r'31c950117ec6b5ff84574c0f2e0bdd192a9625f4';
+String _$sortedSectionsHash() => r'b22a7f3c10c87ef149f1084f21bb71f275bdb7b6';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -47,15 +47,21 @@ class SortedSectionsFamily extends Family<List<entities.PracticeSection>> {
   /// Sorted sections provider for a repertoire
   ///
   /// Copied from [sortedSections].
-  SortedSectionsProvider call(String repertoireId) {
-    return SortedSectionsProvider(repertoireId);
+  SortedSectionsProvider call(
+    String repertoireId,
+  ) {
+    return SortedSectionsProvider(
+      repertoireId,
+    );
   }
 
   @override
   SortedSectionsProvider getProviderOverride(
     covariant SortedSectionsProvider provider,
   ) {
-    return call(provider.repertoireId);
+    return call(
+      provider.repertoireId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -80,20 +86,24 @@ class SortedSectionsProvider extends Provider<List<entities.PracticeSection>> {
   /// Sorted sections provider for a repertoire
   ///
   /// Copied from [sortedSections].
-  SortedSectionsProvider(String repertoireId)
-    : this._internal(
-        (ref) => sortedSections(ref as SortedSectionsRef, repertoireId),
-        from: sortedSectionsProvider,
-        name: r'sortedSectionsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$sortedSectionsHash,
-        dependencies: SortedSectionsFamily._dependencies,
-        allTransitiveDependencies:
-            SortedSectionsFamily._allTransitiveDependencies,
-        repertoireId: repertoireId,
-      );
+  SortedSectionsProvider(
+    String repertoireId,
+  ) : this._internal(
+          (ref) => sortedSections(
+            ref as SortedSectionsRef,
+            repertoireId,
+          ),
+          from: sortedSectionsProvider,
+          name: r'sortedSectionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sortedSectionsHash,
+          dependencies: SortedSectionsFamily._dependencies,
+          allTransitiveDependencies:
+              SortedSectionsFamily._allTransitiveDependencies,
+          repertoireId: repertoireId,
+        );
 
   SortedSectionsProvider._internal(
     super._createNotifier, {
@@ -168,19 +178,18 @@ String _$sectionSortTypeStateHash() =>
 @ProviderFor(SectionSortTypeState)
 final sectionSortTypeStateProvider =
     NotifierProvider<SectionSortTypeState, entities.SectionSortType>.internal(
-      SectionSortTypeState.new,
-      name: r'sectionSortTypeStateProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$sectionSortTypeStateHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SectionSortTypeState.new,
+  name: r'sectionSortTypeStateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sectionSortTypeStateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SectionSortTypeState = Notifier<entities.SectionSortType>;
 String _$sectionOrderNotifierHash() =>
-    r'5747917a094c21e63c60789c07648cda85b69863';
+    r'd3fc1c339abb63193ddaed2097c187bc6356c837';
 
 /// Section order notifier for drag and drop
 ///
@@ -188,15 +197,14 @@ String _$sectionOrderNotifierHash() =>
 @ProviderFor(SectionOrderNotifier)
 final sectionOrderNotifierProvider =
     AsyncNotifierProvider<SectionOrderNotifier, void>.internal(
-      SectionOrderNotifier.new,
-      name: r'sectionOrderNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$sectionOrderNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SectionOrderNotifier.new,
+  name: r'sectionOrderNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sectionOrderNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SectionOrderNotifier = AsyncNotifier<void>;
 // ignore_for_file: type=lint

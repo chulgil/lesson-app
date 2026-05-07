@@ -15,8 +15,9 @@ import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/subscription_ui_facade.dart';
 import '../../domain/entities/child_profile.dart';
+import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
-import 'parent_dashboard_tab.dart';
+import '../providers/parent_dashboard_state_provider.dart';
 
 /// Parent's per-child subscription / deposit status view.
 ///

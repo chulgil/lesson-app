@@ -12,8 +12,7 @@ GroupClassSchedule _$GroupClassScheduleFromJson(Map<String, dynamic> json) =>
       groupClassId: json['group_class_id'] as String,
       startTime: DateTime.parse(json['start_time'] as String),
       endTime: DateTime.parse(json['end_time'] as String),
-      status:
-          $enumDecodeNullable(_$ScheduleStatusEnumMap, json['status']) ??
+      status: $enumDecodeNullable(_$ScheduleStatusEnumMap, json['status']) ??
           ScheduleStatus.open,
       currentBookings: (json['current_bookings'] as num?)?.toInt() ?? 0,
       waitlistCount: (json['waitlist_count'] as num?)?.toInt() ?? 0,
@@ -22,10 +21,9 @@ GroupClassSchedule _$GroupClassScheduleFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
       cancelReason: json['cancel_reason'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt:
-          json['updated_at'] == null
-              ? null
-              : DateTime.parse(json['updated_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$GroupClassScheduleToJson(GroupClassSchedule instance) =>

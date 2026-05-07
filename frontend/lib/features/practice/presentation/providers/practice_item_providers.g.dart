@@ -15,15 +15,14 @@ String _$practiceItemRepositoryHash() =>
 @ProviderFor(practiceItemRepository)
 final practiceItemRepositoryProvider =
     Provider<PracticeItemRepository>.internal(
-      practiceItemRepository,
-      name: r'practiceItemRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceItemRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  practiceItemRepository,
+  name: r'practiceItemRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceItemRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef PracticeItemRepositoryRef = ProviderRef<PracticeItemRepository>;
 String _$practiceItemsByLessonHash() =>
@@ -69,15 +68,21 @@ class PracticeItemsByLessonFamily
   /// Practice items by lesson ID
   ///
   /// Copied from [practiceItemsByLesson].
-  PracticeItemsByLessonProvider call(String lessonId) {
-    return PracticeItemsByLessonProvider(lessonId);
+  PracticeItemsByLessonProvider call(
+    String lessonId,
+  ) {
+    return PracticeItemsByLessonProvider(
+      lessonId,
+    );
   }
 
   @override
   PracticeItemsByLessonProvider getProviderOverride(
     covariant PracticeItemsByLessonProvider provider,
   ) {
-    return call(provider.lessonId);
+    return call(
+      provider.lessonId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -102,21 +107,24 @@ class PracticeItemsByLessonProvider extends FutureProvider<List<PracticeItem>> {
   /// Practice items by lesson ID
   ///
   /// Copied from [practiceItemsByLesson].
-  PracticeItemsByLessonProvider(String lessonId)
-    : this._internal(
-        (ref) =>
-            practiceItemsByLesson(ref as PracticeItemsByLessonRef, lessonId),
-        from: practiceItemsByLessonProvider,
-        name: r'practiceItemsByLessonProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$practiceItemsByLessonHash,
-        dependencies: PracticeItemsByLessonFamily._dependencies,
-        allTransitiveDependencies:
-            PracticeItemsByLessonFamily._allTransitiveDependencies,
-        lessonId: lessonId,
-      );
+  PracticeItemsByLessonProvider(
+    String lessonId,
+  ) : this._internal(
+          (ref) => practiceItemsByLesson(
+            ref as PracticeItemsByLessonRef,
+            lessonId,
+          ),
+          from: practiceItemsByLessonProvider,
+          name: r'practiceItemsByLessonProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceItemsByLessonHash,
+          dependencies: PracticeItemsByLessonFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeItemsByLessonFamily._allTransitiveDependencies,
+          lessonId: lessonId,
+        );
 
   PracticeItemsByLessonProvider._internal(
     super._createNotifier, {
@@ -133,7 +141,7 @@ class PracticeItemsByLessonProvider extends FutureProvider<List<PracticeItem>> {
   @override
   Override overrideWith(
     FutureOr<List<PracticeItem>> Function(PracticeItemsByLessonRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -204,15 +212,21 @@ class PracticeItemsByStudentFamily
   /// Practice items by student ID
   ///
   /// Copied from [practiceItemsByStudent].
-  PracticeItemsByStudentProvider call(String studentId) {
-    return PracticeItemsByStudentProvider(studentId);
+  PracticeItemsByStudentProvider call(
+    String studentId,
+  ) {
+    return PracticeItemsByStudentProvider(
+      studentId,
+    );
   }
 
   @override
   PracticeItemsByStudentProvider getProviderOverride(
     covariant PracticeItemsByStudentProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -238,21 +252,24 @@ class PracticeItemsByStudentProvider
   /// Practice items by student ID
   ///
   /// Copied from [practiceItemsByStudent].
-  PracticeItemsByStudentProvider(String studentId)
-    : this._internal(
-        (ref) =>
-            practiceItemsByStudent(ref as PracticeItemsByStudentRef, studentId),
-        from: practiceItemsByStudentProvider,
-        name: r'practiceItemsByStudentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$practiceItemsByStudentHash,
-        dependencies: PracticeItemsByStudentFamily._dependencies,
-        allTransitiveDependencies:
-            PracticeItemsByStudentFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  PracticeItemsByStudentProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => practiceItemsByStudent(
+            ref as PracticeItemsByStudentRef,
+            studentId,
+          ),
+          from: practiceItemsByStudentProvider,
+          name: r'practiceItemsByStudentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceItemsByStudentHash,
+          dependencies: PracticeItemsByStudentFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeItemsByStudentFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   PracticeItemsByStudentProvider._internal(
     super._createNotifier, {
@@ -269,7 +286,7 @@ class PracticeItemsByStudentProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeItem>> Function(PracticeItemsByStudentRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -340,15 +357,21 @@ class WeeklyPracticeItemsFamily extends Family<AsyncValue<List<PracticeItem>>> {
   /// Weekly practice items for student (current week)
   ///
   /// Copied from [weeklyPracticeItems].
-  WeeklyPracticeItemsProvider call(String studentId) {
-    return WeeklyPracticeItemsProvider(studentId);
+  WeeklyPracticeItemsProvider call(
+    String studentId,
+  ) {
+    return WeeklyPracticeItemsProvider(
+      studentId,
+    );
   }
 
   @override
   WeeklyPracticeItemsProvider getProviderOverride(
     covariant WeeklyPracticeItemsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -373,20 +396,24 @@ class WeeklyPracticeItemsProvider extends FutureProvider<List<PracticeItem>> {
   /// Weekly practice items for student (current week)
   ///
   /// Copied from [weeklyPracticeItems].
-  WeeklyPracticeItemsProvider(String studentId)
-    : this._internal(
-        (ref) => weeklyPracticeItems(ref as WeeklyPracticeItemsRef, studentId),
-        from: weeklyPracticeItemsProvider,
-        name: r'weeklyPracticeItemsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$weeklyPracticeItemsHash,
-        dependencies: WeeklyPracticeItemsFamily._dependencies,
-        allTransitiveDependencies:
-            WeeklyPracticeItemsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  WeeklyPracticeItemsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => weeklyPracticeItems(
+            ref as WeeklyPracticeItemsRef,
+            studentId,
+          ),
+          from: weeklyPracticeItemsProvider,
+          name: r'weeklyPracticeItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$weeklyPracticeItemsHash,
+          dependencies: WeeklyPracticeItemsFamily._dependencies,
+          allTransitiveDependencies:
+              WeeklyPracticeItemsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   WeeklyPracticeItemsProvider._internal(
     super._createNotifier, {
@@ -403,7 +430,7 @@ class WeeklyPracticeItemsProvider extends FutureProvider<List<PracticeItem>> {
   @override
   Override overrideWith(
     FutureOr<List<PracticeItem>> Function(WeeklyPracticeItemsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -474,15 +501,21 @@ class IncompletePracticeItemsFamily
   /// Incomplete practice items for student (for dashboard)
   ///
   /// Copied from [incompletePracticeItems].
-  IncompletePracticeItemsProvider call(String studentId) {
-    return IncompletePracticeItemsProvider(studentId);
+  IncompletePracticeItemsProvider call(
+    String studentId,
+  ) {
+    return IncompletePracticeItemsProvider(
+      studentId,
+    );
   }
 
   @override
   IncompletePracticeItemsProvider getProviderOverride(
     covariant IncompletePracticeItemsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -508,23 +541,24 @@ class IncompletePracticeItemsProvider
   /// Incomplete practice items for student (for dashboard)
   ///
   /// Copied from [incompletePracticeItems].
-  IncompletePracticeItemsProvider(String studentId)
-    : this._internal(
-        (ref) => incompletePracticeItems(
-          ref as IncompletePracticeItemsRef,
-          studentId,
-        ),
-        from: incompletePracticeItemsProvider,
-        name: r'incompletePracticeItemsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$incompletePracticeItemsHash,
-        dependencies: IncompletePracticeItemsFamily._dependencies,
-        allTransitiveDependencies:
-            IncompletePracticeItemsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  IncompletePracticeItemsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => incompletePracticeItems(
+            ref as IncompletePracticeItemsRef,
+            studentId,
+          ),
+          from: incompletePracticeItemsProvider,
+          name: r'incompletePracticeItemsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$incompletePracticeItemsHash,
+          dependencies: IncompletePracticeItemsFamily._dependencies,
+          allTransitiveDependencies:
+              IncompletePracticeItemsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   IncompletePracticeItemsProvider._internal(
     super._createNotifier, {
@@ -541,7 +575,7 @@ class IncompletePracticeItemsProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeItem>> Function(IncompletePracticeItemsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -600,10 +634,9 @@ String _$awaitingFeedbackHash() => r'7727891a22045712ecbe521df39860466a075ce9';
 final awaitingFeedbackProvider = FutureProvider<List<PracticeItem>>.internal(
   awaitingFeedback,
   name: r'awaitingFeedbackProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$awaitingFeedbackHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$awaitingFeedbackHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -629,15 +662,21 @@ class PracticeItemByIdFamily extends Family<AsyncValue<PracticeItem?>> {
   /// Single practice item by ID
   ///
   /// Copied from [practiceItemById].
-  PracticeItemByIdProvider call(String id) {
-    return PracticeItemByIdProvider(id);
+  PracticeItemByIdProvider call(
+    String id,
+  ) {
+    return PracticeItemByIdProvider(
+      id,
+    );
   }
 
   @override
   PracticeItemByIdProvider getProviderOverride(
     covariant PracticeItemByIdProvider provider,
   ) {
-    return call(provider.id);
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -662,20 +701,24 @@ class PracticeItemByIdProvider extends FutureProvider<PracticeItem?> {
   /// Single practice item by ID
   ///
   /// Copied from [practiceItemById].
-  PracticeItemByIdProvider(String id)
-    : this._internal(
-        (ref) => practiceItemById(ref as PracticeItemByIdRef, id),
-        from: practiceItemByIdProvider,
-        name: r'practiceItemByIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$practiceItemByIdHash,
-        dependencies: PracticeItemByIdFamily._dependencies,
-        allTransitiveDependencies:
-            PracticeItemByIdFamily._allTransitiveDependencies,
-        id: id,
-      );
+  PracticeItemByIdProvider(
+    String id,
+  ) : this._internal(
+          (ref) => practiceItemById(
+            ref as PracticeItemByIdRef,
+            id,
+          ),
+          from: practiceItemByIdProvider,
+          name: r'practiceItemByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceItemByIdHash,
+          dependencies: PracticeItemByIdFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeItemByIdFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   PracticeItemByIdProvider._internal(
     super._createNotifier, {
@@ -732,8 +775,7 @@ mixin PracticeItemByIdRef on FutureProviderRef<PracticeItem?> {
 }
 
 class _PracticeItemByIdProviderElement
-    extends FutureProviderElement<PracticeItem?>
-    with PracticeItemByIdRef {
+    extends FutureProviderElement<PracticeItem?> with PracticeItemByIdRef {
   _PracticeItemByIdProviderElement(super.provider);
 
   @override
@@ -748,15 +790,14 @@ String _$currentStudentIdHash() => r'3fe269cf04c36a61a4869c2cd2f60b9fdee8ad34';
 @ProviderFor(CurrentStudentId)
 final currentStudentIdProvider =
     NotifierProvider<CurrentStudentId, String?>.internal(
-      CurrentStudentId.new,
-      name: r'currentStudentIdProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$currentStudentIdHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  CurrentStudentId.new,
+  name: r'currentStudentIdProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentStudentIdHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$CurrentStudentId = Notifier<String?>;
 String _$practiceItemsNotifierHash() =>
@@ -766,7 +807,9 @@ abstract class _$PracticeItemsNotifier
     extends BuildlessAsyncNotifier<List<PracticeItem>> {
   late final String lessonId;
 
-  FutureOr<List<PracticeItem>> build(String lessonId);
+  FutureOr<List<PracticeItem>> build(
+    String lessonId,
+  );
 }
 
 /// Notifier for practice item CRUD operations (lesson-based)
@@ -788,15 +831,21 @@ class PracticeItemsNotifierFamily
   /// Notifier for practice item CRUD operations (lesson-based)
   ///
   /// Copied from [PracticeItemsNotifier].
-  PracticeItemsNotifierProvider call(String lessonId) {
-    return PracticeItemsNotifierProvider(lessonId);
+  PracticeItemsNotifierProvider call(
+    String lessonId,
+  ) {
+    return PracticeItemsNotifierProvider(
+      lessonId,
+    );
   }
 
   @override
   PracticeItemsNotifierProvider getProviderOverride(
     covariant PracticeItemsNotifierProvider provider,
   ) {
-    return call(provider.lessonId);
+    return call(
+      provider.lessonId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -817,26 +866,26 @@ class PracticeItemsNotifierFamily
 /// Notifier for practice item CRUD operations (lesson-based)
 ///
 /// Copied from [PracticeItemsNotifier].
-class PracticeItemsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<PracticeItemsNotifier, List<PracticeItem>> {
+class PracticeItemsNotifierProvider extends AsyncNotifierProviderImpl<
+    PracticeItemsNotifier, List<PracticeItem>> {
   /// Notifier for practice item CRUD operations (lesson-based)
   ///
   /// Copied from [PracticeItemsNotifier].
-  PracticeItemsNotifierProvider(String lessonId)
-    : this._internal(
-        () => PracticeItemsNotifier()..lessonId = lessonId,
-        from: practiceItemsNotifierProvider,
-        name: r'practiceItemsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$practiceItemsNotifierHash,
-        dependencies: PracticeItemsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            PracticeItemsNotifierFamily._allTransitiveDependencies,
-        lessonId: lessonId,
-      );
+  PracticeItemsNotifierProvider(
+    String lessonId,
+  ) : this._internal(
+          () => PracticeItemsNotifier()..lessonId = lessonId,
+          from: practiceItemsNotifierProvider,
+          name: r'practiceItemsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceItemsNotifierHash,
+          dependencies: PracticeItemsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeItemsNotifierFamily._allTransitiveDependencies,
+          lessonId: lessonId,
+        );
 
   PracticeItemsNotifierProvider._internal(
     super._createNotifier, {
@@ -854,7 +903,9 @@ class PracticeItemsNotifierProvider
   FutureOr<List<PracticeItem>> runNotifierBuild(
     covariant PracticeItemsNotifier notifier,
   ) {
-    return notifier.build(lessonId);
+    return notifier.build(
+      lessonId,
+    );
   }
 
   @override
@@ -875,7 +926,7 @@ class PracticeItemsNotifierProvider
 
   @override
   AsyncNotifierProviderElement<PracticeItemsNotifier, List<PracticeItem>>
-  createElement() {
+      createElement() {
     return _PracticeItemsNotifierProviderElement(this);
   }
 
@@ -899,9 +950,8 @@ mixin PracticeItemsNotifierRef on AsyncNotifierProviderRef<List<PracticeItem>> {
 }
 
 class _PracticeItemsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<PracticeItemsNotifier, List<PracticeItem>>
-    with PracticeItemsNotifierRef {
+    extends AsyncNotifierProviderElement<PracticeItemsNotifier,
+        List<PracticeItem>> with PracticeItemsNotifierRef {
   _PracticeItemsNotifierProviderElement(super.provider);
 
   @override
@@ -915,7 +965,9 @@ abstract class _$StudentPracticeNotifier
     extends BuildlessAsyncNotifier<List<PracticeItem>> {
   late final String studentId;
 
-  FutureOr<List<PracticeItem>> build(String studentId);
+  FutureOr<List<PracticeItem>> build(
+    String studentId,
+  );
 }
 
 /// Notifier for student's practice items (student-based operations)
@@ -937,15 +989,21 @@ class StudentPracticeNotifierFamily
   /// Notifier for student's practice items (student-based operations)
   ///
   /// Copied from [StudentPracticeNotifier].
-  StudentPracticeNotifierProvider call(String studentId) {
-    return StudentPracticeNotifierProvider(studentId);
+  StudentPracticeNotifierProvider call(
+    String studentId,
+  ) {
+    return StudentPracticeNotifierProvider(
+      studentId,
+    );
   }
 
   @override
   StudentPracticeNotifierProvider getProviderOverride(
     covariant StudentPracticeNotifierProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -966,26 +1024,26 @@ class StudentPracticeNotifierFamily
 /// Notifier for student's practice items (student-based operations)
 ///
 /// Copied from [StudentPracticeNotifier].
-class StudentPracticeNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<StudentPracticeNotifier, List<PracticeItem>> {
+class StudentPracticeNotifierProvider extends AsyncNotifierProviderImpl<
+    StudentPracticeNotifier, List<PracticeItem>> {
   /// Notifier for student's practice items (student-based operations)
   ///
   /// Copied from [StudentPracticeNotifier].
-  StudentPracticeNotifierProvider(String studentId)
-    : this._internal(
-        () => StudentPracticeNotifier()..studentId = studentId,
-        from: studentPracticeNotifierProvider,
-        name: r'studentPracticeNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentPracticeNotifierHash,
-        dependencies: StudentPracticeNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            StudentPracticeNotifierFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentPracticeNotifierProvider(
+    String studentId,
+  ) : this._internal(
+          () => StudentPracticeNotifier()..studentId = studentId,
+          from: studentPracticeNotifierProvider,
+          name: r'studentPracticeNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentPracticeNotifierHash,
+          dependencies: StudentPracticeNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              StudentPracticeNotifierFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentPracticeNotifierProvider._internal(
     super._createNotifier, {
@@ -1003,7 +1061,9 @@ class StudentPracticeNotifierProvider
   FutureOr<List<PracticeItem>> runNotifierBuild(
     covariant StudentPracticeNotifier notifier,
   ) {
-    return notifier.build(studentId);
+    return notifier.build(
+      studentId,
+    );
   }
 
   @override
@@ -1024,7 +1084,7 @@ class StudentPracticeNotifierProvider
 
   @override
   AsyncNotifierProviderElement<StudentPracticeNotifier, List<PracticeItem>>
-  createElement() {
+      createElement() {
     return _StudentPracticeNotifierProviderElement(this);
   }
 
@@ -1050,17 +1110,12 @@ mixin StudentPracticeNotifierRef
 }
 
 class _StudentPracticeNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<
-          StudentPracticeNotifier,
-          List<PracticeItem>
-        >
-    with StudentPracticeNotifierRef {
+    extends AsyncNotifierProviderElement<StudentPracticeNotifier,
+        List<PracticeItem>> with StudentPracticeNotifierRef {
   _StudentPracticeNotifierProviderElement(super.provider);
 
   @override
   String get studentId => (origin as StudentPracticeNotifierProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

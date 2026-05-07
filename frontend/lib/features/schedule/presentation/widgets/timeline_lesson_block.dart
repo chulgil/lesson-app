@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../../features/lessons/presentation/extensions/lesson_visuals.dart';
 
 /// Height per 30-minute unit in timeline view.
 const double kTimelineUnitHeight = 30.0;

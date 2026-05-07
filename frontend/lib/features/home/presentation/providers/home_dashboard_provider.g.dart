@@ -13,10 +13,9 @@ String _$homeDashboardHash() => r'893d50cb1f7242aeca6b9edf961ec92a7d9d5d99';
 final homeDashboardProvider = Provider<HomeDashboardData>.internal(
   homeDashboard,
   name: r'homeDashboardProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeDashboardHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeDashboardHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -30,10 +29,9 @@ String _$homeDashboardRefreshHash() =>
 final homeDashboardRefreshProvider = Provider<HomeDashboardRefresh>.internal(
   homeDashboardRefresh,
   name: r'homeDashboardRefreshProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$homeDashboardRefreshHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeDashboardRefreshHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

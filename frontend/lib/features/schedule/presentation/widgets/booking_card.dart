@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 
 /// A card widget displaying booking information
 class BookingCard extends StatelessWidget {

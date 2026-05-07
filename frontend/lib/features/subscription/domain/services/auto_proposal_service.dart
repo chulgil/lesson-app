@@ -1,4 +1,3 @@
-import '../../../../core/l10n/app_strings.dart';
 import '../entities/proposal_settings.dart';
 import '../entities/subscription_proposal.dart';
 import '../entities/subscription_template.dart';
@@ -20,6 +19,12 @@ typedef CreateAutoProposal =
       String? discountReason,
       required bool isAutoProposal,
     });
+typedef BuildAutoProposalMessage = String Function(ProposalSettings settings);
+typedef BuildGoldenTimeDiscountReason =
+    String Function({
+      required int discountPercent,
+      required int goldenTimeHours,
+    });
 
 /// Service for automatically creating subscription proposals after trial lessons.
 class AutoProposalService {
@@ -27,16 +32,22 @@ class AutoProposalService {
   final LoadActiveProposal _loadActiveProposal;
   final LoadAutoProposalTemplates _loadAutoProposalTemplates;
   final CreateAutoProposal _createAutoProposal;
+  final BuildAutoProposalMessage _buildAutoProposalMessage;
+  final BuildGoldenTimeDiscountReason _buildGoldenTimeDiscountReason;
 
   const AutoProposalService({
     required LoadProposalSettings loadSettings,
     required LoadActiveProposal loadActiveProposal,
     required LoadAutoProposalTemplates loadAutoProposalTemplates,
     required CreateAutoProposal createAutoProposal,
+    required BuildAutoProposalMessage buildAutoProposalMessage,
+    required BuildGoldenTimeDiscountReason buildGoldenTimeDiscountReason,
   }) : _loadSettings = loadSettings,
        _loadActiveProposal = loadActiveProposal,
        _loadAutoProposalTemplates = loadAutoProposalTemplates,
-       _createAutoProposal = createAutoProposal;
+       _createAutoProposal = createAutoProposal,
+       _buildAutoProposalMessage = buildAutoProposalMessage,
+       _buildGoldenTimeDiscountReason = buildGoldenTimeDiscountReason;
 
   /// Trigger auto-proposal after trial lesson completion.
   ///
@@ -107,9 +118,9 @@ class AutoProposalService {
       discountAmount = discountAmount.abs(); // Make positive
 
       if (discountAmount > 0) {
-        discountReason = AppStrings.autoProposalGoldenTimeReason(
-          settings.goldenTimeDiscountPercent,
-          settings.goldenTimeHours,
+        discountReason = _buildGoldenTimeDiscountReason(
+          discountPercent: settings.goldenTimeDiscountPercent,
+          goldenTimeHours: settings.goldenTimeHours,
         );
       }
     }
@@ -148,24 +159,5 @@ class AutoProposalService {
 
     // Default to first template
     return templates.first.id;
-  }
-
-  String _buildAutoProposalMessage(ProposalSettings settings) {
-    final buffer = StringBuffer();
-    buffer.write(AppStrings.autoProposalGreeting);
-
-    if (settings.hasGoldenTimeDiscount) {
-      buffer.write(
-        AppStrings.autoProposalGoldenTimeHours(settings.goldenTimeHours),
-      );
-      buffer.write(
-        AppStrings.autoProposalGoldenTimePercent(
-          settings.goldenTimeDiscountPercent,
-        ),
-      );
-    }
-
-    buffer.write(AppStrings.autoProposalSelectionPrompt);
-    return buffer.toString();
   }
 }

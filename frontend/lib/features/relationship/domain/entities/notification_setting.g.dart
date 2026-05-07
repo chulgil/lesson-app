@@ -20,15 +20,15 @@ NotificationSetting _$NotificationSettingFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$NotificationSettingToJson(
-  NotificationSetting instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'user_id': instance.userId,
-  'target_user_id': instance.targetUserId,
-  'push_enabled': instance.pushEnabled,
-  'practice_share_enabled': instance.practiceShareEnabled,
-  'lesson_reminder_enabled': instance.lessonReminderEnabled,
-  'payment_reminder_enabled': instance.paymentReminderEnabled,
-  'created_at': instance.createdAt.toIso8601String(),
-  'updated_at': instance.updatedAt.toIso8601String(),
-};
+        NotificationSetting instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user_id': instance.userId,
+      'target_user_id': instance.targetUserId,
+      'push_enabled': instance.pushEnabled,
+      'practice_share_enabled': instance.practiceShareEnabled,
+      'lesson_reminder_enabled': instance.lessonReminderEnabled,
+      'payment_reminder_enabled': instance.paymentReminderEnabled,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+    };

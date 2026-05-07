@@ -14,25 +14,21 @@ GroupClassBooking _$GroupClassBookingFromJson(Map<String, dynamic> json) =>
       subscriptionId: json['subscription_id'] as String?,
       status: $enumDecode(_$GroupBookingStatusEnumMap, json['status']),
       waitlistPosition: (json['waitlist_position'] as num?)?.toInt(),
-      attendedAt:
-          json['attended_at'] == null
-              ? null
-              : DateTime.parse(json['attended_at'] as String),
+      attendedAt: json['attended_at'] == null
+          ? null
+          : DateTime.parse(json['attended_at'] as String),
       subscriptionDeducted: json['subscription_deducted'] as bool? ?? false,
       cancelReason: json['cancel_reason'] as String?,
-      cancelledAt:
-          json['cancelled_at'] == null
-              ? null
-              : DateTime.parse(json['cancelled_at'] as String),
-      promotedAt:
-          json['promoted_at'] == null
-              ? null
-              : DateTime.parse(json['promoted_at'] as String),
+      cancelledAt: json['cancelled_at'] == null
+          ? null
+          : DateTime.parse(json['cancelled_at'] as String),
+      promotedAt: json['promoted_at'] == null
+          ? null
+          : DateTime.parse(json['promoted_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt:
-          json['updated_at'] == null
-              ? null
-              : DateTime.parse(json['updated_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$GroupClassBookingToJson(GroupClassBooking instance) =>

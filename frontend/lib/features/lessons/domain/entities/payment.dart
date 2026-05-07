@@ -4,9 +4,6 @@
 // status tracking only. Do not expose this as an independent in-app payment
 // feature until the future app-admin billing spec is approved.
 
-import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'payment.g.dart';
@@ -14,16 +11,7 @@ part 'payment.g.dart';
 /// Payment type enum (trial vs regular)
 enum PaymentType {
   trial, // 체험 레슨
-  regular; // 정규 레슨
-
-  String get label {
-    switch (this) {
-      case PaymentType.trial:
-        return '체험';
-      case PaymentType.regular:
-        return '정규';
-    }
-  }
+  regular, // 정규 레슨
 }
 
 /// Payment status enum (V2: state-transition based flow)
@@ -37,42 +25,22 @@ enum PaymentStatus {
   @Deprecated('Use confirmed instead. Kept for backwards compatibility.')
   completed; // V1 완료 → V2 confirmed로 마이그레이션 예정
 
-  String get label {
+  /// V2: Semantic key for status indicator color.
+  String get colorKey {
     switch (this) {
       case PaymentStatus.pending:
-        return '청구됨';
+        return 'paperAccent';
       case PaymentStatus.paid:
-        return '입금됨';
-      case PaymentStatus.confirmed:
-        return '확인완료';
-      case PaymentStatus.overdue:
-        return '연체';
-      case PaymentStatus.cancelled:
-        return '취소';
-      case PaymentStatus.refunded:
-        return '환불';
-      // ignore: deprecated_member_use_from_same_package
-      case PaymentStatus.completed:
-        return '완료'; // Legacy
-    }
-  }
-
-  /// V2: Get color for status indicator
-  Color get color {
-    switch (this) {
-      case PaymentStatus.pending:
-        return AppColors.paperAccent;
-      case PaymentStatus.paid:
-        return AppColors.ink;
+        return 'ink';
       case PaymentStatus.confirmed:
       // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
-        return AppColors.paperOk;
+        return 'paperOk';
       case PaymentStatus.overdue:
-        return AppColors.paperAccent;
+        return 'paperAccent';
       case PaymentStatus.cancelled:
       case PaymentStatus.refunded:
-        return AppColors.inkTertiary;
+        return 'inkTertiary';
     }
   }
 
@@ -90,39 +58,12 @@ enum PaymentStatus {
 }
 
 /// Payment method enum
-enum PaymentMethod {
-  cash,
-  bankTransfer,
-  card,
-  other;
-
-  String get label {
-    switch (this) {
-      case PaymentMethod.cash:
-        return '현금';
-      case PaymentMethod.bankTransfer:
-        return '계좌이체';
-      case PaymentMethod.card:
-        return '카드';
-      case PaymentMethod.other:
-        return '기타';
-    }
-  }
-}
+enum PaymentMethod { cash, bankTransfer, card, other }
 
 /// Billing target type enum
 enum BillingTargetType {
   student, // Default: student pays themselves
-  parent; // Parent is the billing target
-
-  String get label {
-    switch (this) {
-      case BillingTargetType.student:
-        return '학생';
-      case BillingTargetType.parent:
-        return '학부모';
-    }
-  }
+  parent, // Parent is the billing target
 }
 
 /// Payment record model
@@ -210,23 +151,6 @@ class Payment {
   bool get isAwaitingTeacherConfirmation =>
       status == PaymentStatus.pending && studentConfirmed;
 
-  /// Get display status considering V2 state-transition flow
-  String get displayStatus {
-    // V2 status values
-    if (status == PaymentStatus.confirmed) return '확인완료';
-    if (status == PaymentStatus.paid) return '입금됨';
-    if (status == PaymentStatus.overdue) return '연체';
-    // Legacy status values
-    // ignore: deprecated_member_use_from_same_package
-    if (status == PaymentStatus.completed) return '완료';
-    if (status == PaymentStatus.cancelled) return '취소';
-    if (status == PaymentStatus.refunded) return '환불';
-    // V1 fallback: use studentConfirmed flag
-    if (studentConfirmed) return '입금됨';
-    if (isOverdue) return '연체';
-    return '청구됨';
-  }
-
   /// V2: Get effective status considering both V1 and V2 fields
   PaymentStatus get effectiveStatus {
     // If already using V2 status, return as-is
@@ -245,47 +169,8 @@ class Payment {
     return status;
   }
 
-  /// Format amount as Korean won
-  String get formattedAmount {
-    final formatter = amount.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
-    return '$formatter원';
-  }
-
-  /// Get period display string
-  String get periodDisplay {
-    if (type == PaymentType.trial) {
-      return '${periodStart.month}월 ${periodStart.day}일 체험';
-    }
-    if (weekStart != null && weekEnd != null) {
-      if (weekStart == weekEnd) {
-        return '${periodStart.month}월 $weekStart주';
-      }
-      return '${periodStart.month}월 $weekStart~$weekEnd주';
-    }
-    return '${periodStart.month}월 ${periodStart.day}일 ~ ${periodEnd.month}월 ${periodEnd.day}일';
-  }
-
-  /// Get short display for list
-  String get shortDisplay {
-    if (type == PaymentType.trial) {
-      return '체험 · $formattedAmount';
-    }
-    return '$lessonCount회 · $formattedAmount';
-  }
-
   /// Check if parent is the billing target
   bool get isBilledToParent => billingTargetType == BillingTargetType.parent;
-
-  /// Get billing target display name
-  String get billingTargetDisplayName {
-    if (isBilledToParent && billingTargetName != null) {
-      return '$billingTargetName (학부모)';
-    }
-    return '$studentName (학생)';
-  }
 
   Payment copyWith({
     String? id,

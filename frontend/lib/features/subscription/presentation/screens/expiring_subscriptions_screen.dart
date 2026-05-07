@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/subscription_card.dart';
 

@@ -18,6 +18,7 @@ import '../../../../features/students/students_facade.dart'
         studentProfileImageNotifierProvider,
         studentProvider,
         studentsNotifierProvider;
+import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for editing an existing student

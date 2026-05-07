@@ -63,13 +63,21 @@ class ParentFamily extends Family<AsyncValue<Parent?>> {
   /// Single parent provider by ID
   ///
   /// Copied from [parent].
-  ParentProvider call(String id) {
-    return ParentProvider(id);
+  ParentProvider call(
+    String id,
+  ) {
+    return ParentProvider(
+      id,
+    );
   }
 
   @override
-  ParentProvider getProviderOverride(covariant ParentProvider provider) {
-    return call(provider.id);
+  ParentProvider getProviderOverride(
+    covariant ParentProvider provider,
+  ) {
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -94,17 +102,23 @@ class ParentProvider extends FutureProvider<Parent?> {
   /// Single parent provider by ID
   ///
   /// Copied from [parent].
-  ParentProvider(String id)
-    : this._internal(
-        (ref) => parent(ref as ParentRef, id),
-        from: parentProvider,
-        name: r'parentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product') ? null : _$parentHash,
-        dependencies: ParentFamily._dependencies,
-        allTransitiveDependencies: ParentFamily._allTransitiveDependencies,
-        id: id,
-      );
+  ParentProvider(
+    String id,
+  ) : this._internal(
+          (ref) => parent(
+            ref as ParentRef,
+            id,
+          ),
+          from: parentProvider,
+          name: r'parentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$parentHash,
+          dependencies: ParentFamily._dependencies,
+          allTransitiveDependencies: ParentFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   ParentProvider._internal(
     super._createNotifier, {
@@ -119,7 +133,9 @@ class ParentProvider extends FutureProvider<Parent?> {
   final String id;
 
   @override
-  Override overrideWith(FutureOr<Parent?> Function(ParentRef provider) create) {
+  Override overrideWith(
+    FutureOr<Parent?> Function(ParentRef provider) create,
+  ) {
     return ProviderOverride(
       origin: this,
       override: ParentProvider._internal(
@@ -186,15 +202,21 @@ class ParentByUserIdFamily extends Family<AsyncValue<Parent?>> {
   /// Parent by user ID provider
   ///
   /// Copied from [parentByUserId].
-  ParentByUserIdProvider call(String userId) {
-    return ParentByUserIdProvider(userId);
+  ParentByUserIdProvider call(
+    String userId,
+  ) {
+    return ParentByUserIdProvider(
+      userId,
+    );
   }
 
   @override
   ParentByUserIdProvider getProviderOverride(
     covariant ParentByUserIdProvider provider,
   ) {
-    return call(provider.userId);
+    return call(
+      provider.userId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -219,20 +241,24 @@ class ParentByUserIdProvider extends FutureProvider<Parent?> {
   /// Parent by user ID provider
   ///
   /// Copied from [parentByUserId].
-  ParentByUserIdProvider(String userId)
-    : this._internal(
-        (ref) => parentByUserId(ref as ParentByUserIdRef, userId),
-        from: parentByUserIdProvider,
-        name: r'parentByUserIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$parentByUserIdHash,
-        dependencies: ParentByUserIdFamily._dependencies,
-        allTransitiveDependencies:
-            ParentByUserIdFamily._allTransitiveDependencies,
-        userId: userId,
-      );
+  ParentByUserIdProvider(
+    String userId,
+  ) : this._internal(
+          (ref) => parentByUserId(
+            ref as ParentByUserIdRef,
+            userId,
+          ),
+          from: parentByUserIdProvider,
+          name: r'parentByUserIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$parentByUserIdHash,
+          dependencies: ParentByUserIdFamily._dependencies,
+          allTransitiveDependencies:
+              ParentByUserIdFamily._allTransitiveDependencies,
+          userId: userId,
+        );
 
   ParentByUserIdProvider._internal(
     super._createNotifier, {
@@ -316,15 +342,21 @@ class InvitationByCodeFamily extends Family<AsyncValue<ParentInvitation?>> {
   /// Invitation by code provider
   ///
   /// Copied from [invitationByCode].
-  InvitationByCodeProvider call(String code) {
-    return InvitationByCodeProvider(code);
+  InvitationByCodeProvider call(
+    String code,
+  ) {
+    return InvitationByCodeProvider(
+      code,
+    );
   }
 
   @override
   InvitationByCodeProvider getProviderOverride(
     covariant InvitationByCodeProvider provider,
   ) {
-    return call(provider.code);
+    return call(
+      provider.code,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -349,20 +381,24 @@ class InvitationByCodeProvider extends FutureProvider<ParentInvitation?> {
   /// Invitation by code provider
   ///
   /// Copied from [invitationByCode].
-  InvitationByCodeProvider(String code)
-    : this._internal(
-        (ref) => invitationByCode(ref as InvitationByCodeRef, code),
-        from: invitationByCodeProvider,
-        name: r'invitationByCodeProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$invitationByCodeHash,
-        dependencies: InvitationByCodeFamily._dependencies,
-        allTransitiveDependencies:
-            InvitationByCodeFamily._allTransitiveDependencies,
-        code: code,
-      );
+  InvitationByCodeProvider(
+    String code,
+  ) : this._internal(
+          (ref) => invitationByCode(
+            ref as InvitationByCodeRef,
+            code,
+          ),
+          from: invitationByCodeProvider,
+          name: r'invitationByCodeProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$invitationByCodeHash,
+          dependencies: InvitationByCodeFamily._dependencies,
+          allTransitiveDependencies:
+              InvitationByCodeFamily._allTransitiveDependencies,
+          code: code,
+        );
 
   InvitationByCodeProvider._internal(
     super._createNotifier, {
@@ -419,8 +455,7 @@ mixin InvitationByCodeRef on FutureProviderRef<ParentInvitation?> {
 }
 
 class _InvitationByCodeProviderElement
-    extends FutureProviderElement<ParentInvitation?>
-    with InvitationByCodeRef {
+    extends FutureProviderElement<ParentInvitation?> with InvitationByCodeRef {
   _InvitationByCodeProviderElement(super.provider);
 
   @override
@@ -449,15 +484,21 @@ class PendingInvitationsFamily
   /// Pending invitations for a student
   ///
   /// Copied from [pendingInvitations].
-  PendingInvitationsProvider call(String studentId) {
-    return PendingInvitationsProvider(studentId);
+  PendingInvitationsProvider call(
+    String studentId,
+  ) {
+    return PendingInvitationsProvider(
+      studentId,
+    );
   }
 
   @override
   PendingInvitationsProvider getProviderOverride(
     covariant PendingInvitationsProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -483,20 +524,24 @@ class PendingInvitationsProvider
   /// Pending invitations for a student
   ///
   /// Copied from [pendingInvitations].
-  PendingInvitationsProvider(String studentId)
-    : this._internal(
-        (ref) => pendingInvitations(ref as PendingInvitationsRef, studentId),
-        from: pendingInvitationsProvider,
-        name: r'pendingInvitationsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$pendingInvitationsHash,
-        dependencies: PendingInvitationsFamily._dependencies,
-        allTransitiveDependencies:
-            PendingInvitationsFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  PendingInvitationsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => pendingInvitations(
+            ref as PendingInvitationsRef,
+            studentId,
+          ),
+          from: pendingInvitationsProvider,
+          name: r'pendingInvitationsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingInvitationsHash,
+          dependencies: PendingInvitationsFamily._dependencies,
+          allTransitiveDependencies:
+              PendingInvitationsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   PendingInvitationsProvider._internal(
     super._createNotifier, {
@@ -513,7 +558,7 @@ class PendingInvitationsProvider
   @override
   Override overrideWith(
     FutureOr<List<ParentInvitation>> Function(PendingInvitationsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -584,15 +629,21 @@ class RelationsForParentFamily
   /// Relations for a parent (their children)
   ///
   /// Copied from [relationsForParent].
-  RelationsForParentProvider call(String parentId) {
-    return RelationsForParentProvider(parentId);
+  RelationsForParentProvider call(
+    String parentId,
+  ) {
+    return RelationsForParentProvider(
+      parentId,
+    );
   }
 
   @override
   RelationsForParentProvider getProviderOverride(
     covariant RelationsForParentProvider provider,
   ) {
-    return call(provider.parentId);
+    return call(
+      provider.parentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -618,20 +669,24 @@ class RelationsForParentProvider
   /// Relations for a parent (their children)
   ///
   /// Copied from [relationsForParent].
-  RelationsForParentProvider(String parentId)
-    : this._internal(
-        (ref) => relationsForParent(ref as RelationsForParentRef, parentId),
-        from: relationsForParentProvider,
-        name: r'relationsForParentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$relationsForParentHash,
-        dependencies: RelationsForParentFamily._dependencies,
-        allTransitiveDependencies:
-            RelationsForParentFamily._allTransitiveDependencies,
-        parentId: parentId,
-      );
+  RelationsForParentProvider(
+    String parentId,
+  ) : this._internal(
+          (ref) => relationsForParent(
+            ref as RelationsForParentRef,
+            parentId,
+          ),
+          from: relationsForParentProvider,
+          name: r'relationsForParentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$relationsForParentHash,
+          dependencies: RelationsForParentFamily._dependencies,
+          allTransitiveDependencies:
+              RelationsForParentFamily._allTransitiveDependencies,
+          parentId: parentId,
+        );
 
   RelationsForParentProvider._internal(
     super._createNotifier, {
@@ -648,7 +703,7 @@ class RelationsForParentProvider
   @override
   Override overrideWith(
     FutureOr<List<ParentChildRelation>> Function(RelationsForParentRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -719,15 +774,21 @@ class RelationsForStudentFamily
   /// Relations for a student (their parents)
   ///
   /// Copied from [relationsForStudent].
-  RelationsForStudentProvider call(String studentId) {
-    return RelationsForStudentProvider(studentId);
+  RelationsForStudentProvider call(
+    String studentId,
+  ) {
+    return RelationsForStudentProvider(
+      studentId,
+    );
   }
 
   @override
   RelationsForStudentProvider getProviderOverride(
     covariant RelationsForStudentProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -753,20 +814,24 @@ class RelationsForStudentProvider
   /// Relations for a student (their parents)
   ///
   /// Copied from [relationsForStudent].
-  RelationsForStudentProvider(String studentId)
-    : this._internal(
-        (ref) => relationsForStudent(ref as RelationsForStudentRef, studentId),
-        from: relationsForStudentProvider,
-        name: r'relationsForStudentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$relationsForStudentHash,
-        dependencies: RelationsForStudentFamily._dependencies,
-        allTransitiveDependencies:
-            RelationsForStudentFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  RelationsForStudentProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => relationsForStudent(
+            ref as RelationsForStudentRef,
+            studentId,
+          ),
+          from: relationsForStudentProvider,
+          name: r'relationsForStudentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$relationsForStudentHash,
+          dependencies: RelationsForStudentFamily._dependencies,
+          allTransitiveDependencies:
+              RelationsForStudentFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   RelationsForStudentProvider._internal(
     super._createNotifier, {
@@ -783,9 +848,8 @@ class RelationsForStudentProvider
   @override
   Override overrideWith(
     FutureOr<List<ParentChildRelation>> Function(
-      RelationsForStudentRef provider,
-    )
-    create,
+            RelationsForStudentRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -859,14 +923,18 @@ class ParentStudentRelationFamily
   ParentStudentRelationProvider call(
     ({String parentId, String studentId}) params,
   ) {
-    return ParentStudentRelationProvider(params);
+    return ParentStudentRelationProvider(
+      params,
+    );
   }
 
   @override
   ParentStudentRelationProvider getProviderOverride(
     covariant ParentStudentRelationProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -892,20 +960,24 @@ class ParentStudentRelationProvider
   /// Single relation between parent and student
   ///
   /// Copied from [parentStudentRelation].
-  ParentStudentRelationProvider(({String parentId, String studentId}) params)
-    : this._internal(
-        (ref) => parentStudentRelation(ref as ParentStudentRelationRef, params),
-        from: parentStudentRelationProvider,
-        name: r'parentStudentRelationProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$parentStudentRelationHash,
-        dependencies: ParentStudentRelationFamily._dependencies,
-        allTransitiveDependencies:
-            ParentStudentRelationFamily._allTransitiveDependencies,
-        params: params,
-      );
+  ParentStudentRelationProvider(
+    ({String parentId, String studentId}) params,
+  ) : this._internal(
+          (ref) => parentStudentRelation(
+            ref as ParentStudentRelationRef,
+            params,
+          ),
+          from: parentStudentRelationProvider,
+          name: r'parentStudentRelationProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$parentStudentRelationHash,
+          dependencies: ParentStudentRelationFamily._dependencies,
+          allTransitiveDependencies:
+              ParentStudentRelationFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   ParentStudentRelationProvider._internal(
     super._createNotifier, {
@@ -922,7 +994,7 @@ class ParentStudentRelationProvider
   @override
   Override overrideWith(
     FutureOr<ParentChildRelation?> Function(ParentStudentRelationRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -997,14 +1069,18 @@ class VisibilitySettingsFamily
   VisibilitySettingsProvider call(
     ({String studentId, String teacherId}) params,
   ) {
-    return VisibilitySettingsProvider(params);
+    return VisibilitySettingsProvider(
+      params,
+    );
   }
 
   @override
   VisibilitySettingsProvider getProviderOverride(
     covariant VisibilitySettingsProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1030,20 +1106,24 @@ class VisibilitySettingsProvider
   /// Visibility settings for a student (set by teacher)
   ///
   /// Copied from [visibilitySettings].
-  VisibilitySettingsProvider(({String studentId, String teacherId}) params)
-    : this._internal(
-        (ref) => visibilitySettings(ref as VisibilitySettingsRef, params),
-        from: visibilitySettingsProvider,
-        name: r'visibilitySettingsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$visibilitySettingsHash,
-        dependencies: VisibilitySettingsFamily._dependencies,
-        allTransitiveDependencies:
-            VisibilitySettingsFamily._allTransitiveDependencies,
-        params: params,
-      );
+  VisibilitySettingsProvider(
+    ({String studentId, String teacherId}) params,
+  ) : this._internal(
+          (ref) => visibilitySettings(
+            ref as VisibilitySettingsRef,
+            params,
+          ),
+          from: visibilitySettingsProvider,
+          name: r'visibilitySettingsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$visibilitySettingsHash,
+          dependencies: VisibilitySettingsFamily._dependencies,
+          allTransitiveDependencies:
+              VisibilitySettingsFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   VisibilitySettingsProvider._internal(
     super._createNotifier, {
@@ -1060,7 +1140,7 @@ class VisibilitySettingsProvider
   @override
   Override overrideWith(
     FutureOr<ParentVisibilitySettings?> Function(VisibilitySettingsRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1132,15 +1212,21 @@ class NotificationSettingsFamily
   /// Notification settings for a parent
   ///
   /// Copied from [notificationSettings].
-  NotificationSettingsProvider call(String parentId) {
-    return NotificationSettingsProvider(parentId);
+  NotificationSettingsProvider call(
+    String parentId,
+  ) {
+    return NotificationSettingsProvider(
+      parentId,
+    );
   }
 
   @override
   NotificationSettingsProvider getProviderOverride(
     covariant NotificationSettingsProvider provider,
   ) {
-    return call(provider.parentId);
+    return call(
+      provider.parentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1166,20 +1252,24 @@ class NotificationSettingsProvider
   /// Notification settings for a parent
   ///
   /// Copied from [notificationSettings].
-  NotificationSettingsProvider(String parentId)
-    : this._internal(
-        (ref) => notificationSettings(ref as NotificationSettingsRef, parentId),
-        from: notificationSettingsProvider,
-        name: r'notificationSettingsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$notificationSettingsHash,
-        dependencies: NotificationSettingsFamily._dependencies,
-        allTransitiveDependencies:
-            NotificationSettingsFamily._allTransitiveDependencies,
-        parentId: parentId,
-      );
+  NotificationSettingsProvider(
+    String parentId,
+  ) : this._internal(
+          (ref) => notificationSettings(
+            ref as NotificationSettingsRef,
+            parentId,
+          ),
+          from: notificationSettingsProvider,
+          name: r'notificationSettingsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$notificationSettingsHash,
+          dependencies: NotificationSettingsFamily._dependencies,
+          allTransitiveDependencies:
+              NotificationSettingsFamily._allTransitiveDependencies,
+          parentId: parentId,
+        );
 
   NotificationSettingsProvider._internal(
     super._createNotifier, {
@@ -1196,9 +1286,8 @@ class NotificationSettingsProvider
   @override
   Override overrideWith(
     FutureOr<ParentNotificationSettings?> Function(
-      NotificationSettingsRef provider,
-    )
-    create,
+            NotificationSettingsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1268,15 +1357,21 @@ class BillingTargetFamily extends Family<AsyncValue<Parent?>> {
   /// Billing target parent for a student
   ///
   /// Copied from [billingTarget].
-  BillingTargetProvider call(String studentId) {
-    return BillingTargetProvider(studentId);
+  BillingTargetProvider call(
+    String studentId,
+  ) {
+    return BillingTargetProvider(
+      studentId,
+    );
   }
 
   @override
   BillingTargetProvider getProviderOverride(
     covariant BillingTargetProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1301,20 +1396,24 @@ class BillingTargetProvider extends FutureProvider<Parent?> {
   /// Billing target parent for a student
   ///
   /// Copied from [billingTarget].
-  BillingTargetProvider(String studentId)
-    : this._internal(
-        (ref) => billingTarget(ref as BillingTargetRef, studentId),
-        from: billingTargetProvider,
-        name: r'billingTargetProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$billingTargetHash,
-        dependencies: BillingTargetFamily._dependencies,
-        allTransitiveDependencies:
-            BillingTargetFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  BillingTargetProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => billingTarget(
+            ref as BillingTargetRef,
+            studentId,
+          ),
+          from: billingTargetProvider,
+          name: r'billingTargetProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$billingTargetHash,
+          dependencies: BillingTargetFamily._dependencies,
+          allTransitiveDependencies:
+              BillingTargetFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   BillingTargetProvider._internal(
     super._createNotifier, {
@@ -1386,15 +1485,14 @@ String _$parentsNotifierHash() => r'43844435e10d7ec2845987048432b26f481dc294';
 @ProviderFor(ParentsNotifier)
 final parentsNotifierProvider =
     AsyncNotifierProvider<ParentsNotifier, List<Parent>>.internal(
-      ParentsNotifier.new,
-      name: r'parentsNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$parentsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  ParentsNotifier.new,
+  name: r'parentsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$parentsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$ParentsNotifier = AsyncNotifier<List<Parent>>;
 String _$invitationsNotifierHash() =>
@@ -1404,7 +1502,9 @@ abstract class _$InvitationsNotifier
     extends BuildlessAsyncNotifier<List<ParentInvitation>> {
   late final String studentId;
 
-  FutureOr<List<ParentInvitation>> build(String studentId);
+  FutureOr<List<ParentInvitation>> build(
+    String studentId,
+  );
 }
 
 /// Invitation notifier for creating/managing invitations
@@ -1426,15 +1526,21 @@ class InvitationsNotifierFamily
   /// Invitation notifier for creating/managing invitations
   ///
   /// Copied from [InvitationsNotifier].
-  InvitationsNotifierProvider call(String studentId) {
-    return InvitationsNotifierProvider(studentId);
+  InvitationsNotifierProvider call(
+    String studentId,
+  ) {
+    return InvitationsNotifierProvider(
+      studentId,
+    );
   }
 
   @override
   InvitationsNotifierProvider getProviderOverride(
     covariant InvitationsNotifierProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1455,26 +1561,26 @@ class InvitationsNotifierFamily
 /// Invitation notifier for creating/managing invitations
 ///
 /// Copied from [InvitationsNotifier].
-class InvitationsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<InvitationsNotifier, List<ParentInvitation>> {
+class InvitationsNotifierProvider extends AsyncNotifierProviderImpl<
+    InvitationsNotifier, List<ParentInvitation>> {
   /// Invitation notifier for creating/managing invitations
   ///
   /// Copied from [InvitationsNotifier].
-  InvitationsNotifierProvider(String studentId)
-    : this._internal(
-        () => InvitationsNotifier()..studentId = studentId,
-        from: invitationsNotifierProvider,
-        name: r'invitationsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$invitationsNotifierHash,
-        dependencies: InvitationsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            InvitationsNotifierFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  InvitationsNotifierProvider(
+    String studentId,
+  ) : this._internal(
+          () => InvitationsNotifier()..studentId = studentId,
+          from: invitationsNotifierProvider,
+          name: r'invitationsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$invitationsNotifierHash,
+          dependencies: InvitationsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              InvitationsNotifierFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   InvitationsNotifierProvider._internal(
     super._createNotifier, {
@@ -1492,7 +1598,9 @@ class InvitationsNotifierProvider
   FutureOr<List<ParentInvitation>> runNotifierBuild(
     covariant InvitationsNotifier notifier,
   ) {
-    return notifier.build(studentId);
+    return notifier.build(
+      studentId,
+    );
   }
 
   @override
@@ -1513,7 +1621,7 @@ class InvitationsNotifierProvider
 
   @override
   AsyncNotifierProviderElement<InvitationsNotifier, List<ParentInvitation>>
-  createElement() {
+      createElement() {
     return _InvitationsNotifierProviderElement(this);
   }
 
@@ -1537,13 +1645,8 @@ mixin InvitationsNotifierRef
   String get studentId;
 }
 
-class _InvitationsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<
-          InvitationsNotifier,
-          List<ParentInvitation>
-        >
-    with InvitationsNotifierRef {
+class _InvitationsNotifierProviderElement extends AsyncNotifierProviderElement<
+    InvitationsNotifier, List<ParentInvitation>> with InvitationsNotifierRef {
   _InvitationsNotifierProviderElement(super.provider);
 
   @override
@@ -1556,7 +1659,9 @@ abstract class _$RelationsNotifier
     extends BuildlessAsyncNotifier<List<ParentChildRelation>> {
   late final String parentId;
 
-  FutureOr<List<ParentChildRelation>> build(String parentId);
+  FutureOr<List<ParentChildRelation>> build(
+    String parentId,
+  );
 }
 
 /// Relations notifier for managing parent-child relationships
@@ -1578,15 +1683,21 @@ class RelationsNotifierFamily
   /// Relations notifier for managing parent-child relationships
   ///
   /// Copied from [RelationsNotifier].
-  RelationsNotifierProvider call(String parentId) {
-    return RelationsNotifierProvider(parentId);
+  RelationsNotifierProvider call(
+    String parentId,
+  ) {
+    return RelationsNotifierProvider(
+      parentId,
+    );
   }
 
   @override
   RelationsNotifierProvider getProviderOverride(
     covariant RelationsNotifierProvider provider,
   ) {
-    return call(provider.parentId);
+    return call(
+      provider.parentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1607,29 +1718,26 @@ class RelationsNotifierFamily
 /// Relations notifier for managing parent-child relationships
 ///
 /// Copied from [RelationsNotifier].
-class RelationsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<
-          RelationsNotifier,
-          List<ParentChildRelation>
-        > {
+class RelationsNotifierProvider extends AsyncNotifierProviderImpl<
+    RelationsNotifier, List<ParentChildRelation>> {
   /// Relations notifier for managing parent-child relationships
   ///
   /// Copied from [RelationsNotifier].
-  RelationsNotifierProvider(String parentId)
-    : this._internal(
-        () => RelationsNotifier()..parentId = parentId,
-        from: relationsNotifierProvider,
-        name: r'relationsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$relationsNotifierHash,
-        dependencies: RelationsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            RelationsNotifierFamily._allTransitiveDependencies,
-        parentId: parentId,
-      );
+  RelationsNotifierProvider(
+    String parentId,
+  ) : this._internal(
+          () => RelationsNotifier()..parentId = parentId,
+          from: relationsNotifierProvider,
+          name: r'relationsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$relationsNotifierHash,
+          dependencies: RelationsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              RelationsNotifierFamily._allTransitiveDependencies,
+          parentId: parentId,
+        );
 
   RelationsNotifierProvider._internal(
     super._createNotifier, {
@@ -1647,7 +1755,9 @@ class RelationsNotifierProvider
   FutureOr<List<ParentChildRelation>> runNotifierBuild(
     covariant RelationsNotifier notifier,
   ) {
-    return notifier.build(parentId);
+    return notifier.build(
+      parentId,
+    );
   }
 
   @override
@@ -1668,7 +1778,7 @@ class RelationsNotifierProvider
 
   @override
   AsyncNotifierProviderElement<RelationsNotifier, List<ParentChildRelation>>
-  createElement() {
+      createElement() {
     return _RelationsNotifierProviderElement(this);
   }
 
@@ -1692,13 +1802,8 @@ mixin RelationsNotifierRef
   String get parentId;
 }
 
-class _RelationsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<
-          RelationsNotifier,
-          List<ParentChildRelation>
-        >
-    with RelationsNotifierRef {
+class _RelationsNotifierProviderElement extends AsyncNotifierProviderElement<
+    RelationsNotifier, List<ParentChildRelation>> with RelationsNotifierRef {
   _RelationsNotifierProviderElement(super.provider);
 
   @override
@@ -1739,14 +1844,18 @@ class VisibilitySettingsNotifierFamily
   VisibilitySettingsNotifierProvider call(
     ({String studentId, String teacherId}) params,
   ) {
-    return VisibilitySettingsNotifierProvider(params);
+    return VisibilitySettingsNotifierProvider(
+      params,
+    );
   }
 
   @override
   VisibilitySettingsNotifierProvider getProviderOverride(
     covariant VisibilitySettingsNotifierProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1767,30 +1876,26 @@ class VisibilitySettingsNotifierFamily
 /// Visibility settings notifier for teacher to manage parent access
 ///
 /// Copied from [VisibilitySettingsNotifier].
-class VisibilitySettingsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<
-          VisibilitySettingsNotifier,
-          ParentVisibilitySettings?
-        > {
+class VisibilitySettingsNotifierProvider extends AsyncNotifierProviderImpl<
+    VisibilitySettingsNotifier, ParentVisibilitySettings?> {
   /// Visibility settings notifier for teacher to manage parent access
   ///
   /// Copied from [VisibilitySettingsNotifier].
   VisibilitySettingsNotifierProvider(
     ({String studentId, String teacherId}) params,
   ) : this._internal(
-        () => VisibilitySettingsNotifier()..params = params,
-        from: visibilitySettingsNotifierProvider,
-        name: r'visibilitySettingsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$visibilitySettingsNotifierHash,
-        dependencies: VisibilitySettingsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            VisibilitySettingsNotifierFamily._allTransitiveDependencies,
-        params: params,
-      );
+          () => VisibilitySettingsNotifier()..params = params,
+          from: visibilitySettingsNotifierProvider,
+          name: r'visibilitySettingsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$visibilitySettingsNotifierHash,
+          dependencies: VisibilitySettingsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              VisibilitySettingsNotifierFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   VisibilitySettingsNotifierProvider._internal(
     super._createNotifier, {
@@ -1808,7 +1913,9 @@ class VisibilitySettingsNotifierProvider
   FutureOr<ParentVisibilitySettings?> runNotifierBuild(
     covariant VisibilitySettingsNotifier notifier,
   ) {
-    return notifier.build(params);
+    return notifier.build(
+      params,
+    );
   }
 
   @override
@@ -1828,11 +1935,8 @@ class VisibilitySettingsNotifierProvider
   }
 
   @override
-  AsyncNotifierProviderElement<
-    VisibilitySettingsNotifier,
-    ParentVisibilitySettings?
-  >
-  createElement() {
+  AsyncNotifierProviderElement<VisibilitySettingsNotifier,
+      ParentVisibilitySettings?> createElement() {
     return _VisibilitySettingsNotifierProviderElement(this);
   }
 
@@ -1858,12 +1962,8 @@ mixin VisibilitySettingsNotifierRef
 }
 
 class _VisibilitySettingsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<
-          VisibilitySettingsNotifier,
-          ParentVisibilitySettings?
-        >
-    with VisibilitySettingsNotifierRef {
+    extends AsyncNotifierProviderElement<VisibilitySettingsNotifier,
+        ParentVisibilitySettings?> with VisibilitySettingsNotifierRef {
   _VisibilitySettingsNotifierProviderElement(super.provider);
 
   @override
@@ -1878,7 +1978,9 @@ abstract class _$NotificationSettingsNotifier
     extends BuildlessAsyncNotifier<ParentNotificationSettings?> {
   late final String parentId;
 
-  FutureOr<ParentNotificationSettings?> build(String parentId);
+  FutureOr<ParentNotificationSettings?> build(
+    String parentId,
+  );
 }
 
 /// Notification settings notifier for parent to customize their preferences
@@ -1901,15 +2003,21 @@ class NotificationSettingsNotifierFamily
   /// Notification settings notifier for parent to customize their preferences
   ///
   /// Copied from [NotificationSettingsNotifier].
-  NotificationSettingsNotifierProvider call(String parentId) {
-    return NotificationSettingsNotifierProvider(parentId);
+  NotificationSettingsNotifierProvider call(
+    String parentId,
+  ) {
+    return NotificationSettingsNotifierProvider(
+      parentId,
+    );
   }
 
   @override
   NotificationSettingsNotifierProvider getProviderOverride(
     covariant NotificationSettingsNotifierProvider provider,
   ) {
-    return call(provider.parentId);
+    return call(
+      provider.parentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1930,29 +2038,26 @@ class NotificationSettingsNotifierFamily
 /// Notification settings notifier for parent to customize their preferences
 ///
 /// Copied from [NotificationSettingsNotifier].
-class NotificationSettingsNotifierProvider
-    extends
-        AsyncNotifierProviderImpl<
-          NotificationSettingsNotifier,
-          ParentNotificationSettings?
-        > {
+class NotificationSettingsNotifierProvider extends AsyncNotifierProviderImpl<
+    NotificationSettingsNotifier, ParentNotificationSettings?> {
   /// Notification settings notifier for parent to customize their preferences
   ///
   /// Copied from [NotificationSettingsNotifier].
-  NotificationSettingsNotifierProvider(String parentId)
-    : this._internal(
-        () => NotificationSettingsNotifier()..parentId = parentId,
-        from: notificationSettingsNotifierProvider,
-        name: r'notificationSettingsNotifierProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$notificationSettingsNotifierHash,
-        dependencies: NotificationSettingsNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            NotificationSettingsNotifierFamily._allTransitiveDependencies,
-        parentId: parentId,
-      );
+  NotificationSettingsNotifierProvider(
+    String parentId,
+  ) : this._internal(
+          () => NotificationSettingsNotifier()..parentId = parentId,
+          from: notificationSettingsNotifierProvider,
+          name: r'notificationSettingsNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$notificationSettingsNotifierHash,
+          dependencies: NotificationSettingsNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              NotificationSettingsNotifierFamily._allTransitiveDependencies,
+          parentId: parentId,
+        );
 
   NotificationSettingsNotifierProvider._internal(
     super._createNotifier, {
@@ -1970,7 +2075,9 @@ class NotificationSettingsNotifierProvider
   FutureOr<ParentNotificationSettings?> runNotifierBuild(
     covariant NotificationSettingsNotifier notifier,
   ) {
-    return notifier.build(parentId);
+    return notifier.build(
+      parentId,
+    );
   }
 
   @override
@@ -1990,11 +2097,8 @@ class NotificationSettingsNotifierProvider
   }
 
   @override
-  AsyncNotifierProviderElement<
-    NotificationSettingsNotifier,
-    ParentNotificationSettings?
-  >
-  createElement() {
+  AsyncNotifierProviderElement<NotificationSettingsNotifier,
+      ParentNotificationSettings?> createElement() {
     return _NotificationSettingsNotifierProviderElement(this);
   }
 
@@ -2020,18 +2124,13 @@ mixin NotificationSettingsNotifierRef
 }
 
 class _NotificationSettingsNotifierProviderElement
-    extends
-        AsyncNotifierProviderElement<
-          NotificationSettingsNotifier,
-          ParentNotificationSettings?
-        >
-    with NotificationSettingsNotifierRef {
+    extends AsyncNotifierProviderElement<NotificationSettingsNotifier,
+        ParentNotificationSettings?> with NotificationSettingsNotifierRef {
   _NotificationSettingsNotifierProviderElement(super.provider);
 
   @override
   String get parentId =>
       (origin as NotificationSettingsNotifierProvider).parentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

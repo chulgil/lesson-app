@@ -15,10 +15,9 @@ String _$teacherRepositoryHash() => r'3c40c0584987848e3023552bedd98c5a208f6064';
 final teacherRepositoryProvider = Provider<TeacherRepository>.internal(
   teacherRepository,
   name: r'teacherRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -81,13 +80,21 @@ class TeacherFamily extends Family<AsyncValue<Teacher?>> {
   /// Single teacher provider
   ///
   /// Copied from [teacher].
-  TeacherProvider call(String teacherId) {
-    return TeacherProvider(teacherId);
+  TeacherProvider call(
+    String teacherId,
+  ) {
+    return TeacherProvider(
+      teacherId,
+    );
   }
 
   @override
-  TeacherProvider getProviderOverride(covariant TeacherProvider provider) {
-    return call(provider.teacherId);
+  TeacherProvider getProviderOverride(
+    covariant TeacherProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -112,19 +119,23 @@ class TeacherProvider extends FutureProvider<Teacher?> {
   /// Single teacher provider
   ///
   /// Copied from [teacher].
-  TeacherProvider(String teacherId)
-    : this._internal(
-        (ref) => teacher(ref as TeacherRef, teacherId),
-        from: teacherProvider,
-        name: r'teacherProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherHash,
-        dependencies: TeacherFamily._dependencies,
-        allTransitiveDependencies: TeacherFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacher(
+            ref as TeacherRef,
+            teacherId,
+          ),
+          from: teacherProvider,
+          name: r'teacherProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherHash,
+          dependencies: TeacherFamily._dependencies,
+          allTransitiveDependencies: TeacherFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherProvider._internal(
     super._createNotifier, {
@@ -197,10 +208,9 @@ String _$featuredTeachersHash() => r'2b83005b6f0a98203f5fc0a4379d5284de008fb2';
 final featuredTeachersProvider = FutureProvider<List<Teacher>>.internal(
   featuredTeachers,
   name: r'featuredTeachersProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$featuredTeachersHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$featuredTeachersHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -227,15 +237,21 @@ class TeachersByInstrumentFamily extends Family<AsyncValue<List<Teacher>>> {
   /// Teachers by instrument provider
   ///
   /// Copied from [teachersByInstrument].
-  TeachersByInstrumentProvider call(String instrument) {
-    return TeachersByInstrumentProvider(instrument);
+  TeachersByInstrumentProvider call(
+    String instrument,
+  ) {
+    return TeachersByInstrumentProvider(
+      instrument,
+    );
   }
 
   @override
   TeachersByInstrumentProvider getProviderOverride(
     covariant TeachersByInstrumentProvider provider,
   ) {
-    return call(provider.instrument);
+    return call(
+      provider.instrument,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -260,21 +276,24 @@ class TeachersByInstrumentProvider extends FutureProvider<List<Teacher>> {
   /// Teachers by instrument provider
   ///
   /// Copied from [teachersByInstrument].
-  TeachersByInstrumentProvider(String instrument)
-    : this._internal(
-        (ref) =>
-            teachersByInstrument(ref as TeachersByInstrumentRef, instrument),
-        from: teachersByInstrumentProvider,
-        name: r'teachersByInstrumentProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teachersByInstrumentHash,
-        dependencies: TeachersByInstrumentFamily._dependencies,
-        allTransitiveDependencies:
-            TeachersByInstrumentFamily._allTransitiveDependencies,
-        instrument: instrument,
-      );
+  TeachersByInstrumentProvider(
+    String instrument,
+  ) : this._internal(
+          (ref) => teachersByInstrument(
+            ref as TeachersByInstrumentRef,
+            instrument,
+          ),
+          from: teachersByInstrumentProvider,
+          name: r'teachersByInstrumentProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teachersByInstrumentHash,
+          dependencies: TeachersByInstrumentFamily._dependencies,
+          allTransitiveDependencies:
+              TeachersByInstrumentFamily._allTransitiveDependencies,
+          instrument: instrument,
+        );
 
   TeachersByInstrumentProvider._internal(
     super._createNotifier, {
@@ -332,8 +351,7 @@ mixin TeachersByInstrumentRef on FutureProviderRef<List<Teacher>> {
 }
 
 class _TeachersByInstrumentProviderElement
-    extends FutureProviderElement<List<Teacher>>
-    with TeachersByInstrumentRef {
+    extends FutureProviderElement<List<Teacher>> with TeachersByInstrumentRef {
   _TeachersByInstrumentProviderElement(super.provider);
 
   @override
@@ -360,15 +378,21 @@ class FilteredTeachersFamily extends Family<AsyncValue<List<Teacher>>> {
   /// Filtered teachers provider
   ///
   /// Copied from [filteredTeachers].
-  FilteredTeachersProvider call(TeacherFilter filter) {
-    return FilteredTeachersProvider(filter);
+  FilteredTeachersProvider call(
+    TeacherFilter filter,
+  ) {
+    return FilteredTeachersProvider(
+      filter,
+    );
   }
 
   @override
   FilteredTeachersProvider getProviderOverride(
     covariant FilteredTeachersProvider provider,
   ) {
-    return call(provider.filter);
+    return call(
+      provider.filter,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -393,20 +417,24 @@ class FilteredTeachersProvider extends FutureProvider<List<Teacher>> {
   /// Filtered teachers provider
   ///
   /// Copied from [filteredTeachers].
-  FilteredTeachersProvider(TeacherFilter filter)
-    : this._internal(
-        (ref) => filteredTeachers(ref as FilteredTeachersRef, filter),
-        from: filteredTeachersProvider,
-        name: r'filteredTeachersProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$filteredTeachersHash,
-        dependencies: FilteredTeachersFamily._dependencies,
-        allTransitiveDependencies:
-            FilteredTeachersFamily._allTransitiveDependencies,
-        filter: filter,
-      );
+  FilteredTeachersProvider(
+    TeacherFilter filter,
+  ) : this._internal(
+          (ref) => filteredTeachers(
+            ref as FilteredTeachersRef,
+            filter,
+          ),
+          from: filteredTeachersProvider,
+          name: r'filteredTeachersProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$filteredTeachersHash,
+          dependencies: FilteredTeachersFamily._dependencies,
+          allTransitiveDependencies:
+              FilteredTeachersFamily._allTransitiveDependencies,
+          filter: filter,
+        );
 
   FilteredTeachersProvider._internal(
     super._createNotifier, {
@@ -463,8 +491,7 @@ mixin FilteredTeachersRef on FutureProviderRef<List<Teacher>> {
 }
 
 class _FilteredTeachersProviderElement
-    extends FutureProviderElement<List<Teacher>>
-    with FilteredTeachersRef {
+    extends FutureProviderElement<List<Teacher>> with FilteredTeachersRef {
   _FilteredTeachersProviderElement(super.provider);
 
   @override
@@ -480,10 +507,9 @@ String _$availableTeachersHash() => r'b7f5bb16c09b85b65c900d354fd0b4097d241c94';
 final availableTeachersProvider = FutureProvider<List<Teacher>>.internal(
   availableTeachers,
   name: r'availableTeachersProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$availableTeachersHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$availableTeachersHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -498,15 +524,14 @@ String _$selectedInstrumentFilterHash() =>
 @ProviderFor(SelectedInstrumentFilter)
 final selectedInstrumentFilterProvider =
     NotifierProvider<SelectedInstrumentFilter, String?>.internal(
-      SelectedInstrumentFilter.new,
-      name: r'selectedInstrumentFilterProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$selectedInstrumentFilterHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SelectedInstrumentFilter.new,
+  name: r'selectedInstrumentFilterProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedInstrumentFilterHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SelectedInstrumentFilter = Notifier<String?>;
 String _$teacherSearchQueryHash() =>
@@ -518,15 +543,14 @@ String _$teacherSearchQueryHash() =>
 @ProviderFor(TeacherSearchQuery)
 final teacherSearchQueryProvider =
     NotifierProvider<TeacherSearchQuery, String>.internal(
-      TeacherSearchQuery.new,
-      name: r'teacherSearchQueryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teacherSearchQueryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  TeacherSearchQuery.new,
+  name: r'teacherSearchQueryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherSearchQueryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$TeacherSearchQuery = Notifier<String>;
 // ignore_for_file: type=lint

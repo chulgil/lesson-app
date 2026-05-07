@@ -15,18 +15,17 @@ String _$practiceRepertoireRepositoryHash() =>
 @ProviderFor(practiceRepertoireRepository)
 final practiceRepertoireRepositoryProvider =
     Provider<PracticeRepertoireRepository>.internal(
-      practiceRepertoireRepository,
-      name: r'practiceRepertoireRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$practiceRepertoireRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  practiceRepertoireRepository,
+  name: r'practiceRepertoireRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceRepertoireRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef PracticeRepertoireRepositoryRef =
-    ProviderRef<PracticeRepertoireRepository>;
+typedef PracticeRepertoireRepositoryRef
+    = ProviderRef<PracticeRepertoireRepository>;
 String _$defaultRepertoireServiceHash() =>
     r'9198a7fc6fc4c74dadbefacc4daccc08e1d2fb36';
 
@@ -35,10 +34,9 @@ String _$defaultRepertoireServiceHash() =>
 final defaultRepertoireServiceProvider = FutureProvider<void>.internal(
   defaultRepertoireService,
   name: r'defaultRepertoireServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$defaultRepertoireServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$defaultRepertoireServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

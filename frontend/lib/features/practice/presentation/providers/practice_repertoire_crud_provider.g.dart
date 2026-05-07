@@ -49,15 +49,21 @@ class StudentRepertoiresFamily
   /// Provider for student's repertoires list
   ///
   /// Copied from [studentRepertoires].
-  StudentRepertoiresProvider call(String studentId) {
-    return StudentRepertoiresProvider(studentId);
+  StudentRepertoiresProvider call(
+    String studentId,
+  ) {
+    return StudentRepertoiresProvider(
+      studentId,
+    );
   }
 
   @override
   StudentRepertoiresProvider getProviderOverride(
     covariant StudentRepertoiresProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -83,20 +89,24 @@ class StudentRepertoiresProvider
   /// Provider for student's repertoires list
   ///
   /// Copied from [studentRepertoires].
-  StudentRepertoiresProvider(String studentId)
-    : this._internal(
-        (ref) => studentRepertoires(ref as StudentRepertoiresRef, studentId),
-        from: studentRepertoiresProvider,
-        name: r'studentRepertoiresProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentRepertoiresHash,
-        dependencies: StudentRepertoiresFamily._dependencies,
-        allTransitiveDependencies:
-            StudentRepertoiresFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentRepertoiresProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentRepertoires(
+            ref as StudentRepertoiresRef,
+            studentId,
+          ),
+          from: studentRepertoiresProvider,
+          name: r'studentRepertoiresProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentRepertoiresHash,
+          dependencies: StudentRepertoiresFamily._dependencies,
+          allTransitiveDependencies:
+              StudentRepertoiresFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentRepertoiresProvider._internal(
     super._createNotifier, {
@@ -113,7 +123,7 @@ class StudentRepertoiresProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeRepertoire>> Function(StudentRepertoiresRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -184,15 +194,21 @@ class RepertoiresForDateFamily
   /// Provider for student's repertoires filtered by date
   ///
   /// Copied from [repertoiresForDate].
-  RepertoiresForDateProvider call(RepertoiresForDateParams params) {
-    return RepertoiresForDateProvider(params);
+  RepertoiresForDateProvider call(
+    RepertoiresForDateParams params,
+  ) {
+    return RepertoiresForDateProvider(
+      params,
+    );
   }
 
   @override
   RepertoiresForDateProvider getProviderOverride(
     covariant RepertoiresForDateProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -218,20 +234,24 @@ class RepertoiresForDateProvider
   /// Provider for student's repertoires filtered by date
   ///
   /// Copied from [repertoiresForDate].
-  RepertoiresForDateProvider(RepertoiresForDateParams params)
-    : this._internal(
-        (ref) => repertoiresForDate(ref as RepertoiresForDateRef, params),
-        from: repertoiresForDateProvider,
-        name: r'repertoiresForDateProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$repertoiresForDateHash,
-        dependencies: RepertoiresForDateFamily._dependencies,
-        allTransitiveDependencies:
-            RepertoiresForDateFamily._allTransitiveDependencies,
-        params: params,
-      );
+  RepertoiresForDateProvider(
+    RepertoiresForDateParams params,
+  ) : this._internal(
+          (ref) => repertoiresForDate(
+            ref as RepertoiresForDateRef,
+            params,
+          ),
+          from: repertoiresForDateProvider,
+          name: r'repertoiresForDateProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$repertoiresForDateHash,
+          dependencies: RepertoiresForDateFamily._dependencies,
+          allTransitiveDependencies:
+              RepertoiresForDateFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   RepertoiresForDateProvider._internal(
     super._createNotifier, {
@@ -248,7 +268,7 @@ class RepertoiresForDateProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeRepertoire>> Function(RepertoiresForDateRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -318,15 +338,21 @@ class RepertoireFamily extends Family<AsyncValue<PracticeRepertoire?>> {
   /// Provider for a single repertoire
   ///
   /// Copied from [repertoire].
-  RepertoireProvider call(String repertoireId) {
-    return RepertoireProvider(repertoireId);
+  RepertoireProvider call(
+    String repertoireId,
+  ) {
+    return RepertoireProvider(
+      repertoireId,
+    );
   }
 
   @override
   RepertoireProvider getProviderOverride(
     covariant RepertoireProvider provider,
   ) {
-    return call(provider.repertoireId);
+    return call(
+      provider.repertoireId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -351,19 +377,24 @@ class RepertoireProvider extends FutureProvider<PracticeRepertoire?> {
   /// Provider for a single repertoire
   ///
   /// Copied from [repertoire].
-  RepertoireProvider(String repertoireId)
-    : this._internal(
-        (ref) => repertoire(ref as RepertoireRef, repertoireId),
-        from: repertoireProvider,
-        name: r'repertoireProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$repertoireHash,
-        dependencies: RepertoireFamily._dependencies,
-        allTransitiveDependencies: RepertoireFamily._allTransitiveDependencies,
-        repertoireId: repertoireId,
-      );
+  RepertoireProvider(
+    String repertoireId,
+  ) : this._internal(
+          (ref) => repertoire(
+            ref as RepertoireRef,
+            repertoireId,
+          ),
+          from: repertoireProvider,
+          name: r'repertoireProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$repertoireHash,
+          dependencies: RepertoireFamily._dependencies,
+          allTransitiveDependencies:
+              RepertoireFamily._allTransitiveDependencies,
+          repertoireId: repertoireId,
+        );
 
   RepertoireProvider._internal(
     super._createNotifier, {
@@ -420,8 +451,7 @@ mixin RepertoireRef on FutureProviderRef<PracticeRepertoire?> {
 }
 
 class _RepertoireProviderElement
-    extends FutureProviderElement<PracticeRepertoire?>
-    with RepertoireRef {
+    extends FutureProviderElement<PracticeRepertoire?> with RepertoireRef {
   _RepertoireProviderElement(super.provider);
 
   @override
@@ -448,13 +478,21 @@ class SectionFamily extends Family<AsyncValue<PracticeSection?>> {
   /// Provider for a single section
   ///
   /// Copied from [section].
-  SectionProvider call(String sectionId) {
-    return SectionProvider(sectionId);
+  SectionProvider call(
+    String sectionId,
+  ) {
+    return SectionProvider(
+      sectionId,
+    );
   }
 
   @override
-  SectionProvider getProviderOverride(covariant SectionProvider provider) {
-    return call(provider.sectionId);
+  SectionProvider getProviderOverride(
+    covariant SectionProvider provider,
+  ) {
+    return call(
+      provider.sectionId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -479,19 +517,23 @@ class SectionProvider extends FutureProvider<PracticeSection?> {
   /// Provider for a single section
   ///
   /// Copied from [section].
-  SectionProvider(String sectionId)
-    : this._internal(
-        (ref) => section(ref as SectionRef, sectionId),
-        from: sectionProvider,
-        name: r'sectionProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$sectionHash,
-        dependencies: SectionFamily._dependencies,
-        allTransitiveDependencies: SectionFamily._allTransitiveDependencies,
-        sectionId: sectionId,
-      );
+  SectionProvider(
+    String sectionId,
+  ) : this._internal(
+          (ref) => section(
+            ref as SectionRef,
+            sectionId,
+          ),
+          from: sectionProvider,
+          name: r'sectionProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$sectionHash,
+          dependencies: SectionFamily._dependencies,
+          allTransitiveDependencies: SectionFamily._allTransitiveDependencies,
+          sectionId: sectionId,
+        );
 
   SectionProvider._internal(
     super._createNotifier, {
@@ -563,15 +605,14 @@ String _$repertoireCrudHash() => r'1a5229356d6b0cf409a520aa90d92fd91658d74e';
 @ProviderFor(RepertoireCrud)
 final repertoireCrudProvider =
     AsyncNotifierProvider<RepertoireCrud, void>.internal(
-      RepertoireCrud.new,
-      name: r'repertoireCrudProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$repertoireCrudHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  RepertoireCrud.new,
+  name: r'repertoireCrudProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$repertoireCrudHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$RepertoireCrud = AsyncNotifier<void>;
 String _$sectionCrudHash() => r'a89bb9a78af8438f6b60289b68a344d23539076e';
@@ -598,15 +639,14 @@ String _$recordingCrudHash() => r'ce3b1b73054137f1f6e59c6540f11d38988f00c7';
 @ProviderFor(RecordingCrud)
 final recordingCrudProvider =
     AsyncNotifierProvider<RecordingCrud, void>.internal(
-      RecordingCrud.new,
-      name: r'recordingCrudProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$recordingCrudHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  RecordingCrud.new,
+  name: r'recordingCrudProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$recordingCrudHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$RecordingCrud = AsyncNotifier<void>;
 // ignore_for_file: type=lint

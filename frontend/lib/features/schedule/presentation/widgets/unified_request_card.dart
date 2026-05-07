@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 
 /// Card displaying a unified lesson request with approve/reject/negotiate actions.
 class UnifiedRequestCard extends StatelessWidget {

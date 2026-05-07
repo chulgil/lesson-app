@@ -14,6 +14,7 @@ import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/relationship_facade.dart';
 import '../../domain/entities/manual_teacher.dart';
+import '../extensions/manual_teacher_visuals.dart';
 import '../providers/manual_teacher_provider.dart';
 
 /// Screen showing the student's connected teachers

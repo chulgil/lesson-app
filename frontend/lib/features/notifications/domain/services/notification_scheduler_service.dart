@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 import '../entities/notification.dart';
 import 'notification_service.dart';
@@ -28,15 +28,17 @@ class NotificationSchedulerService {
   /// The notification will be delivered at [notification.scheduledAt].
   Future<void> scheduleNotification(AppNotification notification) async {
     if (notification.scheduledAt == null) {
-      debugPrint(
+      developer.log(
         '[NotificationScheduler] Cannot schedule notification without scheduledAt',
+        name: 'NotificationScheduler',
       );
       return;
     }
 
-    debugPrint(
+    developer.log(
       '[NotificationScheduler] Scheduling notification: ${notification.id} '
       'for ${notification.scheduledAt}',
+      name: 'NotificationScheduler',
     );
 
     _scheduledNotifications[notification.id] = notification;
@@ -59,9 +61,10 @@ class NotificationSchedulerService {
       }
     });
 
-    debugPrint(
+    developer.log(
       '[NotificationScheduler] Notification ${notification.id} scheduled '
       'to deliver in ${delay.inMinutes} minutes',
+      name: 'NotificationScheduler',
     );
   }
 
@@ -69,8 +72,9 @@ class NotificationSchedulerService {
   Future<void> cancelNotification(String notificationId) async {
     final removed = _scheduledNotifications.remove(notificationId);
     if (removed != null) {
-      debugPrint(
+      developer.log(
         '[NotificationScheduler] Cancelled notification: $notificationId',
+        name: 'NotificationScheduler',
       );
     }
   }
@@ -90,9 +94,10 @@ class NotificationSchedulerService {
       _scheduledNotifications.remove(id);
     }
 
-    debugPrint(
+    developer.log(
       '[NotificationScheduler] Cancelled ${toRemove.length} notifications '
       'for proposal: $proposalId',
+      name: 'NotificationScheduler',
     );
   }
 
@@ -119,11 +124,16 @@ class NotificationSchedulerService {
     // Deliver via NotificationService
     try {
       await _notificationDelivery.showNotification(sentNotification);
-      debugPrint(
+      developer.log(
         '[NotificationScheduler] Delivered notification: ${notification.id}',
+        name: 'NotificationScheduler',
       );
     } catch (e) {
-      debugPrint('[NotificationScheduler] Failed to deliver notification: $e');
+      developer.log(
+        '[NotificationScheduler] Failed to deliver notification',
+        name: 'NotificationScheduler',
+        error: e,
+      );
     }
   }
 
@@ -133,6 +143,9 @@ class NotificationSchedulerService {
   /// Clear all scheduled notifications (for testing/cleanup).
   void clearAll() {
     _scheduledNotifications.clear();
-    debugPrint('[NotificationScheduler] Cleared all scheduled notifications');
+    developer.log(
+      '[NotificationScheduler] Cleared all scheduled notifications',
+      name: 'NotificationScheduler',
+    );
   }
 }

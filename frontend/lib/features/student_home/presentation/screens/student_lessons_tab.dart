@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -13,29 +14,10 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../providers/student_home_booking_provider.dart';
 import '../providers/student_home_session_provider.dart';
+import '../providers/student_lessons_tab_state_provider.dart';
 import '../widgets/student_lesson_card.dart';
 import '../widgets/trial_booking_card.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
-
-/// Lesson sort type for schedule views
-enum LessonSortType {
-  timeAsc('시간순'),
-  nameAsc('이름순');
-
-  final String displayName;
-  const LessonSortType(this.displayName);
-}
-
-/// State provider for student selected date
-final studentSelectedDateProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day);
-});
-
-/// State provider for student lesson sort type
-final studentLessonSortTypeProvider = StateProvider<LessonSortType>(
-  (ref) => LessonSortType.timeAsc,
-);
 
 /// Student lessons tab with WeekCalendar and lesson list
 class StudentLessonsTab extends ConsumerWidget {

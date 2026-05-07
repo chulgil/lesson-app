@@ -15,10 +15,9 @@ String _$backupServiceHash() => r'c56e2190c30d5a8aecb70e2a899bdbe3b24d45dd';
 final backupServiceProvider = Provider<BackupService>.internal(
   backupService,
   name: r'backupServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$backupServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$backupServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -49,15 +48,14 @@ String _$backupStateNotifierHash() =>
 @ProviderFor(BackupStateNotifier)
 final backupStateNotifierProvider =
     AsyncNotifierProvider<BackupStateNotifier, BackupState>.internal(
-      BackupStateNotifier.new,
-      name: r'backupStateNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$backupStateNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  BackupStateNotifier.new,
+  name: r'backupStateNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$backupStateNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$BackupStateNotifier = AsyncNotifier<BackupState>;
 // ignore_for_file: type=lint

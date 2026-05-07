@@ -15,18 +15,17 @@ String _$currentTeacherProfileHash() =>
 @ProviderFor(currentTeacherProfile)
 final currentTeacherProfileProvider =
     AutoDisposeFutureProvider<TeacherProfile?>.internal(
-      currentTeacherProfile,
-      name: r'currentTeacherProfileProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$currentTeacherProfileHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  currentTeacherProfile,
+  name: r'currentTeacherProfileProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentTeacherProfileHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef CurrentTeacherProfileRef =
-    AutoDisposeFutureProviderRef<TeacherProfile?>;
+typedef CurrentTeacherProfileRef
+    = AutoDisposeFutureProviderRef<TeacherProfile?>;
 String _$teacherProfileByIdHash() =>
     r'5faaf69ba75732d3d536044258ff6d8c733101f9';
 
@@ -69,15 +68,21 @@ class TeacherProfileByIdFamily extends Family<AsyncValue<TeacherProfile?>> {
   /// Teacher profile by ID provider
   ///
   /// Copied from [teacherProfileById].
-  TeacherProfileByIdProvider call(String profileId) {
-    return TeacherProfileByIdProvider(profileId);
+  TeacherProfileByIdProvider call(
+    String profileId,
+  ) {
+    return TeacherProfileByIdProvider(
+      profileId,
+    );
   }
 
   @override
   TeacherProfileByIdProvider getProviderOverride(
     covariant TeacherProfileByIdProvider provider,
   ) {
-    return call(provider.profileId);
+    return call(
+      provider.profileId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -103,20 +108,24 @@ class TeacherProfileByIdProvider
   /// Teacher profile by ID provider
   ///
   /// Copied from [teacherProfileById].
-  TeacherProfileByIdProvider(String profileId)
-    : this._internal(
-        (ref) => teacherProfileById(ref as TeacherProfileByIdRef, profileId),
-        from: teacherProfileByIdProvider,
-        name: r'teacherProfileByIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherProfileByIdHash,
-        dependencies: TeacherProfileByIdFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherProfileByIdFamily._allTransitiveDependencies,
-        profileId: profileId,
-      );
+  TeacherProfileByIdProvider(
+    String profileId,
+  ) : this._internal(
+          (ref) => teacherProfileById(
+            ref as TeacherProfileByIdRef,
+            profileId,
+          ),
+          from: teacherProfileByIdProvider,
+          name: r'teacherProfileByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherProfileByIdHash,
+          dependencies: TeacherProfileByIdFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherProfileByIdFamily._allTransitiveDependencies,
+          profileId: profileId,
+        );
 
   TeacherProfileByIdProvider._internal(
     super._createNotifier, {
@@ -190,18 +199,17 @@ String _$featuredTeacherProfilesHash() =>
 @ProviderFor(featuredTeacherProfiles)
 final featuredTeacherProfilesProvider =
     AutoDisposeFutureProvider<List<TeacherProfile>>.internal(
-      featuredTeacherProfiles,
-      name: r'featuredTeacherProfilesProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$featuredTeacherProfilesHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  featuredTeacherProfiles,
+  name: r'featuredTeacherProfilesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$featuredTeacherProfilesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef FeaturedTeacherProfilesRef =
-    AutoDisposeFutureProviderRef<List<TeacherProfile>>;
+typedef FeaturedTeacherProfilesRef
+    = AutoDisposeFutureProviderRef<List<TeacherProfile>>;
 String _$searchTeacherProfilesHash() =>
     r'929d3da2c52b2ab46fa2a47faae8b1e2d8eb8674';
 
@@ -224,15 +232,21 @@ class SearchTeacherProfilesFamily
   /// Search teacher profiles provider
   ///
   /// Copied from [searchTeacherProfiles].
-  SearchTeacherProfilesProvider call(TeacherProfileFilter filter) {
-    return SearchTeacherProfilesProvider(filter);
+  SearchTeacherProfilesProvider call(
+    TeacherProfileFilter filter,
+  ) {
+    return SearchTeacherProfilesProvider(
+      filter,
+    );
   }
 
   @override
   SearchTeacherProfilesProvider getProviderOverride(
     covariant SearchTeacherProfilesProvider provider,
   ) {
-    return call(provider.filter);
+    return call(
+      provider.filter,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -258,20 +272,24 @@ class SearchTeacherProfilesProvider
   /// Search teacher profiles provider
   ///
   /// Copied from [searchTeacherProfiles].
-  SearchTeacherProfilesProvider(TeacherProfileFilter filter)
-    : this._internal(
-        (ref) => searchTeacherProfiles(ref as SearchTeacherProfilesRef, filter),
-        from: searchTeacherProfilesProvider,
-        name: r'searchTeacherProfilesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$searchTeacherProfilesHash,
-        dependencies: SearchTeacherProfilesFamily._dependencies,
-        allTransitiveDependencies:
-            SearchTeacherProfilesFamily._allTransitiveDependencies,
-        filter: filter,
-      );
+  SearchTeacherProfilesProvider(
+    TeacherProfileFilter filter,
+  ) : this._internal(
+          (ref) => searchTeacherProfiles(
+            ref as SearchTeacherProfilesRef,
+            filter,
+          ),
+          from: searchTeacherProfilesProvider,
+          name: r'searchTeacherProfilesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$searchTeacherProfilesHash,
+          dependencies: SearchTeacherProfilesFamily._dependencies,
+          allTransitiveDependencies:
+              SearchTeacherProfilesFamily._allTransitiveDependencies,
+          filter: filter,
+        );
 
   SearchTeacherProfilesProvider._internal(
     super._createNotifier, {
@@ -288,7 +306,7 @@ class SearchTeacherProfilesProvider
   @override
   Override overrideWith(
     FutureOr<List<TeacherProfile>> Function(SearchTeacherProfilesRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -349,10 +367,9 @@ String _$teacherNeedsOnboardingHash() =>
 final teacherNeedsOnboardingProvider = AutoDisposeFutureProvider<bool>.internal(
   teacherNeedsOnboarding,
   name: r'teacherNeedsOnboardingProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherNeedsOnboardingHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherNeedsOnboardingHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -368,10 +385,9 @@ String _$isPhoneNumberValidHash() =>
 final isPhoneNumberValidProvider = Provider<bool>.internal(
   isPhoneNumberValid,
   name: r'isPhoneNumberValidProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$isPhoneNumberValidHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isPhoneNumberValidHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -387,17 +403,16 @@ String _$isVerificationCodeValidHash() =>
 final isVerificationCodeValidProvider = Provider<bool>.internal(
   isVerificationCodeValid,
   name: r'isVerificationCodeValidProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$isVerificationCodeValidHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isVerificationCodeValidHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 typedef IsVerificationCodeValidRef = ProviderRef<bool>;
 String _$isProfileFormValidHash() =>
-    r'feda8523e194b0cc459cdf978f708f3ef8e63b88';
+    r'ccbf57b40512b3e9881cb6db6bf5de1224c0f044';
 
 /// Profile form validation
 ///
@@ -406,17 +421,16 @@ String _$isProfileFormValidHash() =>
 final isProfileFormValidProvider = Provider<bool>.internal(
   isProfileFormValid,
   name: r'isProfileFormValidProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$isProfileFormValidHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isProfileFormValidHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 typedef IsProfileFormValidRef = ProviderRef<bool>;
 String _$profileMissingFieldsHash() =>
-    r'cc75790504cf8eb9c6e6219f38e1299406d24d29';
+    r'ca47c43773bf9c22129182d7bf8df882948b57b5';
 
 /// Missing fields for profile
 ///
@@ -425,10 +439,9 @@ String _$profileMissingFieldsHash() =>
 final profileMissingFieldsProvider = Provider<List<String>>.internal(
   profileMissingFields,
   name: r'profileMissingFieldsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$profileMissingFieldsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$profileMissingFieldsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -443,15 +456,14 @@ String _$onboardingProfileFromFormHash() =>
 @ProviderFor(onboardingProfileFromForm)
 final onboardingProfileFromFormProvider =
     Provider<TeacherOnboardingProfile?>.internal(
-      onboardingProfileFromForm,
-      name: r'onboardingProfileFromFormProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$onboardingProfileFromFormHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  onboardingProfileFromForm,
+  name: r'onboardingProfileFromFormProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$onboardingProfileFromFormHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef OnboardingProfileFromFormRef = ProviderRef<TeacherOnboardingProfile?>;
 String _$teacherOnboardingNotifierHash() =>
@@ -462,15 +474,12 @@ String _$teacherOnboardingNotifierHash() =>
 /// Copied from [TeacherOnboardingNotifier].
 @ProviderFor(TeacherOnboardingNotifier)
 final teacherOnboardingNotifierProvider = NotifierProvider<
-  TeacherOnboardingNotifier,
-  TeacherOnboardingState
->.internal(
+    TeacherOnboardingNotifier, TeacherOnboardingState>.internal(
   TeacherOnboardingNotifier.new,
   name: r'teacherOnboardingNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherOnboardingNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherOnboardingNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -484,21 +493,18 @@ String _$currentTeacherProfileNotifierHash() =>
 /// Copied from [CurrentTeacherProfileNotifier].
 @ProviderFor(CurrentTeacherProfileNotifier)
 final currentTeacherProfileNotifierProvider = AutoDisposeAsyncNotifierProvider<
-  CurrentTeacherProfileNotifier,
-  TeacherProfile?
->.internal(
+    CurrentTeacherProfileNotifier, TeacherProfile?>.internal(
   CurrentTeacherProfileNotifier.new,
   name: r'currentTeacherProfileNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$currentTeacherProfileNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentTeacherProfileNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CurrentTeacherProfileNotifier =
-    AutoDisposeAsyncNotifier<TeacherProfile?>;
+typedef _$CurrentTeacherProfileNotifier
+    = AutoDisposeAsyncNotifier<TeacherProfile?>;
 String _$teacherOnboardingCompletedHash() =>
     r'f64255988646e6d498783526658c4e179c03dc81';
 
@@ -508,15 +514,14 @@ String _$teacherOnboardingCompletedHash() =>
 @ProviderFor(TeacherOnboardingCompleted)
 final teacherOnboardingCompletedProvider =
     NotifierProvider<TeacherOnboardingCompleted, bool>.internal(
-      TeacherOnboardingCompleted.new,
-      name: r'teacherOnboardingCompletedProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teacherOnboardingCompletedHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  TeacherOnboardingCompleted.new,
+  name: r'teacherOnboardingCompletedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherOnboardingCompletedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$TeacherOnboardingCompleted = Notifier<bool>;
 String _$phoneVerificationTimerHash() =>
@@ -528,15 +533,14 @@ String _$phoneVerificationTimerHash() =>
 @ProviderFor(PhoneVerificationTimer)
 final phoneVerificationTimerProvider =
     AutoDisposeNotifierProvider<PhoneVerificationTimer, int>.internal(
-      PhoneVerificationTimer.new,
-      name: r'phoneVerificationTimerProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$phoneVerificationTimerHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  PhoneVerificationTimer.new,
+  name: r'phoneVerificationTimerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$phoneVerificationTimerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$PhoneVerificationTimer = AutoDisposeNotifier<int>;
 String _$phoneNumberHash() => r'2e16a948bd29584cf7b37f2ed601e1592e942b5a';
@@ -561,15 +565,14 @@ String _$verificationCodeHash() => r'e4fc5505f56d331a2f92792e02ee9cf6c042d906';
 @ProviderFor(VerificationCode)
 final verificationCodeProvider =
     NotifierProvider<VerificationCode, String>.internal(
-      VerificationCode.new,
-      name: r'verificationCodeProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$verificationCodeHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  VerificationCode.new,
+  name: r'verificationCodeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$verificationCodeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$VerificationCode = Notifier<String>;
 String _$profileNameHash() => r'ebe4fa432a8ec1e7051952b982b2793de991cf1e';
@@ -613,15 +616,14 @@ String _$selectedInstrumentsHash() =>
 @ProviderFor(SelectedInstruments)
 final selectedInstrumentsProvider =
     NotifierProvider<SelectedInstruments, List<String>>.internal(
-      SelectedInstruments.new,
-      name: r'selectedInstrumentsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$selectedInstrumentsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SelectedInstruments.new,
+  name: r'selectedInstrumentsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedInstrumentsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SelectedInstruments = Notifier<List<String>>;
 String _$profileIntroductionHash() =>
@@ -633,15 +635,14 @@ String _$profileIntroductionHash() =>
 @ProviderFor(ProfileIntroduction)
 final profileIntroductionProvider =
     NotifierProvider<ProfileIntroduction, String>.internal(
-      ProfileIntroduction.new,
-      name: r'profileIntroductionProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$profileIntroductionHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  ProfileIntroduction.new,
+  name: r'profileIntroductionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$profileIntroductionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$ProfileIntroduction = Notifier<String>;
 // ignore_for_file: type=lint

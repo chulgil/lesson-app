@@ -9,6 +9,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/feedback_template.dart';
+import '../extensions/template_category_visuals.dart';
 import '../providers/feedback_template_providers.dart';
 
 /// Bottom sheet for picking a [FeedbackTemplate] to apply to lesson feedback.

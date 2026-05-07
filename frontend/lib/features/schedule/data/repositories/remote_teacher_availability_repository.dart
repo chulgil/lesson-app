@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/availability_slot.dart';
@@ -290,7 +290,7 @@ class RemoteTeacherAvailabilityRepository
   Future<void> toggleTimeBlock(
     String teacherId,
     DateTime date,
-    TimeOfDay time,
+    ClockTime time,
     bool isAvailable,
   ) async {
     if (isAvailable) {
@@ -326,7 +326,7 @@ class RemoteTeacherAvailabilityRepository
   Future<void> setTimeBlocks(
     String teacherId,
     DateTime date,
-    List<TimeOfDay> times,
+    List<ClockTime> times,
     bool isAvailable,
   ) async {
     for (final time in times) {
@@ -425,9 +425,9 @@ class RemoteTeacherAvailabilityRepository
     );
   }
 
-  static TimeOfDay _timeOfDayFromString(String time) {
+  static ClockTime _timeOfDayFromString(String time) {
     final parts = time.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    return ClockTime(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   static AvailabilitySlotStatus _slotStatusFromString(String status) {

@@ -15,15 +15,14 @@ String _$studentSelectedDateHash() =>
 @ProviderFor(StudentSelectedDate)
 final studentSelectedDateProvider =
     NotifierProvider<StudentSelectedDate, DateTime>.internal(
-      StudentSelectedDate.new,
-      name: r'studentSelectedDateProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentSelectedDateHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  StudentSelectedDate.new,
+  name: r'studentSelectedDateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentSelectedDateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$StudentSelectedDate = Notifier<DateTime>;
 String _$studentLessonSortTypeHash() =>
@@ -35,15 +34,14 @@ String _$studentLessonSortTypeHash() =>
 @ProviderFor(StudentLessonSortType)
 final studentLessonSortTypeProvider =
     NotifierProvider<StudentLessonSortType, LessonSortType>.internal(
-      StudentLessonSortType.new,
-      name: r'studentLessonSortTypeProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentLessonSortTypeHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  StudentLessonSortType.new,
+  name: r'studentLessonSortTypeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentLessonSortTypeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$StudentLessonSortType = Notifier<LessonSortType>;
 // ignore_for_file: type=lint

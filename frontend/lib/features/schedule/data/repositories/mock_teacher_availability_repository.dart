@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/availability_slot.dart';
@@ -181,8 +181,8 @@ class MockTeacherAvailabilityRepository
       id: 'booking_student1_tue16',
       teacherId: teacherId,
       date: nextTuesday,
-      startTime: const TimeOfDay(hour: 16, minute: 0),
-      endTime: const TimeOfDay(hour: 17, minute: 0),
+      startTime: const ClockTime(hour: 16, minute: 0),
+      endTime: const ClockTime(hour: 17, minute: 0),
       durationMinutes: 60,
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_1',
@@ -197,8 +197,8 @@ class MockTeacherAvailabilityRepository
       id: 'booking_student1_tue16_next',
       teacherId: teacherId,
       date: nextNextTuesday,
-      startTime: const TimeOfDay(hour: 16, minute: 0),
-      endTime: const TimeOfDay(hour: 17, minute: 0),
+      startTime: const ClockTime(hour: 16, minute: 0),
+      endTime: const ClockTime(hour: 17, minute: 0),
       durationMinutes: 60,
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_1',
@@ -212,8 +212,8 @@ class MockTeacherAvailabilityRepository
       id: _uuid.v4(),
       teacherId: teacherId,
       date: nextTuesday,
-      startTime: const TimeOfDay(hour: 14, minute: 0),
-      endTime: const TimeOfDay(hour: 15, minute: 0),
+      startTime: const ClockTime(hour: 14, minute: 0),
+      endTime: const ClockTime(hour: 15, minute: 0),
       durationMinutes: 60,
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_3',
@@ -585,8 +585,8 @@ class MockTeacherAvailabilityRepository
         final slotHour = currentMinutes ~/ 60;
         final slotMinute = currentMinutes % 60;
 
-        final startTime = TimeOfDay(hour: slotHour, minute: slotMinute);
-        final endTime = TimeOfDay(
+        final startTime = ClockTime(hour: slotHour, minute: slotMinute);
+        final endTime = ClockTime(
           hour: (currentMinutes + lessonDuration) ~/ 60,
           minute: (currentMinutes + lessonDuration) % 60,
         );
@@ -737,7 +737,7 @@ class MockTeacherAvailabilityRepository
     return _studentTravelTimes[studentId] ?? 0;
   }
 
-  bool _isRecommendedSlot(String studentId, DateTime date, TimeOfDay time) {
+  bool _isRecommendedSlot(String studentId, DateTime date, ClockTime time) {
     final history = _lessonHistory[studentId];
     if (history == null) return false;
 
@@ -819,8 +819,8 @@ class MockTeacherAvailabilityRepository
       id: slotId,
       teacherId: teacherId,
       date: date,
-      startTime: TimeOfDay(hour: hour, minute: minute),
-      endTime: TimeOfDay(hour: endMinutes ~/ 60, minute: endMinutes % 60),
+      startTime: ClockTime(hour: hour, minute: minute),
+      endTime: ClockTime(hour: endMinutes ~/ 60, minute: endMinutes % 60),
       durationMinutes: availability.slotDurationMinutes,
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: studentId,
@@ -858,7 +858,7 @@ class MockTeacherAvailabilityRepository
   Future<void> toggleTimeBlock(
     String teacherId,
     DateTime date,
-    TimeOfDay time,
+    ClockTime time,
     bool isAvailable,
   ) async {
     await Future.delayed(const Duration(milliseconds: 50));
@@ -903,7 +903,7 @@ class MockTeacherAvailabilityRepository
   Future<void> setTimeBlocks(
     String teacherId,
     DateTime date,
-    List<TimeOfDay> times,
+    List<ClockTime> times,
     bool isAvailable,
   ) async {
     for (final time in times) {

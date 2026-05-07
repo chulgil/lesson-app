@@ -11,6 +11,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../students/students_facade.dart';
+import '../../../students/presentation/extensions/student_domain_visuals.dart';
+import '../extensions/lesson_visuals.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../widgets/lesson_form_widgets.dart';
 

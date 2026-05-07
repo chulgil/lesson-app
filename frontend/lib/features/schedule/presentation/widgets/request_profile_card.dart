@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 
 /// Profile card for lesson request detail — branches by viewer role and type.
 ///

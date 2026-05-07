@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../providers/student_home_booking_provider.dart';
 
 /// Trial Booking Card - displays a single trial lesson booking with status and actions

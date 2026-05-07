@@ -17,20 +17,19 @@ String _$subscriptionExpiryNotificationServiceHash() =>
 @ProviderFor(subscriptionExpiryNotificationService)
 final subscriptionExpiryNotificationServiceProvider =
     Provider<SubscriptionExpiryNotificationService>.internal(
-      subscriptionExpiryNotificationService,
-      name: r'subscriptionExpiryNotificationServiceProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionExpiryNotificationServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionExpiryNotificationService,
+  name: r'subscriptionExpiryNotificationServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionExpiryNotificationServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef SubscriptionExpiryNotificationServiceRef =
-    ProviderRef<SubscriptionExpiryNotificationService>;
+typedef SubscriptionExpiryNotificationServiceRef
+    = ProviderRef<SubscriptionExpiryNotificationService>;
 String _$subscriptionExpiryReminderRefreshHash() =>
-    r'e534c125fe3cff5311a9278eac6b30eafcd91e4f';
+    r'a195fd42d2902c94a7e8398c89f8c3c40d0670dc';
 
 /// 교사의 전체 활성 수강권에 대해 만료 알림을 자동 재등록한다.
 ///
@@ -41,18 +40,17 @@ String _$subscriptionExpiryReminderRefreshHash() =>
 @ProviderFor(subscriptionExpiryReminderRefresh)
 final subscriptionExpiryReminderRefreshProvider =
     AutoDisposeFutureProvider<int>.internal(
-      subscriptionExpiryReminderRefresh,
-      name: r'subscriptionExpiryReminderRefreshProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionExpiryReminderRefreshHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionExpiryReminderRefresh,
+  name: r'subscriptionExpiryReminderRefreshProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionExpiryReminderRefreshHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef SubscriptionExpiryReminderRefreshRef =
-    AutoDisposeFutureProviderRef<int>;
+typedef SubscriptionExpiryReminderRefreshRef
+    = AutoDisposeFutureProviderRef<int>;
 String _$subscriptionExpiryReminderSettingsNotifierHash() =>
     r'01abc172eafe8a91139fd1b8b32e0b09d063df44';
 
@@ -65,20 +63,18 @@ String _$subscriptionExpiryReminderSettingsNotifierHash() =>
 /// Copied from [SubscriptionExpiryReminderSettingsNotifier].
 @ProviderFor(SubscriptionExpiryReminderSettingsNotifier)
 final subscriptionExpiryReminderSettingsNotifierProvider = NotifierProvider<
-  SubscriptionExpiryReminderSettingsNotifier,
-  SubscriptionExpiryReminderSettings
->.internal(
+    SubscriptionExpiryReminderSettingsNotifier,
+    SubscriptionExpiryReminderSettings>.internal(
   SubscriptionExpiryReminderSettingsNotifier.new,
   name: r'subscriptionExpiryReminderSettingsNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$subscriptionExpiryReminderSettingsNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionExpiryReminderSettingsNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SubscriptionExpiryReminderSettingsNotifier =
-    Notifier<SubscriptionExpiryReminderSettings>;
+typedef _$SubscriptionExpiryReminderSettingsNotifier
+    = Notifier<SubscriptionExpiryReminderSettings>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

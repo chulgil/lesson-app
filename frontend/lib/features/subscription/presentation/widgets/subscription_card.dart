@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 import '../utils/subscription_status_colors.dart';
 
 /// Card widget displaying subscription information.

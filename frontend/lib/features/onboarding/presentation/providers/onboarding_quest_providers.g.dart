@@ -13,15 +13,14 @@ String _$teacherOnboardingQuestsHash() =>
 @ProviderFor(teacherOnboardingQuests)
 final teacherOnboardingQuestsProvider =
     Provider<List<OnboardingQuest>>.internal(
-      teacherOnboardingQuests,
-      name: r'teacherOnboardingQuestsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teacherOnboardingQuestsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  teacherOnboardingQuests,
+  name: r'teacherOnboardingQuestsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherOnboardingQuestsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef TeacherOnboardingQuestsRef = ProviderRef<List<OnboardingQuest>>;
 String _$teacherOnboardingProgressHash() =>
@@ -32,10 +31,9 @@ String _$teacherOnboardingProgressHash() =>
 final teacherOnboardingProgressProvider = Provider<OnboardingProgress>.internal(
   teacherOnboardingProgress,
   name: r'teacherOnboardingProgressProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherOnboardingProgressHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherOnboardingProgressHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

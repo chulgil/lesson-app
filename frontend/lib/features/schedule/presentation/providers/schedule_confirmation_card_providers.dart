@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_schedule_confirmation_card_repository.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
 import '../../domain/repositories/schedule_confirmation_card_repository.dart';
@@ -11,14 +11,11 @@ part 'schedule_confirmation_card_providers.g.dart';
 @Riverpod(keepAlive: true)
 ScheduleConfirmationCardRepository scheduleConfirmationCardRepository(
   ScheduleConfirmationCardRepositoryRef ref,
-) {
-  if (EnvironmentConfig.useMockData) {
-    return MockScheduleConfirmationCardRepository();
-  }
-  // Narrow exception: no remote repository/API endpoint exists yet, and
-  // createRepository<T>() would read ApiClient in non-mock mode unnecessarily.
-  return MockScheduleConfirmationCardRepository();
-}
+) => createLocalFallbackRepository<ScheduleConfirmationCardRepository>(
+  mock: () => MockScheduleConfirmationCardRepository(),
+  // No remote API exists yet, so production keeps using the local fallback.
+  fallback: () => MockScheduleConfirmationCardRepository(),
+);
 
 /// Get all pending schedule confirmation cards for a student.
 @riverpod

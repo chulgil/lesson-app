@@ -16,8 +16,7 @@ SubscriptionUsage _$SubscriptionUsageFromJson(Map<String, dynamic> json) =>
       instrument: json['instrument'] as String?,
       note: json['note'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
-      usageType:
-          $enumDecodeNullable(_$UsageTypeEnumMap, json['usage_type']) ??
+      usageType: $enumDecodeNullable(_$UsageTypeEnumMap, json['usage_type']) ??
           UsageType.normal,
       deducted: json['deducted'] as bool? ?? true,
     );

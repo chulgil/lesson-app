@@ -14,10 +14,9 @@ String _$autoProposalServiceHash() =>
 final autoProposalServiceProvider = Provider<AutoProposalService>.internal(
   autoProposalService,
   name: r'autoProposalServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$autoProposalServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$autoProposalServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -30,15 +29,14 @@ String _$subscriptionRenewalServiceHash() =>
 @ProviderFor(subscriptionRenewalService)
 final subscriptionRenewalServiceProvider =
     Provider<SubscriptionRenewalService>.internal(
-      subscriptionRenewalService,
-      name: r'subscriptionRenewalServiceProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionRenewalServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionRenewalService,
+  name: r'subscriptionRenewalServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionRenewalServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef SubscriptionRenewalServiceRef = ProviderRef<SubscriptionRenewalService>;
 String _$subscriptionExpiryMonitorHash() =>
@@ -48,15 +46,14 @@ String _$subscriptionExpiryMonitorHash() =>
 @ProviderFor(subscriptionExpiryMonitor)
 final subscriptionExpiryMonitorProvider =
     Provider<SubscriptionExpiryMonitor>.internal(
-      subscriptionExpiryMonitor,
-      name: r'subscriptionExpiryMonitorProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionExpiryMonitorHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionExpiryMonitor,
+  name: r'subscriptionExpiryMonitorProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionExpiryMonitorHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef SubscriptionExpiryMonitorRef = ProviderRef<SubscriptionExpiryMonitor>;
 // ignore_for_file: type=lint

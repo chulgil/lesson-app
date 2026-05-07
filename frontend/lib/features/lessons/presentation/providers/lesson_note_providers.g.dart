@@ -48,15 +48,21 @@ class StudentLessonNotesFamily extends Family<AsyncValue<List<Lesson>>> {
   /// Lessons with notes for a student (sorted newest first).
   ///
   /// Copied from [studentLessonNotes].
-  StudentLessonNotesProvider call(String studentId) {
-    return StudentLessonNotesProvider(studentId);
+  StudentLessonNotesProvider call(
+    String studentId,
+  ) {
+    return StudentLessonNotesProvider(
+      studentId,
+    );
   }
 
   @override
   StudentLessonNotesProvider getProviderOverride(
     covariant StudentLessonNotesProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -81,20 +87,24 @@ class StudentLessonNotesProvider extends FutureProvider<List<Lesson>> {
   /// Lessons with notes for a student (sorted newest first).
   ///
   /// Copied from [studentLessonNotes].
-  StudentLessonNotesProvider(String studentId)
-    : this._internal(
-        (ref) => studentLessonNotes(ref as StudentLessonNotesRef, studentId),
-        from: studentLessonNotesProvider,
-        name: r'studentLessonNotesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentLessonNotesHash,
-        dependencies: StudentLessonNotesFamily._dependencies,
-        allTransitiveDependencies:
-            StudentLessonNotesFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentLessonNotesProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentLessonNotes(
+            ref as StudentLessonNotesRef,
+            studentId,
+          ),
+          from: studentLessonNotesProvider,
+          name: r'studentLessonNotesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentLessonNotesHash,
+          dependencies: StudentLessonNotesFamily._dependencies,
+          allTransitiveDependencies:
+              StudentLessonNotesFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentLessonNotesProvider._internal(
     super._createNotifier, {
@@ -151,13 +161,11 @@ mixin StudentLessonNotesRef on FutureProviderRef<List<Lesson>> {
 }
 
 class _StudentLessonNotesProviderElement
-    extends FutureProviderElement<List<Lesson>>
-    with StudentLessonNotesRef {
+    extends FutureProviderElement<List<Lesson>> with StudentLessonNotesRef {
   _StudentLessonNotesProviderElement(super.provider);
 
   @override
   String get studentId => (origin as StudentLessonNotesProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

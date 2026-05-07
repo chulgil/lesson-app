@@ -15,10 +15,9 @@ String _$paymentRepositoryHash() => r'd5e13526506306c52345974896ad911b0560b3ad';
 final paymentRepositoryProvider = Provider<PaymentRepository>.internal(
   paymentRepository,
   name: r'paymentRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$paymentRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$paymentRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
+import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/schedule/domain/entities/availability_slot.dart';
 import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
@@ -221,7 +222,7 @@ class _FakeAvailabilityRepository implements TeacherAvailabilityRepository {
   Future<void> setTimeBlocks(
     String teacherId,
     DateTime date,
-    List<TimeOfDay> times,
+    List<ClockTime> times,
     bool isAvailable,
   ) => throw UnimplementedError();
 
@@ -229,7 +230,7 @@ class _FakeAvailabilityRepository implements TeacherAvailabilityRepository {
   Future<void> toggleTimeBlock(
     String teacherId,
     DateTime date,
-    TimeOfDay time,
+    ClockTime time,
     bool isAvailable,
   ) => throw UnimplementedError();
 

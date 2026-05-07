@@ -51,15 +51,21 @@ class WeekLessonsFamily extends Family<AsyncValue<List<Lesson>>> {
   /// [weekStartDate] should be the Monday of the target week.
   ///
   /// Copied from [weekLessons].
-  WeekLessonsProvider call(DateTime weekStartDate) {
-    return WeekLessonsProvider(weekStartDate);
+  WeekLessonsProvider call(
+    DateTime weekStartDate,
+  ) {
+    return WeekLessonsProvider(
+      weekStartDate,
+    );
   }
 
   @override
   WeekLessonsProvider getProviderOverride(
     covariant WeekLessonsProvider provider,
   ) {
-    return call(provider.weekStartDate);
+    return call(
+      provider.weekStartDate,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -86,19 +92,24 @@ class WeekLessonsProvider extends FutureProvider<List<Lesson>> {
   /// [weekStartDate] should be the Monday of the target week.
   ///
   /// Copied from [weekLessons].
-  WeekLessonsProvider(DateTime weekStartDate)
-    : this._internal(
-        (ref) => weekLessons(ref as WeekLessonsRef, weekStartDate),
-        from: weekLessonsProvider,
-        name: r'weekLessonsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$weekLessonsHash,
-        dependencies: WeekLessonsFamily._dependencies,
-        allTransitiveDependencies: WeekLessonsFamily._allTransitiveDependencies,
-        weekStartDate: weekStartDate,
-      );
+  WeekLessonsProvider(
+    DateTime weekStartDate,
+  ) : this._internal(
+          (ref) => weekLessons(
+            ref as WeekLessonsRef,
+            weekStartDate,
+          ),
+          from: weekLessonsProvider,
+          name: r'weekLessonsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$weekLessonsHash,
+          dependencies: WeekLessonsFamily._dependencies,
+          allTransitiveDependencies:
+              WeekLessonsFamily._allTransitiveDependencies,
+          weekStartDate: weekStartDate,
+        );
 
   WeekLessonsProvider._internal(
     super._createNotifier, {
@@ -198,14 +209,18 @@ class WeekLessonsWithPreviewFamily extends Family<AsyncValue<List<Lesson>>> {
   WeekLessonsWithPreviewProvider call(
     ({String teacherId, DateTime weekStart}) params,
   ) {
-    return WeekLessonsWithPreviewProvider(params);
+    return WeekLessonsWithPreviewProvider(
+      params,
+    );
   }
 
   @override
   WeekLessonsWithPreviewProvider getProviderOverride(
     covariant WeekLessonsWithPreviewProvider provider,
   ) {
-    return call(provider.params);
+    return call(
+      provider.params,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -239,19 +254,21 @@ class WeekLessonsWithPreviewProvider extends FutureProvider<List<Lesson>> {
   WeekLessonsWithPreviewProvider(
     ({String teacherId, DateTime weekStart}) params,
   ) : this._internal(
-        (ref) =>
-            weekLessonsWithPreview(ref as WeekLessonsWithPreviewRef, params),
-        from: weekLessonsWithPreviewProvider,
-        name: r'weekLessonsWithPreviewProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$weekLessonsWithPreviewHash,
-        dependencies: WeekLessonsWithPreviewFamily._dependencies,
-        allTransitiveDependencies:
-            WeekLessonsWithPreviewFamily._allTransitiveDependencies,
-        params: params,
-      );
+          (ref) => weekLessonsWithPreview(
+            ref as WeekLessonsWithPreviewRef,
+            params,
+          ),
+          from: weekLessonsWithPreviewProvider,
+          name: r'weekLessonsWithPreviewProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$weekLessonsWithPreviewHash,
+          dependencies: WeekLessonsWithPreviewFamily._dependencies,
+          allTransitiveDependencies:
+              WeekLessonsWithPreviewFamily._allTransitiveDependencies,
+          params: params,
+        );
 
   WeekLessonsWithPreviewProvider._internal(
     super._createNotifier, {
@@ -308,14 +325,12 @@ mixin WeekLessonsWithPreviewRef on FutureProviderRef<List<Lesson>> {
 }
 
 class _WeekLessonsWithPreviewProviderElement
-    extends FutureProviderElement<List<Lesson>>
-    with WeekLessonsWithPreviewRef {
+    extends FutureProviderElement<List<Lesson>> with WeekLessonsWithPreviewRef {
   _WeekLessonsWithPreviewProviderElement(super.provider);
 
   @override
   ({String teacherId, DateTime weekStart}) get params =>
       (origin as WeekLessonsWithPreviewProvider).params;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -7,22 +7,22 @@ part of 'follow.dart';
 // **************************************************************************
 
 Follow _$FollowFromJson(Map<String, dynamic> json) => Follow(
-  id: json['id'] as String,
-  followerId: json['follower_id'] as String,
-  followingId: json['following_id'] as String,
-  targetType: $enumDecode(_$FollowTargetTypeEnumMap, json['target_type']),
-  notificationEnabled: json['notification_enabled'] as bool? ?? true,
-  createdAt: DateTime.parse(json['created_at'] as String),
-);
+      id: json['id'] as String,
+      followerId: json['follower_id'] as String,
+      followingId: json['following_id'] as String,
+      targetType: $enumDecode(_$FollowTargetTypeEnumMap, json['target_type']),
+      notificationEnabled: json['notification_enabled'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
 
 Map<String, dynamic> _$FollowToJson(Follow instance) => <String, dynamic>{
-  'id': instance.id,
-  'follower_id': instance.followerId,
-  'following_id': instance.followingId,
-  'target_type': _$FollowTargetTypeEnumMap[instance.targetType]!,
-  'notification_enabled': instance.notificationEnabled,
-  'created_at': instance.createdAt.toIso8601String(),
-};
+      'id': instance.id,
+      'follower_id': instance.followerId,
+      'following_id': instance.followingId,
+      'target_type': _$FollowTargetTypeEnumMap[instance.targetType]!,
+      'notification_enabled': instance.notificationEnabled,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
 
 const _$FollowTargetTypeEnumMap = {
   FollowTargetType.teacher: 'teacher',

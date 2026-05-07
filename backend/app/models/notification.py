@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import JSON, Boolean, DateTime, Enum, Index, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, Enum, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -19,7 +19,7 @@ class Notification(UUIDMixin, Base):
 
     __tablename__ = "notifications"
 
-    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False)
     type: Mapped[str] = mapped_column(String(50), nullable=False)
     priority: Mapped[NotificationPriority] = mapped_column(
         Enum(NotificationPriority, native_enum=True),
@@ -59,7 +59,7 @@ class UserNotificationPreference(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "user_notification_preferences"
 
-    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False)
     role: Mapped[str | None] = mapped_column(String(40), nullable=True)
     settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
 

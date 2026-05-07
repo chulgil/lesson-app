@@ -6,29 +6,7 @@ part 'teaching_resource.g.dart';
 enum TeachingResourceType {
   teacherRecording, // Teacher's model performance recording
   youtube, // YouTube video link with timestamp support
-  externalLink; // External link (sheet music PDF, theory sites, etc.)
-
-  String get label {
-    switch (this) {
-      case TeachingResourceType.teacherRecording:
-        return '녹음';
-      case TeachingResourceType.youtube:
-        return '유튜브';
-      case TeachingResourceType.externalLink:
-        return '링크';
-    }
-  }
-
-  String get icon {
-    switch (this) {
-      case TeachingResourceType.teacherRecording:
-        return '🎵';
-      case TeachingResourceType.youtube:
-        return '🎬';
-      case TeachingResourceType.externalLink:
-        return '🔗';
-    }
-  }
+  externalLink, // External link (sheet music PDF, theory sites, etc.)
 }
 
 /// Teaching resource model - learning materials shared by teachers
@@ -179,8 +157,7 @@ class TeachingResource {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() =>
-      'TeachingResource(id: $id, type: $type, title: $title)';
+  String toString() => 'TeachingResource(id: $id, type: $type, title: $title)';
 
   // --- Utility methods ---
 
@@ -196,8 +173,7 @@ class TeachingResource {
     if (shortMatch != null) return shortMatch.group(1);
 
     // Handle youtube.com/watch?v=VIDEO_ID
-    final longMatch =
-        RegExp(r'[?&]v=([a-zA-Z0-9_-]{11})').firstMatch(url);
+    final longMatch = RegExp(r'[?&]v=([a-zA-Z0-9_-]{11})').firstMatch(url);
     if (longMatch != null) return longMatch.group(1);
 
     return null;

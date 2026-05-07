@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 
 /// Computed availability slot for UI display
 ///
@@ -8,8 +8,8 @@ class AvailabilitySlot {
   final String id;
   final String teacherId;
   final DateTime date;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
+  final ClockTime startTime;
+  final ClockTime endTime;
   final int durationMinutes;
   final AvailabilitySlotStatus status;
 
@@ -47,8 +47,8 @@ class AvailabilitySlot {
     String? id,
     String? teacherId,
     DateTime? date,
-    TimeOfDay? startTime,
-    TimeOfDay? endTime,
+    ClockTime? startTime,
+    ClockTime? endTime,
     int? durationMinutes,
     AvailabilitySlotStatus? status,
     String? bookedByStudentId,
@@ -117,21 +117,16 @@ class AvailabilitySlot {
 
   /// Get DateTime for the start of this slot
   DateTime get startDateTime => DateTime(
-        date.year,
-        date.month,
-        date.day,
-        startTime.hour,
-        startTime.minute,
-      );
+    date.year,
+    date.month,
+    date.day,
+    startTime.hour,
+    startTime.minute,
+  );
 
   /// Get DateTime for the end of this slot
-  DateTime get endDateTime => DateTime(
-        date.year,
-        date.month,
-        date.day,
-        endTime.hour,
-        endTime.minute,
-      );
+  DateTime get endDateTime =>
+      DateTime(date.year, date.month, date.day, endTime.hour, endTime.minute);
 
   @override
   bool operator ==(Object other) =>

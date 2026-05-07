@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../data/services/ai_notes_service.dart';
 import '../../domain/entities/lesson.dart';
+import '../extensions/lesson_visuals.dart';
 import '../providers/ai_notes_provider.dart';
 import 'ai_notes_result_sheet.dart';
 

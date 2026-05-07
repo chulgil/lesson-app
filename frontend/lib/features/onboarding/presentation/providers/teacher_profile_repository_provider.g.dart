@@ -15,15 +15,14 @@ String _$teacherProfileRepositoryHash() =>
 @ProviderFor(teacherProfileRepository)
 final teacherProfileRepositoryProvider =
     Provider<TeacherProfileRepository>.internal(
-      teacherProfileRepository,
-      name: r'teacherProfileRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teacherProfileRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  teacherProfileRepository,
+  name: r'teacherProfileRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherProfileRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef TeacherProfileRepositoryRef = ProviderRef<TeacherProfileRepository>;
 // ignore_for_file: type=lint

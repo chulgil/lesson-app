@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
 import '../../domain/repositories/settings_repository.dart';
 
@@ -14,50 +13,50 @@ class MockSettingsRepository implements SettingsRepository {
       TimeSlot(
         id: 'slot_1',
         dayOfWeek: 1, // Monday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 21, minute: 0),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 21, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_2',
         dayOfWeek: 2, // Tuesday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 21, minute: 0),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 21, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_3',
         dayOfWeek: 3, // Wednesday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 21, minute: 0),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 21, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_4',
         dayOfWeek: 4, // Thursday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 21, minute: 0),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 21, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_5',
         dayOfWeek: 5, // Friday
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 21, minute: 0),
+        startTime: const ClockTime(hour: 14, minute: 0),
+        endTime: const ClockTime(hour: 21, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_6',
         dayOfWeek: 6, // Saturday
-        startTime: const TimeOfDay(hour: 10, minute: 0),
-        endTime: const TimeOfDay(hour: 18, minute: 0),
+        startTime: const ClockTime(hour: 10, minute: 0),
+        endTime: const ClockTime(hour: 18, minute: 0),
         isActive: true,
       ),
       TimeSlot(
         id: 'slot_7',
         dayOfWeek: 7, // Sunday
-        startTime: const TimeOfDay(hour: 10, minute: 0),
-        endTime: const TimeOfDay(hour: 18, minute: 0),
+        startTime: const ClockTime(hour: 10, minute: 0),
+        endTime: const ClockTime(hour: 18, minute: 0),
         isActive: false,
       ),
     ],
@@ -85,43 +84,43 @@ class MockSettingsRepository implements SettingsRepository {
         TimeSlot(
           id: 'slot_1',
           dayOfWeek: 1, // Monday
-          startTime: const TimeOfDay(hour: 14, minute: 0),
-          endTime: const TimeOfDay(hour: 21, minute: 0),
+          startTime: const ClockTime(hour: 14, minute: 0),
+          endTime: const ClockTime(hour: 21, minute: 0),
           isActive: true,
         ),
         TimeSlot(
           id: 'slot_2',
           dayOfWeek: 2, // Tuesday
-          startTime: const TimeOfDay(hour: 14, minute: 0),
-          endTime: const TimeOfDay(hour: 21, minute: 0),
+          startTime: const ClockTime(hour: 14, minute: 0),
+          endTime: const ClockTime(hour: 21, minute: 0),
           isActive: true,
         ),
         TimeSlot(
           id: 'slot_3',
           dayOfWeek: 3, // Wednesday
-          startTime: const TimeOfDay(hour: 15, minute: 0),
-          endTime: const TimeOfDay(hour: 20, minute: 0),
+          startTime: const ClockTime(hour: 15, minute: 0),
+          endTime: const ClockTime(hour: 20, minute: 0),
           isActive: true,
         ),
         TimeSlot(
           id: 'slot_4',
           dayOfWeek: 4, // Thursday
-          startTime: const TimeOfDay(hour: 14, minute: 0),
-          endTime: const TimeOfDay(hour: 21, minute: 0),
+          startTime: const ClockTime(hour: 14, minute: 0),
+          endTime: const ClockTime(hour: 21, minute: 0),
           isActive: true,
         ),
         TimeSlot(
           id: 'slot_5',
           dayOfWeek: 5, // Friday
-          startTime: const TimeOfDay(hour: 14, minute: 0),
-          endTime: const TimeOfDay(hour: 19, minute: 0),
+          startTime: const ClockTime(hour: 14, minute: 0),
+          endTime: const ClockTime(hour: 19, minute: 0),
           isActive: true,
         ),
         TimeSlot(
           id: 'slot_6',
           dayOfWeek: 6, // Saturday
-          startTime: const TimeOfDay(hour: 10, minute: 0),
-          endTime: const TimeOfDay(hour: 18, minute: 0),
+          startTime: const ClockTime(hour: 10, minute: 0),
+          endTime: const ClockTime(hour: 18, minute: 0),
           isActive: true,
         ),
       ],

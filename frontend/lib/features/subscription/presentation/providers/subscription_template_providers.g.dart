@@ -15,18 +15,17 @@ String _$subscriptionTemplateRepositoryHash() =>
 @ProviderFor(subscriptionTemplateRepository)
 final subscriptionTemplateRepositoryProvider =
     Provider<SubscriptionTemplateRepository>.internal(
-      subscriptionTemplateRepository,
-      name: r'subscriptionTemplateRepositoryProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$subscriptionTemplateRepositoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  subscriptionTemplateRepository,
+  name: r'subscriptionTemplateRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionTemplateRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef SubscriptionTemplateRepositoryRef =
-    ProviderRef<SubscriptionTemplateRepository>;
+typedef SubscriptionTemplateRepositoryRef
+    = ProviderRef<SubscriptionTemplateRepository>;
 String _$teacherTemplatesHash() => r'3ece1db7ec611ed16fe64b09532f42026f0725f9';
 
 /// Copied from Dart SDK
@@ -61,15 +60,21 @@ class TeacherTemplatesFamily
   const TeacherTemplatesFamily();
 
   /// See also [teacherTemplates].
-  TeacherTemplatesProvider call(String teacherId) {
-    return TeacherTemplatesProvider(teacherId);
+  TeacherTemplatesProvider call(
+    String teacherId,
+  ) {
+    return TeacherTemplatesProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherTemplatesProvider getProviderOverride(
     covariant TeacherTemplatesProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -91,20 +96,24 @@ class TeacherTemplatesFamily
 class TeacherTemplatesProvider
     extends AutoDisposeFutureProvider<List<SubscriptionTemplate>> {
   /// See also [teacherTemplates].
-  TeacherTemplatesProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherTemplates(ref as TeacherTemplatesRef, teacherId),
-        from: teacherTemplatesProvider,
-        name: r'teacherTemplatesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherTemplatesHash,
-        dependencies: TeacherTemplatesFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherTemplatesFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherTemplatesProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherTemplates(
+            ref as TeacherTemplatesRef,
+            teacherId,
+          ),
+          from: teacherTemplatesProvider,
+          name: r'teacherTemplatesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherTemplatesHash,
+          dependencies: TeacherTemplatesFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherTemplatesFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherTemplatesProvider._internal(
     super._createNotifier, {
@@ -121,7 +130,7 @@ class TeacherTemplatesProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionTemplate>> Function(TeacherTemplatesRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -185,15 +194,21 @@ class ActiveTeacherTemplatesFamily
   const ActiveTeacherTemplatesFamily();
 
   /// See also [activeTeacherTemplates].
-  ActiveTeacherTemplatesProvider call(String teacherId) {
-    return ActiveTeacherTemplatesProvider(teacherId);
+  ActiveTeacherTemplatesProvider call(
+    String teacherId,
+  ) {
+    return ActiveTeacherTemplatesProvider(
+      teacherId,
+    );
   }
 
   @override
   ActiveTeacherTemplatesProvider getProviderOverride(
     covariant ActiveTeacherTemplatesProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -215,21 +230,24 @@ class ActiveTeacherTemplatesFamily
 class ActiveTeacherTemplatesProvider
     extends AutoDisposeFutureProvider<List<SubscriptionTemplate>> {
   /// See also [activeTeacherTemplates].
-  ActiveTeacherTemplatesProvider(String teacherId)
-    : this._internal(
-        (ref) =>
-            activeTeacherTemplates(ref as ActiveTeacherTemplatesRef, teacherId),
-        from: activeTeacherTemplatesProvider,
-        name: r'activeTeacherTemplatesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$activeTeacherTemplatesHash,
-        dependencies: ActiveTeacherTemplatesFamily._dependencies,
-        allTransitiveDependencies:
-            ActiveTeacherTemplatesFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  ActiveTeacherTemplatesProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => activeTeacherTemplates(
+            ref as ActiveTeacherTemplatesRef,
+            teacherId,
+          ),
+          from: activeTeacherTemplatesProvider,
+          name: r'activeTeacherTemplatesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeTeacherTemplatesHash,
+          dependencies: ActiveTeacherTemplatesFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveTeacherTemplatesFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   ActiveTeacherTemplatesProvider._internal(
     super._createNotifier, {
@@ -246,9 +264,8 @@ class ActiveTeacherTemplatesProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionTemplate>> Function(
-      ActiveTeacherTemplatesRef provider,
-    )
-    create,
+            ActiveTeacherTemplatesRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -329,15 +346,21 @@ class AutoProposalTemplatesFamily
   /// 체험레슨 완료 또는 수강권 만료 시 자동 제안에 사용
   ///
   /// Copied from [autoProposalTemplates].
-  AutoProposalTemplatesProvider call(String teacherId) {
-    return AutoProposalTemplatesProvider(teacherId);
+  AutoProposalTemplatesProvider call(
+    String teacherId,
+  ) {
+    return AutoProposalTemplatesProvider(
+      teacherId,
+    );
   }
 
   @override
   AutoProposalTemplatesProvider getProviderOverride(
     covariant AutoProposalTemplatesProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -367,21 +390,24 @@ class AutoProposalTemplatesProvider
   /// 체험레슨 완료 또는 수강권 만료 시 자동 제안에 사용
   ///
   /// Copied from [autoProposalTemplates].
-  AutoProposalTemplatesProvider(String teacherId)
-    : this._internal(
-        (ref) =>
-            autoProposalTemplates(ref as AutoProposalTemplatesRef, teacherId),
-        from: autoProposalTemplatesProvider,
-        name: r'autoProposalTemplatesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$autoProposalTemplatesHash,
-        dependencies: AutoProposalTemplatesFamily._dependencies,
-        allTransitiveDependencies:
-            AutoProposalTemplatesFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  AutoProposalTemplatesProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => autoProposalTemplates(
+            ref as AutoProposalTemplatesRef,
+            teacherId,
+          ),
+          from: autoProposalTemplatesProvider,
+          name: r'autoProposalTemplatesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$autoProposalTemplatesHash,
+          dependencies: AutoProposalTemplatesFamily._dependencies,
+          allTransitiveDependencies:
+              AutoProposalTemplatesFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   AutoProposalTemplatesProvider._internal(
     super._createNotifier, {
@@ -398,9 +424,8 @@ class AutoProposalTemplatesProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionTemplate>> Function(
-      AutoProposalTemplatesRef provider,
-    )
-    create,
+            AutoProposalTemplatesRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -464,15 +489,21 @@ class AcademyTemplatesFamily
   const AcademyTemplatesFamily();
 
   /// See also [academyTemplates].
-  AcademyTemplatesProvider call(String academyId) {
-    return AcademyTemplatesProvider(academyId);
+  AcademyTemplatesProvider call(
+    String academyId,
+  ) {
+    return AcademyTemplatesProvider(
+      academyId,
+    );
   }
 
   @override
   AcademyTemplatesProvider getProviderOverride(
     covariant AcademyTemplatesProvider provider,
   ) {
-    return call(provider.academyId);
+    return call(
+      provider.academyId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -494,20 +525,24 @@ class AcademyTemplatesFamily
 class AcademyTemplatesProvider
     extends AutoDisposeFutureProvider<List<SubscriptionTemplate>> {
   /// See also [academyTemplates].
-  AcademyTemplatesProvider(String academyId)
-    : this._internal(
-        (ref) => academyTemplates(ref as AcademyTemplatesRef, academyId),
-        from: academyTemplatesProvider,
-        name: r'academyTemplatesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$academyTemplatesHash,
-        dependencies: AcademyTemplatesFamily._dependencies,
-        allTransitiveDependencies:
-            AcademyTemplatesFamily._allTransitiveDependencies,
-        academyId: academyId,
-      );
+  AcademyTemplatesProvider(
+    String academyId,
+  ) : this._internal(
+          (ref) => academyTemplates(
+            ref as AcademyTemplatesRef,
+            academyId,
+          ),
+          from: academyTemplatesProvider,
+          name: r'academyTemplatesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$academyTemplatesHash,
+          dependencies: AcademyTemplatesFamily._dependencies,
+          allTransitiveDependencies:
+              AcademyTemplatesFamily._allTransitiveDependencies,
+          academyId: academyId,
+        );
 
   AcademyTemplatesProvider._internal(
     super._createNotifier, {
@@ -524,7 +559,7 @@ class AcademyTemplatesProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionTemplate>> Function(AcademyTemplatesRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -588,15 +623,21 @@ class ActiveAcademyTemplatesFamily
   const ActiveAcademyTemplatesFamily();
 
   /// See also [activeAcademyTemplates].
-  ActiveAcademyTemplatesProvider call(String academyId) {
-    return ActiveAcademyTemplatesProvider(academyId);
+  ActiveAcademyTemplatesProvider call(
+    String academyId,
+  ) {
+    return ActiveAcademyTemplatesProvider(
+      academyId,
+    );
   }
 
   @override
   ActiveAcademyTemplatesProvider getProviderOverride(
     covariant ActiveAcademyTemplatesProvider provider,
   ) {
-    return call(provider.academyId);
+    return call(
+      provider.academyId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -618,21 +659,24 @@ class ActiveAcademyTemplatesFamily
 class ActiveAcademyTemplatesProvider
     extends AutoDisposeFutureProvider<List<SubscriptionTemplate>> {
   /// See also [activeAcademyTemplates].
-  ActiveAcademyTemplatesProvider(String academyId)
-    : this._internal(
-        (ref) =>
-            activeAcademyTemplates(ref as ActiveAcademyTemplatesRef, academyId),
-        from: activeAcademyTemplatesProvider,
-        name: r'activeAcademyTemplatesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$activeAcademyTemplatesHash,
-        dependencies: ActiveAcademyTemplatesFamily._dependencies,
-        allTransitiveDependencies:
-            ActiveAcademyTemplatesFamily._allTransitiveDependencies,
-        academyId: academyId,
-      );
+  ActiveAcademyTemplatesProvider(
+    String academyId,
+  ) : this._internal(
+          (ref) => activeAcademyTemplates(
+            ref as ActiveAcademyTemplatesRef,
+            academyId,
+          ),
+          from: activeAcademyTemplatesProvider,
+          name: r'activeAcademyTemplatesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeAcademyTemplatesHash,
+          dependencies: ActiveAcademyTemplatesFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveAcademyTemplatesFamily._allTransitiveDependencies,
+          academyId: academyId,
+        );
 
   ActiveAcademyTemplatesProvider._internal(
     super._createNotifier, {
@@ -649,9 +693,8 @@ class ActiveAcademyTemplatesProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionTemplate>> Function(
-      ActiveAcademyTemplatesRef provider,
-    )
-    create,
+            ActiveAcademyTemplatesRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -716,15 +759,21 @@ class SubscriptionTemplateFamily
   const SubscriptionTemplateFamily();
 
   /// See also [subscriptionTemplate].
-  SubscriptionTemplateProvider call(String templateId) {
-    return SubscriptionTemplateProvider(templateId);
+  SubscriptionTemplateProvider call(
+    String templateId,
+  ) {
+    return SubscriptionTemplateProvider(
+      templateId,
+    );
   }
 
   @override
   SubscriptionTemplateProvider getProviderOverride(
     covariant SubscriptionTemplateProvider provider,
   ) {
-    return call(provider.templateId);
+    return call(
+      provider.templateId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -746,21 +795,24 @@ class SubscriptionTemplateFamily
 class SubscriptionTemplateProvider
     extends AutoDisposeFutureProvider<SubscriptionTemplate?> {
   /// See also [subscriptionTemplate].
-  SubscriptionTemplateProvider(String templateId)
-    : this._internal(
-        (ref) =>
-            subscriptionTemplate(ref as SubscriptionTemplateRef, templateId),
-        from: subscriptionTemplateProvider,
-        name: r'subscriptionTemplateProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$subscriptionTemplateHash,
-        dependencies: SubscriptionTemplateFamily._dependencies,
-        allTransitiveDependencies:
-            SubscriptionTemplateFamily._allTransitiveDependencies,
-        templateId: templateId,
-      );
+  SubscriptionTemplateProvider(
+    String templateId,
+  ) : this._internal(
+          (ref) => subscriptionTemplate(
+            ref as SubscriptionTemplateRef,
+            templateId,
+          ),
+          from: subscriptionTemplateProvider,
+          name: r'subscriptionTemplateProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionTemplateHash,
+          dependencies: SubscriptionTemplateFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionTemplateFamily._allTransitiveDependencies,
+          templateId: templateId,
+        );
 
   SubscriptionTemplateProvider._internal(
     super._createNotifier, {
@@ -777,7 +829,7 @@ class SubscriptionTemplateProvider
   @override
   Override overrideWith(
     FutureOr<SubscriptionTemplate?> Function(SubscriptionTemplateRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -834,20 +886,17 @@ String _$subscriptionTemplateNotifierHash() =>
 /// See also [SubscriptionTemplateNotifier].
 @ProviderFor(SubscriptionTemplateNotifier)
 final subscriptionTemplateNotifierProvider = AutoDisposeNotifierProvider<
-  SubscriptionTemplateNotifier,
-  AsyncValue<SubscriptionTemplate?>
->.internal(
+    SubscriptionTemplateNotifier, AsyncValue<SubscriptionTemplate?>>.internal(
   SubscriptionTemplateNotifier.new,
   name: r'subscriptionTemplateNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$subscriptionTemplateNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$subscriptionTemplateNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SubscriptionTemplateNotifier =
-    AutoDisposeNotifier<AsyncValue<SubscriptionTemplate?>>;
+typedef _$SubscriptionTemplateNotifier
+    = AutoDisposeNotifier<AsyncValue<SubscriptionTemplate?>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

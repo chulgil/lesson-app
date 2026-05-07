@@ -15,10 +15,9 @@ String _$teacherSettingsHash() => r'8280ea81365790eb469fa84e531b91724f29aa37';
 final teacherSettingsProvider = FutureProvider<TeacherSettings>.internal(
   teacherSettings,
   name: r'teacherSettingsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherSettingsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherSettingsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -66,15 +65,21 @@ class TeacherSettingsByIdFamily extends Family<AsyncValue<TeacherSettings>> {
   /// Teacher settings provider by teacherId (for viewing other teacher's settings)
   ///
   /// Copied from [teacherSettingsById].
-  TeacherSettingsByIdProvider call(String teacherId) {
-    return TeacherSettingsByIdProvider(teacherId);
+  TeacherSettingsByIdProvider call(
+    String teacherId,
+  ) {
+    return TeacherSettingsByIdProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherSettingsByIdProvider getProviderOverride(
     covariant TeacherSettingsByIdProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -99,20 +104,24 @@ class TeacherSettingsByIdProvider extends FutureProvider<TeacherSettings> {
   /// Teacher settings provider by teacherId (for viewing other teacher's settings)
   ///
   /// Copied from [teacherSettingsById].
-  TeacherSettingsByIdProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherSettingsById(ref as TeacherSettingsByIdRef, teacherId),
-        from: teacherSettingsByIdProvider,
-        name: r'teacherSettingsByIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherSettingsByIdHash,
-        dependencies: TeacherSettingsByIdFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherSettingsByIdFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherSettingsByIdProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherSettingsById(
+            ref as TeacherSettingsByIdRef,
+            teacherId,
+          ),
+          from: teacherSettingsByIdProvider,
+          name: r'teacherSettingsByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherSettingsByIdHash,
+          dependencies: TeacherSettingsByIdFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherSettingsByIdFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherSettingsByIdProvider._internal(
     super._createNotifier, {
@@ -169,8 +178,7 @@ mixin TeacherSettingsByIdRef on FutureProviderRef<TeacherSettings> {
 }
 
 class _TeacherSettingsByIdProviderElement
-    extends FutureProviderElement<TeacherSettings>
-    with TeacherSettingsByIdRef {
+    extends FutureProviderElement<TeacherSettings> with TeacherSettingsByIdRef {
   _TeacherSettingsByIdProviderElement(super.provider);
 
   @override
@@ -187,10 +195,9 @@ String _$teacherInstrumentsHash() =>
 final teacherInstrumentsProvider = Provider<AsyncValue<List<String>>>.internal(
   teacherInstruments,
   name: r'teacherInstrumentsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$teacherInstrumentsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherInstrumentsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -206,10 +213,9 @@ String _$defaultLessonDurationHash() =>
 final defaultLessonDurationProvider = Provider<AsyncValue<int>>.internal(
   defaultLessonDuration,
   name: r'defaultLessonDurationProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$defaultLessonDurationHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$defaultLessonDurationHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -224,15 +230,14 @@ String _$availableTimeSlotsHash() =>
 @ProviderFor(availableTimeSlots)
 final availableTimeSlotsProvider =
     Provider<AsyncValue<List<TimeSlot>>>.internal(
-      availableTimeSlots,
-      name: r'availableTimeSlotsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$availableTimeSlotsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  availableTimeSlots,
+  name: r'availableTimeSlotsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$availableTimeSlotsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef AvailableTimeSlotsRef = ProviderRef<AsyncValue<List<TimeSlot>>>;
 String _$teacherSettingsNotifierHash() =>
@@ -244,15 +249,14 @@ String _$teacherSettingsNotifierHash() =>
 @ProviderFor(TeacherSettingsNotifier)
 final teacherSettingsNotifierProvider =
     AsyncNotifierProvider<TeacherSettingsNotifier, TeacherSettings>.internal(
-      TeacherSettingsNotifier.new,
-      name: r'teacherSettingsNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$teacherSettingsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  TeacherSettingsNotifier.new,
+  name: r'teacherSettingsNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherSettingsNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$TeacherSettingsNotifier = AsyncNotifier<TeacherSettings>;
 // ignore_for_file: type=lint

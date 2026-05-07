@@ -7,7 +7,7 @@ part of 'schedule_confirmation_card_providers.dart';
 // **************************************************************************
 
 String _$scheduleConfirmationCardRepositoryHash() =>
-    r'fd7e8ad244f5df85c62398a634af7c842e551f95';
+    r'4d11dd645783c33c6a8f9f34391fec4961e1940a';
 
 /// Repository provider for schedule confirmation cards.
 ///

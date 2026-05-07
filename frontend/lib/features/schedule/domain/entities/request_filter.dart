@@ -1,25 +1,10 @@
-import '../../../../core/l10n/app_strings.dart';
 import 'unified_lesson_request.dart';
 
 /// Sort options for lesson request lists.
 enum RequestSortBy { createdAtDesc, studentNameAsc }
 
 /// Preset date range options for the filter UI.
-enum RequestFilterPreset {
-  oneWeek,
-  oneMonth,
-  threeMonths,
-  custom;
-
-  String get label {
-    return switch (this) {
-      RequestFilterPreset.oneWeek => AppStrings.recentOneWeek,
-      RequestFilterPreset.oneMonth => AppStrings.recentOneMonth,
-      RequestFilterPreset.threeMonths => AppStrings.recentThreeMonths,
-      RequestFilterPreset.custom => AppStrings.periodCustom,
-    };
-  }
-}
+enum RequestFilterPreset { oneWeek, oneMonth, threeMonths, custom }
 
 /// Source filter: academy or individual.
 enum RequestSourceFilter { all, academy, individual }

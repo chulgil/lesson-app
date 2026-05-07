@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/lesson_booking.dart';
+import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/booking_providers.dart';
 import 'package:lessonaza/features/student_home/domain/entities/student_lesson_progress_item.dart';
@@ -52,8 +53,8 @@ void main() {
       lessonType: LessonType.regular,
       status: BookingStatus.confirmed,
       lessonDate: DateTime.now().add(const Duration(days: 3)),
-      startTime: const TimeOfDay(hour: 17, minute: 30),
-      endTime: const TimeOfDay(hour: 18, minute: 30),
+      startTime: const ClockTime(hour: 17, minute: 30),
+      endTime: const ClockTime(hour: 18, minute: 30),
       fee: 60000,
       createdAt: DateTime.utc(2026, 5, 4),
     );

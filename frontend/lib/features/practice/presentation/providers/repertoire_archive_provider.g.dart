@@ -48,15 +48,21 @@ class ActiveRepertoiresFamily
   /// Active (non-archived) repertoires provider
   ///
   /// Copied from [activeRepertoires].
-  ActiveRepertoiresProvider call(String studentId) {
-    return ActiveRepertoiresProvider(studentId);
+  ActiveRepertoiresProvider call(
+    String studentId,
+  ) {
+    return ActiveRepertoiresProvider(
+      studentId,
+    );
   }
 
   @override
   ActiveRepertoiresProvider getProviderOverride(
     covariant ActiveRepertoiresProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -82,20 +88,24 @@ class ActiveRepertoiresProvider
   /// Active (non-archived) repertoires provider
   ///
   /// Copied from [activeRepertoires].
-  ActiveRepertoiresProvider(String studentId)
-    : this._internal(
-        (ref) => activeRepertoires(ref as ActiveRepertoiresRef, studentId),
-        from: activeRepertoiresProvider,
-        name: r'activeRepertoiresProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$activeRepertoiresHash,
-        dependencies: ActiveRepertoiresFamily._dependencies,
-        allTransitiveDependencies:
-            ActiveRepertoiresFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  ActiveRepertoiresProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => activeRepertoires(
+            ref as ActiveRepertoiresRef,
+            studentId,
+          ),
+          from: activeRepertoiresProvider,
+          name: r'activeRepertoiresProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeRepertoiresHash,
+          dependencies: ActiveRepertoiresFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveRepertoiresFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   ActiveRepertoiresProvider._internal(
     super._createNotifier, {
@@ -112,7 +122,7 @@ class ActiveRepertoiresProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeRepertoire>> Function(ActiveRepertoiresRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -183,15 +193,21 @@ class ArchivedRepertoiresFamily
   /// Archived repertoires provider
   ///
   /// Copied from [archivedRepertoires].
-  ArchivedRepertoiresProvider call(String studentId) {
-    return ArchivedRepertoiresProvider(studentId);
+  ArchivedRepertoiresProvider call(
+    String studentId,
+  ) {
+    return ArchivedRepertoiresProvider(
+      studentId,
+    );
   }
 
   @override
   ArchivedRepertoiresProvider getProviderOverride(
     covariant ArchivedRepertoiresProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -217,20 +233,24 @@ class ArchivedRepertoiresProvider
   /// Archived repertoires provider
   ///
   /// Copied from [archivedRepertoires].
-  ArchivedRepertoiresProvider(String studentId)
-    : this._internal(
-        (ref) => archivedRepertoires(ref as ArchivedRepertoiresRef, studentId),
-        from: archivedRepertoiresProvider,
-        name: r'archivedRepertoiresProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$archivedRepertoiresHash,
-        dependencies: ArchivedRepertoiresFamily._dependencies,
-        allTransitiveDependencies:
-            ArchivedRepertoiresFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  ArchivedRepertoiresProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => archivedRepertoires(
+            ref as ArchivedRepertoiresRef,
+            studentId,
+          ),
+          from: archivedRepertoiresProvider,
+          name: r'archivedRepertoiresProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$archivedRepertoiresHash,
+          dependencies: ArchivedRepertoiresFamily._dependencies,
+          allTransitiveDependencies:
+              ArchivedRepertoiresFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   ArchivedRepertoiresProvider._internal(
     super._createNotifier, {
@@ -247,7 +267,7 @@ class ArchivedRepertoiresProvider
   @override
   Override overrideWith(
     FutureOr<List<PracticeRepertoire>> Function(ArchivedRepertoiresRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -305,15 +325,14 @@ String _$repertoireArchiveNotifierHash() =>
 @ProviderFor(RepertoireArchiveNotifier)
 final repertoireArchiveNotifierProvider =
     AsyncNotifierProvider<RepertoireArchiveNotifier, void>.internal(
-      RepertoireArchiveNotifier.new,
-      name: r'repertoireArchiveNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$repertoireArchiveNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  RepertoireArchiveNotifier.new,
+  name: r'repertoireArchiveNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$repertoireArchiveNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$RepertoireArchiveNotifier = AsyncNotifier<void>;
 // ignore_for_file: type=lint

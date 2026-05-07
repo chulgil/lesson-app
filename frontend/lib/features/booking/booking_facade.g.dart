@@ -47,15 +47,21 @@ class BookingByIdFamily extends Family<AsyncValue<LessonBooking?>> {
   /// Single booking by ID.
   ///
   /// Copied from [bookingById].
-  BookingByIdProvider call(String id) {
-    return BookingByIdProvider(id);
+  BookingByIdProvider call(
+    String id,
+  ) {
+    return BookingByIdProvider(
+      id,
+    );
   }
 
   @override
   BookingByIdProvider getProviderOverride(
     covariant BookingByIdProvider provider,
   ) {
-    return call(provider.id);
+    return call(
+      provider.id,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -80,19 +86,24 @@ class BookingByIdProvider extends AutoDisposeFutureProvider<LessonBooking?> {
   /// Single booking by ID.
   ///
   /// Copied from [bookingById].
-  BookingByIdProvider(String id)
-    : this._internal(
-        (ref) => bookingById(ref as BookingByIdRef, id),
-        from: bookingByIdProvider,
-        name: r'bookingByIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$bookingByIdHash,
-        dependencies: BookingByIdFamily._dependencies,
-        allTransitiveDependencies: BookingByIdFamily._allTransitiveDependencies,
-        id: id,
-      );
+  BookingByIdProvider(
+    String id,
+  ) : this._internal(
+          (ref) => bookingById(
+            ref as BookingByIdRef,
+            id,
+          ),
+          from: bookingByIdProvider,
+          name: r'bookingByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$bookingByIdHash,
+          dependencies: BookingByIdFamily._dependencies,
+          allTransitiveDependencies:
+              BookingByIdFamily._allTransitiveDependencies,
+          id: id,
+        );
 
   BookingByIdProvider._internal(
     super._createNotifier, {
@@ -178,15 +189,21 @@ class StudentBookingListFamily extends Family<AsyncValue<List<LessonBooking>>> {
   /// All bookings for a student (student home, trial cards).
   ///
   /// Copied from [studentBookingList].
-  StudentBookingListProvider call(String studentId) {
-    return StudentBookingListProvider(studentId);
+  StudentBookingListProvider call(
+    String studentId,
+  ) {
+    return StudentBookingListProvider(
+      studentId,
+    );
   }
 
   @override
   StudentBookingListProvider getProviderOverride(
     covariant StudentBookingListProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -212,20 +229,24 @@ class StudentBookingListProvider
   /// All bookings for a student (student home, trial cards).
   ///
   /// Copied from [studentBookingList].
-  StudentBookingListProvider(String studentId)
-    : this._internal(
-        (ref) => studentBookingList(ref as StudentBookingListRef, studentId),
-        from: studentBookingListProvider,
-        name: r'studentBookingListProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentBookingListHash,
-        dependencies: StudentBookingListFamily._dependencies,
-        allTransitiveDependencies:
-            StudentBookingListFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentBookingListProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentBookingList(
+            ref as StudentBookingListRef,
+            studentId,
+          ),
+          from: studentBookingListProvider,
+          name: r'studentBookingListProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentBookingListHash,
+          dependencies: StudentBookingListFamily._dependencies,
+          allTransitiveDependencies:
+              StudentBookingListFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentBookingListProvider._internal(
     super._createNotifier, {
@@ -242,7 +263,7 @@ class StudentBookingListProvider
   @override
   Override overrideWith(
     FutureOr<List<LessonBooking>> Function(StudentBookingListRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -313,15 +334,21 @@ class TeacherBookingListFamily extends Family<AsyncValue<List<LessonBooking>>> {
   /// All bookings for a teacher (teacher schedule).
   ///
   /// Copied from [teacherBookingList].
-  TeacherBookingListProvider call(String teacherId) {
-    return TeacherBookingListProvider(teacherId);
+  TeacherBookingListProvider call(
+    String teacherId,
+  ) {
+    return TeacherBookingListProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherBookingListProvider getProviderOverride(
     covariant TeacherBookingListProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -347,20 +374,24 @@ class TeacherBookingListProvider
   /// All bookings for a teacher (teacher schedule).
   ///
   /// Copied from [teacherBookingList].
-  TeacherBookingListProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherBookingList(ref as TeacherBookingListRef, teacherId),
-        from: teacherBookingListProvider,
-        name: r'teacherBookingListProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherBookingListHash,
-        dependencies: TeacherBookingListFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherBookingListFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherBookingListProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherBookingList(
+            ref as TeacherBookingListRef,
+            teacherId,
+          ),
+          from: teacherBookingListProvider,
+          name: r'teacherBookingListProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherBookingListHash,
+          dependencies: TeacherBookingListFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherBookingListFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherBookingListProvider._internal(
     super._createNotifier, {
@@ -377,7 +408,7 @@ class TeacherBookingListProvider
   @override
   Override overrideWith(
     FutureOr<List<LessonBooking>> Function(TeacherBookingListRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -448,15 +479,21 @@ class PendingBookingListFamily extends Family<AsyncValue<List<LessonBooking>>> {
   /// Pending bookings awaiting teacher approval.
   ///
   /// Copied from [pendingBookingList].
-  PendingBookingListProvider call(String teacherId) {
-    return PendingBookingListProvider(teacherId);
+  PendingBookingListProvider call(
+    String teacherId,
+  ) {
+    return PendingBookingListProvider(
+      teacherId,
+    );
   }
 
   @override
   PendingBookingListProvider getProviderOverride(
     covariant PendingBookingListProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -482,20 +519,24 @@ class PendingBookingListProvider
   /// Pending bookings awaiting teacher approval.
   ///
   /// Copied from [pendingBookingList].
-  PendingBookingListProvider(String teacherId)
-    : this._internal(
-        (ref) => pendingBookingList(ref as PendingBookingListRef, teacherId),
-        from: pendingBookingListProvider,
-        name: r'pendingBookingListProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$pendingBookingListHash,
-        dependencies: PendingBookingListFamily._dependencies,
-        allTransitiveDependencies:
-            PendingBookingListFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  PendingBookingListProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingBookingList(
+            ref as PendingBookingListRef,
+            teacherId,
+          ),
+          from: pendingBookingListProvider,
+          name: r'pendingBookingListProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingBookingListHash,
+          dependencies: PendingBookingListFamily._dependencies,
+          allTransitiveDependencies:
+              PendingBookingListFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   PendingBookingListProvider._internal(
     super._createNotifier, {
@@ -512,7 +553,7 @@ class PendingBookingListProvider
   @override
   Override overrideWith(
     FutureOr<List<LessonBooking>> Function(PendingBookingListRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -582,15 +623,21 @@ class PendingCountFamily extends Family<AsyncValue<int>> {
   /// Badge count for pending bookings.
   ///
   /// Copied from [pendingCount].
-  PendingCountProvider call(String teacherId) {
-    return PendingCountProvider(teacherId);
+  PendingCountProvider call(
+    String teacherId,
+  ) {
+    return PendingCountProvider(
+      teacherId,
+    );
   }
 
   @override
   PendingCountProvider getProviderOverride(
     covariant PendingCountProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -615,20 +662,24 @@ class PendingCountProvider extends AutoDisposeFutureProvider<int> {
   /// Badge count for pending bookings.
   ///
   /// Copied from [pendingCount].
-  PendingCountProvider(String teacherId)
-    : this._internal(
-        (ref) => pendingCount(ref as PendingCountRef, teacherId),
-        from: pendingCountProvider,
-        name: r'pendingCountProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$pendingCountHash,
-        dependencies: PendingCountFamily._dependencies,
-        allTransitiveDependencies:
-            PendingCountFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  PendingCountProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingCount(
+            ref as PendingCountRef,
+            teacherId,
+          ),
+          from: pendingCountProvider,
+          name: r'pendingCountProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingCountHash,
+          dependencies: PendingCountFamily._dependencies,
+          allTransitiveDependencies:
+              PendingCountFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   PendingCountProvider._internal(
     super._createNotifier, {
@@ -712,15 +763,21 @@ class UpcomingConfirmedFamily extends Family<AsyncValue<List<LessonBooking>>> {
   /// Confirmed upcoming bookings.
   ///
   /// Copied from [upcomingConfirmed].
-  UpcomingConfirmedProvider call(String teacherId) {
-    return UpcomingConfirmedProvider(teacherId);
+  UpcomingConfirmedProvider call(
+    String teacherId,
+  ) {
+    return UpcomingConfirmedProvider(
+      teacherId,
+    );
   }
 
   @override
   UpcomingConfirmedProvider getProviderOverride(
     covariant UpcomingConfirmedProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -746,20 +803,24 @@ class UpcomingConfirmedProvider
   /// Confirmed upcoming bookings.
   ///
   /// Copied from [upcomingConfirmed].
-  UpcomingConfirmedProvider(String teacherId)
-    : this._internal(
-        (ref) => upcomingConfirmed(ref as UpcomingConfirmedRef, teacherId),
-        from: upcomingConfirmedProvider,
-        name: r'upcomingConfirmedProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$upcomingConfirmedHash,
-        dependencies: UpcomingConfirmedFamily._dependencies,
-        allTransitiveDependencies:
-            UpcomingConfirmedFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  UpcomingConfirmedProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => upcomingConfirmed(
+            ref as UpcomingConfirmedRef,
+            teacherId,
+          ),
+          from: upcomingConfirmedProvider,
+          name: r'upcomingConfirmedProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$upcomingConfirmedHash,
+          dependencies: UpcomingConfirmedFamily._dependencies,
+          allTransitiveDependencies:
+              UpcomingConfirmedFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   UpcomingConfirmedProvider._internal(
     super._createNotifier, {
@@ -776,7 +837,7 @@ class UpcomingConfirmedProvider
   @override
   Override overrideWith(
     FutureOr<List<LessonBooking>> Function(UpcomingConfirmedRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -846,15 +907,21 @@ class TeacherSlotsFamily extends Family<AsyncValue<List<TimeSlot>>> {
   /// Teacher's available time slots.
   ///
   /// Copied from [teacherSlots].
-  TeacherSlotsProvider call(String teacherId) {
-    return TeacherSlotsProvider(teacherId);
+  TeacherSlotsProvider call(
+    String teacherId,
+  ) {
+    return TeacherSlotsProvider(
+      teacherId,
+    );
   }
 
   @override
   TeacherSlotsProvider getProviderOverride(
     covariant TeacherSlotsProvider provider,
   ) {
-    return call(provider.teacherId);
+    return call(
+      provider.teacherId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -879,20 +946,24 @@ class TeacherSlotsProvider extends AutoDisposeFutureProvider<List<TimeSlot>> {
   /// Teacher's available time slots.
   ///
   /// Copied from [teacherSlots].
-  TeacherSlotsProvider(String teacherId)
-    : this._internal(
-        (ref) => teacherSlots(ref as TeacherSlotsRef, teacherId),
-        from: teacherSlotsProvider,
-        name: r'teacherSlotsProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$teacherSlotsHash,
-        dependencies: TeacherSlotsFamily._dependencies,
-        allTransitiveDependencies:
-            TeacherSlotsFamily._allTransitiveDependencies,
-        teacherId: teacherId,
-      );
+  TeacherSlotsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherSlots(
+            ref as TeacherSlotsRef,
+            teacherId,
+          ),
+          from: teacherSlotsProvider,
+          name: r'teacherSlotsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherSlotsHash,
+          dependencies: TeacherSlotsFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherSlotsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
 
   TeacherSlotsProvider._internal(
     super._createNotifier, {
@@ -976,15 +1047,14 @@ String _$bookingFacadeHash() => r'37f832ad07a0dec1a2e99ffb0329073c905cf708';
 @ProviderFor(BookingFacade)
 final bookingFacadeProvider =
     AsyncNotifierProvider<BookingFacade, List<LessonBooking>>.internal(
-      BookingFacade.new,
-      name: r'bookingFacadeProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$bookingFacadeHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  BookingFacade.new,
+  name: r'bookingFacadeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$bookingFacadeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$BookingFacade = AsyncNotifier<List<LessonBooking>>;
 // ignore_for_file: type=lint

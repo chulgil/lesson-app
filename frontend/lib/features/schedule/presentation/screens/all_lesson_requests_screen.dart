@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 import '../../domain/entities/request_filter.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../extensions/request_filter_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/request_list_item.dart';
 

@@ -15,10 +15,9 @@ String _$parentRepositoryHash() => r'77bfc4e4046d168c493f64a035a7a1bf249027fa';
 final parentRepositoryProvider = Provider<ParentRepository>.internal(
   parentRepository,
   name: r'parentRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$parentRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$parentRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

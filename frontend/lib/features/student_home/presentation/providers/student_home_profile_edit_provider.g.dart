@@ -13,18 +13,17 @@ String _$studentHomeProfileEditStudentHash() =>
 @ProviderFor(studentHomeProfileEditStudent)
 final studentHomeProfileEditStudentProvider =
     AutoDisposeFutureProvider<Student?>.internal(
-      studentHomeProfileEditStudent,
-      name: r'studentHomeProfileEditStudentProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeProfileEditStudentHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeProfileEditStudent,
+  name: r'studentHomeProfileEditStudentProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeProfileEditStudentHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef StudentHomeProfileEditStudentRef =
-    AutoDisposeFutureProviderRef<Student?>;
+typedef StudentHomeProfileEditStudentRef
+    = AutoDisposeFutureProviderRef<Student?>;
 String _$studentHomeProfileEditImagePathHash() =>
     r'1ebb6ed6161818888c6dbafddb1ca7067cbffb42';
 
@@ -61,15 +60,21 @@ class StudentHomeProfileEditImagePathFamily
   const StudentHomeProfileEditImagePathFamily();
 
   /// See also [studentHomeProfileEditImagePath].
-  StudentHomeProfileEditImagePathProvider call(String studentId) {
-    return StudentHomeProfileEditImagePathProvider(studentId);
+  StudentHomeProfileEditImagePathProvider call(
+    String studentId,
+  ) {
+    return StudentHomeProfileEditImagePathProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeProfileEditImagePathProvider getProviderOverride(
     covariant StudentHomeProfileEditImagePathProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -91,23 +96,24 @@ class StudentHomeProfileEditImagePathFamily
 class StudentHomeProfileEditImagePathProvider
     extends AutoDisposeFutureProvider<String?> {
   /// See also [studentHomeProfileEditImagePath].
-  StudentHomeProfileEditImagePathProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeProfileEditImagePath(
-          ref as StudentHomeProfileEditImagePathRef,
-          studentId,
-        ),
-        from: studentHomeProfileEditImagePathProvider,
-        name: r'studentHomeProfileEditImagePathProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeProfileEditImagePathHash,
-        dependencies: StudentHomeProfileEditImagePathFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeProfileEditImagePathFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeProfileEditImagePathProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeProfileEditImagePath(
+            ref as StudentHomeProfileEditImagePathRef,
+            studentId,
+          ),
+          from: studentHomeProfileEditImagePathProvider,
+          name: r'studentHomeProfileEditImagePathProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeProfileEditImagePathHash,
+          dependencies: StudentHomeProfileEditImagePathFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeProfileEditImagePathFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeProfileEditImagePathProvider._internal(
     super._createNotifier, {
@@ -124,7 +130,7 @@ class StudentHomeProfileEditImagePathProvider
   @override
   Override overrideWith(
     FutureOr<String?> Function(StudentHomeProfileEditImagePathRef provider)
-    create,
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -183,17 +189,16 @@ String _$studentHomeProfileEditActionsHash() =>
 @ProviderFor(studentHomeProfileEditActions)
 final studentHomeProfileEditActionsProvider =
     AutoDisposeProvider<StudentHomeProfileEditActions>.internal(
-      studentHomeProfileEditActions,
-      name: r'studentHomeProfileEditActionsProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentHomeProfileEditActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentHomeProfileEditActions,
+  name: r'studentHomeProfileEditActionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentHomeProfileEditActionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef StudentHomeProfileEditActionsRef =
-    AutoDisposeProviderRef<StudentHomeProfileEditActions>;
+typedef StudentHomeProfileEditActionsRef
+    = AutoDisposeProviderRef<StudentHomeProfileEditActions>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

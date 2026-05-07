@@ -9,6 +9,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_visuals.dart';
 
 /// Subscription type selector with chips and description
 class SubscriptionTypeSelector extends StatelessWidget {

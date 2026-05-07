@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'class_membership.dart';
 import 'student.dart';
 
@@ -9,15 +7,12 @@ class StudentWithMembership {
   final Student student;
   final ClassMembership? membership; // null for uncategorized students
 
-  const StudentWithMembership({
-    required this.student,
-    this.membership,
-  });
+  const StudentWithMembership({required this.student, this.membership});
 
   String get name => student.name;
   String get studentId => student.id;
   String get initial => student.initial;
-  Color get profileColor => student.profileColor;
+  String get profileColorKey => student.profileColorKey;
   PracticeStatus get practiceStatus => student.practiceStatus;
 
   // Prefer membership data over student data

@@ -33,25 +33,25 @@ Map<String, dynamic> _$MonthlyAttendanceToJson(MonthlyAttendance instance) =>
       'cancelled_by_student_late': instance.cancelledByStudentLate,
     };
 
-AttendanceStats _$AttendanceStatsFromJson(
-  Map<String, dynamic> json,
-) => AttendanceStats(
-  studentId: json['student_id'] as String,
-  totalLessons: (json['total_lessons'] as num?)?.toInt() ?? 0,
-  completedLessons: (json['completed_lessons'] as num?)?.toInt() ?? 0,
-  absentCount: (json['absent_count'] as num?)?.toInt() ?? 0,
-  noShowCount: (json['no_show_count'] as num?)?.toInt() ?? 0,
-  cancelledByStudentLateCount:
-      (json['cancelled_by_student_late_count'] as num?)?.toInt() ?? 0,
-  cancelledByTeacherCount:
-      (json['cancelled_by_teacher_count'] as num?)?.toInt() ?? 0,
-  mutualCancelledCount: (json['mutual_cancelled_count'] as num?)?.toInt() ?? 0,
-  monthlyBreakdown:
-      (json['monthly_breakdown'] as List<dynamic>?)
-          ?.map((e) => MonthlyAttendance.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-);
+AttendanceStats _$AttendanceStatsFromJson(Map<String, dynamic> json) =>
+    AttendanceStats(
+      studentId: json['student_id'] as String,
+      totalLessons: (json['total_lessons'] as num?)?.toInt() ?? 0,
+      completedLessons: (json['completed_lessons'] as num?)?.toInt() ?? 0,
+      absentCount: (json['absent_count'] as num?)?.toInt() ?? 0,
+      noShowCount: (json['no_show_count'] as num?)?.toInt() ?? 0,
+      cancelledByStudentLateCount:
+          (json['cancelled_by_student_late_count'] as num?)?.toInt() ?? 0,
+      cancelledByTeacherCount:
+          (json['cancelled_by_teacher_count'] as num?)?.toInt() ?? 0,
+      mutualCancelledCount:
+          (json['mutual_cancelled_count'] as num?)?.toInt() ?? 0,
+      monthlyBreakdown: (json['monthly_breakdown'] as List<dynamic>?)
+              ?.map(
+                  (e) => MonthlyAttendance.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+    );
 
 Map<String, dynamic> _$AttendanceStatsToJson(AttendanceStats instance) =>
     <String, dynamic>{

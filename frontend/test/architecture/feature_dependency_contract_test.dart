@@ -76,6 +76,39 @@ void main() {
             'Presentation providers may be re-exported only from a feature facade so public provider boundaries stay explicit.',
       );
     });
+
+    test('screens do not declare Riverpod providers inline', () {
+      final violations = _screenInlineProviderDeclarations().toList()..sort();
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Screen files must consume providers, not declare them. Move screen state providers to presentation/providers so state is testable and reusable.',
+      );
+    });
+
+    test('screens do not re-export provider state APIs', () {
+      final violations = _screenProviderExports().toList()..sort();
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Screen files must not become public state boundaries. Export providers from feature facades or presentation/providers files instead.',
+      );
+    });
+
+    test('complex UI state does not use StateProvider directly', () {
+      final violations = _complexStateProviderDeclarations().toList()..sort();
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'StateProvider is reserved for scalar UI state such as bool, String, enum, int, and dates. Lists, domain objects, and form states must use NotifierProvider or AsyncNotifierProvider.',
+      );
+    });
   });
 }
 
@@ -136,6 +169,70 @@ Iterable<String> _nonFacadePresentationProviderExports() sync* {
       yield '${file.path} -> $uri';
     }
   }
+}
+
+Iterable<String> _screenInlineProviderDeclarations() sync* {
+  final providerDeclaration = RegExp(
+    r'\b(?:StateProvider|Provider|FutureProvider|StreamProvider|NotifierProvider|AsyncNotifierProvider)\s*(?:<|\()',
+  );
+
+  for (final file in _dartFilesUnder('lib/features')) {
+    if (!file.path.contains('/presentation/screens/')) continue;
+
+    final source = file.readAsStringSync();
+    if (!providerDeclaration.hasMatch(source)) continue;
+
+    yield file.path;
+  }
+}
+
+Iterable<String> _screenProviderExports() sync* {
+  for (final file in _dartFilesUnder('lib/features')) {
+    if (!file.path.contains('/presentation/screens/')) continue;
+
+    for (final uri in _exportUris(file)) {
+      if (_pointsToPresentationProvider(uri) || uri.contains('/providers/')) {
+        yield '${file.path} -> $uri';
+      }
+    }
+  }
+}
+
+Iterable<String> _complexStateProviderDeclarations() sync* {
+  final declaration = RegExp(r'\bStateProvider\s*<([^>]+)>');
+  const allowedExactTypes = {
+    'bool',
+    'int',
+    'double',
+    'String',
+    'String?',
+    'DateTime',
+    'DateTime?',
+  };
+
+  for (final file in _dartFilesUnder('lib/features')) {
+    final source = file.readAsStringSync();
+
+    for (final match in declaration.allMatches(source)) {
+      final type = match.group(1)!.trim();
+      if (allowedExactTypes.contains(type)) continue;
+      if (_looksLikeEnumStateType(type)) continue;
+
+      yield '${file.path}: StateProvider<$type>';
+    }
+  }
+}
+
+bool _looksLikeEnumStateType(String type) {
+  if (type.endsWith('?')) {
+    return _looksLikeEnumStateType(type.substring(0, type.length - 1));
+  }
+  return type.endsWith('Type') ||
+      type.endsWith('Mode') ||
+      type.endsWith('Role') ||
+      type.endsWith('Status') ||
+      type.endsWith('Sort') ||
+      type.endsWith('SortType');
 }
 
 Iterable<File> _dartFilesUnder(String path) {

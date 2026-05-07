@@ -29,6 +29,7 @@ import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
+import '../../../lessons/presentation/widgets/lesson_export_sheet.dart';
 
 /// Student detail screen — Notebook × Score 레이아웃.
 ///
@@ -271,6 +272,24 @@ class _StudentDetailContent extends ConsumerWidget {
                   Navigator.pop(context);
                   context.push(
                     AppRoutes.studentNotes.replaceFirst(':id', student.id),
+                  );
+                },
+              ),
+              _MoreOptionTile(
+                icon: Icons.file_download_outlined,
+                title: AppStrings.exportTitle,
+                hint: 'CSV · PDF',
+                onTap: () {
+                  Navigator.pop(context);
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder:
+                        (_) => LessonExportSheet(
+                          studentId: student.id,
+                          studentName: student.name,
+                        ),
                   );
                 },
               ),

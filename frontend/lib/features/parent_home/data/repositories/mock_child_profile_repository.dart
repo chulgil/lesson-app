@@ -1,4 +1,3 @@
-import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../domain/repositories/child_profile_repository.dart';
 
@@ -19,7 +18,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       teacherId: 'teacher_1',
       teacherName: '김선생님',
       linkedStudentId: 'student_1',
-      profileColor: AppColors.profileBlue,
+      profileColorKey: 'profileBlue',
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 180)),
     ),
@@ -33,7 +32,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       teacherId: 'teacher_2',
       teacherName: '박선생님',
       linkedStudentId: 'student_2',
-      profileColor: AppColors.profilePink,
+      profileColorKey: 'profilePink',
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 90)),
     ),
@@ -47,7 +46,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       teacherId: 'teacher_1',
       teacherName: '김선생님',
       linkedStudentId: 'student_3',
-      profileColor: AppColors.profileGreen,
+      profileColorKey: 'profileGreen',
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
     ),
@@ -148,7 +147,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       teacherId: null,
       teacherName: null,
       linkedStudentId: current.linkedStudentId,
-      profileColor: current.profileColor,
+      profileColorKey: current.profileColorKey,
       status: current.status,
       createdAt: current.createdAt,
       updatedAt: DateTime.now(),

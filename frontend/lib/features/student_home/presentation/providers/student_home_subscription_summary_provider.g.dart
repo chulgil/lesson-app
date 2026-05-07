@@ -42,15 +42,21 @@ class StudentHomeSubscriptionSummariesFamily
   const StudentHomeSubscriptionSummariesFamily();
 
   /// See also [studentHomeSubscriptionSummaries].
-  StudentHomeSubscriptionSummariesProvider call(String studentId) {
-    return StudentHomeSubscriptionSummariesProvider(studentId);
+  StudentHomeSubscriptionSummariesProvider call(
+    String studentId,
+  ) {
+    return StudentHomeSubscriptionSummariesProvider(
+      studentId,
+    );
   }
 
   @override
   StudentHomeSubscriptionSummariesProvider getProviderOverride(
     covariant StudentHomeSubscriptionSummariesProvider provider,
   ) {
-    return call(provider.studentId);
+    return call(
+      provider.studentId,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -70,26 +76,27 @@ class StudentHomeSubscriptionSummariesFamily
 
 /// See also [studentHomeSubscriptionSummaries].
 class StudentHomeSubscriptionSummariesProvider
-    extends
-        AutoDisposeFutureProvider<List<StudentHomeSubscriptionSummaryItem>> {
+    extends AutoDisposeFutureProvider<
+        List<StudentHomeSubscriptionSummaryItem>> {
   /// See also [studentHomeSubscriptionSummaries].
-  StudentHomeSubscriptionSummariesProvider(String studentId)
-    : this._internal(
-        (ref) => studentHomeSubscriptionSummaries(
-          ref as StudentHomeSubscriptionSummariesRef,
-          studentId,
-        ),
-        from: studentHomeSubscriptionSummariesProvider,
-        name: r'studentHomeSubscriptionSummariesProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$studentHomeSubscriptionSummariesHash,
-        dependencies: StudentHomeSubscriptionSummariesFamily._dependencies,
-        allTransitiveDependencies:
-            StudentHomeSubscriptionSummariesFamily._allTransitiveDependencies,
-        studentId: studentId,
-      );
+  StudentHomeSubscriptionSummariesProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentHomeSubscriptionSummaries(
+            ref as StudentHomeSubscriptionSummariesRef,
+            studentId,
+          ),
+          from: studentHomeSubscriptionSummariesProvider,
+          name: r'studentHomeSubscriptionSummariesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentHomeSubscriptionSummariesHash,
+          dependencies: StudentHomeSubscriptionSummariesFamily._dependencies,
+          allTransitiveDependencies:
+              StudentHomeSubscriptionSummariesFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
 
   StudentHomeSubscriptionSummariesProvider._internal(
     super._createNotifier, {
@@ -106,9 +113,8 @@ class StudentHomeSubscriptionSummariesProvider
   @override
   Override overrideWith(
     FutureOr<List<StudentHomeSubscriptionSummaryItem>> Function(
-      StudentHomeSubscriptionSummariesRef provider,
-    )
-    create,
+            StudentHomeSubscriptionSummariesRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -126,7 +132,7 @@ class StudentHomeSubscriptionSummariesProvider
 
   @override
   AutoDisposeFutureProviderElement<List<StudentHomeSubscriptionSummaryItem>>
-  createElement() {
+      createElement() {
     return _StudentHomeSubscriptionSummariesProviderElement(this);
   }
 
@@ -152,10 +158,8 @@ mixin StudentHomeSubscriptionSummariesRef
 }
 
 class _StudentHomeSubscriptionSummariesProviderElement
-    extends
-        AutoDisposeFutureProviderElement<
-          List<StudentHomeSubscriptionSummaryItem>
-        >
+    extends AutoDisposeFutureProviderElement<
+        List<StudentHomeSubscriptionSummaryItem>>
     with StudentHomeSubscriptionSummariesRef {
   _StudentHomeSubscriptionSummariesProviderElement(super.provider);
 
@@ -163,6 +167,5 @@ class _StudentHomeSubscriptionSummariesProviderElement
   String get studentId =>
       (origin as StudentHomeSubscriptionSummariesProvider).studentId;
 }
-
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

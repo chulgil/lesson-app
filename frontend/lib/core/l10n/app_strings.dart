@@ -4800,6 +4800,124 @@ class AppStrings {
   /// 연습 데이터가 없습니다 (PracticeRankingList 빈 상태)
   static const analyticsNoPracticeData = '연습 데이터가 없습니다';
 
+  // ── Analytics Dashboard Tabs (분석 대시보드 탭 — Refs #354) ──────────────
+
+  /// 분석 (AnalyticsDashboardScreen AppBar 타이틀)
+  static const analyticsTitle = '분석';
+
+  /// 월간 요약 (Tab 1 라벨)
+  static const analyticsMonthlySummary = '월간 요약';
+
+  /// 학생 성장 (Tab 2 라벨)
+  static const analyticsStudentGrowth = '학생 성장';
+
+  /// 수입 분석 (Tab 3 라벨)
+  static const analyticsRevenue = '수입 분석';
+
+  /// 학생 선택 드롭다운 플레이스홀더
+  static const analyticsSelectStudent = '학생 선택';
+
+  /// 기간 선택 드롭다운 1개월
+  static const analyticsPeriod1Month = '1개월';
+
+  /// 기간 선택 드롭다운 3개월
+  static const analyticsPeriod3Months = '3개월';
+
+  /// 기간 선택 드롭다운 6개월
+  static const analyticsPeriod6Months = '6개월';
+
+  /// 기간 선택 드롭다운 12개월
+  static const analyticsPeriod12Months = '12개월';
+
+  /// 완료율 StatCard 타이틀
+  static const analyticsCompletionRateLabel = '완료율';
+
+  /// 취소율 StatCard 타이틀
+  static const analyticsCancellationRateLabel = '취소율';
+
+  /// 수강료 수입 StatCard 타이틀
+  static const analyticsRevenueLabel = '수강료 수입';
+
+  /// 활성 학생 StatCard 타이틀
+  static const analyticsActiveStudentsLabel = '활성 학생';
+
+  /// 이동시간 StatCard 타이틀
+  static const analyticsTravelTimeLabel = '이동시간';
+
+  /// 미수금 StatCard 타이틀
+  static const analyticsPendingLabel = '미수금';
+
+  /// 예상 수입 StatCard 타이틀
+  static const analyticsExpectedLabel = '예상 수입';
+
+  /// 만료 임박 StatCard 타이틀
+  static const analyticsExpiringLabel = '만료 임박';
+
+  /// N% 포매터 (달성률)
+  static String analyticsRatePercent(double rate) =>
+      '${(rate * 100).toStringAsFixed(1)}%';
+
+  /// N% 포매터 (정수)
+  static String analyticsIntPercent(int percent) => '$percent%';
+
+  /// 이동 Nh시간 Nm분 포매터
+  static String analyticsTravelTime(int minutes) {
+    final h = minutes ~/ 60;
+    final m = minutes % 60;
+    if (h == 0) return '$m분';
+    if (m == 0) return '$h시간';
+    return '$h시간 $m분';
+  }
+
+  /// 전월 대비 +N.N% / -N.N%
+  static String analyticsVsPrevMonth(double percent) {
+    final sign = percent >= 0 ? '+' : '';
+    return '$sign${percent.toStringAsFixed(1)}% 전월 대비';
+  }
+
+  /// N명 대기 (미수금 카드 부제)
+  static String analyticsPendingWaiting(int count) => '$count명 대기';
+
+  /// 이번 달 만료 N개
+  static String analyticsExpiringThisMonth(int count) => '이번 달 만료 $count개';
+
+  /// 활성 수강권 N개 기준
+  static String analyticsExpectedBasis(int count) => '활성 수강권 $count개 기준';
+
+  /// 학생별 수입 비중 (섹션 헤더)
+  static const analyticsStudentRevenuePortion = '학생별 수입 비중';
+
+  /// 월별 수입 추이 (섹션 헤더)
+  static const analyticsMonthlyRevenueTrend = '월별 수입 추이';
+
+  /// 연습률 (학생 성장 탭 라벨)
+  static const analyticsPracticeRateLabel = '연습률';
+
+  /// 출석률 (학생 성장 탭 라벨)
+  static const analyticsAttendanceRateLabel = '출석률';
+
+  /// 레퍼토리 진도 (섹션 헤더)
+  static const analyticsRepertoireProgress = '레퍼토리 진도';
+
+  /// 녹음 기록 (섹션 헤더)
+  static const analyticsRecordingHistory = '녹음 기록';
+
+  /// 피드백 요약 (섹션 헤더)
+  static const analyticsFeedbackSummary = '피드백 요약';
+
+  /// 연습 시간 추이 (섹션 헤더)
+  static const analyticsPracticeTrend = '연습 시간 추이';
+
+  /// 연습률 / 출석률 (학생 목록 행 부제 포매터)
+  static String analyticsStudentRates(double practiceRate, double attendanceRate) {
+    final pr = (practiceRate * 100).round();
+    final ar = (attendanceRate * 100).round();
+    return '연습 $pr% · 출석 $ar%';
+  }
+
+  /// 학생 데이터가 없습니다 (빈 상태)
+  static const analyticsNoStudentData = '학생 데이터가 없습니다';
+
   // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
   /// 레퍼토리 편집 (AppBar 타이틀)
   static const editRepertoireAppBarTitle = '레퍼토리 편집';
@@ -6558,6 +6676,35 @@ class AppStrings {
   /// 장소 변경 (버튼 라벨)
   static const changeLocation = '장소 변경';
 
+  // -- Receipt / Export (영수증 · 레슨 이력 내보내기) --
+
+  /// 영수증 (스크린 타이틀)
+  static const receiptTitle = '영수증';
+
+  /// 영수증 번호 (라벨)
+  static const receiptNumber = '영수증 번호';
+
+  /// PDF 다운로드 (버튼 라벨)
+  static const receiptDownload = 'PDF 다운로드';
+
+  /// 레슨 이력 내보내기 (바텀시트 타이틀)
+  static const exportTitle = '레슨 이력 내보내기';
+
+  /// CSV (형식 선택 라벨)
+  static const exportFormatCsv = 'CSV';
+
+  /// PDF (형식 선택 라벨)
+  static const exportFormatPdf = 'PDF';
+
+  /// 내보내기 (버튼 라벨)
+  static const exportButton = '내보내기';
+
+  /// 기간 (내보내기 섹션 라벨)
+  static const exportPeriod = '기간';
+
+  /// 형식 (내보내기 섹션 라벨)
+  static const exportFormat = '형식';
+
   // -- Preferred Location (희망 레슨 장소 선택 — 레슨 신청 폼) --
 
   /// 희망 레슨 장소 (섹션 제목)
@@ -6571,4 +6718,90 @@ class AppStrings {
       '학생이 신청 시 "$original"을 희망했습니다.\n'
       '"$newLoc"으로 변경하시겠습니까?\n\n'
       '※ 학생에게 장소 변경이 안내됩니다.';
+
+  // ── Notification Settings (알림 설정) ──────────────────────────────────
+
+  /// 알림 설정 화면 제목
+  static const notificationSettingsTitle = '알림 설정';
+
+  /// 전체 알림 마스터 토글 라벨
+  static const notificationMasterToggle = '전체 알림';
+
+  /// 카테고리별 설정 섹션 헤더
+  static const notificationCategoryHeader = '카테고리별 설정';
+
+  /// 레슨 알림 카테고리 제목
+  static const notificationLesson = '레슨 알림';
+
+  /// 레슨 알림 카테고리 설명
+  static const notificationLessonDesc = '레슨 시작, 완료 알림';
+
+  /// 스케줄 변경 카테고리 제목
+  static const notificationSchedule = '스케줄 변경';
+
+  /// 스케줄 변경 카테고리 설명
+  static const notificationScheduleDesc = '시간 변경 요청, 승인/거절';
+
+  /// 수강권 카테고리 제목
+  static const notificationSubscription = '수강권';
+
+  /// 수강권 카테고리 설명
+  static const notificationSubscriptionDesc = '만료 임박, 갱신 제안, 입금';
+
+  /// 공지 카테고리 제목
+  static const notificationAnnouncement = '공지';
+
+  /// 공지 카테고리 설명
+  static const notificationAnnouncementDesc = '선생님 휴강, 일반 공지';
+
+  /// 연습 리마인더 카테고리 제목
+  static const notificationPractice = '연습 리마인더';
+
+  /// 연습 리마인더 카테고리 설명
+  static const notificationPracticeDesc = '연습 알림, 목표 달성';
+
+  /// 마케팅 카테고리 제목
+  static const notificationMarketing = '마케팅';
+
+  /// 마케팅 카테고리 설명
+  static const notificationMarketingDesc = '새 기능 안내, 이벤트';
+
+  /// 방해금지 시간 섹션 제목
+  static const quietHoursTitle = '방해금지 시간';
+
+  /// 방해금지 활성화 토글 라벨
+  static const quietHoursEnabledLabel = '방해금지 시간 설정';
+
+  /// 방해금지 시작 시간 라벨
+  static const quietHoursStartLabel = '시작';
+
+  /// 방해금지 종료 시간 라벨
+  static const quietHoursEndLabel = '끝';
+
+  // ── App Rating Prompt (앱 평가 유도) ────────────────────────────────────
+
+  /// 1단계 만족도 확인 — 제목
+  static const ratingQuestion = '레슨앱이 도움이 되고 있나요?';
+
+  /// 1단계 만족도 확인 — 본문
+  static const ratingPromptBody =
+      '레슨과 연습을 함께 관리하는\n경험이 어떠셨는지 알고 싶어요.';
+
+  /// 1단계 — 만족 버튼
+  static const ratingYes = '네, 도움돼요!';
+
+  /// 1단계 — 불만족 버튼
+  static const ratingNo = '아니요, 별로예요';
+
+  /// 2단계 피드백 수집 — 제목
+  static const ratingFeedbackQuestion = '어떤 점을 개선하면 좋을까요?';
+
+  /// 2단계 피드백 수집 — 본문
+  static const ratingFeedbackBody = '소중한 의견을 개발팀에 직접 전달할게요.';
+
+  /// 2단계 — 피드백 보내기 버튼
+  static const ratingSendFeedback = '피드백 보내기';
+
+  /// 2단계 — 나중에 버튼
+  static const ratingLater = '나중에';
 }

@@ -7,27 +7,24 @@ part of 'makeup_lesson.dart';
 // **************************************************************************
 
 MakeupLesson _$MakeupLessonFromJson(Map<String, dynamic> json) => MakeupLesson(
-  id: json['id'] as String,
-  studentId: json['student_id'] as String,
-  teacherId: json['teacher_id'] as String,
-  originalLessonId: json['original_lesson_id'] as String?,
-  scheduledLessonId: json['scheduled_lesson_id'] as String?,
-  status:
-      $enumDecodeNullable(_$MakeupStatusEnumMap, json['status']) ??
-      MakeupStatus.pending,
-  reason: $enumDecode(_$MakeupReasonEnumMap, json['reason']),
-  createdAt: DateTime.parse(json['created_at'] as String),
-  expiresAt: DateTime.parse(json['expires_at'] as String),
-  scheduledAt:
-      json['scheduled_at'] == null
+      id: json['id'] as String,
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
+      originalLessonId: json['original_lesson_id'] as String?,
+      scheduledLessonId: json['scheduled_lesson_id'] as String?,
+      status: $enumDecodeNullable(_$MakeupStatusEnumMap, json['status']) ??
+          MakeupStatus.pending,
+      reason: $enumDecode(_$MakeupReasonEnumMap, json['reason']),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      expiresAt: DateTime.parse(json['expires_at'] as String),
+      scheduledAt: json['scheduled_at'] == null
           ? null
           : DateTime.parse(json['scheduled_at'] as String),
-  completedAt:
-      json['completed_at'] == null
+      completedAt: json['completed_at'] == null
           ? null
           : DateTime.parse(json['completed_at'] as String),
-  note: json['note'] as String?,
-);
+      note: json['note'] as String?,
+    );
 
 Map<String, dynamic> _$MakeupLessonToJson(MakeupLesson instance) =>
     <String, dynamic>{

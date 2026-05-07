@@ -14,18 +14,17 @@ String _$studentsByStatusHash() => r'92e3da08bc85cafbf34f84a09db61e671dcd5806';
 @ProviderFor(studentsByStatus)
 final studentsByStatusProvider =
     Provider<AsyncValue<Map<PracticeStatus, List<Student>>>>.internal(
-      studentsByStatus,
-      name: r'studentsByStatusProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$studentsByStatusHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  studentsByStatus,
+  name: r'studentsByStatusProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentsByStatusHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-typedef StudentsByStatusRef =
-    ProviderRef<AsyncValue<Map<PracticeStatus, List<Student>>>>;
+typedef StudentsByStatusRef
+    = ProviderRef<AsyncValue<Map<PracticeStatus, List<Student>>>>;
 String _$studentCountsHash() => r'8f299504bd776ccd908b0cf41d5a3fb51b79bb0a';
 
 /// Students count by status for dashboard
@@ -35,10 +34,9 @@ String _$studentCountsHash() => r'8f299504bd776ccd908b0cf41d5a3fb51b79bb0a';
 final studentCountsProvider = Provider<AsyncValue<Map<String, int>>>.internal(
   studentCounts,
   name: r'studentCountsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$studentCountsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentCountsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

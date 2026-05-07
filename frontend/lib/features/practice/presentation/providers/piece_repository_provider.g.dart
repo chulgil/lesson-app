@@ -15,10 +15,9 @@ String _$pieceRepositoryHash() => r'c319caf428ee0b92e1810338c5f154691bd7b5c8';
 final pieceRepositoryProvider = Provider<PieceRepository>.internal(
   pieceRepository,
   name: r'pieceRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$pieceRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pieceRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

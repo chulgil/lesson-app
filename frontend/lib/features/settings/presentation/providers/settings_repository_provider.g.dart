@@ -16,10 +16,9 @@ String _$settingsRepositoryHash() =>
 final settingsRepositoryProvider = Provider<SettingsRepository>.internal(
   settingsRepository,
   name: r'settingsRepositoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$settingsRepositoryHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$settingsRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

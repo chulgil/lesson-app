@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/domain/entities/feedback_template.dart';
+import '../../../lessons/presentation/extensions/template_category_visuals.dart';
 
 /// Bottom sheet for creating or editing a [FeedbackTemplate].
 ///
