@@ -38,7 +38,21 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
   DateTime? _selectedDate;
   final _messageController = TextEditingController();
   bool _submitting = false;
+  bool _isUsingDefault = true;
   TeacherAnnouncement? _result;
+
+  static const _systemDefaultDayOff = '개인적인 사정으로 휴강합니다.';
+  static const _systemDefaultGeneral = '';
+
+  String get _defaultMessage =>
+      _type == AnnouncementType.dayOff ? _systemDefaultDayOff : _systemDefaultGeneral;
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: 선생님 커스텀 디폴트 메시지가 있으면 우선 사용
+    _messageController.text = _defaultMessage;
+  }
 
   @override
   void dispose() {
@@ -48,9 +62,14 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
 
   bool get _canSend {
     if (_submitting) return false;
-    if (_messageController.text.trim().isEmpty) return false;
     if (_type == AnnouncementType.dayOff && _selectedDate == null) return false;
+    // 메시지가 비어있어도 발송 가능 (디폴트 메시지 또는 빈 공지)
     return true;
+  }
+
+  String get _effectiveMessage {
+    final text = _messageController.text.trim();
+    return text.isNotEmpty ? text : _defaultMessage;
   }
 
   Future<void> _pickDate() async {
@@ -79,7 +98,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
       dates: _type == AnnouncementType.dayOff && _selectedDate != null
           ? [_selectedDate!]
           : [],
-      message: _messageController.text.trim(),
+      message: _effectiveMessage,
       createdAt: DateTime.now(),
     );
 
@@ -168,7 +187,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
           const SizedBox(height: AppSpacing.space4),
         ],
 
-        // Message
+        // Message — 디폴트 메시지가 채워져 있음, 탭하면 빈칸으로 직접 입력
         TextField(
           controller: _messageController,
           maxLines: 4,
@@ -177,8 +196,23 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
             labelText: '메시지',
             hintText: AppStrings.announcementMessageHint,
             border: const OutlineInputBorder(),
+            suffixIcon: _messageController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear, size: 18),
+                    onPressed: () {
+                      _messageController.clear();
+                      setState(() => _isUsingDefault = false);
+                    },
+                  )
+                : null,
           ),
           enabled: !_submitting,
+          onTap: () {
+            if (_isUsingDefault && _messageController.text == _defaultMessage) {
+              _messageController.clear();
+              setState(() => _isUsingDefault = false);
+            }
+          },
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: AppSpacing.space4),
