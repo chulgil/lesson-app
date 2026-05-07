@@ -2887,6 +2887,12 @@ class AppStrings {
   /// 검색 결과 없음
   static const youtubeSearchNoResults = '검색 결과가 없습니다';
 
+  /// 통합 검색 힌트 (URL + 검색어)
+  static const youtubeSearchUnifiedHint = '유튜브 링크 또는 검색어 입력';
+
+  /// 검색 전 안내
+  static const youtubeSearchEmptyState = '유튜브 링크를 붙여넣거나\n검색어를 입력하세요';
+
   /// 유튜브 링크 추가 (add youtube link option — URL direct input)
   static const addYoutubeLink = 'URL 직접 입력';
 
