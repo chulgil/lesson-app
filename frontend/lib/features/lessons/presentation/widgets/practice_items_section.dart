@@ -305,8 +305,9 @@ class PracticeItemsSection extends ConsumerWidget {
 
   Widget _buildCompletionCheckbox(WidgetRef ref, PracticeItem item) {
     // Notebook × Score: 연습 완료를 연필 사각 체크박스로 표시. 체크 색은 paperOk(녹색 펜).
+    // 선생님 뷰: 읽기 전용 (학생만 체크 가능)
     return GestureDetector(
-      onTap: () => _toggleComplete(ref, item),
+      onTap: isTeacher ? null : () => _toggleComplete(ref, item),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 24,
