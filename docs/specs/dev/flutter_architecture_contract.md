@@ -102,6 +102,21 @@ State 규칙:
 
 Debug/profile 실행에서는 `ProviderObserver`로 provider add/update/dispose를 기록한다. Release 실행에서는 observer를 붙이지 않는다.
 
+### 오디오 캡처 정책 (튜너/녹음)
+
+- 사용자 화면 흐름은 항상 다음만 허용한다.
+  - `튜너 탭/튜너 화면`이 열린 경우에만 튜너 마이크를 활성화할 수 있다.
+  - 사용자 이탈(앱 백그라운드 전환/화면 이탈) 시 튜너 화면이 닫혔다면 튜너 스트림은 종료한다.
+  - 이미 녹음이 진행 중인 경우는 녹음이 의도된 마이크 점유를 보존한다.
+- `AudioRecorderService`로 `isCaptureActive` 상태를 직접 읽고, 다음 조건에서 분기한다.
+  - `isCaptureActive == false`인 경우: 앱이 백그라운드로 가면 `tunerProvider.onAppPaused()`는 `stopForBackground`로 스트림/세션을 완전히 정리한다.
+  - `isCaptureActive == true`인 경우: 녹음이 유지되는 동안에만 튜너는 처리만 정지하고 스트림은 즉시 종료하지 않는다(예외 처리).
+- `tunerProvider.stopCompletely()`/`disableProcessing()` 정책:
+  - 튜너 창/탭 이탈: 처리만 비활성화하고 UI 상태를 초기화.
+  - 앱 전환: 처리 중단 + 세션 종료(녹음 미동작 상태) 또는 처리 비활성화(녹음 동작 상태).
+  - 앱 재진입: 튜너 상태 의도 보존(`_wasListeningBeforePause`)가 있어야만 자동 재활성화.
+- 동일 룰은 `PracticeToolsModal`과 `TunerScreen` 라이프사이클 훅에서 동일하게 적용한다.
+
 ## Feature Public API
 
 feature root에 facade를 둘 수 있지만 다음 중 하나로 명시한다.

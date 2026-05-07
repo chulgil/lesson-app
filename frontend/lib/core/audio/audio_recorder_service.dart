@@ -28,6 +28,9 @@ class AudioRecorderService {
   /// Whether paused.
   bool get isPaused => _state == RecordState.pause;
 
+  /// Whether any recording session is active (recording or paused).
+  bool get isCaptureActive => isRecording || isPaused;
+
   /// Stream of recording state changes.
   Stream<RecordState> get stateStream => _recorder.onStateChanged();
 

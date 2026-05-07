@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -49,20 +50,14 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     // Listen for tab changes to manage tuner microphone
     _tabController.addListener(_onTabChanged);
 
-    // Pre-warm both metronome and tuner engines
+    // Pre-warm metronome and tuner only when tuner tab is opened.
+    // Tuner should keep microphone inactive unless user enters tuner mode.
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
 
-      // Warm up tuner (starts microphone stream without processing)
-      // This is done once when modal opens, so tab switching is instant
-      ref.read(tunerProvider.notifier).warmUp().then((_) {
-        if (!mounted) return;
-
-        // If starting on tuner tab, enable processing after warm-up
-        if (widget.initialTab == 1) {
-          ref.read(tunerProvider.notifier).enableProcessing();
-        }
-      });
+      if (widget.initialTab == 1) {
+        unawaited(_activateTunerProcessing());
+      }
     });
   }
 
@@ -82,14 +77,20 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
 
     final tuner = ref.read(tunerProvider.notifier);
     if (_tabController.index == 1) {
-      // Switching TO tuner tab - enable processing (instant!)
-      // Stream is already active from warmUp, so no blocking occurs
-      tuner.enableProcessing();
+      // Switching TO tuner tab - warm and enable processing.
+      unawaited(_activateTunerProcessing());
     } else {
-      // Switching AWAY from tuner tab - disable processing
-      // Stream stays active for instant re-enabling
+      // Switching AWAY from tuner tab - clear tuner processing state.
       tuner.disableProcessing();
     }
+  }
+
+  Future<void> _activateTunerProcessing() async {
+    if (!mounted) return;
+    final tuner = ref.read(tunerProvider.notifier);
+    await tuner.warmUp();
+    if (!mounted || _tabController.index != 1) return;
+    await tuner.enableProcessing();
   }
 
   /// Handle app lifecycle changes
@@ -109,8 +110,8 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
           // On tuner tab - full resume (permission check + stream restart + enable)
           tuner.onAppResumed();
         } else {
-          // On other tab - re-warm stream so switching to tuner tab later works
-          tuner.warmUp();
+          // On other tab - keep tuner closed while inactive.
+          tuner.stopCompletely();
         }
         break;
       case AppLifecycleState.detached:

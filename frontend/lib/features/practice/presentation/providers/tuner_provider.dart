@@ -11,6 +11,7 @@ import '../../../../core/audio/tuner_engine.dart';
 import '../../../../core/audio/tuner_storage_service.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
+import 'recording_provider.dart';
 
 part 'tuner_provider.g.dart';
 
@@ -115,6 +116,11 @@ class Tuner extends _$Tuner {
   bool _isPaused = false; // Guard against inactive→paused double-call
   int _lifecycleVersion = 0; // Invalidate stale resume operations
 
+  bool _isManualRecordingActive() {
+    final recorder = ref.read(audioRecorderServiceProvider);
+    return recorder.isCaptureActive;
+  }
+
   @override
   TunerProviderState build() {
     // Use RecordTunerEngine for all platforms (uses record package)
@@ -146,11 +152,9 @@ class Tuner extends _$Tuner {
 
     _engine = switch (type) {
       TunerEngineType.mock => MockTunerEngine(
-          simulationMode: MockSimulationMode.tuningApproach,
-        ),
-      TunerEngineType.record => RecordTunerEngine(
-          referenceFrequency: refFreq,
-        ),
+        simulationMode: MockSimulationMode.tuningApproach,
+      ),
+      TunerEngineType.record => RecordTunerEngine(referenceFrequency: refFreq),
     };
 
     _engine!.onError = _onError;
@@ -198,8 +202,11 @@ class Tuner extends _$Tuner {
     if (note == null) {
       // Don't immediately clear - check if we're within grace period
       // This allows brief gaps in sound while maintaining continuity for same note
-      if (gracePeriodMs > 0 && _lastDetectedNoteName != null && _lastNoteTime != null) {
-        final elapsed = DateTime.now().difference(_lastNoteTime!).inMilliseconds;
+      if (gracePeriodMs > 0 &&
+          _lastDetectedNoteName != null &&
+          _lastNoteTime != null) {
+        final elapsed =
+            DateTime.now().difference(_lastNoteTime!).inMilliseconds;
         if (elapsed < gracePeriodMs) {
           // Within grace period - keep current state (don't reset)
           // The currentNote stays as is, allowing isPerfect to remain true
@@ -218,9 +225,10 @@ class Tuner extends _$Tuner {
     } else {
       // Check if this is the same note (continuity) or a new note
       final isSameNote = _lastDetectedNoteName == note.name;
-      final elapsed = _lastNoteTime != null
-          ? DateTime.now().difference(_lastNoteTime!).inMilliseconds
-          : gracePeriodMs + 1; // If no previous time, treat as expired
+      final elapsed =
+          _lastNoteTime != null
+              ? DateTime.now().difference(_lastNoteTime!).inMilliseconds
+              : gracePeriodMs + 1; // If no previous time, treat as expired
       final wasWithinGrace = gracePeriodMs > 0 && elapsed < gracePeriodMs;
 
       // If same note but grace period expired, this is a fresh start
@@ -240,10 +248,7 @@ class Tuner extends _$Tuner {
 
       // Use difficulty-aware status for consistency with isPerfect
       final status = note.statusForDifficulty(state.settings.difficulty);
-      state = state.copyWith(
-        currentNote: note,
-        status: status,
-      );
+      state = state.copyWith(currentNote: note, status: status);
     }
   }
 
@@ -391,10 +396,7 @@ class Tuner extends _$Tuner {
     _createEngine(type);
 
     // Update state
-    state = state.copyWith(
-      engineType: type,
-      isInitialized: false,
-    );
+    state = state.copyWith(engineType: type, isInitialized: false);
 
     // Restart if was listening
     if (wasListening) {
@@ -472,12 +474,19 @@ class Tuner extends _$Tuner {
   /// Call this when the practice tools modal closes.
   Future<void> stopCompletely() async {
     _wasListeningBeforePause = false;
+    if (_isManualRecordingActive()) {
+      disableProcessing();
+      return;
+    }
+
     await stop();
   }
 
   /// Called when app goes to background (paused).
   /// Fully stops the microphone stream (not just processing).
   Future<void> onAppPaused() async {
+    final isManualRecordingActive = _isManualRecordingActive();
+
     // Guard against inactive→paused double-call:
     // iOS sends inactive first, then paused. Without this guard,
     // the second call would overwrite _wasListeningBeforePause.
@@ -489,8 +498,12 @@ class Tuner extends _$Tuner {
     // is still running (state.isListening may be false mid-async-resume).
     _wasListeningBeforePause = state.isListening || _wasListeningBeforePause;
 
-    // Fully stop the mic (not just disable processing)
-    await _engine?.stopForBackground();
+    if (isManualRecordingActive) {
+      disableProcessing();
+    } else {
+      // Fully stop the mic (not just disable processing)
+      await _engine?.stopForBackground();
+    }
 
     _lastDetectedNoteName = null;
     _lastNoteTime = null;
@@ -566,9 +579,10 @@ String? currentNoteName(Ref ref) {
   // Apply transposition display if not concert pitch
   if (settings.transposition != Transposition.c) {
     final transposed = settings.transposition.transpose(note.name);
-    final transposedName = settings.enharmonicMode == EnharmonicMode.flatOnly
-        ? transposed.flatName
-        : transposed.sharpName;
+    final transposedName =
+        settings.enharmonicMode == EnharmonicMode.flatOnly
+            ? transposed.flatName
+            : transposed.sharpName;
     return '$displayName ($transposedName${note.octave})';
   }
 

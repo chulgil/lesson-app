@@ -4,6 +4,24 @@ import '../../../../../features/practice/domain/entities/metronome_settings.dart
 
 /// Paw color — Notebook × Score highlight tone (catAccent = paperHighlight).
 const _pawColor = AppColors.catAccent;
+const int _maxPawsPerRow = 6;
+
+@visibleForTesting
+List<List<int>> chunkPawsForDisplayRows(int beatCount, {int? maxPawsPerRow}) {
+  final chunkSize = maxPawsPerRow ?? _maxPawsPerRow;
+  final chunks = <List<int>>[];
+
+  for (var start = 0; start < beatCount; start += chunkSize) {
+    final end = (start + chunkSize).clamp(0, beatCount);
+    final beats =
+        List<int>.generate(end - start, (index) => start + index + 1).toList();
+    if (beats.isNotEmpty) {
+      chunks.add(beats);
+    }
+  }
+
+  return chunks;
+}
 
 /// Cat beat indicator with animated paw design.
 ///
@@ -132,34 +150,48 @@ class _AnimatedPawsRow extends StatelessWidget {
   final AccentPattern accentPattern;
   final double parentWidth;
 
+  /// Split beats into visual rows (for compound meter readability).
+  ///
+  /// 테스트에서 사용하기 위해 공개 함수를 노출한다.
+  @visibleForTesting
+  static List<List<int>> chunkPawsForDisplay(int beatCount) {
+    return chunkPawsForDisplayRows(beatCount, maxPawsPerRow: _maxPawsPerRow);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Calculate paw size based on available width
-    final pawWidth = (parentWidth / beatCount).clamp(40.0, 100.0);
+    final rows = chunkPawsForDisplay(beatCount);
+    final pawWidth = (parentWidth / _maxPawsPerRow).clamp(28.0, 92.0);
     final pawHeight = pawWidth * 0.6;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(beatCount, (index) {
-        final beatNumber = index + 1;
-        final isActive = currentBeat > 0 && index < currentBeat;
-        final isCurrentBeat = currentBeat == beatNumber;
-
-        return Expanded(
-          child: Center(
-            child: _AnimatedPaw(
-              key: ValueKey('paw_$beatNumber'),
-              beatNumber: beatNumber,
-              isActive: isActive,
-              isCurrentBeat: isCurrentBeat,
-              bpm: bpm,
-              accentPattern: accentPattern,
-              beatCount: beatCount,
-              pawSize: Size(pawWidth, pawHeight),
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+                rows[rowIndex].map((beatNumber) {
+                  final isActive = currentBeat > 0 && beatNumber <= currentBeat;
+                  final isCurrentBeat = currentBeat == beatNumber;
+                  return SizedBox(
+                    width: pawWidth,
+                    child: _AnimatedPaw(
+                      key: ValueKey('paw_$beatNumber'),
+                      beatNumber: beatNumber,
+                      isActive: isActive,
+                      isCurrentBeat: isCurrentBeat,
+                      bpm: bpm,
+                      accentPattern: accentPattern,
+                      beatCount: beatCount,
+                      pawSize: Size(pawWidth, pawHeight),
+                    ),
+                  );
+                }).toList(),
           ),
-        );
-      }),
+          if (rowIndex < rows.length - 1) const SizedBox(height: 2),
+        ],
+      ],
     );
   }
 }
