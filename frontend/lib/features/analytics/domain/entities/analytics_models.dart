@@ -204,10 +204,10 @@ class MonthlyRenewalTrend {
 
 /// Tenure distribution bucket.
 class TenureDistribution {
-  final String label;
+  final String bucketLabel;
   final int count;
 
-  const TenureDistribution({required this.label, required this.count});
+  const TenureDistribution({required this.bucketLabel, required this.count});
 }
 
 /// Retention analytics aggregate for teacher.

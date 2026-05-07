@@ -72,7 +72,10 @@ class _ReceiptListScreenState extends ConsumerState<ReceiptListScreen> {
                     size: 22,
                   ),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                 ),
               ),
             ),
@@ -166,10 +169,7 @@ class _MonthPickerRow extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(
-            color: AppColors.inkQuaternary,
-            width: 0.5,
-          ),
+          border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -280,16 +280,14 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : Colors.transparent,
+                        isSelected ? AppColors.paperAccent : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     // ignore: unnecessary_brace_in_string_interps
                     '${m}월',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: isSelected ? Colors.white : AppColors.ink,
+                      color: isSelected ? AppColors.paper : AppColors.ink,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -469,9 +467,9 @@ class _PdfDownloadButton extends StatelessWidget {
   }
 
   void _handleDownload(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PDF 다운로드 기능은 준비 중입니다.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('PDF 다운로드 기능은 준비 중입니다.')));
   }
 
   void _showPdfNotReady(BuildContext context) {

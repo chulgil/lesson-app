@@ -74,10 +74,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
               ),
-              child: Text(
-                _title,
-                style: NotebookTypography.sectionTitle,
-              ),
+              child: Text(_title, style: NotebookTypography.sectionTitle),
             ),
             const SizedBox(height: AppSpacing.space4),
             if (_isExporting) ...[
@@ -117,10 +114,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space3,
                 ),
-                child: Text(
-                  '~',
-                  style: AppTypography.bodyLarge,
-                ),
+                child: Text('~', style: AppTypography.bodyLarge),
               ),
               Expanded(
                 child: _DateButton(
@@ -170,7 +164,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
             onPressed: _startExport,
             child: Text(
               AppStrings.exportButton,
-              style: AppTypography.button.copyWith(color: Colors.white),
+              style: AppTypography.button.copyWith(color: AppColors.paper),
             ),
           ),
         ],
@@ -274,7 +268,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
                   label: Text(
                     '공유하기',
                     style: AppTypography.buttonSmall.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                     ),
                   ),
                 ),
@@ -368,9 +362,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
     final buffer = StringBuffer();
     // UTF-8 BOM for Excel Windows compatibility
     buffer.write('\uFEFF');
-    buffer.write(
-      '레슨날짜,요일,시작시간,종료시간,수업시간(분),선생님명,악기,레슨유형,상태,수강권\r\n',
-    );
+    buffer.write('레슨날짜,요일,시작시간,종료시간,수업시간(분),선생님명,악기,레슨유형,상태,수강권\r\n');
     // Mock rows
     final rows = [
       '2026-05-07,수,15:00,16:00,60,김선생,바이올린,정기,완료,5월 정기 8회권',
@@ -483,7 +475,9 @@ class _FormatCard extends StatelessWidget {
                   icon,
                   size: 18,
                   color:
-                      isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkTertiary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(

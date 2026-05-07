@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/notification_preferences.dart';
 import '../providers/notification_preferences_provider.dart';
 
@@ -19,23 +20,10 @@ class NotificationSettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(notificationPreferencesNotifierProvider);
-    final notifier =
-        ref.read(notificationPreferencesNotifierProvider.notifier);
+    final notifier = ref.read(notificationPreferencesNotifierProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        backgroundColor: AppColors.paper,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          AppStrings.notificationSettingsTitle,
-          style: AppTypography.headingSmall,
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: AppColors.inkQuaternary),
-        ),
-      ),
+    return NotebookScreenScaffold(
+      appBarTitle: AppStrings.notificationSettingsTitle,
       body: ListView(
         children: [
           _MasterToggleSection(
@@ -49,63 +37,66 @@ class NotificationSettingsScreen extends ConsumerWidget {
             subtitle: AppStrings.notificationLessonDesc,
             enabled: prefs.lessonEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) =>
-                notifier.toggleCategory(NotificationCategory.lesson, v),
+            onChanged:
+                (v) => notifier.toggleCategory(NotificationCategory.lesson, v),
           ),
           _CategoryTile(
             title: AppStrings.notificationSchedule,
             subtitle: AppStrings.notificationScheduleDesc,
             enabled: prefs.scheduleEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) =>
-                notifier.toggleCategory(NotificationCategory.schedule, v),
+            onChanged:
+                (v) =>
+                    notifier.toggleCategory(NotificationCategory.schedule, v),
           ),
           _CategoryTile(
             title: AppStrings.notificationSubscription,
             subtitle: AppStrings.notificationSubscriptionDesc,
             enabled: prefs.subscriptionEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) => notifier.toggleCategory(
-              NotificationCategory.subscription,
-              v,
-            ),
+            onChanged:
+                (v) => notifier.toggleCategory(
+                  NotificationCategory.subscription,
+                  v,
+                ),
           ),
           _CategoryTile(
             title: AppStrings.notificationAnnouncement,
             subtitle: AppStrings.notificationAnnouncementDesc,
             enabled: prefs.announcementEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) => notifier.toggleCategory(
-              NotificationCategory.announcement,
-              v,
-            ),
+            onChanged:
+                (v) => notifier.toggleCategory(
+                  NotificationCategory.announcement,
+                  v,
+                ),
           ),
           _CategoryTile(
             title: AppStrings.notificationPractice,
             subtitle: AppStrings.notificationPracticeDesc,
             enabled: prefs.practiceEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) =>
-                notifier.toggleCategory(NotificationCategory.practice, v),
+            onChanged:
+                (v) =>
+                    notifier.toggleCategory(NotificationCategory.practice, v),
           ),
           _CategoryTile(
             title: AppStrings.notificationMarketing,
             subtitle: AppStrings.notificationMarketingDesc,
             enabled: prefs.marketingEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged: (v) =>
-                notifier.toggleCategory(NotificationCategory.marketing, v),
+            onChanged:
+                (v) =>
+                    notifier.toggleCategory(NotificationCategory.marketing, v),
           ),
           const SizedBox(height: AppSpacing.space2),
           _SectionHeader(AppStrings.quietHoursTitle),
           _QuietHoursSection(
             startHour: prefs.quietStartHour,
             endHour: prefs.quietEndHour,
-            onChanged: ({required int? startHour, required int? endHour}) =>
-                notifier.setQuietHours(
-              startHour: startHour,
-              endHour: endHour,
-            ),
+            onChanged:
+                ({required int? startHour, required int? endHour}) => notifier
+                    .setQuietHours(startHour: startHour, endHour: endHour),
           ),
           const SizedBox(height: AppSpacing.space8),
         ],
@@ -119,10 +110,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 
 class _MasterToggleSection extends StatelessWidget {
-  const _MasterToggleSection({
-    required this.enabled,
-    required this.onChanged,
-  });
+  const _MasterToggleSection({required this.enabled, required this.onChanged});
 
   final bool enabled;
   final ValueChanged<bool> onChanged;
@@ -171,9 +159,7 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.inkSecondary,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }
@@ -213,9 +199,7 @@ class _CategoryTile extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.inkTertiary,
-        ),
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
       ),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
@@ -238,7 +222,7 @@ class _QuietHoursSection extends StatelessWidget {
   final int? startHour;
   final int? endHour;
   final void Function({required int? startHour, required int? endHour})
-      onChanged;
+  onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -280,8 +264,7 @@ class _QuietHoursSection extends StatelessWidget {
                   child: _HourPickerButton(
                     label: AppStrings.quietHoursStartLabel,
                     hour: startHour!,
-                    onChanged: (h) =>
-                        onChanged(startHour: h, endHour: endHour),
+                    onChanged: (h) => onChanged(startHour: h, endHour: endHour),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
@@ -289,8 +272,8 @@ class _QuietHoursSection extends StatelessWidget {
                   child: _HourPickerButton(
                     label: AppStrings.quietHoursEndLabel,
                     hour: endHour!,
-                    onChanged: (h) =>
-                        onChanged(startHour: startHour, endHour: h),
+                    onChanged:
+                        (h) => onChanged(startHour: startHour, endHour: h),
                   ),
                 ),
               ],
@@ -355,10 +338,11 @@ class _HourPickerButton extends StatelessWidget {
       context: context,
       initialTime: TimeOfDay(hour: hour, minute: 0),
       initialEntryMode: TimePickerEntryMode.input,
-      builder: (ctx, child) => MediaQuery(
-        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
+      builder:
+          (ctx, child) => MediaQuery(
+            data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
     );
     if (picked != null) {
       onChanged(picked.hour);
