@@ -3,8 +3,6 @@
 
 import 'practice_note.dart';
 
-part 'practice_repertoire.g.dart';
-
 /// Range type for practice section (full, line, or measure)
 enum SectionRangeType {
   full, // 전체 (범위 지정 없음)
