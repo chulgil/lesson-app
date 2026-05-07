@@ -35,6 +35,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '10:00',
         duration: 60,
         status: LessonStatus.completed,
+        subscriptionId: 'sub_pkg_01',
         pieces: const [
           LessonPiece(
             id: 'piece_001',
@@ -72,6 +73,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '14:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_mon_01',
         travelTimeMinutes: 25,
         pieces: const [
           LessonPiece(
@@ -186,6 +188,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '15:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_pkg_01',
         travelTimeMinutes: 20,
         pieces: const [
           LessonPiece(
@@ -242,6 +245,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '14:00',
         duration: 60,
         status: LessonStatus.completed,
+        subscriptionId: 'sub_mon_02',
         pieces: const [
           LessonPiece(
             id: 'piece_010',

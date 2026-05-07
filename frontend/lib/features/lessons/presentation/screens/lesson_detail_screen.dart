@@ -17,6 +17,7 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../../subscription/presentation/extensions/subscription_visuals.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 
@@ -252,7 +253,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     value: 'cancel',
                     child: Text(AppStrings.cancel),
                   ),
-                if (lesson.hasSubscription)
+                // Show for subscription lessons OR manual lessons with an active subscription
+                if (lesson.subscriptionId != null ||
+                    ref.watch(activeStudentSubscriptionsProvider(lesson.studentId)).valueOrNull?.isNotEmpty == true)
                   PopupMenuItem(
                     value: 'schedule_change',
                     child: Text(AppStrings.announcementScheduleChange),
@@ -356,12 +359,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         }
       }
     } else if (value == 'schedule_change') {
-      if (lesson.subscriptionId != null) {
+      final subId = lesson.subscriptionId ??
+          ref.read(activeStudentSubscriptionsProvider(lesson.studentId)).valueOrNull?.firstOrNull?.id;
+      if (subId != null) {
         context.push(
-          AppRoutes.subscriptionDetail.replaceFirst(
-            ':id',
-            lesson.subscriptionId!,
-          ),
+          AppRoutes.subscriptionDetail.replaceFirst(':id', subId),
           extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
         );
       }
@@ -425,29 +427,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             const SizedBox(height: AppSpacing.space4),
           ],
 
-          // Regular lesson proposal banner (shown after feedback is written,
-          // when no active subscription exists with this student)
-          // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨만
-          if (lesson.hasSubscription && lesson.subscriptionId != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-              child: OutlinedButton.icon(
-                onPressed: () => context.push(
-                  AppRoutes.subscriptionDetail.replaceFirst(
-                    ':id',
-                    lesson.subscriptionId!,
-                  ),
-                  extra: {
-                    'viewerRole': widget.isTeacher ? 'teacher' : 'student',
-                  },
-                ),
-                icon: const Icon(Icons.swap_horiz, size: 18),
-                label: const Text(AppStrings.announcementScheduleChange),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
-                ),
-              ),
-            ),
+          // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨 또는 활성 수강권이 있는 수동 레슨
+          _buildScheduleChangeButton(lesson),
 
           // Teacher notes section
           if (widget.isTeacher) ...[
@@ -519,6 +500,52 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           Center(child: Text('Fine.', style: NotebookTypography.fine)),
           const SizedBox(height: AppSpacing.space8),
         ],
+      ),
+    );
+  }
+
+  /// Schedule-change button — shows for subscription lessons or manual lessons
+  /// that have an active subscription with the same student.
+  Widget _buildScheduleChangeButton(Lesson lesson) {
+    // Case 1: lesson is directly linked to a subscription
+    if (lesson.subscriptionId != null) {
+      return _scheduleChangeButton(
+        subscriptionId: lesson.subscriptionId!,
+        label: AppStrings.announcementScheduleChange,
+      );
+    }
+
+    // Case 2: manual lesson — check whether an active subscription exists
+    final subsAsync = ref.watch(activeStudentSubscriptionsProvider(lesson.studentId));
+    return subsAsync.maybeWhen(
+      data: (subs) {
+        if (subs.isEmpty) return const SizedBox.shrink();
+        final activeSub = subs.first;
+        return _scheduleChangeButton(
+          subscriptionId: activeSub.id,
+          label: '${AppStrings.announcementScheduleChange} (${activeSub.typeLabel})',
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _scheduleChangeButton({
+    required String subscriptionId,
+    required String label,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+      child: OutlinedButton.icon(
+        onPressed: () => context.push(
+          AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
+          extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
+        ),
+        icon: const Icon(Icons.swap_horiz, size: 18),
+        label: Text(label),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
+        ),
       ),
     );
   }

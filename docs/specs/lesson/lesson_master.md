@@ -1421,3 +1421,40 @@ frontend/lib/features/schedule/
 - 기본정보 수정에서 설정 (이름 바로 아래)
 - 기본값: 본명이 자동 채움
 - `displayName` getter: nickname ?? name
+
+## 12. 레슨 상세 → 스케줄 변경 진입 규칙 (2026-05-08)
+
+### 12.1 문제
+
+레슨 상세에서 [스케줄 변경] 버튼이 `subscriptionId != null`일 때만 표시됨.
+하지만 수기 등록 레슨도 학생에게 활성 수강권이 있으면 스케줄 변경이 가능해야 함.
+
+### 12.2 진입 조건
+
+| 레슨 타입 | subscriptionId | 활성 수강권 | [스케줄 변경] 표시 | 이동 대상 |
+|----------|:-----------:|:--------:|:-------------:|----------|
+| 수강권 레슨 | ✅ 있음 | ✅ | **표시** | 해당 수강권 상세(챗) |
+| 수기 레슨 | null | ✅ 있음 | **표시** | 학생의 활성 수강권 상세(챗) |
+| 수기 레슨 | null | ❌ 없음 | 미표시 | — |
+
+### 12.3 로직
+
+```dart
+// 1순위: 레슨에 연결된 수강권
+if (lesson.subscriptionId != null) → subscriptionDetail(lesson.subscriptionId)
+
+// 2순위: 학생의 활성 수강권 (수기 레슨)
+else → activeSubscriptionBetween(studentId, teacherId) → subscriptionDetail(sub.id)
+
+// 수강권 없음 → 버튼 미표시
+```
+
+### 12.4 버튼 위치
+
+- **본문**: 레슨 정보 아래, 피드백 위 — full width OutlinedButton
+- **AppBar ⋮ 메뉴**: "스케줄 변경" 옵션
+
+### 12.5 버튼 라벨
+
+수강권 레슨: "스케줄 변경"
+수기 레슨 (활성 수강권 있음): "스케줄 변경 (수강권: 8회권)"
