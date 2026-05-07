@@ -69,6 +69,20 @@ class MockTeacherAnnouncementRepository
   }
 
   @override
+  Future<TeacherAnnouncement> update(TeacherAnnouncement announcement) async {
+    final index = _store.indexWhere((a) => a.id == announcement.id);
+    if (index >= 0) {
+      _store[index] = announcement;
+    }
+    return announcement;
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    _store.removeWhere((a) => a.id == id);
+  }
+
+  @override
   Future<List<TeacherAnnouncement>> getByTeacherId(String teacherId) async {
     return _store
         .where((a) => a.teacherId == teacherId)

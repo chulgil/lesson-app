@@ -85,13 +85,77 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
   }
 }
 
-class _AnnouncementCard extends StatelessWidget {
+class _AnnouncementCard extends ConsumerWidget {
   final TeacherAnnouncement announcement;
 
   const _AnnouncementCard({required this.announcement});
 
+  void _editAnnouncement(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController(text: announcement.message);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('공지 수정'),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: '공지 내용을 수정하세요',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('취소')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (result != null && result.isNotEmpty) {
+      final repo = ref.read(teacherAnnouncementRepositoryProvider);
+      await repo.update(TeacherAnnouncement(
+        id: announcement.id,
+        teacherId: announcement.teacherId,
+        type: announcement.type,
+        dates: announcement.dates,
+        message: result,
+        createdAt: announcement.createdAt,
+        affectedLessons: announcement.affectedLessons,
+      ));
+      ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
+    }
+  }
+
+  void _deleteAnnouncement(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('공지 삭제'),
+        content: const Text('이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final repo = ref.read(teacherAnnouncementRepositoryProvider);
+      await repo.delete(announcement.id);
+      ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDayOff = announcement.type == AnnouncementType.dayOff;
     final dateText = announcement.dates.isNotEmpty
         ? formatDateMD(announcement.dates.first)
@@ -133,6 +197,24 @@ class _AnnouncementCard extends StatelessWidget {
                   style: AppTypography.captionSmall.copyWith(
                     color: AppColors.inkTertiary,
                   ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  iconSize: 18,
+                  icon: Icon(Icons.more_vert, size: 18, color: AppColors.inkTertiary),
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(value: 'edit', child: Text('수정')),
+                    const PopupMenuItem(value: 'delete', child: Text('삭제')),
+                  ],
+                  onSelected: (action) {
+                    if (action == 'edit') {
+                      _editAnnouncement(context, ref);
+                    } else if (action == 'delete') {
+                      _deleteAnnouncement(context, ref);
+                    }
+                  },
                 ),
               ],
             ),
