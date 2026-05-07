@@ -654,6 +654,7 @@ async def test_confirmation_card_confirm_does_not_duplicate_subscription_booking
     ).all()
     assert len(bookings) == 1
     assert bookings[0].scheduled_time == "15:00"
+    assert bookings[0].subscription_id == "dup-booking-subscription"
 
 
 @pytest.mark.asyncio

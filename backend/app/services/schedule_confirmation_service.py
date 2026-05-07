@@ -296,6 +296,7 @@ class ScheduleConfirmationService:
                 scheduled_time=scheduled_time,
                 duration=duration,
                 instrument=card.instrument,
+                subscription_id=card.subscription_id,
                 status="confirmed",
             )
             self.db.add(booking)

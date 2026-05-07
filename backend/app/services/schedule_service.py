@@ -581,6 +581,7 @@ class ScheduleService:
             scheduled_time=data.scheduled_time,
             duration=data.duration,
             instrument=data.instrument,
+            subscription_id=data.subscription_id,
             notes=data.notes,
             status="pending",
         )

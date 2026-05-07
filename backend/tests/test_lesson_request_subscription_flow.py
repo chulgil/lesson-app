@@ -202,6 +202,7 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
         )
     )).all()
     assert len(bookings) == 4  # monthly, total_lessons=4
+    assert all(booking.subscription_id == sub.id for booking in bookings)
 
 
 @pytest.mark.asyncio
@@ -242,6 +243,7 @@ async def test_trial_single_booking(db_session: AsyncSession, create_test_user):
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 1
     assert bookings[0].lesson_type == "trial"
+    assert all(booking.subscription_id == result.subscription_id for booking in bookings)
 
 
 @pytest.mark.asyncio
@@ -280,6 +282,7 @@ async def test_package_first_booking_only(db_session: AsyncSession, create_test_
     from app.models.schedule import LessonBooking
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 1  # Package: first lesson only
+    assert all(booking.subscription_id == result.subscription_id for booking in bookings)
 
 
 @pytest.mark.asyncio

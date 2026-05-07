@@ -276,6 +276,7 @@ class BookingResponse(BaseModel):
     location_id: str | None = None
     notes: str | None = None
     status: str | None = None
+    subscription_id: str | None = None
     reason: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
@@ -332,6 +333,7 @@ class BookingCreate(BaseModel):
     duration: int = 60
     instrument: str | None = None
     location_id: str | None = None
+    subscription_id: str | None = None
     notes: str | None = None
 
     # Frontend-specific fields (stored in notes or ignored)

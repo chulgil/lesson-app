@@ -893,6 +893,7 @@ CREATE TABLE lesson_bookings (
     duration INT NOT NULL DEFAULT 60,
     instrument VARCHAR(50),
     location_id CHAR(36),
+    subscription_id CHAR(36),
     status ENUM('pending', 'approved', 'rejected', 'cancelled', 'completed', 'noShow')
         NOT NULL DEFAULT 'pending',
     notes TEXT,
@@ -901,9 +902,11 @@ CREATE TABLE lesson_bookings (
 
     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL,
     FOREIGN KEY (location_id) REFERENCES lesson_locations(id) ON DELETE SET NULL,
     INDEX idx_booking_teacher (teacher_id),
     INDEX idx_booking_student (student_id),
+    INDEX idx_booking_subscription (subscription_id),
     INDEX idx_booking_date (scheduled_date),
     INDEX idx_booking_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

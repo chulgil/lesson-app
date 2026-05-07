@@ -100,6 +100,7 @@ class LessonService:
             date=data.date,
             start_time=data.start_time or "00:00",
             duration=data.duration,
+            subscription_id=data.subscription_id,
             location_name=data.location_name,
         )
         self.db.add(lesson)

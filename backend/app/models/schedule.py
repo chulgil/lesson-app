@@ -1,7 +1,20 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import CheckConstraint, JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    JSON,
+    Boolean,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -151,6 +164,11 @@ class LessonBooking(UUIDMixin, TimestampMixin, Base):
     duration: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
     instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
     location_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    subscription_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("subscriptions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     status: Mapped[BookingStatus] = mapped_column(
         Enum(BookingStatus, native_enum=True),
         nullable=False,
@@ -161,6 +179,7 @@ class LessonBooking(UUIDMixin, TimestampMixin, Base):
     __table_args__ = (
         Index("idx_booking_teacher", "teacher_id"),
         Index("idx_booking_student", "student_id"),
+        Index("idx_booking_subscription", "subscription_id"),
         Index("idx_booking_date", "scheduled_date"),
         Index("idx_booking_status", "status"),
     )

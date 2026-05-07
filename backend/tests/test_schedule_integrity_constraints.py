@@ -25,12 +25,19 @@ def _script() -> ScriptDirectory:
 def test_schedule_integrity_constraints_are_declared_in_model_metadata() -> None:
     teacher_availability = Base.metadata.tables["teacher_availabilities"]
     availability_slot = Base.metadata.tables["availability_time_slots"]
+    lesson_bookings = Base.metadata.tables["lesson_bookings"]
 
     teacher_availability_constraints = {constraint.name for constraint in teacher_availability.constraints}
     availability_slot_constraints = {constraint.name for constraint in availability_slot.constraints}
+    lesson_booking_indexes = {idx.name for idx in lesson_bookings.indexes}
+    booking_subscription_fk = {
+        fk.target_fullname for fk in lesson_bookings.c["subscription_id"].foreign_keys
+    }
 
     assert "ck_teacher_availabilities_day_of_week" in teacher_availability_constraints
     assert "ck_availability_time_slots_temporal_order" in availability_slot_constraints
+    assert "idx_booking_subscription" in lesson_booking_indexes
+    assert "subscriptions.id" in booking_subscription_fk
 
 
 def test_schedule_integrity_migration_declares_constraints() -> None:
@@ -42,6 +49,17 @@ def test_schedule_integrity_migration_declares_constraints() -> None:
     source = Path(rev.module.__file__).read_text()
     assert "ck_teacher_availabilities_day_of_week" in source
     assert "ck_availability_time_slots_temporal_order" in source
+
+
+def test_booking_subscription_origin_migration_declares_fk_and_index() -> None:
+    script = _script()
+    rev = script.get_revision("add_booking_subscription_origin")
+    assert rev is not None
+    assert rev.down_revision == "add_schedule_availability_time_constraints"
+
+    source = Path(rev.module.__file__).read_text()
+    assert "fk_lesson_bookings_subscription_id_subscriptions" in source
+    assert "idx_booking_subscription" in source
 
 
 @pytest.mark.asyncio
