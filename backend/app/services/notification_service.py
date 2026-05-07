@@ -83,6 +83,7 @@ BOTH_ROLE_NOTIFICATION_TYPES = frozenset(
         "scheduleChangeAlternative",
         "subscriptionExpiringSoon",
         "subscriptionExpired",
+        "generalAnnouncement",
     }
 )
 KNOWN_ROLE_TARGETED_TYPES = (
