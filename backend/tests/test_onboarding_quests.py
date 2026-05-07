@@ -77,3 +77,55 @@ async def test_onboarding_quest_complete_rejects_unknown_quest(
     )
 
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_teacher_domain_actions_auto_complete_onboarding_quests(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Backend domain actions advance onboarding quests without frontend mock state."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    profile_response = await client.put(
+        "/api/v1/teachers/me/profile",
+        headers=auth_headers,
+        json={"instruments": ["violin"], "introduction": "Lesson teacher"},
+    )
+    assert profile_response.status_code == 200
+    progress_response = await client.get("/api/v1/users/me/onboarding-progress", headers=auth_headers)
+    progress = progress_response.json()
+    assert _quest_status(progress, "teacher.profile") == "completed"
+
+    student_response = await client.post(
+        "/api/v1/teachers/me/students",
+        headers=auth_headers,
+        json={"name": "Student", "instrument": "violin"},
+    )
+    assert student_response.status_code == 201
+    progress_response = await client.get("/api/v1/users/me/onboarding-progress", headers=auth_headers)
+    progress = progress_response.json()
+    assert _quest_status(progress, "teacher.firstStudent") == "completed"
+
+    lesson_response = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": student_response.json()["id"],
+            "instrument": "violin",
+            "date": "2026-05-07",
+            "start_time": "15:00",
+            "duration": 60,
+        },
+    )
+    assert lesson_response.status_code == 201
+    progress_response = await client.get("/api/v1/users/me/onboarding-progress", headers=auth_headers)
+    progress = progress_response.json()
+    assert _quest_status(progress, "teacher.firstLesson") == "completed"
+    assert progress["is_all_required_completed"] is True
+    assert progress["current_phase"] == "completed"
+
+
+def _quest_status(progress: dict, quest_id: str) -> str:
+    return next(quest["status"] for quest in progress["quests"] if quest["id"] == quest_id)

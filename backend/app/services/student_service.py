@@ -60,6 +60,7 @@ class StudentService:
     async def create(self, data: StudentCreate, current_user: Any) -> StudentResponse:
         """Register a new student under the current teacher."""
         from app.models.student import Student
+        from app.services.user_service import UserService
 
         tid = await resolve_teacher_id(self.db, current_user.id)
         create_data = data.model_dump(exclude_unset=True)
@@ -73,6 +74,7 @@ class StudentService:
         self.db.add(student)
         await self.db.flush()
         await self.db.refresh(student)
+        await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstStudent")
         return StudentResponse.model_validate(student)
 
     async def get_by_id(self, student_id: str, current_user: Any) -> StudentResponse:

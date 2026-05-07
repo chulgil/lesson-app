@@ -77,6 +77,7 @@ class LessonService:
         """Create a new lesson."""
         from app.models.lesson import Lesson
         from app.models.student import Student
+        from app.services.user_service import UserService
 
         tid = await resolve_teacher_id(self.db, current_user.id)
 
@@ -104,6 +105,7 @@ class LessonService:
         self.db.add(lesson)
         await self.db.flush()
         await self.db.refresh(lesson)
+        await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
         return LessonResponse.model_validate(lesson)
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:

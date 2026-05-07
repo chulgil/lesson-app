@@ -137,6 +137,7 @@ class TeacherService:
     async def update(self, teacher_id: str, data: TeacherUpdate, current_user: Any) -> TeacherResponse:
         """Update teacher profile (owner only)."""
         from app.models.teacher import Teacher
+        from app.services.user_service import UserService
 
         teacher = await self.db.get(Teacher, teacher_id)
         if teacher is None:
@@ -149,6 +150,7 @@ class TeacherService:
             setattr(teacher, key, value)
         await self.db.flush()
         await self.db.refresh(teacher)
+        await UserService(self.db).complete_onboarding_quest(current_user, "teacher.profile")
         return await self._enrich_response(teacher)
 
     async def upsert_for_user(self, user_id: str, data: TeacherUpdate, current_user: Any) -> TeacherResponse:
