@@ -28,6 +28,15 @@
 | Backend 단위 | `pytest` | `uv run pytest -x -q` | 80% |
 | E2E | Playwright MCP 또는 수동 | — | 핵심 플로우 커버 |
 
+### Frontend 아키텍처 자동 점검 항목
+
+- `flutter --no-version-check test frontend/test/architecture/layer_boundaries_test.dart`
+- `flutter --no-version-check test frontend/test/architecture/feature_dependency_contract_test.dart`
+- `flutter --no-version-check test frontend/test/architecture/notebook_design_contract_test.dart`
+- `flutter --no-version-check test frontend/test/architecture/ux_overlay_label_contract_test.dart`
+
+이 항목은 변경 전/후 `git status`에서 UI 라벨 문구가 변경되었는지 확인되면 반드시 재실행한다.
+
 ## 빌드
 
 | 대상 | 명령 |
