@@ -17,30 +17,21 @@
 
 ## 2. 기획 방향 누락 (P0 — 즉시 해결)
 
-### 2.1 레슨 추가 시 학생 선택 UI 미표시
-- **문제**: 레슨 추가 화면에서 학생 선택 UI가 보이지 않음
-- **기획 결정 필요**: 수강권과 연동된 레슨 vs 수기 관리 레슨
-- **상태**: 조사 중
+### P0 — 상세 스펙 완료 ✅
 
-### 2.2 결제 영수증 / 인보이스 PDF
-- **문제**: 학부모가 수강료 영수증을 요구할 때 제공 수단 없음
-- **경쟁사**: Tonara, StudioMate 모두 제공
-- **영향**: B2B(학원) 고객 유치 실패 위험
-- **우선순위**: P0 (사전 출시)
+| 항목 | 스펙 문서 | 핵심 내용 |
+|------|----------|----------|
+| 학생 진도 분석 대시보드 | [`student_progress_dashboard_spec.md`](../analytics/student_progress_dashboard_spec.md) | 월간 요약 / 학생별 성장 차트 / 수입 분석 / 리텐션. API 5개, Phase A~G |
+| 결제 영수증/인보이스 PDF | [`payment_receipt_spec.md`](../subscription/payment_receipt_spec.md) | WeasyPrint PDF / Vultr S3 저장 / 자동 영수증 + 청구서 발송. API 9개, Phase 1~2 |
+| 레슨 추가 수강권 안내 | [`lesson_master.md §10`](../lesson/lesson_master.md) | 수강권 유무별 배너 (녹색/회색) — **구현 완료** |
 
-### 2.3 학생 진도 분석 대시보드
-- **문제**: 선생님이 학생 성장을 수치로 보여줄 수 없음
-- **경쟁사**: 모든 경쟁사가 제공 (연습 시간/진도율/출석률)
-- **영향**: 선생님 이탈 (ROI 증명 불가)
-- **우선순위**: P0 (사전 출시)
+### P1 — 상세 스펙 완료 ✅
 
-## 3. 기획 방향 누락 (P1 — 베타 후)
-
-| 항목 | 설명 | 예상 공수 |
-|------|------|----------|
-| 세분화된 푸시 알림 설정 | 레슨/공지/결제별 토글 | 1-2주 |
-| 앱스토어 리뷰 프롬프트 | in_app_review 연동 | 2-3일 |
-| 레슨 이력 CSV/PDF 내보내기 | 학부모 세무 신고용 | 1-2주 |
+| 항목 | 스펙 문서 | 핵심 내용 |
+|------|----------|----------|
+| 레슨 이력 내보내기 | [`lesson_history_export_spec.md`](../lesson/lesson_history_export_spec.md) | CSV (UTF-8 BOM) + PDF. 비동기 job, 최대 3년 |
+| 세분화 푸시 알림 설정 | [`push_notification_settings_spec.md`](../notification/push_notification_settings_spec.md) | 6카테고리 토글 + DND + 우회 알림 4종 |
+| 앱스토어 리뷰 프롬프트 | [`app_rating_prompt_spec.md`](../settings/app_rating_prompt_spec.md) | 2단계 (만족→리뷰, 불만→피드백). Hive 로컬 |
 
 ## 4. 장기 과제 (P2-P3)
 

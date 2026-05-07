@@ -141,6 +141,11 @@
 | 6-c | travel_time_spec.md v2 | - | 보강 | - | 설계 완료 |
 | 3-b | teaching_resource_attachment_spec.md | - | 신규 | - | 설계 완료 |
 | 3-c | subscription_edit_spec.md | - | 신규 | - | 설계 완료 |
+| 3-d | student_progress_dashboard_spec.md | - | 신규 | - | 설계 완료 |
+| 3-e | payment_receipt_spec.md | - | 신규 | - | 설계 완료 |
+| 3-f | lesson_history_export_spec.md | - | 신규 | - | 설계 완료 |
+| 8-b | push_notification_settings_spec.md | - | 신규 | - | 설계 완료 |
+| 13-b | app_rating_prompt_spec.md | - | 신규 | - | 설계 완료 |
 | 11 | student_home_master.md | 1종 | 15개 파일 | - | 완료 |
 | 12 | follow_master.md | - | Phase 3 | - | 완료 |
 | 13 | settings_master.md | - | 13개 파일 | - | 완료 |
