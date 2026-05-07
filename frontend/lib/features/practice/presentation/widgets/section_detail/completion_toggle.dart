@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -170,7 +171,7 @@ class CompletionToggle extends StatelessWidget {
         Icon(Icons.share, size: 12, color: AppColors.ink),
         const SizedBox(width: AppSpacing.space1),
         Text(
-          '완료 시 대표녹음이 선생님께 공유됩니다',
+          AppStrings.practiceJournalShareHint,
           style: AppTypography.caption.copyWith(color: AppColors.ink),
         ),
       ],

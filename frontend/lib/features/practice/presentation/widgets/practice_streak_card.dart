@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/practice_streak.dart';
+import '../../../../features/practice/presentation/extensions/practice_display_extensions.dart';
 import '../../../../features/practice/practice_facade.dart';
 
 /// Compact streak display widget for dashboard
@@ -50,7 +51,7 @@ class PracticeStreakCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '연습 스트릭',
+                  AppStrings.practiceJournalTitle,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paper.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w500,
@@ -82,7 +83,7 @@ class PracticeStreakCard extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: Text(
-                    '일 연속',
+                    AppStrings.practiceJournalContinuousDays,
                     style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.paper.withValues(alpha: 0.9),
                     ),
@@ -110,7 +111,7 @@ class PracticeStreakCard extends ConsumerWidget {
             if (streak.longestStreak > 0) ...[
               const SizedBox(height: AppSpacing.space2),
               Text(
-                '최고 기록: ${streak.longestStreak}일',
+                '${AppStrings.practiceJournalBestRun}: ${streak.longestStreak}일',
                 style: AppTypography.caption.copyWith(
                   color: AppColors.paper.withValues(alpha: 0.7),
                 ),
@@ -208,7 +209,7 @@ class PracticeStreakCard extends ConsumerWidget {
           const Icon(Icons.error_outline, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '스트릭 정보를 불러올 수 없습니다',
+            AppStrings.practiceJournalErrorShort,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),

@@ -1,6 +1,8 @@
+import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/metronome_settings.dart';
 import '../../domain/entities/piece.dart';
 import '../../domain/entities/practice_item.dart';
+import '../../domain/entities/practice_streak.dart';
 import '../../domain/entities/recording.dart';
 import '../../domain/entities/repertoire_timeline.dart';
 import '../../domain/entities/tuner_settings.dart';
@@ -135,6 +137,20 @@ extension PracticeTypeDisplay on PracticeType {
       PracticeType.theory => '이론',
       PracticeType.custom => '직접입력',
     };
+  }
+}
+
+extension PracticeStreakDisplay on PracticeStreak {
+  String get motivationMessage {
+    if (currentStreak == 0) {
+      return AppStrings.practiceJournalMotivationStart();
+    } else if (currentStreak < 7) {
+      return AppStrings.practiceJournalMotivationGrowing(currentStreak);
+    } else if (currentStreak < 30) {
+      return AppStrings.practiceJournalMotivationContinuing(currentStreak);
+    } else {
+      return AppStrings.practiceJournalMotivationCelebration(currentStreak);
+    }
   }
 }
 

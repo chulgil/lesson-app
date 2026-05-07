@@ -7,5 +7,6 @@ export 'practice_streak_provider.dart';
 export 'practice_item_providers.dart';
 export 'practice_repertoire_repository_provider.dart';
 export 'practice_repertoire_crud_provider.dart';
+export 'journal_privacy_provider.dart';
 export 'piece_repository_provider.dart';
 export 'piece_crud_provider.dart';

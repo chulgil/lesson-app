@@ -1,7 +1,4 @@
-import 'package:flutter/foundation.dart';
-
 /// Teacher feedback on a shared recording.
-@immutable
 class RecordingFeedback {
   const RecordingFeedback({
     required this.id,

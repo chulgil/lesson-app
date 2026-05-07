@@ -1182,18 +1182,18 @@ class AppStrings {
   // 학생 메시지
   static const timeBannerStudentMorningLesson = '좋은 아침이에요. 오늘 레슨이 있어요!';
   static String timeBannerStudentMorningStreak(int streak) =>
-      '좋은 아침이에요. $streak일 연속 연습 중이에요!';
+      '좋은 아침이에요. 연습 일지 $streak일째예요!';
   static const timeBannerStudentMorningPractice = '좋은 아침이에요. 오늘 연습해볼까요?';
   static String timeBannerStudentLessonTime(String time) => '$time 레슨 시간이에요!';
   static String timeBannerStudentStreakKeep(int streak) =>
-      '오늘도 $streak일째 이어가요!';
+      '오늘도 연습 일지 $streak일째예요!';
   static String timeBannerStudentStreakGreat(int streak) =>
-      '$streak일 연속 연습! 멋져요!';
+      '연습 일지 $streak일째를 채웠어요! 멋져요!';
   static String timeBannerStudentStreakContinue(int streak) =>
-      '$streak일 연속 연습 중이에요. 오늘도 이어가세요!';
+      '연습 일지 $streak일째 이어가고 있어요. 오늘도 기록해볼까요?';
   static const timeBannerStudentEveningAsk = '오늘 연습 어땠나요?';
   static String timeBannerStudentNightStreak(int streak) =>
-      '오늘도 수고하셨어요. $streak일째 멋져요!';
+      '오늘도 수고하셨어요. 연습 일지 $streak일째예요!';
   static const timeBannerStudentNight = '편안한 밤 되세요. 내일 파이팅!';
 
   // 학생 홈 헤더
@@ -5550,6 +5550,7 @@ class AppStrings {
   static const studentHomePracticeReminder = '연습 리마인더';
   static const studentHomePracticeReminderDesc = '설정한 시간에 연습 알림을 받습니다';
   static const studentHomeWeeklyPractice = '이번 주 연습';
+  static const studentHomePracticeJournal = '연습 일지';
   static const studentHomeMySubscriptions = '내 수강권';
   static const studentHomeViewAllSpaced = '전체 보기';
   static const studentHomeTrialLesson = '체험레슨';
@@ -5568,9 +5569,9 @@ class AppStrings {
   static const studentHomeTrialBooking = '체험레슨 신청';
   static const studentHomeStartNewLesson = '새로운 선생님과 레슨을 시작해보세요';
   static const studentHomePracticeSummaryDetail = '상세 보기';
-  static const studentHomePracticeStreak = '연속 연습';
-  static const studentHomePracticeWeeklyTotal = '이번 주 총';
-  static const studentHomePracticeGoalAchievement = '목표 달성';
+  static const studentHomePracticeStreak = '연속 일수';
+  static const studentHomePracticeWeeklyTotal = '이번 주 총 연습';
+  static const studentHomePracticeGoalAchievement = '주간 달성률';
   static const studentHomeRecentFeedback = '최근 피드백';
   static const studentHomeFindTeacher = '선생님 찾기';
   static const studentHomeNoUpcomingLesson = '예정된 레슨이 없습니다';
@@ -5848,11 +5849,26 @@ class AppStrings {
   static const practiceRecordingDeleteConfirm = '이 녹음을 삭제하시겠습니까?';
   static const practiceRecordingDeletedSnack = '녹음이 삭제되었습니다';
   static const practiceShare = '공유';
+  static const practiceShareToTeacherAction = '선생님께 공유';
   static const practiceShareToTeacherTitle = '선생님께 공유';
   static const practiceShareToTeacherConfirm = '대표 녹음을 선생님께 공유하시겠습니까?';
-  static const practiceSharedToTeacherSnack = '선생님께 공유되었습니다';
+  static const practiceSharedToTeacherSnack = '선생님께 공유했어요';
   static const practiceSelectAsRepresentative = '대표로 선택';
   static const practiceTeacherFeedbackArrived = '선생님 피드백이 도착했어요';
+  static const practiceJournalTitle = '연습 일지';
+  static const practiceJournalContinuousDays = '연속 일수';
+  static const practiceJournalBestRun = '최고 연속 일수';
+  static const practiceJournalShareHint = '대표 녹음을 선생님께 공유할 수 있어요';
+  static const practiceJournalErrorShort = '일지 정보를 불러올 수 없습니다';
+  static String practiceJournalMotivationStart() => '오늘 연습 일지를 시작해보세요!';
+  static String practiceJournalMotivationGrowing(int days) =>
+      '$days일째 연습 일지가 쌓이고 있어요.';
+  static String practiceJournalMotivationContinuing(int days) =>
+      '연습 일지가 $days일째 이어지고 있어요.';
+  static String practiceJournalMotivationCelebration(int days) =>
+      '연습 일지가 멋지게 $days일째 이어지고 있어요!';
+  static String practiceJournalStreakSummary(int days) =>
+      '연습 일지 $days일째 이어졌어요!';
 
   // -- Section Detail Screen --
   static const practiceSectionNotFound = '섹션을 찾을 수 없습니다';

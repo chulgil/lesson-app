@@ -4,6 +4,7 @@ export 'metronome_settings.dart';
 export 'piece.dart';
 export 'practice_goal.dart';
 export 'practice_item.dart';
+export 'journal_privacy.dart';
 export 'practice_log.dart';
 export 'practice_note.dart';
 export 'practice_progress.dart';

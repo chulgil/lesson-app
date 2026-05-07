@@ -102,7 +102,7 @@ class GoalAchievedDialog extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
-                      '$streakDays일 연속 스트릭!',
+                      AppStrings.practiceJournalStreakSummary(streakDays),
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.paperAccent,

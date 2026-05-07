@@ -92,7 +92,7 @@ class _PracticeRecordingScreenState
             TextButton.icon(
               onPressed: _shareWithTeacher,
               icon: const Icon(Icons.share),
-              label: const Text(AppStrings.practiceShare),
+              label: const Text(AppStrings.practiceShareToTeacherAction),
             ),
         ],
       ),

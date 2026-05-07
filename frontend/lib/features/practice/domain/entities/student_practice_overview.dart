@@ -1,16 +1,11 @@
-import 'package:flutter/foundation.dart';
-
 /// Daily practice entry for weekly calendar view
-@immutable
 class DailyPracticeEntry {
   final DateTime date;
   final int practiceMinutes;
   final bool hasPracticed;
 
-  const DailyPracticeEntry({
-    required this.date,
-    required this.practiceMinutes,
-  }) : hasPracticed = practiceMinutes > 0;
+  const DailyPracticeEntry({required this.date, required this.practiceMinutes})
+    : hasPracticed = practiceMinutes > 0;
 
   /// Formatted practice time string
   String get formattedTime {
@@ -23,7 +18,6 @@ class DailyPracticeEntry {
 }
 
 /// Shared recording visible to teacher
-@immutable
 class SharedRecording {
   const SharedRecording({
     required this.recordingId,
@@ -52,7 +46,6 @@ class SharedRecording {
 }
 
 /// Teacher's view of a student's practice overview
-@immutable
 class StudentPracticeOverview {
   const StudentPracticeOverview({
     required this.studentId,

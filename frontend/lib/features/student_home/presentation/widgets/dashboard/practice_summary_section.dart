@@ -87,7 +87,7 @@ class PracticeSummarySection extends ConsumerWidget {
           children: [
             // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
             Text(
-              AppStrings.studentHomeWeeklyPractice,
+              AppStrings.studentHomePracticeJournal,
               style: NotebookTypography.sectionTitle,
             ),
             TextButton(

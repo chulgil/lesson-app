@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'practice_streak.g.dart';
 
 /// Practice streak tracking entity
@@ -68,19 +69,6 @@ class PracticeStreak {
         return '✨';
       default:
         return '';
-    }
-  }
-
-  /// Get motivational message
-  String get motivationMessage {
-    if (currentStreak == 0) {
-      return '오늘 연습을 시작해보세요!';
-    } else if (currentStreak < 7) {
-      return '${7 - currentStreak}일 더 연습하면 불꽃이 켜져요!';
-    } else if (currentStreak < 30) {
-      return '${30 - currentStreak}일 더하면 더블 불꽃!';
-    } else {
-      return '대단해요! 연습 마스터!';
     }
   }
 

@@ -134,7 +134,18 @@ enum PracticeType {
 | PracticeStreak | Hive | 연속 연습일 기록 |
 | PracticeGoal | Hive | 연습 목표 설정 |
 | PracticeNote | Hive | 섹션별 연습 노트 |
+| JournalPrivacy | Hive | 연습 저널 공개 범위 (user + student별 저장) |
 | PracticeStats | - | 연습 통계 (계산값) |
+
+#### 1.8.1 JournalPrivacy
+
+| 값 | 의미 |
+|------|------|
+| `private` | 본인만 열람 |
+| `partial` | 제한된 범위만 공유 |
+| `shared` | 전체 저널 공유 |
+
+저장 규칙은 `currentUserId`와 학생 ID를 함께 묶어서 키를 만들고, 사용자별/학생별 상태가 서로 덮어쓰이지 않도록 한다.
 
 ---
 

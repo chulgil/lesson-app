@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/practice/domain/entities/metronome_settings.dart';
 import 'package:lessonaza/features/practice/domain/entities/piece.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_item.dart';
+import 'package:lessonaza/features/practice/domain/entities/practice_streak.dart';
 import 'package:lessonaza/features/practice/domain/entities/recording.dart';
 import 'package:lessonaza/features/practice/domain/entities/repertoire_timeline.dart';
 import 'package:lessonaza/features/practice/domain/entities/tuner_settings.dart';
@@ -46,6 +47,49 @@ void main() {
 
       expect(RecordingType.student.label, '연습 녹음');
       expect(StorageStatus.archived.label, '아카이브');
+    });
+
+    test('uses positive journal framing for streak motivation message', () {
+      final now = DateTime(2026, 5, 7);
+
+      expect(
+        PracticeStreak(
+          id: 'streak_0',
+          studentId: 'student_1',
+          updatedAt: now,
+        ).motivationMessage,
+        '오늘 연습 일지를 시작해보세요!',
+      );
+
+      expect(
+        PracticeStreak(
+          id: 'streak_3',
+          studentId: 'student_1',
+          currentStreak: 3,
+          updatedAt: now,
+        ).motivationMessage,
+        '3일째 연습 일지가 쌓이고 있어요.',
+      );
+
+      expect(
+        PracticeStreak(
+          id: 'streak_12',
+          studentId: 'student_1',
+          currentStreak: 12,
+          updatedAt: now,
+        ).motivationMessage,
+        '연습 일지가 12일째 이어지고 있어요.',
+      );
+
+      expect(
+        PracticeStreak(
+          id: 'streak_30',
+          studentId: 'student_1',
+          currentStreak: 30,
+          updatedAt: now,
+        ).motivationMessage,
+        '연습 일지가 멋지게 30일째 이어지고 있어요!',
+      );
     });
 
     test('maps timeline and tuner display values', () {
