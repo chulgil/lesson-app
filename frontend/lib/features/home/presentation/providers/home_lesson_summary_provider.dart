@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../lessons/lessons_facade.dart';
+import '../../../onboarding/onboarding_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 
@@ -28,6 +29,25 @@ bool homeHasCompletedLesson(HomeHasCompletedLessonRef ref) {
           .watch(_homeLessonsProvider)
           .valueOrNull
           ?.any((lesson) => lesson.status == LessonStatus.completed) ??
+      false;
+}
+
+@Riverpod(keepAlive: true)
+bool homeHasLessonNotes(HomeHasLessonNotesRef ref) {
+  return ref
+          .watch(_homeLessonsProvider)
+          .valueOrNull
+          ?.any((lesson) => lesson.hasFeedback) ??
+      false;
+}
+
+@Riverpod(keepAlive: true)
+bool homeTeacherPhoneVerified(HomeTeacherPhoneVerifiedRef ref) {
+  return ref
+          .watch(currentTeacherProfileProvider)
+          .valueOrNull
+          ?.verification
+          .isPhoneVerified ??
       false;
 }
 

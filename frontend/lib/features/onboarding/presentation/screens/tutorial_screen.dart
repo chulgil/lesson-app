@@ -25,11 +25,17 @@ class TutorialScreen extends ConsumerStatefulWidget {
 
 class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   final PageController _pageController = PageController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   int _currentPage = 0;
+  String? _selectedInstrument;
+  bool _sampleStudentCreated = false;
 
   @override
   void dispose() {
     _pageController.dispose();
+    _nameController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -38,6 +44,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   }
 
   void _nextPage() {
+    if (!_canContinue) return;
     if (_currentPage < TutorialStepContent.allSteps.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -45,6 +52,20 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       );
     } else {
       _completeTutorial();
+    }
+  }
+
+  bool get _canContinue {
+    switch (_currentPage) {
+      case 0:
+        return _nameController.text.trim().isNotEmpty &&
+            _selectedInstrument != null;
+      case 1:
+        return _sampleStudentCreated;
+      case 2:
+        return _noteController.text.trim().length >= 10;
+      default:
+        return false;
     }
   }
 
@@ -118,11 +139,24 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: _onPageChanged,
                 itemCount: TutorialStepContent.allSteps.length,
                 itemBuilder: (context, index) {
                   final content = TutorialStepContent.allSteps[index];
-                  return _TutorialPage(content: content);
+                  return _TutorialPage(
+                    content: content,
+                    nameController: _nameController,
+                    noteController: _noteController,
+                    selectedInstrument: _selectedInstrument,
+                    sampleStudentCreated: _sampleStudentCreated,
+                    onInstrumentSelected:
+                        (instrument) =>
+                            setState(() => _selectedInstrument = instrument),
+                    onSampleStudentCreated:
+                        () => setState(() => _sampleStudentCreated = true),
+                    onTextChanged: () => setState(() {}),
+                  );
                 },
               ),
             ),
@@ -172,7 +206,6 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                   Expanded(
                     flex: _currentPage > 0 ? 1 : 2,
                     child: ElevatedButton(
-                      onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
                         foregroundColor: AppColors.paper,
@@ -181,6 +214,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         ),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
+                      onPressed: _canContinue ? _nextPage : null,
                       child: Text(
                         isLastPage ? '시작하기' : '다음',
                         style: AppTypography.button,
@@ -226,54 +260,143 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
 
 class _TutorialPage extends StatelessWidget {
   final TutorialStepContent content;
+  final TextEditingController nameController;
+  final TextEditingController noteController;
+  final String? selectedInstrument;
+  final bool sampleStudentCreated;
+  final ValueChanged<String> onInstrumentSelected;
+  final VoidCallback onSampleStudentCreated;
+  final VoidCallback onTextChanged;
 
-  const _TutorialPage({required this.content});
+  const _TutorialPage({
+    required this.content,
+    required this.nameController,
+    required this.noteController,
+    required this.selectedInstrument,
+    required this.sampleStudentCreated,
+    required this.onInstrumentSelected,
+    required this.onSampleStudentCreated,
+    required this.onTextChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Illustration
+          const SizedBox(height: AppSpacing.space6),
           Container(
-            width: 200,
-            height: 200,
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.space5),
             decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.zero,
+              color: AppColors.paper,
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
-            child: Icon(
-              _getIconForStep(content.step),
-              size: 80,
-              color: AppColors.paperAccent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  _getIconForStep(content.step),
+                  size: 42,
+                  color: AppColors.paperAccent,
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                Text(content.title, style: NotebookTypography.sectionTitle),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  content.description,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space5),
+                _buildInteractiveBody(context),
+              ],
             ),
-          ),
-
-          const SizedBox(height: AppSpacing.space8),
-
-          // Notebook × Score: 튜토리얼 슬라이드 헤드라인 Playfair sectionTitle (§7.87-h).
-          Text(
-            content.title,
-            style: NotebookTypography.sectionTitle,
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // Description
-          Text(
-            content.description,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildInteractiveBody(BuildContext context) {
+    switch (content.step) {
+      case TutorialStep.welcome:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              key: const ValueKey('tutorial_name'),
+              controller: nameController,
+              onChanged: (_) => onTextChanged(),
+              decoration: const InputDecoration(
+                labelText: '선생님 이름',
+                hintText: '예) 김선생',
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Wrap(
+              spacing: AppSpacing.space2,
+              runSpacing: AppSpacing.space2,
+              children:
+                  const ['피아노', '바이올린', '첼로', '보컬']
+                      .map(
+                        (instrument) => ChoiceChip(
+                          label: Text(instrument),
+                          selected: selectedInstrument == instrument,
+                          onSelected: (_) => onInstrumentSelected(instrument),
+                        ),
+                      )
+                      .toList(),
+            ),
+          ],
+        );
+      case TutorialStep.inviteStudent:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              decoration: BoxDecoration(
+                color: AppColors.paperDark,
+                border: Border.all(color: AppColors.inkQuaternary),
+              ),
+              child: Text(
+                sampleStudentCreated
+                    ? '샘플 학생: 이서연 · $selectedInstrument'
+                    : '샘플 학생을 생성하면 수강 관리 카드가 준비됩니다.',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            OutlinedButton(
+              onPressed: sampleStudentCreated ? null : onSampleStudentCreated,
+              child: Text(sampleStudentCreated ? '생성 완료' : '샘플 학생 생성'),
+            ),
+          ],
+        );
+      case TutorialStep.writeFeedback:
+        return TextField(
+          key: const ValueKey('tutorial_note'),
+          controller: noteController,
+          onChanged: (_) => onTextChanged(),
+          minLines: 4,
+          maxLines: 6,
+          decoration: const InputDecoration(
+            labelText: '레슨 노트',
+            hintText: '예) 오늘 연습한 내용과 다음 과제를 적어주세요.',
+          ),
+        );
+      case TutorialStep.createLesson:
+      case TutorialStep.completed:
+        return const SizedBox.shrink();
+    }
   }
 
   IconData _getIconForStep(TutorialStep step) {

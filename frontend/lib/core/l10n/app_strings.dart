@@ -5116,6 +5116,18 @@ class AppStrings {
   /// Step 3 — 첫 레슨 완료 서브타이틀.
   static const gettingStartedStep3Subtitle = '레슨을 탭해 완료 처리하세요';
 
+  /// Step 4 — 첫 레슨 노트 작성 타이틀.
+  static const gettingStartedStep4Title = '첫 레슨 노트 작성';
+
+  /// Step 4 — 첫 레슨 노트 작성 서브타이틀.
+  static const gettingStartedStep4Subtitle = '레슨 후 피드백을 남겨보세요';
+
+  /// Step 5 — 전화번호 인증 타이틀.
+  static const gettingStartedStep5Title = '전화번호 인증하기';
+
+  /// Step 5 — 전화번호 인증 서브타이틀.
+  static const gettingStartedStep5Subtitle = '안전한 수업 관리를 위해 연락처를 확인하세요';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';

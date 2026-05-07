@@ -67,6 +67,40 @@ final homeHasCompletedLessonProvider = Provider<bool>.internal(
 );
 
 typedef HomeHasCompletedLessonRef = ProviderRef<bool>;
+String _$homeHasLessonNotesHash() =>
+    r'f61acea13db71771fb55b6837fe446849e222bb1';
+
+/// See also [homeHasLessonNotes].
+@ProviderFor(homeHasLessonNotes)
+final homeHasLessonNotesProvider = Provider<bool>.internal(
+  homeHasLessonNotes,
+  name: r'homeHasLessonNotesProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$homeHasLessonNotesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HomeHasLessonNotesRef = ProviderRef<bool>;
+String _$homeTeacherPhoneVerifiedHash() =>
+    r'4e2b92afbab72e6ecae73e2d9c005c34cd082bfe';
+
+/// See also [homeTeacherPhoneVerified].
+@ProviderFor(homeTeacherPhoneVerified)
+final homeTeacherPhoneVerifiedProvider = Provider<bool>.internal(
+  homeTeacherPhoneVerified,
+  name: r'homeTeacherPhoneVerifiedProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$homeTeacherPhoneVerifiedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HomeTeacherPhoneVerifiedRef = ProviderRef<bool>;
 String _$homeFirstLessonIdHash() => r'7eb7a8abedae32878060365475385c68a78da63e';
 
 /// See also [homeFirstLessonId].

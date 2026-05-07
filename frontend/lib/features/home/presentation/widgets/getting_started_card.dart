@@ -27,19 +27,96 @@ class GettingStartedCard extends ConsumerWidget {
     final studentsAsync = ref.watch(homeStudentsProvider);
     final hasLessons = ref.watch(homeHasLessonsProvider);
     final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
+    final hasLessonNotes = ref.watch(homeHasLessonNotesProvider);
+    final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
     final firstLessonId = ref.watch(homeFirstLessonIdProvider);
 
     return studentsAsync.when(
       data: (students) {
-        // Only show when teacher has 0 students
-        if (students.isNotEmpty) return const SizedBox.shrink();
+        final hasStudents = students.isNotEmpty;
+        final steps = [
+          _GettingStartedStep(
+            step: 1,
+            title: AppStrings.gettingStartedStep1Title,
+            subtitle: AppStrings.gettingStartedStep1Subtitle,
+            isCompleted: hasStudents,
+            onTap: () => context.push(AppRoutes.addStudentMethod),
+          ),
+          _GettingStartedStep(
+            step: 2,
+            title: AppStrings.gettingStartedStep2Title,
+            subtitle: AppStrings.gettingStartedStep2Subtitle,
+            isCompleted: hasLessons,
+            onTap:
+                hasStudents
+                    ? () => context.push(
+                      '${AppRoutes.addLesson}?studentId=${students.first.id}',
+                    )
+                    : null,
+          ),
+          _GettingStartedStep(
+            step: 3,
+            title: AppStrings.gettingStartedStep3Title,
+            subtitle: AppStrings.gettingStartedStep3Subtitle,
+            isCompleted: hasCompletedLesson,
+            onTap:
+                hasLessons && firstLessonId != null
+                    ? () {
+                      context.push(
+                        AppRoutes.lessonDetail.replaceFirst(
+                          ':id',
+                          firstLessonId,
+                        ),
+                      );
+                    }
+                    : null,
+          ),
+          _GettingStartedStep(
+            step: 4,
+            title: AppStrings.gettingStartedStep4Title,
+            subtitle: AppStrings.gettingStartedStep4Subtitle,
+            isCompleted: hasLessonNotes,
+            onTap:
+                firstLessonId != null
+                    ? () {
+                      context.push(
+                        AppRoutes.lessonDetail.replaceFirst(
+                          ':id',
+                          firstLessonId,
+                        ),
+                      );
+                    }
+                    : null,
+          ),
+          _GettingStartedStep(
+            step: 5,
+            title: AppStrings.gettingStartedStep5Title,
+            subtitle: AppStrings.gettingStartedStep5Subtitle,
+            isCompleted: isPhoneVerified,
+            onTap: null,
+          ),
+        ];
+        final completedCount = steps.where((step) => step.isCompleted).length;
+        if (completedCount == steps.length) return const SizedBox.shrink();
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const NotebookSectionHeader(label: 'Getting Started'),
+              Row(
+                children: [
+                  const Expanded(
+                    child: NotebookSectionHeader(label: 'Getting Started'),
+                  ),
+                  Text(
+                    '$completedCount/${steps.length}',
+                    style: NotebookTypography.roman.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 AppStrings.gettingStartedIntro,
@@ -49,44 +126,17 @@ class GettingStartedCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
-              _StepItem(
-                step: 1,
-                title: AppStrings.gettingStartedStep1Title,
-                subtitle: AppStrings.gettingStartedStep1Subtitle,
-                isCompleted: false,
-                onTap: () => context.push(AppRoutes.addStudentMethod),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              _StepItem(
-                step: 2,
-                title: AppStrings.gettingStartedStep2Title,
-                subtitle: AppStrings.gettingStartedStep2Subtitle,
-                isCompleted: hasLessons,
-                onTap:
-                    students.isEmpty
-                        ? null
-                        : () => context.push(
-                          '${AppRoutes.addLesson}?studentId=${students.first.id}',
-                        ),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              _StepItem(
-                step: 3,
-                title: AppStrings.gettingStartedStep3Title,
-                subtitle: AppStrings.gettingStartedStep3Subtitle,
-                isCompleted: hasCompletedLesson,
-                onTap:
-                    hasLessons && firstLessonId != null
-                        ? () {
-                          context.push(
-                            AppRoutes.lessonDetail.replaceFirst(
-                              ':id',
-                              firstLessonId,
-                            ),
-                          );
-                        }
-                        : null,
-              ),
+              for (final step in steps) ...[
+                _StepItem(
+                  step: step.step,
+                  title: step.title,
+                  subtitle: step.subtitle,
+                  isCompleted: step.isCompleted,
+                  onTap: step.onTap,
+                ),
+                if (step != steps.last)
+                  const SizedBox(height: AppSpacing.space2),
+              ],
             ],
           ),
         );
@@ -95,6 +145,22 @@ class GettingStartedCard extends ConsumerWidget {
       error: (_, __) => const SizedBox.shrink(),
     );
   }
+}
+
+class _GettingStartedStep {
+  final int step;
+  final String title;
+  final String subtitle;
+  final bool isCompleted;
+  final VoidCallback? onTap;
+
+  const _GettingStartedStep({
+    required this.step,
+    required this.title,
+    required this.subtitle,
+    required this.isCompleted,
+    this.onTap,
+  });
 }
 
 class _StepItem extends StatelessWidget {
