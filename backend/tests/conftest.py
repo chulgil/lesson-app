@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+import tempfile
 from collections.abc import AsyncGenerator
 
 # Plan C Phase 6a — must run before app.main import so APScheduler stays off.
@@ -17,13 +18,6 @@ from app.models.base import Base
 # SQLite test database (in-memory would be ideal, but aiosqlite needs a file)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
-test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-TestSessionLocal = async_sessionmaker(
-    test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
-
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -34,22 +28,40 @@ def event_loop():
 
 
 @pytest.fixture(autouse=True)
-async def setup_db():
+async def setup_db(db_engine) -> AsyncGenerator[None, None]:
     """Create all tables before each test and drop them after."""
     # Import all models so Base.metadata is populated
     import app.models  # noqa: F401
 
-    async with test_engine.begin() as conn:
+    async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with test_engine.begin() as conn:
+    async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+async def db_engine() -> AsyncGenerator:
+    """Create a per-test isolated SQLite database engine."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        test_db_path = f"{tmp_dir}/test.db"
+        database_url = f"sqlite+aiosqlite:///{test_db_path}"
+        engine = create_async_engine(database_url, echo=False)
+        try:
+            yield engine
+        finally:
+            await engine.dispose()
+
+
+@pytest.fixture
+async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
     """Yield a fresh database session for each test."""
-    async with TestSessionLocal() as session:
+    SessionLocal = async_sessionmaker(
+        bind=db_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+    async with SessionLocal() as session:
         yield session
         await session.rollback()
 

@@ -92,6 +92,36 @@ app/
 - **Timestamps**: TimestampMixin (created_at, updated_at)
 - **Pagination**: PaginatedResponse[T] 제네릭 (page, size, total, pages)
 
+### 최신 검증 요약 (2026-05-07)
+
+백엔드 API/DB 정합성은 다음 테스트로 정기 검증되었고, 모두 통과했습니다.
+
+- `uv run pytest tests/test_teacher_announcements.py -q`
+- `uv run pytest tests/test_bulk_teacher_actions.py -q`
+- `uv run pytest tests/test_schedule_confirmation_cards.py -q`
+- `uv run pytest tests/test_parent_child_profiles.py -q`
+- `uv run pytest tests/test_practice_repertoire_remote_contract.py -q`
+- `uv run pytest tests/test_contract.py -q`
+- `uv run pytest tests/test_backend_architecture_contract.py -q`
+- `uv run pytest tests/test_parent_api_spec_alignment.py -q`
+- `uv run pytest tests/test_subscriptions.py -q`
+- `uv run pytest -q` (backend 전체)
+
+**결과:** 529개 테스트 모두 통과(실패 0)
+
+핵심 정합성 점검 대상:
+
+- 알림/휴강: `POST /api/v1/notifications/broadcast`, `POST /api/v1/lessons/bulk-cancel`, `POST /api/v1/announcements`
+- 알람 읽음 상태: `GET /api/v1/notifications/unread-count`, `PATCH /notifications/{id}/read`, `PATCH /notifications/read-all`
+- 스케줄 확인 카드/부모 자녀 프로필/연습 레퍼토리/노트 API 계약(기존 커버리지 기준)
+
+### DB/아키텍처 정합성 메모
+
+- 알림 `read/unread`는 `notifications.read_at IS NULL` 단일 규칙으로 통일되어 있으며 `unread-count`의 집계도 동일 기준입니다.
+- 휴강일은 정규화된 조인 테이블(`teacher_announcement_dates`)로 모델링되어, 날짜 기반 조회/중복 방지 인덱스를 지원합니다.
+- 이벤트 타입은 `lessonCancelledByTeacher`, `teacherAnnouncement`까지 확장되어 프론트 이벤트 엔터티(`RequestEventType`) 정렬이 완료되었습니다.
+- 현재 런타임은 PostgreSQL 17을 SSOT로 운용하며, Redis는 캐시/락 계층 후보로만 사용하고 별도 Graph DB는 도입하지 않습니다.
+
 ### 아키텍처 가드레일
 
 `backend/tests/test_backend_architecture_contract.py`가 다음 규칙을 자동 검증한다.
