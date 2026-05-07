@@ -18,9 +18,15 @@ class RemoteAppReleaseRepository implements AppReleaseRepository {
 
       final map = (data is Map<String, dynamic>) ? data : <String, dynamic>{};
       return AppReleaseSnapshot(
-        version: _parseVersion(map['version'] as dynamic),
-        news: _parseNewsList(map['news'] as dynamic),
-        roadmap: _parseRoadmapList(map['roadmap'] as dynamic),
+        version: _parseVersion(map['version'] ?? map),
+        news: _parseNewsList(
+          map['news'] ?? map['newsItems'] ?? map['news_items'],
+        ),
+        roadmap: _parseRoadmapList(
+          map['roadmap'] ??
+              map['roadmapItems'] ??
+              map['roadmap_items'],
+        ),
       );
     } on DioException catch (error) {
       final statusCode = error.response?.statusCode;
