@@ -71,26 +71,30 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp> {
             ? AppRouter.router
             : AppRouter.createRouter(ref, useMockData: useMockData);
 
-    return MaterialApp.router(
-      title: 'Lessonaza',
-      debugShowCheckedModeBanner: false,
+    // Global keyboard dismiss: tap outside any text field to close keyboard
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: MaterialApp.router(
+        title: 'Lessonaza',
+        debugShowCheckedModeBanner: false,
 
-      // Localization
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
-      locale: const Locale('ko', 'KR'),
+        // Localization
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
+        locale: const Locale('ko', 'KR'),
 
-      // Theme
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.light,
+        // Theme
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.light,
 
-      // Router
-      routerConfig: routerConfig,
+        // Router
+        routerConfig: routerConfig,
+      ),
     );
   }
 }
