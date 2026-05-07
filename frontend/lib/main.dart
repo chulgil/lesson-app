@@ -12,7 +12,6 @@ import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
-import 'features/practice/presentation/providers/tuner_provider.dart';
 
 /// Get the startup recovery result.
 startup_recovery.StartupRecoveryResult? getStartupRecoveryResult() =>
@@ -46,9 +45,8 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp> {
     // Pre-initialize engines at app startup to eliminate first-use delay
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
-      // Warm up tuner (starts microphone stream without processing)
-      // This pre-configures audio session, eliminating delay when opening practice tools
-      ref.read(tunerProvider.notifier).warmUp();
+      // Tuner warm-up is intentionally deferred until user opens tuner.
+      // Keeping it running globally can hold the microphone active in background.
       unawaited(_initializeSyncService());
     });
   }

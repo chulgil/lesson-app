@@ -81,6 +81,7 @@ Future<T?> showNotebookBottomSheet<T>({
   return showModalBottomSheet<T>(
     context: context,
     backgroundColor: Colors.transparent,
+    barrierColor: AppColors.ink.withValues(alpha: 0.45),
     isScrollControlled: isScrollControlled,
     builder:
         (ctx) => NotebookBottomSheet(
@@ -108,6 +109,10 @@ Future<T?> showNotebookModalBottomSheet<T>({
     isScrollControlled: isScrollControlled,
     useSafeArea: useSafeArea,
     shape: const RoundedRectangleBorder(),
-    builder: builder,
+    barrierColor: AppColors.ink.withValues(alpha: 0.45),
+    builder: (ctx) {
+      final child = builder(ctx);
+      return Material(color: AppColors.paper, child: child);
+    },
   );
 }

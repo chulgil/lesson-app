@@ -4,7 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('UX 라벨 규칙 문서에 닫기/취소 분리 규칙이 반영돼야 한다', () {
-    final uxGuidelines = File('../docs/specs/design/ux_guidelines.md').readAsStringSync();
+    final uxGuidelines =
+        File('../docs/specs/design/ux_guidelines.md').readAsStringSync();
     final bottomSheetComponent =
         File('../docs/_components/bottom_sheet.md').readAsStringSync();
     final confirmDialogComponent =
@@ -44,13 +45,22 @@ void main() {
         .where((file) => file.path.endsWith('.dart'))
         .where((file) => !file.path.endsWith('.g.dart'));
 
-    final overlayPattern =
-        RegExp(r'showNotebookBottomSheet|showNotebookDialog|showModalBottomSheet|showDialog');
-    final headerClosePattern = RegExp(r'Icons\.close|closeAction|close action');
-    final closeLabelPattern =
-        RegExp(r'Text\s*\(\s*(?:const\s+)?(?:AppStrings\.closeAction|[\'\"]닫기[\'\"])\s*\)');
-    final closeCancelArgPattern =
-        RegExp(r'cancelLabel:\s*(?:AppStrings\.closeAction|[\'\"]닫기[\'\"])');
+    final overlayPattern = RegExp(
+      r'showNotebookBottomSheet|showNotebookDialog|showModalBottomSheet|showDialog',
+    );
+    final headerClosePattern = RegExp(
+      r'showCloseButton\s*:\s*true|Icons\.close|AppStrings\.closeAction',
+      caseSensitive: false,
+    );
+    final closeActionButtonPattern = RegExp(
+      r'Text\((?:const\s+)?(?:AppStrings\.closeAction|[^)]*닫기[^)]*)\)|'
+      r'cancelLabel:\s*(?:AppStrings\.closeAction|[^,)}]*닫기[^,)}]*)',
+      caseSensitive: false,
+    );
+    final closeLabelAsCancelMisusePattern = RegExp(
+      r'cancelLabel:\s*(?:AppStrings\.closeAction|[^,)}]*닫기[^,)}]*)',
+      caseSensitive: false,
+    );
 
     for (final file in dartFiles) {
       final normalizedPath = file.path.replaceAll('\\', '/');
@@ -61,14 +71,11 @@ void main() {
       }
 
       if (headerClosePattern.hasMatch(content) &&
-          (closeLabelPattern.hasMatch(content) ||
-              closeCancelArgPattern.hasMatch(content))) {
+          closeActionButtonPattern.hasMatch(content)) {
         violations.add(normalizedPath);
       }
 
-      if (RegExp(r'cancelLabel:\s*AppStrings\.closeAction').hasMatch(content) ||
-          RegExp(r'cancelLabel:\s*[\'\"]닫기[\'\"]')
-              .hasMatch(content)) {
+      if (closeLabelAsCancelMisusePattern.hasMatch(content)) {
         violations.add('$normalizedPath (cancelLabel close misuse)');
       }
     }
