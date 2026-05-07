@@ -99,7 +99,8 @@ app/
 백엔드 API/DB 정합성은 다음 테스트로 정기 검증되었고, 모두 통과했습니다.
 
 - `uv run pytest tests/test_teacher_announcements.py -q`
-- `uv run pytest tests/test_bulk_teacher_actions.py -q`
+- `uv run pytest tests/test_bulk_teacher_actions.py -q`  
+  (추가: `test_bulk_cancel_includes_trial_subscription_and_skips_expired_trial`, `test_broadcast_active_subscription_includes_trial_subscriptions_and_filters_non_active_trials`으로 `trial` 구간 처리 검증)
 - `uv run pytest tests/test_schedule_confirmation_cards.py -q`
 - `uv run pytest tests/test_parent_child_profiles.py -q`
 - `uv run pytest tests/test_practice_repertoire_remote_contract.py -q`
@@ -109,7 +110,7 @@ app/
 - `uv run pytest tests/test_subscriptions.py -q`
 - `uv run pytest -q` (backend 전체)
 
-**결과:** 529개 테스트 모두 통과(실패 0)
+**결과:** 531개 테스트 모두 통과(실패 0)
 
 핵심 정합성 점검 대상:
 
