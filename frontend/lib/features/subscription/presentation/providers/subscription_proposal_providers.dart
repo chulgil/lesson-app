@@ -18,14 +18,14 @@ part 'subscription_proposal_providers.g.dart';
 // ============================================================
 
 /// Proposal repository provider - switches between Mock and Remote.
-final subscriptionProposalRepositoryProvider =
-    Provider<SubscriptionProposalRepository>(
-      (ref) => createRepository<SubscriptionProposalRepository>(
-        ref: ref,
-        mock: () => MockSubscriptionProposalRepository(),
-        remote: (api) => RemoteSubscriptionProposalRepository(api),
-      ),
-    );
+@Riverpod(keepAlive: true)
+SubscriptionProposalRepository subscriptionProposalRepository(
+  SubscriptionProposalRepositoryRef ref,
+) => createRepository<SubscriptionProposalRepository>(
+  ref: ref,
+  mock: () => MockSubscriptionProposalRepository(),
+  remote: (api) => RemoteSubscriptionProposalRepository(api),
+);
 
 @Riverpod(keepAlive: true)
 ProposalReminderService proposalReminderService(

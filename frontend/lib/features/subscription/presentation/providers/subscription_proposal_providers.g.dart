@@ -6,6 +6,27 @@ part of 'subscription_proposal_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$subscriptionProposalRepositoryHash() =>
+    r'3a6434b66f93e3b9711ff070962e3005a5330d81';
+
+/// Proposal repository provider - switches between Mock and Remote.
+///
+/// Copied from [subscriptionProposalRepository].
+@ProviderFor(subscriptionProposalRepository)
+final subscriptionProposalRepositoryProvider =
+    Provider<SubscriptionProposalRepository>.internal(
+      subscriptionProposalRepository,
+      name: r'subscriptionProposalRepositoryProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$subscriptionProposalRepositoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef SubscriptionProposalRepositoryRef =
+    ProviderRef<SubscriptionProposalRepository>;
 String _$proposalReminderServiceHash() =>
     r'b4e109645398d4d15240b885a2171ca4198bd7b8';
 
