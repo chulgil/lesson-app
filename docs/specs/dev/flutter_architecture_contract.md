@@ -107,12 +107,45 @@ Debug/profile 실행에서는 `ProviderObserver`로 provider add/update/dispose�
 feature root에 facade를 둘 수 있지만 다음 중 하나로 명시한다.
 
 - `feature/<name>_facade.dart`: 다른 feature가 사용할 public API만 export한다.
-- 내부 presentation provider/widget을 직접 export하는 facade는 legacy API로 보고 새 코드에서는 추가하지 않는다.
+- facade는 feature의 public boundary다. 다른 feature가 provider를 써야 한다면 해당 provider를 facade에서 좁게 export하고, 소비자는 facade만 import한다.
+- facade에서 export하는 provider는 repository provider, read-only query provider, application service provider처럼 외부 계약으로 인정된 API여야 한다.
+- screen/widget 내부 상태, 임시 form 상태, private orchestration provider는 facade로 export하지 않는다.
 - cross-feature 접근은 facade, domain contract, application service, shared core provider 중 하나를 통해 한다.
 - 새 코드에서 다른 feature의 `presentation/providers`를 직접 import/export하지 않는다.
 - 기존 cross-feature presentation provider import는 `frontend/test/architecture/feature_dependency_contract_test.dart`의 legacy baseline에만 남긴다.
 - legacy import를 제거하면 baseline도 함께 줄인다. 새 baseline 항목 추가는 architecture debt 증가로 보고 별도 이슈와 설계 사유가 필요하다.
 - 특정 feature의 상태/행동을 외부에서 재사용해야 하면 먼저 그 feature의 public API를 정의한다. public API는 UI widget 내부 provider가 아니라 domain-facing DTO, usecase, facade method, 또는 좁은 read-only provider로 노출한다.
+
+예시:
+
+```dart
+// 허용: home feature가 onboarding public boundary만 의존
+import 'package:lessonaza/features/onboarding/onboarding_facade.dart';
+
+// 금지: 다른 feature의 내부 provider 파일 직접 의존
+import 'package:lessonaza/features/onboarding/presentation/providers/onboarding_progress_storage_provider.dart';
+```
+
+## Local Persistence and UI Flags
+
+Hive, SharedPreferences, SecureStorage 같은 로컬 저장소는 business entity에 직접 섞지 않는다.
+
+규칙:
+- 새 domain entity에 Hive annotation을 추가하지 않는다.
+- 로컬 저장소 key/box 이름은 data adapter 또는 presentation/application storage provider 안에 캡슐화한다.
+- 온보딩 완료 여부, 데모 오버레이 dismiss 여부, 최초 진입 안내처럼 UI/application flag는 `AsyncNotifier` 기반 storage provider로 둔다.
+- 사용자별 상태는 반드시 user id scoped key를 사용한다. 예: `teacher:<userId>:completed`, `teacher:<userId>:demoOverlayDismissed`.
+- 같은 기기에서 역할/계정이 바뀌어도 flag가 섞이지 않는 테스트를 추가한다.
+- 저장소 provider를 다른 feature에서 써야 하면 feature facade에서 public API로 export한다.
+
+온보딩 예시:
+
+```text
+features/onboarding/presentation/providers/onboarding_progress_storage_provider.dart
+  - Hive box: onboarding_progress
+  - state: teacherOnboardingCompleted, demoOverlayDismissed
+  - public export: features/onboarding/onboarding_facade.dart
+```
 
 ## UI Text and i18n
 
@@ -158,6 +191,34 @@ extension LessonRequestStatusVisuals on LessonRequestStatus {
 ```
 
 이 규칙의 목적은 `AppStrings`를 제거하는 것이 아니라, localization 변경이 business rule, repository contract, 서버 payload, 테스트 데이터 구조까지 전염되지 않게 막는 것이다.
+
+## Cross-Feature Domain Services
+
+여러 feature의 repository/service를 조합하는 workflow는 application/domain service로 분리하되, wiring은 presentation provider가 담당한다.
+
+규칙:
+- service constructor는 domain repository interface와 순수 service interface만 받는다.
+- service 내부에서 Riverpod provider, facade, presentation provider를 import하지 않는다.
+- service provider는 각 dependency를 해당 feature facade 또는 local provider에서 주입한다.
+- 특정 feature의 repository provider가 다른 feature에서 필요하면 먼저 source feature facade가 public export한다.
+- service가 notification, schedule event, subscription 같은 side effect를 함께 수행하면 targeted unit test에서 fake repository/service를 모두 주입한다.
+- domain model에 없는 UI 편의 필드를 가정하지 않는다. 회차, 잔여 변경권, request id 같은 파생 값은 repository 조회 또는 mapper/service helper에서 계산한다.
+
+예시:
+
+```dart
+@riverpod
+BulkTeacherActionService bulkTeacherActionService(Ref ref) {
+  return BulkTeacherActionService(
+    lessonRepository: ref.watch(lessonRepositoryProvider),
+    notificationService: ref.watch(notificationServiceProvider),
+    requestRepository: ref.watch(schedule.unifiedLessonRequestRepositoryProvider),
+    subscriptionRepository: ref.watch(subscriptionRepositoryProvider),
+  );
+}
+```
+
+위 provider는 presentation layer에 있고, `BulkTeacherActionService` 자체는 Riverpod과 presentation provider를 모른다.
 
 ## Startup Bootstrap
 

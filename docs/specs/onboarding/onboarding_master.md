@@ -1,7 +1,8 @@
-# Onboarding System Master Spec
+# Onboarding System Master Spec (v1 — Legacy)
 
-> 구현 상태: ✅ 구현 완료 (Mock 모드)
-> Last updated: 2026-03-07
+> ⚠️ **v2 재설계됨**: [onboarding_quest_v2.md](onboarding_quest_v2.md) 참조
+> 구현 상태: ✅ v1 구현 완료 (Mock 모드) → v2 퀘스트 시스템으로 대체 예정
+> Last updated: 2026-05-07 (로컬 진행 상태 저장/홈 데모 오버레이 반영)
 
 ## 1. 개요
 
@@ -236,7 +237,8 @@ enum TutorialStep {
 | `teacherOnboardingNotifierProvider` | `Notifier<TeacherOnboardingState>` | 온보딩 상태 관리 (keepAlive) |
 | `currentTeacherProfileProvider` | `Future<TeacherProfile?>` | 현재 프로필 조회 |
 | `teacherNeedsOnboardingProvider` | `Future<bool>` | 온보딩 필요 여부 |
-| `teacherOnboardingCompletedProvider` | `StateProvider<bool>` | 온보딩 완료 플래그 |
+| `teacherOnboardingCompletedProvider` | `StateProvider<bool>` | 런타임 온보딩 완료 플래그 (레거시/호환) |
+| `onboardingProgressStorageProvider` | `AsyncNotifier<OnboardingProgressStorageState>` | Hive 기반 사용자별 온보딩 완료/데모 오버레이 dismiss 저장 |
 | `teacherProfileRepositoryProvider` | `Provider<TeacherProfileRepository>` | Repository 제공 |
 | `phoneNumberProvider` | `StateProvider<String>` | 전화번호 입력 상태 |
 | `verificationCodeProvider` | `StateProvider<String>` | 인증코드 입력 상태 |
@@ -244,6 +246,38 @@ enum TutorialStep {
 | `isVerificationCodeValidProvider` | `Provider<bool>` | 인증코드 유효성 |
 | `isProfileFormValidProvider` | `Provider<bool>` | 프로필 폼 유효성 |
 | `profileMissingFieldsProvider` | `Provider<List<String>>` | 누락 필드 목록 |
+
+### 로컬 진행 상태 저장
+
+온보딩 완료 여부와 홈 데모 대시보드 오버레이 dismiss 여부는 앱 재시작 후에도 유지되어야 하므로 Hive 기반 storage provider가 관리한다.
+
+| 항목 | 값 |
+|------|-----|
+| Provider | `onboardingProgressStorageProvider` |
+| State | `OnboardingProgressStorageState` |
+| Hive box | `onboarding_progress` |
+| 완료 key | `teacher:<userId>:completed` |
+| 오버레이 dismiss key | `teacher:<userId>:demoOverlayDismissed` |
+
+규칙:
+- user id scoped key를 사용해 같은 기기의 다른 선생님 계정 상태가 섞이지 않게 한다.
+- 이 provider는 `features/onboarding/onboarding_facade.dart`에서 public API로 export한다.
+- 다른 feature는 `onboarding/presentation/providers/...`를 직접 import하지 않고 facade만 import한다.
+- domain entity에 Hive annotation을 추가하지 않는다.
+- 완료 처리 시 런타임 플래그와 storage provider를 함께 갱신한다.
+
+### 홈 데모 대시보드 오버레이
+
+튜토리얼을 완료하거나 건너뛰어 홈으로 진입한 선생님에게 Notebook x Score 스타일의 데모 안내를 1회 표시한다.
+
+| 조건 | 동작 |
+|------|------|
+| `teacherOnboardingCompleted == false` | 표시하지 않음 |
+| `demoOverlayDismissed == false` | `DemoDashboardOverlay` 표시 |
+| 확인 버튼 클릭 | `dismissDemoOverlay()` 호출 후 숨김 |
+| 앱 재시작 | Hive 저장 상태를 기준으로 유지 |
+
+UI 문구는 `AppStrings`에 모으고, 홈 feature는 onboarding facade를 통해 storage provider를 읽는다.
 
 ## 6. 구현 파일 위치
 
@@ -255,6 +289,9 @@ enum TutorialStep {
 | **Entity (Extension)** | `onboarding/domain/entities/onboarding_step.dart` | OnboardingStep UI 헬퍼 (label, stepNumber, progress) |
 | **Provider** | `onboarding/presentation/providers/onboarding_providers.dart` | TeacherOnboardingNotifier 등 모든 온보딩 Provider |
 | **Provider** | `onboarding/presentation/providers/teacher_profile_repository_provider.dart` | TeacherProfileRepository Provider |
+| **Provider** | `onboarding/presentation/providers/onboarding_progress_storage_provider.dart` | Hive 기반 온보딩 완료/데모 오버레이 저장 Provider |
+| **Facade** | `onboarding/onboarding_facade.dart` | 온보딩 public provider boundary |
+| **Widget** | `home/presentation/widgets/demo_dashboard_overlay.dart` | 온보딩 완료 후 홈 최초 진입 데모 오버레이 |
 | **Screen** | `onboarding/presentation/screens/phone_verification_screen.dart` | 휴대폰 인증 화면 |
 | **Screen** | `onboarding/presentation/screens/profile_setup_screen.dart` | 프로필 설정 화면 |
 | **Screen** | `onboarding/presentation/screens/tutorial_screen.dart` | 튜토리얼 화면 |
@@ -279,6 +316,8 @@ enum TutorialStep {
 | 튜토리얼 건너뛰기 | 구현 완료 |
 | 진행 표시기 | 구현 완료 |
 | 온보딩 완료 후 홈 이동 | 구현 완료 |
+| 온보딩 완료 상태 Hive 저장 | 구현 완료 |
+| 홈 데모 대시보드 오버레이 1회 표시 | 구현 완료 |
 | 프로필 생성 및 저장 | 구현 완료 (Mock Repository) |
 | 온보딩 필요 여부 판단 | 구현 완료 |
 | 실제 SMS 연동 | 미구현 (mock) |
@@ -302,3 +341,4 @@ enum TutorialStep {
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
 | 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 |
 | 2026-03-11 | 학생 온보딩 섹션 추가 (프로필 설정, 튜토리얼 화면) |
+| 2026-05-07 | 온보딩 로컬 storage provider와 홈 데모 대시보드 오버레이 반영 |
