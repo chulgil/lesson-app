@@ -6787,28 +6787,29 @@ class AppStrings {
 
   // ── App Rating Prompt (앱 평가 유도) ────────────────────────────────────
 
-  /// 1단계 만족도 확인 — 제목
-  static const ratingQuestion = '레슨앱이 도움이 되고 있나요?';
+  // ── 마일스톤 축하 카드 (팝업 다이얼로그 폐기 → 인라인 카드) ──
 
-  /// 1단계 만족도 확인 — 본문
+  /// 마일스톤 축하 메시지
+  static String milestoneCongrats(int count) => '$count회 레슨 달성!';
+
+  /// 마일스톤 설명
+  static const milestoneDescription =
+      '선생님의 레슨이 쌓이고 있어요.\n앞으로도 좋은 레슨을 응원합니다!';
+
+  /// 마일스톤 카드 내 소프트 리뷰 링크
+  static const milestoneReviewLink = '앱이 마음에 드셨다면 평가를 남겨주세요 →';
+
+  /// 프로필 하단 조용한 리뷰 링크
+  static const profileRatingLink = '레슨앱 평가하기';
+
+  // ── 레거시 (기존 팝업용, 참조 유지) ──
+  static const ratingQuestion = '레슨앱이 도움이 되고 있나요?';
   static const ratingPromptBody =
       '레슨과 연습을 함께 관리하는\n경험이 어떠셨는지 알고 싶어요.';
-
-  /// 1단계 — 만족 버튼
   static const ratingYes = '네, 도움돼요!';
-
-  /// 1단계 — 불만족 버튼
   static const ratingNo = '아니요, 별로예요';
-
-  /// 2단계 피드백 수집 — 제목
   static const ratingFeedbackQuestion = '어떤 점을 개선하면 좋을까요?';
-
-  /// 2단계 피드백 수집 — 본문
   static const ratingFeedbackBody = '소중한 의견을 개발팀에 직접 전달할게요.';
-
-  /// 2단계 — 피드백 보내기 버튼
   static const ratingSendFeedback = '피드백 보내기';
-
-  /// 2단계 — 나중에 버튼
   static const ratingLater = '나중에';
 }

@@ -1,218 +1,146 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
-import '../../../../core/widgets/notebook/notebook_glyph.dart';
-import '../../../auth/domain/entities/user_role.dart';
-import '../../domain/services/app_review_trigger_service.dart';
-import '../providers/app_review_providers.dart';
+import '../../../../core/theme/notebook_typography.dart';
 
 // ignore: widget-smoke-test
-// Smoke test: test/features/settings/app_rating_prompt_dialog_test.dart
 
-// ---------------------------------------------------------------------------
-// 1단계: 만족도 확인 다이얼로그
-// ---------------------------------------------------------------------------
+/// 마일스톤 축하 카드 — 홈 대시보드에서 조건 충족 시 인라인 표시.
+///
+/// 기존 팝업 다이얼로그 방식 폐기 → 인라인 카드로 전환.
+/// 선생님 작업 흐름을 방해하지 않고, 자연스럽게 앱 리뷰를 유도.
+///
+/// 표시 조건: 50회/100회/200회 레슨 달성 시 (마일스톤)
+/// 닫기: × 버튼 → Hive에 해당 마일스톤 dismiss 기록
+class MilestoneRatingCard extends ConsumerWidget {
+  final int completedLessons;
+  final VoidCallback? onDismiss;
 
-/// Step 1 of the app rating flow: ask if the app is helpful.
-class AppRatingPromptDialog extends StatelessWidget {
-  const AppRatingPromptDialog({
+  const MilestoneRatingCard({
     super.key,
-    required this.onSatisfied,
-    required this.onDissatisfied,
+    required this.completedLessons,
+    this.onDismiss,
   });
 
-  final VoidCallback onSatisfied;
-  final VoidCallback onDissatisfied;
+  /// 현재 달성한 마일스톤 (50, 100, 200, 500, 1000)
+  int? get _currentMilestone {
+    const milestones = [1000, 500, 200, 100, 50];
+    for (final m in milestones) {
+      if (completedLessons >= m) return m;
+    }
+    return null;
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return NotebookAlertDialog(
-      icon: const NotebookGlyph(
-        NotebookGlyph.eighthNote,
-        size: 32,
-        semanticLabel: '음악 아이콘',
-      ),
-      title: AppStrings.ratingQuestion,
-      content: Text(
-        AppStrings.ratingPromptBody,
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.inkSecondary,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final milestone = _currentMilestone;
+    if (milestone == null) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.paperOk.withValues(alpha: 0.08),
+        border: Border.all(
+          color: AppColors.paperOk.withValues(alpha: 0.3),
         ),
-        textAlign: TextAlign.center,
       ),
-      actions: [
-        TextButton(
-          onPressed: onDissatisfied,
-          child: Text(
-            AppStrings.ratingNo,
-            style: AppTypography.bodyMedium.copyWith(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('🎉', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: Text(
+                  AppStrings.milestoneCongrats(milestone),
+                  style: NotebookTypography.pieceTitle.copyWith(
+                    fontSize: 15,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+              if (onDismiss != null)
+                GestureDetector(
+                  onTap: onDismiss,
+                  child: Icon(
+                    Icons.close,
+                    size: 18,
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            AppStrings.milestoneDescription,
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
-        ),
-        TextButton(
-          onPressed: onSatisfied,
-          child: Text(
-            AppStrings.ratingYes,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
+          const SizedBox(height: AppSpacing.space3),
+          // 소프트 링크 — 강제 아닌 선택
+          GestureDetector(
+            onTap: () => _openAppStore(),
+            child: Text(
+              AppStrings.milestoneReviewLink,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.paperAccent,
+              ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 2단계 B: 피드백 수집 다이얼로그
-// ---------------------------------------------------------------------------
-
-/// Step 2B of the app rating flow: collect feedback when user is dissatisfied.
-class AppRatingFeedbackDialog extends StatelessWidget {
-  const AppRatingFeedbackDialog({
-    super.key,
-    required this.onFeedback,
-    required this.onLater,
-  });
-
-  final VoidCallback onFeedback;
-  final VoidCallback onLater;
-
-  @override
-  Widget build(BuildContext context) {
-    return NotebookAlertDialog(
-      title: AppStrings.ratingFeedbackQuestion,
-      content: Text(
-        AppStrings.ratingFeedbackBody,
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.inkSecondary,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      actions: [
-        TextButton(
-          onPressed: onLater,
-          child: Text(
-            AppStrings.ratingLater,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: onFeedback,
-          child: Text(
-            AppStrings.ratingSendFeedback,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Helper: show prompt if conditions are met
-// ---------------------------------------------------------------------------
-
-/// Shows the app rating prompt if all spec §2 conditions are satisfied.
-///
-/// Call this from a lesson-complete or practice-complete screen's
-/// `initState` / `addPostFrameCallback`.
-///
-/// The 1.5 s delay matches spec §2.2 (wait for transition animation).
-Future<void> showAppRatingPromptIfNeeded({
-  required BuildContext context,
-  required WidgetRef ref,
-  required AppReviewTriggerContext triggerContext,
-}) async {
-  final service = ref.read(appReviewTriggerServiceProvider);
-  final should = await service.shouldShowPrompt(triggerContext);
-  if (!should || !context.mounted) return;
-
-  // 1.5 s delay per spec §2.2 (wait for transition animation)
-  await Future.delayed(const Duration(milliseconds: 1500));
-  if (!context.mounted) return;
-
-  // Capture navigator before any further awaits.
-  final navigator = Navigator.of(context);
-
-  await service.onPromptShown();
-
-  // ignore: use_build_context_synchronously — mounted check performed above
-  final result = await showDialog<_RatingResult>(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AppRatingPromptDialog(
-      onSatisfied: () => navigator.pop(_RatingResult.satisfied),
-      onDissatisfied: () => navigator.pop(_RatingResult.dissatisfied),
-    ),
-  );
-
-  if (result == _RatingResult.satisfied) {
-    await service.onSatisfied();
-    return;
-  }
-
-  if (result == _RatingResult.dissatisfied) {
-    // ignore: use_build_context_synchronously — navigator captured before awaits
-    final feedbackResult = await showDialog<_FeedbackResult>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AppRatingFeedbackDialog(
-        onFeedback: () => navigator.pop(_FeedbackResult.send),
-        onLater: () => navigator.pop(_FeedbackResult.later),
+        ],
       ),
     );
+  }
 
-    if (feedbackResult == _FeedbackResult.send) {
-      await service.onFeedbackSent();
-      navigator.pushNamed('/settings/feedback');
-    } else {
-      await service.onDismissed();
+  Future<void> _openAppStore() async {
+    // TODO: 실제 앱스토어 URL로 교체
+    final uri = Uri.parse('https://apps.apple.com/app/lessonaza');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }
 
-// ---------------------------------------------------------------------------
-// Internal enums
-// ---------------------------------------------------------------------------
+/// 프로필 탭 하단 — 조용한 앱 평가 링크.
+///
+/// 프로필 > 설정 영역 최하단에 배치. 작업 흐름 방해 없이 접근 가능.
+class ProfileRatingLink extends StatelessWidget {
+  const ProfileRatingLink({super.key});
 
-enum _RatingResult { satisfied, dissatisfied }
-
-enum _FeedbackResult { send, later }
-
-// ---------------------------------------------------------------------------
-// Convenience factory for AppReviewTriggerContext
-// ---------------------------------------------------------------------------
-
-/// Creates a [AppReviewTriggerContext] for a teacher trigger point.
-AppReviewTriggerContext teacherRatingContext({
-  required int completedLessonCount,
-  DateTime? firstInstallDate,
-}) =>
-    AppReviewTriggerContext(
-      userRole: UserRole.teacher,
-      completedLessonCount: completedLessonCount,
-      firstInstallDate: firstInstallDate,
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+      child: Center(
+        child: GestureDetector(
+          onTap: () => _openAppStore(),
+          child: Text(
+            AppStrings.profileRatingLink,
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.inkTertiary,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.inkTertiary,
+            ),
+          ),
+        ),
+      ),
     );
+  }
 
-/// Creates a [AppReviewTriggerContext] for a student trigger point.
-AppReviewTriggerContext studentRatingContext({
-  required int completedPracticeCount,
-  DateTime? firstInstallDate,
-}) =>
-    AppReviewTriggerContext(
-      userRole: UserRole.student,
-      completedPracticeCount: completedPracticeCount,
-      firstInstallDate: firstInstallDate,
-    );
+  Future<void> _openAppStore() async {
+    final uri = Uri.parse('https://apps.apple.com/app/lessonaza');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+}
