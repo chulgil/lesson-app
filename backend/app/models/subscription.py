@@ -1,7 +1,20 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -125,6 +138,25 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     original_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     __table_args__ = (
+        CheckConstraint(
+            "used_lessons >= 0 "
+            "AND bonus_count >= 0 "
+            "AND total_reschedule_allowance >= 0 "
+            "AND used_reschedule_count >= 0",
+            name="ck_subscriptions_non_negative_counters",
+        ),
+        CheckConstraint(
+            "((type = 'trial' AND used_lessons <= 1 + bonus_count) "
+            "OR (type != 'trial' AND total_lessons IS NOT NULL AND used_lessons <= total_lessons + bonus_count) "
+            "OR (type != 'trial' AND total_lessons IS NULL AND lessons_per_month IS NOT NULL "
+            "AND used_lessons <= lessons_per_month + bonus_count) "
+            "OR (type != 'trial' AND total_lessons IS NULL AND lessons_per_month IS NULL))",
+            name="ck_subscriptions_lesson_counter_capacity",
+        ),
+        CheckConstraint(
+            "used_reschedule_count <= total_reschedule_allowance",
+            name="ck_subscriptions_reschedule_counter_capacity",
+        ),
         Index("idx_sub_student", "student_id"),
         Index("idx_sub_membership", "membership_id"),
         Index("idx_sub_status", "status"),

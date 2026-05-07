@@ -202,6 +202,13 @@ class SubscriptionService:
                 student_id=data.student_id,
             )
 
+        paid_at = data.paid_at
+        payment_confirmed_at = data.payment_confirmed_at
+        if data.payment_confirmed:
+            now = datetime.now(UTC)
+            paid_at = paid_at or now
+            payment_confirmed_at = payment_confirmed_at or now
+
         sub = Subscription(
             student_id=data.student_id,
             membership_id=membership_id,
@@ -222,8 +229,8 @@ class SubscriptionService:
             used_reschedule_count=data.used_reschedule_count,
             payment_confirmed=data.payment_confirmed,
             payment_method=data.payment_method,
-            paid_at=data.paid_at,
-            payment_confirmed_at=data.payment_confirmed_at,
+            paid_at=paid_at,
+            payment_confirmed_at=payment_confirmed_at,
             discount_amount=data.discount_amount,
             discount_reason=data.discount_reason,
             original_amount=data.original_amount,
@@ -244,6 +251,11 @@ class SubscriptionService:
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
+        self._validate_subscription_update_state(sub, update_data)
+        if update_data.get("payment_confirmed") is True:
+            now = datetime.now(UTC)
+            update_data.setdefault("paid_at", sub.paid_at or now)
+            update_data.setdefault("payment_confirmed_at", sub.payment_confirmed_at or now)
         for key, value in update_data.items():
             setattr(sub, key, value)
         await self.db.flush()
@@ -591,6 +603,78 @@ class SubscriptionService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"session_number must be less than or equal to subscription {bound_field}",
             )
+
+    def _validate_subscription_update_state(self, subscription: Any, update_data: dict[str, Any]) -> None:
+        """Validate merged subscription counters and static deposit invariants."""
+        values = {
+            "type": update_data.get("type", subscription.type),
+            "total_lessons": update_data.get("total_lessons", subscription.total_lessons),
+            "lessons_per_month": update_data.get("lessons_per_month", subscription.lessons_per_month),
+            "bonus_count": update_data.get("bonus_count", subscription.bonus_count),
+            "used_lessons": update_data.get("used_lessons", subscription.used_lessons),
+            "total_reschedule_allowance": update_data.get(
+                "total_reschedule_allowance",
+                subscription.total_reschedule_allowance,
+            ),
+            "used_reschedule_count": update_data.get("used_reschedule_count", subscription.used_reschedule_count),
+            "payment_confirmed": update_data.get("payment_confirmed", subscription.payment_confirmed),
+            "payment_confirmed_at": update_data.get("payment_confirmed_at", subscription.payment_confirmed_at),
+        }
+        self._validate_counter_value("bonus_count", values["bonus_count"])
+        self._validate_counter_value("used_lessons", values["used_lessons"])
+        self._validate_counter_value("total_lessons", values["total_lessons"])
+        self._validate_counter_value("lessons_per_month", values["lessons_per_month"])
+        self._validate_counter_value("total_reschedule_allowance", values["total_reschedule_allowance"])
+        self._validate_counter_value("used_reschedule_count", values["used_reschedule_count"])
+
+        lesson_capacity = self._effective_lesson_capacity(
+            subscription_type=self._enum_value(values["type"]),
+            total_lessons=values["total_lessons"],
+            lessons_per_month=values["lessons_per_month"],
+            bonus_count=values["bonus_count"] or 0,
+        )
+        if lesson_capacity is not None and (values["used_lessons"] or 0) > lesson_capacity:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="used_lessons must not exceed effective lesson capacity",
+            )
+        if (values["used_reschedule_count"] or 0) > (values["total_reschedule_allowance"] or 0):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="used_reschedule_count must not exceed total_reschedule_allowance",
+            )
+        if values["payment_confirmed"] is False and values["payment_confirmed_at"] is not None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="payment_confirmed_at is not allowed when payment_confirmed is false",
+            )
+
+    def _validate_counter_value(self, field_name: str, value: int | None) -> None:
+        if value is not None and value < 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"{field_name} must be greater than or equal to 0",
+            )
+
+    def _effective_lesson_capacity(
+        self,
+        *,
+        subscription_type: str | None,
+        total_lessons: int | None,
+        lessons_per_month: int | None,
+        bonus_count: int,
+    ) -> int | None:
+        if subscription_type == "trial":
+            return 1 + bonus_count
+        base = total_lessons if total_lessons is not None else lessons_per_month
+        if base is None:
+            return None
+        return base + bonus_count
+
+    def _enum_value(self, value: Any) -> str | None:
+        if value is None:
+            return None
+        return str(getattr(value, "value", value))
 
     async def _latest_schedule_change_source_event(
         self,

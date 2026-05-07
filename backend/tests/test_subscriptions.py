@@ -1937,6 +1937,91 @@ async def test_subscription_remaining_lessons_matches_frontend_hybrid_calculatio
 
 
 @pytest.mark.asyncio
+async def test_create_subscription_rejects_impossible_counter_state(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Subscription counters cannot start beyond the effective lesson/reschedule capacity."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    used_over_capacity = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-overused",
+            "type": "package",
+            "total_lessons": 4,
+            "bonus_count": 1,
+            "used_lessons": 6,
+            "amount": 160000,
+        },
+    )
+    assert used_over_capacity.status_code == 422
+    assert "used_lessons" in used_over_capacity.text
+
+    reschedule_over_capacity = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-over-reschedule",
+            "type": "package",
+            "total_lessons": 4,
+            "total_reschedule_allowance": 1,
+            "used_reschedule_count": 2,
+            "amount": 160000,
+        },
+    )
+    assert reschedule_over_capacity.status_code == 422
+    assert "used_reschedule_count" in reschedule_over_capacity.text
+
+
+@pytest.mark.asyncio
+async def test_update_subscription_rejects_impossible_counter_and_deposit_state(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Updates cannot create negative remaining counts or contradictory deposit timestamps."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "package",
+            "total_lessons": 4,
+            "used_lessons": 2,
+            "total_reschedule_allowance": 1,
+            "amount": 160000,
+            "payment_confirmed": False,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+
+    overused = await client.put(
+        f"/api/v1/subscriptions/{sub_id}",
+        headers=auth_headers,
+        json={"used_lessons": 5},
+    )
+    assert overused.status_code == 422
+    assert "used_lessons" in overused.text
+
+    impossible_deposit = await client.put(
+        f"/api/v1/subscriptions/{sub_id}",
+        headers=auth_headers,
+        json={
+            "payment_confirmed": False,
+            "payment_confirmed_at": "2026-05-05T09:00:00Z",
+        },
+    )
+    assert impossible_deposit.status_code == 422
+    assert "payment_confirmed_at" in impossible_deposit.text
+
+
+@pytest.mark.asyncio
 async def test_use_reschedule_increments_counter_and_rejects_exhausted_credit(
     client: AsyncClient,
     auth_headers,

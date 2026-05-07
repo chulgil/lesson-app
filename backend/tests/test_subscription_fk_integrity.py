@@ -59,3 +59,19 @@ def test_subscription_fk_migration_is_chained_and_declares_constraints() -> None
         "fk_request_events_subscription_id_subscriptions",
     ]:
         assert name in source
+
+
+def test_subscription_counter_check_migration_is_chained_and_declares_constraints() -> None:
+    """Alembic migration should add subscription counter check constraints."""
+    script = _script()
+    rev = script.get_revision("add_subscription_counter_checks")
+    assert rev is not None
+    assert rev.down_revision == "add_bulk_teacher_action_event_types"
+
+    source = Path(rev.module.__file__).read_text()
+    for name in [
+        "ck_subscriptions_non_negative_counters",
+        "ck_subscriptions_lesson_counter_capacity",
+        "ck_subscriptions_reschedule_counter_capacity",
+    ]:
+        assert name in source

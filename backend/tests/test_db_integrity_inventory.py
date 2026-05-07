@@ -8,7 +8,6 @@ from typing import Any
 
 from app.models.base import Base
 
-
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 INVENTORY_PATH = BACKEND_ROOT / "docs" / "db_integrity_inventory.json"
 
@@ -52,6 +51,16 @@ def test_db_integrity_inventory_business_constraints_reference_real_tables() -> 
         assert constraint["table"] in Base.metadata.tables
         assert constraint["priority"] in {"P0", "P1", "P2"}
         assert constraint["type"] in {"check", "unique", "partial_unique", "exclusion", "state_machine"}
+
+
+def test_subscription_counter_check_constraints_are_registered() -> None:
+    """Subscription counter invariants should be backed by database checks."""
+    table = Base.metadata.tables["subscriptions"]
+    constraint_names = {constraint.name for constraint in table.constraints}
+
+    assert "ck_subscriptions_non_negative_counters" in constraint_names
+    assert "ck_subscriptions_lesson_counter_capacity" in constraint_names
+    assert "ck_subscriptions_reschedule_counter_capacity" in constraint_names
 
 
 def test_schedule_change_remote_contract_audit_is_recorded() -> None:

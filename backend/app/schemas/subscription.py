@@ -116,6 +116,23 @@ class SubscriptionCreate(BaseModel):
             raise ValueError("card/PG payments are not supported for current tuition deposits")
         return value
 
+    @model_validator(mode="after")
+    def validate_business_invariants(self) -> "SubscriptionCreate":
+        _validate_subscription_counter_state(
+            subscription_type=self.type,
+            total_lessons=self.total_lessons,
+            lessons_per_month=self.lessons_per_month,
+            bonus_count=self.bonus_count,
+            used_lessons=self.used_lessons,
+            total_reschedule_allowance=self.total_reschedule_allowance,
+            used_reschedule_count=self.used_reschedule_count,
+        )
+        _validate_manual_deposit_state(
+            payment_confirmed=self.payment_confirmed,
+            payment_confirmed_at=self.payment_confirmed_at,
+        )
+        return self
+
 
 class SubscriptionUpdate(BaseModel):
     """Update a subscription."""
@@ -150,6 +167,70 @@ class SubscriptionUpdate(BaseModel):
         if value == "card":
             raise ValueError("card/PG payments are not supported for current tuition deposits")
         return value
+
+    @model_validator(mode="after")
+    def validate_partial_deposit_state(self) -> "SubscriptionUpdate":
+        if self.payment_confirmed is False and self.payment_confirmed_at is not None:
+            raise ValueError("payment_confirmed_at is not allowed when payment_confirmed is false")
+        return self
+
+
+def _effective_lesson_capacity(
+    *,
+    subscription_type: str | None,
+    total_lessons: int | None,
+    lessons_per_month: int | None,
+    bonus_count: int,
+) -> int | None:
+    if subscription_type == "trial":
+        return 1 + bonus_count
+    base = total_lessons if total_lessons is not None else lessons_per_month
+    if base is None:
+        return None
+    return base + bonus_count
+
+
+def _validate_subscription_counter_state(
+    *,
+    subscription_type: str | None,
+    total_lessons: int | None,
+    lessons_per_month: int | None,
+    bonus_count: int,
+    used_lessons: int,
+    total_reschedule_allowance: int,
+    used_reschedule_count: int,
+) -> None:
+    counters = {
+        "total_lessons": total_lessons,
+        "lessons_per_month": lessons_per_month,
+        "bonus_count": bonus_count,
+        "used_lessons": used_lessons,
+        "total_reschedule_allowance": total_reschedule_allowance,
+        "used_reschedule_count": used_reschedule_count,
+    }
+    for field_name, value in counters.items():
+        if value is not None and value < 0:
+            raise ValueError(f"{field_name} must be greater than or equal to 0")
+
+    lesson_capacity = _effective_lesson_capacity(
+        subscription_type=subscription_type,
+        total_lessons=total_lessons,
+        lessons_per_month=lessons_per_month,
+        bonus_count=bonus_count,
+    )
+    if lesson_capacity is not None and used_lessons > lesson_capacity:
+        raise ValueError("used_lessons must not exceed effective lesson capacity")
+    if used_reschedule_count > total_reschedule_allowance:
+        raise ValueError("used_reschedule_count must not exceed total_reschedule_allowance")
+
+
+def _validate_manual_deposit_state(
+    *,
+    payment_confirmed: bool,
+    payment_confirmed_at: _dt.datetime | None,
+) -> None:
+    if not payment_confirmed and payment_confirmed_at is not None:
+        raise ValueError("payment_confirmed_at is not allowed when payment_confirmed is false")
 
 
 class UseLessonRequest(BaseModel):

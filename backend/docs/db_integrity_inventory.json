@@ -222,13 +222,6 @@
     {
       "domain": "subscription",
       "table": "subscriptions",
-      "type": "check",
-      "priority": "P0",
-      "rule": "used_lessons between 0 and total_lessons; used_reschedule_count between 0 and total_reschedule_allowance"
-    },
-    {
-      "domain": "subscription",
-      "table": "subscriptions",
       "type": "state_machine",
       "priority": "P0",
       "rule": "status, deposit_status, payment_confirmed, paid_at, and payment_confirmed_at must transition consistently for manual deposits"
