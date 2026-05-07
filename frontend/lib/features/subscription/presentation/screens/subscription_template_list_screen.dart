@@ -32,6 +32,11 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         elevation: 0,
         actions: [
           IconButton(
+            onPressed: () => _showAddTemplateDialog(context, ref),
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.templateAddButton,
+          ),
+          IconButton(
             onPressed: () {
               context.push(
                 '${AppRoutes.proposalSettings}?teacherId=$teacherId',
@@ -47,11 +52,6 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         data: (templates) => _buildContent(context, ref, templates),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _buildErrorState(context, error),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddTemplateDialog(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.templateAddButton),
       ),
     );
   }
@@ -106,15 +106,6 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
                 color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            FilledButton.icon(
-              onPressed: () => _showAddTemplateDialog(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text(AppStrings.templateFirstCreate),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-              ),
             ),
           ],
         ),

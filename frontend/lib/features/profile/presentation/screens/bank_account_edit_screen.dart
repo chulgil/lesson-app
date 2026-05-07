@@ -29,11 +29,13 @@ class BankAccountEditScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text(AppStrings.profileBankAccountTitle),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddAccountSheet(context, ref, accounts),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.profileBankAccountAddLabel),
+        actions: [
+          IconButton(
+            onPressed: () => _showAddAccountSheet(context, ref, accounts),
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.profileBankAccountAddLabel,
+          ),
+        ],
       ),
       body:
           accounts.isEmpty

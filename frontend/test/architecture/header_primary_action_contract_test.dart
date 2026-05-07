@@ -52,10 +52,7 @@ bool _hasHeaderAddAction(String source) {
       if (bracketStart != -1) {
         final bracketEnd = _findMatchingBracket(source, bracketStart);
         if (bracketEnd != -1) {
-          final actionsBlock = source.substring(
-            actionsIndex,
-            bracketEnd + 1,
-          );
+          final actionsBlock = source.substring(actionsIndex, bracketEnd + 1);
           if (_containsAddActionIcon(actionsBlock)) {
             return true;
           }
@@ -69,12 +66,16 @@ bool _hasHeaderAddAction(String source) {
 
 bool _containsAddActionIcon(String block) {
   return block.contains('IconButton(') &&
-      block.contains('Icons.add') &&
+      _containsExactAddIcon(block) &&
       block.contains('onPressed');
 }
 
 bool _hasInBodyDuplicateAddAction(String source) {
-  return _hasFloatingActionAdd(source) || _hasEmptyStateAddAction(source);
+  return _hasFloatingActionAdd(source) ||
+      _hasEmptyStateAddAction(source) ||
+      _hasLabeledButtonAddAction(source, 'FilledButton.icon') ||
+      _hasLabeledButtonAddAction(source, 'OutlinedButton.icon') ||
+      _hasLabeledButtonAddAction(source, 'ElevatedButton.icon');
 }
 
 bool _hasFloatingActionAdd(String source) {
@@ -88,7 +89,7 @@ bool _hasFloatingActionAdd(String source) {
   if (closeParen == -1) return false;
 
   final block = source.substring(fabIndex, closeParen + 1);
-  return block.contains('Icons.add');
+  return _containsExactAddIcon(block);
 }
 
 bool _hasEmptyStateAddAction(String source) {
@@ -105,12 +106,35 @@ bool _hasEmptyStateAddAction(String source) {
     if (block.contains('actionLabel:') &&
         block.contains('actionIcon:') &&
         block.contains('onAction:') &&
-        block.contains('Icons.add')) {
+        _containsExactAddIcon(block)) {
       return true;
     }
 
     cursor = closeParen + 1;
   }
+}
+
+bool _hasLabeledButtonAddAction(String source, String buttonType) {
+  var cursor = 0;
+  while (true) {
+    final index = source.indexOf('$buttonType(', cursor);
+    if (index == -1) return false;
+
+    final openParen = source.indexOf('(', index);
+    final closeParen = _findMatchingParen(source, openParen);
+    if (closeParen == -1) return false;
+
+    final block = source.substring(index, closeParen + 1);
+    if (_containsExactAddIcon(block) && block.contains('onPressed:')) {
+      return true;
+    }
+
+    cursor = closeParen + 1;
+  }
+}
+
+bool _containsExactAddIcon(String source) {
+  return RegExp(r'Icons\.add(?![_a-zA-Z0-9])').hasMatch(source);
 }
 
 int _findMatchingParen(String source, int openIndex) {
