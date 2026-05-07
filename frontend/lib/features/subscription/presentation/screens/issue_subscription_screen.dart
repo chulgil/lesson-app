@@ -7,10 +7,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../students/domain/entities/class_membership.dart';
+import '../../../students/domain/entities/lesson_location.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../extensions/lesson_policy_visuals.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
@@ -150,6 +153,21 @@ class _IssueSubscriptionScreenState
   int get finalAmount {
     if (_discountPercent <= 0) return _originalAmount;
     return (_originalAmount * (100 - _discountPercent) / 100).round();
+  }
+
+  /// Resolves the student's preferred location type from the linked lesson request.
+  /// Returns null if there is no linked request or no preference was set.
+  LocationType? _resolvePreferredLocationType() {
+    final requestId = widget.lessonRequestId;
+    if (requestId == null) return null;
+    final requestAsync = ref.watch(unifiedRequestByIdProvider(requestId));
+    final raw = requestAsync.valueOrNull?.preferredLocationType;
+    if (raw == null) return null;
+    try {
+      return LocationType.values.byName(raw);
+    } catch (_) {
+      return null;
+    }
   }
 
   // --- Lifecycle ---
@@ -339,6 +357,7 @@ class _IssueSubscriptionScreenState
                       setState(() => _selectedLocationId = locationId),
               onTravelTimeChanged:
                   (minutes) => setState(() => _travelTimeMinutes = minutes),
+              initialLocationType: _resolvePreferredLocationType(),
             ),
           ],
 

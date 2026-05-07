@@ -74,6 +74,10 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
   final ValueChanged<String?> onLocationChanged;
   final ValueChanged<int> onTravelTimeChanged;
 
+  /// Optional callback notifying the parent of the selected [LocationType].
+  /// Useful when the parent needs to compare types (e.g. warning dialog).
+  final ValueChanged<LocationType?>? onLocationTypeChanged;
+
   /// true = 학원 레슨 (학원, 온라인만), false = 개인 레슨 (학생집, 외부, 선생님집, 온라인)
   final bool isAcademy;
 
@@ -89,6 +93,10 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
   /// Optional: lesson duration in minutes for surcharge calculation.
   final int? lessonDurationMinutes;
 
+  /// Optional: pre-select a location type (e.g. from student's lesson request preference).
+  /// Used as a default when [currentLocationId] is null or yields no type.
+  final LocationType? initialLocationType;
+
   const LocationTravelSelector({
     super.key,
     required this.membershipId,
@@ -102,6 +110,8 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
     this.suggestionSource,
     this.baseLessonFee,
     this.lessonDurationMinutes,
+    this.initialLocationType,
+    this.onLocationTypeChanged,
   });
 
   @override
@@ -118,8 +128,10 @@ class _LocationTravelSelectorState
   @override
   void initState() {
     super.initState();
-    // Derive initial type from currentLocationId if provided
-    _selectedType = _inferTypeFromLocationId(widget.currentLocationId);
+    // Derive initial type from currentLocationId, then fall back to
+    // initialLocationType (e.g. student's preferred location from request).
+    _selectedType = _inferTypeFromLocationId(widget.currentLocationId) ??
+        widget.initialLocationType;
     // Initialise travel time text field
     final initial = widget.currentTravelTime;
     _travelTimeController.text = initial > 0 ? initial.toString() : '';
@@ -167,6 +179,9 @@ class _LocationTravelSelectorState
 
     // Generate location ID and notify parent
     widget.onLocationChanged(_locationIdFromType(type));
+
+    // Notify parent of type change (used for warning dialog in ChangeLocationSheet)
+    widget.onLocationTypeChanged?.call(type);
 
     // Auto-set travel time to 0 for online and teacher studio
     if (type == LocationType.online || type == LocationType.teacherStudio) {

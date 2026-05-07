@@ -13,6 +13,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/settings/settings_facade.dart';
+import '../../../../features/students/domain/entities/lesson_location.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/weekly_calendar_picker.dart';
@@ -61,6 +62,7 @@ class _UnifiedLessonRequestScreenState
   UnifiedLessonGoal _selectedGoal = UnifiedLessonGoal.hobby;
   UnifiedExperienceLevel _selectedExperience = UnifiedExperienceLevel.beginner;
   List<PreferredTimeSlot> _preferredSlots = [];
+  LocationType? _preferredLocationType;
   bool _isSubmitting = false;
 
   @override
@@ -116,6 +118,8 @@ class _UnifiedLessonRequestScreenState
               const SizedBox(height: AppSpacing.space6),
               _buildExperienceSection(),
               const SizedBox(height: AppSpacing.space6),
+              _buildPreferredLocationSection(),
+              const SizedBox(height: AppSpacing.space6),
               _buildEstimatedDuration(),
               const SizedBox(height: AppSpacing.space6),
               _buildSlotPickerSection(),
@@ -133,6 +137,26 @@ class _UnifiedLessonRequestScreenState
         ),
       ),
     );
+  }
+
+  // Location option definitions for ChoiceChip display
+  static const _preferredPrivateLocationOptions = [
+    MapEntry(LocationType.studentHome, AppStrings.locationStudentHomeLabel),
+    MapEntry(LocationType.externalPlace, AppStrings.locationExternalPlaceLabel),
+    MapEntry(LocationType.teacherStudio, AppStrings.locationTeacherHomeLabel),
+    MapEntry(LocationType.online, AppStrings.locationOnlineLabel),
+  ];
+
+  // ignore: unused_field — reserved for when UnifiedLessonRequestParams gains isAcademy flag
+  static const _preferredAcademyLocationOptions = [
+    MapEntry(LocationType.academyRoom, AppStrings.academy),
+    MapEntry(LocationType.online, AppStrings.locationOnlineLabel),
+  ];
+
+  /// Convert LocationType to the raw string stored in UnifiedLessonRequest.
+  String? _locationTypeToString(LocationType? type) {
+    if (type == null) return null;
+    return type.name; // e.g. "studentHome", "academyRoom", etc.
   }
 
   // -- Teacher info header --
@@ -418,6 +442,49 @@ class _UnifiedLessonRequestScreenState
     );
   }
 
+  // -- Preferred location --
+
+  Widget _buildPreferredLocationSection() {
+    // Academy flag is not carried in params; default to private location options.
+    // Academy requests would need an `isAcademy` param in UnifiedLessonRequestParams.
+    const options = _preferredPrivateLocationOptions;
+
+    return _SectionWrapper(
+      icon: Icons.location_on,
+      title: AppStrings.preferredLocationTitle,
+      child: Wrap(
+        spacing: AppSpacing.space2,
+        runSpacing: AppSpacing.space2,
+        children: options.map((entry) {
+          final type = entry.key;
+          final label = entry.value;
+          final isSelected = _preferredLocationType == type;
+          return ChoiceChip(
+            label: Text(label),
+            selected: isSelected,
+            onSelected: (selected) {
+              setState(() {
+                _preferredLocationType = selected ? type : null;
+              });
+            },
+            selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+            backgroundColor: AppColors.paper,
+            labelStyle: AppTypography.bodyMedium.copyWith(
+              color: isSelected ? AppColors.paperAccent : AppColors.ink,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            side: BorderSide(
+              color: isSelected
+                  ? AppColors.paperAccent
+                  : AppColors.inkQuaternary,
+            ),
+            shape: const RoundedRectangleBorder(),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   // -- Slot picker --
 
   Widget _buildSlotPickerSection() {
@@ -657,6 +724,7 @@ class _UnifiedLessonRequestScreenState
         isReturningStudent: widget.params.isReturningStudent,
         suggestedPrice: _lookupReferencePrice(),
         createdAt: now,
+        preferredLocationType: _locationTypeToString(_preferredLocationType),
       );
 
       final actions = UnifiedLessonRequestActions(ref);

@@ -33,11 +33,17 @@ class SubscriptionPolicySheet extends ConsumerWidget {
   /// Callback invoked after teacher navigates to issue a new subscription.
   final VoidCallback? onIssueNewSubscription;
 
+  /// The student's preferred location type from their lesson request.
+  /// When the teacher changes the location to a different type, a confirmation
+  /// dialog is shown informing them of the student's original preference.
+  final LocationType? preferredLocationType;
+
   const SubscriptionPolicySheet({
     super.key,
     required this.subscription,
     this.viewerRole = 'student',
     this.onIssueNewSubscription,
+    this.preferredLocationType,
   });
 
   static Future<void> show(
@@ -45,6 +51,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
     required Subscription subscription,
     String viewerRole = 'student',
     VoidCallback? onIssueNewSubscription,
+    LocationType? preferredLocationType,
   }) {
     return showNotebookModalBottomSheet<void>(
       context: context,
@@ -62,6 +69,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
                     subscription: subscription,
                     viewerRole: viewerRole,
                     onIssueNewSubscription: onIssueNewSubscription,
+                    preferredLocationType: preferredLocationType,
                   ),
                 ),
           ),
@@ -153,6 +161,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
             membership: membership,
             policy: policy,
             onIssueNewSubscription: onIssueNewSubscription,
+            preferredLocationType: preferredLocationType,
           )
         else ...[
           _buildReadOnlyPolicyRows(policy),
@@ -209,12 +218,14 @@ class _EditableSection extends ConsumerStatefulWidget {
   final ClassMembership membership;
   final LessonPolicy? policy;
   final VoidCallback? onIssueNewSubscription;
+  final LocationType? preferredLocationType;
 
   const _EditableSection({
     required this.subscription,
     required this.membership,
     required this.policy,
     this.onIssueNewSubscription,
+    this.preferredLocationType,
   });
 
   @override
@@ -381,6 +392,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
       isScrollControlled: true,
       builder: (ctx) => _ChangeLocationSheet(
         membership: membership,
+        preferredLocationType: widget.preferredLocationType,
         onSave: (locationId, travelTime) async {
           final updated = membership.copyWith(
             lessonLocationId: locationId,
@@ -568,9 +580,14 @@ class _ChangeLocationSheet extends ConsumerStatefulWidget {
   final ClassMembership membership;
   final Future<void> Function(String? locationId, int travelTime) onSave;
 
+  /// Student's preferred location type from their original lesson request.
+  /// When the teacher picks a different type, a confirmation dialog is shown.
+  final LocationType? preferredLocationType;
+
   const _ChangeLocationSheet({
     required this.membership,
     required this.onSave,
+    this.preferredLocationType,
   });
 
   @override
@@ -581,6 +598,7 @@ class _ChangeLocationSheet extends ConsumerStatefulWidget {
 class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
   late String? _locationId;
   late int _travelTime;
+  LocationType? _selectedLocationType;
   bool _saving = false;
 
   @override
@@ -588,6 +606,55 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
     super.initState();
     _locationId = widget.membership.lessonLocationId;
     _travelTime = widget.membership.travelTimeMinutes;
+  }
+
+  /// Returns a human-readable label for [type].
+  String _locationTypeLabel(LocationType type) {
+    switch (type) {
+      case LocationType.studentHome:
+        return AppStrings.locationStudentHomeLabel;
+      case LocationType.externalPlace:
+        return AppStrings.locationExternalPlaceLabel;
+      case LocationType.teacherStudio:
+        return AppStrings.locationTeacherHomeLabel;
+      case LocationType.online:
+        return AppStrings.locationOnlineLabel;
+      case LocationType.academyRoom:
+        return AppStrings.academy;
+    }
+  }
+
+  Future<void> _handleSave() async {
+    final preferred = widget.preferredLocationType;
+
+    // Show warning dialog if the selected type differs from student's preference
+    if (preferred != null &&
+        _selectedLocationType != null &&
+        _selectedLocationType != preferred) {
+      final confirmed = await showNotebookDialog<bool>(
+        context: context,
+        title: AppStrings.locationChangeWarningTitle,
+        content: Text(
+          AppStrings.locationChangeWarningBody(
+            _locationTypeLabel(preferred),
+            _locationTypeLabel(_selectedLocationType!),
+          ),
+        ),
+        confirmLabel: AppStrings.changeTypeLabel,
+        cancelLabel: AppStrings.cancel,
+      );
+      if (confirmed != true) return;
+    }
+
+    setState(() => _saving = true);
+    try {
+      await widget.onSave(_locationId, _travelTime);
+      if (!mounted) return;
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -617,6 +684,8 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
             currentTravelTime: _travelTime,
             onLocationChanged: (id) => setState(() => _locationId = id),
             onTravelTimeChanged: (t) => setState(() => _travelTime = t),
+            onLocationTypeChanged: (type) =>
+                setState(() => _selectedLocationType = type),
           ),
           const SizedBox(height: AppSpacing.space4),
           SizedBox(
@@ -630,17 +699,7 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                   borderRadius: BorderRadius.zero,
                 ),
               ),
-              onPressed: _saving
-                  ? null
-                  : () async {
-                      setState(() => _saving = true);
-                      try {
-                        await widget.onSave(_locationId, _travelTime);
-                        if (context.mounted) Navigator.of(context).pop();
-                      } finally {
-                        if (mounted) setState(() => _saving = false);
-                      }
-                    },
+              onPressed: _saving ? null : _handleSave,
               child: _saving
                   ? const SizedBox(
                       width: 20,
