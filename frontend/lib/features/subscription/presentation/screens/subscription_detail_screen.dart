@@ -14,8 +14,6 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
-import '../../../students/domain/entities/teacher_announcement.dart';
-import '../../../students/presentation/providers/teacher_announcement_providers.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';

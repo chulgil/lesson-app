@@ -5,7 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../students/presentation/providers/teacher_announcement_providers.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/teacher_availability_providers.dart' hide SelectedSlot;

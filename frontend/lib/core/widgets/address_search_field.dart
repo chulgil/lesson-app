@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'notebook/notebook_bottom_sheet.dart';
 
 /// Result of an address search selection.
 class AddressResult {
@@ -11,11 +12,7 @@ class AddressResult {
   final String? address;
   final String? addressDetail;
 
-  const AddressResult({
-    this.postalCode,
-    this.address,
-    this.addressDetail,
-  });
+  const AddressResult({this.postalCode, this.address, this.addressDetail});
 
   AddressResult copyWith({
     String? postalCode,
@@ -110,12 +107,14 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
 
   void _onDetailChanged() => _notifyParent();
   void _onManualChanged() {
-    _postalCode = _manualPostalController.text.isEmpty
-        ? null
-        : _manualPostalController.text;
-    _address = _manualAddressController.text.isEmpty
-        ? null
-        : _manualAddressController.text;
+    _postalCode =
+        _manualPostalController.text.isEmpty
+            ? null
+            : _manualPostalController.text;
+    _address =
+        _manualAddressController.text.isEmpty
+            ? null
+            : _manualAddressController.text;
     _notifyParent();
   }
 
@@ -124,9 +123,8 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
       AddressResult(
         postalCode: _postalCode,
         address: _address,
-        addressDetail: _detailController.text.isEmpty
-            ? null
-            : _detailController.text,
+        addressDetail:
+            _detailController.text.isEmpty ? null : _detailController.text,
       ),
     );
   }
@@ -142,11 +140,9 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
   }
 
   Future<void> _openSearchSheet() async {
-    final result = await showModalBottomSheet<_MockAddress>(
+    final result = await showNotebookModalBottomSheet<_MockAddress>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(),
       builder: (ctx) => const _AddressSearchSheet(),
     );
 
@@ -159,9 +155,8 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
         AddressResult(
           postalCode: result.postalCode,
           address: result.address,
-          addressDetail: _detailController.text.isEmpty
-              ? null
-              : _detailController.text,
+          addressDetail:
+              _detailController.text.isEmpty ? null : _detailController.text,
         ),
       );
     }
@@ -229,9 +224,7 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
         // 상세주소 (모드 무관 공통)
         TextField(
           controller: _detailController,
-          decoration: _inputDecoration(
-            hintText: AppStrings.addressDetailHint,
-          ),
+          decoration: _inputDecoration(hintText: AppStrings.addressDetailHint),
           style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           textInputAction: TextInputAction.done,
         ),
@@ -260,31 +253,32 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
-            child: hasAddress
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_postalCode != null)
+            child:
+                hasAddress
+                    ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_postalCode != null)
+                          Text(
+                            _postalCode!,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.inkTertiary,
+                            ),
+                          ),
                         Text(
-                          _postalCode!,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.inkTertiary,
+                          _address!,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.ink,
                           ),
                         ),
-                      Text(
-                        _address!,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.ink,
-                        ),
+                      ],
+                    )
+                    : Text(
+                      widget.hintText ?? AppStrings.addressSearchHint,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkQuaternary,
                       ),
-                    ],
-                  )
-                : Text(
-                    widget.hintText ?? AppStrings.addressSearchHint,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkQuaternary,
                     ),
-                  ),
           ),
           const SizedBox(width: AppSpacing.space2),
           TextButton(
@@ -363,13 +357,13 @@ class _AddressSearchSheetState extends State<_AddressSearchSheet> {
       if (query.isEmpty) {
         _results = _kMockAddresses;
       } else {
-        _results = _kMockAddresses
-            .where(
-              (a) =>
-                  a.address.contains(query) ||
-                  a.postalCode.contains(query),
-            )
-            .toList();
+        _results =
+            _kMockAddresses
+                .where(
+                  (a) =>
+                      a.address.contains(query) || a.postalCode.contains(query),
+                )
+                .toList();
       }
     });
   }
@@ -450,85 +444,89 @@ class _AddressSearchSheetState extends State<_AddressSearchSheet> {
 
             // Results list
             Expanded(
-              child: _results.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppStrings.addressNoResults,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.inkTertiary,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.space3),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              AppStrings.addressManualInputGuide,
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
+              child:
+                  _results.isEmpty
+                      ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppStrings.addressNoResults,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.inkTertiary,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.separated(
-                      itemCount: _results.length,
-                      separatorBuilder: (_, __) => Container(
-                        height: 1,
-                        color: AppColors.inkQuaternary,
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.space4,
+                            const SizedBox(height: AppSpacing.space3),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                AppStrings.addressManualInputGuide,
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.paperAccent,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      itemBuilder: (ctx, index) {
-                        final item = _results[index];
-                        return InkWell(
-                          onTap: () => Navigator.of(ctx).pop(item),
-                          child: Container(
-                            color: AppColors.paper,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.space4,
-                              vertical: AppSpacing.space3,
+                      )
+                      : ListView.separated(
+                        itemCount: _results.length,
+                        separatorBuilder:
+                            (_, __) => Container(
+                              height: 1,
+                              color: AppColors.inkQuaternary,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.space4,
+                              ),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on_outlined,
-                                  size: AppSpacing.iconSM,
-                                  color: AppColors.inkTertiary,
-                                ),
-                                const SizedBox(width: AppSpacing.space3),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.address,
-                                        style: AppTypography.bodyMedium
-                                            .copyWith(color: AppColors.ink),
-                                      ),
-                                      const SizedBox(height: AppSpacing.space1),
-                                      Text(
-                                        item.postalCode,
-                                        style: AppTypography.bodySmall
-                                            .copyWith(
-                                          color: AppColors.inkTertiary,
-                                        ),
-                                      ),
-                                    ],
+                        itemBuilder: (ctx, index) {
+                          final item = _results[index];
+                          return InkWell(
+                            onTap: () => Navigator.of(ctx).pop(item),
+                            child: Container(
+                              color: AppColors.paper,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.space4,
+                                vertical: AppSpacing.space3,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_outlined,
+                                    size: AppSpacing.iconSM,
+                                    color: AppColors.inkTertiary,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: AppSpacing.space3),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.address,
+                                          style: AppTypography.bodyMedium
+                                              .copyWith(color: AppColors.ink),
+                                        ),
+                                        const SizedBox(
+                                          height: AppSpacing.space1,
+                                        ),
+                                        Text(
+                                          item.postalCode,
+                                          style: AppTypography.bodySmall
+                                              .copyWith(
+                                                color: AppColors.inkTertiary,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),

@@ -12,7 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../students/presentation/providers/teacher_announcement_providers.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
