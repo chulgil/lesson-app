@@ -863,6 +863,100 @@ async def test_pending_subscription_schedule_change_events_include_lesson_cancel
 
 
 @pytest.mark.asyncio
+async def test_subscription_events_reject_session_numbers_outside_subscription_bounds(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Subscription session events must map to an existing lesson count."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session, teacher_id="test-user-id-prof")
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 160000,
+        },
+    )
+    assert create_resp.status_code == 201
+    sub_id = create_resp.json()["id"]
+
+    for session_number in (0, 5):
+        response = await client.post(
+            f"/api/v1/subscriptions/{sub_id}/events",
+            headers=auth_headers,
+            json={
+                "request_id": sub_id,
+                "actor_type": "student",
+                "actor_id": "student-001",
+                "event_type": "scheduleChanged",
+                "subscription_id": sub_id,
+                "session_number": session_number,
+                "message": f"{session_number}회차 시간 변경 요청",
+            },
+        )
+        assert response.status_code == 400
+        assert "session_number" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_subscription_events_use_lessons_per_month_when_total_lessons_is_absent(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Monthly subscriptions can validate session events against lessons_per_month."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session, teacher_id="test-user-id-prof")
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "type": "monthly",
+            "lessons_per_month": 4,
+            "amount": 200000,
+        },
+    )
+    assert create_resp.status_code == 201
+    sub_id = create_resp.json()["id"]
+
+    accepted = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChanged",
+            "subscription_id": sub_id,
+            "session_number": 4,
+            "message": "4회차 시간 변경 요청",
+        },
+    )
+    assert accepted.status_code == 201
+
+    rejected = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "scheduleChanged",
+            "subscription_id": sub_id,
+            "session_number": 5,
+            "message": "5회차 시간 변경 요청",
+        },
+    )
+    assert rejected.status_code == 400
+    assert "lessons_per_month" in rejected.json()["detail"]
+
+
+@pytest.mark.asyncio
 async def test_parent_cannot_create_subscription_schedule_change_event(
     client: AsyncClient,
     auth_headers,

@@ -452,7 +452,8 @@ class SubscriptionService:
         """Persist a subscription chat event."""
         from app.models.request_event import RequestEvent, RequestEventType, ScheduleChangeType
 
-        await self._get_subscription_for_user(subscription_id, current_user)
+        sub = await self._get_subscription_for_user(subscription_id, current_user)
+        self._validate_subscription_event_session_number(sub, data.session_number)
         await self._validate_subscription_event_turn(subscription_id, data, current_user)
         if data.subscription_id is not None and data.subscription_id != subscription_id:
             raise HTTPException(
@@ -563,6 +564,32 @@ class SubscriptionService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Only the other party can respond to the schedule-change proposal",
+            )
+
+    def _validate_subscription_event_session_number(self, subscription: Any, session_number: int | None) -> None:
+        """Ensure session-scoped events reference an actual subscription lesson."""
+        if session_number is None:
+            return
+        if session_number < 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="session_number must be greater than or equal to 1",
+            )
+
+        max_session = subscription.total_lessons
+        bound_field = "total_lessons"
+        if max_session is None:
+            max_session = subscription.lessons_per_month
+            bound_field = "lessons_per_month"
+        if max_session is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="session_number requires subscription total_lessons or lessons_per_month",
+            )
+        if session_number > max_session:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"session_number must be less than or equal to subscription {bound_field}",
             )
 
     async def _latest_schedule_change_source_event(
