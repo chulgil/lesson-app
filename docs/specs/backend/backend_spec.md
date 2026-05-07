@@ -236,6 +236,24 @@ NAVER_CLIENT_SECRET=xxx         # 네이버 Client Secret
 GOOGLE_MAPS_API_KEY=xxx         # 구글 Maps API 키 (글로벌)
 ```
 
+### YouTube 검색 API 계약 (2026-05-07)
+
+> 상세 스펙: [teaching_resource_attachment_spec.md](../lesson/teaching_resource_attachment_spec.md) §3
+
+| 기능 | 엔드포인트 | 설명 |
+|------|-----------|------|
+| 유튜브 검색 | `GET /api/v1/youtube/search` | 키워드 기반 유튜브 동영상 검색 (서버 경유) |
+
+**요청:** `?query=바이올린+스케일&max_results=10`
+**응답:** `{ results: [{ video_id, title, channel, thumbnail, duration_seconds, duration_text }] }`
+
+**백엔드 아키텍처:**
+```
+YouTubeRouter → YouTubeService → YouTube Data API v3 (search.list)
+  환경변수: YOUTUBE_API_KEY
+  일일 한도: 10,000 units (search.list = 100 units/요청 = 일 100회)
+```
+
 ### 이동시간 자동 측정 API 계약 (2026-05-07)
 
 > 상세 스펙: [lesson_location_management_spec.md](../schedule/lesson_location_management_spec.md) §12

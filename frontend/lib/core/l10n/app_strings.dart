@@ -2790,6 +2790,36 @@ class AppStrings {
   /// 녹음 추가에 실패했습니다 (recording add failed snack)
   static const recordingAddFailed = '녹음 추가에 실패했습니다';
 
+  /// 참고 녹음 추가 (add recording resource sheet short title)
+  static const addRecordingTitle = '참고 녹음 추가';
+
+  /// 새로 녹음하기 (record new button)
+  static const recordNew = '새로 녹음하기';
+
+  /// 파일에서 선택 (select from file button)
+  static const selectFile = '파일에서 선택';
+
+  /// 녹음 중... (recording in progress label)
+  static const recordingInProgressLabel = '녹음 중...';
+
+  /// 녹음 완료 (recording complete label)
+  static const recordingComplete = '녹음 완료';
+
+  /// 녹음 제목을 입력하세요 (recording title hint text)
+  static const recordingTitleHintText = '녹음 제목을 입력하세요';
+
+  /// 학생에게 전달할 메모 (선택) (recording memo hint)
+  static const recordingMemoHint = '학생에게 전달할 메모 (선택)';
+
+  /// 최대 50MB (m4a/mp3/wav) (max file size note)
+  static const maxFileSize = '최대 50MB (m4a/mp3/wav)';
+
+  /// 녹음을 시작할 수 없습니다 (cannot start recording)
+  static const cannotStartRecording = '녹음을 시작할 수 없습니다';
+
+  /// 마이크 권한이 필요합니다 (microphone permission needed)
+  static const micPermissionNeeded = '마이크 권한이 필요합니다';
+
   // -- Add External Link Sheet --
 
   /// 외부 링크 추가 (add external link sheet title)
@@ -2839,8 +2869,26 @@ class AppStrings {
   /// 라이브러리에서 선택 (select from library option)
   static const selectFromLibrary = '라이브러리에서 선택';
 
-  /// 유튜브 링크 추가 (add youtube link option)
-  static const addYoutubeLink = '유튜브 링크 추가';
+  /// 유튜브 검색 (youtube search option label)
+  static const youtubeSearch = '유튜브 검색';
+
+  /// 유튜브 검색 시트 제목
+  static const youtubeSearchTitle = '유튜브 검색';
+
+  /// 유튜브 검색창 힌트 텍스트
+  static const youtubeSearchHint = '검색어를 입력하세요';
+
+  /// 유튜브 검색 결과 선택 버튼
+  static const youtubeSearchSelect = '선택';
+
+  /// URL 직접 입력 링크 라벨
+  static const youtubeSearchDirectUrl = 'URL 직접 입력 →';
+
+  /// 검색 결과 없음
+  static const youtubeSearchNoResults = '검색 결과가 없습니다';
+
+  /// 유튜브 링크 추가 (add youtube link option — URL direct input)
+  static const addYoutubeLink = 'URL 직접 입력';
 
   /// 내 학습 자료 (my learning resources sheet title)
   static const myLearningResources = '내 학습 자료';

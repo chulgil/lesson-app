@@ -10,8 +10,11 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/teaching_resource.dart';
+import '../extensions/teaching_resource_visuals.dart';
 import '../providers/teaching_resource_providers.dart';
+import 'add_recording_resource_sheet.dart';
 import 'add_youtube_resource_sheet.dart';
+import 'youtube_search_sheet.dart';
 
 /// Displays attached teaching resources on a practice item card (read-only)
 class ResourceAttachmentList extends ConsumerWidget {
@@ -315,6 +318,18 @@ class _AddResourceButton extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space4),
 
+                  // Teacher recording (own recording)
+                  _buildOption(
+                    ctx,
+                    icon: Icons.mic_none,
+                    label: AppStrings.addRecordingTitle,
+                    color: AppColors.paperAccent,
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _showAddRecording(context);
+                    },
+                  ),
+
                   // From library
                   _buildOption(
                     ctx,
@@ -326,7 +341,19 @@ class _AddResourceButton extends ConsumerWidget {
                     },
                   ),
 
-                  // New YouTube link
+                  // YouTube search (new — first YouTube entry point)
+                  _buildOption(
+                    ctx,
+                    icon: Icons.search,
+                    label: AppStrings.youtubeSearch,
+                    color: AppColors.youtubeRed,
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _showYoutubeSearch(context);
+                    },
+                  ),
+
+                  // URL 직접 입력 (second YouTube option)
                   _buildOption(
                     ctx,
                     icon: Icons.play_circle_outline,
@@ -475,12 +502,31 @@ class _AddResourceButton extends ConsumerWidget {
     );
   }
 
+  void _showYoutubeSearch(BuildContext context) {
+    showNotebookModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder:
+          (_) => YoutubeSearchSheet(onResourceCreated: onResourceSelected),
+    );
+  }
+
   void _showAddYoutube(BuildContext context) {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder:
           (_) => AddYoutubeResourceSheet(onResourceCreated: onResourceSelected),
+    );
+  }
+
+  void _showAddRecording(BuildContext context) {
+    showNotebookModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder:
+          (_) =>
+              AddRecordingResourceSheet(onResourceCreated: onResourceSelected),
     );
   }
 }
