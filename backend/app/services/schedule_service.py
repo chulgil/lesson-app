@@ -419,6 +419,7 @@ class ScheduleService:
         exception = await self.db.get(ScheduleException, exception_id)
         if exception is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+        await self._assert_exception_owner(exception, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         updated_start_date = update_data.get("start_date", exception.start_date)
@@ -471,8 +472,24 @@ class ScheduleService:
         exception = await self.db.get(ScheduleException, exception_id)
         if exception is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+        await self._assert_exception_owner(exception, current_user)
         await self.db.delete(exception)
         await self.db.flush()
+
+    async def _assert_exception_owner(self, exception: Any, current_user: Any | None) -> None:
+        from app.models.schedule import TeacherAvailability
+
+        if current_user is None:
+            return
+
+        availability = await self.db.get(TeacherAvailability, exception.teacher_availability_id)
+        if availability is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Exception availability not found",
+            )
+        if availability.teacher_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     # ------------------------------------------------------------------
     # Bookings

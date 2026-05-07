@@ -7,7 +7,13 @@ from alembic.script import ScriptDirectory
 from httpx import AsyncClient
 import pytest
 
+from app.core.security import create_access_token
 from app.models.base import Base
+
+
+def _headers(user_id: str, role: str = "teacher") -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": role})
+    return {"Authorization": f"Bearer {token}"}
 
 
 def _script() -> ScriptDirectory:
@@ -137,6 +143,20 @@ async def test_schedule_exception_update_rejects_partial_time_payload(
     create_test_user,
 ) -> None:
     await create_test_user(user_id="test-user-id", role="teacher")
+    await client.put(
+        "/api/v1/schedule/availability",
+        headers=auth_headers,
+        json={
+            "availabilities": [
+                {
+                    "day_of_week": 0,
+                    "time_slots": [
+                        {"start_time": "09:00", "end_time": "18:00"},
+                    ],
+                }
+            ]
+        },
+    )
 
     created = await client.post(
         "/api/v1/schedule/exceptions",
@@ -156,3 +176,102 @@ async def test_schedule_exception_update_rejects_partial_time_payload(
     )
 
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_schedule_exception_update_requires_ownership(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    await create_test_user(
+        user_id="teacher-owner-id",
+        role="teacher",
+        email="owner-update@test.com",
+    )
+    await create_test_user(
+        user_id="teacher-other-id",
+        role="teacher",
+        email="other-update@test.com",
+    )
+    await client.put(
+        "/api/v1/schedule/availability",
+        headers=_headers("teacher-owner-id"),
+        json={
+            "availabilities": [
+                {
+                    "day_of_week": 0,
+                    "time_slots": [
+                        {"start_time": "09:00", "end_time": "18:00"},
+                    ],
+                }
+            ]
+        },
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=_headers("teacher-owner-id"),
+        json={
+            "start_date": "2026-05-07",
+            "type": "holiday",
+        },
+    )
+    assert create_response.status_code == 201
+    exc_id = create_response.json()["id"]
+
+    update_response = await client.put(
+        f"/api/v1/schedule/exceptions/{exc_id}",
+        headers=_headers("teacher-other-id"),
+        json={"reason": "blocked"},
+    )
+
+    assert update_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_schedule_exception_delete_requires_ownership(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    await create_test_user(
+        user_id="teacher-owner-id-2",
+        role="teacher",
+        email="owner-delete@test.com",
+    )
+    await create_test_user(
+        user_id="teacher-other-id-2",
+        role="teacher",
+        email="other-delete@test.com",
+    )
+    await client.put(
+        "/api/v1/schedule/availability",
+        headers=_headers("teacher-owner-id-2"),
+        json={
+            "availabilities": [
+                {
+                    "day_of_week": 0,
+                    "time_slots": [
+                        {"start_time": "09:00", "end_time": "18:00"},
+                    ],
+                }
+            ]
+        },
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=_headers("teacher-owner-id-2"),
+        json={
+            "start_date": "2026-05-08",
+            "type": "holiday",
+        },
+    )
+    assert create_response.status_code == 201
+    exc_id = create_response.json()["id"]
+
+    delete_response = await client.delete(
+        f"/api/v1/schedule/exceptions/{exc_id}",
+        headers=_headers("teacher-other-id-2"),
+    )
+
+    assert delete_response.status_code == 403
