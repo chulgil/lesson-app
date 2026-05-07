@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../features/profile/profile_facade.dart';
 import '../../../students/students_facade.dart';
+import '../../../students/presentation/extensions/student_domain_visuals.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
@@ -333,19 +334,41 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
     return subscriptionsAsync.when(
       data: (subscriptions) {
-        if (subscriptions.isNotEmpty) return const SizedBox.shrink();
+        final hasActive = subscriptions.isNotEmpty;
+        final activeSub = hasActive ? subscriptions.first : null;
+
+        final message = hasActive
+            ? AppStrings.activeSubscriptionBanner(
+                activeSub!.remainingLessons ?? 0,
+                activeSub.totalLessonsForDisplay ?? 0,
+              )
+            : AppStrings.noActiveSubscriptionBanner;
+        final icon = hasActive ? Icons.check_circle_outline : Icons.info_outline;
+        final bgColor = hasActive
+            ? AppColors.paperOk.withValues(alpha: 0.08)
+            : AppColors.paperDark;
+        final iconColor = hasActive ? AppColors.paperOk : AppColors.ink;
+
         return Padding(
           padding: const EdgeInsets.only(top: AppSpacing.space2),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(color: AppColors.paperDark),
+            decoration: BoxDecoration(
+              color: bgColor,
+              border: Border.all(
+                color: hasActive
+                    ? AppColors.paperOk.withValues(alpha: 0.3)
+                    : AppColors.inkQuaternary,
+              ),
+            ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, color: AppColors.ink, size: 18),
+                Icon(icon, color: iconColor, size: 18),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    AppStrings.noActiveSubscriptionBanner,
+                    message,
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.ink,
                     ),

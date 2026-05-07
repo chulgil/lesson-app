@@ -2541,7 +2541,11 @@ class AppStrings {
 
   /// 이 학생은 현재 유효한 수강권이 없습니다... (no active subscription banner)
   static const noActiveSubscriptionBanner =
-      '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.';
+      '현재 유효한 수강권이 없는 학생입니다.\n'
+      '수기로 레슨을 등록할 수 있으며, 수강권 발급 후에는\n'
+      '레슨 횟수와 이동시간이 자동으로 관리됩니다.';
+  static String activeSubscriptionBanner(int remaining, int total) =>
+      '수강권 $remaining/$total회 남음 · 이 레슨은 1회차로 차감됩니다.';
 
   /// 과거 레슨 기록 (past lesson record dialog title)
   static const pastLessonRecordTitle = '과거 레슨 기록';
