@@ -277,6 +277,9 @@ async def test_student_and_parent_can_notify_external_deposit_without_payments_a
     db_session: AsyncSession,
 ):
     """External tuition deposit notification stays on subscriptions, not /payments."""
+    from sqlalchemy import select
+
+    from app.models.notification import Notification
     from app.models.parent import Parent, ParentChildRelation
     from app.models.student import Student
 
@@ -346,6 +349,45 @@ async def test_student_and_parent_can_notify_external_deposit_without_payments_a
         json={"payment_method": "cash"},
     )
     assert parent_notify.status_code == 200
+
+    teacher_notifications = (
+        await db_session.scalars(
+            select(Notification)
+            .where(Notification.user_id == "test-user-id", Notification.type == "paymentReceived")
+            .order_by(Notification.created_at)
+        )
+    ).all()
+    assert len(teacher_notifications) == 2
+    assert all(notification.action_url == f"/subscriptions/{sub_id}" for notification in teacher_notifications)
+    assert all(notification.data["subscriptionId"] == sub_id for notification in teacher_notifications)
+    assert all(notification.data["source"] == "subscription_deposit" for notification in teacher_notifications)
+
+    confirm_response = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/confirm-payment",
+        headers=auth_headers,
+        json={"payment_method": "bankTransfer"},
+    )
+    assert confirm_response.status_code == 200
+    assert confirm_response.json()["payment_confirmed"] is True
+    assert confirm_response.json()["payment_confirmed_at"] is not None
+
+    student_side_notifications = (
+        await db_session.scalars(
+            select(Notification)
+            .where(
+                Notification.user_id.in_(["student-user-id", "parent-user-id"]),
+                Notification.type == "paymentConfirmed",
+            )
+            .order_by(Notification.user_id)
+        )
+    ).all()
+    assert [notification.user_id for notification in student_side_notifications] == [
+        "parent-user-id",
+        "student-user-id",
+    ]
+    assert all(notification.action_url == f"/subscriptions/{sub_id}" for notification in student_side_notifications)
+    assert all(notification.data["subscriptionId"] == sub_id for notification in student_side_notifications)
+    assert all(notification.data["source"] == "subscription_deposit" for notification in student_side_notifications)
 
     openapi = await client.get("/openapi.json")
     assert not any(path.startswith("/api/v1/payments") for path in openapi.json()["paths"])

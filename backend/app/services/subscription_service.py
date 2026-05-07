@@ -831,6 +831,7 @@ class SubscriptionService:
     ) -> SubscriptionResponse:
         """Confirm a manual tuition deposit."""
         from app.models.subscription import PaymentMethod
+        from app.services.notification_service import NotificationService
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
         sub.payment_confirmed = True
@@ -839,6 +840,7 @@ class SubscriptionService:
         sub.payment_confirmed_at = datetime.now(UTC)
         if data.payment_method:
             sub.payment_method = PaymentMethod(data.payment_method)
+        await self._notify_deposit_confirmed(sub, NotificationService(self.db))
         await self.db.flush()
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)
@@ -851,6 +853,7 @@ class SubscriptionService:
     ) -> SubscriptionResponse:
         """Record that a student or parent reports an external tuition deposit."""
         from app.models.subscription import PaymentMethod
+        from app.services.notification_service import NotificationService
 
         sub = await self._get_subscription_for_user(subscription_id, current_user)
         if sub.payment_confirmed:
@@ -861,9 +864,85 @@ class SubscriptionService:
         if data.payment_method:
             sub.payment_method = PaymentMethod(data.payment_method)
         sub.paid_at = datetime.now(UTC)
+        await self._notify_deposit_received(sub, NotificationService(self.db))
         await self.db.flush()
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)
+
+    async def _notify_deposit_received(self, subscription: Any, notification_service: Any) -> None:
+        """Notify the teacher that a student-side external deposit was reported."""
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.notification import NotificationPriority
+        from app.models.student import Student
+        from app.models.teacher import Teacher
+
+        row = (
+            await self.db.execute(
+                select(Teacher.user_id, Student.name)
+                .join(LessonClass, LessonClass.teacher_id == Teacher.id)
+                .join(ClassMembership, ClassMembership.lesson_class_id == LessonClass.id)
+                .join(Student, Student.id == subscription.student_id)
+                .where(ClassMembership.id == subscription.membership_id)
+            )
+        ).one_or_none()
+        if row is None:
+            return
+
+        teacher_user_id, student_name = row
+        await notification_service.create_and_send(
+            user_id=teacher_user_id,
+            notification_type="paymentReceived",
+            title="입금 완료 알림",
+            body=f"{student_name}님이 입금 완료를 알렸습니다.",
+            priority=NotificationPriority.high,
+            data={
+                "subscriptionId": subscription.id,
+                "studentId": subscription.student_id,
+                "source": "subscription_deposit",
+            },
+            action_url=f"/subscriptions/{subscription.id}",
+            action_label="입금 확인",
+        )
+
+    async def _notify_deposit_confirmed(self, subscription: Any, notification_service: Any) -> None:
+        """Notify student-side recipients that the teacher confirmed the external deposit."""
+        from app.models.notification import NotificationPriority
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import Student
+
+        student = await self.db.get(Student, subscription.student_id)
+        if student is None:
+            return
+
+        recipient_user_ids: set[str] = set()
+        if student.user_id:
+            recipient_user_ids.add(student.user_id)
+
+        parent_user_ids = await self.db.scalars(
+            select(Parent.user_id)
+            .join(ParentChildRelation, ParentChildRelation.parent_id == Parent.id)
+            .where(
+                ParentChildRelation.student_id == subscription.student_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        recipient_user_ids.update(user_id for user_id in parent_user_ids.all() if user_id)
+
+        for user_id in sorted(recipient_user_ids):
+            await notification_service.create_and_send(
+                user_id=user_id,
+                notification_type="paymentConfirmed",
+                title="입금 확인 완료",
+                body=f"{student.name} 수강권 입금이 확인되었습니다.",
+                priority=NotificationPriority.normal,
+                data={
+                    "subscriptionId": subscription.id,
+                    "studentId": subscription.student_id,
+                    "source": "subscription_deposit",
+                },
+                action_url=f"/subscriptions/{subscription.id}",
+                action_label="수강권 보기",
+            )
 
     # ------------------------------------------------------------------
     # Templates
