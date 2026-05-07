@@ -174,6 +174,7 @@ class LessonService:
     ) -> LessonResponse:
         """Write or update feedback for a lesson."""
         from app.models.request_event import RequestEvent, RequestEventType
+        from app.services.user_service import UserService
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
 
@@ -181,6 +182,8 @@ class LessonService:
             lesson.feedback = data.feedback
         if data.practice_tips is not None:
             lesson.practice_tips = data.practice_tips
+
+        await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstNote")
 
         # Phase 3 event logging
         self.db.add(

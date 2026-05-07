@@ -51,6 +51,12 @@ QUESTS_BY_ROLE: dict[str, list[QuestDefinition]] = {
             description="캘린더에 첫 레슨을 등록합니다.",
             celebration_message="첫 레슨이 준비됐습니다.",
         ),
+        QuestDefinition(
+            id="teacher.firstNote",
+            title="첫 레슨 노트 작성",
+            description="첫 레슨 피드백을 남겨 학생에게 다음 연습 방향을 안내합니다.",
+            celebration_message="첫 레슨 노트를 남겼습니다.",
+        ),
     ],
     "student": [
         QuestDefinition(

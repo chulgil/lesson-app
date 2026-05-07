@@ -30,7 +30,9 @@ async def test_onboarding_progress_and_quests_contract(
     assert quests_response.status_code == 200
     quests = quests_response.json()["quests"]
     quest_ids = {quest["id"] for quest in quests}
-    assert {"teacher.profile", "teacher.firstStudent", "teacher.firstLesson"}.issubset(quest_ids)
+    assert {"teacher.profile", "teacher.firstStudent", "teacher.firstLesson", "teacher.firstNote"}.issubset(
+        quest_ids
+    )
     assert all("status" in quest for quest in quests)
 
     complete_response = await client.post(
@@ -123,6 +125,19 @@ async def test_teacher_domain_actions_auto_complete_onboarding_quests(
     progress_response = await client.get("/api/v1/users/me/onboarding-progress", headers=auth_headers)
     progress = progress_response.json()
     assert _quest_status(progress, "teacher.firstLesson") == "completed"
+    assert _quest_status(progress, "teacher.firstNote") == "available"
+    assert progress["is_all_required_completed"] is False
+
+    feedback_response = await client.put(
+        f"/api/v1/lessons/{lesson_response.json()['id']}/feedback",
+        headers=auth_headers,
+        json={"feedback": "첫 레슨 노트를 남겼습니다."},
+    )
+    assert feedback_response.status_code == 200
+
+    progress_response = await client.get("/api/v1/users/me/onboarding-progress", headers=auth_headers)
+    progress = progress_response.json()
+    assert _quest_status(progress, "teacher.firstNote") == "completed"
     assert progress["is_all_required_completed"] is True
     assert progress["current_phase"] == "completed"
 
