@@ -91,6 +91,19 @@ class TeacherAvailabilityUpdate(BaseModel):
             raise ValueError("day_of_week must be 0..6")
         return value
 
+    @model_validator(mode="after")
+    def validate_no_overlap(self) -> "TeacherAvailabilityUpdate":
+        if self.time_slots is None or len(self.time_slots) <= 1:
+            return self
+        slots = sorted(
+            (_parse_slot_minute(slot.start_time), _parse_slot_minute(slot.end_time))
+            for slot in self.time_slots
+        )
+        for previous, current in zip(slots, slots[1:]):
+            if previous[1] > current[0]:
+                raise ValueError("time_slots for a day must not overlap")
+        return self
+
 
 class TeacherAvailabilityResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

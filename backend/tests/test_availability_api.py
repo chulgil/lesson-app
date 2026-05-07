@@ -84,3 +84,82 @@ async def test_availability_mutations_are_scoped_to_owner(
     )
     assert owner_list.status_code == 200
     assert owner_list.json()[0]["day_of_week"] == 1
+
+
+@pytest.mark.asyncio
+async def test_availability_update_rejects_overlapping_time_slots(client: AsyncClient, create_test_user):
+    """Updating availability with overlapping slots should fail early."""
+    await create_test_user(user_id="teacher-owner", role="teacher")
+
+    create_response = await client.post(
+        "/api/v1/availability/",
+        headers=_headers("teacher-owner"),
+        json={
+            "day_of_week": 2,
+            "time_slots": [
+                {
+                    "start_time": "10:00",
+                    "end_time": "11:00",
+                    "is_available": True,
+                }
+            ],
+        },
+    )
+    assert create_response.status_code == 201
+    availability_id = create_response.json()["id"]
+
+    update_response = await client.put(
+        f"/api/v1/availability/{availability_id}",
+        headers=_headers("teacher-owner"),
+        json={
+            "time_slots": [
+                {
+                    "start_time": "10:30",
+                    "end_time": "12:00",
+                    "is_available": True,
+                },
+                {
+                    "start_time": "11:30",
+                    "end_time": "13:00",
+                    "is_available": True,
+                },
+            ],
+        },
+    )
+
+    assert update_response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_availability_add_time_slot_rejects_overlap(client: AsyncClient, create_test_user):
+    """Adding an overlapping time slot should be rejected."""
+    await create_test_user(user_id="teacher-slot-owner", role="teacher")
+
+    create_response = await client.post(
+        "/api/v1/availability/",
+        headers=_headers("teacher-slot-owner"),
+        json={
+            "day_of_week": 3,
+            "time_slots": [
+                {
+                    "start_time": "10:00",
+                    "end_time": "11:00",
+                    "is_available": True,
+                }
+            ],
+        },
+    )
+    assert create_response.status_code == 201
+    availability_id = create_response.json()["id"]
+
+    add_response = await client.post(
+        f"/api/v1/availability/{availability_id}/slots",
+        headers=_headers("teacher-slot-owner"),
+        json={
+            "start_time": "10:30",
+            "end_time": "11:30",
+            "is_available": True,
+        },
+    )
+
+    assert add_response.status_code == 422

@@ -17,6 +17,17 @@ from app.schemas.availability import (
 )
 
 
+def _slot_minutes(value: str) -> int:
+    """Parse HH:MM into minutes since midnight."""
+    hour_str, minute_str = value.split(":")
+    return int(hour_str) * 60 + int(minute_str)
+
+
+def _slots_overlap(start_a: int, end_a: int, start_b: int, end_b: int) -> bool:
+    """Return True when two half-open intervals overlap."""
+    return start_a < end_b and end_a > start_b
+
+
 class AvailabilityService:
     """Handle teacher availability and time slots."""
 
@@ -137,6 +148,7 @@ class AvailabilityService:
 
         # Replace time slots if provided
         if data.time_slots is not None:
+            self._assert_non_overlapping_slots(data.time_slots)
             old_slots = await self.db.scalars(
                 select(AvailabilityTimeSlot).where(
                     AvailabilityTimeSlot.availability_id == availability_id
@@ -220,6 +232,7 @@ class AvailabilityService:
                 detail="Availability not found",
             )
         await self._assert_availability_owner(avail, current_user)
+        await self._assert_slot_conflicts(availability_id, data.start_time, data.end_time)
 
         slot = AvailabilityTimeSlot(
             availability_id=availability_id,
@@ -264,3 +277,51 @@ class AvailabilityService:
             identifiers.append(teacher_profile_id)
         if availability.teacher_id not in identifiers:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _assert_slot_conflicts(
+        self,
+        availability_id: str,
+        start_time: str,
+        end_time: str,
+    ) -> None:
+        """Ensure the candidate slot does not overlap existing slots."""
+        from app.models.schedule import AvailabilityTimeSlot
+
+        new_start = _slot_minutes(start_time)
+        new_end = _slot_minutes(end_time)
+        if new_start >= new_end:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="end_time must be after start_time",
+            )
+
+        existing = await self.db.scalars(
+            select(AvailabilityTimeSlot).where(
+                AvailabilityTimeSlot.availability_id == availability_id
+            )
+        )
+        for slot in existing:
+            if _slots_overlap(
+                new_start,
+                new_end,
+                _slot_minutes(slot.start_time),
+                _slot_minutes(slot.end_time),
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="time_slots for a day must not overlap",
+                )
+
+    @staticmethod
+    def _assert_non_overlapping_slots(time_slots: list[TimeSlotCreate]) -> None:
+        """Validate a replacement slot list does not contain overlaps."""
+        normalized = sorted(
+            (_slot_minutes(slot.start_time), _slot_minutes(slot.end_time))
+            for slot in time_slots
+        )
+        for previous, current in zip(normalized, normalized[1:]):
+            if previous[1] > current[0]:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="time_slots for a day must not overlap",
+                )
