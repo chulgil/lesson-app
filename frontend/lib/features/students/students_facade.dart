@@ -8,7 +8,7 @@ export 'domain/entities/student.dart';
 export 'domain/entities/teacher_announcement.dart';
 export 'presentation/providers/lesson_class_providers.dart';
 export 'presentation/providers/location_providers.dart'
-    show teacherLocationsProvider;
+    show locationProvider, teacherLocationsProvider;
 export 'presentation/providers/membership_providers.dart';
 export 'presentation/providers/grouped_students_provider.dart'
     show groupedStudentsProvider;

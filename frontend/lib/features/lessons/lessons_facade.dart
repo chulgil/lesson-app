@@ -28,3 +28,4 @@ export 'presentation/providers/tip_template_providers.dart'
         tipTemplatesByCategoryProvider,
         tipTemplatesNotifierProvider,
         tipTemplatesProvider;
+export 'presentation/widgets/lesson_export_sheet.dart';

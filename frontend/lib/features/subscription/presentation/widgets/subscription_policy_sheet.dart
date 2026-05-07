@@ -9,8 +9,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
-import '../../../students/presentation/providers/location_providers.dart'
-    show locationProvider;
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
 import '../extensions/lesson_policy_visuals.dart';
@@ -84,7 +82,8 @@ class SubscriptionPolicySheet extends ConsumerWidget {
 
     return membershipAsync.when(
       loading: () => const _Loading(),
-      error: (_, __) => _buildBody(context, ref, policy: null, membership: null),
+      error:
+          (_, __) => _buildBody(context, ref, policy: null, membership: null),
       data: (membership) {
         if (membership == null) {
           return _buildBody(context, ref, policy: null, membership: null);
@@ -94,8 +93,13 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         );
         return lessonClassAsync.when(
           loading: () => const _Loading(),
-          error: (_, __) =>
-              _buildBody(context, ref, policy: null, membership: membership),
+          error:
+              (_, __) => _buildBody(
+                context,
+                ref,
+                policy: null,
+                membership: membership,
+              ),
           data: (lessonClass) {
             if (lessonClass == null) {
               return _buildBody(
@@ -113,14 +117,20 @@ class SubscriptionPolicySheet extends ConsumerWidget {
             );
             return policyAsync.when(
               loading: () => const _Loading(),
-              error: (_, __) =>
-                  _buildBody(context, ref, policy: null, membership: membership),
-              data: (policy) => _buildBody(
-                context,
-                ref,
-                policy: policy,
-                membership: membership,
-              ),
+              error:
+                  (_, __) => _buildBody(
+                    context,
+                    ref,
+                    policy: null,
+                    membership: membership,
+                  ),
+              data:
+                  (policy) => _buildBody(
+                    context,
+                    ref,
+                    policy: policy,
+                    membership: membership,
+                  ),
             );
           },
         );
@@ -252,9 +262,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
     setState(() => _isSaving = true);
     try {
       await ref
-          .read(
-            membershipNotifierProvider(updated.lessonClassId).notifier,
-          )
+          .read(membershipNotifierProvider(updated.lessonClassId).notifier)
           .updateMembership(updated);
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -374,33 +382,38 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => _AddRescheduleSheet(
-        subscription: sub,
-        onConfirm: (count) async {
-          final updated = sub.copyWith(
-            bonusRescheduleCount: sub.bonusRescheduleCount + count,
-          );
-          await _updateSubscription(updated);
-        },
-      ),
+      builder:
+          (ctx) => _AddRescheduleSheet(
+            subscription: sub,
+            onConfirm: (count) async {
+              final updated = sub.copyWith(
+                bonusRescheduleCount: sub.bonusRescheduleCount + count,
+              );
+              await _updateSubscription(updated);
+            },
+          ),
     );
   }
 
-  void _showChangeLocationSheet(BuildContext context, ClassMembership membership) {
+  void _showChangeLocationSheet(
+    BuildContext context,
+    ClassMembership membership,
+  ) {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => _ChangeLocationSheet(
-        membership: membership,
-        preferredLocationType: widget.preferredLocationType,
-        onSave: (locationId, travelTime) async {
-          final updated = membership.copyWith(
-            lessonLocationId: locationId,
-            travelTimeMinutes: travelTime,
-          );
-          await _updateMembership(updated);
-        },
-      ),
+      builder:
+          (ctx) => _ChangeLocationSheet(
+            membership: membership,
+            preferredLocationType: widget.preferredLocationType,
+            onSave: (locationId, travelTime) async {
+              final updated = membership.copyWith(
+                lessonLocationId: locationId,
+                travelTimeMinutes: travelTime,
+              );
+              await _updateMembership(updated);
+            },
+          ),
     );
   }
 
@@ -411,13 +424,14 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => _EditTravelTimeSheet(
-        currentMinutes: membership.travelTimeMinutes,
-        onSave: (minutes) async {
-          final updated = membership.copyWith(travelTimeMinutes: minutes);
-          await _updateMembership(updated);
-        },
-      ),
+      builder:
+          (ctx) => _EditTravelTimeSheet(
+            currentMinutes: membership.travelTimeMinutes,
+            onSave: (minutes) async {
+              final updated = membership.copyWith(travelTimeMinutes: minutes);
+              await _updateMembership(updated);
+            },
+          ),
     );
   }
 
@@ -425,13 +439,14 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => _EditCancelDeadlineSheet(
-        currentHours: sub.effectiveCancelDeadlineHours,
-        onSave: (hours) async {
-          final updated = sub.copyWith(overrideCancelDeadlineHours: hours);
-          await _updateSubscription(updated);
-        },
-      ),
+      builder:
+          (ctx) => _EditCancelDeadlineSheet(
+            currentHours: sub.effectiveCancelDeadlineHours,
+            onSave: (hours) async {
+              final updated = sub.copyWith(overrideCancelDeadlineHours: hours);
+              await _updateSubscription(updated);
+            },
+          ),
     );
   }
 
@@ -528,7 +543,10 @@ class _AddRescheduleSheetState extends State<_AddRescheduleSheet> {
               border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.paperAccent, width: 1.5),
+                borderSide: BorderSide(
+                  color: AppColors.paperAccent,
+                  width: 1.5,
+                ),
               ),
             ),
             style: AppTypography.bodyMedium,
@@ -546,24 +564,26 @@ class _AddRescheduleSheetState extends State<_AddRescheduleSheet> {
                   borderRadius: BorderRadius.zero,
                 ),
               ),
-              onPressed: _saving
-                  ? null
-                  : () async {
-                      setState(() => _saving = true);
-                      try {
-                        await widget.onConfirm(_count);
-                        if (context.mounted) Navigator.of(context).pop();
-                      } finally {
-                        if (mounted) setState(() => _saving = false);
-                      }
-                    },
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text('$_count회 추가'),
+              onPressed:
+                  _saving
+                      ? null
+                      : () async {
+                        setState(() => _saving = true);
+                        try {
+                          await widget.onConfirm(_count);
+                          if (context.mounted) Navigator.of(context).pop();
+                        } finally {
+                          if (mounted) setState(() => _saving = false);
+                        }
+                      },
+              child:
+                  _saving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text('$_count회 추가'),
             ),
           ),
         ],
@@ -684,8 +704,8 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
             currentTravelTime: _travelTime,
             onLocationChanged: (id) => setState(() => _locationId = id),
             onTravelTimeChanged: (t) => setState(() => _travelTime = t),
-            onLocationTypeChanged: (type) =>
-                setState(() => _selectedLocationType = type),
+            onLocationTypeChanged:
+                (type) => setState(() => _selectedLocationType = type),
           ),
           const SizedBox(height: AppSpacing.space4),
           SizedBox(
@@ -700,13 +720,14 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                 ),
               ),
               onPressed: _saving ? null : _handleSave,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(AppStrings.save),
+              child:
+                  _saving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(AppStrings.save),
             ),
           ),
         ],
@@ -739,9 +760,7 @@ class _EditTravelTimeSheetState extends State<_EditTravelTimeSheet> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.currentMinutes.toString(),
-    );
+    _controller = TextEditingController(text: widget.currentMinutes.toString());
   }
 
   @override
@@ -779,7 +798,10 @@ class _EditTravelTimeSheetState extends State<_EditTravelTimeSheet> {
               border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.paperAccent, width: 1.5),
+                borderSide: BorderSide(
+                  color: AppColors.paperAccent,
+                  width: 1.5,
+                ),
               ),
             ),
             style: AppTypography.bodyMedium,
@@ -796,25 +818,27 @@ class _EditTravelTimeSheetState extends State<_EditTravelTimeSheet> {
                   borderRadius: BorderRadius.zero,
                 ),
               ),
-              onPressed: _saving
-                  ? null
-                  : () async {
-                      final minutes = int.tryParse(_controller.text) ?? 0;
-                      setState(() => _saving = true);
-                      try {
-                        await widget.onSave(minutes);
-                        if (context.mounted) Navigator.of(context).pop();
-                      } finally {
-                        if (mounted) setState(() => _saving = false);
-                      }
-                    },
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(AppStrings.save),
+              onPressed:
+                  _saving
+                      ? null
+                      : () async {
+                        final minutes = int.tryParse(_controller.text) ?? 0;
+                        setState(() => _saving = true);
+                        try {
+                          await widget.onSave(minutes);
+                          if (context.mounted) Navigator.of(context).pop();
+                        } finally {
+                          if (mounted) setState(() => _saving = false);
+                        }
+                      },
+              child:
+                  _saving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(AppStrings.save),
             ),
           ),
         ],
@@ -865,7 +889,9 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
   }
 
   int get _effectiveHours =>
-      _isCustom ? (int.tryParse(_customController.text) ?? _selected) : _selected;
+      _isCustom
+          ? (int.tryParse(_customController.text) ?? _selected)
+          : _selected;
 
   @override
   Widget build(BuildContext context) {
@@ -904,9 +930,10 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
                   },
                   selectedColor: AppColors.paperAccent,
                   labelStyle: AppTypography.bodySmall.copyWith(
-                    color: (!_isCustom && _selected == h)
-                        ? AppColors.paper
-                        : AppColors.ink,
+                    color:
+                        (!_isCustom && _selected == h)
+                            ? AppColors.paper
+                            : AppColors.ink,
                   ),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,
@@ -940,8 +967,10 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.zero),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.zero,
-                  borderSide:
-                      BorderSide(color: AppColors.paperAccent, width: 1.5),
+                  borderSide: BorderSide(
+                    color: AppColors.paperAccent,
+                    width: 1.5,
+                  ),
                 ),
               ),
               style: AppTypography.bodyMedium,
@@ -960,24 +989,26 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
                   borderRadius: BorderRadius.zero,
                 ),
               ),
-              onPressed: _saving
-                  ? null
-                  : () async {
-                      setState(() => _saving = true);
-                      try {
-                        await widget.onSave(_effectiveHours);
-                        if (context.mounted) Navigator.of(context).pop();
-                      } finally {
-                        if (mounted) setState(() => _saving = false);
-                      }
-                    },
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(AppStrings.save),
+              onPressed:
+                  _saving
+                      ? null
+                      : () async {
+                        setState(() => _saving = true);
+                        try {
+                          await widget.onSave(_effectiveHours);
+                          if (context.mounted) Navigator.of(context).pop();
+                        } finally {
+                          if (mounted) setState(() => _saving = false);
+                        }
+                      },
+              child:
+                  _saving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(AppStrings.save),
             ),
           ),
         ],
@@ -1076,9 +1107,10 @@ class _PolicyItem extends StatelessWidget {
             child: Text(
               value,
               style: baseTextStyle.copyWith(
-                color: isGrey
-                    ? AppColors.inkTertiary
-                    : (valueColor ?? AppColors.ink),
+                color:
+                    isGrey
+                        ? AppColors.inkTertiary
+                        : (valueColor ?? AppColors.ink),
                 fontWeight: isGrey ? FontWeight.normal : FontWeight.w600,
               ),
             ),
@@ -1137,7 +1169,9 @@ class _EditableRow extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: AppColors.paperAccent,
               minimumSize: Size(0, AppSpacing.buttonHeightSmall),
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+              ),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             onPressed: isSaving ? null : onTap,
@@ -1208,7 +1242,9 @@ class _CounterButton extends StatelessWidget {
           child: Text(
             '$value',
             textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         IconButton(

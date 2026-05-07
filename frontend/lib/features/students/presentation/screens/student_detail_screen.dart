@@ -30,7 +30,7 @@ import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
-import '../../../lessons/presentation/widgets/lesson_export_sheet.dart';
+import '../../../lessons/lessons_facade.dart';
 
 /// Student detail screen — Notebook × Score 레이아웃.
 ///
@@ -285,10 +285,11 @@ class _StudentDetailContent extends ConsumerWidget {
                   showNotebookModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
-                    builder: (_) => LessonExportSheet(
-                      studentId: student.id,
-                      studentName: student.name,
-                    ),
+                    builder:
+                        (_) => LessonExportSheet(
+                          studentId: student.id,
+                          studentName: student.name,
+                        ),
                   );
                 },
               ),
