@@ -1559,6 +1559,25 @@ class _CanBookLessonProviderElement
   bool get isTrialLesson => (origin as CanBookLessonProvider).isTrialLesson;
 }
 
+String _$subscriptionSessionEventActionsHash() =>
+    r'446b328ed52e6439a34090fab7262c87c2810fde';
+
+/// See also [subscriptionSessionEventActions].
+@ProviderFor(subscriptionSessionEventActions)
+final subscriptionSessionEventActionsProvider =
+    Provider<SubscriptionSessionEventActions>.internal(
+      subscriptionSessionEventActions,
+      name: r'subscriptionSessionEventActionsProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$subscriptionSessionEventActionsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef SubscriptionSessionEventActionsRef =
+    ProviderRef<SubscriptionSessionEventActions>;
 String _$subscriptionSessionEventsHash() =>
     r'38705742aa72cd20d64eb1c3d80b2402f475edf7';
 

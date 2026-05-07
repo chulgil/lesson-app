@@ -64,7 +64,8 @@ Future<List<FeedbackTemplate>> feedbackTemplateSearch(
 }
 
 /// CRUD notifier mirroring TipTemplatesNotifier conventions.
-class FeedbackTemplatesNotifier extends AsyncNotifier<List<FeedbackTemplate>> {
+@Riverpod(keepAlive: true)
+class FeedbackTemplatesNotifier extends _$FeedbackTemplatesNotifier {
   FeedbackTemplateRepository get _repo =>
       ref.read(feedbackTemplateRepositoryProvider);
   String get _teacherId => ref.read(_currentTeacherIdProvider);
@@ -132,8 +133,3 @@ class FeedbackTemplatesNotifier extends AsyncNotifier<List<FeedbackTemplate>> {
     return updated;
   }
 }
-
-final feedbackTemplatesNotifierProvider =
-    AsyncNotifierProvider<FeedbackTemplatesNotifier, List<FeedbackTemplate>>(
-      FeedbackTemplatesNotifier.new,
-    );

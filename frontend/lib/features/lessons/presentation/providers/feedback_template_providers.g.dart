@@ -384,5 +384,27 @@ class _FeedbackTemplateSearchProviderElement
   String get query => (origin as FeedbackTemplateSearchProvider).query;
 }
 
+String _$feedbackTemplatesNotifierHash() =>
+    r'5decd8dd3ba9a2aa79d3fd4579f22c8b500cecc2';
+
+/// CRUD notifier mirroring TipTemplatesNotifier conventions.
+///
+/// Copied from [FeedbackTemplatesNotifier].
+@ProviderFor(FeedbackTemplatesNotifier)
+final feedbackTemplatesNotifierProvider = AsyncNotifierProvider<
+  FeedbackTemplatesNotifier,
+  List<FeedbackTemplate>
+>.internal(
+  FeedbackTemplatesNotifier.new,
+  name: r'feedbackTemplatesNotifierProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$feedbackTemplatesNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$FeedbackTemplatesNotifier = AsyncNotifier<List<FeedbackTemplate>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

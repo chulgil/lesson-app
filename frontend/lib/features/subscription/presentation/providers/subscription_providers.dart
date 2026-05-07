@@ -491,10 +491,12 @@ void resetMockSubscriptionSessionEventsForTesting() {
   _subscriptionSessionEventStore.clear();
 }
 
-final subscriptionSessionEventActionsProvider =
-    Provider<SubscriptionSessionEventActions>(
-      (ref) => SubscriptionSessionEventActions(ref),
-    );
+@Riverpod(keepAlive: true)
+SubscriptionSessionEventActions subscriptionSessionEventActions(
+  SubscriptionSessionEventActionsRef ref,
+) {
+  return SubscriptionSessionEventActions(ref);
+}
 
 class SubscriptionSessionEventActions {
   const SubscriptionSessionEventActions(this._ref);
