@@ -3751,8 +3751,8 @@ class AppStrings {
   /// 외부 스튜디오 (LocationType.externalPlace chip label)
   static const locationExternalPlaceLabel = '외부 스튜디오';
 
-  /// 선생님 집 (LocationType.teacherStudio chip label)
-  static const locationTeacherHomeLabel = '선생님 집';
+  /// 선생님 레슨실 (LocationType.teacherStudio chip label)
+  static const locationTeacherHomeLabel = '선생님 레슨실';
 
   /// 온라인 (LocationType.online chip label)
   static const locationOnlineLabel = '온라인';
@@ -6553,4 +6553,18 @@ class AppStrings {
 
   /// 장소 변경 (버튼 라벨)
   static const changeLocation = '장소 변경';
+
+  // -- Preferred Location (희망 레슨 장소 선택 — 레슨 신청 폼) --
+
+  /// 희망 레슨 장소 (섹션 제목)
+  static const preferredLocationTitle = '희망 레슨 장소';
+
+  /// 학생 희망 장소 변경 (경고 다이얼로그 제목)
+  static const locationChangeWarningTitle = '학생 희망 장소 변경';
+
+  /// 학생 희망 장소 변경 경고 본문
+  static String locationChangeWarningBody(String original, String newLoc) =>
+      '학생이 신청 시 "$original"을 희망했습니다.\n'
+      '"$newLoc"으로 변경하시겠습니까?\n\n'
+      '※ 학생에게 장소 변경이 안내됩니다.';
 }
