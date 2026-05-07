@@ -96,9 +96,12 @@ async def test_get_subscription_settings_default(client: AsyncClient, auth_heade
     response = await client.get("/api/v1/settings/subscription", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
+    assert data["teacher_id"] == "test-user-id-prof"
     assert data["renewal_alert_threshold"] == 2
     assert data["renewal_alert_days_set"] == [14, 7, 1, 0]
     assert data["enable_push_notification"] is True
+    assert data["created_at"] is not None
+    assert data["updated_at"] is not None
 
 
 @pytest.mark.asyncio
@@ -116,6 +119,96 @@ async def test_update_subscription_settings(client: AsyncClient, auth_headers, c
     assert data["renewal_alert_threshold"] == 5
     assert data["renewal_alert_days_set"] == [7, 1]
     assert data["notify_parent"] is False
+
+
+@pytest.mark.asyncio
+async def test_settings_subscription_matches_flat_teacher_profile_contract(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Settings shortcut and flat frontend route must address the same teacher profile row."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    update_response = await client.put(
+        "/api/v1/settings/subscription",
+        headers=auth_headers,
+        json={"renewal_alert_days_set": [3, 1], "enable_badge": False},
+    )
+    assert update_response.status_code == 200
+    settings = update_response.json()
+    assert settings["teacher_id"] == "test-user-id-prof"
+    assert settings["created_at"] is not None
+    assert settings["updated_at"] is not None
+
+    flat_response = await client.get(
+        "/api/v1/subscription-settings/teacher/test-user-id-prof",
+        headers=auth_headers,
+    )
+    assert flat_response.status_code == 200
+    flat = flat_response.json()
+    assert flat["id"] == settings["id"]
+    assert flat["renewal_alert_days_set"] == [3, 1]
+    assert flat["enable_badge"] is False
+    assert flat["created_at"] is not None
+    assert flat["updated_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_flat_subscription_update_accepts_settings_route_created_row(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Rows created by /settings/subscription remain mutable through flat routes."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    shortcut_response = await client.get("/api/v1/settings/subscription", headers=auth_headers)
+    assert shortcut_response.status_code == 200
+    settings_id = shortcut_response.json()["id"]
+
+    flat_update_response = await client.put(
+        f"/api/v1/subscription-settings/{settings_id}",
+        headers=auth_headers,
+        json={"renewal_alert_days": 11, "notify_parent": False},
+    )
+    assert flat_update_response.status_code == 200
+    data = flat_update_response.json()
+    assert data["teacher_id"] == "test-user-id-prof"
+    assert data["renewal_alert_days"] == 11
+    assert data["notify_parent"] is False
+
+
+@pytest.mark.asyncio
+async def test_flat_subscription_settings_accepts_user_id_and_normalizes_to_teacher_profile(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Flat frontend route accepts legacy User.id input but stores canonical Teacher.id."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    create_response = await client.post(
+        "/api/v1/subscription-settings",
+        headers=auth_headers,
+        json={"teacher_id": "test-user-id", "renewal_alert_days": 8},
+    )
+    assert create_response.status_code == 201
+    created = create_response.json()
+    assert created["teacher_id"] == "test-user-id-prof"
+
+    by_user_response = await client.get(
+        "/api/v1/subscription-settings/teacher/test-user-id",
+        headers=auth_headers,
+    )
+    by_profile_response = await client.get(
+        "/api/v1/subscription-settings/teacher/test-user-id-prof",
+        headers=auth_headers,
+    )
+    assert by_user_response.status_code == 200
+    assert by_profile_response.status_code == 200
+    assert by_user_response.json()["id"] == created["id"]
+    assert by_profile_response.json()["id"] == created["id"]
 
 
 # ---------------------------------------------------------------------------

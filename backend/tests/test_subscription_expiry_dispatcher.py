@@ -266,6 +266,41 @@ async def test_dispatch_filters_disabled_teacher_alert_milestone(db_session: Asy
 
 
 @pytest.mark.asyncio
+async def test_dispatch_uses_subscription_settings_saved_through_user_id_shortcut(
+    db_session: AsyncSession,
+) -> None:
+    """Settings saved via /settings/subscription style User.id are visible to Teacher.id milestones."""
+    from app.models.notification import Notification
+    from app.models.teacher import Teacher
+    from app.services.settings_service import SettingsService
+    from app.services.subscription_expiry_dispatcher import SubscriptionExpiryDispatcher
+
+    await _make_user(db_session, user_id="teacher-user-id", role="teacher")
+    await _make_user(db_session, user_id="student-user-id", role="student")
+    db_session.add(Teacher(id="teacher-user-id-prof", user_id="teacher-user-id", instruments=[]))
+    await db_session.flush()
+    await _make_student(
+        db_session,
+        student_id="student-1",
+        teacher_id="teacher-user-id-prof",
+        user_id="student-user-id",
+    )
+    await SettingsService(db_session).update_subscription_settings(
+        "teacher-user-id",
+        {"renewal_alert_days_set": [1]},
+    )
+
+    dispatcher = SubscriptionExpiryDispatcher(db_session)
+    milestone = _milestone(sub_id="sub1", student_id="student-1", days_left=7, end_date=date(2026, 5, 9))
+    milestone["teacher_id"] = "teacher-user-id-prof"
+    result = await dispatcher.dispatch_milestones([milestone], today_kst=_TODAY_KST)
+
+    assert result == {"sent": 0, "deduplicated": 0, "filtered": 1}
+    notifs = (await db_session.scalars(select(Notification))).all()
+    assert len(notifs) == 0
+
+
+@pytest.mark.asyncio
 async def test_dispatch_priority_high_for_d0_d1(db_session: AsyncSession) -> None:
     """D-0/D-1 → priority=high, D-7/D-14 → normal."""
     from app.models.notification import Notification, NotificationPriority

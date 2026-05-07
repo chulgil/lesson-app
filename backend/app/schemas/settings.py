@@ -55,6 +55,8 @@ class SubscriptionSettingsResponse(BaseModel):
     enable_push_notification: bool
     enable_badge: bool
     notify_parent: bool
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
 
 
 class SubscriptionSettingsUpdate(BaseModel):

@@ -65,6 +65,8 @@ class SettingsService:
     async def get_subscription_settings(self, teacher_id: str) -> Any:
         from app.models.settings import SubscriptionSettings
 
+        teacher_id = await self._resolve_subscription_teacher_id(teacher_id)
+
         settings = await self.db.scalar(
             select(SubscriptionSettings).where(SubscriptionSettings.teacher_id == teacher_id)
         )
@@ -78,6 +80,7 @@ class SettingsService:
     async def get_subscription_settings_by_teacher(self, teacher_id: str) -> Any:
         from app.models.settings import SubscriptionSettings
 
+        teacher_id = await self._resolve_subscription_teacher_id(teacher_id)
         settings = await self.db.scalar(
             select(SubscriptionSettings).where(SubscriptionSettings.teacher_id == teacher_id)
         )
@@ -98,6 +101,7 @@ class SettingsService:
     async def create_subscription_settings(self, data: dict, current_user: Any | None = None) -> Any:
         from app.models.settings import SubscriptionSettings
 
+        data = await self._normalize_subscription_settings_data(data)
         if current_user is not None:
             await self._assert_subscription_settings_owner(data, current_user)
         settings = SubscriptionSettings(**data)
@@ -126,6 +130,7 @@ class SettingsService:
         settings = await self.db.get(SubscriptionSettings, settings_id)
         if settings is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
+        data = await self._normalize_subscription_settings_data(data)
         if current_user is not None:
             await self._assert_subscription_settings_owner(
                 {
@@ -141,6 +146,24 @@ class SettingsService:
         await self.db.refresh(settings)
         return settings
 
+    async def _normalize_subscription_settings_data(self, data: dict) -> dict:
+        """Normalize subscription settings teacher_id values to Teacher.id."""
+        if data.get("teacher_id") is None:
+            return data
+        normalized = dict(data)
+        normalized["teacher_id"] = await self._resolve_subscription_teacher_id(data["teacher_id"])
+        return normalized
+
+    async def _resolve_subscription_teacher_id(self, teacher_id: str) -> str:
+        """Accept either User.id or Teacher.id and return the canonical Teacher.id."""
+        from app.models.teacher import Teacher
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            return teacher_id
+        return await resolve_teacher_id(self.db, teacher_id)
+
     async def _assert_subscription_settings_owner(self, data: dict, current_user: Any) -> None:
         """Allow flat subscription settings writes only for the current teacher profile."""
         from app.services.teacher_id_resolver import resolve_teacher_id
@@ -151,6 +174,7 @@ class SettingsService:
             return
         if teacher_id is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="teacher_id is required")
+        teacher_id = await self._resolve_subscription_teacher_id(teacher_id)
         current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
         if teacher_id != current_teacher_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")

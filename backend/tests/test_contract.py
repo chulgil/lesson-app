@@ -1746,6 +1746,8 @@ async def test_contract_subscription_settings_flat_crud(
     created = create_resp.json()
     assert created["teacher_id"] == "test-user-id-prof"
     assert created["organization_id"] is None
+    assert created["created_at"] is not None
+    assert created["updated_at"] is not None
 
     teacher_resp = await client.get(
         "/api/v1/subscription-settings/teacher/test-user-id-prof",
@@ -1753,6 +1755,8 @@ async def test_contract_subscription_settings_flat_crud(
     )
     assert teacher_resp.status_code == 200
     assert teacher_resp.json()["id"] == created["id"]
+    assert teacher_resp.json()["created_at"] is not None
+    assert teacher_resp.json()["updated_at"] is not None
 
     update_resp = await client.put(
         f"/api/v1/subscription-settings/{created['id']}",
@@ -1762,6 +1766,15 @@ async def test_contract_subscription_settings_flat_crud(
     assert update_resp.status_code == 200
     assert update_resp.json()["renewal_alert_days"] == 9
     assert update_resp.json()["notify_parent"] is True
+    assert update_resp.json()["created_at"] is not None
+    assert update_resp.json()["updated_at"] is not None
+
+    by_user_resp = await client.get(
+        "/api/v1/subscription-settings/teacher/test-user-id",
+        headers=auth_headers,
+    )
+    assert by_user_resp.status_code == 200
+    assert by_user_resp.json()["id"] == created["id"]
 
     org_create_resp = await client.post(
         "/api/v1/subscription-settings",
