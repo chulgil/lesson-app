@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/local_app_release_repository.dart';
+import '../../data/repositories/remote_app_release_repository.dart';
 import '../../data/repositories/local_app_review_client.dart';
 import '../../domain/entities/app_release.dart';
 import '../../domain/repositories/app_release_repository.dart';
@@ -9,7 +11,11 @@ part 'app_release_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 AppReleaseRepository appReleaseRepository(AppReleaseRepositoryRef ref) {
-  return const LocalAppReleaseRepository();
+  return createRepository<AppReleaseRepository>(
+    ref: ref,
+    mock: () => const LocalAppReleaseRepository(),
+    remote: (apiClient) => RemoteAppReleaseRepository(apiClient),
+  );
 }
 
 @Riverpod(keepAlive: true)
