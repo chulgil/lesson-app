@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../gamification/gamification_facade.dart'
@@ -11,76 +11,97 @@ import '../../domain/repositories/practice_item_repository.dart';
 import 'practice_repertoire_repository_provider.dart';
 import 'practice_repertoire_crud_provider.dart';
 
+part 'practice_item_providers.g.dart';
+
 /// Repository provider
-final practiceItemRepositoryProvider = Provider<PracticeItemRepository>((ref) {
+@Riverpod(keepAlive: true)
+PracticeItemRepository practiceItemRepository(PracticeItemRepositoryRef ref) {
   return MockPracticeItemRepository();
-});
+}
 
 /// Current student ID provider (placeholder - should come from auth/navigation)
-final currentStudentIdProvider = StateProvider<String?>((ref) {
-  return null;
-});
+@Riverpod(keepAlive: true)
+class CurrentStudentId extends _$CurrentStudentId {
+  @override
+  String? build() => null;
+
+  void setStudentId(String? studentId) {
+    state = studentId;
+  }
+}
 
 /// Practice items by lesson ID
-final practiceItemsByLessonProvider =
-    FutureProvider.family<List<PracticeItem>, String>((ref, lessonId) async {
-      final repository = ref.watch(practiceItemRepositoryProvider);
-      return repository.getByLessonId(lessonId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<PracticeItem>> practiceItemsByLesson(
+  PracticeItemsByLessonRef ref,
+  String lessonId,
+) async {
+  final repository = ref.watch(practiceItemRepositoryProvider);
+  return repository.getByLessonId(lessonId);
+}
 
 /// Practice items by student ID
-final practiceItemsByStudentProvider =
-    FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-      final repository = ref.watch(practiceItemRepositoryProvider);
-      return repository.getByStudentId(studentId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<PracticeItem>> practiceItemsByStudent(
+  PracticeItemsByStudentRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(practiceItemRepositoryProvider);
+  return repository.getByStudentId(studentId);
+}
 
 /// Weekly practice items for student (current week)
-final weeklyPracticeItemsProvider =
-    FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-      final repository = ref.watch(practiceItemRepositoryProvider);
-      final now = DateTime.now();
+@Riverpod(keepAlive: true)
+Future<List<PracticeItem>> weeklyPracticeItems(
+  WeeklyPracticeItemsRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(practiceItemRepositoryProvider);
+  final now = DateTime.now();
 
-      // Calculate start of week (Monday)
-      final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-      // Calculate end of week (Sunday)
-      final endOfWeek = startOfWeek.add(const Duration(days: 6));
+  // Calculate start of week (Monday)
+  final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+  // Calculate end of week (Sunday)
+  final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
-      return repository.getByStudentIdAndDateRange(
-        studentId,
-        startOfWeek,
-        endOfWeek,
-      );
-    });
+  return repository.getByStudentIdAndDateRange(
+    studentId,
+    startOfWeek,
+    endOfWeek,
+  );
+}
 
 /// Incomplete practice items for student (for dashboard)
-final incompletePracticeItemsProvider =
-    FutureProvider.family<List<PracticeItem>, String>((ref, studentId) async {
-      final repository = ref.watch(practiceItemRepositoryProvider);
-      return repository.getIncompleteByStudentId(studentId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<PracticeItem>> incompletePracticeItems(
+  IncompletePracticeItemsRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(practiceItemRepositoryProvider);
+  return repository.getIncompleteByStudentId(studentId);
+}
 
 /// Practice items awaiting teacher feedback
-final awaitingFeedbackProvider = FutureProvider<List<PracticeItem>>((
-  ref,
-) async {
+@Riverpod(keepAlive: true)
+Future<List<PracticeItem>> awaitingFeedback(AwaitingFeedbackRef ref) async {
   final repository = ref.watch(practiceItemRepositoryProvider);
   final teacherId = ref.watch(currentTeacherIdProvider);
   return repository.getAwaitingFeedback(teacherId);
-});
+}
 
 /// Single practice item by ID
-final practiceItemByIdProvider = FutureProvider.family<PracticeItem?, String>((
-  ref,
-  id,
+@Riverpod(keepAlive: true)
+Future<PracticeItem?> practiceItemById(
+  PracticeItemByIdRef ref,
+  String id,
 ) async {
   final repository = ref.watch(practiceItemRepositoryProvider);
   return repository.getById(id);
-});
+}
 
 /// Notifier for practice item CRUD operations (lesson-based)
-class PracticeItemsNotifier
-    extends FamilyAsyncNotifier<List<PracticeItem>, String> {
+@Riverpod(keepAlive: true)
+class PracticeItemsNotifier extends _$PracticeItemsNotifier {
   PracticeItemRepository get _repository =>
       ref.read(practiceItemRepositoryProvider);
 
@@ -103,7 +124,7 @@ class PracticeItemsNotifier
   }) async {
     final item = PracticeItem(
       id: '',
-      lessonId: arg,
+      lessonId: lessonId,
       studentId: studentId,
       teacherId: teacherId,
       type: type,
@@ -130,7 +151,7 @@ class PracticeItemsNotifier
         resourceIds: resourceIds,
       );
 
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
@@ -147,7 +168,7 @@ class PracticeItemsNotifier
     state = const AsyncValue.loading();
     try {
       final updated = await _repository.update(item);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(item.studentId));
       ref.invalidate(weeklyPracticeItemsProvider(item.studentId));
@@ -163,7 +184,7 @@ class PracticeItemsNotifier
     state = const AsyncValue.loading();
     try {
       await _repository.delete(id);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
@@ -178,7 +199,7 @@ class PracticeItemsNotifier
   Future<PracticeItem> toggleComplete(String id, String studentId) async {
     try {
       final updated = await _repository.toggleComplete(id);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
@@ -201,7 +222,7 @@ class PracticeItemsNotifier
   Future<PracticeItem> toggleLike(String id, String studentId) async {
     try {
       final updated = await _repository.toggleLike(id);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
@@ -217,7 +238,7 @@ class PracticeItemsNotifier
   Future<PracticeItem> incrementCount(String id, String studentId) async {
     try {
       final updated = await _repository.incrementCount(id);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
       return updated;
@@ -231,7 +252,7 @@ class PracticeItemsNotifier
   Future<PracticeItem> decrementCount(String id, String studentId) async {
     try {
       final updated = await _repository.decrementCount(id);
-      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       ref.invalidate(practiceItemsByStudentProvider(studentId));
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
       return updated;
@@ -312,15 +333,9 @@ class PracticeItemsNotifier
   }
 }
 
-final practiceItemsNotifierProvider = AsyncNotifierProvider.family<
-  PracticeItemsNotifier,
-  List<PracticeItem>,
-  String
->(PracticeItemsNotifier.new);
-
 /// Notifier for student's practice items (student-based operations)
-class StudentPracticeNotifier
-    extends FamilyAsyncNotifier<List<PracticeItem>, String> {
+@Riverpod(keepAlive: true)
+class StudentPracticeNotifier extends _$StudentPracticeNotifier {
   PracticeItemRepository get _repository =>
       ref.read(practiceItemRepositoryProvider);
 
@@ -333,16 +348,18 @@ class StudentPracticeNotifier
   Future<PracticeItem> toggleComplete(String id) async {
     try {
       final updated = await _repository.toggleComplete(id);
-      state = await AsyncValue.guard(() => _repository.getByStudentId(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getByStudentId(studentId),
+      );
       // Invalidate related providers
-      ref.invalidate(weeklyPracticeItemsProvider(arg));
-      ref.invalidate(incompletePracticeItemsProvider(arg));
+      ref.invalidate(weeklyPracticeItemsProvider(studentId));
+      ref.invalidate(incompletePracticeItemsProvider(studentId));
       ref.invalidate(awaitingFeedbackProvider);
       // Award points when item is toggled to completed
       if (updated.isCompleted) {
         ref
             .read(pointAwardNotifierProvider.notifier)
-            .awardTaskComplete(arg, updated.title);
+            .awardTaskComplete(studentId, updated.title);
       }
       return updated;
     } catch (e, st) {
@@ -355,8 +372,10 @@ class StudentPracticeNotifier
   Future<PracticeItem> incrementCount(String id) async {
     try {
       final updated = await _repository.incrementCount(id);
-      state = await AsyncValue.guard(() => _repository.getByStudentId(arg));
-      ref.invalidate(weeklyPracticeItemsProvider(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getByStudentId(studentId),
+      );
+      ref.invalidate(weeklyPracticeItemsProvider(studentId));
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -368,8 +387,10 @@ class StudentPracticeNotifier
   Future<PracticeItem> decrementCount(String id) async {
     try {
       final updated = await _repository.decrementCount(id);
-      state = await AsyncValue.guard(() => _repository.getByStudentId(arg));
-      ref.invalidate(weeklyPracticeItemsProvider(arg));
+      state = await AsyncValue.guard(
+        () => _repository.getByStudentId(studentId),
+      );
+      ref.invalidate(weeklyPracticeItemsProvider(studentId));
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -377,9 +398,3 @@ class StudentPracticeNotifier
     }
   }
 }
-
-final studentPracticeNotifierProvider = AsyncNotifierProvider.family<
-  StudentPracticeNotifier,
-  List<PracticeItem>,
-  String
->(StudentPracticeNotifier.new);
