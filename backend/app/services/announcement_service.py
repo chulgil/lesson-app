@@ -35,8 +35,11 @@ class AnnouncementService:
         current_user: Any,
     ) -> TeacherAnnouncementResponse:
         """Create announcement and notify active students."""
-        from app.models.teacher_announcement import TeacherAnnouncement, TeacherAnnouncementDate
-        from app.models.teacher_announcement import TeacherAnnouncementType
+        from app.models.teacher_announcement import (
+            TeacherAnnouncement,
+            TeacherAnnouncementDate,
+            TeacherAnnouncementType,
+        )
 
         teacher_id = await self._authorize_teacher(body.teacher_id, current_user)
         normalized_dates = self._normalize_dates(body.dates)
@@ -94,7 +97,7 @@ class AnnouncementService:
     async def list_announcements(
         self,
         *,
-        teacher_id: str,
+        teacher_id: str | None,
         current_user: Any,
     ) -> list[TeacherAnnouncementResponse]:
         """List announcements for a teacher, newest first."""
@@ -136,7 +139,7 @@ class AnnouncementService:
     async def list_day_offs(
         self,
         *,
-        teacher_id: str,
+        teacher_id: str | None,
         from_date: date,
         to_date: date,
         current_user: Any,
@@ -266,7 +269,8 @@ class AnnouncementService:
         if not lessons:
             return []
 
-        session_map = await self._session_number_by_lesson_id([l for l in lessons if l.subscription_id is not None])
+        lessons_with_subscription = [lesson for lesson in lessons if lesson.subscription_id is not None]
+        session_map = await self._session_number_by_lesson_id(lessons_with_subscription)
 
         return [
             AffectedLesson(
@@ -324,8 +328,10 @@ class AnnouncementService:
         )
         return list(rows)
 
-    async def _authorize_teacher(self, teacher_id: str, current_user: Any) -> str:
+    async def _authorize_teacher(self, teacher_id: str | None, current_user: Any) -> str:
         resolved_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if teacher_id is None:
+            return resolved_teacher_id
         if teacher_id not in {current_user.id, resolved_teacher_id}:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access denied")
         return resolved_teacher_id

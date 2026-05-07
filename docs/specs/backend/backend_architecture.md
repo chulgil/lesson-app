@@ -32,6 +32,7 @@
 - 읽지 않음: `notifications.read_at IS NULL`
 - `GET /api/v1/notifications/unread-count`는 동일 규칙으로 계산
 - `generalAnnouncement`는 교사/학생/부모 공통 알림으로 처리되며, 인앱 알림 가시성 필터에 포함됨
+- 선생님 공지 API (`/api/v1/announcements*`)는 인증 주체에서 `teacher_id`를 유추해 동작하도록 보완
 - 휴강 공지는 `teacher_announcements + teacher_announcement_dates` 정규화 조인 테이블 기반으로 저장
 
 ## 신규 계약 완료 상태 (요약)

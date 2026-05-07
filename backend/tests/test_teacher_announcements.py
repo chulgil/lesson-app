@@ -282,6 +282,31 @@ async def test_list_announcements_returns_sorted_day_off_lessons(
 
 
 @pytest.mark.asyncio
+async def test_list_announcements_defaults_to_authenticated_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id=TEACHER_USER_ID, role="teacher")
+
+    await client.post(
+        "/api/v1/announcements",
+        headers=auth_headers,
+        json={
+            "teacher_id": TEACHER_PROFILE_ID,
+            "type": "general",
+            "message": "일반 공지",
+            "dates": [],
+        },
+    )
+
+    response = await client.get("/api/v1/announcements", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert response.json()[0]["type"] == "general"
+
+
+@pytest.mark.asyncio
 async def test_list_day_offs_filters_and_deduplicates(
     client: AsyncClient,
     auth_headers,
@@ -322,3 +347,31 @@ async def test_list_day_offs_filters_and_deduplicates(
         headers=auth_headers,
     )
     assert bad_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_list_day_offs_defaults_to_authenticated_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id=TEACHER_USER_ID, role="teacher")
+
+    await client.post(
+        "/api/v1/announcements",
+        headers=auth_headers,
+        json={
+            "teacher_id": TEACHER_PROFILE_ID,
+            "type": "dayOff",
+            "dates": ["2026-05-09"],
+            "message": "휴강 공지",
+        },
+    )
+
+    response = await client.get(
+        "/api/v1/announcements/day-offs?from_date=2026-05-08&to_date=2026-05-10",
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"dates": ["2026-05-09"]}
