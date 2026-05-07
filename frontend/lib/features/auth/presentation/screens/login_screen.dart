@@ -17,6 +17,7 @@ import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
+import '../../../home/home_ui_facade.dart' show AppUpdateBanner;
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';
 
@@ -69,7 +70,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const Spacer(flex: 2),
                     _buildHeader(),
-                    const SizedBox(height: AppSpacing.space8),
+                    const SizedBox(height: AppSpacing.space6),
+                    // 앱 업데이트 배너 (로그인 전 표시)
+                    const AppUpdateBanner(),
+                    const SizedBox(height: AppSpacing.space4),
                     _buildSocialButtons(context),
                     if (!useMockData) ...[
                       const SizedBox(height: AppSpacing.space6),
