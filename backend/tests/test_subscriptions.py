@@ -765,6 +765,104 @@ async def test_pending_subscription_schedule_change_events_return_latest_events_
 
 
 @pytest.mark.asyncio
+async def test_pending_subscription_schedule_change_events_include_lesson_cancelled_requests(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Student lessonCancelled requests appear as pending, but teacher/broadcast events do not."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    membership_id = await _create_membership(db_session, teacher_id="test-user-id-prof")
+
+    create_resp = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "membership_id": membership_id,
+            "total_lessons": 8,
+            "amount": 200000,
+        },
+    )
+    assert create_resp.status_code == 201
+    sub_id = create_resp.json()["id"]
+
+    student_cancelled = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "student",
+            "actor_id": "student-001",
+            "event_type": "lessonCancelled",
+            "subscription_id": sub_id,
+            "session_number": 4,
+            "message": "4회차 레슨 취소를 요청합니다.",
+        },
+    )
+    assert student_cancelled.status_code == 201
+
+    teacher_cancelled = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "lessonCancelledByTeacher",
+            "subscription_id": sub_id,
+            "session_number": 5,
+            "message": "5회차 휴강 공지",
+        },
+    )
+    assert teacher_cancelled.status_code == 201
+
+    teacher_announcement = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "teacherAnnouncement",
+            "subscription_id": sub_id,
+            "message": "공지입니다.",
+        },
+    )
+    assert teacher_announcement.status_code == 201
+
+    response = await client.get(
+        "/api/v1/subscriptions/schedule-change-events/pending",
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [event["id"] for event in body] == [student_cancelled.json()["id"]]
+    assert body[0]["event_type"] == "lessonCancelled"
+    assert body[0]["session_number"] == 4
+
+    accepted = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/events",
+        headers=auth_headers,
+        json={
+            "request_id": sub_id,
+            "actor_type": "teacher",
+            "actor_id": "test-user-id",
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": sub_id,
+            "session_number": 4,
+        },
+    )
+    assert accepted.status_code == 201
+
+    response_after_decision = await client.get(
+        "/api/v1/subscriptions/schedule-change-events/pending",
+        headers=auth_headers,
+    )
+    assert response_after_decision.status_code == 200
+    assert response_after_decision.json() == []
+
+
+@pytest.mark.asyncio
 async def test_parent_cannot_create_subscription_schedule_change_event(
     client: AsyncClient,
     auth_headers,

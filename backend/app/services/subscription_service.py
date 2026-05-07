@@ -381,6 +381,7 @@ class SubscriptionService:
 
         role = self._actor_type(current_user)
         source_types = {
+            RequestEventType.lessonCancelled,
             RequestEventType.scheduleChanged,
             RequestEventType.scheduleChangeProposed,
             RequestEventType.scheduleChangeCountered,
@@ -531,6 +532,7 @@ class SubscriptionService:
             RequestEventType.scheduleChangeRejected,
         }
         pending_source_types = {
+            RequestEventType.lessonCancelled,
             RequestEventType.scheduleChanged,
             RequestEventType.scheduleChangeProposed,
             RequestEventType.scheduleChangeCountered,
