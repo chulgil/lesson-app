@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../../core/booking/entities/time_slot.dart';
+import '../../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/booking/repositories/booking_repository.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'booking_repository_provider.dart';
@@ -10,108 +11,128 @@ import 'booking_repository_provider.dart';
 // Export repository provider
 export 'booking_repository_provider.dart';
 
+part 'booking_providers.g.dart';
+
 // =============================================================================
 // Query Providers (FutureProvider)
 // =============================================================================
 
 /// All bookings provider
-final allBookingsProvider = FutureProvider<List<LessonBooking>>((ref) async {
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> allBookings(AllBookingsRef ref) async {
   final repository = ref.watch(bookingRepositoryProvider);
   return repository.getAllBookings();
-});
+}
 
 /// Single booking provider
-final bookingProvider = FutureProvider.family<LessonBooking?, String>((
-  ref,
-  bookingId,
-) async {
+@Riverpod(keepAlive: true)
+Future<LessonBooking?> booking(BookingRef ref, String bookingId) async {
   final repository = ref.watch(bookingRepositoryProvider);
   return repository.getBookingById(bookingId);
-});
+}
 
 /// Bookings by teacher provider
-final teacherBookingsProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      return repository.getBookingsByTeacher(teacherId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> teacherBookings(
+  TeacherBookingsRef ref,
+  String teacherId,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  return repository.getBookingsByTeacher(teacherId);
+}
 
 /// Bookings by student provider
-final studentBookingsProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, studentId) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      return repository.getBookingsByStudent(studentId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> studentBookings(
+  StudentBookingsRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  return repository.getBookingsByStudent(studentId);
+}
 
 /// Bookings by status provider
-final bookingsByStatusProvider =
-    FutureProvider.family<List<LessonBooking>, BookingStatus>((
-      ref,
-      status,
-    ) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      return repository.getBookingsByStatus(status);
-    });
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> bookingsByStatus(
+  BookingsByStatusRef ref,
+  BookingStatus status,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  return repository.getBookingsByStatus(status);
+}
 
 /// Pending bookings for teacher provider
-final pendingBookingsProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      return repository.getPendingBookings(teacherId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> pendingBookings(
+  PendingBookingsRef ref,
+  String teacherId,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  return repository.getPendingBookings(teacherId);
+}
 
 /// Pending bookings count provider (for badge)
-final pendingBookingsCountProvider = FutureProvider.family<int, String>((
-  ref,
-  teacherId,
+@Riverpod(keepAlive: true)
+Future<int> pendingBookingsCount(
+  PendingBookingsCountRef ref,
+  String teacherId,
 ) async {
   final repository = ref.watch(bookingRepositoryProvider);
   final bookings = await repository.getPendingBookings(teacherId);
   return bookings.length;
-});
+}
 
 /// Upcoming bookings provider (confirmed, future dates)
-final upcomingBookingsProvider =
-    FutureProvider.family<List<LessonBooking>, String>((ref, teacherId) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      final bookings = await repository.getBookingsByTeacher(teacherId);
-      return bookings
-          .where((b) => b.isUpcoming && b.status == BookingStatus.confirmed)
-          .toList()
-        ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
-    });
+@Riverpod(keepAlive: true)
+Future<List<LessonBooking>> upcomingBookings(
+  UpcomingBookingsRef ref,
+  String teacherId,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  final bookings = await repository.getBookingsByTeacher(teacherId);
+  return bookings
+      .where((b) => b.isUpcoming && b.status == BookingStatus.confirmed)
+      .toList()
+    ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
+}
 
 /// Teacher availability provider
-final teacherAvailabilityProvider =
-    FutureProvider.family<List<TimeSlot>, String>((ref, teacherId) async {
-      final repository = ref.watch(bookingRepositoryProvider);
-      return repository.getTeacherAvailability(teacherId);
-    });
+@Riverpod(keepAlive: true)
+Future<List<TimeSlot>> teacherAvailability(
+  TeacherAvailabilityRef ref,
+  String teacherId,
+) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  return repository.getTeacherAvailability(teacherId);
+}
 
 /// Available dates provider
-final availableDatesProvider = FutureProvider.family<
-  List<DateTime>,
-  ({String teacherId, DateTime from, DateTime to})
->((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<List<DateTime>> availableDates(
+  AvailableDatesRef ref,
+  ({String teacherId, DateTime from, DateTime to}) params,
+) async {
   final repository = ref.watch(bookingRepositoryProvider);
   return repository.getAvailableDates(params.teacherId, params.from, params.to);
-});
+}
 
 /// Available time slots for booking (by date)
-final bookingAvailableTimeSlotsProvider = FutureProvider.family<
-  List<TimeSlot>,
-  ({String teacherId, DateTime date})
->((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<List<TimeSlot>> bookingAvailableTimeSlots(
+  BookingAvailableTimeSlotsRef ref,
+  ({String teacherId, DateTime date}) params,
+) async {
   final repository = ref.watch(bookingRepositoryProvider);
   return repository.getAvailableTimeSlotsForDate(params.teacherId, params.date);
-});
+}
 
 // =============================================================================
 // Mutation Provider (AsyncNotifier)
 // =============================================================================
 
 /// Bookings notifier for CRUD operations
-class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
+@Riverpod(keepAlive: true)
+class BookingsNotifier extends _$BookingsNotifier {
   BookingRepository get _repository => ref.read(bookingRepositoryProvider);
 
   @override
@@ -323,25 +344,58 @@ class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
   }
 }
 
-final bookingsNotifierProvider =
-    AsyncNotifierProvider<BookingsNotifier, List<LessonBooking>>(
-      BookingsNotifier.new,
-    );
-
 // =============================================================================
 // Selected State Providers
 // =============================================================================
 
 /// Selected date for booking
-final selectedBookingDateProvider = StateProvider<DateTime?>((ref) => null);
+@Riverpod(keepAlive: true)
+class SelectedBookingDate extends _$SelectedBookingDate {
+  @override
+  DateTime? build() => null;
+
+  @override
+  DateTime? get state => super.state;
+
+  @override
+  set state(DateTime? value) => super.state = value;
+}
 
 /// Selected time slot for booking
-final selectedBookingTimeSlotProvider = StateProvider<TimeSlot?>((ref) => null);
+@Riverpod(keepAlive: true)
+class SelectedBookingTimeSlot extends _$SelectedBookingTimeSlot {
+  @override
+  TimeSlot? build() => null;
+
+  @override
+  TimeSlot? get state => super.state;
+
+  @override
+  set state(TimeSlot? value) => super.state = value;
+
+  void select(TimeSlot timeSlot) {
+    state = timeSlot;
+  }
+
+  void clear() {
+    state = null;
+  }
+}
+
+typedef SelectedBookingTimeSlotNotifier = SelectedBookingTimeSlot;
 
 /// Selected schedule type for regular lesson
-final selectedScheduleTypeProvider = StateProvider<ScheduleType>(
-  (ref) => ScheduleType.fixed,
-);
+@Riverpod(keepAlive: true)
+class SelectedScheduleType extends _$SelectedScheduleType {
+  @override
+  ScheduleType build() => ScheduleType.fixed;
+
+  @override
+  ScheduleType get state => super.state;
+
+  @override
+  set state(ScheduleType value) => super.state = value;
+}
 
 /// Trial lesson request form state
 class TrialLessonFormState {
@@ -394,12 +448,30 @@ class TrialLessonFormState {
       experience: experience,
       message: message,
       preferredDate: date,
-      preferredStartTime: startTime,
-      preferredEndTime: endTime,
+      preferredStartTime: startTime.toClockTime(),
+      preferredEndTime: endTime.toClockTime(),
     );
   }
 }
 
-final trialLessonFormProvider = StateProvider<TrialLessonFormState>(
-  (ref) => const TrialLessonFormState(),
-);
+@Riverpod(keepAlive: true)
+class TrialLessonForm extends _$TrialLessonForm {
+  @override
+  TrialLessonFormState build() => const TrialLessonFormState();
+
+  @override
+  TrialLessonFormState get state => super.state;
+
+  @override
+  set state(TrialLessonFormState value) => super.state = value;
+
+  void update(TrialLessonFormState formState) {
+    state = formState;
+  }
+
+  void reset() {
+    state = const TrialLessonFormState();
+  }
+}
+
+typedef TrialLessonFormNotifier = TrialLessonForm;

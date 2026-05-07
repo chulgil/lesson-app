@@ -275,9 +275,17 @@ Future<bool> teacherNeedsOnboarding(Ref ref) async {
 }
 
 /// Check if teacher has completed onboarding
-final teacherOnboardingCompletedProvider = StateProvider<bool>((ref) {
-  return false;
-});
+@Riverpod(keepAlive: true)
+class TeacherOnboardingCompleted extends _$TeacherOnboardingCompleted {
+  @override
+  bool build() => false;
+
+  @override
+  bool get state => super.state;
+
+  @override
+  set state(bool value) => super.state = value;
+}
 
 // =============================================================================
 // Phone Verification UI State
@@ -298,42 +306,128 @@ class PhoneVerificationTimer extends _$PhoneVerificationTimer {
 }
 
 /// Phone input validation state
-final phoneNumberProvider = StateProvider<String>((ref) => '');
-final verificationCodeProvider = StateProvider<String>((ref) => '');
+@Riverpod(keepAlive: true)
+class PhoneNumber extends _$PhoneNumber {
+  @override
+  String build() => '';
+
+  @override
+  String get state => super.state;
+
+  @override
+  set state(String value) => super.state = value;
+}
+
+@Riverpod(keepAlive: true)
+class VerificationCode extends _$VerificationCode {
+  @override
+  String build() => '';
+
+  @override
+  String get state => super.state;
+
+  @override
+  set state(String value) => super.state = value;
+}
 
 /// Phone number validation
-final isPhoneNumberValidProvider = Provider<bool>((ref) {
+@Riverpod(keepAlive: true)
+bool isPhoneNumberValid(Ref ref) {
   final phone = ref.watch(phoneNumberProvider);
   // Korean phone number format: 010-XXXX-XXXX or 01XXXXXXXXX
   final phoneRegex = RegExp(r'^01[0-9]{8,9}$');
   final cleanPhone = phone.replaceAll('-', '').replaceAll(' ', '');
   return phoneRegex.hasMatch(cleanPhone);
-});
+}
 
 /// Verification code validation
-final isVerificationCodeValidProvider = Provider<bool>((ref) {
+@Riverpod(keepAlive: true)
+bool isVerificationCodeValid(Ref ref) {
   final code = ref.watch(verificationCodeProvider);
   return code.length == 6 && int.tryParse(code) != null;
-});
+}
 
 // =============================================================================
 // Profile Setup UI State
 // =============================================================================
 
 /// Profile name input
-final profileNameProvider = StateProvider<String>((ref) => '');
+@Riverpod(keepAlive: true)
+class ProfileName extends _$ProfileName {
+  @override
+  String build() => '';
+
+  @override
+  String get state => super.state;
+
+  @override
+  set state(String value) => super.state = value;
+}
 
 /// Profile image URL
-final profileImageProvider = StateProvider<String?>((ref) => null);
+@Riverpod(keepAlive: true)
+class ProfileImage extends _$ProfileImage {
+  @override
+  String? build() => null;
+
+  @override
+  String? get state => super.state;
+
+  @override
+  set state(String? value) => super.state = value;
+}
 
 /// Selected instruments
-final selectedInstrumentsProvider = StateProvider<List<String>>((ref) => []);
+@Riverpod(keepAlive: true)
+class SelectedInstruments extends _$SelectedInstruments {
+  @override
+  List<String> build() => [];
+
+  @override
+  List<String> get state => super.state;
+
+  @override
+  set state(List<String> value) => super.state = value;
+
+  void set(List<String> instruments) {
+    state = List.unmodifiable(instruments);
+  }
+
+  void toggle(String instrument) {
+    if (state.contains(instrument)) {
+      state = [
+        for (final selected in state)
+          if (selected != instrument) selected,
+      ];
+      return;
+    }
+
+    state = [...state, instrument];
+  }
+
+  void clear() {
+    state = [];
+  }
+}
+
+typedef SelectedInstrumentsNotifier = SelectedInstruments;
 
 /// Introduction text
-final profileIntroductionProvider = StateProvider<String>((ref) => '');
+@Riverpod(keepAlive: true)
+class ProfileIntroduction extends _$ProfileIntroduction {
+  @override
+  String build() => '';
+
+  @override
+  String get state => super.state;
+
+  @override
+  set state(String value) => super.state = value;
+}
 
 /// Profile form validation
-final isProfileFormValidProvider = Provider<bool>((ref) {
+@Riverpod(keepAlive: true)
+bool isProfileFormValid(Ref ref) {
   final name = ref.watch(profileNameProvider);
   final image = ref.watch(profileImageProvider);
   final instruments = ref.watch(selectedInstrumentsProvider);
@@ -344,10 +438,11 @@ final isProfileFormValidProvider = Provider<bool>((ref) {
       image.isNotEmpty &&
       instruments.isNotEmpty &&
       introduction.length >= 20;
-});
+}
 
 /// Missing fields for profile
-final profileMissingFieldsProvider = Provider<List<String>>((ref) {
+@Riverpod(keepAlive: true)
+List<String> profileMissingFields(Ref ref) {
   final fields = <String>[];
   final name = ref.watch(profileNameProvider);
   final image = ref.watch(profileImageProvider);
@@ -360,12 +455,11 @@ final profileMissingFieldsProvider = Provider<List<String>>((ref) {
   if (introduction.length < 20) fields.add('소개글 (20자 이상)');
 
   return fields;
-});
+}
 
 /// Build onboarding profile from form data
-final onboardingProfileFromFormProvider = Provider<TeacherOnboardingProfile?>((
-  ref,
-) {
+@Riverpod(keepAlive: true)
+TeacherOnboardingProfile? onboardingProfileFromForm(Ref ref) {
   final isValid = ref.watch(isProfileFormValidProvider);
   if (!isValid) return null;
 
@@ -375,4 +469,4 @@ final onboardingProfileFromFormProvider = Provider<TeacherOnboardingProfile?>((
     instruments: ref.read(selectedInstrumentsProvider),
     introduction: ref.read(profileIntroductionProvider),
   );
-});
+}
