@@ -75,8 +75,6 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
   late String? _postalCode;
   late String? _address;
   late final TextEditingController _detailController;
-  late final TextEditingController _manualAddressController;
-  late final TextEditingController _manualPostalController;
 
   @override
   void initState() {
@@ -86,36 +84,17 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
     _detailController = TextEditingController(
       text: widget.initialAddressDetail,
     );
-    _manualAddressController = TextEditingController(text: _address);
-    _manualPostalController = TextEditingController(text: _postalCode);
     _detailController.addListener(_onDetailChanged);
-    _manualAddressController.addListener(_onManualChanged);
-    _manualPostalController.addListener(_onManualChanged);
   }
 
   @override
   void dispose() {
     _detailController.removeListener(_onDetailChanged);
-    _manualAddressController.removeListener(_onManualChanged);
-    _manualPostalController.removeListener(_onManualChanged);
     _detailController.dispose();
-    _manualAddressController.dispose();
-    _manualPostalController.dispose();
     super.dispose();
   }
 
   void _onDetailChanged() => _notifyParent();
-  void _onManualChanged() {
-    _postalCode =
-        _manualPostalController.text.isEmpty
-            ? null
-            : _manualPostalController.text;
-    _address =
-        _manualAddressController.text.isEmpty
-            ? null
-            : _manualAddressController.text;
-    _notifyParent();
-  }
 
   void _notifyParent() {
     widget.onChanged(

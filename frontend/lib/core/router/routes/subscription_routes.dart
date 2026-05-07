@@ -16,11 +16,21 @@ import '../../../features/subscription/presentation/screens/renewal_detail_scree
 import '../../../features/subscription/presentation/screens/student_proposal_accept_screen.dart';
 import '../../../features/subscription/presentation/screens/schedule_change_request_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
+import '../../../features/subscription/presentation/screens/proposal_settings_screen.dart';
 
 /// Subscription-related routes.
 /// NOTE: More specific routes (like /issue, /policy) must come BEFORE parameterized routes (like /:id)
 /// to prevent GoRouter from matching them as an ID parameter.
 List<RouteBase> subscriptionRoutes = [
+  GoRoute(
+    path: AppRoutes.proposalSettings,
+    builder: (context, state) {
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      return _TeacherOnlySubscriptionRoute(
+        child: ProposalSettingsScreen(teacherId: teacherId),
+      );
+    },
+  ),
   GoRoute(
     path: AppRoutes.subscriptionTemplates,
     builder: (context, state) {

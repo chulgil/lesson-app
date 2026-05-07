@@ -120,7 +120,7 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
             icon: Icons.event_note_outlined,
             text: AppStrings.pendingBookings(count),
             urgent: false,
-            onTap: () => context.push(AppRoutes.bookingList),
+            onTap: () => context.push(AppRoutes.myBookings),
           ),
         );
       }

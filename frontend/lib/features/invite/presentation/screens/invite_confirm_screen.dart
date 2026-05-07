@@ -573,8 +573,6 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
                           context.go(homeRoute);
-                          // Navigate to students tab
-                          context.push(AppRoutes.students);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.paperAccent,

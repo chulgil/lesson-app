@@ -20,7 +20,6 @@ import 'demo_dashboard_overlay.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
-import 'review_prompt_card.dart';
 import 'schedule_change_request_section.dart';
 import 'time_context_banner.dart';
 import 'urgent_alert_zone.dart';
@@ -112,17 +111,6 @@ class DashboardTab extends ConsumerWidget {
               _buildStatsRow(context, todayLessons, dashboard.lessonStats),
 
               const SizedBox(height: AppSpacing.space3),
-
-              dashboard.lessonStats.maybeWhen(
-                data:
-                    (stats) => Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-                      child: ReviewPromptCard(
-                        completedLessonCount: stats['completed'] ?? 0,
-                      ),
-                    ),
-                orElse: () => const SizedBox.shrink(),
-              ),
 
               // ── 긴급 알림 존 (입금대기 등 — 통계 바로 아래) ────
               UrgentAlertZone(
