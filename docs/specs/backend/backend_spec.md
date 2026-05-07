@@ -300,6 +300,19 @@ DIRECTIONS_PROVIDER=kakao       # kakao | naver | google
 > 주소 검색(`AddressProvider`) + 이동시간(`DirectionsProvider`)은 **동일 외부 API 키**를 공유.
 > 카카오 REST API 키 1개로 주소 검색(Local API) + 길찾기(Mobility API) 모두 호출 가능.
 
+### 발급된 수강권 수정 API 계약 (2026-05-07)
+
+> 상세 스펙: [subscription_edit_spec.md](../subscription/subscription_edit_spec.md)
+
+| 기능 | 엔드포인트 | 설명 |
+|------|-----------|------|
+| 변경권 추가 | `PATCH /api/v1/subscriptions/{id}/reschedule-credits` | `{ additional_count, reason }` |
+| 레슨 장소 변경 | `PATCH /api/v1/subscriptions/{id}/location` | `{ location_type, location_id, travel_time_minutes }` |
+| 이동시간 수정 | `PATCH /api/v1/subscriptions/{id}/travel-time` | `{ travel_time_minutes }` |
+| 취소 기준시간 수정 | `PATCH /api/v1/subscriptions/{id}/cancel-deadline` | `{ deadline_hours }` |
+
+**원칙:** 변경권/장소/이동시간/기준시간은 수정 가능. 횟수/금액/기간은 재발급 필요.
+
 ### 향후 항목
 
 1. [ ] Frontend Remote Repository 연결 (Mock → Remote 전환) — 프론트엔드 작업

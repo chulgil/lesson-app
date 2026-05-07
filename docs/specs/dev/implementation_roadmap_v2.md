@@ -140,6 +140,7 @@
 | 6-b | lesson_location_management_spec.md v2 | - | 보강 | - | 설계 완료 |
 | 6-c | travel_time_spec.md v2 | - | 보강 | - | 설계 완료 |
 | 3-b | teaching_resource_attachment_spec.md | - | 신규 | - | 설계 완료 |
+| 3-c | subscription_edit_spec.md | - | 신규 | - | 설계 완료 |
 | 11 | student_home_master.md | 1종 | 15개 파일 | - | 완료 |
 | 12 | follow_master.md | - | Phase 3 | - | 완료 |
 | 13 | settings_master.md | - | 13개 파일 | - | 완료 |
