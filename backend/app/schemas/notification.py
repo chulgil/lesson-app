@@ -2,8 +2,9 @@
 
 
 import datetime as _dt
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class NotificationResponse(BaseModel):
@@ -52,3 +53,21 @@ class NotificationPreferenceResponse(BaseModel):
     settings: dict
     created_at: _dt.datetime
     updated_at: _dt.datetime
+
+
+class BroadcastNotificationRequest(BaseModel):
+    """Bulk teacher announcement payload."""
+
+    teacher_id: str
+    student_ids: list[str] = Field(min_length=1)
+    target_filter: Literal["active_subscription", "all"]
+    title: str
+    body: str
+
+
+class BroadcastNotificationResponse(BaseModel):
+    """Bulk teacher announcement result."""
+
+    sent_count: int
+    event_created_count: int
+    filtered_out_count: int

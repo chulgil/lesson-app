@@ -12,6 +12,8 @@ from app.core.deps import get_current_teacher, get_current_user, get_db, get_pag
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import (
+    BulkCancelLessonRequest,
+    BulkCancelLessonResponse,
     LessonClassCreate,
     LessonClassResponse,
     LessonClassUpdate,
@@ -24,6 +26,7 @@ from app.schemas.lesson import (
     MembershipResponse,
     MembershipUpdate,
 )
+from app.services.bulk_teacher_action_service import BulkTeacherActionService
 from app.services.lesson_service import LessonService
 
 router = APIRouter()
@@ -111,6 +114,29 @@ async def recent_lessons(
     """Return the last N completed lessons for the current user."""
     service = LessonService(db)
     return await service.get_recent(current_user, limit=limit)
+
+
+@router.post(
+    "/bulk-cancel",
+    response_model=BulkCancelLessonResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Bulk cancel teacher lessons",
+)
+async def bulk_cancel_lessons(
+    body: BulkCancelLessonRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> BulkCancelLessonResponse:
+    """Cancel selected students' lessons on a date and notify them."""
+    service = BulkTeacherActionService(db)
+    return await service.bulk_cancel_lessons(
+        teacher_id=body.teacher_id,
+        student_ids=body.student_ids,
+        target_date=body.target_date,
+        reason=body.reason,
+        notification_title=body.notification_title,
+        current_user=current_user,
+    )
 
 
 @router.get(

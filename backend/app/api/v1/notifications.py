@@ -7,15 +7,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_user, get_db, get_pagination
+from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.notification import (
+    BroadcastNotificationRequest,
+    BroadcastNotificationResponse,
     NotificationPreferenceResponse,
     NotificationPreferenceUpdate,
     NotificationResponse,
     UnreadCountResponse,
 )
+from app.services.bulk_teacher_action_service import BulkTeacherActionService
 from app.services.notification_service import NotificationService
 
 router = APIRouter()
@@ -50,6 +53,29 @@ async def update_preferences(
     """Patch current user's notification preferences."""
     service = NotificationService(db)
     return await service.update_preferences(current_user, body.settings)
+
+
+@router.post(
+    "/broadcast",
+    response_model=BroadcastNotificationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Broadcast announcement to selected students",
+)
+async def broadcast(
+    body: BroadcastNotificationRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> BroadcastNotificationResponse:
+    """Send a bulk teacher announcement to selected students."""
+    service = BulkTeacherActionService(db)
+    return await service.broadcast(
+        teacher_id=body.teacher_id,
+        student_ids=body.student_ids,
+        target_filter=body.target_filter,
+        title=body.title,
+        body=body.body,
+        current_user=current_user,
+    )
 
 
 @router.get(

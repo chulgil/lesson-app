@@ -205,3 +205,31 @@ class LessonFeedbackUpdate(BaseModel):
     feedback: str | None = None
     key_points: list[str] = []
     practice_tips: str | None = None
+
+
+class BulkCancelLessonRequest(BaseModel):
+    """Bulk teacher lesson cancellation payload."""
+
+    teacher_id: str
+    student_ids: list[str] = Field(min_length=1)
+    target_date: _dt.date
+    reason: str | None = None
+    notification_title: str
+
+
+class BulkLessonEventCreated(BaseModel):
+    """Event created for a cancelled lesson."""
+
+    student_id: str
+    lesson_id: str
+    session_number: int | None = None
+    subscription_id: str
+
+
+class BulkCancelLessonResponse(BaseModel):
+    """Bulk teacher lesson cancellation result."""
+
+    cancelled_lesson_count: int
+    notified_student_count: int
+    skipped_student_ids: list[str]
+    events_created: list[BulkLessonEventCreated]
