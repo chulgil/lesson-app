@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import NotificationPriority
 from app.schemas.common import PaginatedResponse
-from app.schemas.notification import NotificationResponse
+from app.schemas.notification import NotificationPreferenceResponse, NotificationResponse
 from app.services.device_token_service import DeviceTokenService
 from app.services.fcm_service import FcmService
 
@@ -96,6 +96,24 @@ class NotificationService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
+    async def get_preferences(self, current_user: Any) -> NotificationPreferenceResponse:
+        """Return user notification preferences, creating role defaults on first access."""
+        preference = await self._get_or_create_preferences(current_user)
+        return NotificationPreferenceResponse.model_validate(preference)
+
+    async def update_preferences(
+        self,
+        current_user: Any,
+        settings: dict[str, Any],
+    ) -> NotificationPreferenceResponse:
+        """Merge and persist user notification preference settings."""
+        preference = await self._get_or_create_preferences(current_user)
+        preference.settings = {**self._default_preferences(current_user), **(preference.settings or {}), **settings}
+        preference.role = self._role_value(current_user)
+        await self.db.flush()
+        await self.db.refresh(preference)
+        return NotificationPreferenceResponse.model_validate(preference)
+
     async def get_all(
         self,
         *,
@@ -132,6 +150,55 @@ class NotificationService:
         )
         items = [NotificationResponse.model_validate(n) for n in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
+
+    async def _get_or_create_preferences(self, current_user: Any) -> Any:
+        from app.models.notification import UserNotificationPreference
+
+        preference = await self.db.scalar(
+            select(UserNotificationPreference).where(UserNotificationPreference.user_id == current_user.id)
+        )
+        if preference is None:
+            preference = UserNotificationPreference(
+                user_id=current_user.id,
+                role=self._role_value(current_user),
+                settings=self._default_preferences(current_user),
+            )
+            self.db.add(preference)
+            await self.db.flush()
+            await self.db.refresh(preference)
+        return preference
+
+    def _default_preferences(self, current_user: Any) -> dict[str, Any]:
+        role = self._role_value(current_user)
+        if role == "teacher":
+            return {
+                "lessonReminderEnabled": True,
+                "lessonReminderTimes": [1440],
+                "newStudentAlert": True,
+                "trialBookingAlert": True,
+                "paymentReceivedAlert": True,
+                "studentPracticeReport": False,
+                "reviewReceivedAlert": True,
+                "dndEnabled": True,
+                "dndStart": {"hour": 22, "minute": 0},
+                "dndEnd": {"hour": 8, "minute": 0},
+            }
+        return {
+            "lessonReminderEnabled": True,
+            "lessonReminderTimes": [1440],
+            "practiceReminderEnabled": True,
+            "practiceReminderTime": {"hour": 19, "minute": 0},
+            "streakWarningEnabled": True,
+            "streakWarningTime": {"hour": 21, "minute": 0},
+            "paymentReminderEnabled": True,
+            "dndEnabled": True,
+            "dndStart": {"hour": 22, "minute": 0},
+            "dndEnd": {"hour": 8, "minute": 0},
+            "maxDailyNotifications": 5,
+        }
+
+    def _role_value(self, current_user: Any) -> str | None:
+        return getattr(getattr(current_user, "role", None), "value", getattr(current_user, "role", None))
 
     async def mark_read(self, notification_id: str, user_id: str) -> None:
         """Mark a single notification as read."""

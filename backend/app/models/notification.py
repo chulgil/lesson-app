@@ -1,13 +1,13 @@
-import enum
 from datetime import datetime
+from enum import StrEnum
 
-from sqlalchemy import Boolean, DateTime, Enum, Index, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, Enum, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base, UUIDMixin
+from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
-class NotificationPriority(str, enum.Enum):
+class NotificationPriority(StrEnum):
     low = "low"
     normal = "normal"
     high = "high"
@@ -51,4 +51,18 @@ class Notification(UUIDMixin, Base):
         Index("idx_notif_user", "user_id"),
         Index("idx_notif_read", "user_id", "read_at"),
         Index("idx_notif_created", "created_at"),
+    )
+
+
+class UserNotificationPreference(UUIDMixin, TimestampMixin, Base):
+    """User-scoped notification preference state."""
+
+    __tablename__ = "user_notification_preferences"
+
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    role: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+    __table_args__ = (
+        Index("uk_user_notification_preferences_user", "user_id", unique=True),
     )

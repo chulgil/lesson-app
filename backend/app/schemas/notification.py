@@ -33,3 +33,22 @@ class UnreadCountResponse(BaseModel):
     """Unread notification count."""
 
     count: int = 0
+
+
+class NotificationPreferenceUpdate(BaseModel):
+    """Patch user-scoped notification preference settings."""
+
+    settings: dict
+
+
+class NotificationPreferenceResponse(BaseModel):
+    """User-scoped notification preference state."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    user_id: str
+    role: str | None = None
+    settings: dict
+    created_at: _dt.datetime
+    updated_at: _dt.datetime

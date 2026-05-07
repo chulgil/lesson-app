@@ -10,10 +10,46 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
-from app.schemas.notification import NotificationResponse, UnreadCountResponse
+from app.schemas.notification import (
+    NotificationPreferenceResponse,
+    NotificationPreferenceUpdate,
+    NotificationResponse,
+    UnreadCountResponse,
+)
 from app.services.notification_service import NotificationService
 
 router = APIRouter()
+
+
+@router.get(
+    "/preferences",
+    response_model=NotificationPreferenceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get notification preferences",
+)
+async def get_preferences(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationPreferenceResponse:
+    """Return current user's notification preferences."""
+    service = NotificationService(db)
+    return await service.get_preferences(current_user)
+
+
+@router.patch(
+    "/preferences",
+    response_model=NotificationPreferenceResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update notification preferences",
+)
+async def update_preferences(
+    body: NotificationPreferenceUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationPreferenceResponse:
+    """Patch current user's notification preferences."""
+    service = NotificationService(db)
+    return await service.update_preferences(current_user, body.settings)
 
 
 @router.get(

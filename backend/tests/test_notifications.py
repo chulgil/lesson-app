@@ -453,3 +453,69 @@ async def test_parent_notifications_use_student_and_common_targets(
         "lessonCancelled",
         "paymentReminder",
     }
+
+
+@pytest.mark.asyncio
+async def test_teacher_notification_preferences_default_and_patch(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Teacher notification preferences are persisted remotely instead of Hive-only state."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    default_response = await client.get("/api/v1/notifications/preferences", headers=auth_headers)
+    assert default_response.status_code == 200
+    defaults = default_response.json()
+    assert defaults["user_id"] == "test-user-id"
+    assert defaults["role"] == "teacher"
+    assert defaults["settings"]["lessonReminderEnabled"] is True
+    assert defaults["settings"]["studentPracticeReport"] is False
+    assert defaults["settings"]["dndStart"] == {"hour": 22, "minute": 0}
+    assert defaults["settings"]["dndEnd"] == {"hour": 8, "minute": 0}
+    assert defaults["created_at"] is not None
+    assert defaults["updated_at"] is not None
+
+    patch_response = await client.patch(
+        "/api/v1/notifications/preferences",
+        headers=auth_headers,
+        json={
+            "settings": {
+                "studentPracticeReport": True,
+                "dndEnabled": False,
+            },
+        },
+    )
+    assert patch_response.status_code == 200
+    patched = patch_response.json()
+    assert patched["settings"]["studentPracticeReport"] is True
+    assert patched["settings"]["dndEnabled"] is False
+    assert patched["settings"]["lessonReminderEnabled"] is True
+
+
+@pytest.mark.asyncio
+async def test_student_notification_preferences_use_student_defaults(
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+):
+    """Student preferences expose practice/streak/payment settings with defaults."""
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="Test Student",
+        email="student-pref@test.com",
+    )
+
+    response = await client.get("/api/v1/notifications/preferences", headers=student_auth_headers)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["user_id"] == "test-student-id"
+    assert body["role"] == "student"
+    assert body["settings"]["practiceReminderEnabled"] is True
+    assert body["settings"]["practiceReminderTime"] == {"hour": 19, "minute": 0}
+    assert body["settings"]["streakWarningTime"] == {"hour": 21, "minute": 0}
+    assert body["settings"]["paymentReminderEnabled"] is True
+    assert body["settings"]["maxDailyNotifications"] == 5
+    assert "newStudentAlert" not in body["settings"]

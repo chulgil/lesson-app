@@ -13,7 +13,7 @@ from app.models.lesson import (  # noqa: F401
     LessonRecording,
 )
 from app.models.manual_teacher import ManualTeacher  # noqa: F401
-from app.models.notification import Notification  # noqa: F401
+from app.models.notification import Notification, UserNotificationPreference  # noqa: F401
 from app.models.onboarding import UserOnboardingProgress, UserOnboardingQuestProgress  # noqa: F401
 from app.models.parent import (  # noqa: F401
     Parent,
