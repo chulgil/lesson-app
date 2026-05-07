@@ -51,7 +51,12 @@ async def test_fw_subscription_lifecycle(teacher: TeacherActions):
     """Template → subscription → deduct 6/8 → verify remaining → payment."""
     await teacher.create_template("바이올린 8회", lessons_count=8, amount=320000)
     sid = await teacher.create_student("이서연")
-    sub_id = await teacher.create_subscription(sid, total_lessons=8, amount=320000)
+    sub_id = await teacher.create_subscription(
+        sid,
+        total_lessons=8,
+        amount=320000,
+        payment_confirmed=False,
+    )
 
     # Deduct 6 lessons
     for i in range(6):

@@ -117,7 +117,6 @@ async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers
         },
     )
     assert tmpl.status_code == 201
-    template_id = tmpl.json()["id"]
 
     # Step 2: Create student
     student = await client.post(
@@ -137,6 +136,7 @@ async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers
             "total_lessons": 8,
             "amount": 320000,
             "start_date": "2026-03-01",
+            "payment_confirmed": False,
         },
     )
     assert sub.status_code == 201
@@ -491,7 +491,7 @@ async def test_scenario_dashboard_and_content(
             "duration": 60,
         },
     )
-    lesson_id = lesson.json()["id"]
+    assert lesson.status_code == 201
 
     # Step 3: Check upcoming lessons
     upcoming = await client.get("/api/v1/lessons/upcoming", headers=auth_headers)
@@ -530,7 +530,6 @@ async def test_scenario_dashboard_and_content(
         },
     )
     assert resource.status_code == 201
-    resource_id = resource.json()["id"]
 
     # Step 7: Verify resource in list
     resources = await client.get("/api/v1/settings/teaching-resources", headers=auth_headers)
@@ -807,7 +806,7 @@ async def test_scenario_multi_student_day(client: AsyncClient, auth_headers, cre
     # Step 2: Create lessons at different times
     lesson_ids = []
     for i, (sid, time) in enumerate(zip(students, ["10:00", "11:30", "14:00"])):
-        l = await client.post(
+        lesson = await client.post(
             "/api/v1/lessons",
             headers=auth_headers,
             json={
@@ -817,7 +816,7 @@ async def test_scenario_multi_student_day(client: AsyncClient, auth_headers, cre
                 "duration": 60,
             },
         )
-        lesson_ids.append(l.json()["id"])
+        lesson_ids.append(lesson.json()["id"])
 
     # Step 3: List lessons for the day
     day_lessons = await client.get(

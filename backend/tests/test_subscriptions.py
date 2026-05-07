@@ -424,6 +424,127 @@ async def test_subscription_deposit_status_rejects_card_pg_method(
 
 
 @pytest.mark.asyncio
+async def test_update_subscription_rejects_deposit_state_transition_through_put_but_allows_unchanged_payload(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Generic subscription updates cannot bypass manual deposit transition endpoints."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+            "payment_method": "bankTransfer",
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+
+    unchanged = await client.put(
+        f"/api/v1/subscriptions/{sub_id}",
+        headers=auth_headers,
+        json={
+            "amount": 130000,
+            "payment_confirmed": False,
+            "payment_method": "bankTransfer",
+            "paid_at": None,
+            "payment_confirmed_at": None,
+        },
+    )
+    assert unchanged.status_code == 200
+    assert unchanged.json()["amount"] == 130000
+
+    bypass = await client.put(
+        f"/api/v1/subscriptions/{sub_id}",
+        headers=auth_headers,
+        json={
+            "payment_confirmed": True,
+        },
+    )
+    assert bypass.status_code == 422
+    assert "notify-payment or confirm-payment" in bypass.text
+
+
+@pytest.mark.asyncio
+async def test_notify_payment_rejects_teacher_actor_for_manual_deposit_notification(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Only student-side actors can notify that an external deposit was made."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+        },
+    )
+    assert created.status_code == 201
+
+    response = await client.patch(
+        f"/api/v1/subscriptions/{created.json()['id']}/notify-payment",
+        headers=auth_headers,
+        json={"payment_method": "bankTransfer"},
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_confirm_payment_rejects_already_confirmed_without_rewriting_confirmed_at(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Repeated confirmation must not rewrite the original manual deposit confirmation time."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 120000,
+            "payment_confirmed": False,
+        },
+    )
+    assert created.status_code == 201
+    sub_id = created.json()["id"]
+
+    first = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/confirm-payment",
+        headers=auth_headers,
+        json={"payment_method": "cash"},
+    )
+    assert first.status_code == 200
+    confirmed_at = first.json()["payment_confirmed_at"]
+
+    second = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/confirm-payment",
+        headers=auth_headers,
+        json={"payment_method": "cash"},
+    )
+    assert second.status_code == 400
+    detail = await client.get(f"/api/v1/subscriptions/{sub_id}", headers=auth_headers)
+    assert detail.status_code == 200
+    assert detail.json()["payment_confirmed_at"] == confirmed_at
+
+
+@pytest.mark.asyncio
 async def test_list_subscriptions(client: AsyncClient, auth_headers, create_test_user):
     """GET /api/v1/subscriptions returns a paginated list."""
     await create_test_user(user_id="test-user-id", role="teacher")

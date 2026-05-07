@@ -251,6 +251,7 @@ class SubscriptionService:
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
+        self._reject_deposit_state_update(sub, update_data)
         self._validate_subscription_update_state(sub, update_data)
         if update_data.get("payment_confirmed") is True:
             now = datetime.now(UTC)
@@ -834,6 +835,11 @@ class SubscriptionService:
         from app.services.notification_service import NotificationService
 
         sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        if sub.payment_confirmed:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment already confirmed",
+            )
         sub.payment_confirmed = True
         if sub.paid_at is None:
             sub.paid_at = datetime.now(UTC)
@@ -856,6 +862,11 @@ class SubscriptionService:
         from app.services.notification_service import NotificationService
 
         sub = await self._get_subscription_for_user(subscription_id, current_user)
+        if self._actor_type(current_user) == "teacher":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Teachers must use confirm-payment for manual tuition deposits",
+            )
         if sub.payment_confirmed:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -868,6 +879,28 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)
+
+    def _reject_deposit_state_update(self, subscription: Any, update_data: dict[str, Any]) -> None:
+        """Keep manual deposit state transitions on dedicated endpoints."""
+        restricted_fields = {
+            "payment_confirmed",
+            "paid_at",
+            "payment_confirmed_at",
+            "payment_method",
+        }
+        for field_name in restricted_fields & update_data.keys():
+            if not self._same_deposit_value(update_data[field_name], getattr(subscription, field_name)):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="Use notify-payment or confirm-payment to change manual tuition deposit state",
+                )
+
+    def _same_deposit_value(self, incoming: Any, current: Any) -> bool:
+        if incoming is None or current is None:
+            return incoming is current
+        if isinstance(incoming, datetime) or isinstance(current, datetime):
+            return incoming == current
+        return self._enum_value(incoming) == self._enum_value(current)
 
     async def _notify_deposit_received(self, subscription: Any, notification_service: Any) -> None:
         """Notify the teacher that a student-side external deposit was reported."""
