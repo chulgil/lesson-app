@@ -501,6 +501,51 @@ async def test_student_sees_general_announcement_in_unread_inbox(
 
 
 @pytest.mark.asyncio
+async def test_parent_sees_general_announcement_in_unread_inbox(
+    client: AsyncClient,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """generalAnnouncement is shared for parents and contributes to unread badge."""
+    await create_test_user(
+        user_id="parent-ann-user",
+        role="parent",
+        name="Parent Notification",
+        email="parent-ann@example.com",
+    )
+
+    db_session.add(
+        Notification(
+            user_id="parent-ann-user",
+            type="generalAnnouncement",
+            priority=NotificationPriority.normal,
+            title="학원 휴강 공지",
+            body="금주는 휴강입니다",
+            is_in_app=True,
+        )
+    )
+    await db_session.flush()
+
+    parent_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'parent-ann-user', 'role': 'parent'})}"
+    }
+
+    list_response = await client.get("/api/v1/notifications", headers=parent_headers)
+    unread_response = await client.get("/api/v1/notifications?is_read=false", headers=parent_headers)
+    count_response = await client.get("/api/v1/notifications/unread-count", headers=parent_headers)
+
+    assert list_response.status_code == 200
+    items = list_response.json()["items"]
+    assert len(items) == 1
+    assert items[0]["type"] == "generalAnnouncement"
+    assert items[0]["is_read"] is False
+    assert unread_response.status_code == 200
+    assert unread_response.json()["items"][0]["type"] == "generalAnnouncement"
+    assert count_response.status_code == 200
+    assert count_response.json() == {"count": 1}
+
+
+@pytest.mark.asyncio
 async def test_teacher_notification_preferences_default_and_patch(
     client: AsyncClient,
     auth_headers,
