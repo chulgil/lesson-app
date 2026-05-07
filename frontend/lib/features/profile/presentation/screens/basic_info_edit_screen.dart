@@ -429,29 +429,13 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   }
 
   Widget _buildAreaInput() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: _areaController,
-            decoration: _inputDecoration(
-              hintText: AppStrings.profileBasicInfoHintArea,
-            ),
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (_) => _addArea(),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space2),
-        IconButton.filled(
-          onPressed: _addArea,
-          icon: const Icon(Icons.add, size: 20),
-          style: IconButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-            foregroundColor: AppColors.paper,
-            minimumSize: const Size(44, 44),
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: _areaController,
+      decoration: _inputDecoration(
+        hintText: AppStrings.profileBasicInfoHintArea,
+      ),
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _addArea(),
     );
   }
 
