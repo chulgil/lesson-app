@@ -36,8 +36,8 @@ class InviteService:
         from app.models.invite import Invite
 
         code = secrets.token_urlsafe(4).upper()[:6]
-        invite_url = f"https://lessonaza.app/invite/{code}"
-        qr_data = f"lessonaza://invite/{code}"
+        invite_url = f"lessonapp://invite/{code}"
+        qr_data = invite_url
 
         invite = Invite(
             creator_id=current_user.id,

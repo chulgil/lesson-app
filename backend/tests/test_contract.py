@@ -331,6 +331,60 @@ async def test_contract_membership_preserves_frontend_lesson_location_id(client,
 
 
 @pytest.mark.asyncio
+async def test_contract_membership_preserves_frontend_lesson_slots(client, auth_headers, create_test_user):
+    """ClassMembership.toJson includes lesson_slots; backend should persist the primary slot."""
+    await create_test_user()
+    student_resp = await client.post(
+        "/api/v1/students",
+        json={"name": "시간학생", "instrument": "piano"},
+        headers=auth_headers,
+    )
+    assert student_resp.status_code == 201
+    class_resp = await client.post(
+        "/api/v1/lessons-classes",
+        json={"name": "수요반", "type": "academy", "payment_type": "parent"},
+        headers=auth_headers,
+    )
+    assert class_resp.status_code == 201
+    class_id = class_resp.json()["id"]
+
+    create_resp = await client.post(
+        f"/api/v1/lessons-classes/{class_id}/memberships",
+        json={
+            "student_id": student_resp.json()["id"],
+            "instrument": "piano",
+            "monthly_fee": 250000,
+            "lesson_duration": 50,
+            "lesson_slots": [
+                {"day_of_week": 2, "start_time": "15:30", "end_time": "16:20"},
+            ],
+        },
+        headers=auth_headers,
+    )
+    assert create_resp.status_code == 201
+    data = create_resp.json()
+    assert data["lesson_slots"] == [
+        {"day_of_week": 2, "start_time": "15:30", "end_time": "16:20"},
+    ]
+
+    update_resp = await client.put(
+        f"/api/v1/lessons-classes/{class_id}/memberships/{data['id']}",
+        json={
+            **data,
+            "lesson_duration": 60,
+            "lesson_slots": [
+                {"day_of_week": 4, "start_time": "18:00", "end_time": "19:00"},
+            ],
+        },
+        headers=auth_headers,
+    )
+    assert update_resp.status_code == 200
+    assert update_resp.json()["lesson_slots"] == [
+        {"day_of_week": 4, "start_time": "18:00", "end_time": "19:00"},
+    ]
+
+
+@pytest.mark.asyncio
 async def test_contract_subscription_preserves_frontend_full_json_fields(client, auth_headers, create_test_user):
     """Subscription.toJson includes billing, discount, and reschedule policy fields."""
     await create_test_user()
@@ -1671,7 +1725,7 @@ async def test_contract_subscription_settings_flat_crud(
     create_resp = await client.post(
         "/api/v1/subscription-settings",
         json={
-            "teacher_id": "teacher-001",
+            "teacher_id": "test-user-id-prof",
             "renewal_alert_threshold": 2,
             "renewal_alert_days": 5,
             "discount_policies": [
@@ -1690,11 +1744,11 @@ async def test_contract_subscription_settings_flat_crud(
     )
     assert create_resp.status_code == 201
     created = create_resp.json()
-    assert created["teacher_id"] == "teacher-001"
+    assert created["teacher_id"] == "test-user-id-prof"
     assert created["organization_id"] is None
 
     teacher_resp = await client.get(
-        "/api/v1/subscription-settings/teacher/teacher-001",
+        "/api/v1/subscription-settings/teacher/test-user-id-prof",
         headers=auth_headers,
     )
     assert teacher_resp.status_code == 200
@@ -1730,6 +1784,42 @@ async def test_contract_subscription_settings_flat_crud(
     )
     assert org_resp.status_code == 200
     assert org_resp.json()["organization_id"] == "org-001"
+
+
+@pytest.mark.asyncio
+async def test_subscription_settings_flat_routes_are_scoped_to_teacher_profile(client, create_test_user):
+    """Teachers cannot create or mutate subscription settings for another teacher."""
+    await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-settings@test.com")
+    await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-settings@test.com")
+
+    teacher_a_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-a-id', 'role': 'teacher'})}"
+    }
+    teacher_b_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-b-id', 'role': 'teacher'})}"
+    }
+
+    cross_create = await client.post(
+        "/api/v1/subscription-settings",
+        json={"teacher_id": "teacher-b-id-prof", "renewal_alert_days": 5},
+        headers=teacher_a_headers,
+    )
+    assert cross_create.status_code == 403
+
+    own_create = await client.post(
+        "/api/v1/subscription-settings",
+        json={"teacher_id": "teacher-b-id-prof", "renewal_alert_days": 5},
+        headers=teacher_b_headers,
+    )
+    assert own_create.status_code == 201
+    settings_id = own_create.json()["id"]
+
+    cross_update = await client.put(
+        f"/api/v1/subscription-settings/{settings_id}",
+        json={"renewal_alert_days": 11},
+        headers=teacher_a_headers,
+    )
+    assert cross_update.status_code == 403
 
 
 @pytest.mark.asyncio

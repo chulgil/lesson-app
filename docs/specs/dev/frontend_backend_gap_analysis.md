@@ -98,7 +98,7 @@
 | 38 | Parent | ChildProfileRepository | ✅ 있음 | LOW | 백엔드 `GET /parents/{parent_id}/child-profiles`, `POST /parents/child-profiles`, `GET/PUT/DELETE /parents/child-profiles/{child_id}`, teacher connect/disconnect 지원. 프론트 remote adapter 연결 필요 |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |
-| 40 | Subscription | SubscriptionSettingsRepository | ❌ | LOW | **Orphan** — Provider 미연결 |
+| 40 | Subscription | SubscriptionSettingsRepository | ✅ 있음 | LOW | 백엔드 `/subscription-settings` flat CRUD와 frontend remote class 존재. Provider 미연결 상태이며, write는 현재 teacher profile 소유권으로 제한 |
 
 ### 2-3. 2026-05-06 백엔드 mock replacement 재검토
 
@@ -237,7 +237,7 @@
 | 10 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
 | 11 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
 | 12 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
-| 13 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | Orphan 상태 해소 |
+| 13 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | 백엔드 API와 remote class는 존재. Provider 미연결 상태 해소 |
 | 14 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
 
 ---
@@ -251,7 +251,7 @@ Mock-only:                13개 (32.5%)
 API 경로 일치:             24/27 Remote (88.9%)
 API 경로 불일치:            3건 (CRITICAL 1 + HIGH 2)
 백엔드 전용 엔드포인트:     ~30개 (프론트 미사용)
-Orphan Repository:         1개 (SubscriptionSettings)
+Provider 미연결 Repository: 1개 (SubscriptionSettings)
 ```
 
 ---

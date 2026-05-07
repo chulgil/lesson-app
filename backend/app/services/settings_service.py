@@ -95,9 +95,11 @@ class SettingsService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
         return settings
 
-    async def create_subscription_settings(self, data: dict) -> Any:
+    async def create_subscription_settings(self, data: dict, current_user: Any | None = None) -> Any:
         from app.models.settings import SubscriptionSettings
 
+        if current_user is not None:
+            await self._assert_subscription_settings_owner(data, current_user)
         settings = SubscriptionSettings(**data)
         self.db.add(settings)
         await self.db.flush()
@@ -113,18 +115,45 @@ class SettingsService:
         await self.db.refresh(settings)
         return settings
 
-    async def update_subscription_settings_by_id(self, settings_id: str, data: dict) -> Any:
+    async def update_subscription_settings_by_id(
+        self,
+        settings_id: str,
+        data: dict,
+        current_user: Any | None = None,
+    ) -> Any:
         from app.models.settings import SubscriptionSettings
 
         settings = await self.db.get(SubscriptionSettings, settings_id)
         if settings is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
+        if current_user is not None:
+            await self._assert_subscription_settings_owner(
+                {
+                    "teacher_id": data.get("teacher_id", settings.teacher_id),
+                    "organization_id": data.get("organization_id", settings.organization_id),
+                },
+                current_user,
+            )
         for key, value in data.items():
             if value is not None:
                 setattr(settings, key, value)
         await self.db.flush()
         await self.db.refresh(settings)
         return settings
+
+    async def _assert_subscription_settings_owner(self, data: dict, current_user: Any) -> None:
+        """Allow flat subscription settings writes only for the current teacher profile."""
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher_id = data.get("teacher_id")
+        organization_id = data.get("organization_id")
+        if organization_id is not None:
+            return
+        if teacher_id is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="teacher_id is required")
+        current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if teacher_id != current_teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     # -----------------------------------------------------------------------
     # Proposal Settings

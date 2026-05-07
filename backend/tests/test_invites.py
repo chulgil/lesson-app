@@ -29,6 +29,26 @@ async def test_create_invite(client: AsyncClient, auth_headers, create_test_user
 
 
 @pytest.mark.asyncio
+async def test_create_invite_returns_frontend_deep_link_qr_contract(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Created invites should match the frontend QR parser and mock repository URL contract."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/invites/",
+        headers=auth_headers,
+        json={},
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    expected_link = f"lessonapp://invite/{data['invite_code']}"
+    assert data["invite_url"] == expected_link
+    assert data["qr_code_data"] == expected_link
+
+
+@pytest.mark.asyncio
 async def test_list_invites(client: AsyncClient, auth_headers, create_test_user):
     """GET /invites/ should return paginated invites."""
     await create_test_user(user_id="test-user-id", role="teacher")

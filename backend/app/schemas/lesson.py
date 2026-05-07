@@ -2,7 +2,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Lesson class (group / academy)
@@ -49,6 +49,14 @@ class LessonClassUpdate(BaseModel):
     address: str | None = None
 
 
+class LessonSlotPayload(BaseModel):
+    """Frontend recurring lesson slot payload."""
+
+    day_of_week: int
+    start_time: str
+    end_time: str
+
+
 class MembershipCreate(BaseModel):
     """Add a student membership to a lesson class."""
 
@@ -60,6 +68,7 @@ class MembershipCreate(BaseModel):
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_slots: list[LessonSlotPayload] = Field(default_factory=list)
     lesson_duration: int = 60
     notes: str | None = None
     lesson_location_id: str | None = None
@@ -76,6 +85,7 @@ class MembershipUpdate(BaseModel):
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_slots: list[LessonSlotPayload] | None = None
     lesson_duration: int | None = None
     notes: str | None = None
     lesson_location_id: str | None = None
@@ -97,6 +107,7 @@ class MembershipResponse(BaseModel):
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_slots: list[LessonSlotPayload] = Field(default_factory=list)
     lesson_duration: int = 60
     notes: str | None = None
     lesson_location_id: str | None = None

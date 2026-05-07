@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -17,6 +17,7 @@ from app.schemas.lesson import (
     LessonCreate,
     LessonFeedbackUpdate,
     LessonResponse,
+    LessonSlotPayload,
     LessonUpdate,
     MembershipCreate,
     MembershipResponse,
@@ -363,6 +364,56 @@ class LessonService:
     # Memberships
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _duration_from_slot(slot: LessonSlotPayload) -> int:
+        start = datetime.strptime(slot.start_time, "%H:%M")
+        end = datetime.strptime(slot.end_time, "%H:%M")
+        if end <= start:
+            end += timedelta(days=1)
+        return int((end - start).total_seconds() // 60)
+
+    @staticmethod
+    def _day_of_week(value: str | None) -> int | None:
+        if value is None:
+            return None
+        if value.isdigit():
+            return int(value)
+        return {
+            "mon": 0,
+            "monday": 0,
+            "tue": 1,
+            "tuesday": 1,
+            "wed": 2,
+            "wednesday": 2,
+            "thu": 3,
+            "thursday": 3,
+            "fri": 4,
+            "friday": 4,
+            "sat": 5,
+            "saturday": 5,
+            "sun": 6,
+            "sunday": 6,
+        }.get(value.lower())
+
+    @staticmethod
+    def _end_time(start_time: str, duration_minutes: int) -> str:
+        start = datetime.strptime(start_time, "%H:%M")
+        return (start + timedelta(minutes=duration_minutes)).strftime("%H:%M")
+
+    @classmethod
+    def _membership_response(cls, membership: Any) -> MembershipResponse:
+        response = MembershipResponse.model_validate(membership)
+        day_of_week = cls._day_of_week(membership.lesson_day)
+        if day_of_week is not None and membership.lesson_time is not None:
+            response.lesson_slots = [
+                LessonSlotPayload(
+                    day_of_week=day_of_week,
+                    start_time=membership.lesson_time,
+                    end_time=cls._end_time(membership.lesson_time, membership.lesson_duration),
+                )
+            ]
+        return response
+
     async def get_memberships_by_class(
         self, class_id: str, current_user: Any
     ) -> list[MembershipResponse]:
@@ -373,7 +424,7 @@ class LessonService:
         result = await self.db.scalars(
             select(ClassMembership).where(ClassMembership.lesson_class_id == class_id)
         )
-        return [MembershipResponse.model_validate(m) for m in result.all()]
+        return [self._membership_response(m) for m in result.all()]
 
     async def get_memberships(
         self,
@@ -425,7 +476,7 @@ class LessonService:
             query = query.where(ClassMembership.student_id == current_user.id)
 
         result = await self.db.scalars(query)
-        return [MembershipResponse.model_validate(membership) for membership in result.all()]
+        return [self._membership_response(membership) for membership in result.all()]
 
     async def get_membership_by_id(self, membership_id: str, current_user: Any) -> MembershipResponse:
         """Return a single membership."""
@@ -435,7 +486,7 @@ class LessonService:
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
         await self._assert_membership_access(m, current_user)
-        return MembershipResponse.model_validate(m)
+        return self._membership_response(m)
 
     async def add_membership(
         self, class_id: str, data: MembershipCreate, current_user: Any
@@ -444,21 +495,32 @@ class LessonService:
         from app.models.lesson import ClassMembership
 
         await self._get_accessible_class(class_id, current_user)
+        lesson_day = data.lesson_day
+        lesson_time = data.lesson_time
+        lesson_duration = data.lesson_duration
+        if data.lesson_slots:
+            primary_slot = data.lesson_slots[0]
+            lesson_day = str(primary_slot.day_of_week)
+            lesson_time = primary_slot.start_time
+            if "lesson_duration" not in data.model_fields_set:
+                lesson_duration = self._duration_from_slot(primary_slot)
+
         membership = ClassMembership(
             lesson_class_id=class_id,
             student_id=data.student_id,
             instrument=data.instrument or "",
             monthly_fee=data.monthly_fee or 0,
             lessons_per_week=data.lessons_per_week or 1,
-            lesson_day=data.lesson_day,
-            lesson_time=data.lesson_time,
+            lesson_day=lesson_day,
+            lesson_time=lesson_time,
+            lesson_duration=lesson_duration,
             lesson_location_id=data.lesson_location_id,
             travel_time_minutes=data.travel_time_minutes,
         )
         self.db.add(membership)
         await self.db.flush()
         await self.db.refresh(membership)
-        return MembershipResponse.model_validate(membership)
+        return self._membership_response(membership)
 
     async def update_membership(
         self, class_id: str, membership_id: str, data: MembershipUpdate, current_user: Any
@@ -471,12 +533,18 @@ class LessonService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
         await self._assert_membership_access(m, current_user)
 
-        update_data = data.model_dump(exclude_unset=True)
+        update_data = data.model_dump(exclude_unset=True, exclude={"lesson_slots"})
+        if data.lesson_slots:
+            primary_slot = data.lesson_slots[0]
+            update_data["lesson_day"] = str(primary_slot.day_of_week)
+            update_data["lesson_time"] = primary_slot.start_time
+            if "lesson_duration" not in data.model_fields_set:
+                update_data["lesson_duration"] = self._duration_from_slot(primary_slot)
         for key, value in update_data.items():
             setattr(m, key, value)
         await self.db.flush()
         await self.db.refresh(m)
-        return MembershipResponse.model_validate(m)
+        return self._membership_response(m)
 
     async def remove_membership(self, class_id: str, membership_id: str, current_user: Any) -> None:
         """Remove a membership from a class."""
@@ -498,7 +566,7 @@ class LessonService:
         m.status = ClassMembership.MembershipStatus(new_status)
         await self.db.flush()
         await self.db.refresh(m)
-        return MembershipResponse.model_validate(m)
+        return self._membership_response(m)
 
     async def remove_membership_by_id(self, membership_id: str, current_user: Any) -> None:
         """Remove a membership without requiring class_id context."""

@@ -60,7 +60,8 @@ async def create_subscription_settings(
 ) -> SubscriptionSettingsResponse:
     service = SettingsService(db)
     result: SubscriptionSettingsResponse = await service.create_subscription_settings(
-        body.model_dump(exclude_none=True)
+        body.model_dump(exclude_none=True),
+        current_user=current_user,
     )
     return result
 
@@ -81,5 +82,6 @@ async def update_subscription_settings(
     result: SubscriptionSettingsResponse = await service.update_subscription_settings_by_id(
         settings_id,
         body.model_dump(exclude_none=True),
+        current_user=current_user,
     )
     return result
