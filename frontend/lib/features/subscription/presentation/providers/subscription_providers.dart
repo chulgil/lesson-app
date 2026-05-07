@@ -12,13 +12,14 @@ import '../../domain/repositories/subscription_repository.dart';
 part 'subscription_providers.g.dart';
 
 /// Repository provider for Subscription - switches between Mock and Remote.
-final subscriptionRepositoryProvider = Provider<SubscriptionRepository>(
-  (ref) => createRepository<SubscriptionRepository>(
+@Riverpod(keepAlive: true)
+SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
+  return createRepository<SubscriptionRepository>(
     ref: ref,
     mock: () => MockSubscriptionRepository(),
     remote: (api) => RemoteSubscriptionRepository(api),
-  ),
-);
+  );
+}
 
 /// Get all subscriptions for a student.
 @riverpod

@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../relationship/relationship_facade.dart';
 import '../../../schedule/schedule_facade.dart';
@@ -9,50 +9,58 @@ import '../../domain/entities/subscription.dart';
 import 'lesson_policy_providers.dart';
 import 'subscription_providers.dart';
 
-final subscriptionIssueStudentsProvider = FutureProvider<List<Student>>((
-  ref,
+part 'subscription_issue_flow_provider.g.dart';
+
+@Riverpod(keepAlive: true)
+Future<List<Student>> subscriptionIssueStudents(
+  SubscriptionIssueStudentsRef ref,
 ) async {
   return ref.watch(studentsProvider.future);
-});
+}
 
-final subscriptionIssueStudentProvider =
-    FutureProvider.family<Student?, String>((ref, studentId) async {
-      return ref.watch(studentProvider(studentId).future);
-    });
+@Riverpod(keepAlive: true)
+Future<Student?> subscriptionIssueStudent(
+  SubscriptionIssueStudentRef ref,
+  String studentId,
+) async {
+  return ref.watch(studentProvider(studentId).future);
+}
 
-final subscriptionIssueMembershipsProvider =
-    FutureProvider.family<List<ClassMembership>, String>((
-      ref,
-      studentId,
-    ) async {
-      return ref.watch(studentMembershipsProvider(studentId).future);
-    });
+@Riverpod(keepAlive: true)
+Future<List<ClassMembership>> subscriptionIssueMemberships(
+  SubscriptionIssueMembershipsRef ref,
+  String studentId,
+) async {
+  return ref.watch(studentMembershipsProvider(studentId).future);
+}
 
-final subscriptionIssueEffectivePolicyProvider =
-    FutureProvider.family<LessonPolicy?, ClassMembership>((
-      ref,
-      membership,
-    ) async {
-      final lessonClass = await ref.watch(
-        lessonClassProvider(membership.lessonClassId).future,
-      );
-      if (lessonClass == null) return null;
+@Riverpod(keepAlive: true)
+Future<LessonPolicy?> subscriptionIssueEffectivePolicy(
+  SubscriptionIssueEffectivePolicyRef ref,
+  ClassMembership membership,
+) async {
+  final lessonClass = await ref.watch(
+    lessonClassProvider(membership.lessonClassId).future,
+  );
+  if (lessonClass == null) return null;
 
-      return ref.watch(
-        effectivePolicyProvider(
-          teacherId: lessonClass.teacherId,
-          lessonClassId: membership.lessonClassId,
-        ).future,
-      );
-    });
+  return ref.watch(
+    effectivePolicyProvider(
+      teacherId: lessonClass.teacherId,
+      lessonClassId: membership.lessonClassId,
+    ).future,
+  );
+}
 
-final subscriptionIssueFlowControllerProvider =
-    Provider<SubscriptionIssueFlowController>(
-      SubscriptionIssueFlowController.new,
-    );
+@Riverpod(keepAlive: true)
+SubscriptionIssueFlowController subscriptionIssueFlowController(
+  SubscriptionIssueFlowControllerRef ref,
+) {
+  return SubscriptionIssueFlowController(ref);
+}
 
 class SubscriptionIssueFlowController {
-  final Ref _ref;
+  final SubscriptionIssueFlowControllerRef _ref;
 
   SubscriptionIssueFlowController(this._ref);
 
