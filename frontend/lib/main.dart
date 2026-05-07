@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'core/startup/app_bootstrap.dart';
 import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
+import 'core/sync/presentation/providers/sync_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
 
@@ -46,7 +49,19 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp> {
       // Warm up tuner (starts microphone stream without processing)
       // This pre-configures audio session, eliminating delay when opening practice tools
       ref.read(tunerProvider.notifier).warmUp();
+      unawaited(_initializeSyncService());
     });
+  }
+
+  @override
+  void dispose() {
+    unawaited(ref.read(syncServiceProvider).dispose());
+    super.dispose();
+  }
+
+  Future<void> _initializeSyncService() async {
+    final syncService = ref.read(syncServiceProvider);
+    await syncService.initialize();
   }
 
   @override
