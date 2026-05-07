@@ -1,25 +1,26 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import 'practice_repertoire_repository_provider.dart';
 
+part 'practice_repertoire_crud_provider.g.dart';
+
 /// Provider for student's repertoires list
-final studentRepertoiresProvider = FutureProvider.family<List<PracticeRepertoire>, String>(
-  (ref, studentId) async {
-    final repository = ref.watch(practiceRepertoireRepositoryProvider);
-    return repository.getRepertoires(studentId);
-  },
-);
+@Riverpod(keepAlive: true)
+Future<List<PracticeRepertoire>> studentRepertoires(
+  StudentRepertoiresRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(practiceRepertoireRepositoryProvider);
+  return repository.getRepertoires(studentId);
+}
 
 /// Parameters for date-filtered repertoires
 class RepertoiresForDateParams {
   final String studentId;
   final DateTime date;
 
-  const RepertoiresForDateParams({
-    required this.studentId,
-    required this.date,
-  });
+  const RepertoiresForDateParams({required this.studentId, required this.date});
 
   @override
   bool operator ==(Object other) =>
@@ -36,32 +37,35 @@ class RepertoiresForDateParams {
 }
 
 /// Provider for student's repertoires filtered by date
-final repertoiresForDateProvider =
-    FutureProvider.family<List<PracticeRepertoire>, RepertoiresForDateParams>(
-  (ref, params) async {
-    final repository = ref.watch(practiceRepertoireRepositoryProvider);
-    return repository.getRepertoiresForDate(params.studentId, params.date);
-  },
-);
+@Riverpod(keepAlive: true)
+Future<List<PracticeRepertoire>> repertoiresForDate(
+  RepertoiresForDateRef ref,
+  RepertoiresForDateParams params,
+) async {
+  final repository = ref.watch(practiceRepertoireRepositoryProvider);
+  return repository.getRepertoiresForDate(params.studentId, params.date);
+}
 
 /// Provider for a single repertoire
-final repertoireProvider = FutureProvider.family<PracticeRepertoire?, String>(
-  (ref, repertoireId) async {
-    final repository = ref.watch(practiceRepertoireRepositoryProvider);
-    return repository.getRepertoire(repertoireId);
-  },
-);
+@Riverpod(keepAlive: true)
+Future<PracticeRepertoire?> repertoire(
+  RepertoireRef ref,
+  String repertoireId,
+) async {
+  final repository = ref.watch(practiceRepertoireRepositoryProvider);
+  return repository.getRepertoire(repertoireId);
+}
 
 /// Provider for a single section
-final sectionProvider = FutureProvider.family<PracticeSection?, String>(
-  (ref, sectionId) async {
-    final repository = ref.watch(practiceRepertoireRepositoryProvider);
-    return repository.getSection(sectionId);
-  },
-);
+@Riverpod(keepAlive: true)
+Future<PracticeSection?> section(SectionRef ref, String sectionId) async {
+  final repository = ref.watch(practiceRepertoireRepositoryProvider);
+  return repository.getSection(sectionId);
+}
 
 /// Notifier for repertoire CRUD operations
-class RepertoireCrudNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class RepertoireCrud extends _$RepertoireCrud {
   @override
   Future<void> build() async {}
 
@@ -93,9 +97,11 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
 
       // Also invalidate date-based provider for practice tab
       final today = DateTime.now();
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: studentId, date: today),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: today),
+        ),
+      );
 
       state = const AsyncData(null);
       return result;
@@ -106,7 +112,9 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
   }
 
   /// Update an existing repertoire
-  Future<PracticeRepertoire> updateRepertoire(PracticeRepertoire repertoire) async {
+  Future<PracticeRepertoire> updateRepertoire(
+    PracticeRepertoire repertoire,
+  ) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
@@ -118,9 +126,14 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
 
       // Also invalidate date-based provider for practice tab
       final today = DateTime.now();
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: repertoire.studentId, date: today),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(
+            studentId: repertoire.studentId,
+            date: today,
+          ),
+        ),
+      );
 
       state = const AsyncData(null);
       return result;
@@ -142,9 +155,11 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
 
       // Also invalidate date-based provider for practice tab
       final today = DateTime.now();
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: studentId, date: today),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: today),
+        ),
+      );
 
       state = const AsyncData(null);
     } catch (e, st) {
@@ -154,14 +169,11 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
   }
 }
 
-/// Provider for repertoire CRUD operations
-final repertoireCrudProvider =
-    AsyncNotifierProvider<RepertoireCrudNotifier, void>(
-  RepertoireCrudNotifier.new,
-);
+typedef RepertoireCrudNotifier = RepertoireCrud;
 
 /// Notifier for section CRUD operations
-class SectionCrudNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class SectionCrud extends _$SectionCrud {
   @override
   Future<void> build() async {}
 
@@ -215,8 +227,10 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   }
 
   /// Update an existing section
-  Future<PracticeSection> updateSection(PracticeSection section,
-      {String? studentId}) async {
+  Future<PracticeSection> updateSection(
+    PracticeSection section, {
+    String? studentId,
+  }) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
@@ -230,9 +244,11 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
       if (studentId != null) {
         ref.invalidate(studentRepertoiresProvider(studentId));
         final today = DateTime.now();
-        ref.invalidate(repertoiresForDateProvider(
-          RepertoiresForDateParams(studentId: studentId, date: today),
-        ));
+        ref.invalidate(
+          repertoiresForDateProvider(
+            RepertoiresForDateParams(studentId: studentId, date: today),
+          ),
+        );
       }
 
       state = const AsyncData(null);
@@ -272,7 +288,10 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
-      final result = await repository.toggleSectionComplete(sectionId, date: date);
+      final result = await repository.toggleSectionComplete(
+        sectionId,
+        date: date,
+      );
 
       // Invalidate related providers
       ref.invalidate(repertoireProvider(repertoireId));
@@ -283,9 +302,11 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
         ref.invalidate(studentRepertoiresProvider(studentId));
         // Invalidate the target date's provider for calendar sync
         final targetDate = date ?? DateTime.now();
-        ref.invalidate(repertoiresForDateProvider(
-          RepertoiresForDateParams(studentId: studentId, date: targetDate),
-        ));
+        ref.invalidate(
+          repertoiresForDateProvider(
+            RepertoiresForDateParams(studentId: studentId, date: targetDate),
+          ),
+        );
       }
 
       state = const AsyncData(null);
@@ -305,8 +326,10 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
-      final result =
-          await repository.incrementPracticeCount(sectionId, practiceSeconds);
+      final result = await repository.incrementPracticeCount(
+        sectionId,
+        practiceSeconds,
+      );
 
       // Invalidate related providers
       ref.invalidate(repertoireProvider(repertoireId));
@@ -336,9 +359,11 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
       ref.invalidate(repertoireProvider(repertoireId));
       ref.invalidate(sectionProvider(sectionId));
       ref.invalidate(studentRepertoiresProvider(studentId));
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: studentId, date: date),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: date),
+        ),
+      );
 
       state = const AsyncData(null);
       return result;
@@ -373,13 +398,11 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   }
 }
 
-/// Provider for section CRUD operations
-final sectionCrudProvider = AsyncNotifierProvider<SectionCrudNotifier, void>(
-  SectionCrudNotifier.new,
-);
+typedef SectionCrudNotifier = SectionCrud;
 
 /// Notifier for recording CRUD operations
-class RecordingCrudNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class RecordingCrud extends _$RecordingCrud {
   @override
   Future<void> build() async {}
 
@@ -442,8 +465,10 @@ class RecordingCrudNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
-      final result =
-          await repository.setRepresentativeRecording(sectionId, recordingId);
+      final result = await repository.setRepresentativeRecording(
+        sectionId,
+        recordingId,
+      );
 
       // Invalidate related providers
       ref.invalidate(sectionProvider(sectionId));
@@ -458,8 +483,4 @@ class RecordingCrudNotifier extends AsyncNotifier<void> {
   }
 }
 
-/// Provider for recording CRUD operations
-final recordingCrudProvider =
-    AsyncNotifierProvider<RecordingCrudNotifier, void>(
-  RecordingCrudNotifier.new,
-);
+typedef RecordingCrudNotifier = RecordingCrud;
