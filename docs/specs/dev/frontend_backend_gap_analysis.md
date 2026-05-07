@@ -49,7 +49,7 @@
 
 ## 2. Repository 구현 상태 매트릭스
 
-### 2-1. Remote 구현 완료 (26개) — `USE_MOCK=false` 시 Remote 동작
+### 2-1. Remote 구현 완료 (27개) — `USE_MOCK=false` 시 Remote 동작
 
 | # | 도메인 | Repository | Mock | Remote | 비고 |
 |---|--------|-----------|:----:|:------:|------|
@@ -61,7 +61,7 @@
 | 6 | Practice | PracticeRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
 | 7 | Practice | PracticeGoalRepository | ✅ | ✅ | |
 | 8 | Practice | PracticeStatsRepository | ✅ | ✅ | |
-| 9 | Practice | RecordingRepository | ✅ | ✅ | multipart upload |
+| 9 | Practice | RecordingRepository | ✅ | ✅ | multipart upload. 목록은 `section_id`와 `repertoire_id` 필터를 모두 지원하고 `server_url`, `recorded_at`, `storage_status`, `type` alias를 제공 |
 | 10 | Subscription | SubscriptionRepository | ✅ | ✅ | |
 | 11 | Subscription | SubscriptionProposalRepository | ✅ | ✅ | |
 | 12 | Subscription | SubscriptionTemplateRepository | ✅ | ✅ | |
@@ -79,8 +79,9 @@
 | 24 | Search | TeacherRepository | ✅ | ✅ | |
 | 25 | Search | TeacherSearchRepository | ✅ | ✅ | |
 | 26 | Settings | SettingsRepository | ✅ | ✅ | |
+| 27 | Student | LocationRepository | ✅ | ✅ | `/locations` CRUD/list/default/deactivate/reactivate 지원. class-scoped location은 `LessonClass.teacher_id` 소유권을 검증 |
 
-### 2-2. Mock-only — Remote 미구현 (14개)
+### 2-2. Mock-only — Remote 미구현 (13개)
 
 | # | 도메인 | Repository | 백엔드 API | 긴급도 | 비고 |
 |---|--------|-----------|:----------:|:------:|------|
@@ -93,7 +94,6 @@
 | 33 | Lesson | LessonPolicyRepository | ✅ 있음 | LOW | `/lesson-policies/teacher/{id}`, `/lesson-policies/class/{id}`, `/lesson-policies/effective` 지원. class policy 우선, teacher default fallback |
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
-| 36 | Student | LocationRepository | ❌ | LOW | 레슨 장소 |
 | 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | `/schedule/confirmation-cards` 응답을 Flutter snake_case 계약과 기존 camelCase alias 모두에 맞춤. teacher profile id 접근과 중복 booking guard 포함 |
 | 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
@@ -235,7 +235,7 @@
 | 8 | PaymentRepository Remote 구현 | 결제 기능 별도 설계 필요 |
 | 9 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
 | 10 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
-| 11 | LocationRepository Remote 구현 | 레슨 장소 관리 |
+| 11 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
 | 12 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | Orphan 상태 해소 |
 | 13 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
 
@@ -245,9 +245,9 @@
 
 ```
 총 Repository:            40개
-Remote 구현 완료:          26개 (65%)
-Mock-only:                14개 (35%)
-API 경로 일치:             23/26 Remote (88.5%)
+Remote 구현 완료:          27개 (67.5%)
+Mock-only:                13개 (32.5%)
+API 경로 일치:             24/27 Remote (88.9%)
 API 경로 불일치:            3건 (CRITICAL 1 + HIGH 2)
 백엔드 전용 엔드포인트:     ~30개 (프론트 미사용)
 Orphan Repository:         1개 (SubscriptionSettings)

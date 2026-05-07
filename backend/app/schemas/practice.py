@@ -3,7 +3,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 
 def _camel_alias(field_name: str) -> str:
@@ -316,6 +316,30 @@ class RecordingResponse(BaseModel):
     bpm: int | None = None
     is_representative: bool = False
     created_at: _dt.datetime | None = None
+
+    @computed_field
+    @property
+    def server_url(self) -> str | None:
+        """Frontend recording repository alias for file_url."""
+        return self.file_url
+
+    @computed_field
+    @property
+    def recorded_at(self) -> _dt.datetime | None:
+        """Frontend recording repository alias for created_at."""
+        return self.created_at
+
+    @computed_field
+    @property
+    def storage_status(self) -> str:
+        """Frontend-friendly storage state for persisted recordings."""
+        return "active" if self.file_url else "pending"
+
+    @computed_field
+    @property
+    def type(self) -> str:
+        """Frontend recording type discriminator."""
+        return "student"
 
 
 class RecordingUploadResponse(BaseModel):

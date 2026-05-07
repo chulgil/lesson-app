@@ -1103,6 +1103,89 @@ async def test_create_subscription_proposal_rejects_foreign_templates(
 
 
 @pytest.mark.asyncio
+async def test_create_subscription_proposal_rejects_lesson_request_for_different_student(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """A proposal cannot link a lesson request that belongs to another student."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.schedule import LessonRequest
+
+    lesson_request = LessonRequest(
+        student_id="other-student",
+        teacher_id="test-user-id-prof",
+        request_type="regular",
+        status="timeConfirmed",
+        expires_at=datetime.now(UTC) + timedelta(days=7),
+    )
+    db_session.add(lesson_request)
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "lesson_request_id": lesson_request.id,
+            "message": "Please review this subscription plan",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_create_subscription_proposal_rejects_previous_subscription_for_different_student(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """A renewal proposal cannot reference another student's subscription."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    from datetime import UTC, datetime
+
+    from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
+
+    membership_id = await _create_membership(
+        db_session,
+        teacher_id="test-user-id-prof",
+        student_id="other-student",
+    )
+    subscription = Subscription(
+        student_id="other-student",
+        membership_id=membership_id,
+        type=SubscriptionType.monthly,
+        total_lessons=4,
+        amount=200000,
+        start_date=datetime(2026, 5, 1, tzinfo=UTC).date(),
+        status=SubscriptionStatus.active,
+    )
+    db_session.add(subscription)
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "previous_subscription_id": subscription.id,
+            "proposal_type": "renewal",
+            "is_renewal": True,
+            "message": "Please review this subscription renewal",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_subscription_proposal_notify_payment_action_marks_deposit_notified(
     client: AsyncClient,
     auth_headers,

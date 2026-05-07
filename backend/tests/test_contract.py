@@ -683,6 +683,61 @@ async def test_location_crud_is_scoped_to_owner(client, create_test_user):
     assert owner_get.json()["is_active"] is True
 
 
+@pytest.mark.asyncio
+async def test_location_class_scope_is_validated_against_teacher_profile(client, create_test_user, db_session):
+    """Teachers cannot bind locations to another teacher's lesson class."""
+    from app.models.lesson import LessonClass
+
+    await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-class-location@test.com")
+    await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-class-location@test.com")
+
+    teacher_a_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-a-id', 'role': 'teacher'})}"
+    }
+
+    foreign_class = LessonClass(
+        id="teacher-b-location-class",
+        teacher_id="teacher-b-id-prof",
+        name="Teacher B Class",
+        type="private",
+    )
+    db_session.add(foreign_class)
+    await db_session.flush()
+
+    cross_class_create = await client.post(
+        "/api/v1/locations",
+        json={
+            "lesson_class_id": "teacher-b-location-class",
+            "name": "Hijacked foreign class studio",
+            "type": "teacherStudio",
+        },
+        headers=teacher_a_headers,
+    )
+    assert cross_class_create.status_code == 403
+
+    cross_class_list = await client.get(
+        "/api/v1/locations?class_id=teacher-b-location-class",
+        headers=teacher_a_headers,
+    )
+    assert cross_class_list.status_code == 403
+
+    own_location = await client.post(
+        "/api/v1/locations",
+        json={
+            "name": "Teacher A Studio",
+            "type": "teacherStudio",
+        },
+        headers=teacher_a_headers,
+    )
+    assert own_location.status_code == 201
+
+    cross_default_scope = await client.patch(
+        f"/api/v1/locations/{own_location.json()['id']}/default?class_id=teacher-b-location-class",
+        headers=teacher_a_headers,
+    )
+    assert cross_default_scope.status_code == 403
+
+
 # ---------------------------------------------------------------------------
 # Schedule exception contracts
 # ---------------------------------------------------------------------------

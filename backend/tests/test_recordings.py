@@ -476,6 +476,60 @@ async def test_upload_recording_saves_owner_and_storage_key(
 
 
 @pytest.mark.asyncio
+async def test_list_recordings_supports_repertoire_filter_and_frontend_aliases(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """GET /api/v1/recordings can replace the Flutter remote recording contract."""
+    await create_test_user(user_id="test-user-id", role="student")
+
+    from app.models.practice import PracticeRecording
+
+    db_session.add_all(
+        [
+            PracticeRecording(
+                id="filtered-recording-id",
+                section_id="section-001",
+                student_id="test-user-id",
+                file_path="recordings/filtered.m4a",
+                file_key="recordings/filtered.m4a",
+                file_url="https://storage.example/filtered.m4a",
+                duration_seconds=120,
+                is_representative=True,
+            ),
+            PracticeRecording(
+                id="other-section-recording-id",
+                section_id="section-002",
+                student_id="test-user-id",
+                file_path="recordings/other-section.m4a",
+                file_key="recordings/other-section.m4a",
+                file_url="https://storage.example/other-section.m4a",
+                duration_seconds=180,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/recordings",
+        headers=auth_headers,
+        params={"repertoire_id": "section-001"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    item = data["items"][0]
+    assert item["id"] == "filtered-recording-id"
+    assert item["server_url"] == "https://storage.example/filtered.m4a"
+    assert item["recorded_at"] == item["created_at"]
+    assert item["storage_status"] == "active"
+    assert item["type"] == "student"
+
+
+@pytest.mark.asyncio
 async def test_share_recording(client: AsyncClient, auth_headers, create_test_user):
     """POST /api/v1/recordings/{id}/share returns 404 for non-existent recording."""
     await create_test_user(user_id="test-user-id", role="teacher")

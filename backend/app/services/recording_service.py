@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, UploadFile, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -68,14 +68,24 @@ class RecordingService:
         size: int,
         offset: int,
         section_id: str | None = None,
+        repertoire_id: str | None = None,
         student_id: str | None = None,
     ) -> PaginatedResponse[RecordingResponse]:
         """List recordings with optional filters."""
-        from app.models.practice import PracticeRecording
+        from app.models.practice import PracticeRecording, PracticeSection
 
         query = select(PracticeRecording).where(await self._access_filter(PracticeRecording, user))
         if section_id:
             query = query.where(PracticeRecording.section_id == section_id)
+        if repertoire_id:
+            query = query.where(
+                or_(
+                    PracticeRecording.section_id == repertoire_id,
+                    PracticeRecording.section_id.in_(
+                        select(PracticeSection.id).where(PracticeSection.repertoire_id == repertoire_id)
+                    ),
+                )
+            )
         if student_id:
             query = query.where(PracticeRecording.student_id == student_id)
 

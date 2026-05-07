@@ -59,6 +59,7 @@ async def list_recordings(
     current_user: Annotated[User, Depends(get_current_user)],
     pagination: Annotated[dict, Depends(get_pagination)],
     section_id: str | None = None,
+    repertoire_id: str | None = None,
     student_id: str | None = None,
 ) -> PaginatedResponse[RecordingResponse]:
     """List recordings with optional filters."""
@@ -69,6 +70,7 @@ async def list_recordings(
         size=pagination["size"],
         offset=pagination["offset"],
         section_id=section_id,
+        repertoire_id=repertoire_id,
         student_id=student_id,
     )
 

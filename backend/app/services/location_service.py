@@ -56,6 +56,9 @@ class LocationService:
         """Create a new lesson location."""
         from app.models.lesson import LessonLocation
 
+        if data.lesson_class_id:
+            await self._assert_lesson_class_owner(data.lesson_class_id, owner_id)
+
         location = LessonLocation(
             owner_id=owner_id,
             **data.model_dump(),
@@ -87,6 +90,8 @@ class LocationService:
         location = await self._get_owned_location(location_id, current_user)
 
         default_class_id = class_id or location.lesson_class_id
+        if default_class_id and current_user is not None:
+            await self._assert_lesson_class_owner(default_class_id, current_user.id)
         await self._unset_other_defaults(default_class_id, exclude_id=location_id, current_user=current_user)
         location.is_default = True
         await self.db.flush()
@@ -141,12 +146,27 @@ class LocationService:
     async def _assert_class_locations_owner(self, class_id: str, current_user: Any) -> None:
         from app.models.lesson import LessonLocation
 
+        await self._assert_lesson_class_owner(class_id, current_user.id)
         result = await self.db.scalars(
             select(LessonLocation.owner_id).where(LessonLocation.lesson_class_id == class_id).limit(1)
         )
         owner_id = result.first()
         if owner_id is not None:
             self._assert_owner_id(owner_id, current_user)
+
+    async def _assert_lesson_class_owner(self, class_id: str, owner_user_id: str) -> None:
+        from app.models.lesson import LessonClass
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher_id = await resolve_teacher_id(self.db, owner_user_id)
+        class_teacher_id = await self.db.scalar(select(LessonClass.teacher_id).where(LessonClass.id == class_id))
+        if class_teacher_id is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        if class_teacher_id != teacher_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Cannot manage another teacher's lesson class locations",
+            )
 
     def _assert_owner_id(self, owner_id: str | None, current_user: Any) -> None:
         if owner_id != current_user.id:

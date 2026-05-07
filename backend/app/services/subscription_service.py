@@ -1031,8 +1031,12 @@ class SubscriptionService:
         await self._assert_proposal_template_owner(data.recommended_template_id, teacher_ids)
         for template_id in data.template_ids:
             await self._assert_proposal_template_owner(template_id, teacher_ids)
-        await self._assert_proposal_lesson_request_owner(data.lesson_request_id, teacher_ids)
-        await self._assert_proposal_previous_subscription_owner(data.previous_subscription_id, teacher_ids)
+        await self._assert_proposal_lesson_request_owner(data.lesson_request_id, teacher_ids, data.student_id)
+        await self._assert_proposal_previous_subscription_owner(
+            data.previous_subscription_id,
+            teacher_ids,
+            data.student_id,
+        )
 
     async def _assert_proposal_student_owner(self, student_id: str, teacher_ids: list[str]) -> None:
         from app.models.student import Student
@@ -1055,20 +1059,33 @@ class SubscriptionService:
         self,
         previous_subscription_id: str | None,
         teacher_ids: list[str],
+        proposal_student_id: str,
     ) -> None:
         if previous_subscription_id is None:
             return
 
+        from app.models.lesson import ClassMembership, LessonClass
         from app.models.subscription import Subscription
 
-        subscription = await self.db.get(Subscription, previous_subscription_id)
-        if subscription is not None and subscription.teacher_id not in teacher_ids:
+        subscription = await self.db.scalar(
+            select(Subscription)
+            .join(ClassMembership, ClassMembership.id == Subscription.membership_id)
+            .join(LessonClass, LessonClass.id == ClassMembership.lesson_class_id)
+            .where(
+                Subscription.id == previous_subscription_id,
+                LessonClass.teacher_id.in_(teacher_ids),
+            )
+        )
+        if subscription is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        if subscription.student_id != proposal_student_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     async def _assert_proposal_lesson_request_owner(
         self,
         lesson_request_id: str | None,
         teacher_ids: list[str],
+        proposal_student_id: str,
     ) -> None:
         if lesson_request_id is None:
             return
@@ -1077,6 +1094,29 @@ class SubscriptionService:
 
         lesson_request = await self.db.get(LessonRequest, lesson_request_id)
         if lesson_request is not None and lesson_request.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        if lesson_request is not None and lesson_request.student_id != proposal_student_id:
+            await self._assert_request_can_bind_to_proposal_student(
+                lesson_request.student_id,
+                proposal_student_id,
+                teacher_ids,
+            )
+
+    async def _assert_request_can_bind_to_proposal_student(
+        self,
+        request_student_id: str,
+        proposal_student_id: str,
+        teacher_ids: list[str],
+    ) -> None:
+        """Allow request-user to teacher-created student profile binding, but not profile mixing."""
+        from app.models.student import Student
+
+        proposal_student = await self.db.get(Student, proposal_student_id)
+        if proposal_student is None or proposal_student.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+        request_student = await self.db.get(Student, request_student_id)
+        if request_student is not None and request_student.id != proposal_student_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     async def expire_old_proposals(self) -> int:
