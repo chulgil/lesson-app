@@ -87,6 +87,7 @@ class AppRoutes {
   static const allRecordings = '/settings/recordings';
   static const help = '/settings/help';
   static const appInfo = '/settings/app-info';
+  static const newsRoadmap = '/settings/news-roadmap';
   static const notificationSettings = '/settings/notifications';
   static const profileEdit = '/settings/profile-edit';
   static const termsOfService = '/settings/terms';

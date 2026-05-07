@@ -15,6 +15,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/home_dashboard_provider.dart';
+import 'app_update_banner.dart';
 import 'assignment_summary_section.dart';
 import 'demo_dashboard_overlay.dart';
 import 'getting_started_card.dart';
@@ -74,6 +75,10 @@ class DashboardTab extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space5),
 
               const DemoDashboardOverlay(),
+
+              const AppUpdateBanner(),
+
+              const SizedBox(height: AppSpacing.space4),
 
               // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
               // (home_master.md §3.5)

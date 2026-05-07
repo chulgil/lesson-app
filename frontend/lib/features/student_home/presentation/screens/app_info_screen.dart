@@ -107,6 +107,17 @@ class AppInfoScreen extends StatelessWidget {
                         ),
                       ),
                 ),
+                Divider(
+                  height: 1,
+                  indent: AppSpacing.space4 + 36 + AppSpacing.space3,
+                  color: AppColors.inkQuaternary,
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.newspaper_outlined,
+                  title: AppStrings.newsRoadmapTitle,
+                  onTap: () => context.push(AppRoutes.newsRoadmap),
+                ),
               ],
             ),
           ),

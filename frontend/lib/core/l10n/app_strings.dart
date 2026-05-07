@@ -5582,6 +5582,18 @@ class AppStrings {
   static const studentHomeNeedHelp = '도움이 필요하신가요?';
   static const studentHomeCannotOpenEmail = '이메일 앱을 열 수 없습니다';
   static const studentHomeAppInfoTitle = '앱 정보';
+  static const appUpdateBannerTitle = '새 버전이 준비되었습니다';
+  static String appUpdateBannerSubtitle(String version) =>
+      'v$version 업데이트와 개선 예정 기능을 확인하세요';
+  static const appUpdateBannerAction = '새 소식';
+  static const newsRoadmapTitle = '새 소식과 로드맵';
+  static String newsRoadmapVersion(String current, String latest) =>
+      '현재 $current · 최신 $latest';
+  static const newsRoadmapReleaseSectionTitle = '최근 변경사항';
+  static const newsRoadmapSectionTitle = '앞으로의 개선';
+  static const newsRoadmapStatusPlanned = '준비 중';
+  static const newsRoadmapStatusInProgress = '진행 중';
+  static const newsRoadmapStatusShipped = '완료';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
   static const studentHomeOpenSourceLicense = '오픈소스 라이선스';
