@@ -310,7 +310,7 @@ class _RepertoireDetailScreenState
   }
 
   Widget _buildSectionList(List<PracticeSection> sections) {
-    final sortType = ref.watch(sectionSortTypeProvider);
+    final sortType = ref.watch(sectionSortTypeStateProvider);
     final isCustomSort = sortType == SectionSortType.custom;
 
     if (isCustomSort) {

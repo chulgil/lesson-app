@@ -217,9 +217,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
     WidgetRef ref, {
     required bool enabled,
   }) {
-    final expiry = ref.watch(subscriptionExpiryReminderSettingsProvider);
+    final expiry = ref.watch(
+      subscriptionExpiryReminderSettingsNotifierProvider,
+    );
     final notifier = ref.read(
-      subscriptionExpiryReminderSettingsProvider.notifier,
+      subscriptionExpiryReminderSettingsNotifierProvider.notifier,
     );
     final masterOn = enabled && expiry.enabled;
 

@@ -18,8 +18,6 @@ class RepertoireSortTypeState extends _$RepertoireSortTypeState {
   }
 }
 
-final repertoireSortTypeProvider = repertoireSortTypeStateProvider;
-
 /// Sorted repertoires provider for a date
 @Riverpod(keepAlive: true)
 List<practice.PracticeRepertoire> sortedRepertoiresForDate(
@@ -27,7 +25,7 @@ List<practice.PracticeRepertoire> sortedRepertoiresForDate(
   RepertoiresForDateParams params,
 ) {
   final repertoiresAsync = ref.watch(repertoiresForDateProvider(params));
-  final sortType = ref.watch(repertoireSortTypeProvider);
+  final sortType = ref.watch(repertoireSortTypeStateProvider);
 
   return repertoiresAsync.when(
     data:

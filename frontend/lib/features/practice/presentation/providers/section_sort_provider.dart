@@ -17,8 +17,6 @@ class SectionSortTypeState extends _$SectionSortTypeState {
   }
 }
 
-final sectionSortTypeProvider = sectionSortTypeStateProvider;
-
 /// Sorted sections provider for a repertoire
 @Riverpod(keepAlive: true)
 List<entities.PracticeSection> sortedSections(
@@ -27,7 +25,7 @@ List<entities.PracticeSection> sortedSections(
 ) {
   // Use the same repertoireProvider as the detail screen
   final repertoire = ref.watch(repertoireProvider(repertoireId)).valueOrNull;
-  final sortType = ref.watch(sectionSortTypeProvider);
+  final sortType = ref.watch(sectionSortTypeStateProvider);
 
   if (repertoire == null) return [];
   return entities.SectionSorting(repertoire.sections).sortBy(sortType);
@@ -52,7 +50,7 @@ class SectionOrderNotifier extends _$SectionOrderNotifier {
       if (repertoire == null) throw Exception('Repertoire not found');
 
       // Get current sorted sections
-      final sortType = ref.read(sectionSortTypeProvider);
+      final sortType = ref.read(sectionSortTypeStateProvider);
       final sections = entities.SectionSorting(
         repertoire.sections,
       ).sortBy(sortType);

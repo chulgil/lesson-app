@@ -15,22 +15,12 @@ import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../home/home_ui_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../student_home/student_home_ui_facade.dart';
+import '../providers/schedule_tab_state_provider.dart';
 import '../providers/schedule_view_mode_provider.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
 import '../widgets/sticky_schedule_header_delegate.dart';
-
-/// State provider for teacher selected date
-final teacherSelectedDateProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day);
-});
-
-/// State provider for teacher lesson sort type
-final teacherLessonSortTypeProvider = StateProvider<LessonSortType>(
-  (ref) => LessonSortType.timeAsc,
-);
 
 /// Calendar tab with WeekCalendar and lesson list
 class ScheduleTab extends ConsumerWidget {
@@ -38,7 +28,7 @@ class ScheduleTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewMode = ref.watch(scheduleViewModeProvider);
+    final viewMode = ref.watch(scheduleViewModeNotifierProvider);
 
     // §7.X — list 모드는 CustomScrollView 로 헤더 collapse + WeekStrip sticky.
     // timeline/weeklyGrid 은 자체 스크롤이 있어 외부 collapse 적용 시 충돌
@@ -338,7 +328,7 @@ class ScheduleTab extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
-    final viewMode = ref.watch(scheduleViewModeProvider);
+    final viewMode = ref.watch(scheduleViewModeNotifierProvider);
     final now = DateTime.now();
 
     return Padding(
@@ -356,7 +346,9 @@ class ScheduleTab extends ConsumerWidget {
                 _ViewModeToggle(
                   currentMode: viewMode,
                   onChanged: (mode) {
-                    ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+                    ref
+                        .read(scheduleViewModeNotifierProvider.notifier)
+                        .setMode(mode);
                   },
                 ),
                 const SizedBox(width: AppSpacing.space2),

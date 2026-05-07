@@ -22,7 +22,6 @@ import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/subscription_ui_facade.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
@@ -83,7 +82,6 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   ),
                 ),
               SliverToBoxAdapter(child: _buildSearchBar()),
-              SliverToBoxAdapter(child: _buildFilterChips()),
               const SliverToBoxAdapter(
                 child: SizedBox(height: AppSpacing.space2),
               ),
@@ -242,16 +240,44 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: AppSpacing.space2),
-          // ── Masthead: "ENROLLMENTS" eyebrow + 수강 추가 아이콘 ──
+          // ── Masthead: "ENROLLMENTS" eyebrow + 선택모드 + 추가 아이콘 ──
           NotebookMasthead(
             eyebrow: 'ENROLLMENTS',
             meta: _volumeIssueString(DateTime.now()),
-            trailing: IconButton(
-              onPressed: () => context.push(AppRoutes.addStudentMethod),
-              icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
-              tooltip: AppStrings.studentAddLabel,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSelectionMode = true;
+                      _selectedStudentIds.clear();
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.checklist_rounded,
+                    color: AppColors.ink,
+                    size: 22,
+                  ),
+                  tooltip: AppStrings.studentBulkSelectLabel,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                IconButton(
+                  onPressed: () => context.push(AppRoutes.addStudentMethod),
+                  icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
+                  tooltip: AppStrings.studentAddLabel,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
+                ),
+              ],
             ),
           ),
           // ── Programme Title — "수강 관리" Playfair ──
@@ -272,32 +298,6 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 const SizedBox(height: AppSpacing.space3),
                 const ThinRule(),
               ],
-            ),
-          ),
-          // ── 액션 Row — 학생 추가 ──
-          // 테마 FilledButton.minimumSize 가 Size(∞, 48) 이라 Row+end 단독 자식 배치시
-          // BoxConstraints(w=Infinity) 크래시. 컴팩트 트레일링 버튼이므로 minWidth 0 으로 override.
-          Padding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.space2,
-              bottom: AppSpacing.space2,
-            ),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                onPressed: () {
-                  context.push(AppRoutes.addStudentMethod);
-                },
-                icon: const Icon(Icons.person_add, size: 18),
-                label: const Text(AppStrings.studentAddLabel),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, AppSpacing.buttonHeight),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space4,
-                    vertical: AppSpacing.space2,
-                  ),
-                ),
-              ),
             ),
           ),
         ],
@@ -343,66 +343,6 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             vertical: AppSpacing.space3,
           ),
         ),
-      ),
-    );
-  }
-
-  /// 1줄 세그먼트 (학원/개인/전체) + 필터 버튼 (바텀시트로 연습상태)
-  /// ux_guidelines §2.6 (Progressive Disclosure) 적용
-  Widget _buildFilterChips() {
-    final classTypeFilter = ref.watch(classTypeFilterNotifierProvider);
-    final hasActiveFilter = _currentFilter != StudentFilter.all;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space3,
-      ),
-      child: Row(
-        children: [
-          // Segmented button (학원 / 개인 / 전체)
-          Expanded(
-            child: SegmentedButton<ClassTypeFilter>(
-              segments:
-                  ClassTypeFilter.values
-                      .map(
-                        (filter) => ButtonSegment<ClassTypeFilter>(
-                          value: filter,
-                          label: Text(
-                            filter.label,
-                            style: AppTypography.bodySmall,
-                          ),
-                        ),
-                      )
-                      .toList(),
-              selected: {classTypeFilter},
-              onSelectionChanged: (selection) {
-                ref
-                    .read(classTypeFilterNotifierProvider.notifier)
-                    .set(selection.first);
-              },
-              showSelectedIcon: false,
-              style: ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-
-          // 필터 버튼 (연습상태) → 바텀시트. 활성 시 색상 변경만 (점 인디케이터 제거).
-          IconButton(
-            icon: Icon(
-              Icons.tune,
-              color:
-                  hasActiveFilter
-                      ? AppColors.paperAccent
-                      : AppColors.inkSecondary,
-            ),
-            onPressed: _showPracticeFilterSheet,
-            tooltip: AppStrings.studentFilterTitle,
-          ),
-        ],
       ),
     );
   }
@@ -482,16 +422,32 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       error: (_, __) => 0,
     );
 
+    final hasActiveFilter = _currentFilter != StudentFilter.all;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             '전체 $count명',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
+          ),
+          const Spacer(),
+          IconButton(
+            icon: Icon(
+              Icons.tune,
+              size: 20,
+              color:
+                  hasActiveFilter
+                      ? AppColors.paperAccent
+                      : AppColors.inkSecondary,
+            ),
+            onPressed: _showPracticeFilterSheet,
+            tooltip: AppStrings.studentFilterTitle,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
           TextButton.icon(
             onPressed: _showSortOptions,
@@ -1137,47 +1093,28 @@ class _EnrollmentExtras extends ConsumerWidget {
             ? AppColors.paperAccent
             : AppColors.inkSecondary;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    // 진행 bar만 표시 (D-day, 레슨추가는 상세 화면에서 확인)
+    if (total == null || total <= 0) return const SizedBox.shrink();
+
+    return Row(
       children: [
-        // 진행 bar (2px)
-        if (total != null && total > 0) ...[
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 2,
-                  color: AppColors.inkQuaternary,
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: progress,
-                    child: Container(color: barColor),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                '$used/$total회',
-                style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space1),
-        ],
-        // D-day chip + CTA row
-        Row(
-          children: [
-            if (daysLeft != null) _DdayChip(daysLeft: daysLeft),
-            const Spacer(),
-            _InlineCta(
-              label: AppStrings.studentAddLesson,
-              onTap: () {
-                context.push('${AppRoutes.addLesson}?studentId=$studentId');
-              },
+        Expanded(
+          child: Container(
+            height: 2,
+            color: AppColors.inkQuaternary,
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: progress,
+              child: Container(color: barColor),
             ),
-          ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Text(
+          '$used/$total회',
+          style: AppTypography.captionSmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
         ),
       ],
     );
@@ -1192,27 +1129,9 @@ class _EnrollmentExtras extends ConsumerWidget {
         latest?.endDate != null
             ? '${latest!.endDate!.year}-${latest.endDate!.month.toString().padLeft(2, '0')}-${latest.endDate!.day.toString().padLeft(2, '0')} 만료'
             : '만료됨';
-    return Row(
-      children: [
-        Text(
-          expiredDateText,
-          style: AppTypography.captionSmall.copyWith(
-            color: AppColors.inkTertiary,
-          ),
-        ),
-        const Spacer(),
-        _InlineCta(
-          label: AppStrings.studentReregistrationProposal,
-          onTap: () {
-            final teacherId = ref.read(currentUserIdProvider);
-            UnifiedSubscriptionSheet.show(
-              context,
-              teacherId: teacherId,
-              studentIds: [studentId],
-            );
-          },
-        ),
-      ],
+    return Text(
+      expiredDateText,
+      style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
     );
   }
 
@@ -1221,77 +1140,5 @@ class _EnrollmentExtras extends ConsumerWidget {
         subs.where((s) => s.endDate != null).toList()
           ..sort((a, b) => b.endDate!.compareTo(a.endDate!));
     return withDates.isEmpty ? null : withDates.first;
-  }
-}
-
-class _DdayChip extends StatelessWidget {
-  final int daysLeft;
-
-  const _DdayChip({required this.daysLeft});
-
-  @override
-  Widget build(BuildContext context) {
-    if (daysLeft > 14) return const SizedBox.shrink();
-
-    final Color color;
-    if (daysLeft <= 0) {
-      color = AppColors.paperAccent;
-    } else if (daysLeft <= 7) {
-      color = AppColors.paperAccent;
-    } else {
-      color = AppColors.inkSecondary;
-    }
-
-    final label = daysLeft <= 0 ? '만료' : 'D-$daysLeft 만료';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: color,
-          strokeAlign: BorderSide.strokeAlignInside,
-        ),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.captionSmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _InlineCta extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _InlineCta({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: 4,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.ink,
-            strokeAlign: BorderSide.strokeAlignInside,
-          ),
-        ),
-        child: Text(
-          label,
-          style: AppTypography.captionSmall.copyWith(
-            color: AppColors.ink,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
   }
 }

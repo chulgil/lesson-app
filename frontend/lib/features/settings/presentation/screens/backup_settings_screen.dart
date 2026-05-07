@@ -19,7 +19,7 @@ class BackupSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final backupState = ref.watch(backupStateProvider);
+    final backupState = ref.watch(backupStateNotifierProvider);
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
@@ -49,7 +49,8 @@ class BackupSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   ElevatedButton(
-                    onPressed: () => ref.invalidate(backupStateProvider),
+                    onPressed:
+                        () => ref.invalidate(backupStateNotifierProvider),
                     child: const Text(AppStrings.retry),
                   ),
                 ],
@@ -70,7 +71,7 @@ class _BackupContent extends ConsumerWidget {
     final isOperating = state.isBackingUp || state.isRestoring;
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(backupStateProvider.notifier).refresh(),
+      onRefresh: () => ref.read(backupStateNotifierProvider.notifier).refresh(),
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.space4),
         children: [
@@ -89,7 +90,10 @@ class _BackupContent extends ConsumerWidget {
             ErrorCard(
               error: state.lastError!,
               onDismiss:
-                  () => ref.read(backupStateProvider.notifier).clearError(),
+                  () =>
+                      ref
+                          .read(backupStateNotifierProvider.notifier)
+                          .clearError(),
             ),
             const SizedBox(height: AppSpacing.space6),
           ],

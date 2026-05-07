@@ -6211,6 +6211,7 @@ class AppStrings {
   static const studentRosterMasthead = '수강 관리';
   static const studentFilterTitle = '필터';
   static const studentSortTitle = '정렬 기준';
+  static const studentBulkSelectLabel = '학생 선택';
   static const studentBulkCancelLabel = '휴강 공지';
   static const studentSendMessage = '메시지 보내기';
   static const studentBulkMessageTitle = '일괄 메시지 보내기';

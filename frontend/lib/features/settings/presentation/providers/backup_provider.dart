@@ -19,9 +19,6 @@ BackupService backupService(BackupServiceRef ref) {
   return BackupService();
 }
 
-/// Current backup state provider.
-final backupStateProvider = backupStateNotifierProvider;
-
 /// List of available backup files.
 @Riverpod(keepAlive: true)
 Future<List<BackupFileInfo>> backupList(BackupListRef ref) async {

@@ -47,9 +47,6 @@ SubscriptionExpiryNotificationService subscriptionExpiryNotificationService(
 /// Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
 ///
 /// Phase 5b: master + D14/D7/D1/D0 개별 토글 제공.
-final subscriptionExpiryReminderSettingsProvider =
-    subscriptionExpiryReminderSettingsNotifierProvider;
-
 @Riverpod(keepAlive: true)
 class SubscriptionExpiryReminderSettingsNotifier
     extends _$SubscriptionExpiryReminderSettingsNotifier {
@@ -121,7 +118,9 @@ Future<int> subscriptionExpiryReminderRefresh(
   final teacherId = ref.watch(currentUserIdProvider);
   if (teacherId.isEmpty) return 0;
 
-  final settings = ref.watch(subscriptionExpiryReminderSettingsProvider);
+  final settings = ref.watch(
+    subscriptionExpiryReminderSettingsNotifierProvider,
+  );
   if (!settings.enabled) return 0;
 
   final students = await ref.watch(studentsNotifierProvider.future);

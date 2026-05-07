@@ -213,7 +213,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 return _buildEmptyState(studentId);
               }
               // Apply sorting
-              final sortType = ref.watch(repertoireSortTypeProvider);
+              final sortType = ref.watch(repertoireSortTypeStateProvider);
               final sortedRepertoires = repertoires.sortBy(sortType);
               return _buildRepertoireList(sortedRepertoires, studentId);
             },
@@ -239,12 +239,12 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   }
 
   Widget _buildSortDropdown() {
-    final sortType = ref.watch(repertoireSortTypeProvider);
+    final sortType = ref.watch(repertoireSortTypeStateProvider);
 
     return PopupMenuButton<RepertoireSortType>(
       initialValue: sortType,
       onSelected: (type) {
-        ref.read(repertoireSortTypeProvider.notifier).setSortType(type);
+        ref.read(repertoireSortTypeStateProvider.notifier).setSortType(type);
       },
       itemBuilder:
           (context) =>

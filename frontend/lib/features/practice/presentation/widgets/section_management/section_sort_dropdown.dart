@@ -15,7 +15,7 @@ class SectionSortDropdown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentSort = ref.watch(sectionSortTypeProvider);
+    final currentSort = ref.watch(sectionSortTypeStateProvider);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -67,7 +67,9 @@ class SectionSortDropdown extends ConsumerWidget {
               }).toList(),
           onChanged: (newType) {
             if (newType != null) {
-              ref.read(sectionSortTypeProvider.notifier).setSortType(newType);
+              ref
+                  .read(sectionSortTypeStateProvider.notifier)
+                  .setSortType(newType);
 
               // If switching to custom, apply current order
               if (newType == SectionSortType.custom && repertoireId != null) {

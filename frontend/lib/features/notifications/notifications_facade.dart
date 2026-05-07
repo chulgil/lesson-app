@@ -10,4 +10,4 @@ export 'presentation/providers/notification_providers.dart'
 export 'domain/services/connection_notification_service.dart'
     show ConnectionInfo;
 export 'presentation/providers/subscription_expiry_providers.dart'
-    show subscriptionExpiryReminderSettingsProvider;
+    show subscriptionExpiryReminderSettingsNotifierProvider;

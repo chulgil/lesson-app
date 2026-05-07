@@ -301,7 +301,9 @@ class ActionsSection extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       try {
-        await ref.read(backupStateProvider.notifier).createAndShareBackup();
+        await ref
+            .read(backupStateNotifierProvider.notifier)
+            .createAndShareBackup();
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -333,7 +335,9 @@ class ActionsSection extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       try {
         final result =
-            await ref.read(backupStateProvider.notifier).pickAndRestore();
+            await ref
+                .read(backupStateNotifierProvider.notifier)
+                .pickAndRestore();
 
         if (result != null && context.mounted) {
           _showRestoreResult(context, result);
@@ -641,7 +645,7 @@ class BackupItem extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       final result = await ref
-          .read(backupStateProvider.notifier)
+          .read(backupStateNotifierProvider.notifier)
           .restoreFromFile(backup.file);
 
       if (context.mounted) {
@@ -691,7 +695,7 @@ class BackupItem extends ConsumerWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      await ref.read(backupStateProvider.notifier).deleteBackup(backup);
+      await ref.read(backupStateNotifierProvider.notifier).deleteBackup(backup);
     }
   }
 }

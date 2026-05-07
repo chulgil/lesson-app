@@ -14,9 +14,6 @@ enum ScheduleViewMode {
 const _hiveBoxName = 'settings';
 const _hiveKey = 'schedule_view_mode';
 
-/// Provider for schedule view mode with Hive persistence.
-final scheduleViewModeProvider = scheduleViewModeNotifierProvider;
-
 @Riverpod(keepAlive: true)
 class ScheduleViewModeNotifier extends _$ScheduleViewModeNotifier {
   @override
