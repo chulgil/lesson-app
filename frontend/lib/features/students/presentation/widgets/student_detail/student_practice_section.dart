@@ -89,14 +89,13 @@ class StudentPracticeSection extends ConsumerWidget {
                                     )
                                     : null,
                           ),
-                          child: Icon(
-                            isPracticed ? Icons.check : Icons.remove,
-                            size: 18,
-                            color:
-                                isPracticed
-                                    ? AppColors.paperOk
-                                    : AppColors.inkTertiary,
-                          ),
+                          child: isPracticed
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 18,
+                                  color: AppColors.paperOk,
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     );
