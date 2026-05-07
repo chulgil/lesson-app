@@ -352,7 +352,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               _buildLabel('기본 레슨 장소'),
               const SizedBox(height: AppSpacing.space1),
               Text(
-                '학생 방문 레슨 시 이동시간 자동 계산과\n수강권 발급 시 이동비 산정에 활용됩니다',
+                '학생 방문 시 위치 안내, 출장 레슨 이동시간 자동 계산,\n수강권 발급 시 이동비 산정에 활용됩니다',
                 style: AppTypography.caption.copyWith(
                   color: AppColors.inkTertiary,
                 ),

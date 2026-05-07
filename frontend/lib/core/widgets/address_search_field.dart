@@ -77,7 +77,6 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
   late final TextEditingController _detailController;
   late final TextEditingController _manualAddressController;
   late final TextEditingController _manualPostalController;
-  bool _isManualMode = false;
 
   @override
   void initState() {
@@ -129,15 +128,6 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
     );
   }
 
-  void _toggleManualMode() {
-    setState(() {
-      _isManualMode = !_isManualMode;
-      if (_isManualMode) {
-        _manualAddressController.text = _address ?? '';
-        _manualPostalController.text = _postalCode ?? '';
-      }
-    });
-  }
 
   Future<void> _openSearchSheet() async {
     final result = await showNotebookModalBottomSheet<_MockAddress>(
@@ -167,57 +157,8 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section label + 직접 입력 토글
-        Row(
-          children: [
-            Text(
-              AppStrings.addressLabel,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: _toggleManualMode,
-              child: Text(
-                _isManualMode
-                    ? AppStrings.addressSearch
-                    : AppStrings.addressManualInput,
-                style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-
-        if (_isManualMode) ...[
-          // ── 수기 입력 모드 ──
-          // 우편번호
-          TextField(
-            controller: _manualPostalController,
-            keyboardType: TextInputType.number,
-            maxLength: 5,
-            decoration: _inputDecoration(
-              hintText: AppStrings.addressPostalHint,
-            ),
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          // 기본주소
-          TextField(
-            controller: _manualAddressController,
-            decoration: _inputDecoration(
-              hintText: AppStrings.addressManualHint,
-            ),
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
-          ),
-        ] else ...[
-          // ── 검색 모드 ──
-          _buildSearchRow(),
-        ],
+        // 검색 모드 고정 (우편번호는 검색 시 백그라운드 자동 저장)
+        _buildSearchRow(),
 
         const SizedBox(height: AppSpacing.space2),
 
