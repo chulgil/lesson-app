@@ -6,6 +6,24 @@ part of 'teacher_availability_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$teacherAvailabilityRepositoryHash() =>
+    r'dfd89892e3e9f9b923662c4e9a512298826fd46c';
+
+/// See also [teacherAvailabilityRepository].
+@ProviderFor(teacherAvailabilityRepository)
+final teacherAvailabilityRepositoryProvider =
+    Provider<TeacherAvailabilityRepository>.internal(
+  teacherAvailabilityRepository,
+  name: r'teacherAvailabilityRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherAvailabilityRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef TeacherAvailabilityRepositoryRef
+    = ProviderRef<TeacherAvailabilityRepository>;
 String _$teacherAvailabilityHash() =>
     r'c8a488ca035b8e9370023cd62fd2868e23592120';
 
@@ -1550,7 +1568,7 @@ final selectedDateProvider =
 
 typedef _$SelectedDate = AutoDisposeNotifier<DateTime>;
 String _$slotBookingNotifierHash() =>
-    r'7fa2e0d23450cab483bda46c68e102d09272cf4e';
+    r'5ab97944f387e646fbd1d2b8ab26eff67d91b1b4';
 
 /// See also [SlotBookingNotifier].
 @ProviderFor(SlotBookingNotifier)
@@ -1568,7 +1586,7 @@ final slotBookingNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SlotBookingNotifier
     = AutoDisposeNotifier<AsyncValue<AvailabilitySlot?>>;
 String _$teacherAvailabilityNotifierHash() =>
-    r'2fe26d6c12dbdf7c7519054ff97827b9930d5e67';
+    r'8956f53c167f5649dd774c8368d38df317925070';
 
 abstract class _$TeacherAvailabilityNotifier
     extends BuildlessAutoDisposeNotifier<AsyncValue<TeacherAvailability?>> {

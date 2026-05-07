@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_teaching_resource_repository.dart';
@@ -6,34 +6,42 @@ import '../../data/repositories/remote_teaching_resource_repository.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../../domain/repositories/teaching_resource_repository.dart';
 
+part 'teaching_resource_providers.g.dart';
+
 /// Repository provider
-final teachingResourceRepositoryProvider =
-    Provider<TeachingResourceRepository>((ref) =>
-        createRepository<TeachingResourceRepository>(
-          ref: ref,
-          mock: () => MockTeachingResourceRepository(),
-          remote: (api) => RemoteTeachingResourceRepository(api),
-        ));
+@Riverpod(keepAlive: true)
+TeachingResourceRepository teachingResourceRepository(
+  TeachingResourceRepositoryRef ref,
+) => createRepository<TeachingResourceRepository>(
+  ref: ref,
+  mock: () => MockTeachingResourceRepository(),
+  remote: (api) => RemoteTeachingResourceRepository(api),
+);
 
 /// All resources for current teacher
-final teacherResourcesProvider =
-    FutureProvider.family<List<TeachingResource>, String>(
-        (ref, teacherId) async {
+@Riverpod(keepAlive: true)
+Future<List<TeachingResource>> teacherResources(
+  TeacherResourcesRef ref,
+  String teacherId,
+) async {
   final repository = ref.watch(teachingResourceRepositoryProvider);
   return repository.getByTeacherId(teacherId);
-});
+}
 
 /// Resources by IDs (for displaying attached resources on practice items)
-final resourcesByIdsProvider =
-    FutureProvider.family<List<TeachingResource>, List<String>>(
-        (ref, ids) async {
+@Riverpod(keepAlive: true)
+Future<List<TeachingResource>> resourcesByIds(
+  ResourcesByIdsRef ref,
+  List<String> ids,
+) async {
   if (ids.isEmpty) return [];
   final repository = ref.watch(teachingResourceRepositoryProvider);
   return repository.getByIds(ids);
-});
+}
 
 /// Notifier for CRUD operations on teaching resources
-class TeachingResourceNotifier extends AsyncNotifier<List<TeachingResource>> {
+@Riverpod(keepAlive: true)
+class TeachingResourceNotifier extends _$TeachingResourceNotifier {
   TeachingResourceRepository get _repository =>
       ref.read(teachingResourceRepositoryProvider);
 
@@ -76,7 +84,9 @@ class TeachingResourceNotifier extends AsyncNotifier<List<TeachingResource>> {
     state = const AsyncValue.loading();
     try {
       final created = await _repository.create(resource);
-      state = await AsyncValue.guard(() => _repository.getByTeacherId(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getByTeacherId(_teacherId),
+      );
       return created;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -112,7 +122,9 @@ class TeachingResourceNotifier extends AsyncNotifier<List<TeachingResource>> {
     state = const AsyncValue.loading();
     try {
       final created = await _repository.create(resource);
-      state = await AsyncValue.guard(() => _repository.getByTeacherId(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getByTeacherId(_teacherId),
+      );
       return created;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -125,15 +137,12 @@ class TeachingResourceNotifier extends AsyncNotifier<List<TeachingResource>> {
     state = const AsyncValue.loading();
     try {
       await _repository.delete(id);
-      state = await AsyncValue.guard(() => _repository.getByTeacherId(_teacherId));
+      state = await AsyncValue.guard(
+        () => _repository.getByTeacherId(_teacherId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
     }
   }
 }
-
-final teachingResourceNotifierProvider =
-    AsyncNotifierProvider<TeachingResourceNotifier, List<TeachingResource>>(
-  TeachingResourceNotifier.new,
-);

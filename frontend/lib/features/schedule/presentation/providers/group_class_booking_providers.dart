@@ -19,19 +19,19 @@ part 'group_class_booking_providers.g.dart';
 // Repository Provider - switches between Mock and Remote.
 // ============================================================
 
-final groupClassBookingRepositoryProvider =
-    Provider<GroupClassBookingRepository>(
-      (ref) => createRepository<GroupClassBookingRepository>(
-        ref: ref,
-        mock:
-            () => MockGroupClassBookingRepository(
-              onWaitlistPromotion: (promoted) {
-                _sendWaitlistPromotionNotification(ref, promoted);
-              },
-            ),
-        remote: (api) => RemoteGroupClassBookingRepository(api),
-      ),
-    );
+@Riverpod(keepAlive: true)
+GroupClassBookingRepository groupClassBookingRepository(Ref ref) {
+  return createRepository<GroupClassBookingRepository>(
+    ref: ref,
+    mock:
+        () => MockGroupClassBookingRepository(
+          onWaitlistPromotion: (promoted) {
+            _sendWaitlistPromotionNotification(ref, promoted);
+          },
+        ),
+    remote: (api) => RemoteGroupClassBookingRepository(api),
+  );
+}
 
 void _sendWaitlistPromotionNotification(Ref ref, GroupClassBooking promoted) {
   try {

@@ -1,20 +1,27 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import 'lesson_crud_provider.dart';
 
+part 'lesson_note_providers.g.dart';
+
 /// Lessons with notes for a student (sorted newest first).
-final studentLessonNotesProvider =
-    FutureProvider.family<List<Lesson>, String>((ref, studentId) async {
+@Riverpod(keepAlive: true)
+Future<List<Lesson>> studentLessonNotes(
+  StudentLessonNotesRef ref,
+  String studentId,
+) async {
   final lessons = await ref.watch(lessonsByStudentProvider(studentId).future);
   return lessons
-      .where((l) =>
-          l.feedback != null ||
-          (l.keyPoints?.isNotEmpty ?? false) ||
-          (l.practiceTips != null))
+      .where(
+        (l) =>
+            l.feedback != null ||
+            (l.keyPoints?.isNotEmpty ?? false) ||
+            (l.practiceTips != null),
+      )
       .toList()
     ..sort((a, b) => b.date.compareTo(a.date));
-});
+}
 
 /// Period filter for lesson notes.
 enum NoteFilterPeriod {

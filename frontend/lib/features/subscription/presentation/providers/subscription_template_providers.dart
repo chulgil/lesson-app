@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -13,13 +14,14 @@ part 'subscription_template_providers.g.dart';
 // ============================================================
 
 /// Template repository provider - switches between Mock and Remote.
-final subscriptionTemplateRepositoryProvider =
-    Provider<SubscriptionTemplateRepository>((ref) =>
-        createRepository<SubscriptionTemplateRepository>(
-          ref: ref,
-          mock: () => MockSubscriptionTemplateRepository(),
-          remote: (api) => RemoteSubscriptionTemplateRepository(api),
-        ));
+@Riverpod(keepAlive: true)
+SubscriptionTemplateRepository subscriptionTemplateRepository(Ref ref) {
+  return createRepository<SubscriptionTemplateRepository>(
+    ref: ref,
+    mock: () => MockSubscriptionTemplateRepository(),
+    remote: (api) => RemoteSubscriptionTemplateRepository(api),
+  );
+}
 
 // ============================================================
 // Teacher Templates

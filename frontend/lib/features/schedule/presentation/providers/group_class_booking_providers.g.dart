@@ -6,6 +6,25 @@ part of 'group_class_booking_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$groupClassBookingRepositoryHash() =>
+    r'22ca85642d168debf93129d0d6ed70bf8c20bf79';
+
+/// See also [groupClassBookingRepository].
+@ProviderFor(groupClassBookingRepository)
+final groupClassBookingRepositoryProvider =
+    Provider<GroupClassBookingRepository>.internal(
+      groupClassBookingRepository,
+      name: r'groupClassBookingRepositoryProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$groupClassBookingRepositoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef GroupClassBookingRepositoryRef =
+    ProviderRef<GroupClassBookingRepository>;
 String _$scheduleBookingsHash() => r'a5f707ddb0d514fcd71a44ac27e623c030b8c6de';
 
 /// Copied from Dart SDK
@@ -48,21 +67,15 @@ class ScheduleBookingsFamily
   /// Get all bookings for a schedule
   ///
   /// Copied from [scheduleBookings].
-  ScheduleBookingsProvider call(
-    String scheduleId,
-  ) {
-    return ScheduleBookingsProvider(
-      scheduleId,
-    );
+  ScheduleBookingsProvider call(String scheduleId) {
+    return ScheduleBookingsProvider(scheduleId);
   }
 
   @override
   ScheduleBookingsProvider getProviderOverride(
     covariant ScheduleBookingsProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-    );
+    return call(provider.scheduleId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -88,24 +101,20 @@ class ScheduleBookingsProvider
   /// Get all bookings for a schedule
   ///
   /// Copied from [scheduleBookings].
-  ScheduleBookingsProvider(
-    String scheduleId,
-  ) : this._internal(
-          (ref) => scheduleBookings(
-            ref as ScheduleBookingsRef,
-            scheduleId,
-          ),
-          from: scheduleBookingsProvider,
-          name: r'scheduleBookingsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$scheduleBookingsHash,
-          dependencies: ScheduleBookingsFamily._dependencies,
-          allTransitiveDependencies:
-              ScheduleBookingsFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-        );
+  ScheduleBookingsProvider(String scheduleId)
+    : this._internal(
+        (ref) => scheduleBookings(ref as ScheduleBookingsRef, scheduleId),
+        from: scheduleBookingsProvider,
+        name: r'scheduleBookingsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$scheduleBookingsHash,
+        dependencies: ScheduleBookingsFamily._dependencies,
+        allTransitiveDependencies:
+            ScheduleBookingsFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+      );
 
   ScheduleBookingsProvider._internal(
     super._createNotifier, {
@@ -122,7 +131,7 @@ class ScheduleBookingsProvider
   @override
   Override overrideWith(
     FutureOr<List<GroupClassBooking>> Function(ScheduleBookingsRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -193,21 +202,15 @@ class ScheduleWaitlistFamily
   /// Get waitlist for a schedule
   ///
   /// Copied from [scheduleWaitlist].
-  ScheduleWaitlistProvider call(
-    String scheduleId,
-  ) {
-    return ScheduleWaitlistProvider(
-      scheduleId,
-    );
+  ScheduleWaitlistProvider call(String scheduleId) {
+    return ScheduleWaitlistProvider(scheduleId);
   }
 
   @override
   ScheduleWaitlistProvider getProviderOverride(
     covariant ScheduleWaitlistProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-    );
+    return call(provider.scheduleId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -233,24 +236,20 @@ class ScheduleWaitlistProvider
   /// Get waitlist for a schedule
   ///
   /// Copied from [scheduleWaitlist].
-  ScheduleWaitlistProvider(
-    String scheduleId,
-  ) : this._internal(
-          (ref) => scheduleWaitlist(
-            ref as ScheduleWaitlistRef,
-            scheduleId,
-          ),
-          from: scheduleWaitlistProvider,
-          name: r'scheduleWaitlistProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$scheduleWaitlistHash,
-          dependencies: ScheduleWaitlistFamily._dependencies,
-          allTransitiveDependencies:
-              ScheduleWaitlistFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-        );
+  ScheduleWaitlistProvider(String scheduleId)
+    : this._internal(
+        (ref) => scheduleWaitlist(ref as ScheduleWaitlistRef, scheduleId),
+        from: scheduleWaitlistProvider,
+        name: r'scheduleWaitlistProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$scheduleWaitlistHash,
+        dependencies: ScheduleWaitlistFamily._dependencies,
+        allTransitiveDependencies:
+            ScheduleWaitlistFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+      );
 
   ScheduleWaitlistProvider._internal(
     super._createNotifier, {
@@ -267,7 +266,7 @@ class ScheduleWaitlistProvider
   @override
   Override overrideWith(
     FutureOr<List<GroupClassBooking>> Function(ScheduleWaitlistRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -338,21 +337,15 @@ class ScheduleConfirmedCountFamily extends Family<AsyncValue<int>> {
   /// Get confirmed count for a schedule
   ///
   /// Copied from [scheduleConfirmedCount].
-  ScheduleConfirmedCountProvider call(
-    String scheduleId,
-  ) {
-    return ScheduleConfirmedCountProvider(
-      scheduleId,
-    );
+  ScheduleConfirmedCountProvider call(String scheduleId) {
+    return ScheduleConfirmedCountProvider(scheduleId);
   }
 
   @override
   ScheduleConfirmedCountProvider getProviderOverride(
     covariant ScheduleConfirmedCountProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-    );
+    return call(provider.scheduleId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -377,24 +370,23 @@ class ScheduleConfirmedCountProvider extends AutoDisposeFutureProvider<int> {
   /// Get confirmed count for a schedule
   ///
   /// Copied from [scheduleConfirmedCount].
-  ScheduleConfirmedCountProvider(
-    String scheduleId,
-  ) : this._internal(
-          (ref) => scheduleConfirmedCount(
-            ref as ScheduleConfirmedCountRef,
-            scheduleId,
-          ),
-          from: scheduleConfirmedCountProvider,
-          name: r'scheduleConfirmedCountProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$scheduleConfirmedCountHash,
-          dependencies: ScheduleConfirmedCountFamily._dependencies,
-          allTransitiveDependencies:
-              ScheduleConfirmedCountFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-        );
+  ScheduleConfirmedCountProvider(String scheduleId)
+    : this._internal(
+        (ref) => scheduleConfirmedCount(
+          ref as ScheduleConfirmedCountRef,
+          scheduleId,
+        ),
+        from: scheduleConfirmedCountProvider,
+        name: r'scheduleConfirmedCountProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$scheduleConfirmedCountHash,
+        dependencies: ScheduleConfirmedCountFamily._dependencies,
+        allTransitiveDependencies:
+            ScheduleConfirmedCountFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+      );
 
   ScheduleConfirmedCountProvider._internal(
     super._createNotifier, {
@@ -482,21 +474,15 @@ class ScheduleWaitlistCountFamily extends Family<AsyncValue<int>> {
   /// Get waitlist count for a schedule
   ///
   /// Copied from [scheduleWaitlistCount].
-  ScheduleWaitlistCountProvider call(
-    String scheduleId,
-  ) {
-    return ScheduleWaitlistCountProvider(
-      scheduleId,
-    );
+  ScheduleWaitlistCountProvider call(String scheduleId) {
+    return ScheduleWaitlistCountProvider(scheduleId);
   }
 
   @override
   ScheduleWaitlistCountProvider getProviderOverride(
     covariant ScheduleWaitlistCountProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-    );
+    return call(provider.scheduleId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -521,24 +507,21 @@ class ScheduleWaitlistCountProvider extends AutoDisposeFutureProvider<int> {
   /// Get waitlist count for a schedule
   ///
   /// Copied from [scheduleWaitlistCount].
-  ScheduleWaitlistCountProvider(
-    String scheduleId,
-  ) : this._internal(
-          (ref) => scheduleWaitlistCount(
-            ref as ScheduleWaitlistCountRef,
-            scheduleId,
-          ),
-          from: scheduleWaitlistCountProvider,
-          name: r'scheduleWaitlistCountProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$scheduleWaitlistCountHash,
-          dependencies: ScheduleWaitlistCountFamily._dependencies,
-          allTransitiveDependencies:
-              ScheduleWaitlistCountFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-        );
+  ScheduleWaitlistCountProvider(String scheduleId)
+    : this._internal(
+        (ref) =>
+            scheduleWaitlistCount(ref as ScheduleWaitlistCountRef, scheduleId),
+        from: scheduleWaitlistCountProvider,
+        name: r'scheduleWaitlistCountProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$scheduleWaitlistCountHash,
+        dependencies: ScheduleWaitlistCountFamily._dependencies,
+        allTransitiveDependencies:
+            ScheduleWaitlistCountFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+      );
 
   ScheduleWaitlistCountProvider._internal(
     super._createNotifier, {
@@ -626,24 +609,15 @@ class StudentScheduleBookingFamily
   /// Get booking for a specific student and schedule
   ///
   /// Copied from [studentScheduleBooking].
-  StudentScheduleBookingProvider call(
-    String scheduleId,
-    String studentId,
-  ) {
-    return StudentScheduleBookingProvider(
-      scheduleId,
-      studentId,
-    );
+  StudentScheduleBookingProvider call(String scheduleId, String studentId) {
+    return StudentScheduleBookingProvider(scheduleId, studentId);
   }
 
   @override
   StudentScheduleBookingProvider getProviderOverride(
     covariant StudentScheduleBookingProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-      provider.studentId,
-    );
+    return call(provider.scheduleId, provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -669,27 +643,25 @@ class StudentScheduleBookingProvider
   /// Get booking for a specific student and schedule
   ///
   /// Copied from [studentScheduleBooking].
-  StudentScheduleBookingProvider(
-    String scheduleId,
-    String studentId,
-  ) : this._internal(
-          (ref) => studentScheduleBooking(
-            ref as StudentScheduleBookingRef,
-            scheduleId,
-            studentId,
-          ),
-          from: studentScheduleBookingProvider,
-          name: r'studentScheduleBookingProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$studentScheduleBookingHash,
-          dependencies: StudentScheduleBookingFamily._dependencies,
-          allTransitiveDependencies:
-              StudentScheduleBookingFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-          studentId: studentId,
-        );
+  StudentScheduleBookingProvider(String scheduleId, String studentId)
+    : this._internal(
+        (ref) => studentScheduleBooking(
+          ref as StudentScheduleBookingRef,
+          scheduleId,
+          studentId,
+        ),
+        from: studentScheduleBookingProvider,
+        name: r'studentScheduleBookingProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$studentScheduleBookingHash,
+        dependencies: StudentScheduleBookingFamily._dependencies,
+        allTransitiveDependencies:
+            StudentScheduleBookingFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+        studentId: studentId,
+      );
 
   StudentScheduleBookingProvider._internal(
     super._createNotifier, {
@@ -708,7 +680,7 @@ class StudentScheduleBookingProvider
   @override
   Override overrideWith(
     FutureOr<GroupClassBooking?> Function(StudentScheduleBookingRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -790,21 +762,15 @@ class StudentActiveBookingsFamily
   /// Get all active bookings for a student
   ///
   /// Copied from [studentActiveBookings].
-  StudentActiveBookingsProvider call(
-    String studentId,
-  ) {
-    return StudentActiveBookingsProvider(
-      studentId,
-    );
+  StudentActiveBookingsProvider call(String studentId) {
+    return StudentActiveBookingsProvider(studentId);
   }
 
   @override
   StudentActiveBookingsProvider getProviderOverride(
     covariant StudentActiveBookingsProvider provider,
   ) {
-    return call(
-      provider.studentId,
-    );
+    return call(provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -830,24 +796,21 @@ class StudentActiveBookingsProvider
   /// Get all active bookings for a student
   ///
   /// Copied from [studentActiveBookings].
-  StudentActiveBookingsProvider(
-    String studentId,
-  ) : this._internal(
-          (ref) => studentActiveBookings(
-            ref as StudentActiveBookingsRef,
-            studentId,
-          ),
-          from: studentActiveBookingsProvider,
-          name: r'studentActiveBookingsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$studentActiveBookingsHash,
-          dependencies: StudentActiveBookingsFamily._dependencies,
-          allTransitiveDependencies:
-              StudentActiveBookingsFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
+  StudentActiveBookingsProvider(String studentId)
+    : this._internal(
+        (ref) =>
+            studentActiveBookings(ref as StudentActiveBookingsRef, studentId),
+        from: studentActiveBookingsProvider,
+        name: r'studentActiveBookingsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$studentActiveBookingsHash,
+        dependencies: StudentActiveBookingsFamily._dependencies,
+        allTransitiveDependencies:
+            StudentActiveBookingsFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
 
   StudentActiveBookingsProvider._internal(
     super._createNotifier, {
@@ -864,8 +827,9 @@ class StudentActiveBookingsProvider
   @override
   Override overrideWith(
     FutureOr<List<GroupClassBooking>> Function(
-            StudentActiveBookingsRef provider)
-        create,
+      StudentActiveBookingsRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -937,24 +901,15 @@ class StudentWaitlistPositionFamily extends Family<AsyncValue<int?>> {
   /// Get waitlist position for a student
   ///
   /// Copied from [studentWaitlistPosition].
-  StudentWaitlistPositionProvider call(
-    String scheduleId,
-    String studentId,
-  ) {
-    return StudentWaitlistPositionProvider(
-      scheduleId,
-      studentId,
-    );
+  StudentWaitlistPositionProvider call(String scheduleId, String studentId) {
+    return StudentWaitlistPositionProvider(scheduleId, studentId);
   }
 
   @override
   StudentWaitlistPositionProvider getProviderOverride(
     covariant StudentWaitlistPositionProvider provider,
   ) {
-    return call(
-      provider.scheduleId,
-      provider.studentId,
-    );
+    return call(provider.scheduleId, provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -979,27 +934,25 @@ class StudentWaitlistPositionProvider extends AutoDisposeFutureProvider<int?> {
   /// Get waitlist position for a student
   ///
   /// Copied from [studentWaitlistPosition].
-  StudentWaitlistPositionProvider(
-    String scheduleId,
-    String studentId,
-  ) : this._internal(
-          (ref) => studentWaitlistPosition(
-            ref as StudentWaitlistPositionRef,
-            scheduleId,
-            studentId,
-          ),
-          from: studentWaitlistPositionProvider,
-          name: r'studentWaitlistPositionProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$studentWaitlistPositionHash,
-          dependencies: StudentWaitlistPositionFamily._dependencies,
-          allTransitiveDependencies:
-              StudentWaitlistPositionFamily._allTransitiveDependencies,
-          scheduleId: scheduleId,
-          studentId: studentId,
-        );
+  StudentWaitlistPositionProvider(String scheduleId, String studentId)
+    : this._internal(
+        (ref) => studentWaitlistPosition(
+          ref as StudentWaitlistPositionRef,
+          scheduleId,
+          studentId,
+        ),
+        from: studentWaitlistPositionProvider,
+        name: r'studentWaitlistPositionProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$studentWaitlistPositionHash,
+        dependencies: StudentWaitlistPositionFamily._dependencies,
+        allTransitiveDependencies:
+            StudentWaitlistPositionFamily._allTransitiveDependencies,
+        scheduleId: scheduleId,
+        studentId: studentId,
+      );
 
   StudentWaitlistPositionProvider._internal(
     super._createNotifier, {
@@ -1082,17 +1035,20 @@ String _$groupClassBookingNotifierHash() =>
 /// See also [GroupClassBookingNotifier].
 @ProviderFor(GroupClassBookingNotifier)
 final groupClassBookingNotifierProvider = AutoDisposeNotifierProvider<
-    GroupClassBookingNotifier, AsyncValue<GroupClassBooking?>>.internal(
+  GroupClassBookingNotifier,
+  AsyncValue<GroupClassBooking?>
+>.internal(
   GroupClassBookingNotifier.new,
   name: r'groupClassBookingNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$groupClassBookingNotifierHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$groupClassBookingNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$GroupClassBookingNotifier
-    = AutoDisposeNotifier<AsyncValue<GroupClassBooking?>>;
+typedef _$GroupClassBookingNotifier =
+    AutoDisposeNotifier<AsyncValue<GroupClassBooking?>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

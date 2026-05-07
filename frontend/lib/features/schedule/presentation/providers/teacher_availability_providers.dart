@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../search/search_facade.dart';
@@ -21,14 +23,14 @@ part 'teacher_availability_providers.g.dart';
 // Repository Provider - switches between Mock and Remote.
 // ============================================================
 
-final teacherAvailabilityRepositoryProvider =
-    Provider<TeacherAvailabilityRepository>(
-      (ref) => createRepository<TeacherAvailabilityRepository>(
-        ref: ref,
-        mock: () => MockTeacherAvailabilityRepository(),
-        remote: (api) => RemoteTeacherAvailabilityRepository(api),
-      ),
-    );
+@Riverpod(keepAlive: true)
+TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) {
+  return createRepository<TeacherAvailabilityRepository>(
+    ref: ref,
+    mock: () => MockTeacherAvailabilityRepository(),
+    remote: (api) => RemoteTeacherAvailabilityRepository(api),
+  );
+}
 
 // ============================================================
 // Teacher Availability Settings
@@ -324,8 +326,8 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         goal: LessonGoal.hobby,
         experience: ExperienceLevel.none,
         preferredDate: slotDate,
-        preferredStartTime: slotStartTime,
-        preferredEndTime: slotEndTime,
+        preferredStartTime: slotStartTime.toClockTime(),
+        preferredEndTime: slotEndTime.toClockTime(),
       );
 
       final booking = await bookingsNotifier.requestTrialLesson(
@@ -397,7 +399,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
               userId: studentId,
               teacherName: teacherName,
               lessonDate: cancelledSlot.date,
-              startTime: cancelledSlot.startTime,
+              startTime: cancelledSlot.startTime.toFlutterTimeOfDay(),
               isTeacherInitiated: isTeacherInitiated,
               reason: reason,
             );
@@ -464,9 +466,9 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
               userId: studentId,
               teacherName: teacherName,
               oldDate: oldSlot.date,
-              oldTime: oldSlot.startTime,
+              oldTime: oldSlot.startTime.toFlutterTimeOfDay(),
               newDate: newSlot.date,
-              newTime: newSlot.startTime,
+              newTime: newSlot.startTime.toFlutterTimeOfDay(),
               isTeacherInitiated: isTeacherInitiated,
             );
         // TODO: Send notification via notification service
@@ -567,7 +569,12 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
   ) async {
     try {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
-      await repository.toggleTimeBlock(teacherId, date, time, isAvailable);
+      await repository.toggleTimeBlock(
+        teacherId,
+        date,
+        time.toClockTime(),
+        isAvailable,
+      );
 
       // Reload availability
       final updated = await repository.getAvailability(teacherId);
