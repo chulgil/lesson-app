@@ -40,6 +40,48 @@ class BulkTeacherActionService:
         current_user: Any,
     ) -> BulkCancelLessonResponse:
         """Cancel matching lessons and create subscription chat events."""
+        return await self._bulk_cancel_lessons(
+            teacher_id=teacher_id,
+            student_ids=student_ids,
+            target_date=target_date,
+            reason=reason,
+            notification_title=notification_title,
+            current_user=current_user,
+            preview=False,
+        )
+
+    async def preview_bulk_cancel_lessons(
+        self,
+        *,
+        teacher_id: str,
+        student_ids: list[str],
+        target_date: Any,
+        reason: str | None,
+        notification_title: str,
+        current_user: Any,
+    ) -> BulkCancelLessonResponse:
+        """Preview matching lesson cancellations without side effects."""
+        return await self._bulk_cancel_lessons(
+            teacher_id=teacher_id,
+            student_ids=student_ids,
+            target_date=target_date,
+            reason=reason,
+            notification_title=notification_title,
+            current_user=current_user,
+            preview=True,
+        )
+
+    async def _bulk_cancel_lessons(
+        self,
+        *,
+        teacher_id: str,
+        student_ids: list[str],
+        target_date: Any,
+        reason: str | None,
+        notification_title: str,
+        current_user: Any,
+        preview: bool,
+    ) -> BulkCancelLessonResponse:
         from app.models.lesson import Lesson
         from app.models.request_event import RequestEvent
 
@@ -75,41 +117,42 @@ class BulkTeacherActionService:
 
             for lesson in student_lessons:
                 session_number = await self._session_number_for_lesson(lesson)
-                lesson.status = LessonStatus.cancelledByTeacher
-                event = RequestEvent(
-                    request_id=subscription.id,
-                    actor_type="teacher",
-                    actor_id=current_user.id,
-                    event_type=RequestEventType.lesson_cancelled_by_teacher,
-                    subscription_id=subscription.id,
-                    session_number=session_number,
-                    message=reason,
-                    change_credit_used=0,
-                    change_credit_remaining_after=(
-                        subscription.total_reschedule_allowance - subscription.used_reschedule_count
-                    ),
-                    keeps_session_number=True,
-                )
-                self.db.add(event)
-                body = self._bulk_cancel_body(lesson, reason, session_number)
-                await notification_service.create_and_send(
-                    user_id=student.user_id or student.id,
-                    notification_type="lessonCancelled",
-                    title=notification_title,
-                    body=body,
-                    priority=NotificationPriority.high,
-                    data={
-                        "teacherId": resolved_teacher_id,
-                        "lessonId": lesson.id,
-                        "subscriptionId": subscription.id,
-                        "sessionNumber": session_number,
-                        "source": "bulk_teacher_action",
-                        "actionUrl": f"/subscriptions/{subscription.id}",
-                        "actionLabel": "보강 요청",
-                    },
-                    action_url=f"/subscriptions/{subscription.id}",
-                    action_label="보강 요청",
-                )
+                if not preview:
+                    lesson.status = LessonStatus.cancelledByTeacher
+                    event = RequestEvent(
+                        request_id=subscription.id,
+                        actor_type="teacher",
+                        actor_id=current_user.id,
+                        event_type=RequestEventType.lesson_cancelled_by_teacher,
+                        subscription_id=subscription.id,
+                        session_number=session_number,
+                        message=reason,
+                        change_credit_used=0,
+                        change_credit_remaining_after=(
+                            subscription.total_reschedule_allowance - subscription.used_reschedule_count
+                        ),
+                        keeps_session_number=True,
+                    )
+                    self.db.add(event)
+                    body = self._bulk_cancel_body(lesson, reason, session_number)
+                    await notification_service.create_and_send(
+                        user_id=student.user_id or student.id,
+                        notification_type="lessonCancelled",
+                        title=notification_title,
+                        body=body,
+                        priority=NotificationPriority.high,
+                        data={
+                            "teacherId": resolved_teacher_id,
+                            "lessonId": lesson.id,
+                            "subscriptionId": subscription.id,
+                            "sessionNumber": session_number,
+                            "source": "bulk_teacher_action",
+                            "actionUrl": f"/subscriptions/{subscription.id}",
+                            "actionLabel": "보강 요청",
+                        },
+                        action_url=f"/subscriptions/{subscription.id}",
+                        action_label="보강 요청",
+                    )
                 events_created.append(
                     BulkLessonEventCreated(
                         student_id=student_id,

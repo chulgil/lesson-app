@@ -122,6 +122,69 @@ async def test_bulk_cancel_rejects_empty_student_list(
 
 
 @pytest.mark.asyncio
+async def test_bulk_cancel_preview_returns_events_without_mutation(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    await create_test_user(user_id=TEACHER_USER_ID, role="teacher")
+    await create_test_user(user_id="student-active-user", role="student", email="active@test.com")
+    await create_test_user(user_id="student-skipped-user", role="student", email="skipped@test.com")
+    await _seed_student(db_session, student_id="student-active", user_id="student-active-user")
+    await _seed_student(db_session, student_id="student-skipped", user_id="student-skipped-user")
+    await _seed_active_subscription(db_session, student_id="student-active", subscription_id="sub-active")
+    await _seed_lesson(
+        db_session,
+        lesson_id="lesson-active",
+        student_id="student-active",
+        subscription_id="sub-active",
+        status=LessonStatus.reschedulePending,
+    )
+    await _seed_lesson(
+        db_session,
+        lesson_id="lesson-skipped",
+        student_id="student-skipped",
+        subscription_id=None,
+    )
+
+    response = await client.post(
+        "/api/v1/lessons/bulk-cancel/preview",
+        headers=auth_headers,
+        json={
+            "teacher_id": TEACHER_PROFILE_ID,
+            "student_ids": ["student-active", "student-skipped", "student-missing"],
+            "target_date": "2026-05-09",
+            "reason": "개인 사정으로 휴강합니다",
+            "notification_title": "휴강 안내",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["cancelled_lesson_count"] == 1
+    assert body["notified_student_count"] == 1
+    assert set(body["skipped_student_ids"]) == {"student-skipped", "student-missing"}
+    assert body["events_created"] == [
+        {
+            "student_id": "student-active",
+            "lesson_id": "lesson-active",
+            "session_number": 1,
+            "subscription_id": "sub-active",
+        }
+    ]
+
+    active_lesson = await db_session.get(Lesson, "lesson-active")
+    skipped_lesson = await db_session.get(Lesson, "lesson-skipped")
+    assert active_lesson is not None
+    assert skipped_lesson is not None
+    assert active_lesson.status == LessonStatus.reschedulePending
+    assert skipped_lesson.status == LessonStatus.scheduled
+    assert (await db_session.scalars(select(RequestEvent))).all() == []
+    assert (await db_session.scalars(select(Notification))).all() == []
+
+
+@pytest.mark.asyncio
 async def test_bulk_cancel_creates_events_and_skips_students_without_active_subscription(
     client: AsyncClient,
     auth_headers,

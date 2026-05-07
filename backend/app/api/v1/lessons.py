@@ -139,6 +139,29 @@ async def bulk_cancel_lessons(
     )
 
 
+@router.post(
+    "/bulk-cancel/preview",
+    response_model=BulkCancelLessonResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Preview bulk lesson cancellations",
+)
+async def preview_bulk_cancel_lessons(
+    body: BulkCancelLessonRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> BulkCancelLessonResponse:
+    """Preview selected students' cancellable lessons without mutating state."""
+    service = BulkTeacherActionService(db)
+    return await service.preview_bulk_cancel_lessons(
+        teacher_id=body.teacher_id,
+        student_ids=body.student_ids,
+        target_date=body.target_date,
+        reason=body.reason,
+        notification_title=body.notification_title,
+        current_user=current_user,
+    )
+
+
 @router.get(
     "/{lesson_id}",
     response_model=LessonResponse,
