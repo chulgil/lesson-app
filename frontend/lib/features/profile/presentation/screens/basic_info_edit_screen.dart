@@ -9,6 +9,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/address_search_field.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/profile/profile_facade.dart';
 import '../../../auth/auth_facade.dart';
@@ -34,6 +35,11 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   final Set<String> _selectedSpecialties = {};
   final List<String> _lessonAreas = [];
   final _areaController = TextEditingController();
+
+  // 주소 필드
+  String? _postalCode;
+  String? _address;
+  String? _addressDetail;
 
   bool _isLoading = false;
 
@@ -73,6 +79,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       if (profile.lessonAreas != null) {
         _lessonAreas.addAll(profile.lessonAreas!);
       }
+      _postalCode = profile.postalCode;
+      _address = profile.address;
+      _addressDetail = profile.addressDetail;
     }
   }
 
@@ -162,6 +171,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         teachingStyle: teachingStyle.isNotEmpty ? teachingStyle : null,
         specialties: _selectedSpecialties.toList(),
         lessonAreas: _lessonAreas.toList(),
+        postalCode: _postalCode,
+        address: _address,
+        addressDetail: _addressDetail,
       );
 
       if (mounted) {
@@ -333,6 +345,29 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               _buildAreaInput(),
               const SizedBox(height: AppSpacing.space2),
               _buildAreaChips(),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // 기본 레슨 장소 주소
+              _buildLabel('기본 레슨 장소'),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '학생 방문 레슨 시 이동시간 자동 계산과\n수강권 발급 시 이동비 산정에 활용됩니다',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+              AddressSearchField(
+                initialPostalCode: _postalCode,
+                initialAddress: _address,
+                initialAddressDetail: _addressDetail,
+                onChanged: (result) {
+                  _postalCode = result.postalCode;
+                  _address = result.address;
+                  _addressDetail = result.addressDetail;
+                },
+              ),
             ],
           ),
         ),
