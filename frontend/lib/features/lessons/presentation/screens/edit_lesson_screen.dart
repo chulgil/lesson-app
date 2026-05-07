@@ -9,6 +9,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../students/students_facade.dart';
 import '../../../students/presentation/extensions/student_domain_visuals.dart';
@@ -105,6 +106,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       );
     }
 
+    final isSubscriptionLesson = _originalLesson?.subscriptionId != null;
+
     return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.editLessonTitle),
@@ -179,52 +182,134 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Student info (read-only)
+              // Subscription lesson info banner
+              if (isSubscriptionLesson)
+                Container(
+                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.paperDark,
+                    border: Border.all(color: AppColors.inkQuaternary),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: AppColors.inkTertiary,
+                          ),
+                          const SizedBox(width: AppSpacing.space2),
+                          Expanded(
+                            child: Text(
+                              AppStrings.subscriptionFieldLocked,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      GestureDetector(
+                        onTap:
+                            () => context.push(
+                              AppRoutes.subscriptionDetail.replaceFirst(
+                                ':id',
+                                _originalLesson!.subscriptionId!,
+                              ),
+                              extra: {'viewerRole': 'teacher'},
+                            ),
+                        child: Text(
+                          AppStrings.goToScheduleChange,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.paperAccent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Student info (read-only for subscription lessons, also read-only for manual)
               const LessonFormSectionTitle(AppStrings.student),
               const SizedBox(height: AppSpacing.space3),
               if (_selectedStudent != null)
-                EditLessonStudentCard(
-                  student: _selectedStudent!,
-                  onViewProfile: () {
-                    context.push(
-                      AppRoutes.studentDetail.replaceFirst(
-                        ':id',
-                        _selectedStudent!.id,
+                isSubscriptionLesson
+                    ? _LockedFieldWrapper(
+                      child: EditLessonStudentCard(
+                        student: _selectedStudent!,
+                        onViewProfile: () {
+                          context.push(
+                            AppRoutes.studentDetail.replaceFirst(
+                              ':id',
+                              _selectedStudent!.id,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+                    )
+                    : EditLessonStudentCard(
+                      student: _selectedStudent!,
+                      onViewProfile: () {
+                        context.push(
+                          AppRoutes.studentDetail.replaceFirst(
+                            ':id',
+                            _selectedStudent!.id,
+                          ),
+                        );
+                      },
+                    ),
 
               const SizedBox(height: AppSpacing.space6),
 
               // Date and time selection
               const LessonFormSectionTitle(AppStrings.dateTimeLabel),
               const SizedBox(height: AppSpacing.space3),
-              LessonDateTimeSection(
-                selectedDate: _selectedDate,
-                selectedTime: _selectedTime,
-                onDateTap: _selectDate,
-                onTimeTap: _selectTime,
-              ),
+              isSubscriptionLesson
+                  ? _LockedFieldWrapper(
+                    child: LessonDateTimeSection(
+                      selectedDate: _selectedDate,
+                      selectedTime: _selectedTime,
+                      onDateTap: () {},
+                      onTimeTap: () {},
+                    ),
+                  )
+                  : LessonDateTimeSection(
+                    selectedDate: _selectedDate,
+                    selectedTime: _selectedTime,
+                    onDateTap: _selectDate,
+                    onTimeTap: _selectTime,
+                  ),
 
               const SizedBox(height: AppSpacing.space6),
 
               // Lesson duration
               const LessonFormSectionTitle(AppStrings.lessonDurationLabel),
               const SizedBox(height: AppSpacing.space3),
-              LessonDurationSelector(
-                selectedDuration: _lessonDuration,
-                onDurationChanged: (value) {
-                  setState(() {
-                    _lessonDuration = value;
-                    _hasChanges = true;
-                  });
-                },
-              ),
+              isSubscriptionLesson
+                  ? _LockedFieldWrapper(
+                    child: LessonDurationSelector(
+                      selectedDuration: _lessonDuration,
+                      onDurationChanged: (_) {},
+                    ),
+                  )
+                  : LessonDurationSelector(
+                    selectedDuration: _lessonDuration,
+                    onDurationChanged: (value) {
+                      setState(() {
+                        _lessonDuration = value;
+                        _hasChanges = true;
+                      });
+                    },
+                  ),
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Lesson content
+              // Lesson content — always editable
               const LessonFormSectionTitle(AppStrings.lessonContentLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonContentFields(
@@ -235,22 +320,31 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Reminder settings
-              LessonReminderSection(
-                enableReminder: _enableReminder,
-                onReminderChanged: (value) {
-                  setState(() {
-                    _enableReminder = value;
-                    _hasChanges = true;
-                  });
-                },
-                reminderMinutes: _reminderMinutes,
-                onReminderTimeChanged: (value) {
-                  setState(() {
-                    _reminderMinutes = value;
-                    _hasChanges = true;
-                  });
-                },
-              ),
+              isSubscriptionLesson
+                  ? _LockedFieldWrapper(
+                    child: LessonReminderSection(
+                      enableReminder: _enableReminder,
+                      onReminderChanged: (_) {},
+                      reminderMinutes: _reminderMinutes,
+                      onReminderTimeChanged: (_) {},
+                    ),
+                  )
+                  : LessonReminderSection(
+                    enableReminder: _enableReminder,
+                    onReminderChanged: (value) {
+                      setState(() {
+                        _enableReminder = value;
+                        _hasChanges = true;
+                      });
+                    },
+                    reminderMinutes: _reminderMinutes,
+                    onReminderTimeChanged: (value) {
+                      setState(() {
+                        _reminderMinutes = value;
+                        _hasChanges = true;
+                      });
+                    },
+                  ),
 
               const SizedBox(height: AppSpacing.space8),
 
@@ -513,5 +607,24 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
         setState(() => _isSaving = false);
       }
     }
+  }
+}
+
+/// Grey overlay wrapper that disables interaction for subscription-locked fields.
+///
+/// Notebook × Score: paperDark background tint + inkTertiary foreground.
+class _LockedFieldWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _LockedFieldWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Opacity(
+        opacity: 0.55,
+        child: ColoredBox(color: AppColors.paperDark, child: child),
+      ),
+    );
   }
 }

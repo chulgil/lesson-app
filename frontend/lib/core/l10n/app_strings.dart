@@ -2398,6 +2398,28 @@ class AppStrings {
   /// 레슨 수정에 실패했습니다. 다시 시도해주세요. (edit failure)
   static const editLessonFailedRetry = '레슨 수정에 실패했습니다. 다시 시도해주세요.';
 
+  /// 편집 (수기 레슨 action label) — 레거시
+  static const editManual = '편집 (수기)';
+
+  /// 내용 수정 (수강권 레슨 content-only edit action label) — 레거시
+  static const editContent = '내용 수정';
+
+  /// 내용 수정 subtitle
+  static const editContentSubtitle = '곡/메모 수정';
+
+  /// 편집 (수기) subtitle
+  static const editManualSubtitle = '모든 항목 수정 가능';
+
+  // §13.2 v2 액션 시트 라벨
+  static const editManualFull = '수기 등록 레슨 편집';
+  static const scheduleChangeLabel = '일정 변경';
+
+  /// 수강권 레슨 잠금 필드 안내 배너
+  static const subscriptionFieldLocked = '수강권 레슨의 날짜/시간 변경은\n스케줄 변경에서 진행해주세요.';
+
+  /// 스케줄 변경으로 이동 링크 텍스트
+  static const goToScheduleChange = '스케줄 변경으로 이동 →';
+
   // ── Quick Feedback (빠른 피드백 화면 30차) ─
 
   /// 피드백 (quick feedback screen title)
@@ -4916,7 +4938,10 @@ class AppStrings {
   static const analyticsPracticeTrend = '연습 시간 추이';
 
   /// 연습률 / 출석률 (학생 목록 행 부제 포매터)
-  static String analyticsStudentRates(double practiceRate, double attendanceRate) {
+  static String analyticsStudentRates(
+    double practiceRate,
+    double attendanceRate,
+  ) {
     final pr = (practiceRate * 100).round();
     final ar = (attendanceRate * 100).round();
     return '연습 $pr% · 출석 $ar%';
@@ -6793,8 +6818,7 @@ class AppStrings {
   static String milestoneCongrats(int count) => '$count회 레슨 달성!';
 
   /// 마일스톤 설명
-  static const milestoneDescription =
-      '선생님의 레슨이 쌓이고 있어요.\n앞으로도 좋은 레슨을 응원합니다!';
+  static const milestoneDescription = '선생님의 레슨이 쌓이고 있어요.\n앞으로도 좋은 레슨을 응원합니다!';
 
   /// 마일스톤 카드 내 소프트 리뷰 링크
   static const milestoneReviewLink = '앱이 마음에 드셨다면 평가를 남겨주세요 →';
@@ -6804,8 +6828,7 @@ class AppStrings {
 
   // ── 레거시 (기존 팝업용, 참조 유지) ──
   static const ratingQuestion = '레슨앱이 도움이 되고 있나요?';
-  static const ratingPromptBody =
-      '레슨과 연습을 함께 관리하는\n경험이 어떠셨는지 알고 싶어요.';
+  static const ratingPromptBody = '레슨과 연습을 함께 관리하는\n경험이 어떠셨는지 알고 싶어요.';
   static const ratingYes = '네, 도움돼요!';
   static const ratingNo = '아니요, 별로예요';
   static const ratingFeedbackQuestion = '어떤 점을 개선하면 좋을까요?';

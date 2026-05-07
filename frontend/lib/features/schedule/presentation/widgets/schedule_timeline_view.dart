@@ -590,7 +590,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  // 액션 카드들 (Notebook × Score: 각진 네모 박스)
+                  // §13.2 공통 액션
                   _ActionCard(
                     icon: Icons.check_circle_outline,
                     iconColor: AppColors.paperOk,
@@ -600,14 +600,28 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                       _completeLesson(lesson);
                     },
                   ),
-                  const SizedBox(height: AppSpacing.space2),
-                  // 수강권 + 미래 레슨 → 스케줄 변경(챗)
-                  if (hasSubscription && isUpcoming)
+                  // 수기 레슨 → 수기 등록 레슨 편집
+                  if (!hasSubscription) ...[
+                    const SizedBox(height: AppSpacing.space2),
+                    _ActionCard(
+                      icon: Icons.edit_calendar,
+                      iconColor: AppColors.ink,
+                      label: AppStrings.editManualFull,
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        context.push(
+                          AppRoutes.editLesson.replaceFirst(':id', lesson.id),
+                        );
+                      },
+                    ),
+                  ],
+                  // 수강권 + 미래 레슨 → 일정 변경 (챗)
+                  if (hasSubscription && isUpcoming) ...[
+                    const SizedBox(height: AppSpacing.space2),
                     _ActionCard(
                       icon: Icons.swap_horiz,
                       iconColor: AppColors.ink,
-                      label: AppStrings.scheduleChangeSchedule,
-                      subtitle: '수강권 스케줄 조절 (챗)',
+                      label: AppStrings.scheduleChangeLabel,
                       onTap: () {
                         Navigator.of(ctx).pop();
                         context.push(
@@ -619,20 +633,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                         );
                       },
                     ),
-                  // 수기 레슨 (수강권 없음) → 편집 화면
-                  if (!hasSubscription)
-                    _ActionCard(
-                      icon: Icons.edit_calendar,
-                      iconColor: AppColors.ink,
-                      label: '일정 수정',
-                      subtitle: '수기 등록 레슨 편집',
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                        context.push(
-                          AppRoutes.editLesson.replaceFirst(':id', lesson.id),
-                        );
-                      },
-                    ),
+                  ],
                   const SizedBox(height: AppSpacing.space2),
                   _ActionCard(
                     icon: Icons.close,
@@ -715,14 +716,12 @@ class _ActionCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String label;
-  final String? subtitle;
   final VoidCallback onTap;
 
   const _ActionCard({
     required this.icon,
     required this.iconColor,
     required this.label,
-    this.subtitle,
     required this.onTap,
   });
 
@@ -762,17 +761,14 @@ class _ActionCard extends StatelessWidget {
                       color: AppColors.ink,
                     ),
                   ),
-                  if (subtitle != null)
-                    Text(
-                      subtitle!,
-                      style: AppTypography.captionSmall.copyWith(
-                        color: AppColors.inkTertiary,
-                      ),
-                    ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.inkTertiary, size: 20),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.inkTertiary,
+              size: 20,
+            ),
           ],
         ),
       ),

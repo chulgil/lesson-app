@@ -239,9 +239,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder:
               (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
-                  child: Text(AppStrings.modify),
+                  child: Text(
+                    lesson.subscriptionId != null
+                        ? AppStrings.editContent
+                        : AppStrings.editManual,
+                  ),
                 ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
                   const PopupMenuItem(
@@ -255,7 +259,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                   ),
                 // Show for subscription lessons OR manual lessons with an active subscription
                 if (lesson.subscriptionId != null ||
-                    ref.watch(activeStudentSubscriptionsProvider(lesson.studentId)).valueOrNull?.isNotEmpty == true)
+                    ref
+                            .watch(
+                              activeStudentSubscriptionsProvider(
+                                lesson.studentId,
+                              ),
+                            )
+                            .valueOrNull
+                            ?.isNotEmpty ==
+                        true)
                   PopupMenuItem(
                     value: 'schedule_change',
                     child: Text(AppStrings.announcementScheduleChange),
@@ -359,8 +371,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         }
       }
     } else if (value == 'schedule_change') {
-      final subId = lesson.subscriptionId ??
-          ref.read(activeStudentSubscriptionsProvider(lesson.studentId)).valueOrNull?.firstOrNull?.id;
+      final subId =
+          lesson.subscriptionId ??
+          ref
+              .read(activeStudentSubscriptionsProvider(lesson.studentId))
+              .valueOrNull
+              ?.firstOrNull
+              ?.id;
       if (subId != null) {
         context.push(
           AppRoutes.subscriptionDetail.replaceFirst(':id', subId),
@@ -516,14 +533,17 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     }
 
     // Case 2: manual lesson — check whether an active subscription exists
-    final subsAsync = ref.watch(activeStudentSubscriptionsProvider(lesson.studentId));
+    final subsAsync = ref.watch(
+      activeStudentSubscriptionsProvider(lesson.studentId),
+    );
     return subsAsync.maybeWhen(
       data: (subs) {
         if (subs.isEmpty) return const SizedBox.shrink();
         final activeSub = subs.first;
         return _scheduleChangeButton(
           subscriptionId: activeSub.id,
-          label: '${AppStrings.announcementScheduleChange} (${activeSub.typeLabel})',
+          label:
+              '${AppStrings.announcementScheduleChange} (${activeSub.typeLabel})',
         );
       },
       orElse: () => const SizedBox.shrink(),
@@ -537,10 +557,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
       child: OutlinedButton.icon(
-        onPressed: () => context.push(
-          AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
-          extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
-        ),
+        onPressed:
+            () => context.push(
+              AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
+              extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
+            ),
         icon: const Icon(Icons.swap_horiz, size: 18),
         label: Text(label),
         style: OutlinedButton.styleFrom(
