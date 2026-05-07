@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import CheckConstraint, JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -112,7 +112,10 @@ class TeacherAvailability(UUIDMixin, TimestampMixin, Base):
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     day_of_week: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    __table_args__ = (Index("uk_avail_teacher_day", "teacher_id", "day_of_week", unique=True),)
+    __table_args__ = (
+        Index("uk_avail_teacher_day", "teacher_id", "day_of_week", unique=True),
+        CheckConstraint("day_of_week BETWEEN 0 AND 6", name="ck_teacher_availabilities_day_of_week"),
+    )
 
 
 class AvailabilityTimeSlot(UUIDMixin, Base):
@@ -125,7 +128,10 @@ class AvailabilityTimeSlot(UUIDMixin, Base):
     end_time: Mapped[str] = mapped_column(String(5), nullable=False)
     is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (Index("idx_slot_availability", "availability_id"),)
+    __table_args__ = (
+        Index("idx_slot_availability", "availability_id"),
+        CheckConstraint("end_time > start_time", name="ck_availability_time_slots_temporal_order"),
+    )
 
 
 class LessonBooking(UUIDMixin, TimestampMixin, Base):

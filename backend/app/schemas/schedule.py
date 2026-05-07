@@ -1,8 +1,15 @@
 """Schedule and booking schemas."""
 
 import datetime as _dt
+from datetime import time
 
-from pydantic import BaseModel, ConfigDict, computed_field, model_validator
+from pydantic import BaseModel, ConfigDict, computed_field, model_validator, field_validator
+
+
+def _slot_minutes(value: str) -> int:
+    parsed = time.fromisoformat(value)
+    return parsed.hour * 60 + parsed.minute
+
 
 # ---------------------------------------------------------------------------
 # Availability
@@ -15,12 +22,34 @@ class TimeSlotSchema(BaseModel):
     start_time: str
     end_time: str
 
+    @field_validator("start_time", "end_time")
+    @classmethod
+    def validate_hhmm(cls, value: str) -> str:
+        try:
+            _slot_minutes(value)
+        except ValueError as exc:
+            raise ValueError("time must be HH:MM") from exc
+        return value
+
+    @model_validator(mode="after")
+    def validate_range(self) -> "TimeSlotSchema":
+        if _slot_minutes(self.start_time) >= _slot_minutes(self.end_time):
+            raise ValueError("end_time must be after start_time")
+        return self
+
 
 class DayAvailability(BaseModel):
     """Availability for a specific day of week."""
 
     day_of_week: int  # 0=Mon … 6=Sun
     time_slots: list[TimeSlotSchema] = []
+
+    @field_validator("day_of_week")
+    @classmethod
+    def validate_day_of_week(cls, value: int) -> int:
+        if value < 0 or value > 6:
+            raise ValueError("day_of_week must be 0..6")
+        return value
 
 
 class AvailabilityResponse(BaseModel):
@@ -72,6 +101,25 @@ class AvailabilityCreate(BaseModel):
                     )
                 )
             self.availabilities = converted
+            return self
+
+        return self
+
+    @model_validator(mode="after")
+    def validate_no_overlap(self) -> "AvailabilityCreate":
+        seen: dict[int, list[tuple[int, int]]] = {}
+        seen_days: set[int] = set()
+        for day in self.availabilities:
+            if day.day_of_week in seen_days:
+                raise ValueError("day_of_week must be unique")
+            seen_days.add(day.day_of_week)
+            slots = sorted(((_slot_minutes(slot.start_time), _slot_minutes(slot.end_time)) for slot in day.time_slots))
+            bucket = seen.setdefault(day.day_of_week, [])
+            bucket.extend(slots)
+            bucket.sort()
+            for current, next_slot in zip(bucket, bucket[1:]):
+                if current[1] > next_slot[0]:
+                    raise ValueError("time_slots for a day must not overlap")
         return self
 
 

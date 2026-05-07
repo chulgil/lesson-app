@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_reviewed": "2026-05-06",
+  "last_reviewed": "2026-05-07",
   "purpose": "Explicit inventory of known backend database integrity gaps. This file is a contract target for tests; remove entries only when a migration and model-level FK or constraint closes the gap.",
   "canonical_identifier_policy": {
     "users.id": "Authentication account identifier.",
@@ -222,14 +222,14 @@
       "table": "teacher_availabilities",
       "type": "check",
       "priority": "P0",
-      "rule": "day_of_week in 0..6 and end_time must be after start_time"
+      "rule": "day_of_week in 0..6 (DB check constraint added: ck_teacher_availabilities_day_of_week)"
     },
     {
       "domain": "schedule",
       "table": "availability_time_slots",
       "type": "check",
       "priority": "P0",
-      "rule": "end_time must be after start_time and slot ranges should not overlap within one availability"
+      "rule": "end_time must be after start_time (DB check) and slot ranges must not overlap within one availability (service-level validation)"
     },
     {
       "domain": "lesson",
