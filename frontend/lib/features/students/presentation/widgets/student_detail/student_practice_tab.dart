@@ -223,12 +223,9 @@ class _DayColumn extends StatelessWidget {
               minBarHeight,
               maxBarHeight,
             )
-            : minBarHeight;
+            : 0.0;
 
-    final barColor =
-        entry.hasPracticed
-            ? AppColors.paperOk
-            : AppColors.scheduleMutedBackground;
+    final barColor = AppColors.paperOk;
 
     final dayLabel = LessonDateUtils.getWeekdayNameKorean(entry.date.weekday);
 
