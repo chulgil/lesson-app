@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -11,49 +12,55 @@ import '../../domain/entities/schedule_confirmation_card.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
 import '../../domain/services/unified_lesson_request_workflow_service.dart';
+import '../extensions/unified_lesson_request_visuals.dart';
 import 'schedule_confirmation_card_providers.dart';
 
 part 'unified_lesson_request_providers.g.dart';
 
 /// Student name lookup — Mock only (Remote: fetch from API).
 /// Returns student name by studentId.
-final studentNameMapProvider = Provider<Map<String, String>>(
-  (ref) => {
+@Riverpod(keepAlive: true)
+Map<String, String> studentNameMap(Ref ref) {
+  return {
     'student_1': '김민준',
     'student_2': '이서현',
     'student_3': '박지호',
     'student_4': '최수아',
     'student_5': '정하은',
-  },
-);
+  };
+}
 
 /// Teacher name lookup — Mock only (Remote: fetch from API).
 /// Returns teacher name by teacherId.
-final teacherNameMapProvider = Provider<Map<String, String>>(
-  (ref) => {'teacher_1': '김선아', 'teacher_2': '박지영', 'teacher_3': '이현우'},
-);
+@Riverpod(keepAlive: true)
+Map<String, String> teacherNameMap(Ref ref) {
+  return {'teacher_1': '김선아', 'teacher_2': '박지영', 'teacher_3': '이현우'};
+}
 
 /// Academy name lookup — Mock only.
-final academyNameMapProvider = Provider<Map<String, String>>(
-  (ref) => {'academy_1': '서울음악학원', 'academy_2': '강남아트스쿨'},
-);
+@Riverpod(keepAlive: true)
+Map<String, String> academyNameMap(Ref ref) {
+  return {'academy_1': '서울음악학원', 'academy_2': '강남아트스쿨'};
+}
 
 /// Repository provider — switches between Mock and Remote.
-final unifiedLessonRequestRepositoryProvider =
-    Provider<UnifiedLessonRequestRepository>(
-      (ref) => createRepository<UnifiedLessonRequestRepository>(
-        ref: ref,
-        mock: () => MockUnifiedLessonRequestRepository(),
-        remote: (apiClient) => RemoteUnifiedLessonRequestRepository(apiClient),
-      ),
-    );
+@Riverpod(keepAlive: true)
+UnifiedLessonRequestRepository unifiedLessonRequestRepository(Ref ref) {
+  return createRepository<UnifiedLessonRequestRepository>(
+    ref: ref,
+    mock: () => MockUnifiedLessonRequestRepository(),
+    remote: (apiClient) => RemoteUnifiedLessonRequestRepository(apiClient),
+  );
+}
 
-final unifiedLessonRequestWorkflowServiceProvider =
-    Provider<UnifiedLessonRequestWorkflowService>(
-      (ref) => UnifiedLessonRequestWorkflowService(
-        ref.watch(unifiedLessonRequestRepositoryProvider),
-      ),
-    );
+@Riverpod(keepAlive: true)
+UnifiedLessonRequestWorkflowService unifiedLessonRequestWorkflowService(
+  Ref ref,
+) {
+  return UnifiedLessonRequestWorkflowService(
+    ref.watch(unifiedLessonRequestRepositoryProvider),
+  );
+}
 
 /// Get all unified lesson requests for a teacher
 @riverpod

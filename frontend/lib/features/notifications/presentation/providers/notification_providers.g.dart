@@ -6,8 +6,24 @@ part of 'notification_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$notificationViewerRoleHash() =>
+    r'3ace7612c4292bbc07c3d61bd76806b7f086c132';
+
+/// See also [notificationViewerRole].
+@ProviderFor(notificationViewerRole)
+final notificationViewerRoleProvider = Provider<String>.internal(
+  notificationViewerRole,
+  name: r'notificationViewerRoleProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$notificationViewerRoleHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef NotificationViewerRoleRef = ProviderRef<String>;
 String _$notificationApiRepositoryHash() =>
-    r'7353adb52930040f49f8a22bb1bdeae5275338fa';
+    r'faeb34332b1ae3167f18caed02bd55a9f8257ef0';
 
 /// Notification repository provider (only used for remote mode).
 ///
@@ -63,7 +79,7 @@ final notificationSchedulerServiceProvider =
 
 typedef NotificationSchedulerServiceRef
     = ProviderRef<NotificationSchedulerService>;
-String _$fcmServiceHash() => r'a591c325c23c7af484185a0c7ad33b1c7e4c897d';
+String _$fcmServiceHash() => r'bc590085d4c924b9ad19641f4a2f8a8f28361a57';
 
 /// Provider for FCM push notification service (keepAlive for app lifecycle)
 ///
@@ -139,7 +155,7 @@ final proposalNotificationServiceProvider =
 
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
-String _$userNotificationsHash() => r'24e31a590c0b3a6ece3efa86ea0eedb957b0232c';
+String _$userNotificationsHash() => r'57b0962d3bf3e09a36e6724a2655a09f78a76b99';
 
 /// Provider for user's notifications list.
 ///
@@ -180,7 +196,7 @@ final unreadNotificationCountProvider = AutoDisposeProvider<int>.internal(
 
 typedef UnreadNotificationCountRef = AutoDisposeProviderRef<int>;
 String _$studentNotificationSettingsNotifierHash() =>
-    r'906a644cf8a9222e3dd9079a2e14656780b5df60';
+    r'761947b45d47123e9e9a10b2d445e32ca2a882b5';
 
 /// Provider for student notification settings (persisted to Hive)
 ///

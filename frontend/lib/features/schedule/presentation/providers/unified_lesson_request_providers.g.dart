@@ -6,6 +6,97 @@ part of 'unified_lesson_request_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$studentNameMapHash() => r'2e5d34770957b17c5e4ad08ec38c86711efc40af';
+
+/// Student name lookup — Mock only (Remote: fetch from API).
+/// Returns student name by studentId.
+///
+/// Copied from [studentNameMap].
+@ProviderFor(studentNameMap)
+final studentNameMapProvider = Provider<Map<String, String>>.internal(
+  studentNameMap,
+  name: r'studentNameMapProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$studentNameMapHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef StudentNameMapRef = ProviderRef<Map<String, String>>;
+String _$teacherNameMapHash() => r'db94ce1bbb83dfe67d04bfe578c7d64e063057e0';
+
+/// Teacher name lookup — Mock only (Remote: fetch from API).
+/// Returns teacher name by teacherId.
+///
+/// Copied from [teacherNameMap].
+@ProviderFor(teacherNameMap)
+final teacherNameMapProvider = Provider<Map<String, String>>.internal(
+  teacherNameMap,
+  name: r'teacherNameMapProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherNameMapHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef TeacherNameMapRef = ProviderRef<Map<String, String>>;
+String _$academyNameMapHash() => r'94e2c267d5203f7f3692c6f64f3b931f20ee0f6d';
+
+/// Academy name lookup — Mock only.
+///
+/// Copied from [academyNameMap].
+@ProviderFor(academyNameMap)
+final academyNameMapProvider = Provider<Map<String, String>>.internal(
+  academyNameMap,
+  name: r'academyNameMapProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$academyNameMapHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef AcademyNameMapRef = ProviderRef<Map<String, String>>;
+String _$unifiedLessonRequestRepositoryHash() =>
+    r'3af059d7f54f1e1b4551aca7b3ec528e38bfb4ab';
+
+/// Repository provider — switches between Mock and Remote.
+///
+/// Copied from [unifiedLessonRequestRepository].
+@ProviderFor(unifiedLessonRequestRepository)
+final unifiedLessonRequestRepositoryProvider =
+    Provider<UnifiedLessonRequestRepository>.internal(
+  unifiedLessonRequestRepository,
+  name: r'unifiedLessonRequestRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$unifiedLessonRequestRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef UnifiedLessonRequestRepositoryRef
+    = ProviderRef<UnifiedLessonRequestRepository>;
+String _$unifiedLessonRequestWorkflowServiceHash() =>
+    r'5a3b2e51b584bf503379a76756fe951f30fffb96';
+
+/// See also [unifiedLessonRequestWorkflowService].
+@ProviderFor(unifiedLessonRequestWorkflowService)
+final unifiedLessonRequestWorkflowServiceProvider =
+    Provider<UnifiedLessonRequestWorkflowService>.internal(
+  unifiedLessonRequestWorkflowService,
+  name: r'unifiedLessonRequestWorkflowServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$unifiedLessonRequestWorkflowServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef UnifiedLessonRequestWorkflowServiceRef
+    = ProviderRef<UnifiedLessonRequestWorkflowService>;
 String _$teacherUnifiedRequestsHash() =>
     r'7badd2579857d2673986c6e63733671f710edddc';
 

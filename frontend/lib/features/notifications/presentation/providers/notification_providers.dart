@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/providers/repository_provider.dart';
@@ -26,14 +26,15 @@ const _notificationSettingsBoxName = 'notification_settings';
 const _studentSettingsKey = 'student_settings';
 const _teacherSettingsKey = 'teacher_settings';
 
-final notificationViewerRoleProvider = Provider<String>((ref) {
+@Riverpod(keepAlive: true)
+String notificationViewerRole(Ref ref) {
   final role = ref.watch(currentUserRoleProvider);
   return role == UserRole.teacher
       ? 'teacher'
       : role == UserRole.parent
       ? 'parent'
       : 'student';
-});
+}
 
 /// Notification repository provider (only used for remote mode).
 @Riverpod(keepAlive: true)
@@ -144,14 +145,14 @@ class StudentNotificationSettingsNotifier
 
   void setPracticeReminderTime(int hour, int minute) {
     state = state.copyWith(
-      practiceReminderTime: TimeOfDay(hour: hour, minute: minute),
+      practiceReminderTime: ClockTime(hour: hour, minute: minute),
     );
     _saveToHive(state);
   }
 
   void setStreakWarningTime(int hour, int minute) {
     state = state.copyWith(
-      streakWarningTime: TimeOfDay(hour: hour, minute: minute),
+      streakWarningTime: ClockTime(hour: hour, minute: minute),
     );
     _saveToHive(state);
   }
@@ -168,11 +169,11 @@ class StudentNotificationSettingsNotifier
     int? endMinute,
   }) {
     state = state.copyWith(
-      dndStart: TimeOfDay(
+      dndStart: ClockTime(
         hour: startHour ?? state.dndStart.hour,
         minute: startMinute ?? state.dndStart.minute,
       ),
-      dndEnd: TimeOfDay(
+      dndEnd: ClockTime(
         hour: endHour ?? state.dndEnd.hour,
         minute: endMinute ?? state.dndEnd.minute,
       ),
