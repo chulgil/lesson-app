@@ -615,3 +615,26 @@ String? bookingGuidanceMessage;
 | 재수강 | LessonRequest 별도 시스템 | 동일 폼 + 프리필 |
 | 취소 정책 | 없음 | 폼에 안내 표시 |
 | 레슨 시간 | 표시 안 함 | 읽기 전용 표시 |
+
+
+---
+
+## 18. 희망 레슨 장소 (v5.0, 2026-05-07)
+
+학생이 레슨 신청 시 희망 장소를 선택한다. 이 값은 수강권 발급 시 디폴트로 전달된다.
+
+### 18.1 신청 폼에 추가
+
+| 필드 | 학원 레슨 | 개인 레슨 |
+|------|----------|----------|
+| 희망 장소 | 학원, 온라인 | 학생 집, 외부 스튜디오, 선생님 집, 온라인 |
+
+### 18.2 데이터 모델
+
+`UnifiedLessonRequest.preferredLocationType` (String, nullable)
+
+- 값: `"studentHome"` | `"academyRoom"` | `"teacherStudio"` | `"externalPlace"` | `"online"`
+- 수강권 발급 시 `LocationTravelSelector`의 디폴트로 전달
+- 선생님이 변경 시 경고 다이얼로그 표시
+
+> 상세: [subscription_edit_spec.md](../subscription/subscription_edit_spec.md) §11

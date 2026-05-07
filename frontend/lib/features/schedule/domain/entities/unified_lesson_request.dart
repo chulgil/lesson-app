@@ -234,6 +234,9 @@ class UnifiedLessonRequest {
   // v4.0: Academy association
   final String? academyId;
 
+  // v5.0: 학생 희망 레슨 장소 (수강권 발급 시 디폴트로 전달)
+  final String? preferredLocationType; // "studentHome" | "academyRoom" | "teacherStudio" | "externalPlace" | "online"
+
   UnifiedLessonRequest({
     required this.id,
     required this.studentId,
@@ -258,6 +261,7 @@ class UnifiedLessonRequest {
     this.preferredSlots = const [],
     this.proposalId,
     this.academyId,
+    this.preferredLocationType,
   });
 
   factory UnifiedLessonRequest.fromJson(Map<String, dynamic> json) =>
@@ -431,6 +435,7 @@ class UnifiedLessonRequest {
     List<PreferredTimeSlot>? preferredSlots,
     String? proposalId,
     String? academyId,
+    String? preferredLocationType,
   }) {
     return UnifiedLessonRequest(
       id: id ?? this.id,
@@ -456,6 +461,8 @@ class UnifiedLessonRequest {
       preferredSlots: preferredSlots ?? this.preferredSlots,
       proposalId: proposalId ?? this.proposalId,
       academyId: academyId ?? this.academyId,
+      preferredLocationType:
+          preferredLocationType ?? this.preferredLocationType,
     );
   }
 

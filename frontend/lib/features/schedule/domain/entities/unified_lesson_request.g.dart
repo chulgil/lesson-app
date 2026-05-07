@@ -28,17 +28,16 @@ Map<String, dynamic> _$TimeSlotOptionToJson(TimeSlotOption instance) =>
     };
 
 TimeProposal _$TimeProposalFromJson(Map<String, dynamic> json) => TimeProposal(
-  id: json['id'] as String,
-  proposerId: json['proposer_id'] as String,
-  role: $enumDecode(_$ProposerRoleEnumMap, json['role']),
-  slots:
-      (json['slots'] as List<dynamic>)
+      id: json['id'] as String,
+      proposerId: json['proposer_id'] as String,
+      role: $enumDecode(_$ProposerRoleEnumMap, json['role']),
+      slots: (json['slots'] as List<dynamic>)
           .map((e) => TimeSlotOption.fromJson(e as Map<String, dynamic>))
           .toList(),
-  message: json['message'] as String?,
-  action: $enumDecode(_$ProposalActionEnumMap, json['action']),
-  createdAt: DateTime.parse(json['created_at'] as String),
-);
+      message: json['message'] as String?,
+      action: $enumDecode(_$ProposalActionEnumMap, json['action']),
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
 
 Map<String, dynamic> _$TimeProposalToJson(TimeProposal instance) =>
     <String, dynamic>{
@@ -83,76 +82,77 @@ Map<String, dynamic> _$PreferredTimeSlotToJson(PreferredTimeSlot instance) =>
     };
 
 UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
-  Map<String, dynamic> json,
-) => UnifiedLessonRequest(
-  id: json['id'] as String,
-  studentId: json['student_id'] as String,
-  teacherId: json['teacher_id'] as String,
-  type: $enumDecode(_$LessonRequestTypeEnumMap, json['type']),
-  instrument: json['instrument'] as String,
-  goal: $enumDecode(_$UnifiedLessonGoalEnumMap, json['goal']),
-  experience: $enumDecode(_$UnifiedExperienceLevelEnumMap, json['experience']),
-  message: json['message'] as String?,
-  preferredDay: (json['preferred_day'] as num?)?.toInt(),
-  preferredTime: json['preferred_time'] as String?,
-  preferredDuration: (json['preferred_duration'] as num?)?.toInt() ?? 60,
-  proposals:
-      (json['proposals'] as List<dynamic>?)
-          ?.map((e) => TimeProposal.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  currentRound: (json['current_round'] as num?)?.toInt() ?? 0,
-  isReturningStudent: json['is_returning_student'] as bool? ?? false,
-  status:
-      $enumDecodeNullable(_$UnifiedRequestStatusEnumMap, json['status']) ??
-      UnifiedRequestStatus.pending,
-  createdAt: DateTime.parse(json['created_at'] as String),
-  confirmedAt:
-      json['confirmed_at'] == null
+        Map<String, dynamic> json) =>
+    UnifiedLessonRequest(
+      id: json['id'] as String,
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
+      type: $enumDecode(_$LessonRequestTypeEnumMap, json['type']),
+      instrument: json['instrument'] as String,
+      goal: $enumDecode(_$UnifiedLessonGoalEnumMap, json['goal']),
+      experience:
+          $enumDecode(_$UnifiedExperienceLevelEnumMap, json['experience']),
+      message: json['message'] as String?,
+      preferredDay: (json['preferred_day'] as num?)?.toInt(),
+      preferredTime: json['preferred_time'] as String?,
+      preferredDuration: (json['preferred_duration'] as num?)?.toInt() ?? 60,
+      proposals: (json['proposals'] as List<dynamic>?)
+              ?.map((e) => TimeProposal.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      currentRound: (json['current_round'] as num?)?.toInt() ?? 0,
+      isReturningStudent: json['is_returning_student'] as bool? ?? false,
+      status:
+          $enumDecodeNullable(_$UnifiedRequestStatusEnumMap, json['status']) ??
+              UnifiedRequestStatus.pending,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      confirmedAt: json['confirmed_at'] == null
           ? null
           : DateTime.parse(json['confirmed_at'] as String),
-  cancelledAt:
-      json['cancelled_at'] == null
+      cancelledAt: json['cancelled_at'] == null
           ? null
           : DateTime.parse(json['cancelled_at'] as String),
-  rejectionReason: json['decline_reason'] as String?,
-  suggestedPrice: (json['suggested_price'] as num?)?.toInt(),
-  preferredSlots:
-      (json['preferred_slots'] as List<dynamic>?)
-          ?.map((e) => PreferredTimeSlot.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  proposalId: json['proposal_id'] as String?,
-  academyId: json['academy_id'] as String?,
-);
+      rejectionReason: json['decline_reason'] as String?,
+      suggestedPrice: (json['suggested_price'] as num?)?.toInt(),
+      preferredSlots: (json['preferred_slots'] as List<dynamic>?)
+              ?.map(
+                  (e) => PreferredTimeSlot.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      proposalId: json['proposal_id'] as String?,
+      academyId: json['academy_id'] as String?,
+      preferredLocationType: json['preferred_location_type'] as String?,
+    );
 
 Map<String, dynamic> _$UnifiedLessonRequestToJson(
-  UnifiedLessonRequest instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'student_id': instance.studentId,
-  'teacher_id': instance.teacherId,
-  'type': _$LessonRequestTypeEnumMap[instance.type]!,
-  'instrument': instance.instrument,
-  'goal': _$UnifiedLessonGoalEnumMap[instance.goal]!,
-  'experience': _$UnifiedExperienceLevelEnumMap[instance.experience]!,
-  'message': instance.message,
-  'preferred_day': instance.preferredDay,
-  'preferred_time': instance.preferredTime,
-  'preferred_duration': instance.preferredDuration,
-  'proposals': instance.proposals.map((e) => e.toJson()).toList(),
-  'current_round': instance.currentRound,
-  'is_returning_student': instance.isReturningStudent,
-  'status': _$UnifiedRequestStatusEnumMap[instance.status]!,
-  'created_at': instance.createdAt.toIso8601String(),
-  'confirmed_at': instance.confirmedAt?.toIso8601String(),
-  'cancelled_at': instance.cancelledAt?.toIso8601String(),
-  'decline_reason': instance.rejectionReason,
-  'suggested_price': instance.suggestedPrice,
-  'preferred_slots': instance.preferredSlots.map((e) => e.toJson()).toList(),
-  'proposal_id': instance.proposalId,
-  'academy_id': instance.academyId,
-};
+        UnifiedLessonRequest instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'student_id': instance.studentId,
+      'teacher_id': instance.teacherId,
+      'type': _$LessonRequestTypeEnumMap[instance.type]!,
+      'instrument': instance.instrument,
+      'goal': _$UnifiedLessonGoalEnumMap[instance.goal]!,
+      'experience': _$UnifiedExperienceLevelEnumMap[instance.experience]!,
+      'message': instance.message,
+      'preferred_day': instance.preferredDay,
+      'preferred_time': instance.preferredTime,
+      'preferred_duration': instance.preferredDuration,
+      'proposals': instance.proposals.map((e) => e.toJson()).toList(),
+      'current_round': instance.currentRound,
+      'is_returning_student': instance.isReturningStudent,
+      'status': _$UnifiedRequestStatusEnumMap[instance.status]!,
+      'created_at': instance.createdAt.toIso8601String(),
+      'confirmed_at': instance.confirmedAt?.toIso8601String(),
+      'cancelled_at': instance.cancelledAt?.toIso8601String(),
+      'decline_reason': instance.rejectionReason,
+      'suggested_price': instance.suggestedPrice,
+      'preferred_slots':
+          instance.preferredSlots.map((e) => e.toJson()).toList(),
+      'proposal_id': instance.proposalId,
+      'academy_id': instance.academyId,
+      'preferred_location_type': instance.preferredLocationType,
+    };
 
 const _$LessonRequestTypeEnumMap = {
   LessonRequestType.trial: 'trial',
