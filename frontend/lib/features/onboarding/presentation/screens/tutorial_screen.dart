@@ -78,26 +78,30 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     }
   }
 
-  void _skipTutorial() {
+  Future<void> _skipTutorial() async {
     ref.read(teacherOnboardingNotifierProvider.notifier).skipTutorial();
-    _navigateToHome();
+    await _navigateToHome();
   }
 
-  void _completeTutorial() {
+  Future<void> _completeTutorial() async {
     for (final step in TutorialStep.values) {
       ref
           .read(teacherOnboardingNotifierProvider.notifier)
           .completeTutorialStep(step);
     }
-    _navigateToHome();
+    await _navigateToHome();
   }
 
-  void _navigateToHome() {
+  Future<void> _navigateToHome() async {
     ref.read(teacherOnboardingCompletedProvider.notifier).state = true;
+    await ref
+        .read(onboardingProgressStorageProvider.notifier)
+        .markTeacherOnboardingCompleted();
     // Mark onboarding as completed on the server (remote mode)
     if (!ref.read(mockDataModeProvider)) {
       ref.read(authNotifierProvider.notifier).completeOnboarding();
     }
+    if (!mounted) return;
     context.go(AppRoutes.home);
   }
 

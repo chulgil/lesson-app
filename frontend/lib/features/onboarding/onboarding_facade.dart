@@ -8,3 +8,5 @@ export 'presentation/providers/onboarding_providers.dart'
         currentTeacherProfileProvider,
         teacherOnboardingCompletedProvider,
         teacherOnboardingNotifierProvider;
+export 'presentation/providers/onboarding_progress_storage_provider.dart'
+    show OnboardingProgressStorageState, onboardingProgressStorageProvider;

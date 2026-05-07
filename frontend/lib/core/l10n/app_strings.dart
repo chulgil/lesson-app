@@ -5123,6 +5123,9 @@ class AppStrings {
   /// Demo dashboard overlay dismiss button.
   static const demoDashboardOverlayConfirm = '확인';
 
+  /// Demo dashboard overlay never show again button.
+  static const demoDashboardOverlayNeverShowAgain = '다시 보지 않기';
+
   // ── Getting Started Card (홈 온보딩 체크리스트 5-3d-3) ────────────────────
 
   /// Getting Started 인트로 안내 — 학생 0명일 때 노출.

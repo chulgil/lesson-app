@@ -16,6 +16,7 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
+import 'demo_dashboard_overlay.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
@@ -72,29 +73,16 @@ class DashboardTab extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space5),
 
-              // ── 0순위: 시간대 인식 컨텍스트 배너 ─────────────
+              const DemoDashboardOverlay(),
+
+              // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
               // (home_master.md §3.5)
               todayLessons.maybeWhen(
                 data: (lessons) => TimeContextBanner(todayLessons: lessons),
                 orElse: () => const SizedBox.shrink(),
               ),
 
-              // Getting Started Guide (shown when 0 students)
-              const GettingStartedCard(),
-
-              // ── 1순위: 긴급 알림 존 ──────────────────────────
-              UrgentAlertZone(
-                teacherId: dashboard.teacherId,
-                unpaidSummary: dashboard.unpaidSummary,
-                needsConfirmation: dashboard.needsConfirmation,
-              ),
-
-              // ── 2순위: 오늘 ─────────────────────────────────
-              _buildStatsRow(context, todayLessons, dashboard.lessonStats),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Today's Lessons Section
+              // ── Today's Lessons Section (다음 레슨 바로 아래) ──
               _buildTodayLessonsHeader(context, todayLessons),
               const SizedBox(height: AppSpacing.space3),
 
@@ -114,7 +102,24 @@ class DashboardTab extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // ── 이벤트: 대응 필요 (오늘 레슨 바로 아래) ──────────
+              // Getting Started Guide (shown when 0 students)
+              const GettingStartedCard(),
+
+              // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
+              _buildStatsRow(context, todayLessons, dashboard.lessonStats),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // ── 긴급 알림 존 (입금대기 등 — 통계 바로 아래) ────
+              UrgentAlertZone(
+                teacherId: dashboard.teacherId,
+                unpaidSummary: dashboard.unpaidSummary,
+                needsConfirmation: dashboard.needsConfirmation,
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // ── 이벤트: 대응 필요 ──────────────────────────
               _buildEventsGroup(context, dashboard.teacherId),
 
               const SizedBox(height: AppSpacing.space6),
