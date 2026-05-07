@@ -173,6 +173,16 @@
 | `rescheduleAllowanceUsed` | normal | X | O |
 | `rescheduleAllowanceDepleted` | normal | X | O |
 
+#### 리인게이지먼트 알림 (2026-05-07 추가)
+
+> 비활성 사용자 재참여를 위한 알림. 백엔드 `User.last_active_at` 필드 필요.
+
+| 타입 | 우선순위 | 트리거 | 수신자 | 제목 예시 |
+|------|---------|--------|--------|----------|
+| `inactivityReminder7d` | normal | 마지막 활동 7일 경과 | 양쪽 | "이번 주 레슨 정리가 기다리고 있어요" |
+| `inactivityReminder14d` | high | 마지막 활동 14일 경과 | 양쪽 | "놓치고 있는 연습이 있어요" |
+| `winBackOffer30d` | high | 마지막 활동 30일 경과 | 양쪽 | "다시 시작해볼까요? 특별 혜택" |
+
 ### 2.2 알림 유형 상세 (Claude 구현 가이드)
 
 아래 표는 주요 알림 유형별 트리거 조건, 제목, 본문 예시, 아이콘, 딥링크를 정리한 것이다. Claude가 알림 생성 로직을 구현할 때 이 표를 참조한다.
