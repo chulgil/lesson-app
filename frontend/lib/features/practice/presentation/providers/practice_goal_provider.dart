@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_goal_repository.dart';
@@ -6,58 +6,56 @@ import '../../data/repositories/remote_practice_goal_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_goal_repository.dart';
 
+part 'practice_goal_provider.g.dart';
+
 /// Practice goal repository provider - switches between Mock and Remote.
-final practiceGoalRepositoryProvider = Provider<PracticeGoalRepository>((ref) =>
-    createRepository<PracticeGoalRepository>(
-      ref: ref,
-      mock: () => MockPracticeGoalRepository(),
-      remote: (api) => RemotePracticeGoalRepository(api),
-    ));
+@Riverpod(keepAlive: true)
+PracticeGoalRepository practiceGoalRepository(PracticeGoalRepositoryRef ref) {
+  return createRepository<PracticeGoalRepository>(
+    ref: ref,
+    mock: () => MockPracticeGoalRepository(),
+    remote: (api) => RemotePracticeGoalRepository(api),
+  );
+}
 
 /// Student's current active goal
-final practiceGoalProvider = FutureProvider.family<PracticeGoal?, String>((
-  ref,
-  studentId,
-) async {
+@Riverpod(keepAlive: true)
+Future<PracticeGoal?> practiceGoal(PracticeGoalRef ref, String studentId) {
   final repository = ref.watch(practiceGoalRepositoryProvider);
   return repository.getActiveGoal(studentId);
-});
+}
 
 /// Today's progress
-final todayProgressProvider =
-    FutureProvider.family<DailyPracticeProgress, String>((
-      ref,
-      studentId,
-    ) async {
-      final repository = ref.watch(practiceGoalRepositoryProvider);
-      return repository.getDailyProgress(studentId, DateTime.now());
-    });
+@Riverpod(keepAlive: true)
+Future<DailyPracticeProgress> todayProgress(
+  TodayProgressRef ref,
+  String studentId,
+) {
+  final repository = ref.watch(practiceGoalRepositoryProvider);
+  return repository.getDailyProgress(studentId, DateTime.now());
+}
 
 /// This week's progress
-final weeklyProgressProvider =
-    FutureProvider.family<WeeklyPracticeProgress, String>((
-      ref,
-      studentId,
-    ) async {
-      final repository = ref.watch(practiceGoalRepositoryProvider);
-      final now = DateTime.now();
-      // Calculate this Monday
-      final weekStart = now.subtract(Duration(days: now.weekday - 1));
-      final normalizedWeekStart = DateTime(
-        weekStart.year,
-        weekStart.month,
-        weekStart.day,
-      );
-      return repository.getWeeklyProgress(studentId, normalizedWeekStart);
-    });
+@Riverpod(keepAlive: true)
+Future<WeeklyPracticeProgress> weeklyProgress(
+  WeeklyProgressRef ref,
+  String studentId,
+) {
+  final repository = ref.watch(practiceGoalRepositoryProvider);
+  final now = DateTime.now();
+  // Calculate this Monday
+  final weekStart = now.subtract(Duration(days: now.weekday - 1));
+  final normalizedWeekStart = DateTime(
+    weekStart.year,
+    weekStart.month,
+    weekStart.day,
+  );
+  return repository.getWeeklyProgress(studentId, normalizedWeekStart);
+}
 
 /// Goal CRUD notifier
-final practiceGoalCrudProvider =
-    AsyncNotifierProvider<PracticeGoalCrudNotifier, void>(
-      PracticeGoalCrudNotifier.new,
-    );
-
-class PracticeGoalCrudNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class PracticeGoalCrud extends _$PracticeGoalCrud {
   @override
   Future<void> build() async {}
 
@@ -99,11 +97,11 @@ class PracticeGoalCrudNotifier extends AsyncNotifier<void> {
   }
 }
 
+typedef PracticeGoalCrudNotifier = PracticeGoalCrud;
+
 /// Combined goal status provider for widgets
-final goalStatusProvider = FutureProvider.family<GoalStatus, String>((
-  ref,
-  studentId,
-) async {
+@Riverpod(keepAlive: true)
+Future<GoalStatus> goalStatus(GoalStatusRef ref, String studentId) async {
   final goal = await ref.watch(practiceGoalProvider(studentId).future);
   final todayProgress = await ref.watch(
     todayProgressProvider(studentId).future,
@@ -117,7 +115,7 @@ final goalStatusProvider = FutureProvider.family<GoalStatus, String>((
     todayProgress: todayProgress,
     weeklyProgress: weeklyProgress,
   );
-});
+}
 
 /// Combined goal status for widgets
 class GoalStatus {
