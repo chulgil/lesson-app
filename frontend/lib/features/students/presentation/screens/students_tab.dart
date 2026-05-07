@@ -23,6 +23,7 @@ import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/announcement_sheet.dart';
+import 'announcement_history_screen.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
@@ -289,19 +290,17 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 📢 공지 아이콘 (v3)
-                IconButton(
-                  onPressed: () => _showAnnouncementSheet(context),
-                  icon: const Icon(
-                    Icons.campaign,
-                    color: AppColors.ink,
-                    size: 22,
-                  ),
-                  tooltip: AppStrings.announcementTitle,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
+                // 📢 공지 아이콘 — 탭: 공지 작성, 길게 누르기: 공지 이력
+                GestureDetector(
+                  onTap: () => _showAnnouncementSheet(context),
+                  onLongPress: () => _showAnnouncementHistory(context),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.campaign,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
@@ -693,6 +692,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   /// v3: Masthead 📢 → 공지 작성 시트
   void _showAnnouncementSheet(BuildContext context) {
     AnnouncementSheet.show(context, ref: ref);
+  }
+
+  void _showAnnouncementHistory(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const AnnouncementHistoryScreen(),
+      ),
+    );
   }
 
   void _onBulkMessage() async {

@@ -1120,6 +1120,13 @@ class AppStrings {
       '※ 레슨은 자동 취소되지 않습니다.\n   개별 스케줄 변경을 진행해주세요.';
   static const announcementScheduleChange = '스케줄 변경';
 
+  // 공지 이력
+  static const announcementHistoryTitle = '공지 이력';
+  static const announcementHistoryEmpty = '보낸 공지가 없습니다';
+  static String announcementAffectedStudents(int count) => '영향 학생 $count명';
+  static const announcementStatusResolved = '완료';
+  static const announcementStatusPending = '미처리';
+
   /// Notification mock strings (i18n)
   static const notifProposalTitle = '수강권 제안이 도착했어요!';
   static const notifProposalBody = '체험레슨 후 72시간 골든타임 할인 혜택을 확인해보세요';
