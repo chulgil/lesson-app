@@ -3602,8 +3602,8 @@ class AppStrings {
   /// 계좌이체
   static const paymentMethodBankTransfer = '계좌이체';
 
-  /// 카드 (레거시)
-  static const paymentMethodCard = '카드(레거시)';
+  /// 카드 결제
+  static const paymentMethodCard = '카드';
 
   /// 기타 (입금 수단)
   static const paymentMethodOther = '기타';
