@@ -234,7 +234,7 @@ void main() {
   );
 
   test(
-    'teacher proposal and accepted mock events include selected time details',
+    'teacher proposal is pending and accepted event stays in session history',
     () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -253,7 +253,15 @@ void main() {
         contains('16:00'),
       );
 
-      final accepted = events.firstWhere((event) => event.id == 'sce_mock_5');
+      final sessionEvents = await container.read(
+        subscriptionSessionEventsProvider(
+          subscriptionId: 'sub_mon_03',
+          sessionNumber: 2,
+        ).future,
+      );
+      final accepted = sessionEvents.firstWhere(
+        (event) => event.id == 'sce_mock_5',
+      );
       expect(accepted.eventType, RequestEventType.scheduleChangeAccepted);
       expect(accepted.suggestedSlots, isNotEmpty);
       expect(accepted.selectedSlotIndex, 0);
@@ -286,7 +294,7 @@ void main() {
             endTime: '21:00',
           ),
         ],
-        createdAt: DateTime(2026, 5, 4, 20),
+        createdAt: DateTime.now().add(const Duration(minutes: 1)),
         subscriptionId: MockLessonDataIds.studentPrimaryViolinSubscription,
         sessionNumber: 6,
       );
