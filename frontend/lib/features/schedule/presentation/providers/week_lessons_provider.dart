@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../lessons/lessons_facade.dart';
 import '../../../students/students_facade.dart';
@@ -6,25 +6,29 @@ import '../../../subscription/subscription_facade.dart';
 import '../../domain/services/preview_lesson_generator.dart';
 import '../providers/unified_lesson_request_providers.dart';
 
+part 'week_lessons_provider.g.dart';
+
 /// Provider that loads all lessons for a given week (Mon-Sun).
 /// [weekStartDate] should be the Monday of the target week.
-final weekLessonsProvider = FutureProvider.family<List<Lesson>, DateTime>((
-  ref,
-  weekStartDate,
+@Riverpod(keepAlive: true)
+Future<List<Lesson>> weekLessons(
+  WeekLessonsRef ref,
+  DateTime weekStartDate,
 ) async {
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = weekStartDate.add(const Duration(days: 6));
   return repository.getLessonsByDateRange(weekStartDate, weekEnd);
-});
+}
 
 /// Provider that loads lessons + preview lessons for a given week.
 ///
 /// Preview lessons are generated from ClassMembership.lessonSlots for weeks
 /// beyond subscription coverage. Rendered with dashed borders in the grid.
-final weekLessonsWithPreviewProvider = FutureProvider.family<
-  List<Lesson>,
-  ({DateTime weekStart, String teacherId})
->((ref, params) async {
+@Riverpod(keepAlive: true)
+Future<List<Lesson>> weekLessonsWithPreview(
+  WeekLessonsWithPreviewRef ref,
+  ({DateTime weekStart, String teacherId}) params,
+) async {
   // Get real lessons
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = params.weekStart.add(const Duration(days: 6));
@@ -68,7 +72,7 @@ final weekLessonsWithPreviewProvider = FutureProvider.family<
   );
 
   return [...realLessons, ...previewLessons];
-});
+}
 
 /// Helper to get the Monday of the week containing [date].
 DateTime getWeekStart(DateTime date) {
