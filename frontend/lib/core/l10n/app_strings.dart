@@ -6487,4 +6487,27 @@ class AppStrings {
   static const addressManualHint = '주소를 직접 입력하세요';
   static const addressNoResults = '검색 결과가 없습니다';
   static const addressManualInputGuide = '주소를 직접 입력하려면 닫아주세요 →';
+
+  // ── YouTube Player (인앱 플레이어 + 구간 반복) ───────────────────
+
+  /// 구간 반복 (loop section label)
+  static const loopSectionLabel = '구간 반복';
+
+  /// 구간 반복 ON (loop section on)
+  static const loopSectionOn = '구간 반복 ON';
+
+  /// 구간 반복 OFF (loop section off)
+  static const loopSectionOff = '구간 반복 OFF';
+
+  /// 시작 (section start label)
+  static const sectionStart = '시작';
+
+  /// 끝 (section end label)
+  static const sectionEnd = '끝';
+
+  /// macOS에서는 외부 브라우저에서 재생됩니다
+  static const youtubePlayerMacOsFallback = 'macOS에서는 외부 브라우저에서 재생됩니다';
+
+  /// 외부 브라우저에서 열기
+  static const youtubePlayerOpenExternal = '외부 브라우저에서 열기';
 }

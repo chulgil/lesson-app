@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -14,6 +12,7 @@ import '../../domain/entities/teaching_resource.dart';
 import '../../domain/entities/youtube_search_result.dart';
 import '../providers/teaching_resource_providers.dart';
 import '../providers/youtube_search_providers.dart';
+import 'youtube_player_widget.dart';
 
 /// 유튜브 검색 + 구간 선택 통합 시트.
 ///
@@ -77,16 +76,6 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
     setState(() => _selected = null);
   }
 
-  Future<void> _openInYoutube() async {
-    final result = _selected;
-    if (result == null) return;
-    final url = 'https://www.youtube.com/watch?v=${result.videoId}&t=${_startSeconds.round()}';
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
   Future<void> _submit() async {
     final result = _selected;
     if (result == null || _isSubmitting) return;
@@ -125,9 +114,9 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.errorTryAgain)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -227,21 +216,23 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
     final resultsAsync = ref.watch(youtubeSearchProvider(_searchQuery));
 
     return resultsAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.all(AppSpacing.space6),
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
-      error: (_, __) => Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
-        child: Center(
-          child: Text(
-            AppStrings.youtubeSearchNoResults,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
+      loading:
+          () => const Padding(
+            padding: EdgeInsets.all(AppSpacing.space6),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          ),
+      error:
+          (_, __) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space6),
+            child: Center(
+              child: Text(
+                AppStrings.youtubeSearchNoResults,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
       data: (results) {
         if (results.isEmpty) {
           return Padding(
@@ -259,10 +250,8 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
         return ListView.separated(
           shrinkWrap: true,
           itemCount: results.length,
-          separatorBuilder: (_, __) => Container(
-            height: 1,
-            color: AppColors.inkQuaternary,
-          ),
+          separatorBuilder:
+              (_, __) => Container(height: 1, color: AppColors.inkQuaternary),
           itemBuilder: (_, index) {
             final result = results[index];
             return _ResultTile(
@@ -279,7 +268,6 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
 
   Widget _buildDetailView() {
     final result = _selected!;
-    final maxDuration = (result.durationSeconds ?? 300).toDouble();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -297,7 +285,11 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
             children: [
               GestureDetector(
                 onTap: _backToSearch,
-                child: const Icon(Icons.arrow_back, size: 20, color: AppColors.inkSecondary),
+                child: const Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                  color: AppColors.inkSecondary,
+                ),
               ),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
@@ -310,125 +302,40 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
           ),
           const SizedBox(height: AppSpacing.space4),
 
-          // 썸네일 프리뷰 + 외부 재생 버튼
-          Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.inkQuaternary),
-                ),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Image.network(
-                    result.thumbnail,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: AppColors.paperDark,
-                      child: const Center(
-                        child: Icon(Icons.play_circle_outline, size: 48, color: AppColors.inkTertiary),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // 재생 버튼 오버레이
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: _openInYoutube,
-                  child: Container(
-                    color: AppColors.ink.withValues(alpha: 0.3),
-                    child: const Center(
-                      child: Icon(Icons.play_circle_filled, size: 56, color: AppColors.paper),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          // 영상 정보
+          // 영상 정보 (채널 + 이름)
           Text(
             result.title,
-            style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           if (result.channel.isNotEmpty)
             Text(
               '${result.channel} · ${result.durationText ?? ''}',
-              style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
             ),
+          const SizedBox(height: AppSpacing.space3),
 
-          const SizedBox(height: AppSpacing.space5),
-
-          // ── 구간 선택 (RangeSlider) ──
-          Text(
-            AppStrings.playSectionLabel,
-            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-
-          // 시작/끝 시간 표시
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _formatSeconds(_startSeconds.round()),
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                '~',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.inkTertiary),
-              ),
-              Text(
-                _formatSeconds(_endSeconds.round()),
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-
-          // RangeSlider
-          SliderTheme(
-            data: SliderThemeData(
-              activeTrackColor: AppColors.paperAccent,
-              inactiveTrackColor: AppColors.inkQuaternary,
-              thumbColor: AppColors.paperAccent,
-              overlayColor: AppColors.paperAccent.withValues(alpha: 0.12),
-              rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
-            ),
-            child: RangeSlider(
-              values: RangeValues(_startSeconds, _endSeconds),
-              min: 0,
-              max: maxDuration,
-              divisions: maxDuration > 0 ? maxDuration.round() : 1,
-              onChanged: (values) {
-                setState(() {
-                  _startSeconds = values.start;
-                  _endSeconds = values.end;
-                });
-              },
-            ),
-          ),
-
-          // 전체 구간 라벨
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '0:00',
-                style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
-              ),
-              Text(
-                _formatSeconds(maxDuration.round()),
-                style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
-              ),
-            ],
+          // ── 인앱 유튜브 플레이어 (구간 선택 포함) ──
+          YoutubePlayerWidget(
+            videoId: result.videoId,
+            initialStartSeconds:
+                _startSeconds > 0 ? _startSeconds.round() : null,
+            initialEndSeconds:
+                _endSeconds < (result.durationSeconds ?? 300).toDouble()
+                    ? _endSeconds.round()
+                    : null,
+            isEditable: true,
+            onSectionChanged: (section) {
+              setState(() {
+                _startSeconds = section.start.toDouble();
+                _endSeconds = section.end.toDouble();
+              });
+            },
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -436,7 +343,9 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
           // 제목
           Text(
             AppStrings.titleLabel,
-            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           TextField(
@@ -451,7 +360,9 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
           // 메모
           Text(
             AppStrings.memoStudentVisibleLabel,
-            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           TextField(
@@ -469,21 +380,20 @@ class _YoutubeSearchSheetState extends ConsumerState<YoutubeSearchSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _isSubmitting ? null : _submit,
-              child: _isSubmitting
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text(AppStrings.add),
+              child:
+                  _isSubmitting
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Text(AppStrings.add),
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
         ],
       ),
     );
-  }
-
-  static String _formatSeconds(int totalSeconds) {
-    final m = totalSeconds ~/ 60;
-    final s = totalSeconds % 60;
-    return '$m:${s.toString().padLeft(2, '0')}';
   }
 }
 
@@ -517,12 +427,17 @@ class _ResultTile extends StatelessWidget {
                     child: Image.network(
                       result.thumbnail,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: AppColors.paperDark,
-                        child: const Center(
-                          child: Icon(Icons.play_circle_outline, size: 24, color: AppColors.inkTertiary),
-                        ),
-                      ),
+                      errorBuilder:
+                          (_, __, ___) => Container(
+                            color: AppColors.paperDark,
+                            child: const Center(
+                              child: Icon(
+                                Icons.play_circle_outline,
+                                size: 24,
+                                color: AppColors.inkTertiary,
+                              ),
+                            ),
+                          ),
                     ),
                   ),
                   // 시간 뱃지
@@ -531,7 +446,10 @@ class _ResultTile extends StatelessWidget {
                       right: 2,
                       bottom: 2,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
                         color: AppColors.ink.withValues(alpha: 0.75),
                         child: Text(
                           result.durationText!,
@@ -553,14 +471,18 @@ class _ResultTile extends StatelessWidget {
                 children: [
                   Text(
                     result.title,
-                    style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppSpacing.space1),
                   Text(
                     result.channel,
-                    style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
+                    style: AppTypography.captionSmall.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
