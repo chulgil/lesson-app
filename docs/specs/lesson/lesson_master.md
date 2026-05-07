@@ -1474,12 +1474,13 @@ else → activeSubscriptionBetween(studentId, teacherId) → subscriptionDetail(
 │ │ [✓] 완료 처리                    → │ │
 │ └────────────────────────────────────┘ │
 │ ┌────────────────────────────────────┐ │
-│ │ [↔] 스케줄 변경                  → │ │  ← 수강권+미래 레슨만
-│ │     수강권 스케줄 조절 (챗)        │ │
+│ │ [✎] 수기 등록 레슨 편집          → │ │  ← 수기 레슨만
 │ └────────────────────────────────────┘ │
 │ ┌────────────────────────────────────┐ │
-│ │ [✕] 취소                         → │ │
+│ │ [↔] 일정 변경                    → │ │  ← 수강권+미래 레슨만
 │ └────────────────────────────────────┘ │
+│                                        │
+│ (닫기: 바깥 탭 / 스와이프)              │
 └────────────────────────────────────────┘
 ```
 
@@ -1582,15 +1583,21 @@ else → activeSubscriptionBetween(studentId, teacherId) → subscriptionDetail(
 > 각 뷰가 독자적으로 액션을 정의하면 안 됨.
 
 ```dart
-// core 또는 lessons feature에 공통 함수:
-void showLessonActionSheet(BuildContext context, Lesson lesson) {
+// schedule/presentation/widgets/lesson_action_sheet.dart
+void showLessonActionSheet({
+  required BuildContext context,
+  required WidgetRef ref,
+  required Lesson lesson,
+}) {
   // §13.2 규칙에 따라 수기/수강권/미래/과거 분기
   // 모든 스케줄 뷰 + 레슨 상세에서 동일하게 호출
 }
 ```
 
+구현 파일: `schedule/presentation/widgets/lesson_action_sheet.dart`
+
 적용 대상:
-- `schedule_timeline_view.dart` (일간)
-- `schedule_weekly_grid_view.dart` (주간)
-- 리스트 뷰 레슨 카드
+- `schedule_timeline_view.dart` (일간) ✅ 구현 완료
+- `schedule_weekly_grid_view.dart` (주간) ✅ 구현 완료
+- 리스트 뷰 레슨 카드 (Phase 3)
 - `lesson_detail_screen.dart` AppBar 메뉴

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import 'lesson_action_sheet.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -535,6 +536,11 @@ class _ScheduleWeeklyGridViewState
           HapticFeedback.lightImpact();
           context.push(tapRoute);
         },
+        onLongPress: () => showLessonActionSheet(
+          context: context,
+          ref: ref,
+          lesson: lesson,
+        ),
         child: Container(
           width: width - 2,
           height: height,
@@ -555,6 +561,11 @@ class _ScheduleWeeklyGridViewState
         HapticFeedback.lightImpact();
         context.push(tapRoute);
       },
+      onLongPress: () => showLessonActionSheet(
+        context: context,
+        ref: ref,
+        lesson: lesson,
+      ),
       // Notebook × Score: 시작 셀 topLeft/topRight 4px 라운드 제거 → 직사각
       child: Container(
         width: width - 2,

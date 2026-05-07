@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../lessons/lessons_facade.dart' hide teacherAvailabilityProvider;
+import 'lesson_action_sheet.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../utils/schedule_visual_helpers.dart';
@@ -402,7 +401,11 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                 AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
               );
             },
-            onLongPress: () => _showLessonActions(lesson),
+            onLongPress: () => showLessonActionSheet(
+              context: context,
+              ref: ref,
+              lesson: lesson,
+            ),
           ),
         ),
       );
@@ -558,124 +561,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     return '오늘 레슨 완료 🎵';
   }
 
-  void _showLessonActions(Lesson lesson) {
-    final hasSubscription = lesson.subscriptionId != null;
-    final isUpcoming = lesson.isUpcoming;
-
-    showNotebookBottomSheet<void>(
-      context: context,
-      padding: EdgeInsets.zero,
-      showHandle: false,
-      builder:
-          (ctx) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Handle
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                      decoration: BoxDecoration(color: AppColors.inkQuaternary),
-                    ),
-                  ),
-                  // 학생 이름 + 시간
-                  Text(
-                    '${lesson.studentName} · ${lesson.startTime}',
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  // §13.2 공통 액션
-                  _ActionCard(
-                    icon: Icons.check_circle_outline,
-                    iconColor: AppColors.paperOk,
-                    label: AppStrings.scheduleMarkComplete,
-                    onTap: () {
-                      Navigator.of(ctx).pop();
-                      _completeLesson(lesson);
-                    },
-                  ),
-                  // 수기 레슨 → 수기 등록 레슨 편집
-                  if (!hasSubscription) ...[
-                    const SizedBox(height: AppSpacing.space2),
-                    _ActionCard(
-                      icon: Icons.edit_calendar,
-                      iconColor: AppColors.ink,
-                      label: AppStrings.editManualFull,
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                        context.push(
-                          AppRoutes.editLesson.replaceFirst(':id', lesson.id),
-                        );
-                      },
-                    ),
-                  ],
-                  // 수강권 + 미래 레슨 → 일정 변경 (챗)
-                  if (hasSubscription && isUpcoming) ...[
-                    const SizedBox(height: AppSpacing.space2),
-                    _ActionCard(
-                      icon: Icons.swap_horiz,
-                      iconColor: AppColors.ink,
-                      label: AppStrings.scheduleChangeLabel,
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                        context.push(
-                          AppRoutes.subscriptionDetail.replaceFirst(
-                            ':id',
-                            lesson.subscriptionId!,
-                          ),
-                          extra: {'viewerRole': 'teacher'},
-                        );
-                      },
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.space2),
-                  _ActionCard(
-                    icon: Icons.close,
-                    iconColor: AppColors.paperAccent,
-                    label: AppStrings.cancel,
-                    onTap: () {
-                      Navigator.of(ctx).pop();
-                      _cancelLesson(lesson);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                ],
-              ),
-            ),
-          ),
-    );
-  }
-
-  Future<void> _completeLesson(Lesson lesson) async {
-    try {
-      final updated = lesson.copyWith(status: LessonStatus.completed);
-      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppStrings.scheduleCompleteFailed('$e'))),
-        );
-      }
-    }
-  }
-
-  Future<void> _cancelLesson(Lesson lesson) async {
-    try {
-      await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppStrings.scheduleCancelFailed('$e'))),
-        );
-      }
-    }
-  }
 }
 
 /// Travel time block displayed before a lesson in the timeline.
@@ -711,67 +596,3 @@ class _TravelTimeBlock extends StatelessWidget {
   }
 }
 
-/// Notebook × Score 액션 카드 — 각진 네모 박스, 클래식한 느낌.
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ActionCard({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space4,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          border: Border.all(color: AppColors.inkQuaternary),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-              ),
-              child: Icon(icon, size: 20, color: iconColor),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.inkTertiary,
-              size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
