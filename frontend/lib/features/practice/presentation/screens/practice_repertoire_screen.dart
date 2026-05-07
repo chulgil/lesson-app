@@ -90,10 +90,6 @@ class PracticeRepertoireScreen extends ConsumerWidget {
       icon: Icons.library_music_outlined,
       title: AppStrings.practiceRepertoireEmptyTitle,
       subtitle: AppStrings.practiceRepertoireEmptySubtitle,
-      actionLabel: '레퍼토리 추가',
-      actionIcon: Icons.add,
-      onAction:
-          () => context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
     );
   }
 

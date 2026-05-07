@@ -96,11 +96,6 @@ class _RepertoireManagementScreenState
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddPieceDialog,
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.profileRepertoireAddPiece),
-      ),
     );
   }
 

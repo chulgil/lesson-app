@@ -233,9 +233,6 @@ class PracticeNoteListScreen extends ConsumerWidget {
       icon: Icons.edit_note,
       title: AppStrings.practiceNoteEmptyTitle,
       subtitle: AppStrings.practiceNoteEmptySubtitle,
-      actionLabel: '노트 추가',
-      actionIcon: Icons.add,
-      onAction: () => _showAddDialog(context, ref),
     );
   }
 
