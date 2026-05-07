@@ -429,15 +429,10 @@ class ProfileIntroduction extends _$ProfileIntroduction {
 @Riverpod(keepAlive: true)
 bool isProfileFormValid(Ref ref) {
   final name = ref.watch(profileNameProvider);
-  final image = ref.watch(profileImageProvider);
   final instruments = ref.watch(selectedInstrumentsProvider);
   final introduction = ref.watch(profileIntroductionProvider);
 
-  return name.isNotEmpty &&
-      image != null &&
-      image.isNotEmpty &&
-      instruments.isNotEmpty &&
-      introduction.length >= 20;
+  return name.isNotEmpty && instruments.isNotEmpty && introduction.length >= 20;
 }
 
 /// Missing fields for profile
@@ -445,12 +440,10 @@ bool isProfileFormValid(Ref ref) {
 List<String> profileMissingFields(Ref ref) {
   final fields = <String>[];
   final name = ref.watch(profileNameProvider);
-  final image = ref.watch(profileImageProvider);
   final instruments = ref.watch(selectedInstrumentsProvider);
   final introduction = ref.watch(profileIntroductionProvider);
 
   if (name.isEmpty) fields.add('이름');
-  if (image == null || image.isEmpty) fields.add('프로필 사진');
   if (instruments.isEmpty) fields.add('악기');
   if (introduction.length < 20) fields.add('소개글 (20자 이상)');
 

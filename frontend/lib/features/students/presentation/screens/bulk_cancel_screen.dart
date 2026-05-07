@@ -86,6 +86,7 @@ class _BulkCancelScreenState extends ConsumerState<BulkCancelScreen> {
       teacherId: teacherId,
       studentIds: widget.studentIds,
       targetDate: date,
+      notificationTitle: AppStrings.studentBulkCancelNotificationTitle,
       reason:
           _reasonController.text.trim().isEmpty
               ? null

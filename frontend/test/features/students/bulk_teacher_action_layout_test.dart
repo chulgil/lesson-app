@@ -7,8 +7,13 @@ import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:lessonaza/features/notifications/domain/entities/notification.dart';
 import 'package:lessonaza/features/notifications/domain/services/notification_service.dart';
+import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
+import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
+import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
 import 'package:lessonaza/features/students/domain/services/bulk_teacher_action_service.dart';
 import 'package:lessonaza/features/students/presentation/providers/bulk_teacher_action_providers.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
+import 'package:lessonaza/features/subscription/domain/repositories/subscription_repository.dart';
 import 'package:lessonaza/features/students/presentation/screens/bulk_cancel_screen.dart';
 import 'package:lessonaza/features/students/presentation/widgets/bulk_message_sheet.dart';
 
@@ -76,11 +81,74 @@ class _StubNotificationService implements NotificationService {
   Stream<AppNotification> get onNotificationTapped => const Stream.empty();
 }
 
+class _StubRequestRepository implements UnifiedLessonRequestRepository {
+  @override
+  Future<List<RequestEvent>> getEventsByRequestId(String requestId) async =>
+      const [];
+  @override
+  Future<RequestEvent> addEvent(RequestEvent event) async => event;
+  @override
+  Future<UnifiedLessonRequest> create(UnifiedLessonRequest request) async =>
+      request;
+  @override
+  Future<UnifiedLessonRequest?> getById(String id) async => null;
+  @override
+  Future<List<UnifiedLessonRequest>> getByTeacherId(String teacherId) async =>
+      const [];
+  @override
+  Future<List<UnifiedLessonRequest>> getByStudentId(String studentId) async =>
+      const [];
+  @override
+  Future<List<UnifiedLessonRequest>> getPendingByTeacherId(
+    String teacherId,
+  ) async => const [];
+  @override
+  Future<UnifiedLessonRequest> update(UnifiedLessonRequest request) async =>
+      request;
+  @override
+  Future<UnifiedLessonRequest> approve(String id) async =>
+      throw UnimplementedError();
+  @override
+  Future<UnifiedLessonRequest> withdrawApproval(String id) async =>
+      throw UnimplementedError();
+  @override
+  Future<UnifiedLessonRequest> reject(String id, {String? reason}) async =>
+      throw UnimplementedError();
+  @override
+  Future<UnifiedLessonRequest> proposeAlternatives(
+    String id, {
+    required List<TimeSlotOption> slots,
+    String? message,
+  }) async => throw UnimplementedError();
+  @override
+  Future<UnifiedLessonRequest> acceptAlternative(
+    String id, {
+    required int selectedSlotIndex,
+    String? message,
+  }) async => throw UnimplementedError();
+  @override
+  Future<UnifiedLessonRequest> counterPropose(
+    String id, {
+    required TimeSlotOption slot,
+    String? message,
+  }) async => throw UnimplementedError();
+}
+
+class _StubSubscriptionRepository implements SubscriptionRepository {
+  @override
+  Future<List<Subscription>> getByStudentId(String studentId) async =>
+      const [];
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 List<Override> _commonOverrides() => [
   bulkTeacherActionServiceProvider.overrideWithValue(
     BulkTeacherActionService(
       lessonRepository: _StubLessonRepository(),
       notificationService: _StubNotificationService(),
+      requestRepository: _StubRequestRepository(),
+      subscriptionRepository: _StubSubscriptionRepository(),
     ),
   ),
   currentUserIdProvider.overrideWithValue('teacher_1'),

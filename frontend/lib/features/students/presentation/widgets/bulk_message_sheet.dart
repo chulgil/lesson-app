@@ -74,8 +74,8 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
     final insets = MediaQuery.of(context).viewInsets.bottom;
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.6,
-      minChildSize: 0.4,
+      initialChildSize: 0.85,
+      minChildSize: 0.55,
       maxChildSize: 0.9,
       builder: (ctx, scrollController) {
         return Container(

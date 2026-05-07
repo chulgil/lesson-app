@@ -7,13 +7,13 @@ part of 'bulk_teacher_action_providers.dart';
 // **************************************************************************
 
 String _$bulkTeacherActionServiceHash() =>
-    r'39ad182151d5e1c66682d040fc5828611e567bf7';
+    r'3c2f94856bf7b616d29e1d48152f8eec6fc931f8';
 
-/// §7.119 BulkTeacherActionService provider.
+/// §7.119 v2 BulkTeacherActionService provider.
 ///
-/// Injects [LessonRepository] + [NotificationService] so the selection mode
-/// bottom bar ([BulkCancelScreen] / [BulkMessageSheet]) can fan out operations
-/// across the selected students.
+/// Injects [LessonRepository] + [NotificationService] + [UnifiedLessonRequestRepository]
+/// + [SubscriptionRepository] so the selection mode bottom bar can fan out operations
+/// across the selected students with chat event creation.
 ///
 /// Copied from [bulkTeacherActionService].
 @ProviderFor(bulkTeacherActionService)

@@ -61,6 +61,10 @@ extension RequestEventTypeVisualX on RequestEventType {
         return AppStrings.eventLessonCancellationConfirmed;
       case RequestEventType.cancellationCreditRefunded:
         return AppStrings.eventCancellationCreditRefunded;
+      case RequestEventType.lessonCancelledByTeacher:
+        return AppStrings.eventLessonCancelledByTeacher;
+      case RequestEventType.teacherAnnouncement:
+        return AppStrings.eventTeacherAnnouncement;
     }
   }
 }
@@ -125,6 +129,10 @@ extension RequestEventVisualX on RequestEvent {
         return AppStrings.eventLessonCancellationConfirmed;
       case RequestEventType.cancellationCreditRefunded:
         return AppStrings.cancellationCreditRefundedChat;
+      case RequestEventType.lessonCancelledByTeacher:
+        return AppStrings.chatLessonCancelledByTeacher;
+      case RequestEventType.teacherAnnouncement:
+        return message ?? AppStrings.chatTeacherAnnouncement;
     }
   }
 }

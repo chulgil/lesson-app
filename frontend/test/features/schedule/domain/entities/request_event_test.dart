@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
+import 'package:lessonaza/features/schedule/presentation/extensions/request_event_visuals.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 
 void main() {

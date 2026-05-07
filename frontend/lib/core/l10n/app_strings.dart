@@ -521,6 +521,8 @@ class AppStrings {
   static const eventLessonCancelled = '레슨 취소';
   static const eventLessonCancellationConfirmed = '취소 확정';
   static const eventCancellationCreditRefunded = '무료 처리';
+  static const eventLessonCancelledByTeacher = '휴강';
+  static const eventTeacherAnnouncement = '공지';
   static const eventScheduleChanged = '스케줄 변경';
   static const eventLessonNoteAdded = '레슨 노트';
   static const eventSubscriptionRenewed = '수강권 연장';
@@ -1087,6 +1089,21 @@ class AppStrings {
       '이번 취소에 사용된 변경/취소권 1회를 돌려주시겠습니까?';
   static const cancellationFreeProcessed = '변경/취소권을 돌려주었습니다';
   static const cancellationCreditRefundedChat = '선생님이 변경/취소권을 돌려주었습니다';
+
+  // Bulk teacher actions (§7.119 v2)
+  static const chatLessonCancelledByTeacher = '레슨이 휴강 처리되었습니다';
+  static const chatTeacherAnnouncement = '선생님 공지';
+  static String bulkCancelSessionLabel(int session) => '$session회차 휴강';
+  static const bulkCancelNoCreditDeduction = '※ 변경권 차감 없음';
+  static String bulkCancelCreditRemaining(int remaining) =>
+      '※ 변경권 차감 없음 (잔여 $remaining회)';
+  static const bulkCancelKeepsSession = '※ 회차 번호 유지';
+  static const bulkCancelRescheduleCta = '→ 보강 일정을 요청할 수 있어요';
+  static const bulkMessageTargetActive = '활성 수강권 학생만';
+  static const bulkMessageTargetAll = '선택된 전체 학생';
+  static const selectAll = '전체 선택';
+  static const deselectAll = '선택 해제';
+  static const bulkMessageActiveOnlyNotice = '활성 수강권이 있는 학생에게만 전송됩니다';
 
   /// Notification mock strings (i18n)
   static const notifProposalTitle = '수강권 제안이 도착했어요!';
@@ -5093,6 +5110,19 @@ class AppStrings {
   /// 통계 더보기 — Fine. 푸터 링크.
   static const dashboardAnalyticsMoreLink = '통계 더보기';
 
+  /// Demo dashboard overlay eyebrow.
+  static const demoDashboardOverlayEyebrow = 'DEMO SCORE';
+
+  /// Demo dashboard overlay title.
+  static const demoDashboardOverlayTitle = '샘플 대시보드 둘러보기';
+
+  /// Demo dashboard overlay body.
+  static const demoDashboardOverlayDescription =
+      '샘플 학생, 오늘의 레슨, 시작 체크리스트를 보며 실제 운영 흐름을 확인하세요.';
+
+  /// Demo dashboard overlay dismiss button.
+  static const demoDashboardOverlayConfirm = '확인';
+
   // ── Getting Started Card (홈 온보딩 체크리스트 5-3d-3) ────────────────────
 
   /// Getting Started 인트로 안내 — 학생 0명일 때 노출.
@@ -5451,6 +5481,11 @@ class AppStrings {
   static const onboardingProfileSaveFailure = '프로필 저장 실패. 다시 시도해주세요.';
   static const onboardingSelectFromGallery = '갤러리에서 선택';
   static const onboardingTakePhoto = '카메라로 촬영';
+  static const onboardingProfilePhotoOptional = '프로필 사진 (선택)';
+  static const onboardingProfilePhotoTrustHint =
+      '전문적인 사진을 추가하면 학생과 학부모가 선생님을 더 신뢰하고 기억하기 쉽습니다.';
+  static const onboardingProfileImageError =
+      '사진을 불러오지 못했습니다. 권한을 확인하거나 다시 시도해주세요.';
   static const onboardingNext = '다음';
   static const onboardingSelectInstrument = '악기 선택';
   static const onboardingNameHint = '선생님 이름을 입력해주세요';

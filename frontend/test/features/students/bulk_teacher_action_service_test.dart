@@ -3,8 +3,14 @@ import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:lessonaza/features/notifications/domain/entities/notification.dart';
 import 'package:lessonaza/features/notifications/domain/services/notification_service.dart';
+import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
+import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
+import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
 import 'package:lessonaza/features/students/domain/entities/bulk_cancel_result.dart';
 import 'package:lessonaza/features/students/domain/services/bulk_teacher_action_service.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription_usage.dart';
+import 'package:lessonaza/features/subscription/domain/repositories/subscription_repository.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Fakes
@@ -112,6 +118,169 @@ class _FakeNotificationService implements NotificationService {
   Stream<AppNotification> get onNotificationTapped => const Stream.empty();
 }
 
+class _FakeUnifiedLessonRequestRepository
+    implements UnifiedLessonRequestRepository {
+  final List<RequestEvent> addedEvents = [];
+
+  @override
+  Future<RequestEvent> addEvent(RequestEvent event) async {
+    addedEvents.add(event);
+    return event;
+  }
+
+  @override
+  Future<List<UnifiedLessonRequest>> getByStudentId(String studentId) async {
+    return [
+      UnifiedLessonRequest(
+        id: 'R_$studentId',
+        studentId: studentId,
+        teacherId: 'T1',
+        type: LessonRequestType.regular,
+        instrument: '바이올린',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        createdAt: DateTime(2026, 1, 1),
+      ),
+    ];
+  }
+
+  @override
+  Future<List<RequestEvent>> getEventsByRequestId(String requestId) async => [];
+
+  @override
+  Future<UnifiedLessonRequest> create(UnifiedLessonRequest request) async =>
+      request;
+
+  @override
+  Future<UnifiedLessonRequest?> getById(String id) async => null;
+
+  @override
+  Future<List<UnifiedLessonRequest>> getByTeacherId(String teacherId) async =>
+      [];
+
+  @override
+  Future<List<UnifiedLessonRequest>> getPendingByTeacherId(
+    String teacherId,
+  ) async => [];
+
+  @override
+  Future<UnifiedLessonRequest> update(UnifiedLessonRequest request) async =>
+      request;
+
+  @override
+  Future<UnifiedLessonRequest> approve(String id) => throw UnimplementedError();
+
+  @override
+  Future<UnifiedLessonRequest> withdrawApproval(String id) =>
+      throw UnimplementedError();
+
+  @override
+  Future<UnifiedLessonRequest> reject(String id, {String? reason}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<UnifiedLessonRequest> proposeAlternatives(
+    String id, {
+    required List<TimeSlotOption> slots,
+    String? message,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<UnifiedLessonRequest> acceptAlternative(
+    String id, {
+    required int selectedSlotIndex,
+    String? message,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<UnifiedLessonRequest> counterPropose(
+    String id, {
+    required TimeSlotOption slot,
+    String? message,
+  }) => throw UnimplementedError();
+}
+
+class _FakeSubscriptionRepository implements SubscriptionRepository {
+  @override
+  Future<List<Subscription>> getByStudentId(String studentId) async {
+    return [
+      Subscription(
+        id: 'SUB_$studentId',
+        studentId: studentId,
+        membershipId: 'M_$studentId',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 2,
+        amount: 320000,
+        status: SubscriptionStatus.active,
+        createdAt: DateTime(2026, 1, 1),
+      ),
+    ];
+  }
+
+  @override
+  Future<Subscription?> getActiveByMembershipId(String membershipId) async =>
+      null;
+
+  @override
+  Future<Subscription?> getById(String id) async => null;
+
+  @override
+  Future<Subscription> create(Subscription subscription) async => subscription;
+
+  @override
+  Future<Subscription> update(Subscription subscription) async => subscription;
+
+  @override
+  Future<Subscription> useLesson(
+    String id, {
+    String? lessonId,
+    String? teacherName,
+    String? instrument,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Subscription> useReschedule(String id) => throw UnimplementedError();
+
+  @override
+  Future<void> updateStatus(String id, SubscriptionStatus status) async {}
+
+  @override
+  Future<List<Subscription>> getExpiringSoon() async => [];
+
+  @override
+  Future<List<Subscription>> getExpired() async => [];
+
+  @override
+  Future<List<Subscription>> getByTeacherId(String teacherId) async => [];
+
+  @override
+  Stream<List<Subscription>> watchByStudentId(String studentId) =>
+      const Stream.empty();
+
+  @override
+  Stream<Subscription?> watchActiveByMembershipId(String membershipId) =>
+      const Stream.empty();
+
+  @override
+  Future<List<Subscription>> getUnpaidSubscriptions(String teacherId) async =>
+      [];
+
+  @override
+  Future<Subscription> confirmPayment(
+    String id, {
+    SubscriptionPaymentMethod? paymentMethod,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<List<SubscriptionUsage>> getUsageHistory(
+    String subscriptionId,
+  ) async => [];
+
+  @override
+  Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) async => usage;
+}
+
 Lesson _lesson({
   required String id,
   required String studentId,
@@ -152,12 +321,15 @@ void main() {
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
         notificationService: notificationService,
+        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
       final result = await service.cancelLessonsOnDate(
         teacherId: 'T1',
         studentIds: const ['S1', 'S2', 'S3'],
         targetDate: targetDate,
+        notificationTitle: '휴강 공지',
         reason: '선생님 개인 사정',
       );
 
@@ -181,6 +353,7 @@ void main() {
         'S1',
         'S2',
       });
+      expect(notificationService.shown.map((n) => n.title).toSet(), {'휴강 공지'});
     });
 
     test('대상 날짜에 취소된 레슨은 건드리지 않음', () async {
@@ -196,12 +369,15 @@ void main() {
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
         notificationService: _FakeNotificationService(),
+        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
       final result = await service.cancelLessonsOnDate(
         teacherId: 'T1',
         studentIds: const ['S1'],
         targetDate: targetDate,
+        notificationTitle: '휴강 공지',
       );
 
       expect(result.cancelledLessonCount, 0);
@@ -226,6 +402,8 @@ void main() {
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
         notificationService: _FakeNotificationService(),
+        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
       final preview = await service.previewAffectedLessons(
@@ -243,6 +421,8 @@ void main() {
       final service = BulkTeacherActionService(
         lessonRepository: _FakeLessonRepository(const []),
         notificationService: notificationService,
+        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
       final count = await service.broadcastMessage(
@@ -272,6 +452,8 @@ void main() {
       final service = BulkTeacherActionService(
         lessonRepository: _FakeLessonRepository(const []),
         notificationService: notificationService,
+        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
       final count = await service.broadcastMessage(

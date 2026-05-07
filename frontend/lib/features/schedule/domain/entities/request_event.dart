@@ -78,7 +78,16 @@ enum RequestEventType {
   // Phase 3: 레슨 취소 확정 + 크레딧 반환
   lessonCancellationConfirmed,
 
-  cancellationCreditRefunded;
+  cancellationCreditRefunded,
+
+  // Phase 3: 선생님 일괄 작업 (bulk_teacher_actions_spec.md)
+  /// 선생님 사유 레슨 휴강 (일괄 또는 개별).
+  /// sessionNumber + message(사유) + changeCreditUsed(0) 포함.
+  lessonCancelledByTeacher,
+
+  /// 선생님 공지 메시지.
+  /// message(제목\n본문) 포함.
+  teacherAnnouncement;
 
   bool get isTerminal => [
     RequestEventType.cancel,

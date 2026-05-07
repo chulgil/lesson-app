@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
@@ -18,9 +18,29 @@ import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
 
+typedef OnboardingProfileImageSaver =
+    Future<String> Function(String sourcePath, String fileName);
+
+typedef OnboardingProfileImageCropper =
+    Future<String?> Function(String sourcePath);
+
+@visibleForTesting
+Future<String?> saveOnboardingProfileImage({
+  required XFile pickedImage,
+  required OnboardingProfileImageCropper cropper,
+  required OnboardingProfileImageSaver saver,
+  required String fileName,
+}) async {
+  final croppedPath = await cropper(pickedImage.path);
+  final sourcePath = croppedPath ?? pickedImage.path;
+  return saver(sourcePath, fileName);
+}
+
 /// Profile setup screen for teacher onboarding
 class ProfileSetupScreen extends ConsumerStatefulWidget {
   const ProfileSetupScreen({super.key});
+
+  static const instrumentSelectorKey = Key('profile_setup_instrument_selector');
 
   @override
   ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -47,7 +67,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   bool get _isFormValid {
     return _nameController.text.isNotEmpty &&
-        _profileImage != null &&
         _selectedInstruments.isNotEmpty &&
         _introController.text.length >= 20;
   }
@@ -55,7 +74,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   List<String> get _missingFields {
     final fields = <String>[];
     if (_nameController.text.isEmpty) fields.add('이름');
-    if (_profileImage == null) fields.add('프로필 사진');
     if (_selectedInstruments.isEmpty) fields.add('악기');
     if (_introController.text.length < 20) fields.add('소개글 (20자 이상)');
     return fields;
@@ -138,24 +156,33 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     if (source == null || !mounted) return;
 
-    final picked = await pickImage(source);
-    if (picked == null || !mounted) return;
+    try {
+      final picked = await pickImage(source);
+      if (picked == null || !mounted) return;
 
-    final croppedPath = await cropProfileImage(picked.path, context);
-    if (croppedPath == null || !mounted) return;
+      final savedPath = await saveOnboardingProfileImage(
+        pickedImage: picked,
+        cropper: (sourcePath) => cropProfileImage(sourcePath, context),
+        saver: saveProfileImage,
+        fileName: 'onboarding_${DateTime.now().millisecondsSinceEpoch}',
+      );
+      if (!mounted || savedPath == null) return;
 
-    final savedPath = await saveProfileImage(
-      croppedPath,
-      'onboarding_${DateTime.now().millisecondsSinceEpoch}',
-    );
-
-    setState(() => _profileImage = savedPath);
+      setState(() => _profileImage = savedPath);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.onboardingProfileImageError)),
+      );
+    }
   }
 
   void _showInstrumentSelector() {
-    showNotebookModalBottomSheet<void>(
+    showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      showHandle: false,
+      padding: EdgeInsets.zero,
       builder:
           (context) => _InstrumentSelectorSheet(
             selectedInstruments: _selectedInstruments,
@@ -252,6 +279,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           ],
                         ),
                       ),
+                    const SizedBox(height: AppSpacing.buttonHeight),
                   ],
                 ),
               ),
@@ -328,22 +356,29 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         Row(
           children: [
             Text(
-              '프로필 사진',
+              AppStrings.onboardingProfilePhotoOptional,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: AppSpacing.space1),
-            Text('*', style: TextStyle(color: AppColors.paperAccent)),
           ],
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        Text(
+          AppStrings.onboardingProfilePhotoTrustHint,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkSecondary,
+          ),
         ),
         const SizedBox(height: AppSpacing.space3),
         Center(
           child: GestureDetector(
+            key: const Key('profile_setup_profile_image_picker'),
             onTap: _selectProfileImage,
             child: Stack(
               children: [
                 Container(
+                  key: const Key('profile_setup_profile_image_preview'),
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
@@ -452,6 +487,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         ),
         const SizedBox(height: AppSpacing.space2),
         GestureDetector(
+          key: ProfileSetupScreen.instrumentSelectorKey,
           onTap: _showInstrumentSelector,
           child: Container(
             width: double.infinity,
@@ -669,8 +705,13 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('profile_setup_instrument_selector_sheet'),
       height: MediaQuery.of(context).size.height * 0.7,
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        borderRadius: BorderRadius.zero,
+      ),
       child: Column(
         children: [
           // Handle
@@ -692,7 +733,7 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  '완료',
+                  AppStrings.confirm,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
@@ -725,13 +766,17 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
                             color: AppColors.inkQuaternary,
                           ),
                   onTap: () {
+                    final next = List<String>.from(_selected);
                     setState(() {
                       if (isSelected) {
-                        _selected.remove(instrument);
+                        next.remove(instrument);
                       } else {
-                        _selected.add(instrument);
+                        next.add(instrument);
                       }
+                      _selected = next;
                     });
+                    widget.onSelectionChanged(next);
+                    Navigator.pop(context);
                   },
                 );
               },
