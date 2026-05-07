@@ -1,0 +1,55 @@
+"""Contract tests that verify backend exposes frontend-required remote API routes."""
+
+from collections.abc import Iterable
+
+import pytest
+
+
+def _assert_path_methods(routes: dict, path: str, methods: Iterable[str]) -> None:
+    assert path in routes, f"Missing route: {path}"
+    actual_methods = {method.lower() for method in routes[path].keys()}
+    for method in methods:
+        assert method.lower() in actual_methods, f"Missing method {method.upper()} on {path}"
+
+
+@pytest.mark.asyncio
+async def test_openapi_exposes_frontend_remote_contract_routes(client) -> None:
+    """Ensure critical frontend-relevant routes remain contract-available."""
+    response = await client.get("/openapi.json")
+    assert response.status_code == 200
+    routes = response.json()["paths"]
+
+    expected_routes = {
+        "/api/v1/lessons/bulk-cancel": {"post"},
+        "/api/v1/lessons/bulk-cancel/preview": {"post"},
+        "/api/v1/notifications/broadcast": {"post"},
+        "/api/v1/announcements": {"post", "get"},
+        "/api/v1/announcements/day-offs": {"get"},
+        "/api/v1/notifications/{notification_id}/read": {"patch"},
+        "/api/v1/notifications/read-all": {"patch"},
+        "/api/v1/notifications/unread-count": {"get"},
+        "/api/v1/schedule/confirmation-cards": {"get", "post"},
+        "/api/v1/schedule/confirmation-cards/by-subscription/{subscription_id}": {"get"},
+        "/api/v1/schedule/confirmation-cards/{card_id}": {"get"},
+        "/api/v1/schedule/confirmation-cards/{card_id}/status": {"patch"},
+        "/api/v1/schedule/confirmation-cards/{card_id}/confirm": {"patch"},
+        "/api/v1/schedule/confirmation-cards/dismiss-all": {"post"},
+        "/api/v1/parents/{parent_id}/child-profiles": {"get"},
+        "/api/v1/parents/child-profiles": {"post"},
+        "/api/v1/parents/child-profiles/{child_id}": {"get", "put", "delete"},
+        "/api/v1/parents/child-profiles/{child_id}/teacher": {"post", "delete"},
+        "/api/v1/practice/pieces": {"get", "post"},
+        "/api/v1/practice/pieces/{piece_id}": {"get", "put", "delete"},
+        "/api/v1/practice/pieces/search": {"get"},
+        "/api/v1/practice/repertoires/{repertoire_id}/archive": {"patch"},
+        "/api/v1/practice/repertoires/{repertoire_id}/restore": {"patch"},
+        "/api/v1/practice/repertoires/{repertoire_id}/permanent": {"delete"},
+        "/api/v1/practice/sections/{section_id}/notes": {"get", "post"},
+        "/api/v1/practice/notes/{note_id}": {"put", "delete"},
+        "/api/v1/subscriptions/{subscription_id}/events": {"get", "post"},
+        "/api/v1/subscriptions/schedule-change-events/pending": {"get"},
+        "/api/v1/subscriptions/{subscription_id}/use-reschedule": {"patch"},
+    }
+
+    for path, methods in expected_routes.items():
+        _assert_path_methods(routes, path, methods)

@@ -108,9 +108,10 @@ app/
 - `uv run pytest tests/test_backend_architecture_contract.py -q`
 - `uv run pytest tests/test_parent_api_spec_alignment.py -q`
 - `uv run pytest tests/test_subscriptions.py -q`
+- `uv run pytest tests/test_frontend_remote_gap_contract.py -q` (핵심 프론트 원격 계약 경로 노출 점검)
 - `uv run pytest -q` (backend 전체)
 
-**결과:** 531개 테스트 모두 통과(실패 0)
+**결과:** 532개 테스트 모두 통과(실패 0)
 
 핵심 정합성 점검 대상:
 
