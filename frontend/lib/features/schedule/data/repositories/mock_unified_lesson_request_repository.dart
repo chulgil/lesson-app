@@ -343,7 +343,7 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_3',
         eventType: RequestEventType.completed,
-        createdAt: today.subtract(const Duration(hours: 3)),
+        createdAt: now.subtract(const Duration(minutes: 30)),
       ),
     ]);
 
