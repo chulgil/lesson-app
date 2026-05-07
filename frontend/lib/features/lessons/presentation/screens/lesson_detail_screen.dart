@@ -252,6 +252,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     value: 'cancel',
                     child: Text(AppStrings.cancel),
                   ),
+                if (lesson.hasSubscription)
+                  PopupMenuItem(
+                    value: 'schedule_change',
+                    child: Text(AppStrings.announcementScheduleChange),
+                  ),
                 PopupMenuItem(
                   value: 'delete',
                   child: Text(
@@ -350,6 +355,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           }
         }
       }
+    } else if (value == 'schedule_change') {
+      if (lesson.subscriptionId != null) {
+        context.push(
+          AppRoutes.subscriptionDetail.replaceFirst(
+            ':id',
+            lesson.subscriptionId!,
+          ),
+          extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
+        );
+      }
     }
   }
 
@@ -412,7 +427,27 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Regular lesson proposal banner (shown after feedback is written,
           // when no active subscription exists with this student)
-          // 정규레슨 제안 배너는 학생 상세 > 수강권 현황에서 표시 (레슨노트에서 제거)
+          // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨만
+          if (lesson.hasSubscription && lesson.subscriptionId != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+              child: OutlinedButton.icon(
+                onPressed: () => context.push(
+                  AppRoutes.subscriptionDetail.replaceFirst(
+                    ':id',
+                    lesson.subscriptionId!,
+                  ),
+                  extra: {
+                    'viewerRole': widget.isTeacher ? 'teacher' : 'student',
+                  },
+                ),
+                icon: const Icon(Icons.swap_horiz, size: 18),
+                label: const Text(AppStrings.announcementScheduleChange),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
+                ),
+              ),
+            ),
 
           // Teacher notes section
           if (widget.isTeacher) ...[
