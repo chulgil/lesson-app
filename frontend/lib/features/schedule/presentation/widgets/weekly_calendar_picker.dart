@@ -233,8 +233,8 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     final dayOffsAsync = ref.watch(
       teacherDayOffsProvider(
         teacherId: widget.teacherId,
-        from: _weekStart,
-        to: weekEnd,
+        fromDate: _weekStart,
+        toDate: weekEnd,
       ),
     );
     final dayOffSet = {

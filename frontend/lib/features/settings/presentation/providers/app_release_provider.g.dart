@@ -7,7 +7,7 @@ part of 'app_release_provider.dart';
 // **************************************************************************
 
 String _$appReleaseRepositoryHash() =>
-    r'6611a16f6cdc3d5628698d5211c722fad103f0cd';
+    r'740880e5459c31204cb2c28f95a927379bf4bb30';
 
 /// See also [appReleaseRepository].
 @ProviderFor(appReleaseRepository)
@@ -83,7 +83,7 @@ final appRoadmapFeedProvider = FutureProvider<List<AppRoadmapItem>>.internal(
 );
 
 typedef AppRoadmapFeedRef = FutureProviderRef<List<AppRoadmapItem>>;
-String _$appReviewClientHash() => r'db62f60d95ab9fdea9af3b20d2eb4dc4e3f3e6e6';
+String _$appReviewClientHash() => r'f745ed10efd6100420ef23efec947c96edb2e17c';
 
 /// See also [appReviewClient].
 @ProviderFor(appReviewClient)

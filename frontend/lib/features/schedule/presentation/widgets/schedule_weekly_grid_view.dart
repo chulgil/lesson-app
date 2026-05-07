@@ -91,8 +91,8 @@ class _ScheduleWeeklyGridViewState
     final dayOffsAsync = ref.watch(
       teacherDayOffsProvider(
         teacherId: 'teacher_1',
-        from: _weekStart,
-        to: weekEnd,
+        fromDate: _weekStart,
+        toDate: weekEnd,
       ),
     );
     final dayOffDates = dayOffsAsync.valueOrNull ?? const [];
@@ -215,12 +215,13 @@ class _ScheduleWeeklyGridViewState
               final isDayOff = dayOffSet.contains(
                 DateTime(dayDate.year, dayDate.month, dayDate.day),
               );
-              final columnBg = isDayOff
-                  ? AppColors.paperDark
-                  : weeklyColumnBackground(
-                      dayType: _toScheduleDayType(dayType),
-                      restKind: restKind,
-                    );
+              final columnBg =
+                  isDayOff
+                      ? AppColors.paperDark
+                      : weeklyColumnBackground(
+                        dayType: _toScheduleDayType(dayType),
+                        restKind: restKind,
+                      );
 
               // §7.122 — 컬럼 사이 1px 수직 디바이더로 경계 명확화.
               // dayIndex 0(월) 은 시간 라벨과 인접해 디바이더 생략.

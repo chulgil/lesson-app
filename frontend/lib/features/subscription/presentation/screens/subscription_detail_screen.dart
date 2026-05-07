@@ -353,9 +353,7 @@ class _SubscriptionDetailBodyState
               ),
 
               // §7.119 v2.2: 휴강 상단 배너 (선생님+학생 모두 표시)
-              _TeacherCancelBanner(
-                subscriptionId: subscription.id,
-              ),
+              _TeacherCancelBanner(subscriptionId: subscription.id),
 
               // Scrollable chat area (schedule change events only)
               Expanded(
@@ -840,8 +838,8 @@ class _TeacherCancelBanner extends ConsumerWidget {
     final dayOffsAsync = ref.watch(
       teacherDayOffsProvider(
         teacherId: teacherId,
-        from: now.subtract(const Duration(days: 7)),
-        to: now.add(const Duration(days: 30)),
+        fromDate: now.subtract(const Duration(days: 7)),
+        toDate: now.add(const Duration(days: 30)),
       ),
     );
     final dayOffs = dayOffsAsync.valueOrNull ?? const [];
@@ -849,22 +847,28 @@ class _TeacherCancelBanner extends ConsumerWidget {
 
     // 미래 휴강일만 표시
     final today = DateTime(now.year, now.month, now.day);
-    final futureDayOffs = dayOffs.where(
-      (d) => !DateTime(d.year, d.month, d.day).isBefore(today),
-    ).toList()..sort();
+    final futureDayOffs =
+        dayOffs
+            .where((d) => !DateTime(d.year, d.month, d.day).isBefore(today))
+            .toList()
+          ..sort();
 
     if (futureDayOffs.isEmpty) return const SizedBox.shrink();
 
-    final dateText = futureDayOffs.length == 1
-        ? formatDateMD(futureDayOffs.first)
-        : '${formatDateMD(futureDayOffs.first)}~${formatDateMD(futureDayOffs.last)}';
+    final dateText =
+        futureDayOffs.length == 1
+            ? formatDateMD(futureDayOffs.first)
+            : '${formatDateMD(futureDayOffs.first)}~${formatDateMD(futureDayOffs.last)}';
 
     // 공지 메시지 가져오기
-    final announcementsAsync = ref.watch(teacherAnnouncementsProvider(teacherId));
+    final announcementsAsync = ref.watch(
+      teacherAnnouncementsProvider(teacherId),
+    );
     final announcements = announcementsAsync.valueOrNull ?? const [];
-    final dayOffAnnouncement = announcements
-        .where((a) => a.type == AnnouncementType.dayOff)
-        .firstOrNull;
+    final dayOffAnnouncement =
+        announcements
+            .where((a) => a.type == AnnouncementType.dayOff)
+            .firstOrNull;
     final message = dayOffAnnouncement?.message;
 
     return Container(

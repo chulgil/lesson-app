@@ -24,11 +24,15 @@ TeacherAnnouncementRepository teacherAnnouncementRepository(Ref ref) {
 Future<List<DateTime>> teacherDayOffs(
   Ref ref, {
   required String teacherId,
-  required DateTime from,
-  required DateTime to,
+  required DateTime fromDate,
+  required DateTime toDate,
 }) async {
   final repository = ref.watch(teacherAnnouncementRepositoryProvider);
-  return repository.getDayOffs(teacherId: teacherId, from: from, to: to);
+  return repository.getDayOffs(
+    teacherId: teacherId,
+    from: fromDate,
+    to: toDate,
+  );
 }
 
 /// 선생님의 공지 목록.

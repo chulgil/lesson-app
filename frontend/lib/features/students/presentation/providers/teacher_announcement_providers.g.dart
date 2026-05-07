@@ -26,7 +26,7 @@ final teacherAnnouncementRepositoryProvider =
 
 typedef TeacherAnnouncementRepositoryRef
     = ProviderRef<TeacherAnnouncementRepository>;
-String _$teacherDayOffsHash() => r'ea03f3b2a8e0161b607a3ff4010c1e6acaf56150';
+String _$teacherDayOffsHash() => r'f293242381b9c3d7a43709ff961adfd8c6e838c4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -73,13 +73,13 @@ class TeacherDayOffsFamily extends Family<AsyncValue<List<DateTime>>> {
   /// Copied from [teacherDayOffs].
   TeacherDayOffsProvider call({
     required String teacherId,
-    required DateTime from,
-    required DateTime to,
+    required DateTime fromDate,
+    required DateTime toDate,
   }) {
     return TeacherDayOffsProvider(
       teacherId: teacherId,
-      from: from,
-      to: to,
+      fromDate: fromDate,
+      toDate: toDate,
     );
   }
 
@@ -89,8 +89,8 @@ class TeacherDayOffsFamily extends Family<AsyncValue<List<DateTime>>> {
   ) {
     return call(
       teacherId: provider.teacherId,
-      from: provider.from,
-      to: provider.to,
+      fromDate: provider.fromDate,
+      toDate: provider.toDate,
     );
   }
 
@@ -120,14 +120,14 @@ class TeacherDayOffsProvider extends AutoDisposeFutureProvider<List<DateTime>> {
   /// Copied from [teacherDayOffs].
   TeacherDayOffsProvider({
     required String teacherId,
-    required DateTime from,
-    required DateTime to,
+    required DateTime fromDate,
+    required DateTime toDate,
   }) : this._internal(
           (ref) => teacherDayOffs(
             ref as TeacherDayOffsRef,
             teacherId: teacherId,
-            from: from,
-            to: to,
+            fromDate: fromDate,
+            toDate: toDate,
           ),
           from: teacherDayOffsProvider,
           name: r'teacherDayOffsProvider',
@@ -139,8 +139,8 @@ class TeacherDayOffsProvider extends AutoDisposeFutureProvider<List<DateTime>> {
           allTransitiveDependencies:
               TeacherDayOffsFamily._allTransitiveDependencies,
           teacherId: teacherId,
-          from: from,
-          to: to,
+          fromDate: fromDate,
+          toDate: toDate,
         );
 
   TeacherDayOffsProvider._internal(
@@ -151,13 +151,13 @@ class TeacherDayOffsProvider extends AutoDisposeFutureProvider<List<DateTime>> {
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.teacherId,
-    required this.from,
-    required this.to,
+    required this.fromDate,
+    required this.toDate,
   }) : super.internal();
 
   final String teacherId;
-  final DateTime from;
-  final DateTime to;
+  final DateTime fromDate;
+  final DateTime toDate;
 
   @override
   Override overrideWith(
@@ -173,8 +173,8 @@ class TeacherDayOffsProvider extends AutoDisposeFutureProvider<List<DateTime>> {
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         teacherId: teacherId,
-        from: from,
-        to: to,
+        fromDate: fromDate,
+        toDate: toDate,
       ),
     );
   }
@@ -188,16 +188,16 @@ class TeacherDayOffsProvider extends AutoDisposeFutureProvider<List<DateTime>> {
   bool operator ==(Object other) {
     return other is TeacherDayOffsProvider &&
         other.teacherId == teacherId &&
-        other.from == from &&
-        other.to == to;
+        other.fromDate == fromDate &&
+        other.toDate == toDate;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, teacherId.hashCode);
-    hash = _SystemHash.combine(hash, from.hashCode);
-    hash = _SystemHash.combine(hash, to.hashCode);
+    hash = _SystemHash.combine(hash, fromDate.hashCode);
+    hash = _SystemHash.combine(hash, toDate.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -207,11 +207,11 @@ mixin TeacherDayOffsRef on AutoDisposeFutureProviderRef<List<DateTime>> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
 
-  /// The parameter `from` of this provider.
-  DateTime get from;
+  /// The parameter `fromDate` of this provider.
+  DateTime get fromDate;
 
-  /// The parameter `to` of this provider.
-  DateTime get to;
+  /// The parameter `toDate` of this provider.
+  DateTime get toDate;
 }
 
 class _TeacherDayOffsProviderElement
@@ -222,9 +222,9 @@ class _TeacherDayOffsProviderElement
   @override
   String get teacherId => (origin as TeacherDayOffsProvider).teacherId;
   @override
-  DateTime get from => (origin as TeacherDayOffsProvider).from;
+  DateTime get fromDate => (origin as TeacherDayOffsProvider).fromDate;
   @override
-  DateTime get to => (origin as TeacherDayOffsProvider).to;
+  DateTime get toDate => (origin as TeacherDayOffsProvider).toDate;
 }
 
 String _$teacherAnnouncementsHash() =>

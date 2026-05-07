@@ -40,7 +40,7 @@ Future<List<AppRoadmapItem>> appRoadmapFeed(AppRoadmapFeedRef ref) async {
 
 @Riverpod(keepAlive: true)
 AppReviewClient appReviewClient(AppReviewClientRef ref) {
-  return const LocalAppReviewClient();
+  return LocalAppReviewClient();
 }
 
 @Riverpod(keepAlive: true)
