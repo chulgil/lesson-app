@@ -76,7 +76,7 @@
 | 항목 | 필수 | 설명 |
 |------|:----:|------|
 | name | ✓ | 이름 |
-| profileImage | ✓ | 프로필 사진 |
+| profileImage | ✗ | 프로필 사진 (선택, 나중에 추가) |
 | instruments | ✓ | 가르치는 악기 (최소 1개) |
 | introduction | ✓ | 소개글 (최소 20자) |
 

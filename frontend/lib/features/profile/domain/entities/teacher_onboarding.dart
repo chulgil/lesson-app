@@ -225,8 +225,6 @@ class TeacherOnboardingProfile {
   /// Validate profile completeness
   bool get isValid {
     return name.isNotEmpty &&
-        profileImage != null &&
-        profileImage!.isNotEmpty &&
         instruments.isNotEmpty &&
         introduction.length >= 20;
   }
@@ -235,7 +233,6 @@ class TeacherOnboardingProfile {
   List<String> get missingFields {
     final missing = <String>[];
     if (name.isEmpty) missing.add('이름');
-    if (profileImage == null || profileImage!.isEmpty) missing.add('프로필 사진');
     if (instruments.isEmpty) missing.add('악기');
     if (introduction.length < 20) missing.add('소개글 (20자 이상)');
     return missing;

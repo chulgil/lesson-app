@@ -158,7 +158,16 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     try {
       final picked = await pickImage(source);
-      if (picked == null || !mounted) return;
+      if (picked == null || !mounted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.onboardingProfileImageCanceled),
+            ),
+          );
+        }
+        return;
+      }
 
       final savedPath = await saveOnboardingProfileImage(
         pickedImage: picked,

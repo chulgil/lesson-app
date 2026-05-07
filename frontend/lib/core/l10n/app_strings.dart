@@ -5588,6 +5588,7 @@ class AppStrings {
       '전문적인 사진을 추가하면 학생과 학부모가 선생님을 더 신뢰하고 기억하기 쉽습니다.';
   static const onboardingProfileImageError =
       '사진을 불러오지 못했습니다. 권한을 확인하거나 다시 시도해주세요.';
+  static const onboardingProfileImageCanceled = '사진 선택이 취소되었습니다.';
   static const onboardingNext = '다음';
   static const onboardingSelectInstrument = '악기 선택';
   static const onboardingNameHint = '선생님 이름을 입력해주세요';
