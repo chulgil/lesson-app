@@ -13,6 +13,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/teacher_announcement.dart';
 import '../providers/teacher_announcement_providers.dart';
+import '../widgets/announcement_sheet.dart';
 
 /// 공지 이력 화면 — 선생님이 보낸 공지 목록 + 영향 학생 처리 상태.
 ///
@@ -32,6 +33,13 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
           AppStrings.announcementHistoryTitle,
           style: NotebookTypography.appBarTitle,
         ),
+        actions: [
+          IconButton(
+            onPressed: () => AnnouncementSheet.show(context, ref: ref),
+            icon: const Icon(Icons.add, color: AppColors.ink),
+            tooltip: AppStrings.announcementSend,
+          ),
+        ],
       ),
       body: announcementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
