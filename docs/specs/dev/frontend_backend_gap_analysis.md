@@ -1,7 +1,7 @@
 # 프론트엔드-백엔드 갭 분석 리포트
 
 > 작성일: 2026-03-19
-> 최근 백엔드 재검토: 2026-05-06
+> 최근 백엔드 재검토: 2026-05-07
 > 분석 범위: Frontend Remote Repository ↔ Backend API Router 정합성
 
 ---
@@ -71,7 +71,7 @@
 | 16 | Schedule | LessonRequestRepository | ✅ | ✅ | |
 | 17 | Schedule | GroupClassBookingRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
 | 18 | Notification | NotificationRepository | — | ✅ | mock시 null 반환 |
-| 19 | Relationship | TeacherStudentRelationRepository | ✅ | ✅ | |
+| 19 | Relationship | TeacherStudentRelationRepository | ✅ | ✅ | `GET /relationships?teacher_id=&student_id=&status=&is_manually_registered=` 서버 필터로 teacher/student/status/manual 목록과 pair lookup 대체 가능 |
 | 20 | Follow | FollowRepository | ✅ | ✅ | |
 | 21 | Parent | ParentRepository | ✅ | ✅ | |
 | 22 | Gamification | GamificationRepository | ✅ | ✅ | |
@@ -90,7 +90,7 @@
 | 30 | Practice | PracticeNoteRepository | ❌ | MEDIUM | 섹션 노트 — practice/sections에 포함 가능 |
 | 31 | Practice | PracticeItemRepository | ✅ 있음 | LOW | 백엔드 `/practice/items` CRUD/filter/action API 추가. resourceIds는 `practice_item_resources`로 정규화 |
 | 32 | Invite | InviteRepository | ✅ 있음 | **HIGH** | 백엔드에 `/invites` 라우터 존재 |
-| 33 | Lesson | LessonPolicyRepository | ❌ | MEDIUM | 정책 엔드포인트 필요 |
+| 33 | Lesson | LessonPolicyRepository | ✅ 있음 | LOW | `/lesson-policies/teacher/{id}`, `/lesson-policies/class/{id}`, `/lesson-policies/effective` 지원. class policy 우선, teacher default fallback |
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
 | 36 | Student | LocationRepository | ❌ | LOW | 레슨 장소 |
@@ -119,8 +119,10 @@
 | FeedbackTemplateRepository | `GET /settings/feedback-templates`, `POST /settings/feedback-templates`, `GET /settings/feedback-templates/{id}`, `PUT /settings/feedback-templates/{id}`, `PATCH /settings/feedback-templates/{id}/usage`, `DELETE /settings/feedback-templates/{id}` | 프론트 `RemoteFeedbackTemplateRepository` 추가 및 provider mock-only 제거 |
 | TeachingResourceRepository | `GET /settings/teaching-resources?tag=&query=`, `POST /settings/teaching-resources`, `GET /settings/teaching-resources/{id}`, `PUT /settings/teaching-resources/{id}`, `DELETE /settings/teaching-resources/{id}` | 프론트 remote repository의 `getByIds`는 아직 전체 목록 조회 후 client-side filter. 필요 시 batch endpoint 추가 |
 | PracticeItemRepository | `GET /practice/items?lesson_id=&student_id=&date_from=&date_to=`, `GET /practice/items/incomplete`, `GET /practice/items/awaiting-feedback`, `POST /practice/items`, `GET /practice/items/{id}`, `PUT /practice/items/{id}`, `DELETE /practice/items/{id}`, `PATCH /practice/items/{id}/complete`, `PATCH /practice/items/{id}/like`, `PATCH /practice/items/{id}/practice-count/increment`, `PATCH /practice/items/{id}/practice-count/decrement` | 프론트 `RemotePracticeItemRepository` 추가 및 provider mock-only 제거 |
+| RecordingFeedback provider | `GET /recordings/{recording_id}/feedback`, `POST /recordings/{recording_id}/feedback`, `PUT /recordings/{recording_id}/feedback/{feedback_id}`, `DELETE /recordings/{recording_id}/feedback/{feedback_id}` | 프론트 `RecordingFeedbackList` mock-only provider를 remote repository/provider로 전환. 응답 필드는 `id`, `recordingId`, `teacherId`, `content`, `createdAt` |
 | Parent membership/class reads | `GET /memberships?student_id={linkedChildId}`, `GET /lessons-classes/{classId}` | 학부모 결제/수강권 화면이 자녀 subscription API와 같은 권한 모델로 membership/class read를 재사용 가능. mutation은 teacher-only 유지 |
 | FollowRepository filtered lookup | `GET /follows?follower_id=&following_id=&target_type=&direction=following|followers` | 프론트 `RemoteFollowRepository`가 전체 목록 조회 후 client-side filter/count 하던 흐름을 서버 필터로 대체 가능 |
+| TeacherStudentRelationRepository filtered lookup | `GET /relationships?teacher_id=&student_id=&status=&is_manually_registered=` | 프론트 `RemoteTeacherStudentRelationRepository`와 mock repository의 teacher/student/status/manual 필터 및 teacher-student pair lookup을 서버 필터로 대체 가능 |
 | RequestEvent cancellation parity | `lessonCancellationConfirmed`, `cancellationCreditRefunded` event type 저장 지원 | 프론트 schedule/subscription event enum 29개와 백엔드 PostgreSQL enum을 정렬 |
 | ScheduleConfirmationCardRepository | `GET/POST/PATCH /schedule/confirmation-cards*` 응답에 `teacher_name`, `suggested_day`, `suggested_time`, `lesson_duration`, `suggested_day2/3`, `suggested_time2/3` 제공. 기존 `suggestedDay*`/`lessonDuration` alias 유지 | 프론트 `RemoteScheduleConfirmationCardRepository` 추가 및 provider mock-only 제거. 같은 subscription에서 복수 확인 카드가 생겨도 첫 confirmed card만 booking을 materialize |
 | Subscription session events | `GET /subscriptions/schedule-change-events/pending`, 기존 `GET/POST /subscriptions/{id}/events` | 프론트 `subscriptionSessionEventsProvider`, `pendingScheduleChangeRequestsProvider` remote 연결 |
@@ -140,6 +142,7 @@
 | `TipTemplate.instrument` | 단일 nullable scope라 별도 테이블 불필요. 다중 악기 지원이 필요해질 때 `tip_template_instruments`로 분리 |
 | `TeachingResource.tags` | JSON 배열 저장 대신 `teaching_resource_tags(resource_id, tag)`로 정규화. 교수 자료 라이브러리는 tag/query 필터가 필요한 반복 metadata이고 `(resource_id, tag)` 중복 방지가 필요 |
 | `PracticeItem.resourceIds` | JSON 배열 저장 대신 `practice_item_resources(item_id, resource_id)`로 정규화. 연습 항목과 교수 자료는 다대다 관계이고 삭제 cascade/중복 방지가 필요 |
+| `RecordingFeedback` | `recording_feedbacks(recording_id, teacher_id, content)` 테이블로 분리. `practice_recordings.id` 기준 재사용 CRUD를 제공하고, 작성자는 teacher profile id로 저장한다 |
 | Redis / GraphDB | PostgreSQL 17을 SSOT로 유지. Redis는 TTL 캐시/락/큐에만 사용 후보. GraphDB는 현재 관계 깊이에서 불필요하며 PostgreSQL FK/인덱스/recursive CTE 우선 |
 
 ---

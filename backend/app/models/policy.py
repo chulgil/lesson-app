@@ -1,10 +1,12 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
+
+# ruff: noqa: N815, UP042
 
 
 class MakeupStatus(str, enum.Enum):
@@ -36,18 +38,37 @@ class LessonPolicy(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "lesson_policies"
 
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    lesson_class_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     cancellation_deadline_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
+    allow_same_day_cancel: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    late_cancel_deadline: Mapped[str | None] = mapped_column(String(5), nullable=True)
     late_cancel_deducts_lesson: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     no_show_deducts_lesson: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    grace_period_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=15)
     max_no_show_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     reschedule_allowed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     reschedule_deadline_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
     max_reschedule_per_subscription: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     makeup_expiry_days: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
+    allow_carryover: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    max_carryover_lessons: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    carryover_period_months: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    full_refund_days: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    partial_refund_ratio: Mapped[int] = mapped_column(Integer, nullable=False, default=67)
+    halfway_refund_ratio: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    no_show_refund_ratio: Mapped[int] = mapped_column(Integer, nullable=False, default=67)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
-        Index("uk_policy_teacher", "teacher_id", unique=True),
+        Index(
+            "uk_policy_teacher_default",
+            "teacher_id",
+            unique=True,
+            sqlite_where=lesson_class_id.is_(None),
+            postgresql_where=lesson_class_id.is_(None),
+        ),
+        Index("uk_policy_lesson_class", "lesson_class_id", unique=True),
+        Index("idx_policy_teacher_class", "teacher_id", "lesson_class_id"),
     )
 
 

@@ -10,7 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
-from app.schemas.practice import RecordingResponse, RecordingUploadResponse
+from app.schemas.practice import (
+    RecordingFeedbackCreate,
+    RecordingFeedbackResponse,
+    RecordingFeedbackUpdate,
+    RecordingResponse,
+    RecordingUploadResponse,
+)
 from app.services.recording_service import RecordingService
 
 router = APIRouter()
@@ -142,3 +148,70 @@ async def share_recording(
     """Generate a shareable link for a recording."""
     service = RecordingService(db)
     return await service.create_share_link(recording_id, current_user)
+
+
+@router.get(
+    "/{recording_id}/feedback",
+    response_model=list[RecordingFeedbackResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List recording feedback",
+)
+async def list_recording_feedback(
+    recording_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[RecordingFeedbackResponse]:
+    """List teacher feedback attached to a recording."""
+    service = RecordingService(db)
+    return await service.list_feedback(recording_id, current_user)
+
+
+@router.post(
+    "/{recording_id}/feedback",
+    response_model=RecordingFeedbackResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create recording feedback",
+)
+async def create_recording_feedback(
+    recording_id: str,
+    body: RecordingFeedbackCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RecordingFeedbackResponse:
+    """Create teacher feedback attached to a recording."""
+    service = RecordingService(db)
+    return await service.create_feedback(recording_id, body, current_user)
+
+
+@router.put(
+    "/{recording_id}/feedback/{feedback_id}",
+    response_model=RecordingFeedbackResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update recording feedback",
+)
+async def update_recording_feedback(
+    recording_id: str,
+    feedback_id: str,
+    body: RecordingFeedbackUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RecordingFeedbackResponse:
+    """Update teacher feedback attached to a recording."""
+    service = RecordingService(db)
+    return await service.update_feedback(recording_id, feedback_id, body, current_user)
+
+
+@router.delete(
+    "/{recording_id}/feedback/{feedback_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete recording feedback",
+)
+async def delete_recording_feedback(
+    recording_id: str,
+    feedback_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete teacher feedback attached to a recording."""
+    service = RecordingService(db)
+    await service.delete_feedback(recording_id, feedback_id, current_user)

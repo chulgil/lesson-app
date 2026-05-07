@@ -1366,6 +1366,124 @@ async def test_contract_lesson_policy_frontend_repository(
 
 
 @pytest.mark.asyncio
+async def test_contract_lesson_policy_class_policy_overrides_teacher_default(
+    client, auth_headers, create_test_user, db_session
+):
+    """Class-scoped policy should be persisted and preferred by effective lookup."""
+    from app.models.lesson import LessonClass
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    lesson_class = LessonClass(
+        id="policy-class-001",
+        teacher_id="test-user-id-prof",
+        name="Strict Academy Class",
+        type="private",
+    )
+    db_session.add(lesson_class)
+    await db_session.flush()
+
+    default_resp = await client.post(
+        "/api/v1/lesson-policies",
+        json={
+            "teacher_id": "test-user-id-prof",
+            "min_cancel_hours": 4,
+            "max_changes_per_month": 2,
+            "allow_same_day_cancel": False,
+            "late_cancel_deadline": "20:00",
+            "deduct_lesson_on_no_show": True,
+            "grace_period_minutes": 15,
+            "allow_carryover": True,
+            "max_carryover_lessons": 1,
+            "carryover_period_months": 1,
+        },
+        headers=auth_headers,
+    )
+    assert default_resp.status_code == 201
+
+    class_resp = await client.post(
+        "/api/v1/lesson-policies",
+        json={
+            "teacher_id": "test-user-id-prof",
+            "lesson_class_id": "policy-class-001",
+            "min_cancel_hours": 24,
+            "max_changes_per_month": 1,
+            "allow_same_day_cancel": False,
+            "late_cancel_deadline": "18:00",
+            "deduct_lesson_on_no_show": True,
+            "grace_period_minutes": 10,
+            "allow_carryover": False,
+            "max_carryover_lessons": 0,
+            "carryover_period_months": 0,
+        },
+        headers=auth_headers,
+    )
+    assert class_resp.status_code == 201
+    class_policy = class_resp.json()
+    assert class_policy["lesson_class_id"] == "policy-class-001"
+    assert class_policy["min_cancel_hours"] == 24
+    assert class_policy["max_changes_per_month"] == 1
+    assert class_policy["allow_carryover"] is False
+    assert class_policy["grace_period_minutes"] == 10
+
+    class_lookup = await client.get(
+        "/api/v1/lesson-policies/class/policy-class-001",
+        headers=auth_headers,
+    )
+    assert class_lookup.status_code == 200
+    assert class_lookup.json()["id"] == class_policy["id"]
+
+    effective_class = await client.get(
+        "/api/v1/lesson-policies/effective?teacher_id=test-user-id-prof&lesson_class_id=policy-class-001",
+        headers=auth_headers,
+    )
+    assert effective_class.status_code == 200
+    assert effective_class.json()["id"] == class_policy["id"]
+    assert effective_class.json()["min_cancel_hours"] == 24
+
+    effective_default = await client.get(
+        "/api/v1/lesson-policies/effective?teacher_id=test-user-id-prof&lesson_class_id=unknown-class",
+        headers=auth_headers,
+    )
+    assert effective_default.status_code == 200
+    assert effective_default.json()["id"] == default_resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_lesson_policy_class_policy_requires_owned_class(
+    client, create_test_user, db_session
+):
+    """Teachers cannot create class policies for another teacher's class."""
+    from app.models.lesson import LessonClass
+
+    await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-class-policy@test.com")
+    await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-class-policy@test.com")
+    db_session.add(
+        LessonClass(
+            id="teacher-b-class",
+            teacher_id="teacher-b-id-prof",
+            name="Other Teacher Class",
+            type="private",
+        )
+    )
+    await db_session.flush()
+
+    teacher_a_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-a-id', 'role': 'teacher'})}"
+    }
+    response = await client.post(
+        "/api/v1/lesson-policies",
+        json={
+            "teacher_id": "teacher-a-id-prof",
+            "lesson_class_id": "teacher-b-class",
+            "min_cancel_hours": 24,
+        },
+        headers=teacher_a_headers,
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_lesson_policy_mutations_are_scoped_to_owning_teacher(
     client, create_test_user
 ):

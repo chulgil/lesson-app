@@ -11,6 +11,11 @@ def _camel_alias(field_name: str) -> str:
 
 
 CAMEL_MODEL_CONFIG = ConfigDict(populate_by_name=True, alias_generator=_camel_alias)
+CAMEL_FROM_ATTRIBUTES_MODEL_CONFIG = ConfigDict(
+    from_attributes=True,
+    populate_by_name=True,
+    alias_generator=_camel_alias,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -323,6 +328,30 @@ class RecordingUploadResponse(BaseModel):
     file_url: str
     duration_seconds: int | None = None
     bpm: int | None = None
+    created_at: _dt.datetime
+
+
+class RecordingFeedbackCreate(BaseModel):
+    """Create teacher feedback for a recording."""
+
+    content: str = Field(min_length=1)
+
+
+class RecordingFeedbackUpdate(BaseModel):
+    """Update teacher feedback for a recording."""
+
+    content: str = Field(min_length=1)
+
+
+class RecordingFeedbackResponse(BaseModel):
+    """Teacher feedback on a shared recording."""
+
+    model_config = CAMEL_FROM_ATTRIBUTES_MODEL_CONFIG
+
+    id: str
+    recording_id: str
+    teacher_id: str
+    content: str
     created_at: _dt.datetime
 
 

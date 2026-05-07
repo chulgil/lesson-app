@@ -175,6 +175,29 @@ class PracticeRecording(UUIDMixin, Base):
     )
 
 
+class RecordingFeedback(UUIDMixin, TimestampMixin, Base):
+    """Teacher feedback attached to a shared practice recording."""
+
+    __tablename__ = "recording_feedbacks"
+
+    recording_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("practice_recordings.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    teacher_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("teachers.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    __table_args__ = (
+        Index("idx_recording_feedback_recording", "recording_id"),
+        Index("idx_recording_feedback_teacher", "teacher_id"),
+    )
+
+
 class PracticeNote(UUIDMixin, TimestampMixin, Base):
     """Text note attached to a practice section."""
 

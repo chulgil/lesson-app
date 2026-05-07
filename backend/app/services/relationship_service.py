@@ -62,7 +62,16 @@ class RelationshipService:
         return relation
 
     async def get_all(
-        self, *, user: Any, page: int, size: int, offset: int
+        self,
+        *,
+        user: Any,
+        page: int,
+        size: int,
+        offset: int,
+        teacher_id: str | None = None,
+        student_id: str | None = None,
+        status: str | None = None,
+        is_manually_registered: bool | None = None,
     ) -> PaginatedResponse:
         """List all relationships for the current user."""
         from app.models.relationship import TeacherStudentRelation
@@ -72,6 +81,14 @@ class RelationshipService:
             (TeacherStudentRelation.teacher_id == (tid or user.id))
             | (TeacherStudentRelation.student_id == user.id)
         )
+        if teacher_id is not None:
+            query = query.where(TeacherStudentRelation.teacher_id == teacher_id)
+        if student_id is not None:
+            query = query.where(TeacherStudentRelation.student_id == student_id)
+        if status is not None:
+            query = query.where(TeacherStudentRelation.status == status)
+        if is_manually_registered is not None:
+            query = query.where(TeacherStudentRelation.is_manually_registered == is_manually_registered)
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0

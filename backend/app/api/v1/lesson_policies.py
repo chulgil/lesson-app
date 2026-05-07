@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db
@@ -40,8 +40,9 @@ async def get_class_policy(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> LessonPolicyResponse:
-    """Class-specific policies are not separated yet; return 404 until configured."""
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Class lesson policy not found")
+    """Return a class-specific lesson policy."""
+    service = LessonPolicyService(db)
+    return await service.get_class_policy(lesson_class_id)
 
 
 @router.get(

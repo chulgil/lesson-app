@@ -11,7 +11,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
-from app.schemas.practice import RecordingResponse, RecordingUploadResponse
+from app.schemas.practice import (
+    RecordingFeedbackCreate,
+    RecordingFeedbackResponse,
+    RecordingFeedbackUpdate,
+    RecordingResponse,
+    RecordingUploadResponse,
+)
 
 
 class RecordingService:
@@ -144,6 +150,63 @@ class RecordingService:
             "expires_at": expires_at.isoformat(),
         }
 
+    async def list_feedback(self, recording_id: str, current_user: Any) -> list[RecordingFeedbackResponse]:
+        """List feedback attached to an accessible recording."""
+        from app.models.practice import RecordingFeedback
+
+        await self._get_accessible_recording(recording_id, current_user)
+        result = await self.db.scalars(
+            select(RecordingFeedback)
+            .where(RecordingFeedback.recording_id == recording_id)
+            .order_by(RecordingFeedback.created_at.asc())
+        )
+        return [RecordingFeedbackResponse.model_validate(feedback) for feedback in result.all()]
+
+    async def create_feedback(
+        self,
+        recording_id: str,
+        data: RecordingFeedbackCreate,
+        current_user: Any,
+    ) -> RecordingFeedbackResponse:
+        """Create teacher feedback for an accessible recording."""
+        from app.models.practice import RecordingFeedback
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        self._assert_teacher(current_user)
+        await self._get_accessible_recording(recording_id, current_user)
+        content = self._trim_feedback_content(data.content)
+        teacher_id = await resolve_teacher_id(self.db, current_user.id)
+
+        feedback = RecordingFeedback(
+            recording_id=recording_id,
+            teacher_id=teacher_id,
+            content=content,
+        )
+        self.db.add(feedback)
+        await self.db.flush()
+        await self.db.refresh(feedback)
+        return RecordingFeedbackResponse.model_validate(feedback)
+
+    async def update_feedback(
+        self,
+        recording_id: str,
+        feedback_id: str,
+        data: RecordingFeedbackUpdate,
+        current_user: Any,
+    ) -> RecordingFeedbackResponse:
+        """Update teacher feedback for an accessible recording."""
+        feedback = await self._get_mutable_feedback(recording_id, feedback_id, current_user)
+        feedback.content = self._trim_feedback_content(data.content)
+        await self.db.flush()
+        await self.db.refresh(feedback)
+        return RecordingFeedbackResponse.model_validate(feedback)
+
+    async def delete_feedback(self, recording_id: str, feedback_id: str, current_user: Any) -> None:
+        """Delete teacher feedback for an accessible recording."""
+        feedback = await self._get_mutable_feedback(recording_id, feedback_id, current_user)
+        await self.db.delete(feedback)
+        await self.db.flush()
+
     async def _get_accessible_recording(self, recording_id: str, current_user: Any) -> Any:
         """Return a recording when the current user may view it."""
         from app.models.practice import PracticeRecording
@@ -157,6 +220,38 @@ class RecordingService:
         if rec is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording not found")
         return rec
+
+    async def _get_mutable_feedback(self, recording_id: str, feedback_id: str, current_user: Any) -> Any:
+        """Return feedback when the current teacher authored it."""
+        from app.models.practice import RecordingFeedback
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        self._assert_teacher(current_user)
+        await self._get_accessible_recording(recording_id, current_user)
+        feedback = await self.db.scalar(
+            select(RecordingFeedback).where(
+                RecordingFeedback.id == feedback_id,
+                RecordingFeedback.recording_id == recording_id,
+            )
+        )
+        if feedback is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recording feedback not found")
+
+        teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if feedback.teacher_id != teacher_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return feedback
+
+    def _assert_teacher(self, current_user: Any) -> None:
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher access required")
+
+    def _trim_feedback_content(self, content: str) -> str:
+        trimmed = content.strip()
+        if not trimmed:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Feedback content is required")
+        return trimmed
 
     async def _access_filter(self, recording_model: Any, current_user: Any) -> Any:
         """Build the recording visibility condition for a user.

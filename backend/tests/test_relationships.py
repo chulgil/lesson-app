@@ -17,6 +17,101 @@ async def test_list_relationships(client: AsyncClient, auth_headers, create_test
 
 
 @pytest.mark.asyncio
+async def test_list_relationships_supports_repository_filters(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """RemoteTeacherStudentRelationRepository should not need client-side filtering."""
+    from app.models.relationship import TeacherStudentRelation
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add_all(
+        [
+            TeacherStudentRelation(
+                id="relation-active-app",
+                teacher_id="test-user-id-prof",
+                student_id="student-001",
+                status="active",
+                is_manually_registered=False,
+            ),
+            TeacherStudentRelation(
+                id="relation-expired-manual",
+                teacher_id="test-user-id-prof",
+                student_id="student-002",
+                status="expired",
+                is_manually_registered=True,
+            ),
+            TeacherStudentRelation(
+                id="relation-active-manual",
+                teacher_id="test-user-id-prof",
+                student_id="student-003",
+                status="active",
+                is_manually_registered=True,
+            ),
+            TeacherStudentRelation(
+                id="relation-current-user-as-student",
+                teacher_id="other-teacher-prof",
+                student_id="test-user-id",
+                status="active",
+                is_manually_registered=False,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    teacher_active = await client.get(
+        "/api/v1/relationships",
+        headers=auth_headers,
+        params={"teacher_id": "test-user-id-prof", "status": "active"},
+    )
+    assert teacher_active.status_code == 200
+    assert {item["id"] for item in teacher_active.json()["items"]} == {
+        "relation-active-app",
+        "relation-active-manual",
+    }
+    assert teacher_active.json()["total"] == 2
+
+    manually_registered = await client.get(
+        "/api/v1/relationships",
+        headers=auth_headers,
+        params={
+            "teacher_id": "test-user-id-prof",
+            "status": "active",
+            "is_manually_registered": True,
+        },
+    )
+    assert manually_registered.status_code == 200
+    assert [item["id"] for item in manually_registered.json()["items"]] == [
+        "relation-active-manual",
+    ]
+    assert manually_registered.json()["total"] == 1
+
+    pair = await client.get(
+        "/api/v1/relationships",
+        headers=auth_headers,
+        params={"teacher_id": "test-user-id-prof", "student_id": "student-002"},
+    )
+    assert pair.status_code == 200
+    assert [item["id"] for item in pair.json()["items"]] == [
+        "relation-expired-manual",
+    ]
+    assert pair.json()["total"] == 1
+
+    by_student = await client.get(
+        "/api/v1/relationships",
+        headers=auth_headers,
+        params={"student_id": "test-user-id"},
+    )
+    assert by_student.status_code == 200
+    assert [item["id"] for item in by_student.json()["items"]] == [
+        "relation-current-user-as-student",
+    ]
+    assert by_student.json()["total"] == 1
+
+
+@pytest.mark.asyncio
 async def test_invite_student(client: AsyncClient, auth_headers, create_test_user):
     """POST /api/v1/relationships/invite sends an invitation."""
     await create_test_user(user_id="test-user-id", role="teacher")

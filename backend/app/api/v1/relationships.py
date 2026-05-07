@@ -293,6 +293,10 @@ async def list_relationships(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
     pagination: Annotated[dict, Depends(get_pagination)],
+    teacher_id: str | None = None,
+    student_id: str | None = None,
+    status: str | None = None,
+    is_manually_registered: bool | None = None,
 ) -> PaginatedResponse[RelationshipResponse]:
     """List all relationships for the current user."""
     service = RelationshipService(db)
@@ -301,6 +305,10 @@ async def list_relationships(
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
+        teacher_id=teacher_id,
+        student_id=student_id,
+        status=status,
+        is_manually_registered=is_manually_registered,
     )
 
 

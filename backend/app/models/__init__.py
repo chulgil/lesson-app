@@ -35,6 +35,7 @@ from app.models.practice import (  # noqa: F401
     PracticeRepertoire,
     PracticeSection,
     PracticeStreak,
+    RecordingFeedback,
     StudentPracticePiece,
 )
 from app.models.practice_log import PracticeLog  # noqa: F401
