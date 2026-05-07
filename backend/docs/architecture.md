@@ -43,7 +43,7 @@ backend/
 │   │   ├── i18n.py                   # 다국어 미들웨어 + 번역 로더
 │   │   └── storage.py                # Vultr Object Storage 클라이언트
 │   │
-│   ├── models/                       # SQLAlchemy ORM 모델 (28 files)
+│   ├── models/                       # SQLAlchemy ORM 모델 (29 files)
 │   │   ├── base.py                   # Base, TimestampMixin, UUIDMixin
 │   │   ├── user.py                   # User, OAuthAccount, TokenBlacklist
 │   │   ├── teacher.py                # Teacher, Education, Career, Certificate
@@ -60,7 +60,7 @@ backend/
 │   │   ├── policy.py                 # LessonPolicy, MakeupLesson, ScheduleConfirmationCard
 │   │   └── request_event.py          # LessonRequest / subscription event log
 │   │
-│   ├── schemas/                      # Pydantic v2 요청/응답 스키마 (31 files)
+│   ├── schemas/                      # Pydantic v2 요청/응답 스키마 (32 files)
 │   │   ├── auth.py                   # TokenResponse, OAuthRequest
 │   │   ├── user.py                   # UserRead, UserUpdate
 │   │   ├── teacher.py                # TeacherRead, TeacherUpdate
@@ -70,6 +70,7 @@ backend/
 │   │   ├── practice.py               # RepertoireCreate, SectionCreate, RecordingUpload
 │   │   ├── schedule.py               # AvailabilityUpdate, BookingCreate
 │   │   ├── notification.py           # NotificationRead
+│   │   ├── teacher_announcement.py    # TeacherAnnouncementCreate, Response
 │   │   ├── parent.py                 # ParentRead, ChildCreate
 │   │   └── common.py                 # PaginatedResponse, ErrorResponse
 │   │
@@ -94,9 +95,10 @@ backend/
 │   │       ├── schedule_confirmations.py # /schedule/confirmation-cards/*
 │   │       ├── schedule_exceptions.py    # /schedule-exceptions/*
 │   │       ├── settings_api.py       # /settings/*
+│   │       ├── announcements.py      # /announcements/*
 │   │       └── device_tokens.py      # /device-tokens/*
 │   │
-│   ├── services/                     # 비즈니스 로직 (36 files)
+│   ├── services/                     # 비즈니스 로직 (37 files)
 │   │   ├── auth_service.py           # OAuth + JWT
 │   │   ├── lesson_service.py         # 레슨 CRUD + 상태 관리
 │   │   ├── subscription_service.py   # 구독 + 차감 + 제안 워크플로우
@@ -106,6 +108,7 @@ backend/
 │   │   ├── notification_service.py   # 알림 생성 + 발송
 │   │   ├── analytics_service.py      # 월간 통계 집계
 │   │   ├── post_service.py           # 선생님/학원 피드
+│   │   ├── announcement_service.py    # 선생님 공지/휴강일 생성/조회
 │   │   ├── lesson_policy_service.py  # 레슨 정책 CRUD
 │   │
 │   └── utils/
@@ -202,6 +205,7 @@ cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
 - 향후 Lessonaza 앱 사용료 과금은 별도 스펙과 별도 모델/라우터로 분리한다.
 - 수강권 회차별 시간변경은 `/subscriptions/{subscription_id}/events`의 `RequestEvent`가 원격 SSOT다. 단일 회차는 `session_number`, 변경 범위는 `schedule_change_type`으로 식별하고, 변경/수락/거절/역제안은 `scheduleChanged`, `scheduleChangeProposed`, `scheduleChangeAccepted`, `scheduleChangeRejected`, `scheduleChangeCountered` 이벤트로 기록한다. 배지/목록은 `GET /subscriptions/schedule-change-events/pending`에서 현재 사용자가 응답해야 하는 최신 회차 이벤트만 반환한다. `/schedule-changes` 라우트는 레거시 일정 변경 표면이므로 수강권 상세 화면의 회차별 변경 계약을 확장할 때는 우선 subscription event API를 확장한다.
 - 프론트 mock 대체 API는 화면별 mock shape를 그대로 복제하지 않는다. teacher/student/subscription scoped 도메인 API로 제공하고, 프론트 remote repository가 그 API를 조합한다. 선생님 개인 라이브러리는 `/settings/*` 아래에 둔다. 예: `feedback-presets`, `teaching-resources`, `tip-templates`.
+- 선생님 공지 시스템은 `/api/v1/announcements`로 통합되며, 휴강은 `teacher_announcement_dates` 정규화 테이블로 날짜를 관리한다. `/subscriptions/{subscription_id}/events`의 교차 도메인 이벤트와 분리된다.
 - 정규화가 필요한 반복 값은 JSON 배열로 저장하지 않는다. 검색/필터/중복 제약이 필요한 태그는 별도 테이블로 분리한다. 예: 장문 피드백 템플릿은 `feedback_templates`와 `feedback_template_tags`, 교수 자료는 `teaching_resources`와 `teaching_resource_tags`로 저장하고, API 응답에서 `tags: list[str]`로 조립한다. 선생님이 연습 항목에 첨부한 교수 자료도 `practice_item_resources(item_id, resource_id)`로 저장하고, API 응답에서 `resourceIds: list[str]`로 조립한다.
 - PostgreSQL JSON/JSONB는 opaque 설정값, 외부 webhook payload, provider별 부가 데이터처럼 필드 단위 무결성/검색/참조가 필요 없는 문서형 데이터에만 사용한다. 도메인 필터, unique 제약, FK, 개별 row lifecycle이 필요한 값은 join table 또는 별도 엔티티로 승격한다.
 - Redis는 도메인 원장으로 쓰지 않는다. 현재 의존성은 있지만, 적용 후보는 짧은 TTL 캐시, rate limit, scheduler/distributed lock, fan-out queue처럼 재생성 가능한 데이터로 제한한다.

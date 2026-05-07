@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     ai_notes,
+    announcements,
     analytics,
     auth,
     availability,
@@ -61,6 +62,7 @@ api_router.include_router(recordings.router, prefix="/recordings", tags=["record
 api_router.include_router(schedule.router, prefix="/schedule", tags=["schedule"])
 api_router.include_router(bookings.router, prefix="/bookings", tags=["bookings"])
 api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+api_router.include_router(announcements.router, prefix="/announcements", tags=["announcements"])
 api_router.include_router(parents.router, prefix="/parents", tags=["parents"])
 api_router.include_router(posts.router, prefix="/posts", tags=["posts"])
 api_router.include_router(relationships.router, tags=["relationships"])

@@ -88,5 +88,9 @@ from app.models.teacher import (  # noqa: F401
     TeacherCertificate,
     TeacherEducation,
 )
+from app.models.teacher_announcement import (  # noqa: F401
+    TeacherAnnouncement,
+    TeacherAnnouncementDate,
+)
 from app.models.tip import TipTemplate  # noqa: F401
 from app.models.user import OAuthAccount, TokenBlacklist, User  # noqa: F401
