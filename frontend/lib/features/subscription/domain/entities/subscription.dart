@@ -129,6 +129,12 @@ class Subscription {
   /// Reschedule deadline hours — changes within this window consume a reschedule credit.
   final int rescheduleDeadlineHours;
 
+  /// Bonus reschedule credits added post-issuance by the teacher (default 0).
+  final int bonusRescheduleCount;
+
+  /// Individual cancel deadline override in hours (null = use default policy).
+  final int? overrideCancelDeadlineHours;
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -159,6 +165,8 @@ class Subscription {
     this.discountReason,
     this.originalAmount,
     this.rescheduleDeadlineHours = 12, // 기본값: 12시간
+    this.bonusRescheduleCount = 0,
+    this.overrideCancelDeadlineHours,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
@@ -195,11 +203,19 @@ class Subscription {
   /// Check if has bonus lessons.
   bool get hasBonus => bonusCount > 0;
 
-  /// 🆕 Remaining reschedule count.
-  int get remainingReschedule => totalRescheduleAllowance - usedRescheduleCount;
+  /// Effective reschedule allowance (base + bonus credits added post-issuance).
+  int get effectiveRescheduleAllowance =>
+      totalRescheduleAllowance + bonusRescheduleCount;
 
-  /// 🆕 Check if student can reschedule (has remaining allowance).
+  /// Remaining reschedule count (effective allowance minus used count).
+  int get remainingReschedule => effectiveRescheduleAllowance - usedRescheduleCount;
+
+  /// Check if student can reschedule (has remaining allowance).
   bool get canReschedule => remainingReschedule > 0;
+
+  /// Effective cancel deadline hours (override if set, otherwise base policy).
+  int get effectiveCancelDeadlineHours =>
+      overrideCancelDeadlineHours ?? rescheduleDeadlineHours;
 
   /// Check if this subscription is pending postpaid deposit:
   /// active, postpaid, and no student payment has been recorded yet.
@@ -293,6 +309,9 @@ class Subscription {
     int? discountAmount,
     String? discountReason,
     int? originalAmount,
+    int? bonusRescheduleCount,
+    int? overrideCancelDeadlineHours,
+    bool clearOverrideCancelDeadlineHours = false,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -324,6 +343,10 @@ class Subscription {
       discountAmount: discountAmount ?? this.discountAmount,
       discountReason: discountReason ?? this.discountReason,
       originalAmount: originalAmount ?? this.originalAmount,
+      bonusRescheduleCount: bonusRescheduleCount ?? this.bonusRescheduleCount,
+      overrideCancelDeadlineHours: clearOverrideCancelDeadlineHours
+          ? null
+          : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
     );
   }
 

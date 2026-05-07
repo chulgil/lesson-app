@@ -6511,4 +6511,46 @@ class AppStrings {
 
   /// 외부 브라우저에서 열기
   static const youtubePlayerOpenExternal = '외부 브라우저에서 열기';
+
+  // -- Subscription Post-Issuance Editing (수강권 발급 후 수정) --
+
+  /// 수정 (공통 수정 버튼 라벨)
+  static const edit = '수정';
+
+  /// 시간 (시간 단위 접미사)
+  static const hourSuffix = '시간';
+
+  /// 장소 (레슨 장소 라벨)
+  static const locationLabel = '장소';
+
+  /// 유효기간 (라벨)
+  static const validityLabel = '유효기간';
+
+  /// 변경/취소권 추가 (바텀시트 제목)
+  static const addRescheduleCredit = '변경/취소권 추가';
+
+  /// 추가 횟수 (입력 필드 라벨)
+  static const additionalCount = '추가 횟수';
+
+  /// 사유 (입력 필드 라벨)
+  static const addReason = '사유';
+
+  /// 수정 불가 (재발급 필요) (섹션 헤더)
+  static const subscriptionEditNotEditable = '수정 불가 (재발급 필요)';
+
+  /// 레슨 횟수나 금액을 변경하시려면\n새 수강권을 발급해주세요. (안내 메시지)
+  static const subscriptionEditNewRequired =
+      '레슨 횟수나 금액을 변경하시려면\n새 수강권을 발급해주세요.';
+
+  /// 새 수강권 발급 (링크 텍스트)
+  static const issueNewSubscription = '새 수강권 발급';
+
+  /// 이동시간 수정 (바텀시트 제목)
+  static const editTravelTime = '이동시간 수정';
+
+  /// 취소 기준시간 수정 (바텀시트 제목)
+  static const editCancelDeadline = '취소 기준시간 수정';
+
+  /// 장소 변경 (버튼 라벨)
+  static const changeLocation = '장소 변경';
 }
