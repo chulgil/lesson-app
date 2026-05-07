@@ -247,7 +247,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       if (lesson.travelTimeMinutes > 0 &&
           tappedMinutes >= travelStart &&
           tappedMinutes < lessonStart) {
-        return; // Travel time block — ignore tap
+        // 이동 블록 탭 → 해당 레슨 상세로 이동
+        context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
+        return;
       }
     }
 
