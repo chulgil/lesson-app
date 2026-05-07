@@ -3,7 +3,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 
 def _camel_alias(field_name: str) -> str:
@@ -204,10 +204,21 @@ class SectionDailyCompletionUpdate(BaseModel):
     date: _dt.date
 
 
+def _strip_note_content(value: object) -> object:
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
 class SectionNoteCreate(BaseModel):
     """Add a note to a section."""
 
-    content: str
+    content: str = Field(min_length=1)
+
+    @field_validator("content", mode="before")
+    @classmethod
+    def strip_content(cls, value: object) -> object:
+        return _strip_note_content(value)
 
 
 class SectionNoteResponse(BaseModel):
@@ -225,7 +236,12 @@ class SectionNoteResponse(BaseModel):
 class SectionNoteUpdate(BaseModel):
     """Update a practice note."""
 
-    content: str
+    content: str = Field(min_length=1)
+
+    @field_validator("content", mode="before")
+    @classmethod
+    def strip_content(cls, value: object) -> object:
+        return _strip_note_content(value)
 
 
 class SectionPracticeCountUpdate(BaseModel):

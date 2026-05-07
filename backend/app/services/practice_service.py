@@ -6,7 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -260,7 +260,10 @@ class PracticeService:
 
     async def delete_piece(self, piece_id: str, current_user: Any) -> None:
         """Delete a teacher-owned practice piece."""
+        from app.models.practice import StudentPracticePiece
+
         piece = await self._get_piece_for_teacher(piece_id, current_user)
+        await self.db.execute(delete(StudentPracticePiece).where(StudentPracticePiece.piece_id == piece_id))
         await self.db.delete(piece)
         await self.db.flush()
 

@@ -153,6 +153,56 @@ async def test_practice_note_crud_for_section(
 
 
 @pytest.mark.asyncio
+async def test_practice_note_content_matches_frontend_trim_behavior(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Remote note API trims saved content and rejects blank notes like the frontend dialog."""
+    from app.models.practice import PracticeRepertoire, PracticeSection
+    from app.models.student import Student
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add(Student(id="student-001", teacher_id="test-user-id-prof", name="Student", instrument="violin"))
+    repertoire = PracticeRepertoire(id="rep-001", student_id="student-001", name="Etudes", start_date=date(2026, 5, 1))
+    section = PracticeSection(id="section-a", repertoire_id="rep-001", piece_name="A", start_measure=1, end_measure=4)
+    db_session.add_all([repertoire, section])
+    await db_session.flush()
+
+    create_response = await client.post(
+        "/api/v1/practice/sections/section-a/notes",
+        headers=auth_headers,
+        json={"content": "  Keep wrist relaxed  "},
+    )
+    assert create_response.status_code == 201
+    assert create_response.json()["content"] == "Keep wrist relaxed"
+    note_id = create_response.json()["id"]
+
+    blank_create_response = await client.post(
+        "/api/v1/practice/sections/section-a/notes",
+        headers=auth_headers,
+        json={"content": "   "},
+    )
+    assert blank_create_response.status_code == 422
+
+    update_response = await client.put(
+        f"/api/v1/practice/notes/{note_id}",
+        headers=auth_headers,
+        json={"content": "  Relax wrist and thumb  "},
+    )
+    assert update_response.status_code == 200
+    assert update_response.json()["content"] == "Relax wrist and thumb"
+
+    blank_update_response = await client.put(
+        f"/api/v1/practice/notes/{note_id}",
+        headers=auth_headers,
+        json={"content": "   "},
+    )
+    assert blank_update_response.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_recording_metadata_helpers(
     client: AsyncClient,
     auth_headers,

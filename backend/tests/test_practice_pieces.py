@@ -126,6 +126,40 @@ async def test_teacher_assigns_piece_to_student_and_updates_progress(
 
 
 @pytest.mark.asyncio
+async def test_deleting_piece_removes_student_assignments(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Deleting a library piece also removes student assignments, matching PieceRepository mock behavior."""
+    from sqlalchemy import func, select
+
+    from app.models.practice import StudentPracticePiece
+    from app.models.student import Student
+
+    await create_test_user(user_id="test-user-id", role="teacher", name="Teacher")
+    db_session.add(Student(id="student-001", teacher_id="test-user-id-prof", name="Student", instrument="violin"))
+    await db_session.flush()
+
+    create_response = await client.post(
+        "/api/v1/practice/pieces",
+        headers=auth_headers,
+        json={"title": "Delete Me", "composer": "Composer"},
+    )
+    piece_id = create_response.json()["id"]
+    await client.post(f"/api/v1/practice/students/student-001/pieces/{piece_id}", headers=auth_headers)
+
+    delete_response = await client.delete(f"/api/v1/practice/pieces/{piece_id}", headers=auth_headers)
+
+    assert delete_response.status_code == 204
+    assignment_count = await db_session.scalar(
+        select(func.count()).select_from(StudentPracticePiece).where(StudentPracticePiece.piece_id == piece_id)
+    )
+    assert assignment_count == 0
+
+
+@pytest.mark.asyncio
 async def test_parent_can_read_linked_child_piece_repertoire(
     client: AsyncClient,
     auth_headers,

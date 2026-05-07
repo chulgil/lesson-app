@@ -13,8 +13,8 @@
 | 분석 대상 | lesson-app 프론트엔드-백엔드 구현 상태 |
 | 분석일 | 2026-03-19 |
 | 전체 Repository 수 | 40개 |
-| Remote 구현 완료 | 26개 (65%) |
-| Mock-only (Remote 미구현) | 14개 (35%) |
+| Remote 구현 완료 | 27개 (67.5%) |
+| Mock-only (Remote 미구현) | 13개 (32.5%) |
 | 백엔드 API 라우터 | 19개, 120+ 엔드포인트 |
 | API 경로 불일치 | 3건 (CRITICAL 1, HIGH 2) |
 
@@ -24,7 +24,7 @@
 |------|------|
 | **Problem** | 프론트엔드 Remote Repository가 백엔드 API와 실제로 연동 가능한지 불명확 |
 | **Solution** | 40개 Repository × 120 Backend Endpoint 전수 대조 |
-| **Function/UX Effect** | API 경로 불일치 3건 사전 발견, Mock-only 14개 영역 식별 |
+| **Function/UX Effect** | API 경로 불일치 3건 사전 발견, Mock-only 13개 영역 식별 |
 | **Core Value** | 베타 출시 전 Remote 전환 시 런타임 에러 사전 방지 |
 
 ---
@@ -95,7 +95,7 @@
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
 | 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | `/schedule/confirmation-cards` 응답을 Flutter snake_case 계약과 기존 camelCase alias 모두에 맞춤. teacher profile id 접근과 중복 booking guard 포함 |
-| 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
+| 38 | Parent | ChildProfileRepository | ✅ 있음 | LOW | 백엔드 `GET /parents/{parent_id}/child-profiles`, `POST /parents/child-profiles`, `GET/PUT/DELETE /parents/child-profiles/{child_id}`, teacher connect/disconnect 지원. 프론트 remote adapter 연결 필요 |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |
 | 40 | Subscription | SubscriptionSettingsRepository | ❌ | LOW | **Orphan** — Provider 미연결 |
@@ -227,17 +227,18 @@
 | 5 | LessonClassRepository Remote 구현 | 백엔드 `/lessons-classes` 이미 존재 |
 | 6 | MembershipRepository Remote 구현 | 백엔드 memberships 이미 존재 |
 | 7 | PracticeRepertoireRepository Remote 구현 | 백엔드 `/practice/repertoires` 이미 존재 |
+| 8 | ChildProfileRepository Remote 구현 | 백엔드 `/parents/*/child-profiles` CRUD와 teacher connect/disconnect 이미 존재 |
 
 ### P2: 베타 이후
 
 | # | 작업 | 비고 |
 |---|------|------|
-| 8 | PaymentRepository Remote 구현 | 결제 기능 별도 설계 필요 |
-| 9 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
-| 10 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
-| 11 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
-| 12 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | Orphan 상태 해소 |
-| 13 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
+| 9 | PaymentRepository Remote 구현 | 앱 결제 표면이 아니라 선생님 수동 입금 상태 관리로 유지. 별도 PG API는 보류 |
+| 10 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
+| 11 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
+| 12 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
+| 13 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | Orphan 상태 해소 |
+| 14 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
 
 ---
 
