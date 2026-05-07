@@ -303,6 +303,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
   /// Prevents partial save issues when saving from BasicInfoEditScreen.
   Future<void> updateBasicInfoAll({
     required String name,
+    String? nickname,
     required String introduction,
     String? teachingStyle,
     List<String>? specialties,
@@ -319,6 +320,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
       final updated = await repo.updateProfile(
         current.copyWith(
           name: name,
+          nickname: nickname ?? current.nickname,
           introduction: introduction,
           teachingStyle: teachingStyle ?? current.teachingStyle,
           specialties: specialties ?? current.specialties,

@@ -29,6 +29,7 @@ class BasicInfoEditScreen extends ConsumerStatefulWidget {
 class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _nicknameController = TextEditingController();
   final _introductionController = TextEditingController();
   final _teachingStyleController = TextEditingController();
 
@@ -71,6 +72,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     final profile = profileState.valueOrNull;
     if (profile != null) {
       _nameController.text = profile.name;
+      _nicknameController.text = profile.nickname ?? profile.name;
       _introductionController.text = profile.introduction;
       _teachingStyleController.text = profile.teachingStyle ?? '';
       if (profile.specialties != null) {
@@ -88,6 +90,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _nicknameController.dispose();
     _introductionController.dispose();
     _teachingStyleController.dispose();
     _areaController.dispose();
@@ -165,8 +168,10 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       final teachingStyle = _teachingStyleController.text.trim();
 
       // Single atomic save: all fields in one API call
+      final nicknameText = _nicknameController.text.trim();
       await notifier.updateBasicInfoAll(
         name: _nameController.text.trim(),
+        nickname: nicknameText.isNotEmpty ? nicknameText : null,
         introduction: _introductionController.text.trim(),
         teachingStyle: teachingStyle.isNotEmpty ? teachingStyle : null,
         specialties: _selectedSpecialties.toList(),
@@ -272,6 +277,26 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                   }
                   return null;
                 },
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Nickname field (호칭)
+              _buildLabel('호칭 (닉네임)'),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '학생에게 표시되는 이름입니다. 비워두면 본명이 사용됩니다.',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              TextFormField(
+                controller: _nicknameController,
+                decoration: _inputDecoration(
+                  hintText: '예) 영희쌤, 바이올린 선생님',
+                ),
+                textInputAction: TextInputAction.next,
               ),
 
               const SizedBox(height: AppSpacing.space6),

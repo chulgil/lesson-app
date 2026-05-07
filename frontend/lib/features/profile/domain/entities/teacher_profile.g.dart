@@ -188,6 +188,7 @@ TeacherProfile _$TeacherProfileFromJson(Map<String, dynamic> json) =>
       organizationId: json['organization_id'] as String?,
       organizationName: json['organization_name'] as String?,
       name: json['name'] as String,
+      nickname: json['nickname'] as String?,
       profileImage: json['profile_image'] as String?,
       backgroundImage: json['background_image'] as String?,
       instruments: (json['instruments'] as List<dynamic>)
@@ -248,6 +249,7 @@ Map<String, dynamic> _$TeacherProfileToJson(TeacherProfile instance) =>
       'organization_id': instance.organizationId,
       'organization_name': instance.organizationName,
       'name': instance.name,
+      'nickname': instance.nickname,
       'profile_image': instance.profileImage,
       'background_image': instance.backgroundImage,
       'instruments': instance.instruments,

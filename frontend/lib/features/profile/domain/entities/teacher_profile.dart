@@ -398,6 +398,7 @@ class TeacherProfile {
 
   // Basic info (required for minimum)
   final String name;
+  final String? nickname; // 호칭/닉네임 (학생에게 표시, null이면 name 사용)
   final String? profileImage;
   final String? backgroundImage;
   final List<String> instruments;
@@ -455,6 +456,7 @@ class TeacherProfile {
     this.organizationId,
     this.organizationName,
     required this.name,
+    this.nickname,
     this.profileImage,
     this.backgroundImage,
     required this.instruments,
@@ -507,6 +509,9 @@ class TeacherProfile {
     return _$TeacherProfileFromJson(enriched);
   }
   Map<String, dynamic> toJson() => _$TeacherProfileToJson(this);
+
+  /// 학생에게 표시되는 이름 (닉네임 우선, 없으면 본명)
+  String get displayName => nickname?.isNotEmpty == true ? nickname! : name;
 
   /// Calculate profile completion level
   ProfileCompletionLevel get completionLevel {
@@ -620,6 +625,7 @@ class TeacherProfile {
     String? organizationId,
     String? organizationName,
     String? name,
+    String? nickname,
     String? profileImage,
     String? backgroundImage,
     List<String>? instruments,
@@ -649,6 +655,7 @@ class TeacherProfile {
       organizationId: organizationId ?? this.organizationId,
       organizationName: organizationName ?? this.organizationName,
       name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
       profileImage: profileImage ?? this.profileImage,
       backgroundImage: backgroundImage ?? this.backgroundImage,
       instruments: instruments ?? this.instruments,
