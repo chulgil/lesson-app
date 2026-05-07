@@ -1,30 +1,35 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_note_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_note_repository.dart';
 
+part 'practice_note_provider.g.dart';
+
 /// Practice note repository provider - switches between Mock and Remote.
-final practiceNoteRepositoryProvider = Provider<PracticeNoteRepository>((ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockPracticeNoteRepository();
-  }
-  // Mock already starts empty — safe to use in remote mode
-  return MockPracticeNoteRepository();
-});
+@Riverpod(keepAlive: true)
+PracticeNoteRepository practiceNoteRepository(PracticeNoteRepositoryRef ref) {
+  return createLocalFallbackRepository<PracticeNoteRepository>(
+    mock: MockPracticeNoteRepository.new,
+    // Mock already starts empty — safe to use in remote mode
+    fallback: MockPracticeNoteRepository.new,
+  );
+}
 
 /// Section notes provider - gets all notes for a section
-final sectionNotesProvider = FutureProvider.family<List<PracticeNote>, String>((
-  ref,
-  sectionId,
+@Riverpod(keepAlive: true)
+Future<List<PracticeNote>> sectionNotes(
+  SectionNotesRef ref,
+  String sectionId,
 ) async {
   final repository = ref.watch(practiceNoteRepositoryProvider);
   return repository.getNotes(sectionId);
-});
+}
 
 /// Practice note CRUD notifier
-class PracticeNoteCrudNotifier extends AsyncNotifier<void> {
+@Riverpod(keepAlive: true)
+class PracticeNoteCrud extends _$PracticeNoteCrud {
   @override
   Future<void> build() async {}
 
@@ -88,7 +93,4 @@ class PracticeNoteCrudNotifier extends AsyncNotifier<void> {
   }
 }
 
-final practiceNoteCrudProvider =
-    AsyncNotifierProvider<PracticeNoteCrudNotifier, void>(
-      PracticeNoteCrudNotifier.new,
-    );
+typedef PracticeNoteCrudNotifier = PracticeNoteCrud;

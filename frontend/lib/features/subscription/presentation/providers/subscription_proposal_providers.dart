@@ -27,8 +27,9 @@ final subscriptionProposalRepositoryProvider =
       ),
     );
 
-final proposalReminderServiceProvider = Provider<ProposalReminderService>((
-  ref,
+@Riverpod(keepAlive: true)
+ProposalReminderService proposalReminderService(
+  ProposalReminderServiceRef ref,
 ) {
   final schedulerService = ref.read(notificationSchedulerServiceProvider);
   return ProposalReminderService(
@@ -38,8 +39,19 @@ final proposalReminderServiceProvider = Provider<ProposalReminderService>((
     loadProposal:
         (proposalId) =>
             ref.read(subscriptionProposalProvider(proposalId).future),
+    copy: const ProposalReminderCopy(
+      reminder24hTitle: AppStrings.proposalReminder24hTitle,
+      reminder24hBody: AppStrings.proposalReminder24hBody,
+      reminder48hTitle: AppStrings.proposalReminder48hTitle,
+      reminder48hBody: AppStrings.proposalReminder48hBody,
+      reminder72hTitleDiscount: AppStrings.proposalReminder72hTitleDiscount,
+      reminder72hTitleNoDiscount: AppStrings.proposalReminder72hTitleNoDiscount,
+      reminder72hBodyDiscount: AppStrings.proposalReminder72hBodyDiscount,
+      reminder72hBodyNoDiscount: AppStrings.proposalReminder72hBodyNoDiscount,
+      actionLabel: AppStrings.proposalReminderAction,
+    ),
   );
-});
+}
 
 // ============================================================
 // Teacher Proposals

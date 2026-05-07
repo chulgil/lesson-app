@@ -6,6 +6,24 @@ part of 'subscription_proposal_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$proposalReminderServiceHash() =>
+    r'b4e109645398d4d15240b885a2171ca4198bd7b8';
+
+/// See also [proposalReminderService].
+@ProviderFor(proposalReminderService)
+final proposalReminderServiceProvider =
+    Provider<ProposalReminderService>.internal(
+      proposalReminderService,
+      name: r'proposalReminderServiceProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$proposalReminderServiceHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef ProposalReminderServiceRef = ProviderRef<ProposalReminderService>;
 String _$teacherProposalsHash() => r'cb636e8ef7832c9d5798fba5ccbbd90b6d3a6ba8';
 
 /// Copied from Dart SDK
@@ -40,21 +58,15 @@ class TeacherProposalsFamily
   const TeacherProposalsFamily();
 
   /// See also [teacherProposals].
-  TeacherProposalsProvider call(
-    String teacherId,
-  ) {
-    return TeacherProposalsProvider(
-      teacherId,
-    );
+  TeacherProposalsProvider call(String teacherId) {
+    return TeacherProposalsProvider(teacherId);
   }
 
   @override
   TeacherProposalsProvider getProviderOverride(
     covariant TeacherProposalsProvider provider,
   ) {
-    return call(
-      provider.teacherId,
-    );
+    return call(provider.teacherId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -76,24 +88,20 @@ class TeacherProposalsFamily
 class TeacherProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [teacherProposals].
-  TeacherProposalsProvider(
-    String teacherId,
-  ) : this._internal(
-          (ref) => teacherProposals(
-            ref as TeacherProposalsRef,
-            teacherId,
-          ),
-          from: teacherProposalsProvider,
-          name: r'teacherProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$teacherProposalsHash,
-          dependencies: TeacherProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              TeacherProposalsFamily._allTransitiveDependencies,
-          teacherId: teacherId,
-        );
+  TeacherProposalsProvider(String teacherId)
+    : this._internal(
+        (ref) => teacherProposals(ref as TeacherProposalsRef, teacherId),
+        from: teacherProposalsProvider,
+        name: r'teacherProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$teacherProposalsHash,
+        dependencies: TeacherProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            TeacherProposalsFamily._allTransitiveDependencies,
+        teacherId: teacherId,
+      );
 
   TeacherProposalsProvider._internal(
     super._createNotifier, {
@@ -110,7 +118,7 @@ class TeacherProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(TeacherProposalsRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -174,21 +182,15 @@ class ActiveTeacherProposalsFamily
   const ActiveTeacherProposalsFamily();
 
   /// See also [activeTeacherProposals].
-  ActiveTeacherProposalsProvider call(
-    String teacherId,
-  ) {
-    return ActiveTeacherProposalsProvider(
-      teacherId,
-    );
+  ActiveTeacherProposalsProvider call(String teacherId) {
+    return ActiveTeacherProposalsProvider(teacherId);
   }
 
   @override
   ActiveTeacherProposalsProvider getProviderOverride(
     covariant ActiveTeacherProposalsProvider provider,
   ) {
-    return call(
-      provider.teacherId,
-    );
+    return call(provider.teacherId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -210,24 +212,21 @@ class ActiveTeacherProposalsFamily
 class ActiveTeacherProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [activeTeacherProposals].
-  ActiveTeacherProposalsProvider(
-    String teacherId,
-  ) : this._internal(
-          (ref) => activeTeacherProposals(
-            ref as ActiveTeacherProposalsRef,
-            teacherId,
-          ),
-          from: activeTeacherProposalsProvider,
-          name: r'activeTeacherProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$activeTeacherProposalsHash,
-          dependencies: ActiveTeacherProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              ActiveTeacherProposalsFamily._allTransitiveDependencies,
-          teacherId: teacherId,
-        );
+  ActiveTeacherProposalsProvider(String teacherId)
+    : this._internal(
+        (ref) =>
+            activeTeacherProposals(ref as ActiveTeacherProposalsRef, teacherId),
+        from: activeTeacherProposalsProvider,
+        name: r'activeTeacherProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$activeTeacherProposalsHash,
+        dependencies: ActiveTeacherProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            ActiveTeacherProposalsFamily._allTransitiveDependencies,
+        teacherId: teacherId,
+      );
 
   ActiveTeacherProposalsProvider._internal(
     super._createNotifier, {
@@ -244,8 +243,9 @@ class ActiveTeacherProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(
-            ActiveTeacherProposalsRef provider)
-        create,
+      ActiveTeacherProposalsRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -311,21 +311,15 @@ class AwaitingConfirmationProposalsFamily
   const AwaitingConfirmationProposalsFamily();
 
   /// See also [awaitingConfirmationProposals].
-  AwaitingConfirmationProposalsProvider call(
-    String teacherId,
-  ) {
-    return AwaitingConfirmationProposalsProvider(
-      teacherId,
-    );
+  AwaitingConfirmationProposalsProvider call(String teacherId) {
+    return AwaitingConfirmationProposalsProvider(teacherId);
   }
 
   @override
   AwaitingConfirmationProposalsProvider getProviderOverride(
     covariant AwaitingConfirmationProposalsProvider provider,
   ) {
-    return call(
-      provider.teacherId,
-    );
+    return call(provider.teacherId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -347,24 +341,23 @@ class AwaitingConfirmationProposalsFamily
 class AwaitingConfirmationProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [awaitingConfirmationProposals].
-  AwaitingConfirmationProposalsProvider(
-    String teacherId,
-  ) : this._internal(
-          (ref) => awaitingConfirmationProposals(
-            ref as AwaitingConfirmationProposalsRef,
-            teacherId,
-          ),
-          from: awaitingConfirmationProposalsProvider,
-          name: r'awaitingConfirmationProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$awaitingConfirmationProposalsHash,
-          dependencies: AwaitingConfirmationProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              AwaitingConfirmationProposalsFamily._allTransitiveDependencies,
-          teacherId: teacherId,
-        );
+  AwaitingConfirmationProposalsProvider(String teacherId)
+    : this._internal(
+        (ref) => awaitingConfirmationProposals(
+          ref as AwaitingConfirmationProposalsRef,
+          teacherId,
+        ),
+        from: awaitingConfirmationProposalsProvider,
+        name: r'awaitingConfirmationProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$awaitingConfirmationProposalsHash,
+        dependencies: AwaitingConfirmationProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            AwaitingConfirmationProposalsFamily._allTransitiveDependencies,
+        teacherId: teacherId,
+      );
 
   AwaitingConfirmationProposalsProvider._internal(
     super._createNotifier, {
@@ -381,8 +374,9 @@ class AwaitingConfirmationProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(
-            AwaitingConfirmationProposalsRef provider)
-        create,
+      AwaitingConfirmationProposalsRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -447,21 +441,15 @@ class StudentProposalsFamily
   const StudentProposalsFamily();
 
   /// See also [studentProposals].
-  StudentProposalsProvider call(
-    String studentId,
-  ) {
-    return StudentProposalsProvider(
-      studentId,
-    );
+  StudentProposalsProvider call(String studentId) {
+    return StudentProposalsProvider(studentId);
   }
 
   @override
   StudentProposalsProvider getProviderOverride(
     covariant StudentProposalsProvider provider,
   ) {
-    return call(
-      provider.studentId,
-    );
+    return call(provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -483,24 +471,20 @@ class StudentProposalsFamily
 class StudentProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [studentProposals].
-  StudentProposalsProvider(
-    String studentId,
-  ) : this._internal(
-          (ref) => studentProposals(
-            ref as StudentProposalsRef,
-            studentId,
-          ),
-          from: studentProposalsProvider,
-          name: r'studentProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$studentProposalsHash,
-          dependencies: StudentProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              StudentProposalsFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
+  StudentProposalsProvider(String studentId)
+    : this._internal(
+        (ref) => studentProposals(ref as StudentProposalsRef, studentId),
+        from: studentProposalsProvider,
+        name: r'studentProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$studentProposalsHash,
+        dependencies: StudentProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            StudentProposalsFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
 
   StudentProposalsProvider._internal(
     super._createNotifier, {
@@ -517,7 +501,7 @@ class StudentProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(StudentProposalsRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -581,21 +565,15 @@ class ActiveStudentProposalsFamily
   const ActiveStudentProposalsFamily();
 
   /// See also [activeStudentProposals].
-  ActiveStudentProposalsProvider call(
-    String studentId,
-  ) {
-    return ActiveStudentProposalsProvider(
-      studentId,
-    );
+  ActiveStudentProposalsProvider call(String studentId) {
+    return ActiveStudentProposalsProvider(studentId);
   }
 
   @override
   ActiveStudentProposalsProvider getProviderOverride(
     covariant ActiveStudentProposalsProvider provider,
   ) {
-    return call(
-      provider.studentId,
-    );
+    return call(provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -617,24 +595,21 @@ class ActiveStudentProposalsFamily
 class ActiveStudentProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [activeStudentProposals].
-  ActiveStudentProposalsProvider(
-    String studentId,
-  ) : this._internal(
-          (ref) => activeStudentProposals(
-            ref as ActiveStudentProposalsRef,
-            studentId,
-          ),
-          from: activeStudentProposalsProvider,
-          name: r'activeStudentProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$activeStudentProposalsHash,
-          dependencies: ActiveStudentProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              ActiveStudentProposalsFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
+  ActiveStudentProposalsProvider(String studentId)
+    : this._internal(
+        (ref) =>
+            activeStudentProposals(ref as ActiveStudentProposalsRef, studentId),
+        from: activeStudentProposalsProvider,
+        name: r'activeStudentProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$activeStudentProposalsHash,
+        dependencies: ActiveStudentProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            ActiveStudentProposalsFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
 
   ActiveStudentProposalsProvider._internal(
     super._createNotifier, {
@@ -651,8 +626,9 @@ class ActiveStudentProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(
-            ActiveStudentProposalsRef provider)
-        create,
+      ActiveStudentProposalsRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -717,21 +693,15 @@ class PendingStudentProposalsFamily
   const PendingStudentProposalsFamily();
 
   /// See also [pendingStudentProposals].
-  PendingStudentProposalsProvider call(
-    String studentId,
-  ) {
-    return PendingStudentProposalsProvider(
-      studentId,
-    );
+  PendingStudentProposalsProvider call(String studentId) {
+    return PendingStudentProposalsProvider(studentId);
   }
 
   @override
   PendingStudentProposalsProvider getProviderOverride(
     covariant PendingStudentProposalsProvider provider,
   ) {
-    return call(
-      provider.studentId,
-    );
+    return call(provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -753,24 +723,23 @@ class PendingStudentProposalsFamily
 class PendingStudentProposalsProvider
     extends AutoDisposeFutureProvider<List<SubscriptionProposal>> {
   /// See also [pendingStudentProposals].
-  PendingStudentProposalsProvider(
-    String studentId,
-  ) : this._internal(
-          (ref) => pendingStudentProposals(
-            ref as PendingStudentProposalsRef,
-            studentId,
-          ),
-          from: pendingStudentProposalsProvider,
-          name: r'pendingStudentProposalsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$pendingStudentProposalsHash,
-          dependencies: PendingStudentProposalsFamily._dependencies,
-          allTransitiveDependencies:
-              PendingStudentProposalsFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
+  PendingStudentProposalsProvider(String studentId)
+    : this._internal(
+        (ref) => pendingStudentProposals(
+          ref as PendingStudentProposalsRef,
+          studentId,
+        ),
+        from: pendingStudentProposalsProvider,
+        name: r'pendingStudentProposalsProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$pendingStudentProposalsHash,
+        dependencies: PendingStudentProposalsFamily._dependencies,
+        allTransitiveDependencies:
+            PendingStudentProposalsFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
 
   PendingStudentProposalsProvider._internal(
     super._createNotifier, {
@@ -787,8 +756,9 @@ class PendingStudentProposalsProvider
   @override
   Override overrideWith(
     FutureOr<List<SubscriptionProposal>> Function(
-            PendingStudentProposalsRef provider)
-        create,
+      PendingStudentProposalsRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -853,21 +823,15 @@ class PendingRenewalProposalFamily
   const PendingRenewalProposalFamily();
 
   /// See also [pendingRenewalProposal].
-  PendingRenewalProposalProvider call(
-    String studentId,
-  ) {
-    return PendingRenewalProposalProvider(
-      studentId,
-    );
+  PendingRenewalProposalProvider call(String studentId) {
+    return PendingRenewalProposalProvider(studentId);
   }
 
   @override
   PendingRenewalProposalProvider getProviderOverride(
     covariant PendingRenewalProposalProvider provider,
   ) {
-    return call(
-      provider.studentId,
-    );
+    return call(provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -889,24 +853,21 @@ class PendingRenewalProposalFamily
 class PendingRenewalProposalProvider
     extends AutoDisposeFutureProvider<SubscriptionProposal?> {
   /// See also [pendingRenewalProposal].
-  PendingRenewalProposalProvider(
-    String studentId,
-  ) : this._internal(
-          (ref) => pendingRenewalProposal(
-            ref as PendingRenewalProposalRef,
-            studentId,
-          ),
-          from: pendingRenewalProposalProvider,
-          name: r'pendingRenewalProposalProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$pendingRenewalProposalHash,
-          dependencies: PendingRenewalProposalFamily._dependencies,
-          allTransitiveDependencies:
-              PendingRenewalProposalFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
+  PendingRenewalProposalProvider(String studentId)
+    : this._internal(
+        (ref) =>
+            pendingRenewalProposal(ref as PendingRenewalProposalRef, studentId),
+        from: pendingRenewalProposalProvider,
+        name: r'pendingRenewalProposalProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$pendingRenewalProposalHash,
+        dependencies: PendingRenewalProposalFamily._dependencies,
+        allTransitiveDependencies:
+            PendingRenewalProposalFamily._allTransitiveDependencies,
+        studentId: studentId,
+      );
 
   PendingRenewalProposalProvider._internal(
     super._createNotifier, {
@@ -923,7 +884,7 @@ class PendingRenewalProposalProvider
   @override
   Override overrideWith(
     FutureOr<SubscriptionProposal?> Function(PendingRenewalProposalRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -988,21 +949,15 @@ class SubscriptionProposalFamily
   const SubscriptionProposalFamily();
 
   /// See also [subscriptionProposal].
-  SubscriptionProposalProvider call(
-    String proposalId,
-  ) {
-    return SubscriptionProposalProvider(
-      proposalId,
-    );
+  SubscriptionProposalProvider call(String proposalId) {
+    return SubscriptionProposalProvider(proposalId);
   }
 
   @override
   SubscriptionProposalProvider getProviderOverride(
     covariant SubscriptionProposalProvider provider,
   ) {
-    return call(
-      provider.proposalId,
-    );
+    return call(provider.proposalId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1024,24 +979,21 @@ class SubscriptionProposalFamily
 class SubscriptionProposalProvider
     extends AutoDisposeFutureProvider<SubscriptionProposal?> {
   /// See also [subscriptionProposal].
-  SubscriptionProposalProvider(
-    String proposalId,
-  ) : this._internal(
-          (ref) => subscriptionProposal(
-            ref as SubscriptionProposalRef,
-            proposalId,
-          ),
-          from: subscriptionProposalProvider,
-          name: r'subscriptionProposalProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$subscriptionProposalHash,
-          dependencies: SubscriptionProposalFamily._dependencies,
-          allTransitiveDependencies:
-              SubscriptionProposalFamily._allTransitiveDependencies,
-          proposalId: proposalId,
-        );
+  SubscriptionProposalProvider(String proposalId)
+    : this._internal(
+        (ref) =>
+            subscriptionProposal(ref as SubscriptionProposalRef, proposalId),
+        from: subscriptionProposalProvider,
+        name: r'subscriptionProposalProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$subscriptionProposalHash,
+        dependencies: SubscriptionProposalFamily._dependencies,
+        allTransitiveDependencies:
+            SubscriptionProposalFamily._allTransitiveDependencies,
+        proposalId: proposalId,
+      );
 
   SubscriptionProposalProvider._internal(
     super._createNotifier, {
@@ -1058,7 +1010,7 @@ class SubscriptionProposalProvider
   @override
   Override overrideWith(
     FutureOr<SubscriptionProposal?> Function(SubscriptionProposalRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1123,24 +1075,15 @@ class ActiveProposalBetweenFamily
   const ActiveProposalBetweenFamily();
 
   /// See also [activeProposalBetween].
-  ActiveProposalBetweenProvider call(
-    String teacherId,
-    String studentId,
-  ) {
-    return ActiveProposalBetweenProvider(
-      teacherId,
-      studentId,
-    );
+  ActiveProposalBetweenProvider call(String teacherId, String studentId) {
+    return ActiveProposalBetweenProvider(teacherId, studentId);
   }
 
   @override
   ActiveProposalBetweenProvider getProviderOverride(
     covariant ActiveProposalBetweenProvider provider,
   ) {
-    return call(
-      provider.teacherId,
-      provider.studentId,
-    );
+    return call(provider.teacherId, provider.studentId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -1162,27 +1105,25 @@ class ActiveProposalBetweenFamily
 class ActiveProposalBetweenProvider
     extends AutoDisposeFutureProvider<SubscriptionProposal?> {
   /// See also [activeProposalBetween].
-  ActiveProposalBetweenProvider(
-    String teacherId,
-    String studentId,
-  ) : this._internal(
-          (ref) => activeProposalBetween(
-            ref as ActiveProposalBetweenRef,
-            teacherId,
-            studentId,
-          ),
-          from: activeProposalBetweenProvider,
-          name: r'activeProposalBetweenProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$activeProposalBetweenHash,
-          dependencies: ActiveProposalBetweenFamily._dependencies,
-          allTransitiveDependencies:
-              ActiveProposalBetweenFamily._allTransitiveDependencies,
-          teacherId: teacherId,
-          studentId: studentId,
-        );
+  ActiveProposalBetweenProvider(String teacherId, String studentId)
+    : this._internal(
+        (ref) => activeProposalBetween(
+          ref as ActiveProposalBetweenRef,
+          teacherId,
+          studentId,
+        ),
+        from: activeProposalBetweenProvider,
+        name: r'activeProposalBetweenProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product')
+                ? null
+                : _$activeProposalBetweenHash,
+        dependencies: ActiveProposalBetweenFamily._dependencies,
+        allTransitiveDependencies:
+            ActiveProposalBetweenFamily._allTransitiveDependencies,
+        teacherId: teacherId,
+        studentId: studentId,
+      );
 
   ActiveProposalBetweenProvider._internal(
     super._createNotifier, {
@@ -1201,7 +1142,7 @@ class ActiveProposalBetweenProvider
   @override
   Override overrideWith(
     FutureOr<SubscriptionProposal?> Function(ActiveProposalBetweenRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -1266,17 +1207,20 @@ String _$subscriptionProposalNotifierHash() =>
 /// See also [SubscriptionProposalNotifier].
 @ProviderFor(SubscriptionProposalNotifier)
 final subscriptionProposalNotifierProvider = AutoDisposeNotifierProvider<
-    SubscriptionProposalNotifier, AsyncValue<SubscriptionProposal?>>.internal(
+  SubscriptionProposalNotifier,
+  AsyncValue<SubscriptionProposal?>
+>.internal(
   SubscriptionProposalNotifier.new,
   name: r'subscriptionProposalNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$subscriptionProposalNotifierHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$subscriptionProposalNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SubscriptionProposalNotifier
-    = AutoDisposeNotifier<AsyncValue<SubscriptionProposal?>>;
+typedef _$SubscriptionProposalNotifier =
+    AutoDisposeNotifier<AsyncValue<SubscriptionProposal?>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
