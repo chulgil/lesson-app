@@ -85,3 +85,74 @@ async def test_legacy_availability_rejects_overlapping_slots(
     )
 
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_schedule_exception_rejects_invalid_date_range(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=auth_headers,
+        json={
+            "start_date": "2026-05-10",
+            "end_date": "2026-05-05",
+            "type": "holiday",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_schedule_exception_rejects_invalid_time_range(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=auth_headers,
+        json={
+            "start_date": "2026-05-05",
+            "type": "vacation",
+            "start_time": "14:00",
+            "end_time": "14:00",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_schedule_exception_update_rejects_partial_time_payload(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    created = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=auth_headers,
+        json={
+            "start_date": "2026-05-06",
+            "type": "vacation",
+        },
+    )
+    assert created.status_code == 201
+    exc_id = created.json()["id"]
+
+    response = await client.put(
+        f"/api/v1/schedule/exceptions/{exc_id}",
+        headers=auth_headers,
+        json={"start_time": "10:00"},
+    )
+
+    assert response.status_code == 422

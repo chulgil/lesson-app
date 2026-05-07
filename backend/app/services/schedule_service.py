@@ -389,6 +389,12 @@ class ScheduleService:
             select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
         )
         avail_id = avail.id if avail else ""
+        self._validate_exception_dates_and_time(
+            data.start_date,
+            data.end_date,
+            data.start_time,
+            data.end_time,
+        )
 
         exception = ScheduleException(
             teacher_availability_id=avail_id,
@@ -415,11 +421,48 @@ class ScheduleService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
 
         update_data = data.model_dump(exclude_unset=True)
+        updated_start_date = update_data.get("start_date", exception.start_date)
+        updated_end_date = update_data.get("end_date", exception.end_date)
+        updated_start_time = update_data.get("start_time", exception.start_time)
+        updated_end_time = update_data.get("end_time", exception.end_time)
+        self._validate_exception_dates_and_time(
+            updated_start_date,
+            updated_end_date,
+            updated_start_time,
+            updated_end_time,
+        )
+
         for key, value in update_data.items():
             setattr(exception, key, value)
         await self.db.flush()
         await self.db.refresh(exception)
         return ScheduleExceptionResponse.model_validate(exception)
+
+    @staticmethod
+    def _validate_exception_dates_and_time(
+        start_date: Any,
+        end_date: Any,
+        start_time: str | None,
+        end_time: str | None,
+    ) -> None:
+        if start_date and end_date and start_date > end_date:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="start_date must be <= end_date",
+            )
+        if (start_time is None) != (end_time is None):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="start_time and end_time must be both provided",
+            )
+        if start_time is not None and end_time is not None:
+            start_minutes = _parse_time_to_minutes(start_time)
+            end_minutes = _parse_time_to_minutes(end_time)
+            if start_minutes >= end_minutes:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="end_time must be after start_time",
+                )
 
     async def delete_exception(self, exception_id: str, current_user: Any) -> None:
         """Delete a schedule exception."""

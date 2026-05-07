@@ -214,6 +214,13 @@ class ScheduleExceptionCreate(BaseModel):
             self.end_date = self.date
         if self.start_date and not self.end_date:
             self.end_date = self.start_date
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            raise ValueError("start_date must be <= end_date")
+        if (self.start_time is None) != (self.end_time is None):
+            raise ValueError("start_time and end_time must be both provided")
+        if self.start_time is not None and self.end_time is not None:
+            if _slot_minutes(self.start_time) >= _slot_minutes(self.end_time):
+                raise ValueError("end_time must be after start_time")
         return self
 
 
@@ -226,6 +233,7 @@ class ScheduleExceptionUpdate(BaseModel):
     end_time: str | None = None
     type: str | None = None
     reason: str | None = None
+
 
 
 class ScheduleExceptionResponse(BaseModel):
