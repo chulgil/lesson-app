@@ -24,16 +24,26 @@ class _LocationOption {
   });
 }
 
-const _locationOptions = [
-  _LocationOption(
-    type: LocationType.studentHome,
-    icon: Icons.home,
-    label: AppStrings.locationStudentHomeLabel,
-  ),
+/// 학원 레슨: 학원, 온라인만
+const _academyLocationOptions = [
   _LocationOption(
     type: LocationType.academyRoom,
     icon: Icons.school,
     label: AppStrings.academy,
+  ),
+  _LocationOption(
+    type: LocationType.online,
+    icon: Icons.videocam,
+    label: AppStrings.locationOnlineLabel,
+  ),
+];
+
+/// 개인 레슨: 학생집, 외부 스튜디오, 선생님 집, 온라인
+const _privateLocationOptions = [
+  _LocationOption(
+    type: LocationType.studentHome,
+    icon: Icons.home,
+    label: AppStrings.locationStudentHomeLabel,
   ),
   _LocationOption(
     type: LocationType.externalPlace,
@@ -64,6 +74,9 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
   final ValueChanged<String?> onLocationChanged;
   final ValueChanged<int> onTravelTimeChanged;
 
+  /// true = 학원 레슨 (학원, 온라인만), false = 개인 레슨 (학생집, 외부, 선생님집, 온라인)
+  final bool isAcademy;
+
   /// Optional: API-suggested travel time in minutes (e.g. from Kakao Maps).
   final int? suggestedTravelTimeMinutes;
 
@@ -84,6 +97,7 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
     required this.currentTravelTime,
     required this.onLocationChanged,
     required this.onTravelTimeChanged,
+    this.isAcademy = false,
     this.suggestedTravelTimeMinutes,
     this.suggestionSource,
     this.baseLessonFee,
@@ -203,7 +217,7 @@ class _LocationTravelSelectorState
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
       children:
-          _locationOptions.map((option) {
+          (widget.isAcademy ? _academyLocationOptions : _privateLocationOptions).map((option) {
             final isSelected = _selectedType == option.type;
             return ChoiceChip(
               avatar: Icon(
