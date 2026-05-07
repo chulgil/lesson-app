@@ -1105,6 +1105,21 @@ class AppStrings {
   static const deselectAll = '선택 해제';
   static const bulkMessageActiveOnlyNotice = '활성 수강권이 있는 학생에게만 전송됩니다';
 
+  // v3 공지 시스템
+  static const announcementTitle = '공지';
+  static const announcementTypeDayOff = '휴강';
+  static const announcementTypeGeneral = '일반 공지';
+  static const announcementSelectDate = '날짜 선택';
+  static const announcementMessageHint = '공지 내용을 입력하세요';
+  static const announcementSend = '공지 보내기';
+  static const announcementSending = '발송 중…';
+  static const announcementSentTitle = '공지 발송 완료';
+  static String announcementSentCount(int count) => '$count명에게 알림 발송';
+  static const announcementAffectedHeader = '이 날 수업이 있는 학생';
+  static const announcementNoAutoCancel =
+      '※ 레슨은 자동 취소되지 않습니다.\n   개별 스케줄 변경을 진행해주세요.';
+  static const announcementScheduleChange = '스케줄 변경';
+
   /// Notification mock strings (i18n)
   static const notifProposalTitle = '수강권 제안이 도착했어요!';
   static const notifProposalBody = '체험레슨 후 72시간 골든타임 할인 혜택을 확인해보세요';
@@ -5586,6 +5601,11 @@ class AppStrings {
   static String appUpdateBannerSubtitle(String version) =>
       'v$version 업데이트와 개선 예정 기능을 확인하세요';
   static const appUpdateBannerAction = '새 소식';
+  static const reviewPromptTitle = '레슨 경험이 쌓였어요';
+  static String reviewPromptSubtitle(int count) =>
+      '$count회 레슨 후 앱 리뷰로 더 나은 경험을 만들어주세요';
+  static const reviewPromptAction = '지금 리뷰하기';
+  static const reviewPromptThanks = '좋은 의견 감사합니다';
   static const newsRoadmapTitle = '새 소식과 로드맵';
   static String newsRoadmapVersion(String current, String latest) =>
       '현재 $current · 최신 $latest';
