@@ -17,6 +17,7 @@ from app.api.v1 import (
     invites,
     lesson_policies,
     lesson_requests,
+    lesson_summaries,
     lessons,
     locations,
     manual_teachers,
@@ -55,6 +56,7 @@ api_router.include_router(analytics.router, prefix="/analytics", tags=["analytic
 api_router.include_router(teachers.router, prefix="/teachers", tags=["teachers"])
 api_router.include_router(students.router, prefix="/students", tags=["students"])
 api_router.include_router(lessons.router, prefix="/lessons", tags=["lessons"])
+api_router.include_router(lesson_summaries.router, prefix="/lesson-summaries", tags=["lesson-summaries"])
 api_router.include_router(memberships.router, prefix="/memberships", tags=["memberships"])
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["subscriptions"])
 api_router.include_router(subscription_settings.router, prefix="/subscription-settings", tags=["subscription-settings"])
