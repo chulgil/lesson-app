@@ -11,14 +11,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
-import '../../../students/presentation/extensions/student_domain_visuals.dart';
+import '../../../students/presentation/widgets/student_profile_bottom_sheet.dart';
 import '../extensions/subscription_visuals.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
@@ -303,11 +302,13 @@ class _SubscriptionDetailBodyState
             // 로 통일 (§7.27). 탭하면 학생 프로필 바텀시트 표시.
             title: GestureDetector(
               onTap:
-                  () => _showProfileBottomSheet(
-                    context,
-                    studentName,
-                    instrument,
-                    lessonClass,
+                  () => showStudentProfileBottomSheet(
+                    context: context,
+                    studentId: subscription.studentId,
+                    studentName: studentName,
+                    instrument: instrument,
+                    student: ref.read(studentProvider(subscription.studentId)).valueOrNull,
+                    subscriptionSummary: '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
                   ),
               child: Text(
                 appBarTitle,
@@ -361,11 +362,13 @@ class _SubscriptionDetailBodyState
                   studentName: studentName,
                   teacherName: teacherName,
                   onOpponentAvatarTap:
-                      () => _showProfileBottomSheet(
-                        context,
-                        studentName,
-                        instrument,
-                        lessonClass,
+                      () => showStudentProfileBottomSheet(
+                        context: context,
+                        studentId: subscription.studentId,
+                        studentName: studentName,
+                        instrument: instrument,
+                        student: ref.read(studentProvider(subscription.studentId)).valueOrNull,
+                        subscriptionSummary: '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
                       ),
                 ),
               ),
@@ -413,162 +416,6 @@ class _SubscriptionDetailBodyState
               ),
             ),
           ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // Profile Bottom Sheet (matches request_detail_screen pattern)
-  // ═══════════════════════════════════════════════════════════════
-
-  void _showProfileBottomSheet(
-    BuildContext context,
-    String studentName,
-    String instrument,
-    LessonClass? lessonClass,
-  ) {
-    final student =
-        ref.read(studentProvider(subscription.studentId)).valueOrNull;
-
-    showNotebookBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      padding: EdgeInsets.zero,
-      showHandle: false,
-      builder: (ctx) {
-        return Container(
-          decoration: const BoxDecoration(color: AppColors.paper),
-          padding: EdgeInsets.fromLTRB(
-            0,
-            AppSpacing.space3,
-            0,
-            MediaQuery.of(ctx).padding.bottom + AppSpacing.space4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Center(
-                child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Profile avatar + name
-              CircleAvatar(
-                radius: 32,
-                backgroundColor:
-                    student?.profileColor ?? AppColors.scheduleMutedBackground,
-                child: Text(
-                  studentName.isNotEmpty ? studentName[0] : '?',
-                  style: AppTypography.headingLarge.copyWith(
-                    color: AppColors.paper,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Student name
-              Text(studentName, style: NotebookTypography.pieceTitle),
-              const SizedBox(height: AppSpacing.space1),
-
-              // Instrument + class type
-              Text(
-                [
-                  instrument,
-                  if (lessonClass != null)
-                    lessonClass.type == LessonClassType.academy
-                        ? lessonClass.name
-                        : AppStrings.individualLesson,
-                ].join(' · '),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-
-              // Subscription info
-              const SizedBox(height: AppSpacing.space3),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.screenPadding,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: const BoxDecoration(color: AppColors.paperDark),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (subscription.startDate != null &&
-                          subscription.endDate != null) ...[
-                        const SizedBox(height: AppSpacing.space1),
-                        Text(
-                          '${subscription.startDate!.year}.${subscription.startDate!.month.toString().padLeft(2, '0')} ~ ${subscription.endDate!.year}.${subscription.endDate!.month.toString().padLeft(2, '0')}',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.inkTertiary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              // Student detail info (if available)
-              if (student != null) ...[
-                const SizedBox(height: AppSpacing.space3),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.screenPadding,
-                  ),
-                  child: Column(
-                    children: [
-                      if (student.phone != null && student.phone!.isNotEmpty)
-                        _profileInfoRow(AppStrings.phoneLabel, student.phone!),
-                      if (student.parentPhone != null &&
-                          student.parentPhone!.isNotEmpty)
-                        _profileInfoRow(
-                          AppStrings.parentPhoneLabel,
-                          student.parentPhone!,
-                        ),
-                      _profileInfoRow(
-                        AppStrings.levelLabel,
-                        student.level.label,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _profileInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ),
-          Expanded(child: Text(value, style: AppTypography.bodySmall)),
-        ],
-      ),
     );
   }
 

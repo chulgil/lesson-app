@@ -8,12 +8,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
+import '../../../students/presentation/widgets/student_profile_bottom_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 import '../../domain/entities/request_event.dart';
@@ -24,7 +24,6 @@ import '../widgets/schedule_change_response_bottom_sheet.dart';
 import '../widgets/schedule_change_slot_bottom_sheet.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
 import '../widgets/current_request_box.dart';
-import '../widgets/request_profile_card.dart';
 import '../widgets/proposal_bottom_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
@@ -261,11 +260,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       studentName: studentName,
                       proposalTemplates: proposalTemplates,
                       onOpponentAvatarTap:
-                          () => _showProfileBottomSheet(
-                            context,
-                            request,
-                            opponentName,
-                            academyName,
+                          () => showStudentProfileBottomSheet(
+                            context: context,
+                            studentId: request.studentId,
+                            studentName: opponentName,
+                            instrument: request.instrument,
+                            student: ref.read(studentProvider(request.studentId)).valueOrNull,
+                            message: request.message,
+                            isTrialRequest: request.type == LessonRequestType.trial,
                           ),
                     ),
                   ],
@@ -392,131 +394,17 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     return NotebookDetailAppBar(
       titleWidget: GestureDetector(
         onTap:
-            () => _showProfileBottomSheet(
-              context,
-              request,
-              opponentName,
-              academyName,
+            () => showStudentProfileBottomSheet(
+              context: context,
+              studentId: request.studentId,
+              studentName: opponentName,
+              instrument: request.instrument,
+              student: ref.read(studentProvider(request.studentId)).valueOrNull,
+              message: request.message,
+              isTrialRequest: request.type == LessonRequestType.trial,
             ),
         child: Text(titleText, style: NotebookTypography.appBarTitle),
       ),
-    );
-  }
-
-  /// Bottom sheet with typed profile card (trial vs regular vs student view).
-  void _showProfileBottomSheet(
-    BuildContext context,
-    UnifiedLessonRequest request,
-    String opponentName,
-    String? academyName,
-  ) {
-    showNotebookBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      padding: EdgeInsets.zero,
-      showHandle: false,
-      builder: (ctx) {
-        // Fetch student data for regular profile card
-        final studentAsync = ref.watch(studentProvider(request.studentId));
-        final student = studentAsync.valueOrNull;
-
-        return Container(
-          decoration: const BoxDecoration(color: AppColors.paper),
-          padding: EdgeInsets.fromLTRB(
-            0,
-            AppSpacing.space3,
-            0,
-            MediaQuery.of(ctx).padding.bottom + AppSpacing.space4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Drag handle
-              const Center(
-                child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
-              ),
-
-              // Typed profile card
-              _buildProfileCard(request, opponentName, academyName, student),
-
-              // Student message (quote block for trial, small text for regular)
-              if (request.message != null && request.message!.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.screenPadding,
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.space3),
-                    decoration: BoxDecoration(
-                      color:
-                          request.type == LessonRequestType.trial
-                              ? AppColors.paperAccent.withValues(alpha: 0.04)
-                              : AppColors.paperDark,
-                      border:
-                          request.type == LessonRequestType.trial
-                              ? Border(
-                                left: BorderSide(
-                                  color: AppColors.paperAccent,
-                                  width: 3,
-                                ),
-                              )
-                              : null,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (request.type == LessonRequestType.trial)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.space1,
-                            ),
-                            child: Text(
-                              AppStrings.studentMessage,
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        Text(
-                          request.message!,
-                          style:
-                              request.type == LessonRequestType.trial
-                                  ? AppTypography.bodyMedium.copyWith(
-                                    color: AppColors.ink,
-                                  )
-                                  : AppTypography.bodySmall.copyWith(
-                                    color: AppColors.inkSecondary,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  /// Profile card — delegates to RequestProfileCard widget.
-  Widget _buildProfileCard(
-    UnifiedLessonRequest request,
-    String studentName,
-    String? academyName,
-    Student? student,
-  ) {
-    return RequestProfileCard(
-      request: request,
-      viewerRole: viewerRole,
-      studentName: studentName,
-      academyName: academyName,
-      student: student,
     );
   }
 

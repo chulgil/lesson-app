@@ -6598,6 +6598,7 @@ class AppStrings {
   static const studentWeeklyPracticeStatus = '주간 연습 현황';
   static const studentSharedRecordingsSection = '공유된 녹음';
   static const studentDetailTitle = '학생 상세';
+  static const viewStudentDetail = '학생 상세 보기';
   static const studentDetailStatsPreparing = '상세 통계 기능은 준비 중입니다';
   static const studentDetailStatsButton = '상세 통계 보기';
   static const studentStatTotalLessons = '총 레슨';
