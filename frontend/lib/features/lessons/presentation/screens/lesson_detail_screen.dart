@@ -502,7 +502,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   /// Schedule-change button — shows for subscription lessons or manual lessons
   /// that have an active subscription with the same student.
+  /// Hidden for completed/cancelled/past lessons (§15 스펙).
   Widget _buildScheduleChangeButton(Lesson lesson) {
+    // §15: 완료/취소/과거 레슨에는 스케줄 변경 불필요
+    if (lesson.status == LessonStatus.completed ||
+        lesson.status == LessonStatus.cancelled ||
+        !lesson.isUpcoming) {
+      return const SizedBox.shrink();
+    }
+
     // Case 1: lesson is directly linked to a subscription
     if (lesson.subscriptionId != null) {
       return _scheduleChangeButton(
