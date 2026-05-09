@@ -11,6 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
@@ -53,13 +54,7 @@ class _TeacherDashboardScreenState
     final monthLabel = formatYearMonth(_selectedMonth);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text(AppStrings.analyticsAppBarTitle),
-      ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.analyticsAppBarTitle),
       body: Column(
         children: [
           // Month selector

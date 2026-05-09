@@ -487,23 +487,7 @@ class RequestHistoryChat extends StatelessWidget {
                 color: AppColors.inkTertiary,
               ),
             ),
-            // CTA
-            const SizedBox(height: AppSpacing.space3),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  // TODO: Navigate to reschedule request
-                },
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space4,
-                  ),
-                ),
-                child: const Text('보강 일정 요청하기'),
-              ),
-            ),
+            // TODO: CTA "보강 일정 요청하기" — pending reschedule navigation implementation
           ],
         ),
       ),

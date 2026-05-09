@@ -128,104 +128,98 @@ class ArchiveRepertoireTile extends ConsumerWidget {
   }
 
   void _showRestoreDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceRepertoireRestoreTitle),
-            content: Text(
-              '"${repertoire.name}"을(를) 복원할까요?\n\n복원된 레퍼토리는 활성 목록에 다시 표시됩니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(repertoireArchiveNotifierProvider.notifier)
-                      .restore(repertoire.id, repertoire.studentId);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('"${repertoire.name}" 복원됨')),
-                    );
-                  }
-                },
-                child: const Text(AppStrings.practiceRestore),
-              ),
-            ],
-          ),
+      titleWidget: const Text(AppStrings.practiceRepertoireRestoreTitle),
+      content: Text(
+        '"${repertoire.name}"을(를) 복원할까요?\n\n복원된 레퍼토리는 활성 목록에 다시 표시됩니다.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(repertoireArchiveNotifierProvider.notifier)
+                .restore(repertoire.id, repertoire.studentId);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('"${repertoire.name}" 복원됨')),
+              );
+            }
+          },
+          child: const Text(AppStrings.practiceRestore),
+        ),
+      ],
     );
   }
 
   void _showPermanentDeleteDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: Row(
+      titleWidget: Row(
+        children: [
+          Icon(Icons.warning, color: AppColors.paperAccent),
+          const SizedBox(width: AppSpacing.space2),
+          const Text(AppStrings.practiceRepertoirePermanentDeleteTitle),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('"${repertoire.name}"을(를) 영구 삭제할까요?'),
+          const SizedBox(height: AppSpacing.space4),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+            child: Row(
               children: [
-                Icon(Icons.warning, color: AppColors.paperAccent),
+                Icon(
+                  Icons.warning_amber,
+                  color: AppColors.paperAccent,
+                  size: 20,
+                ),
                 const SizedBox(width: AppSpacing.space2),
-                const Text(AppStrings.practiceRepertoirePermanentDeleteTitle),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('"${repertoire.name}"을(를) 영구 삭제할까요?'),
-                const SizedBox(height: AppSpacing.space4),
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber,
-                        color: AppColors.paperAccent,
-                        size: 20,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Expanded(
-                        child: Text(
-                          '이 작업은 되돌릴 수 없습니다.\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.paperAccent,
-                          ),
-                        ),
-                      ),
-                    ],
+                Expanded(
+                  child: Text(
+                    '이 작업은 되돌릴 수 없습니다.\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.paperAccent,
+                    ),
                   ),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(repertoireArchiveNotifierProvider.notifier)
-                      .permanentlyDelete(repertoire.id, repertoire.studentId);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('"${repertoire.name}" 영구 삭제됨')),
-                    );
-                  }
-                },
-                child: const Text(AppStrings.practicePermanentDelete),
-              ),
-            ],
           ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.paperAccent,
+          ),
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(repertoireArchiveNotifierProvider.notifier)
+                .permanentlyDelete(repertoire.id, repertoire.studentId);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('"${repertoire.name}" 영구 삭제됨')),
+              );
+            }
+          },
+          child: const Text(AppStrings.practicePermanentDelete),
+        ),
+      ],
     );
   }
 }

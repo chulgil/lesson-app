@@ -635,52 +635,49 @@ class _ManualTeacherCard extends ConsumerWidget {
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: const Text(AppStrings.studentHomeDeleteTeacher),
-            content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(ctx);
-                  try {
-                    await ref
-                        .read(manualTeacherNotifierProvider.notifier)
-                        .delete(teacher.id);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${teacher.name} 선생님이 삭제되었습니다'),
-                          backgroundColor: AppColors.paperOk,
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            AppStrings.studentHomeDeleteFailedRetry,
-                          ),
-                          backgroundColor: AppColors.paperAccent,
-                        ),
-                      );
-                    }
-                  }
-                },
-                child: Text(
-                  '삭제',
-                  style: TextStyle(color: AppColors.paperAccent),
-                ),
-              ),
-            ],
+      titleWidget: const Text(AppStrings.studentHomeDeleteTeacher),
+      content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(AppStrings.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            try {
+              await ref
+                  .read(manualTeacherNotifierProvider.notifier)
+                  .delete(teacher.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${teacher.name} 선생님이 삭제되었습니다'),
+                    backgroundColor: AppColors.paperOk,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      AppStrings.studentHomeDeleteFailedRetry,
+                    ),
+                    backgroundColor: AppColors.paperAccent,
+                  ),
+                );
+              }
+            }
+          },
+          child: Text(
+            '삭제',
+            style: const TextStyle(color: AppColors.paperAccent),
           ),
+        ),
+      ],
     );
   }
 }

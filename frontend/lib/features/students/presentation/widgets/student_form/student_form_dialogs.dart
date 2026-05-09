@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
@@ -175,29 +175,26 @@ void showExitConfirmation(
     return;
   }
 
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.cancelChangesTitle),
-          content: const Text(AppStrings.studentExitConfirmMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.continueEditing),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onExit();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.exitAction),
-            ),
-          ],
+    titleWidget: const Text(AppStrings.cancelChangesTitle),
+    content: const Text(AppStrings.studentExitConfirmMessage),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.continueEditing),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onExit();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
         ),
+        child: const Text(AppStrings.exitAction),
+      ),
+    ],
   );
 }
 
@@ -207,32 +204,29 @@ void showDeleteStudentConfirmation(
   required String studentName,
   required VoidCallback onDelete,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.studentDeleteTitle),
-          content: Text(
-            '$studentName 학생을 삭제하시겠습니까?\n\n'
-            '관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n'
-            '이 작업은 되돌릴 수 없습니다.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onDelete();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.delete),
-            ),
-          ],
+    titleWidget: const Text(AppStrings.studentDeleteTitle),
+    content: Text(
+      '$studentName 학생을 삭제하시겠습니까?\n\n'
+      '관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n'
+      '이 작업은 되돌릴 수 없습니다.',
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.cancel),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onDelete();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
         ),
+        child: const Text(AppStrings.delete),
+      ),
+    ],
   );
 }

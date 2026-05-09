@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -149,64 +149,61 @@ void showCancelLessonDialog({
   required TimeOfDay lessonTime,
   required VoidCallback onConfirm,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.actionLessonCancel),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+    titleWidget: const Text(AppStrings.actionLessonCancel),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(AppStrings.cancelLessonConfirm),
+        const SizedBox(height: AppSpacing.space4),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(color: AppColors.paperDark),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(AppStrings.cancelLessonConfirm),
-              const SizedBox(height: AppSpacing.space4),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(color: AppColors.paperDark),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.studentNameSuffix(studentName),
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '${formatDateMDWithDayParens(lessonDate)} ${formatLessonTime(lessonTime)}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
-                    ),
-                  ],
+              Text(
+                AppStrings.studentNameSuffix(studentName),
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: AppSpacing.space4),
               Text(
-                AppStrings.cancelLessonNotificationNotice,
-                style: AppTypography.caption.copyWith(
+                '${formatDateMDWithDayParens(lessonDate)} ${formatLessonTime(lessonTime)}',
+                style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.closeAction),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onConfirm();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.actionLessonCancel),
-            ),
-          ],
         ),
+        const SizedBox(height: AppSpacing.space4),
+        Text(
+          AppStrings.cancelLessonNotificationNotice,
+          style: AppTypography.caption.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.closeAction),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onConfirm();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
+        ),
+        child: const Text(AppStrings.actionLessonCancel),
+      ),
+    ],
   );
 }
 
@@ -215,29 +212,26 @@ void showDeleteLessonDialog({
   required BuildContext context,
   required VoidCallback onConfirm,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.deleteLessonTitle),
-          content: const Text(AppStrings.deleteLessonNoRestoreConfirm),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onConfirm();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.delete),
-            ),
-          ],
+    titleWidget: const Text(AppStrings.deleteLessonTitle),
+    content: const Text(AppStrings.deleteLessonNoRestoreConfirm),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.cancel),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onConfirm();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
         ),
+        child: const Text(AppStrings.delete),
+      ),
+    ],
   );
 }
 
@@ -252,28 +246,25 @@ void showEditLessonExitConfirmation({
     return;
   }
 
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.cancelChangesTitle),
-          content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.continueEditing),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onExit();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.exitAction),
-            ),
-          ],
+    titleWidget: const Text(AppStrings.cancelChangesTitle),
+    content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.continueEditing),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onExit();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
         ),
+        child: const Text(AppStrings.exitAction),
+      ),
+    ],
   );
 }

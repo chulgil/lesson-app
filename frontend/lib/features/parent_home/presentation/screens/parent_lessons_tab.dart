@@ -439,19 +439,8 @@ class ParentLessonsTab extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_left),
-              ),
-              Text(monthName, style: AppTypography.headingSmall),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
+          Center(
+            child: Text(monthName, style: AppTypography.headingSmall),
           ),
           const SizedBox(height: AppSpacing.space2),
           // Mini calendar week days

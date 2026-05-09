@@ -223,26 +223,23 @@ class _AddManualTeacherScreenState
       return;
     }
 
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: const Text(AppStrings.studentHomeCancelWriting),
-            content: const Text(AppStrings.studentHomeCancelWritingConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text(AppStrings.continueWriting),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  context.pop();
-                },
-                child: const Text(AppStrings.exitAction),
-              ),
-            ],
-          ),
+      titleWidget: const Text(AppStrings.studentHomeCancelWriting),
+      content: const Text(AppStrings.studentHomeCancelWritingConfirm),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.continueWriting),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.pop();
+          },
+          child: const Text(AppStrings.exitAction),
+        ),
+      ],
     );
   }
 

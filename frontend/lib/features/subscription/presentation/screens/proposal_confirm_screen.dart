@@ -195,7 +195,19 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           // Action buttons
           templateAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (e, st) => const SizedBox.shrink(),
+            error: (e, st) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    AppStrings.loadDataFailed,
+                    style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+                  ),
+                ],
+              ),
+            ),
             data: (template) {
               if (template == null) return const SizedBox.shrink();
               return _buildActionButtons(proposal, template);

@@ -1399,29 +1399,26 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: AppStrings.cancelRequestTitle,
-            content: const Text(AppStrings.cancelRequestMessage),
-            cancelLabel: AppStrings.no,
-            confirmLabel: AppStrings.cancelRequestAction,
-            isDestructive: true,
-            onConfirm: () {
-              Navigator.of(ctx).pop();
-              final actions = UnifiedLessonRequestActions(ref);
-              actions.cancelRequest(
-                request.id,
-                viewerRole == 'teacher' ? request.teacherId : request.studentId,
-                viewerRole == 'teacher'
-                    ? ProposerRole.teacher
-                    : ProposerRole.student,
-                request.teacherId,
-                request.studentId,
-              );
-            },
-          ),
+      title: AppStrings.cancelRequestTitle,
+      content: const Text(AppStrings.cancelRequestMessage),
+      cancelLabel: AppStrings.no,
+      confirmLabel: AppStrings.cancelRequestAction,
+      isDestructive: true,
+      onConfirm: () {
+        Navigator.of(context).pop();
+        final actions = UnifiedLessonRequestActions(ref);
+        actions.cancelRequest(
+          request.id,
+          viewerRole == 'teacher' ? request.teacherId : request.studentId,
+          viewerRole == 'teacher'
+              ? ProposerRole.teacher
+              : ProposerRole.student,
+          request.teacherId,
+          request.studentId,
+        );
+      },
     );
   }
 }

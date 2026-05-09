@@ -192,32 +192,29 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (dialogContext) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceRecordingRecordDeleteTitle),
-            content: const Text(
-              '이 녹음 기록을 삭제하시겠습니까?\n'
-              '(파일이 이미 없으므로 기록만 삭제됩니다)',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  widget.onDelete();
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
+      titleWidget: const Text(AppStrings.practiceRecordingRecordDeleteTitle),
+      content: const Text(
+        '이 녹음 기록을 삭제하시겠습니까?\n'
+        '(파일이 이미 없으므로 기록만 삭제됩니다)',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            widget.onDelete();
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.paperAccent,
           ),
+          child: const Text(AppStrings.delete),
+        ),
+      ],
     );
   }
 

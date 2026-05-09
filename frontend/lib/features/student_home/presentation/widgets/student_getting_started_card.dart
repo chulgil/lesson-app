@@ -128,9 +128,11 @@ class _StepItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isEnabled = onTap != null;
 
-    return InkWell(
-      onTap: onTap,
-      child: Container(
+    return Opacity(
+      opacity: !isCompleted && !isEnabled ? 0.5 : 1.0,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
           vertical: AppSpacing.space3,
@@ -207,6 +209,8 @@ class _StepItem extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
+

@@ -712,10 +712,7 @@ class ParentDashboardTab extends ConsumerWidget {
       romanIndex: 2,
       title: '과제 현황',
       icon: Icons.assignment,
-      trailing: TextButton(
-        onPressed: () {},
-        child: const Text(AppStrings.viewAll),
-      ),
+      trailing: null,
       child: Column(
         children: const [
           AssignmentItem(
@@ -795,13 +792,7 @@ class ParentDashboardTab extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {},
-              child: const Text(AppStrings.parentHomePaymentGuideCheck),
-            ),
-          ),
+          // TODO: payment verification flow — removed NO-OP button
         ],
       ),
     );

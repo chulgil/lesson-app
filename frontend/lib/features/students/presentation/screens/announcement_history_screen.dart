@@ -194,8 +194,8 @@ class _AnnouncementCard extends ConsumerWidget {
                   iconSize: 18,
                   icon: Icon(Icons.more_vert, size: 18, color: AppColors.inkTertiary),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text('수정')),
-                    const PopupMenuItem(value: 'delete', child: Text('삭제')),
+                    PopupMenuItem(value: 'edit', child: Text(AppStrings.modify)),
+                    PopupMenuItem(value: 'delete', child: Text(AppStrings.delete)),
                   ],
                   onSelected: (action) {
                     if (action == 'edit') {

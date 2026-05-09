@@ -393,31 +393,28 @@ class UnconnectedChildDashboard extends ConsumerWidget {
 
   void _enterInviteCode(BuildContext context) {
     // TODO: Show invite code input dialog
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.parentHomeInviteCode),
-            content: const TextField(
-              decoration: InputDecoration(
-                hintText: AppStrings.parentHomeInviteCodeHint,
-                border: OutlineInputBorder(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Process invite code
-                  Navigator.pop(context);
-                },
-                child: const Text(AppStrings.parentHomeConnect),
-              ),
-            ],
-          ),
+      titleWidget: const Text(AppStrings.parentHomeInviteCode),
+      content: const TextField(
+        decoration: InputDecoration(
+          hintText: AppStrings.parentHomeInviteCodeHint,
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(AppStrings.cancel),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // TODO: Process invite code
+            Navigator.pop(context);
+          },
+          child: const Text(AppStrings.parentHomeConnect),
+        ),
+      ],
     );
   }
 }

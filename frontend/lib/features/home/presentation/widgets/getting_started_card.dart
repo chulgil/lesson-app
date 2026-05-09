@@ -188,59 +188,62 @@ class _StepItem extends StatelessWidget {
             ? AppColors.ink
             : AppColors.inkTertiary;
 
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // 로마숫자 or 체크 — Notebook × Score 시그니처
-            SizedBox(
-              width: 28,
-              child:
-                  isCompleted
-                      ? const NotebookGlyph(
-                        NotebookGlyph.check,
-                        size: 18,
-                        color: AppColors.paperOk,
-                      )
-                      : Text(
-                        romanOf(step - 1),
-                        style: NotebookTypography.roman.copyWith(
-                          color: accentColor,
+    return Opacity(
+      opacity: !isCompleted && !isEnabled ? 0.5 : 1.0,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 로마숫자 or 체크 — Notebook × Score 시그니처
+              SizedBox(
+                width: 28,
+                child:
+                    isCompleted
+                        ? const NotebookGlyph(
+                          NotebookGlyph.check,
+                          size: 18,
+                          color: AppColors.paperOk,
+                        )
+                        : Text(
+                          romanOf(step - 1),
+                          style: NotebookTypography.roman.copyWith(
+                            color: accentColor,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: NotebookTypography.pieceTitle.copyWith(
-                      fontSize: 15,
-                      color:
-                          isCompleted ? AppColors.inkTertiary : AppColors.ink,
-                      decoration:
-                          isCompleted ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkTertiary,
-                    ),
-                  ),
-                ],
               ),
-            ),
-            if (isEnabled && !isCompleted)
-              const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
-          ],
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: NotebookTypography.pieceTitle.copyWith(
+                        fontSize: 15,
+                        color:
+                            isCompleted ? AppColors.inkTertiary : AppColors.ink,
+                        decoration:
+                            isCompleted ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isEnabled && !isCompleted)
+                const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
+            ],
+          ),
         ),
       ),
     );

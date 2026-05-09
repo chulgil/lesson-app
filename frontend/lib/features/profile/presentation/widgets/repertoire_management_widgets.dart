@@ -785,56 +785,50 @@ void showAssignToStudentDialog({
   required AsyncValue studentsAsync,
   required Future<void> Function(String studentId) onAssign,
 }) {
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (dialogContext) => NotebookAlertDialog(
-          backgroundColor: AppColors.paper,
-          shape: const RoundedRectangleBorder(),
-          titleTextStyle: NotebookTypography.pieceTitle,
-          title: const Text(AppStrings.profileRepertoireAssignTitle),
-          content: studentsAsync.when(
-            data: (students) {
-              if (students.isEmpty) {
-                return const Text(AppStrings.profileRepertoireNoStudents);
-              }
-              return SizedBox(
-                width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: students.length,
-                  itemBuilder: (listContext, index) {
-                    final student = students[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: AppColors.paperAccent.withValues(
-                          alpha: 0.1,
-                        ),
-                        child: Text(
-                          student.name[0],
-                          style: TextStyle(color: AppColors.paperAccent),
-                        ),
-                      ),
-                      title: Text(student.name),
-                      subtitle: Text(student.instrument),
-                      onTap: () async {
-                        Navigator.pop(dialogContext);
-                        await onAssign(student.id);
-                      },
-                    );
-                  },
+    titleWidget: const Text(AppStrings.profileRepertoireAssignTitle),
+    content: studentsAsync.when(
+      data: (students) {
+        if (students.isEmpty) {
+          return const Text(AppStrings.profileRepertoireNoStudents);
+        }
+        return SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: students.length,
+            itemBuilder: (listContext, index) {
+              final student = students[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.paperAccent.withValues(
+                    alpha: 0.1,
+                  ),
+                  child: Text(
+                    student.name[0],
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
                 ),
+                title: Text(student.name),
+                subtitle: Text(student.instrument),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await onAssign(student.id);
+                },
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Text(AppStrings.profileRepertoireError),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text(AppStrings.cancel),
-            ),
-          ],
-        ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const Text(AppStrings.profileRepertoireError),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.cancel),
+      ),
+    ],
   );
 }

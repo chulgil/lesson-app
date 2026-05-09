@@ -360,60 +360,57 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     final userRole = ref.read(currentUserRoleProvider);
     final homeRoute = userRole.homeRoute;
 
-    showDialog(
+    showNotebookDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (dialogContext) => NotebookAlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: AppSpacing.space4),
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.ink.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  child: Icon(Icons.link, size: 48, color: AppColors.ink),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                // Notebook × Score: 중복 연결 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
-                Text(
-                  '이미 연결되어 있습니다',
-                  style: NotebookTypography.sectionTitle,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.space2),
-                Text(
-                  '해당 $targetRoleLabel과 이미\n연결되어 있습니다.',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-              ],
+      titleWidget: const SizedBox.shrink(),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: AppSpacing.space4),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.ink.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.zero,
             ),
-            actions: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    context.go(homeRoute);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    foregroundColor: AppColors.paper,
-                  ),
-                  child: const Text(AppStrings.confirm),
-                ),
-              ),
-            ],
+            child: Icon(Icons.link, size: 48, color: AppColors.ink),
           ),
+          const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 중복 연결 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
+          Text(
+            '이미 연결되어 있습니다',
+            style: NotebookTypography.sectionTitle,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '해당 $targetRoleLabel과 이미\n연결되어 있습니다.',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.space4),
+        ],
+      ),
+      actions: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.go(homeRoute);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.paperAccent,
+              foregroundColor: AppColors.paper,
+            ),
+            child: const Text(AppStrings.confirm),
+          ),
+        ),
+      ],
     );
   }
 
@@ -430,174 +427,171 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     // Check if teacher received student invite - offer going to student list
     final isTeacherConnectingToStudent = userRole == UserRole.teacher;
 
-    showDialog(
+    showNotebookDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (dialogContext) => NotebookAlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: AppSpacing.space4),
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.paperOk.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.zero,
+      titleWidget: const SizedBox.shrink(),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: AppSpacing.space4),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.paperOk.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.zero,
+            ),
+            child: Icon(
+              Icons.check_circle,
+              size: 48,
+              color: AppColors.paperOk,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          // Notebook × Score: 연결 성공 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
+          Text(
+            '연결 요청이 전송되었습니다!',
+            style: NotebookTypography.sectionTitle,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '$targetRoleLabel이 요청을 수락하면\n연결이 완료됩니다.',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (isStudentConnectingToTeacher) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.ink.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.zero,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    size: 20,
+                    color: AppColors.ink,
                   ),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: 48,
-                    color: AppColors.paperOk,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                // Notebook × Score: 연결 성공 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
-                Text(
-                  '연결 요청이 전송되었습니다!',
-                  style: NotebookTypography.sectionTitle,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.space2),
-                Text(
-                  '$targetRoleLabel이 요청을 수락하면\n연결이 완료됩니다.',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (isStudentConnectingToTeacher) ...[
-                  const SizedBox(height: AppSpacing.space3),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.space3),
-                    decoration: BoxDecoration(
-                      color: AppColors.ink.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.zero,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.lightbulb_outline,
-                          size: 20,
-                          color: AppColors.ink,
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        Expanded(
-                          child: Text(
-                            '지금 바로 체험레슨을 예약할 수 있어요!',
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.ink,
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      '지금 바로 체험레슨을 예약할 수 있어요!',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.ink,
+                      ),
                     ),
                   ),
                 ],
-                const SizedBox(height: AppSpacing.space4),
-              ],
+              ),
             ),
-            actions: [
-              if (isStudentConnectingToTeacher) ...[
-                // Two buttons: Go home or Book lesson
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          context.go(homeRoute);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.inkSecondary,
-                        ),
-                        child: const Text(AppStrings.inviteGoHome),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          // Navigate to booking screen with teacher info
-                          final userProfile = ref.read(
-                            currentUserProfileProvider,
-                          );
-                          context.push(
-                            AppRoutes.lessonBooking,
-                            extra: {
-                              'teacherId': invite.creatorId,
-                              'teacherName': invite.creatorName ?? '선생님',
-                              'instrument':
-                                  '악기', // Will be selected in booking screen
-                              'studentId': userProfile.userId,
-                              'studentName': userProfile.userName,
-                              'isTrialLesson': true,
-                            },
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.paperAccent,
-                          foregroundColor: AppColors.paper,
-                        ),
-                        child: const Text(AppStrings.inviteLessonBooking),
-                      ),
-                    ),
-                  ],
-                ),
-              ] else if (isTeacherConnectingToStudent) ...[
-                // Teacher: offer going to student list
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          context.go(homeRoute);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.inkSecondary,
-                        ),
-                        child: const Text(AppStrings.inviteGoHome),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          context.go(homeRoute);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.paperAccent,
-                          foregroundColor: AppColors.paper,
-                        ),
-                        child: const Text(AppStrings.inviteStudentList),
-                      ),
-                    ),
-                  ],
-                ),
-              ] else ...[
-                // Single button: Go home
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                      context.go(homeRoute);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.paperAccent,
-                      foregroundColor: AppColors.paper,
-                    ),
-                    child: const Text(AppStrings.confirm),
+          ],
+          const SizedBox(height: AppSpacing.space4),
+        ],
+      ),
+      actions: [
+        if (isStudentConnectingToTeacher) ...[
+          // Two buttons: Go home or Book lesson
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.go(homeRoute);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.inkSecondary,
                   ),
+                  child: const Text(AppStrings.inviteGoHome),
                 ),
-              ],
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to booking screen with teacher info
+                    final userProfile = ref.read(
+                      currentUserProfileProvider,
+                    );
+                    context.push(
+                      AppRoutes.lessonBooking,
+                      extra: {
+                        'teacherId': invite.creatorId,
+                        'teacherName': invite.creatorName ?? '선생님',
+                        'instrument':
+                            '악기', // Will be selected in booking screen
+                        'studentId': userProfile.userId,
+                        'studentName': userProfile.userName,
+                        'isTrialLesson': true,
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.paperAccent,
+                    foregroundColor: AppColors.paper,
+                  ),
+                  child: const Text(AppStrings.inviteLessonBooking),
+                ),
+              ),
             ],
           ),
+        ] else if (isTeacherConnectingToStudent) ...[
+          // Teacher: offer going to student list
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.go(homeRoute);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.inkSecondary,
+                  ),
+                  child: const Text(AppStrings.inviteGoHome),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.go(homeRoute);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.paperAccent,
+                    foregroundColor: AppColors.paper,
+                  ),
+                  child: const Text(AppStrings.inviteStudentList),
+                ),
+              ),
+            ],
+          ),
+        ] else ...[
+          // Single button: Go home
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.go(homeRoute);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.paperAccent,
+                foregroundColor: AppColors.paper,
+              ),
+              child: const Text(AppStrings.confirm),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

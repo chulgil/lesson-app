@@ -941,7 +941,7 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
                 ),
               ),
               ChoiceChip(
-                label: const Text('직접 입력'),
+                label: const Text(AppStrings.unifiedSubscriptionDirectInputToggle),
                 selected: _isCustom,
                 onSelected: (_) => setState(() => _isCustom = true),
                 selectedColor: AppColors.paperAccent,

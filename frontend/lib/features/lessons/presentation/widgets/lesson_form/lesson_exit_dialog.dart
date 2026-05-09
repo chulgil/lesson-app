@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -15,28 +15,25 @@ void showLessonExitConfirmation({
     return;
   }
 
-  showDialog(
+  showNotebookDialog(
     context: context,
-    builder:
-        (context) => NotebookAlertDialog(
-          title: const Text(AppStrings.cancelWritingTitle),
-          content: const Text(AppStrings.exitWithoutSavingConfirm),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(AppStrings.continueWriting),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onExit();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-              ),
-              child: const Text(AppStrings.exitAction),
-            ),
-          ],
+    titleWidget: const Text(AppStrings.cancelWritingTitle),
+    content: const Text(AppStrings.exitWithoutSavingConfirm),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.continueWriting),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          onExit();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.paperAccent,
         ),
+        child: const Text(AppStrings.exitAction),
+      ),
+    ],
   );
 }

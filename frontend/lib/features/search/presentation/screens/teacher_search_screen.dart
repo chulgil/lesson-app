@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
@@ -75,9 +76,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
     final currentTab = ref.watch(teacherSearchTabStateProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.searchFindTeacher),
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.searchFindTeacher,
+        customActions: [
           IconButton(
             icon: Badge(
               isLabelVisible: !filter.isEmpty,

@@ -18,10 +18,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(AppStrings.parentHomeAssignmentStatus),
         centerTitle: true,
-        actions: [
-          // Filter button
-          IconButton(onPressed: () {}, icon: const Icon(Icons.filter_list)),
-        ],
+        actions: const [],
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),

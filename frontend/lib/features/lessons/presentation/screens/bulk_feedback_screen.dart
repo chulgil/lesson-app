@@ -251,7 +251,13 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 presetsAsync.when(
                   data: (presets) => _buildInlinePresets(presets),
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, __) => Row(
+                    children: [
+                      Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
+                      const SizedBox(width: AppSpacing.space2),
+                      Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
 

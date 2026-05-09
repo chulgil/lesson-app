@@ -306,35 +306,32 @@ class PracticeNoteListScreen extends ConsumerWidget {
     WidgetRef ref,
     PracticeNote note,
   ) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceNoteDeleteTitle),
-            content: const Text(AppStrings.practiceNoteDeleteConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(practiceNoteCrudProvider.notifier)
-                      .deleteNote(note.id, sectionId);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(AppStrings.practiceNoteDeletedSnack),
-                      ),
-                    );
-                  }
-                },
-                child: const Text(AppStrings.delete),
-              ),
-            ],
-          ),
+      titleWidget: const Text(AppStrings.practiceNoteDeleteTitle),
+      content: const Text(AppStrings.practiceNoteDeleteConfirm),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(practiceNoteCrudProvider.notifier)
+                .deleteNote(note.id, sectionId);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(AppStrings.practiceNoteDeletedSnack),
+                ),
+              );
+            }
+          },
+          child: const Text(AppStrings.delete),
+        ),
+      ],
     );
   }
 }

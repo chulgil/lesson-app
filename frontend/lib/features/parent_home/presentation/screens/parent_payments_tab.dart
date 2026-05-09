@@ -72,7 +72,19 @@ class ParentPaymentsTab extends ConsumerWidget {
         return childrenAsync.when(
           data: (profiles) => _ChildSelectorSheet(profiles: profiles),
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

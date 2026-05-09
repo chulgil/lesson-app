@@ -190,24 +190,21 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     WidgetRef ref,
     SubscriptionTemplate template,
   ) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.templateDeleteDialogTitle,
-            content: Text(
-              AppStrings.templateDeleteConfirmFormat(template.name),
-            ),
-            cancelLabel: AppStrings.cancel,
-            confirmLabel: AppStrings.delete,
-            isDestructive: true,
-            onConfirm: () async {
-              Navigator.pop(context);
-              await ref
-                  .read(subscriptionTemplateNotifierProvider.notifier)
-                  .deleteTemplate(template);
-            },
-          ),
+      title: AppStrings.templateDeleteDialogTitle,
+      content: Text(
+        AppStrings.templateDeleteConfirmFormat(template.name),
+      ),
+      cancelLabel: AppStrings.cancel,
+      confirmLabel: AppStrings.delete,
+      isDestructive: true,
+      onConfirm: () async {
+        Navigator.pop(context);
+        await ref
+            .read(subscriptionTemplateNotifierProvider.notifier)
+            .deleteTemplate(template);
+      },
     );
   }
 }

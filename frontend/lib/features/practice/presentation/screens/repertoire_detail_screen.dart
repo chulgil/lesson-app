@@ -399,36 +399,33 @@ class _RepertoireDetailScreenState
         ref.read(repertoireProvider(widget.repertoireId)).valueOrNull;
     if (repertoire == null) return;
 
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceArchiveTitle),
-            content: Text(
-              '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(repertoireArchiveNotifierProvider.notifier)
-                      .archive(widget.repertoireId, widget.studentId);
+      titleWidget: const Text(AppStrings.practiceArchiveTitle),
+      content: Text(
+        '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(repertoireArchiveNotifierProvider.notifier)
+                .archive(widget.repertoireId, widget.studentId);
 
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
-                  );
-                  context.pop(); // Go back to repertoire list
-                },
-                child: const Text(AppStrings.archiveButton),
-              ),
-            ],
-          ),
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+            );
+            context.pop(); // Go back to repertoire list
+          },
+          child: const Text(AppStrings.archiveButton),
+        ),
+      ],
     );
   }
 

@@ -347,7 +347,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
           ),
-          child: const Text('확인'),
+          child: const Text(AppStrings.confirm),
         ),
       ],
     );

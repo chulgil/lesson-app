@@ -221,7 +221,16 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
 
             return templateAsync.when(
               loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, __) => Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
+                    const SizedBox(width: AppSpacing.space2),
+                    Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
+                  ],
+                ),
+              ),
               data: (template) {
                 if (template == null) return const SizedBox.shrink();
                 return Padding(
@@ -352,7 +361,19 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.loadDataFailed,
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+            ),
+          ],
+        ),
+      ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDetailsCard(template: template);
@@ -389,7 +410,19 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.loadDataFailed,
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+            ),
+          ],
+        ),
+      ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDiscountCard(proposal: proposal, template: template);

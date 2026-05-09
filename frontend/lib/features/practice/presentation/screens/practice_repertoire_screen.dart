@@ -308,68 +308,62 @@ class _RepertoireCard extends ConsumerWidget {
   }
 
   void _showArchiveConfirmation(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceArchiveTitle),
-            content: Text(
-              '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(repertoireArchiveNotifierProvider.notifier)
-                      .archive(repertoire.id, studentId);
-                  ref.invalidate(studentRepertoiresProvider(studentId));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
-                    );
-                  }
-                },
-                child: const Text(AppStrings.practiceArchiveTitle),
-              ),
-            ],
-          ),
+      titleWidget: const Text(AppStrings.practiceArchiveTitle),
+      content: Text(
+        '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(repertoireArchiveNotifierProvider.notifier)
+                .archive(repertoire.id, studentId);
+            ref.invalidate(studentRepertoiresProvider(studentId));
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+              );
+            }
+          },
+          child: const Text(AppStrings.practiceArchiveTitle),
+        ),
+      ],
     );
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showNotebookDialog(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceRepertoireDeleteTitle),
-            content: Text(
-              '\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref
-                      .read(repertoireCrudProvider.notifier)
-                      .deleteRepertoire(repertoire.id, studentId);
-                  ref.invalidate(studentRepertoiresProvider(studentId));
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
+      titleWidget: const Text(AppStrings.practiceRepertoireDeleteTitle),
+      content: Text(
+        '\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await ref
+                .read(repertoireCrudProvider.notifier)
+                .deleteRepertoire(repertoire.id, studentId);
+            ref.invalidate(studentRepertoiresProvider(studentId));
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.paperAccent,
           ),
+          child: const Text(AppStrings.delete),
+        ),
+      ],
     );
   }
 }
