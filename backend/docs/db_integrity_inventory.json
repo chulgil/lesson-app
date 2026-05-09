@@ -236,7 +236,7 @@
       "table": "lessons",
       "type": "check",
       "priority": "P0",
-      "rule": "duration > 0 and cancellation statuses require the matching cancellation timestamp or policy event"
+      "rule": "duration > 0 is DB-enforced by ck_lessons_duration_positive; cancellation statuses still require the matching cancellation timestamp or policy event"
     },
     {
       "domain": "parent",

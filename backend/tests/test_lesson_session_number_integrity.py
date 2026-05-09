@@ -23,7 +23,9 @@ def test_lesson_session_number_column_is_declared_in_model() -> None:
     assert "session_number" in table.c
     assert table.c.session_number.nullable is True
     assert "idx_lesson_subscription_session" in {index.name for index in table.indexes}
-    assert "ck_lessons_session_number_positive" in {constraint.name for constraint in table.constraints}
+    constraint_names = {constraint.name for constraint in table.constraints}
+    assert "ck_lessons_session_number_positive" in constraint_names
+    assert "ck_lessons_duration_positive" in constraint_names
 
 
 def test_lesson_session_number_migration_is_chained_and_declares_contract() -> None:
@@ -37,3 +39,4 @@ def test_lesson_session_number_migration_is_chained_and_declares_contract() -> N
     assert "session_number" in source
     assert "idx_lesson_subscription_session" in source
     assert "ck_lessons_session_number_positive" in source
+    assert "ck_lessons_duration_positive" in source

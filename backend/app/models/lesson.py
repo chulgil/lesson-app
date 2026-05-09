@@ -201,6 +201,7 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
             "session_number IS NULL OR session_number >= 1",
             name="ck_lessons_session_number_positive",
         ),
+        CheckConstraint("duration > 0", name="ck_lessons_duration_positive"),
     )
 
 

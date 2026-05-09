@@ -23,6 +23,10 @@ def upgrade() -> None:
             "ck_lessons_session_number_positive",
             "session_number IS NULL OR session_number >= 1",
         )
+        batch_op.create_check_constraint(
+            "ck_lessons_duration_positive",
+            "duration > 0",
+        )
 
     op.execute(
         """
@@ -46,6 +50,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     with op.batch_alter_table("lessons") as batch_op:
+        batch_op.drop_constraint("ck_lessons_duration_positive", type_="check")
         batch_op.drop_constraint("ck_lessons_session_number_positive", type_="check")
         batch_op.drop_index("idx_lesson_subscription_session")
         batch_op.drop_column("session_number")
