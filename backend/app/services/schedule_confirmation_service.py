@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.schedule_confirmation import (
@@ -283,6 +283,13 @@ class ScheduleConfirmationService:
         if days_ahead <= 0:
             days_ahead += 7
         first_date = base_date + timedelta(days=days_ahead)
+        max_session = await self.db.scalar(
+            select(func.max(Lesson.session_number)).where(
+                Lesson.subscription_id == card.subscription_id,
+                Lesson.session_number.is_not(None),
+            )
+        )
+        next_session_number = int(max_session or 0) + 1
 
         for i in range(count):
             scheduled_date = first_date + timedelta(weeks=i)
@@ -322,10 +329,11 @@ class ScheduleConfirmationService:
                 duration=duration,
                 status="scheduled",
                 subscription_id=card.subscription_id,
-                session_number=i + 1,
+                session_number=next_session_number,
                 lesson_source=LessonSource.subscription_generated,
             )
             self.db.add(lesson)
+            next_session_number += 1
 
     async def _check_time_conflict(
         self,

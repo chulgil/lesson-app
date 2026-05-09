@@ -250,27 +250,6 @@ class ScheduleService:
                 )
                 current_day += timedelta(days=1)
 
-        # Load bookings for this week
-        bookings = await self.db.scalars(
-            select(LessonBooking).where(
-                LessonBooking.teacher_id.in_(teacher_id_scope),
-                LessonBooking.scheduled_date >= ws,
-                LessonBooking.scheduled_date <= week_end,
-            )
-        )
-        bookings_by_date: dict[str, list[dict]] = {}
-        for b in bookings.all():
-            date_str = b.scheduled_date.isoformat()
-            bookings_by_date.setdefault(date_str, []).append(
-                {
-                    "start_time": b.scheduled_time,
-                    "duration": b.duration,
-                    "status": b.status.value if hasattr(b.status, "value") else b.status,
-                    "type": "booking",
-                    "booking_id": b.id,
-                }
-            )
-
         # Load lesson records for this week
         lessons = await self.db.scalars(
             select(Lesson).where(
@@ -288,13 +267,57 @@ class ScheduleService:
                 ),
             )
         )
+        lesson_rows = lessons.all()
+
+        lesson_metadata_by_slot: dict[tuple[str, str, int, str], dict] = {}
+        for lesson in lesson_rows:
+            lesson_metadata_by_slot[
+                (lesson.date.isoformat(), lesson.start_time, lesson.duration, lesson.student_id)
+            ] = {
+                "student_id": lesson.student_id,
+                "lesson_id": lesson.id,
+                "subscription_id": lesson.subscription_id,
+                "session_number": lesson.session_number,
+                "lesson_source": (
+                    lesson.lesson_source.value
+                    if hasattr(lesson.lesson_source, "value")
+                    else lesson.lesson_source
+                ),
+            }
+
+        # Load bookings for this week
+        bookings = await self.db.scalars(
+            select(LessonBooking).where(
+                LessonBooking.teacher_id.in_(teacher_id_scope),
+                LessonBooking.scheduled_date >= ws,
+                LessonBooking.scheduled_date <= week_end,
+            )
+        )
+        bookings_by_date: dict[str, list[dict]] = {}
+        for b in bookings.all():
+            date_str = b.scheduled_date.isoformat()
+            event = {
+                "start_time": b.scheduled_time,
+                "duration": b.duration,
+                "status": b.status.value if hasattr(b.status, "value") else b.status,
+                "student_id": b.student_id,
+                "subscription_id": b.subscription_id,
+                "type": "booking",
+                "booking_id": b.id,
+            }
+            metadata = lesson_metadata_by_slot.get((date_str, b.scheduled_time, b.duration, b.student_id))
+            if metadata is not None:
+                event.update(metadata)
+            bookings_by_date.setdefault(date_str, []).append(event)
+
         lessons_by_date: dict[str, list[dict]] = {}
-        for lesson in lessons.all():
+        for lesson in lesson_rows:
             date_str = lesson.date.isoformat()
             # Skip exact duplicates when booking already exists at same slot.
             if any(
                 existing.get("start_time") == lesson.start_time
                 and existing.get("duration") == lesson.duration
+                and existing.get("student_id") == lesson.student_id
                 for existing in bookings_by_date.get(date_str, [])
             ):
                 continue

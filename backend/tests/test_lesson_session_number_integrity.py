@@ -23,6 +23,8 @@ def test_lesson_session_number_column_is_declared_in_model() -> None:
     assert "session_number" in table.c
     assert table.c.session_number.nullable is True
     assert "idx_lesson_subscription_session" in {index.name for index in table.indexes}
+    unique_index_names = {index.name for index in table.indexes if index.unique}
+    assert "uk_lesson_subscription_session" in unique_index_names
     constraint_names = {constraint.name for constraint in table.constraints}
     assert "ck_lessons_session_number_positive" in constraint_names
     assert "ck_lessons_duration_positive" in constraint_names
@@ -40,3 +42,15 @@ def test_lesson_session_number_migration_is_chained_and_declares_contract() -> N
     assert "idx_lesson_subscription_session" in source
     assert "ck_lessons_session_number_positive" in source
     assert "ck_lessons_duration_positive" in source
+
+
+def test_lesson_subscription_session_unique_migration_is_chained_and_declares_contract() -> None:
+    """Alembic migration should prevent duplicate session numbers within one subscription."""
+    script = _script()
+    rev = script.get_revision("add_lesson_subscription_session_unique")
+    assert rev is not None
+    assert rev.down_revision == "add_app_billing_tables"
+
+    source = Path(rev.module.__file__).read_text()
+    assert "uk_lesson_subscription_session" in source
+    assert "ROW_NUMBER()" in source

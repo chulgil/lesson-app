@@ -6,6 +6,9 @@ import pytest
 from httpx import AsyncClient
 
 from app.models.lesson import Lesson, LessonSource
+from app.models.schedule import LessonBooking
+from app.models.student import Student
+from app.models.subscription import Subscription
 
 
 @pytest.mark.asyncio
@@ -136,6 +139,69 @@ async def test_weekly_schedule_includes_manual_lessons(client: AsyncClient, auth
     day_events = days[str(lesson_date)]
     lesson_events = [evt for evt in day_events if evt.get("type") == "lesson"]
     assert any(evt.get("lesson_source") == "manual" for evt in lesson_events)
+
+
+@pytest.mark.asyncio
+async def test_weekly_schedule_booking_event_keeps_subscription_session_metadata(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Subscription-generated booking/lesson duplicate slots must still expose lesson session metadata."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    lesson_date = _dt.date(2026, 3, 10)
+    student = Student(id="student-001", teacher_id="test-user-id-prof", name="Student", instrument="piano")
+    subscription = Subscription(
+        id="sub-001",
+        student_id="student-001",
+        membership_id="membership-001",
+        type="monthly",
+        total_lessons=4,
+        amount=200000,
+    )
+    booking = LessonBooking(
+        id="booking-001",
+        teacher_id="test-user-id-prof",
+        student_id="student-001",
+        lesson_type="regular",
+        scheduled_date=lesson_date,
+        scheduled_time="14:00",
+        duration=60,
+        instrument="piano",
+        subscription_id="sub-001",
+        status="confirmed",
+    )
+    lesson = Lesson(
+        id="lesson-001",
+        teacher_id="test-user-id-prof",
+        student_id="student-001",
+        student_name="Student",
+        instrument="piano",
+        date=lesson_date,
+        start_time="14:00",
+        duration=60,
+        subscription_id="sub-001",
+        session_number=2,
+        lesson_source=LessonSource.subscription_generated,
+    )
+    db_session.add_all([student, subscription, booking, lesson])
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/weekly",
+        headers=auth_headers,
+        params={"week_start": "2026-03-09"},
+    )
+
+    assert response.status_code == 200
+    events = response.json()["days"][str(lesson_date)]
+    booking_events = [event for event in events if event.get("booking_id") == "booking-001"]
+    assert len(booking_events) == 1
+    assert booking_events[0]["subscription_id"] == "sub-001"
+    assert booking_events[0]["session_number"] == 2
+    assert booking_events[0]["lesson_source"] == "subscriptionGenerated"
+    assert booking_events[0]["lesson_id"] == "lesson-001"
 
 
 @pytest.mark.asyncio

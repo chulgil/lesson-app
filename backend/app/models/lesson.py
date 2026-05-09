@@ -196,6 +196,7 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         Index("idx_lesson_source", "lesson_source"),
         Index("idx_lesson_subscription", "subscription_id"),
         Index("idx_lesson_subscription_session", "subscription_id", "session_number"),
+        Index("uk_lesson_subscription_session", "subscription_id", "session_number", unique=True),
         Index("idx_lesson_teacher_date", "teacher_id", "date"),
         CheckConstraint(
             "session_number IS NULL OR session_number >= 1",

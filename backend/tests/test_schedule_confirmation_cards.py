@@ -744,6 +744,94 @@ async def test_confirmed_monthly_subscription_lessons_persist_session_numbers(
 
 
 @pytest.mark.asyncio
+async def test_subscription_generated_lesson_session_numbers_are_contiguous_when_first_slot_conflicts(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Skipped conflicted slots should not leave gaps in generated lesson session numbers."""
+    from app.models.lesson import ClassMembership, Lesson, LessonClass
+    from app.models.policy import ScheduleConfirmationCard
+    from app.models.schedule import LessonBooking
+    from app.models.student import Student
+    from app.models.subscription import Subscription
+
+    await create_test_user(
+        user_id="gap-teacher",
+        role="teacher",
+        name="Gap Teacher",
+        email="gap-teacher@test.com",
+    )
+    await create_test_user(
+        user_id="gap-student-user",
+        role="student",
+        name="Gap Student",
+        email="gap-student@test.com",
+    )
+    lesson_class = LessonClass(id="gap-class", teacher_id="gap-teacher-prof", name="Gap Class")
+    student = Student(
+        id="gap-student",
+        user_id="gap-student-user",
+        teacher_id="gap-teacher-prof",
+        name="Gap Student",
+        instrument="piano",
+    )
+    membership = ClassMembership(id="gap-membership", lesson_class_id=lesson_class.id, student_id=student.id)
+    subscription = Subscription(
+        id="gap-subscription",
+        student_id=student.id,
+        membership_id=membership.id,
+        type="monthly",
+        total_lessons=4,
+        amount=200000,
+    )
+    proposed_day = (date.today().weekday() + 1) % 7
+    first_lesson_date = date.today() + timedelta(days=1)
+    conflict = LessonBooking(
+        id="gap-conflict",
+        teacher_id="gap-teacher-prof",
+        student_id="other-student",
+        lesson_type="regular",
+        scheduled_date=first_lesson_date,
+        scheduled_time="16:00",
+        duration=60,
+        instrument="piano",
+        status="confirmed",
+    )
+    card = ScheduleConfirmationCard(
+        id="gap-card",
+        student_id=student.id,
+        teacher_id="gap-teacher-prof",
+        subscription_id=subscription.id,
+        card_type="afterTrial",
+        title="Confirm",
+        status="pending",
+        proposed_day=str(proposed_day),
+        proposed_time="16:00",
+        proposed_duration=60,
+        created_at=datetime.now(UTC),
+    )
+    db_session.add_all([lesson_class, student, membership, subscription, conflict, card])
+    await db_session.flush()
+
+    response = await client.patch(
+        "/api/v1/schedule/confirmation-cards/gap-card/confirm",
+        headers=_headers("gap-student-user", "student"),
+        json={"action": "confirmed"},
+    )
+
+    assert response.status_code == 200
+    lessons = (
+        await db_session.scalars(
+            select(Lesson)
+            .where(Lesson.subscription_id == "gap-subscription")
+            .order_by(Lesson.date.asc(), Lesson.start_time.asc(), Lesson.id.asc())
+        )
+    ).all()
+    assert [lesson.session_number for lesson in lessons] == [1, 2, 3]
+
+
+@pytest.mark.asyncio
 async def test_dismiss_all_only_updates_visible_pending_cards(
     client: AsyncClient,
     create_test_user,
