@@ -92,6 +92,7 @@ class AppRoutes {
   static const profileEdit = '/settings/profile-edit';
   static const termsOfService = '/settings/terms';
   static const privacyPolicy = '/settings/privacy';
+  static const accountDeletion = '/settings/account-deletion';
 
   // Follow routes
   static const followList = '/profile/following';

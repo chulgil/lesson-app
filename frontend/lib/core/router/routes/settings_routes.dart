@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../features/follow/presentation/screens/follow_feed_screen.dart';
 import '../../../features/follow/presentation/screens/follow_list_screen.dart';
+import '../../../features/settings/presentation/screens/account_deletion_screen.dart';
 import '../../../features/settings/presentation/screens/all_recordings_screen.dart';
 import '../../../features/settings/presentation/screens/backup_settings_screen.dart';
 import '../../../features/settings/presentation/screens/news_roadmap_screen.dart';
@@ -106,5 +107,11 @@ List<GoRoute> settingsRoutes = [
     path: AppRoutes.followFeed,
     name: 'followFeed',
     builder: (context, state) => const FollowFeedScreen(),
+  ),
+  // Account Deletion
+  GoRoute(
+    path: AppRoutes.accountDeletion,
+    name: 'accountDeletion',
+    builder: (context, state) => const AccountDeletionScreen(),
   ),
 ];

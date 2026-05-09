@@ -12,6 +12,7 @@ import '../widgets/notebook/notebook_surfaces.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/extensions/user_role_visuals.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../services/analytics_service.dart';
 import 'app_routes.dart';
 import 'routes/auth_routes.dart';
 import 'routes/home_routes.dart';
@@ -46,10 +47,14 @@ class AppRouter {
   /// In mock mode: no redirect (existing behavior).
   /// In remote mode: redirects unauthenticated users to /login.
   static GoRouter createRouter(WidgetRef ref, {required bool useMockData}) {
+    final analyticsService = ref.watch(analyticsServiceProvider);
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
+      navigatorObservers: [
+        analyticsService.observer,
+      ],
       redirect:
           useMockData
               ? null
@@ -123,6 +128,9 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.login,
     debugLogDiagnostics: true,
+    navigatorObservers: [
+      AnalyticsService().observer,
+    ],
     routes: [
       ...authRoutes,
       ...homeRoutes,

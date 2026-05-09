@@ -59,6 +59,9 @@ class Teacher(UUIDMixin, TimestampMixin, Base):
     # Settings
     visibility_settings: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
+    # Referral system
+    referral_code: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True)
+
     __table_args__ = (
         Index("uk_teachers_user_id", "user_id", unique=True),
     )

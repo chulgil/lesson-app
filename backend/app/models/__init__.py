@@ -1,5 +1,6 @@
 # Import all models so Alembic can detect them via Base.metadata
 from app.models.app_version import AppNews, AppRoadmap, AppVersion  # noqa: F401
+from app.models.audit_log import AuditLog  # noqa: F401
 from app.models.base import Base  # noqa: F401
 from app.models.device_token import DeviceToken  # noqa: F401
 from app.models.gamification import GamificationBadge, GamificationPoint  # noqa: F401
@@ -83,6 +84,7 @@ from app.models.subscription import (  # noqa: F401
     SubscriptionUsage,
 )
 from app.models.subscription_expiry import SubscriptionExpiryDispatchLog  # noqa: F401
+from app.models.referral import TeacherReferral  # noqa: F401
 from app.models.teacher import (  # noqa: F401
     Teacher,
     TeacherCareer,
@@ -95,3 +97,5 @@ from app.models.teacher_announcement import (  # noqa: F401
 )
 from app.models.tip import TipTemplate  # noqa: F401
 from app.models.user import OAuthAccount, TokenBlacklist, User  # noqa: F401
+from app.models.recovery import RecoveryCode  # noqa: F401
+from app.models.user_session import UserSession  # noqa: F401

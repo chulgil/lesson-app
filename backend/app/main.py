@@ -29,6 +29,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if scheduler_enabled:
         # KST 00:05 daily — subscription expiry status transition + notification dispatch
         register_daily_kst_job(run_subscription_expiry_job, job_id=JOB_ID, hour=0, minute=5)
+
+        # KST 09:00 daily — re-engagement notifications for inactive users (Gap #1)
+        from app.jobs.reengagement_job import JOB_ID as REENGAGEMENT_JOB_ID, run_reengagement_job
+        register_daily_kst_job(run_reengagement_job, job_id=REENGAGEMENT_JOB_ID, hour=9, minute=0)
+
         start_scheduler()
 
     yield

@@ -387,6 +387,13 @@ class StudentProfileTab extends ConsumerWidget {
             title: AppStrings.studentHomeAppInfoTitle,
             onTap: () => context.push(AppRoutes.appInfo),
           ),
+          _buildMenuDivider(),
+          _buildMenuItem(
+            icon: Icons.delete_outline,
+            iconColor: AppColors.profileRed,
+            title: '계정 삭제',
+            onTap: () => context.push(AppRoutes.accountDeletion),
+          ),
         ],
       ),
     );
