@@ -35,8 +35,10 @@ class _InstrumentManagementScreenState
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
+      appBar: NotebookDetailAppBar(
         title: AppStrings.profileInstrumentTitle,
+        actions: [DetailAppBarAction.add],
+        onAction: _handleHeaderAction,
       ),
       body: settingsAsync.when(
         data: (settings) => _buildContent(settings),
@@ -77,13 +79,33 @@ class _InstrumentManagementScreenState
         children: [
           // Current instruments section
           _buildCurrentInstruments(settings.instruments),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          // Add instrument section
-          _buildAddInstrumentSection(settings.instruments),
         ],
       ),
+    );
+  }
+
+  void _handleHeaderAction(DetailAppBarAction action) {
+    if (action == DetailAppBarAction.add) {
+      final settings = ref.read(teacherSettingsNotifierProvider).valueOrNull;
+      _showAddInstrumentSheet(settings?.instruments ?? []);
+    }
+  }
+
+  void _showAddInstrumentSheet(List<String> currentInstruments) {
+    showNotebookModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder:
+          (sheetContext) => Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.space4,
+              AppSpacing.space4,
+              AppSpacing.space4,
+              AppSpacing.space4 + MediaQuery.of(sheetContext).viewInsets.bottom,
+            ),
+            child: _buildAddInstrumentSection(currentInstruments),
+          ),
     );
   }
 
