@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
+import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
@@ -165,6 +166,7 @@ class _SubscriptionDetailBody extends ConsumerStatefulWidget {
 class _SubscriptionDetailBodyState
     extends ConsumerState<_SubscriptionDetailBody> {
   late int _selectedSession;
+  bool _sessionResolved = false;
 
   // Event strip state — matches RequestDetailScreen pattern exactly
   String? _eventMessage;
@@ -179,14 +181,37 @@ class _SubscriptionDetailBodyState
   void initState() {
     super.initState();
     final totalSessions = subscription.totalLessonsForDisplay ?? 1;
-
-    // focusLessonId is passed when navigating from a specific lesson's
-    // schedule change button. Session resolution will be handled by
-    // the backend when lesson-subscription mapping is available.
-    // For now, use initialSelectedSession or default to next session.
     _selectedSession = (widget.initialSelectedSession ??
             subscription.usedLessons + 1)
         .clamp(1, totalSessions);
+  }
+
+  /// Resolve focusLessonId → session number using lesson list.
+  /// Called once in build() when data is available.
+  void _resolveFocusLesson() {
+    if (_sessionResolved || widget.focusLessonId == null) return;
+    _sessionResolved = true;
+
+    final lessonsAsync = ref.read(
+      lessonsByStudentProvider(subscription.studentId),
+    );
+    final lessons = lessonsAsync.valueOrNull;
+    if (lessons == null) return;
+
+    // Filter lessons belonging to this subscription, sorted by date
+    final subLessons =
+        lessons
+            .where((l) => l.subscriptionId == subscription.id)
+            .toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
+
+    final idx = subLessons.indexWhere((l) => l.id == widget.focusLessonId);
+    if (idx >= 0) {
+      final totalSessions = subscription.totalLessonsForDisplay ?? 1;
+      setState(() {
+        _selectedSession = (idx + 1).clamp(1, totalSessions);
+      });
+    }
   }
 
   @override
@@ -257,6 +282,9 @@ class _SubscriptionDetailBodyState
 
   @override
   Widget build(BuildContext context) {
+    // Resolve focusLessonId → session number (once)
+    _resolveFocusLesson();
+
     final membershipAsync = ref.watch(
       membershipProvider(subscription.membershipId),
     );
