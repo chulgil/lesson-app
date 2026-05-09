@@ -176,12 +176,37 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Dev-only login (bypasses OAuth for local development).
+  ///
+  /// In mock mode: creates a local [AuthAuthenticated] state without API call.
+  /// In remote mode: calls `POST /auth/dev-login` on the backend.
   Future<void> devLogin({
     required String email,
     required String role,
     String? name,
   }) async {
     state = const AuthLoading();
+
+    final isMock = ref.read(mockDataModeProvider);
+
+    if (isMock) {
+      // Mock mode: bypass API, create local auth state directly
+      final mockRole = UserRole.values.firstWhere(
+        (r) => r.name == role,
+        orElse: () => UserRole.teacher,
+      );
+      final mockUserId = switch (mockRole) {
+        UserRole.teacher => 'teacher_1',
+        UserRole.student => 'student_1',
+        UserRole.parent => 'parent_1',
+      };
+      state = AuthAuthenticated(
+        userId: mockUserId,
+        name: name ?? email,
+        email: email,
+        role: mockRole,
+      );
+      return;
+    }
 
     try {
       final result = await _authRepository.devLogin(
