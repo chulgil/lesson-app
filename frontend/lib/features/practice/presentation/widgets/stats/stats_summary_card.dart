@@ -42,29 +42,38 @@ class StatsSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildStatItem(
-                  icon: Icons.timer,
-                  label: AppStrings.practiceTimeLabel,
-                  value: report.totalTimeText,
-                  color: AppColors.paperAccent,
+                child: Semantics(
+                  label: '연습 시간: ${report.totalTimeText}',
+                  child: _buildStatItem(
+                    icon: Icons.timer,
+                    label: AppStrings.practiceTimeLabel,
+                    value: report.totalTimeText,
+                    color: AppColors.paperAccent,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
-                child: _buildStatItem(
-                  icon: Icons.calendar_today,
-                  label: AppStrings.practiceDayLabel,
-                  value: '${report.practiceDayCount}일',
-                  color: AppColors.paperOk,
+                child: Semantics(
+                  label: '연습 일수: ${report.practiceDayCount}일',
+                  child: _buildStatItem(
+                    icon: Icons.calendar_today,
+                    label: AppStrings.practiceDayLabel,
+                    value: '${report.practiceDayCount}일',
+                    color: AppColors.paperOk,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
-                child: _buildStatItem(
-                  icon: Icons.check_circle,
-                  label: AppStrings.practiceCompletionRateLabel,
-                  value: '${report.completionPercent}%',
-                  color: AppColors.paperAccent,
+                child: Semantics(
+                  label: '완료율: ${report.completionPercent}%',
+                  child: _buildStatItem(
+                    icon: Icons.check_circle,
+                    label: AppStrings.practiceCompletionRateLabel,
+                    value: '${report.completionPercent}%',
+                    color: AppColors.paperAccent,
+                  ),
                 ),
               ),
             ],
@@ -85,20 +94,26 @@ class StatsSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
-                  child: _buildMiniStat(
-                    label: AppStrings.practiceCurrentStreakLabel,
-                    value: '${report.currentStreak}일',
-                    icon: Icons.local_fire_department,
-                    iconColor: AppColors.paperAccent,
+                  child: Semantics(
+                    label: '현재 연속: ${report.currentStreak}일',
+                    child: _buildMiniStat(
+                      label: AppStrings.practiceCurrentStreakLabel,
+                      value: '${report.currentStreak}일',
+                      icon: Icons.local_fire_department,
+                      iconColor: AppColors.paperAccent,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
-                  child: _buildMiniStat(
-                    label: AppStrings.practiceMaxStreakLabel,
-                    value: '${report.maxStreak}일',
-                    icon: Icons.emoji_events,
-                    iconColor: AppColors.amber,
+                  child: Semantics(
+                    label: '최대 연속: ${report.maxStreak}일',
+                    child: _buildMiniStat(
+                      label: AppStrings.practiceMaxStreakLabel,
+                      value: '${report.maxStreak}일',
+                      icon: Icons.emoji_events,
+                      iconColor: AppColors.amber,
+                    ),
                   ),
                 ),
               ],

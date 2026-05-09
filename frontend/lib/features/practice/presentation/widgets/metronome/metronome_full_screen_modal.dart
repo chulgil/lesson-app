@@ -90,42 +90,61 @@ class _MetronomeFullScreenModalState
                   SizedBox(height: AppSpacing.space8),
 
                   // BPM display
-                  _BpmDisplay(bpm: state.settings.bpm),
+                  Semantics(
+                    label: '현재 템포 ${state.settings.bpm} BPM',
+                    child: _BpmDisplay(bpm: state.settings.bpm),
+                  ),
                   SizedBox(height: AppSpacing.space4),
 
                   // BPM controls
-                  _BpmSlider(
-                    bpm: state.settings.bpm,
-                    onChanged:
-                        (value) =>
-                            ref.read(metronomeProvider.notifier).setBpm(value),
-                    onDecrement:
-                        () => ref
-                            .read(metronomeProvider.notifier)
-                            .incrementBpm(-5),
-                    onIncrement:
-                        () => ref
-                            .read(metronomeProvider.notifier)
-                            .incrementBpm(5),
+                  Semantics(
+                    label: '템포 조절 슬라이더',
+                    slider: true,
+                    onIncrease: () =>
+                        ref.read(metronomeProvider.notifier).incrementBpm(5),
+                    onDecrease: () =>
+                        ref.read(metronomeProvider.notifier).incrementBpm(-5),
+                    child: _BpmSlider(
+                      bpm: state.settings.bpm,
+                      onChanged:
+                          (value) =>
+                              ref.read(metronomeProvider.notifier).setBpm(value),
+                      onDecrement:
+                          () => ref
+                              .read(metronomeProvider.notifier)
+                              .incrementBpm(-5),
+                      onIncrement:
+                          () => ref
+                              .read(metronomeProvider.notifier)
+                              .incrementBpm(5),
+                    ),
                   ),
                   SizedBox(height: AppSpacing.space8),
 
                   // Play/Pause button with beat number
-                  _LargePlayButton(
-                    isPlaying: state.isPlaying,
-                    currentBeat: state.currentBeat,
-                    onPressed:
-                        () => ref.read(metronomeProvider.notifier).toggle(),
+                  Semantics(
+                    label: state.isPlaying ? '메트로놈 정지' : '메트로놈 재생',
+                    button: true,
+                    onTap: () => ref.read(metronomeProvider.notifier).toggle(),
+                    child: _LargePlayButton(
+                      isPlaying: state.isPlaying,
+                      currentBeat: state.currentBeat,
+                      onPressed:
+                          () => ref.read(metronomeProvider.notifier).toggle(),
+                    ),
                   ),
                   SizedBox(height: AppSpacing.space8),
 
                   // Time signature selector
-                  _TimeSignatureSelector(
-                    selected: state.settings.timeSignature,
-                    onChanged:
-                        (ts) => ref
-                            .read(metronomeProvider.notifier)
-                            .setTimeSignature(ts),
+                  Semantics(
+                    label: '박자표: ${state.settings.timeSignature.label}',
+                    child: _TimeSignatureSelector(
+                      selected: state.settings.timeSignature,
+                      onChanged:
+                          (ts) => ref
+                              .read(metronomeProvider.notifier)
+                              .setTimeSignature(ts),
+                    ),
                   ),
                   SizedBox(height: AppSpacing.space6),
 

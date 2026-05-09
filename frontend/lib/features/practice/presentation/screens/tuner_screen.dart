@@ -134,21 +134,31 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Staff display
-                    NormalizedStaffWidget(
-                      note: tunerState.currentNote,
-                      isPerfect: tunerState.isPerfect,
-                      width: 140,
-                      height: 70,
+                    Semantics(
+                      label: tunerState.currentNote != null
+                          ? '현재 음: ${tunerState.currentNote!.fullName}'
+                          : '음 감지 대기 중',
+                      child: NormalizedStaffWidget(
+                        note: tunerState.currentNote,
+                        isPerfect: tunerState.isPerfect,
+                        width: 140,
+                        height: 70,
+                      ),
                     ),
 
                     const SizedBox(height: AppSpacing.space3),
 
                     // Info bar
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space8,
+                    Semantics(
+                      label: tunerState.currentNote != null
+                          ? '피치 편차: ${tunerState.currentNote!.centDisplayString}'
+                          : '정보 없음',
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.space8,
+                        ),
+                        child: TunerInfoBar(),
                       ),
-                      child: TunerInfoBar(),
                     ),
                   ],
                 ),

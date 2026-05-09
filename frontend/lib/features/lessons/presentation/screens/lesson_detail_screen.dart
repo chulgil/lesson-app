@@ -401,26 +401,29 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         children: [
           // Prompt to write feedback for completed lessons
           if (needsFeedback) ...[
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                border: Border.all(color: AppColors.paperAccent),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.edit_note, color: AppColors.paperAccent, size: 20),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      AppStrings.lessonNeedsFeedbackPrompt,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.paperAccent,
-                        fontWeight: FontWeight.w600,
+            Semantics(
+              label: '피드백 입력 필요',
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.paperAccentSoft,
+                  border: Border.all(color: AppColors.paperAccent),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_note, color: AppColors.paperAccent, size: 20),
+                    const SizedBox(width: AppSpacing.space2),
+                    Expanded(
+                      child: Text(
+                        AppStrings.lessonNeedsFeedbackPrompt,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.space4),

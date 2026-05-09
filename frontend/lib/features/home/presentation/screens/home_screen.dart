@@ -72,32 +72,38 @@ class _HomeScreenState extends State<HomeScreen> {
     final accentColor =
         isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
 
-    return InkWell(
+    return Semantics(
+      label: '$label 탭',
+      selected: isSelected,
+      button: true,
       onTap: () => setState(() => _currentIndex = index),
-      child: SizedBox(
-        width: 72,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              roman,
-              style: NotebookTypography.roman.copyWith(
-                fontSize: 18,
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+      child: InkWell(
+        onTap: () => setState(() => _currentIndex = index),
+        child: SizedBox(
+          width: 72,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                roman,
+                style: NotebookTypography.roman.copyWith(
+                  fontSize: 18,
+                  color: accentColor,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: NotebookTypography.sectionLabel.copyWith(
-                fontSize: 10,
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: NotebookTypography.sectionLabel.copyWith(
+                  fontSize: 10,
+                  color: accentColor,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

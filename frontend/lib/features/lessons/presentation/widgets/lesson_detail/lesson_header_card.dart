@@ -86,7 +86,10 @@ class LessonHeaderCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         // Status badge
-                        _StatusBadge(status: lesson.displayStatus),
+                        Semantics(
+                          label: '레슨 상태: ${lesson.displayStatus.label}',
+                          child: _StatusBadge(status: lesson.displayStatus),
+                        ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.space1),

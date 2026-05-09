@@ -62,26 +62,34 @@ class _MetronomeControllerBarState
 
                 // BPM display and controls
                 Expanded(
-                  child: _BpmControls(
-                    bpm: state.settings.bpm,
-                    timeSignature: state.settings.timeSignature.label,
-                    onDecrement:
-                        () => ref
-                            .read(metronomeProvider.notifier)
-                            .incrementBpm(-5),
-                    onIncrement:
-                        () => ref
-                            .read(metronomeProvider.notifier)
-                            .incrementBpm(5),
+                  child: Semantics(
+                    label: '현재 템포 ${state.settings.bpm} BPM, 박자 ${state.settings.timeSignature.label}',
+                    child: _BpmControls(
+                      bpm: state.settings.bpm,
+                      timeSignature: state.settings.timeSignature.label,
+                      onDecrement:
+                          () => ref
+                              .read(metronomeProvider.notifier)
+                              .incrementBpm(-5),
+                      onIncrement:
+                          () => ref
+                              .read(metronomeProvider.notifier)
+                              .incrementBpm(5),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space4),
 
                 // Play/Pause button
-                _PlayPauseButton(
-                  isPlaying: state.isPlaying,
-                  onPressed:
-                      () => ref.read(metronomeProvider.notifier).toggle(),
+                Semantics(
+                  label: state.isPlaying ? '메트로놈 정지' : '메트로놈 재생',
+                  button: true,
+                  onTap: () => ref.read(metronomeProvider.notifier).toggle(),
+                  child: _PlayPauseButton(
+                    isPlaying: state.isPlaying,
+                    onPressed:
+                        () => ref.read(metronomeProvider.notifier).toggle(),
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.space2),
 
