@@ -1,4 +1,5 @@
 # Import all models so Alembic can detect them via Base.metadata
+from app.models.app_billing import AppBillingPlan, AppBillingReceipt  # noqa: F401
 from app.models.app_version import AppNews, AppRoadmap, AppVersion  # noqa: F401
 from app.models.audit_log import AuditLog  # noqa: F401
 from app.models.base import Base  # noqa: F401
