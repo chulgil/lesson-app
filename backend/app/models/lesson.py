@@ -4,19 +4,22 @@ from datetime import date, datetime
 from sqlalchemy import (
     JSON,
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Enum,
+    ForeignKey,
     Index,
     Integer,
     Numeric,
-    ForeignKey,
     String,
     Text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
+
+# ruff: noqa: N815, UP042
 
 
 class LessonClassType(str, enum.Enum):
@@ -176,6 +179,7 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         ForeignKey("subscriptions.id", ondelete="SET NULL"),
         nullable=True,
     )
+    session_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     lesson_source: Mapped[LessonSource] = mapped_column(
         Enum(LessonSource, native_enum=True),
         nullable=False,
@@ -191,7 +195,12 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         Index("idx_lesson_status", "status"),
         Index("idx_lesson_source", "lesson_source"),
         Index("idx_lesson_subscription", "subscription_id"),
+        Index("idx_lesson_subscription_session", "subscription_id", "session_number"),
         Index("idx_lesson_teacher_date", "teacher_id", "date"),
+        CheckConstraint(
+            "session_number IS NULL OR session_number >= 1",
+            name="ck_lessons_session_number_positive",
+        ),
     )
 
 

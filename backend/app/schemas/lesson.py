@@ -164,6 +164,7 @@ class LessonResponse(BaseModel):
     practice_tips: str | None = None
     student_note: str | None = None
     subscription_id: str | None = None
+    session_number: int | None = Field(default=None, ge=1)
     location_name: str | None = None
     location_address: str | None = None
     created_at: _dt.datetime | None = None
@@ -181,6 +182,7 @@ class LessonCreate(BaseModel):
     pieces: list[LessonPieceCreate] = []
     location_name: str | None = None
     subscription_id: str | None = None
+    session_number: int | None = Field(default=None, ge=1)
 
 
 class LessonUpdate(BaseModel):

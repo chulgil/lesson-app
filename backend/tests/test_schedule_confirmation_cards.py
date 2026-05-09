@@ -664,8 +664,83 @@ async def test_confirmation_card_confirm_does_not_duplicate_subscription_booking
     assert len(lessons) == 1
     assert len(bookings) == 1
     assert lessons[0].lesson_source == "subscriptionGenerated"
+    assert lessons[0].session_number == 1
     assert bookings[0].scheduled_time == "15:00"
     assert bookings[0].subscription_id == "dup-booking-subscription"
+
+
+@pytest.mark.asyncio
+async def test_confirmed_monthly_subscription_lessons_persist_session_numbers(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Subscription-generated lessons should store their session number for frontend lesson cards."""
+    from app.models.lesson import ClassMembership, Lesson, LessonClass
+    from app.models.policy import ScheduleConfirmationCard
+    from app.models.student import Student
+    from app.models.subscription import Subscription
+
+    await create_test_user(
+        user_id="session-teacher",
+        role="teacher",
+        name="Session Teacher",
+        email="session-teacher@test.com",
+    )
+    await create_test_user(
+        user_id="session-student-user",
+        role="student",
+        name="Session Student",
+        email="session-student@test.com",
+    )
+    lesson_class = LessonClass(id="session-class", teacher_id="session-teacher-prof", name="Session Class")
+    student = Student(
+        id="session-student",
+        user_id="session-student-user",
+        teacher_id="session-teacher-prof",
+        name="Session Student",
+        instrument="piano",
+    )
+    membership = ClassMembership(id="session-membership", lesson_class_id=lesson_class.id, student_id=student.id)
+    subscription = Subscription(
+        id="session-subscription",
+        student_id=student.id,
+        membership_id=membership.id,
+        type="monthly",
+        total_lessons=4,
+        amount=200000,
+    )
+    card = ScheduleConfirmationCard(
+        id="session-card",
+        student_id=student.id,
+        teacher_id="session-teacher-prof",
+        subscription_id=subscription.id,
+        card_type="afterTrial",
+        title="Confirm",
+        status="pending",
+        proposed_day=str((date.today().weekday() + 1) % 7),
+        proposed_time="16:00",
+        proposed_duration=60,
+        created_at=datetime.now(UTC),
+    )
+    db_session.add_all([lesson_class, student, membership, subscription, card])
+    await db_session.flush()
+
+    response = await client.patch(
+        "/api/v1/schedule/confirmation-cards/session-card/confirm",
+        headers=_headers("session-student-user", "student"),
+        json={"action": "confirmed"},
+    )
+
+    assert response.status_code == 200
+    lessons = (
+        await db_session.scalars(
+            select(Lesson)
+            .where(Lesson.subscription_id == "session-subscription")
+            .order_by(Lesson.date.asc(), Lesson.start_time.asc(), Lesson.id.asc())
+        )
+    ).all()
+    assert [lesson.session_number for lesson in lessons] == [1, 2, 3, 4]
 
 
 @pytest.mark.asyncio

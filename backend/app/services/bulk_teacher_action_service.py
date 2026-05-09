@@ -286,6 +286,8 @@ class BulkTeacherActionService:
 
         if lesson.subscription_id is None:
             return None
+        if getattr(lesson, "session_number", None) is not None:
+            return lesson.session_number
 
         result = await self.db.scalars(
             select(Lesson)

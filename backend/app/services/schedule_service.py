@@ -305,6 +305,8 @@ class ScheduleService:
                     "status": lesson.status.value if hasattr(lesson.status, "value") else lesson.status,
                     "student_id": lesson.student_id,
                     "lesson_id": lesson.id,
+                    "subscription_id": lesson.subscription_id,
+                    "session_number": lesson.session_number,
                     "lesson_source": (
                         lesson.lesson_source.value
                         if hasattr(lesson.lesson_source, "value")

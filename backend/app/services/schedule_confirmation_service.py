@@ -322,6 +322,7 @@ class ScheduleConfirmationService:
                 duration=duration,
                 status="scheduled",
                 subscription_id=card.subscription_id,
+                session_number=i + 1,
                 lesson_source=LessonSource.subscription_generated,
             )
             self.db.add(lesson)

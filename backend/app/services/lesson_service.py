@@ -92,6 +92,15 @@ class LessonService:
                     )
                 student_name = student.name
 
+        session_number = data.session_number
+        if data.subscription_id:
+            await self._assert_subscription_matches_lesson(
+                subscription_id=data.subscription_id,
+                student_id=data.student_id,
+            )
+            if session_number is None:
+                session_number = await self._next_subscription_session_number(data.subscription_id)
+
         lesson = Lesson(
             teacher_id=tid,
             student_id=data.student_id,
@@ -101,6 +110,7 @@ class LessonService:
             start_time=data.start_time or "00:00",
             duration=data.duration,
             subscription_id=data.subscription_id,
+            session_number=session_number,
             location_name=data.location_name,
             lesson_source=LessonSource.manual,
         )
@@ -109,6 +119,37 @@ class LessonService:
         await self.db.refresh(lesson)
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
         return LessonResponse.model_validate(lesson)
+
+    async def _assert_subscription_matches_lesson(self, *, subscription_id: str, student_id: str) -> None:
+        """Ensure a lesson cannot point at another student's subscription."""
+        from app.models.subscription import Subscription
+
+        subscription = await self.db.get(Subscription, subscription_id)
+        if subscription is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        if subscription.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="subscription_id does not belong to student_id",
+            )
+
+    async def _next_subscription_session_number(self, subscription_id: str) -> int:
+        """Return the next stable session number for a subscription-linked lesson."""
+        from app.models.lesson import Lesson
+
+        max_session = await self.db.scalar(
+            select(func.max(Lesson.session_number)).where(
+                Lesson.subscription_id == subscription_id,
+                Lesson.session_number.is_not(None),
+            )
+        )
+        if max_session is not None:
+            return int(max_session) + 1
+
+        existing_count = await self.db.scalar(
+            select(func.count()).where(Lesson.subscription_id == subscription_id)
+        )
+        return int(existing_count or 0) + 1
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:
         """Return a lesson by ID."""

@@ -124,6 +124,7 @@ app/
 - 알림 `read/unread`는 `notifications.read_at IS NULL` 단일 규칙으로 통일되어 있으며 `unread-count`의 집계도 동일 기준입니다.
 - 휴강일은 정규화된 조인 테이블(`teacher_announcement_dates`)로 모델링되어, 날짜 기반 조회/중복 방지 인덱스를 지원합니다.
 - 이벤트 타입은 `lessonCancelledByTeacher`, `teacherAnnouncement`까지 확장되어 프론트 이벤트 엔터티(`RequestEventType`) 정렬이 완료되었습니다.
+- 수강권으로 자동 생성되는 레슨은 `lessons.subscription_id`와 `lessons.session_number`를 함께 저장한다. `session_number`는 수강권 내 회차를 나타내며, 기존/수동 레슨은 `NULL`일 수 있다. `POST /api/v1/lessons`가 `subscription_id`를 받으면 `session_number` 미지정 시 다음 회차를 자동 배정한다.
 - 현재 런타임은 PostgreSQL 17을 SSOT로 운용하며, Redis는 캐시/락 계층 후보로만 사용하고 별도 Graph DB는 도입하지 않습니다.
 
 ### 아키텍처 가드레일

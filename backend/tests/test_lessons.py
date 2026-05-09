@@ -40,6 +40,63 @@ async def test_create_lesson(client: AsyncClient, auth_headers, create_test_user
 
 
 @pytest.mark.asyncio
+async def test_create_subscription_lesson_assigns_next_session_number(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """Manual lesson creation with subscription_id should persist the next subscription session."""
+    from datetime import date
+
+    from app.models.lesson import ClassMembership, Lesson, LessonClass
+    from app.models.subscription import Subscription
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    student = Student(id="student-001", teacher_id="test-user-id-prof", name="Student", instrument="violin")
+    lesson_class = LessonClass(id="class-001", teacher_id="test-user-id-prof", name="Class")
+    membership = ClassMembership(id="membership-001", lesson_class_id="class-001", student_id="student-001")
+    subscription = Subscription(
+        id="sub-001",
+        student_id="student-001",
+        membership_id="membership-001",
+        type="package",
+        total_lessons=4,
+        amount=200000,
+    )
+    existing_lesson = Lesson(
+        student_id="student-001",
+        teacher_id="test-user-id-prof",
+        student_name="Student",
+        instrument="violin",
+        date=date(2026, 3, 3),
+        start_time="14:00",
+        duration=60,
+        subscription_id="sub-001",
+        session_number=1,
+    )
+    db_session.add_all([lesson_class, student, membership, subscription, existing_lesson])
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "instrument": "violin",
+            "date": "2026-03-10",
+            "start_time": "14:00",
+            "duration": 60,
+            "subscription_id": "sub-001",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["subscription_id"] == "sub-001"
+    assert response.json()["session_number"] == 2
+
+
+@pytest.mark.asyncio
 async def test_list_lessons(client: AsyncClient, auth_headers, create_test_user):
     """GET /api/v1/lessons returns a paginated list of lessons."""
     await create_test_user(user_id="test-user-id", role="teacher")

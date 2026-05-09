@@ -311,6 +311,13 @@ class AnnouncementService:
         for lesson in all_lessons:
             if lesson.subscription_id is None:
                 continue
+            if lesson.session_number is not None:
+                lesson_to_session[lesson.id] = lesson.session_number
+                counters[lesson.subscription_id] = max(
+                    counters.get(lesson.subscription_id, 0),
+                    lesson.session_number,
+                )
+                continue
             position = counters.get(lesson.subscription_id, 0) + 1
             counters[lesson.subscription_id] = position
             lesson_to_session[lesson.id] = position
