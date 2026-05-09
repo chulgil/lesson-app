@@ -1,4 +1,4 @@
-// Compact billing plan badge for profile and app bar display.
+// Compact billing plan badge — Notebook × Score design.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/billing_plan.dart';
 import '../providers/billing_provider.dart';
 
 /// Displays the current billing plan as a compact badge.
-///
-/// Shows plan name + remaining days for trials/subscriptions.
 class BillingPlanBadge extends ConsumerWidget {
   const BillingPlanBadge({super.key});
 
@@ -36,12 +35,12 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, color) = switch (status.planType) {
-      BillingPlanType.trialPro => (AppStrings.billingTrialBadge, AppColors.paperTrial),
-      BillingPlanType.pro => (AppStrings.billingProBadge, AppColors.paperAccent),
-      BillingPlanType.studio => (AppStrings.billingStudioBadge, AppColors.profilePurple),
-      BillingPlanType.lifetime => (AppStrings.billingLifetimeBadge, AppColors.amber),
-      BillingPlanType.free => ('Free', AppColors.inkTertiary),
+    final label = switch (status.planType) {
+      BillingPlanType.trialPro => AppStrings.billingTrialBadge,
+      BillingPlanType.pro => AppStrings.billingProBadge,
+      BillingPlanType.studio => AppStrings.billingStudioBadge,
+      BillingPlanType.lifetime => AppStrings.billingLifetimeBadge,
+      BillingPlanType.free => 'Free',
     };
 
     return Container(
@@ -49,28 +48,29 @@ class _Badge extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: 2,
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
+      decoration: const BoxDecoration(
+        color: AppColors.paperAccentSoft,
+        border: Border.fromBorderSide(
+          BorderSide(color: AppColors.paperAccent, width: 0.5),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
+            style: AppTypography.captionSmall.copyWith(
+              color: AppColors.paperAccent,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           if (status.daysRemaining != null && status.isTrial) ...[
             const SizedBox(width: AppSpacing.space1),
             Text(
               '${status.daysRemaining}일',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: color.withValues(alpha: 0.8),
-                  ),
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
           ],
         ],

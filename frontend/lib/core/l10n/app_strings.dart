@@ -6995,4 +6995,12 @@ class AppStrings {
   static String billingDaysLeft(int days) => '$days일 남음';
   static const billingRestorePurchase = '구매 복원';
   static const billingManageSubscription = '구독 관리';
+  static const billingFreePrice = '무료';
+  static const billingSubscribeMonthly = '월간 구독';
+  static const billingSubscribeYearly = '연간 구독';
+  static const billingBuyLifetime = '구매하기';
+  static const billingProductNotAvailable = '상품 정보를 불러올 수 없습니다';
+  static String billingPlanActivated(String plan) => '$plan 플랜이 활성화되었습니다';
+  static const billingPurchasePending = '결제가 처리 중입니다';
+  static const billingRestoreComplete = '구매 복원이 완료되었습니다';
 }

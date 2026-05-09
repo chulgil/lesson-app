@@ -1,4 +1,4 @@
-// Subscription plans comparison screen with IAP purchase flow.
+// Subscription plans comparison screen — Notebook × Score design.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +7,12 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_glyph.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../data/services/iap_service.dart';
 import '../../domain/entities/billing_plan.dart';
 import '../providers/billing_provider.dart';
@@ -19,13 +25,9 @@ class BillingPlansScreen extends ConsumerWidget {
     final billingAsync = ref.watch(billingStatusNotifierProvider);
     final storeProductsAsync = ref.watch(storeProductsProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: const Text(AppStrings.billingViewPlans),
-        backgroundColor: AppColors.paper,
-        foregroundColor: AppColors.ink,
-        elevation: 0,
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.billingViewPlans,
       ),
       body: billingAsync.when(
         data: (status) => _BillingPlansBody(
@@ -36,7 +38,9 @@ class BillingPlansScreen extends ConsumerWidget {
         error: (e, _) => Center(
           child: Text(
             '$e',
-            style: TextStyle(color: AppColors.inkSecondary),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
         ),
       ),
@@ -56,23 +60,22 @@ class _BillingPlansBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
         // Current plan banner
         _CurrentPlanBanner(status: currentStatus),
-        const SizedBox(height: AppSpacing.space6),
+        const SizedBox(height: AppSpacing.space5),
 
         // Plan cards
         _PlanCard(
           planName: 'Free',
-          price: '무료',
+          price: AppStrings.billingFreePrice,
           features: const [
             '학생 5명까지',
             '기본 레슨 관리',
             '스케줄 관리',
           ],
           isCurrent: currentStatus.isFree,
-          accentColor: AppColors.inkTertiary,
         ),
         const SizedBox(height: AppSpacing.space3),
 
@@ -89,7 +92,7 @@ class _BillingPlansBody extends ConsumerWidget {
           ],
           isCurrent: currentStatus.planType == BillingPlanType.pro,
           isTrial: currentStatus.isTrial,
-          accentColor: AppColors.paperAccent,
+          isHighlighted: true,
           onSubscribeMonthly: currentStatus.isPaid
               ? null
               : () => _purchase(context, ref, IapProductIds.proMonthly),
@@ -109,7 +112,6 @@ class _BillingPlansBody extends ConsumerWidget {
             '분석 리포트',
           ],
           isCurrent: currentStatus.planType == BillingPlanType.studio,
-          accentColor: AppColors.profilePurple,
           onSubscribeMonthly: currentStatus.isPaid &&
                   currentStatus.planType != BillingPlanType.pro
               ? null
@@ -127,20 +129,21 @@ class _BillingPlansBody extends ConsumerWidget {
             '평생 업데이트',
           ],
           isCurrent: currentStatus.planType == BillingPlanType.lifetime,
-          accentColor: AppColors.amber,
           onSubscribeMonthly: currentStatus.planType == BillingPlanType.lifetime
               ? null
               : () => _purchase(context, ref, IapProductIds.lifetime),
         ),
-        const SizedBox(height: AppSpacing.space6),
+        const SizedBox(height: AppSpacing.space5),
 
         // Restore purchases
         Center(
           child: TextButton(
             onPressed: () => _restore(context, ref),
-            child: const Text(
+            child: Text(
               AppStrings.billingRestorePurchase,
-              style: TextStyle(color: AppColors.inkTertiary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
             ),
           ),
         ),
@@ -167,7 +170,13 @@ class _BillingPlansBody extends ConsumerWidget {
     if (products.isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('상품 정보를 불러올 수 없습니다')),
+          SnackBar(
+            backgroundColor: AppColors.paperDark,
+            content: Text(
+              AppStrings.billingProductNotAvailable,
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+            ),
+          ),
         );
       }
       return;
@@ -182,18 +191,34 @@ class _BillingPlansBody extends ConsumerWidget {
         ref.read(billingStatusNotifierProvider.notifier).refresh();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${status.plan} 플랜이 활성화되었습니다'),
+            backgroundColor: AppColors.paperDark,
+            content: Text(
+              AppStrings.billingPlanActivated(status.plan),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+            ),
           ),
         );
       case IapPurchaseError(:final message):
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
+          SnackBar(
+            backgroundColor: AppColors.paperDark,
+            content: Text(
+              message,
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+            ),
+          ),
         );
       case IapPurchaseCancelled():
         break;
       case IapPurchasePending():
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('결제가 처리 중입니다')),
+          SnackBar(
+            backgroundColor: AppColors.paperDark,
+            content: Text(
+              AppStrings.billingPurchasePending,
+              style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+            ),
+          ),
         );
     }
   }
@@ -202,7 +227,13 @@ class _BillingPlansBody extends ConsumerWidget {
     await ref.read(billingStatusNotifierProvider.notifier).restorePurchase();
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('구매 복원이 완료되었습니다')),
+        SnackBar(
+          backgroundColor: AppColors.paperDark,
+          content: Text(
+            AppStrings.billingRestoreComplete,
+            style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+          ),
+        ),
       );
     }
   }
@@ -216,47 +247,38 @@ class _CurrentPlanBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, color) = switch (status.planType) {
-      BillingPlanType.free => ('Free', AppColors.inkTertiary),
-      BillingPlanType.trialPro => (AppStrings.billingTrialBadge, AppColors.paperTrial),
-      BillingPlanType.pro => (AppStrings.billingProBadge, AppColors.paperAccent),
-      BillingPlanType.studio => (AppStrings.billingStudioBadge, AppColors.profilePurple),
-      BillingPlanType.lifetime => (AppStrings.billingLifetimeBadge, AppColors.amber),
+    final label = switch (status.planType) {
+      BillingPlanType.free => 'Free',
+      BillingPlanType.trialPro => AppStrings.billingTrialBadge,
+      BillingPlanType.pro => AppStrings.billingProBadge,
+      BillingPlanType.studio => AppStrings.billingStudioBadge,
+      BillingPlanType.lifetime => AppStrings.billingLifetimeBadge,
     };
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+      decoration: const BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border(
+          top: BorderSide(color: AppColors.ink, width: 2),
+          bottom: BorderSide(color: AppColors.inkQuaternary),
+        ),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space1,
-            ),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+          Text(
+            label,
+            style: NotebookTypography.sectionTitle.copyWith(
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               _statusText(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.ink,
-                  ),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
           ),
         ],
@@ -278,7 +300,7 @@ class _CurrentPlanBanner extends StatelessWidget {
   }
 }
 
-// ── Plan card ──────────────────────────────────────────────────
+// ── Plan card — Notebook style ──────────────────────────────
 
 class _PlanCard extends StatelessWidget {
   final String planName;
@@ -288,19 +310,19 @@ class _PlanCard extends StatelessWidget {
   final List<String> features;
   final bool isCurrent;
   final bool isTrial;
-  final Color accentColor;
+  final bool isHighlighted;
   final VoidCallback? onSubscribeMonthly;
   final VoidCallback? onSubscribeYearly;
 
   const _PlanCard({
     required this.planName,
     required this.price,
-    this.yearlyPrice,
-    this.subtitle,
     required this.features,
     required this.isCurrent,
+    this.yearlyPrice,
+    this.subtitle,
     this.isTrial = false,
-    required this.accentColor,
+    this.isHighlighted = false,
     this.onSubscribeMonthly,
     this.onSubscribeYearly,
   });
@@ -309,10 +331,9 @@ class _PlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        color: AppColors.paper,
         border: Border.all(
-          color: isCurrent ? accentColor : AppColors.inkQuaternary,
+          color: isCurrent ? AppColors.paperAccent : AppColors.inkQuaternary,
           width: isCurrent ? 2 : 1,
         ),
       ),
@@ -324,10 +345,9 @@ class _PlanCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.08),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusMedium),
-              ),
+              color: isHighlighted
+                  ? AppColors.paperAccentSoft
+                  : AppColors.paperDark,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,11 +356,9 @@ class _PlanCard extends StatelessWidget {
                   children: [
                     Text(
                       planName,
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: accentColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: NotebookTypography.sectionTitle.copyWith(
+                        color: AppColors.ink,
+                      ),
                     ),
                     if (isCurrent) ...[
                       const SizedBox(width: AppSpacing.space2),
@@ -349,21 +367,15 @@ class _PlanCard extends StatelessWidget {
                           horizontal: AppSpacing.space2,
                           vertical: 2,
                         ),
-                        decoration: BoxDecoration(
-                          color: accentColor,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusSmall,
-                          ),
+                        decoration: const BoxDecoration(
+                          color: AppColors.paperAccent,
                         ),
                         child: Text(
                           isTrial ? '체험 중' : '현재',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: AppTypography.captionSmall.copyWith(
+                            color: AppColors.paper,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -372,24 +384,25 @@ class _PlanCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   price,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.ink,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: AppTypography.headingMedium.copyWith(
+                    color: AppColors.ink,
+                  ),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.space1),
                   Text(
                     subtitle!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.paperTrial,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: AppTypography.captionSmall.copyWith(
+                      color: AppColors.paperTrial,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ],
             ),
           ),
+
+          const ThinRule(),
 
           // Features
           Padding(
@@ -400,20 +413,20 @@ class _PlanCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.check_circle_outline_rounded,
-                          size: 18,
-                          color: accentColor,
+                        NotebookGlyph(
+                          NotebookGlyph.check,
+                          size: 14,
+                          color: AppColors.paperOk,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Expanded(
                           child: Text(
                             feature,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(color: AppColors.ink),
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.ink,
+                            ),
                           ),
                         ),
                       ],
@@ -424,14 +437,10 @@ class _PlanCard extends StatelessWidget {
           ),
 
           // Action buttons
-          if (onSubscribeMonthly != null || onSubscribeYearly != null)
+          if (onSubscribeMonthly != null || onSubscribeYearly != null) ...[
+            const ThinRule(),
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.space4,
-                0,
-                AppSpacing.space4,
-                AppSpacing.space4,
-              ),
+              padding: const EdgeInsets.all(AppSpacing.space4),
               child: Column(
                 children: [
                   if (onSubscribeMonthly != null)
@@ -440,19 +449,18 @@ class _PlanCard extends StatelessWidget {
                       child: FilledButton(
                         onPressed: onSubscribeMonthly,
                         style: FilledButton.styleFrom(
-                          backgroundColor: accentColor,
+                          backgroundColor: AppColors.paperAccent,
+                          foregroundColor: AppColors.paper,
                           minimumSize: const Size(
                             double.infinity,
                             AppSpacing.buttonHeightSmall,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMedium,
-                            ),
-                          ),
+                          shape: const RoundedRectangleBorder(),
                         ),
                         child: Text(
-                          planName == 'Lifetime' ? '구매하기' : '월간 구독',
+                          planName == 'Lifetime'
+                              ? AppStrings.billingBuyLifetime
+                              : AppStrings.billingSubscribeMonthly,
                         ),
                       ),
                     ),
@@ -463,20 +471,16 @@ class _PlanCard extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: onSubscribeYearly,
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: accentColor),
+                          foregroundColor: AppColors.ink,
+                          side: const BorderSide(color: AppColors.inkQuaternary),
                           minimumSize: const Size(
                             double.infinity,
                             AppSpacing.buttonHeightSmall,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMedium,
-                            ),
-                          ),
+                          shape: const RoundedRectangleBorder(),
                         ),
                         child: Text(
-                          '연간 구독 ${yearlyPrice ?? ''}',
-                          style: TextStyle(color: accentColor),
+                          '${AppStrings.billingSubscribeYearly} ${yearlyPrice ?? ''}',
                         ),
                       ),
                     ),
@@ -484,6 +488,7 @@ class _PlanCard extends StatelessWidget {
                 ],
               ),
             ),
+          ],
         ],
       ),
     );

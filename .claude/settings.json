@@ -77,6 +77,11 @@
                         "type": "command",
                         "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-widget-smoke-test.sh",
                         "timeout": 5000
+                    },
+                    {
+                        "type": "command",
+                        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-notebook-design.sh",
+                        "timeout": 5000
                     }
                 ]
             }

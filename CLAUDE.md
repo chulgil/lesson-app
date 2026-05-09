@@ -77,6 +77,7 @@ flutter analyze                                              # 분석
 | `adaptive-quality.md` | 작업 난이도별 검증 강도 (ultra/balanced/fast) |
 | **UI/UX** | |
 | `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
+| `notebook-design-gate.md` | Notebook × Score 디자인 필수 준수 (Scaffold/AppBar/색상/모서리/아이콘/타이포) |
 | `frontend-verify.md` | Playwright 스크린샷 기반 회귀 검증 |
 | **기술 가이드** | |
 | `tech-patterns.md` | 기술 에러 패턴 (Provider/Mock/iOS/CRUD/레이아웃) |

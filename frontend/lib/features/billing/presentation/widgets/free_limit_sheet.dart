@@ -1,4 +1,5 @@
 // Bottom sheet shown when a free-plan teacher tries to add a 6th student.
+// Notebook × Score design — paper bg, ink text, straight edges, no rounded icons.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,23 +9,18 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_glyph.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../providers/billing_provider.dart';
 
 /// Shows a paywall sheet when the free plan student limit is reached.
-///
-/// Offers two paths:
-/// 1. Start 14-day Pro trial (if not already used)
-/// 2. View subscription plans
 Future<void> showFreeLimitSheet(BuildContext context) {
-  return showModalBottomSheet(
+  return showNotebookModalBottomSheet(
     context: context,
-    backgroundColor: AppColors.paper,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusLarge),
-      ),
-    ),
     builder: (_) => const _FreeLimitSheetBody(),
   );
 }
@@ -38,57 +34,49 @@ class _FreeLimitSheetBody extends ConsumerWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag handle
-            Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.inkQuaternary,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            // Handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                color: AppColors.inkSecondary,
               ),
             ),
-            const SizedBox(height: AppSpacing.space6),
+            const SizedBox(height: AppSpacing.space5),
 
-            // Icon
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.workspace_premium_rounded,
-                color: AppColors.paperAccent,
-                size: 32,
-              ),
+            // Title with glyph
+            Row(
+              children: [
+                const NotebookGlyph(
+                  NotebookGlyph.starFilled,
+                  size: 18,
+                  color: AppColors.paperAccent,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.billingFreeLimitTitle,
+                  style: NotebookTypography.sectionTitle,
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space3),
 
-            // Title
-            Text(
-              AppStrings.billingFreeLimitTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.ink,
-                    fontWeight: FontWeight.bold,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
+            const ThinRule(),
+            const SizedBox(height: AppSpacing.space3),
 
             // Description
             Text(
               AppStrings.billingFreeLimitDescription,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-              textAlign: TextAlign.center,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
-            const SizedBox(height: AppSpacing.space6),
+            const SizedBox(height: AppSpacing.space5),
 
             // Trial button
             billingAsync.when(
@@ -107,15 +95,12 @@ class _FreeLimitSheetBody extends ConsumerWidget {
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
+                      foregroundColor: AppColors.paper,
                       minimumSize: const Size(
                         double.infinity,
                         AppSpacing.buttonHeight,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMedium,
-                        ),
-                      ),
+                      shape: const RoundedRectangleBorder(),
                     ),
                     child: const Text(AppStrings.billingStartTrial),
                   ),
@@ -138,16 +123,13 @@ class _FreeLimitSheetBody extends ConsumerWidget {
                   context.push(AppRoutes.billingPlans);
                 },
                 style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.ink,
                   minimumSize: const Size(
                     double.infinity,
                     AppSpacing.buttonHeight,
                   ),
                   side: const BorderSide(color: AppColors.inkQuaternary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 child: const Text(AppStrings.billingViewPlans),
               ),
