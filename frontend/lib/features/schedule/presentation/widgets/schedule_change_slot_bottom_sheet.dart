@@ -303,7 +303,7 @@ class _ScheduleChangeSlotBottomSheetState
 
     final slot = TimeSlot(
       id: 'slot_${DateTime.now().millisecondsSinceEpoch}',
-      dayOfWeek: cellInfo.date.weekday % 7,
+      dayOfWeek: cellInfo.date.weekday,
       startTime:
           TimeOfDay(hour: cellInfo.hour, minute: cellInfo.minute).toClockTime(),
       endTime: TimeOfDay(hour: endHour, minute: endMin).toClockTime(),

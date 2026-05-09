@@ -71,14 +71,19 @@ NotebookDetailScaffold
 
 ## 3. AppBar 규칙
 
+**HARD-GATE**: 모든 상세 화면은 `NotebookDetailAppBar`를 사용한다. `AppBar(` 직접 사용 금지.
+
 | 항목 | 규칙 |
 |------|------|
-| titleSpacing | 0 |
+| 위젯 | `NotebookDetailAppBar(title:)` 또는 `NotebookDetailAppBar(titleWidget:)` |
+| titleSpacing | 0 (NotebookDetailAppBar 내부 자동 적용) |
 | title 포맷 | `학원이름 학생이름 (타입)` 또는 `학생이름 (타입)` |
 | title 스타일 | `NotebookTypography.appBarTitle` |
 | 학원 판별 | `LessonClass.type == academy` → name이 학원 이름 |
 | 타입 라벨 | 레슨요청: `request.typeDisplayLabel`, 수강권: `subscription.typeLabel` |
 | 배경 | 화면 배경과 같은 `AppColors.paper` 톤. Material 기본 surface tint 금지 |
+| 액션 | `DetailAppBarAction` enum 사용 (add/edit/delete/share/more/settings) |
+| 적용 화면 | RequestDetailScreen, SubscriptionDetailScreen, AnnouncementHistoryScreen, BillingPlansScreen |
 
 ## 4. 프로그레스바 규칙
 
