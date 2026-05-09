@@ -278,7 +278,7 @@
       "SubscriptionService validates turn order for terminal schedule-change responses.",
       "Parents can read linked child events but cannot create schedule-change events."
     ],
-    "frontend_remote_status": "backend_ready_not_client_bound",
+    "frontend_remote_status": "partial",
     "frontend_notes": [
       "수행중인 백엔드 계약 자체는 완결(이벤트 SSOT, pending 목록, use-reschedule 포함).",
       "프론트엔드 Provider 계층의 remote 연결 여부는 별도 Flutter 검증 항목으로 추적한다."
