@@ -41,7 +41,7 @@ import '../../../lessons/lessons_facade.dart';
 ///
 /// 구조 2 적용:
 /// - NotebookMasthead: 상단 2px ink + 1px ink 라인 사이 헤더
-/// - "Fine." 푸터: 하단 ThinRule + 종지부 라벨 + "+ 레슨 추가" 액션
+/// - 헤더 액션(+): 레슨 추가 진입점 우선 배치
 class StudentDetailScreen extends ConsumerWidget {
   final String studentId;
   final String? membershipId;
@@ -144,9 +144,7 @@ class _StudentDetailContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileImagePath =
-        ref
-            .watch(studentProfileImageNotifierProvider(student.id))
-            .valueOrNull;
+        ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
 
     return DefaultTabController(
       length: 3,
@@ -154,7 +152,13 @@ class _StudentDetailContent extends ConsumerWidget {
         backgroundColor: AppColors.paper,
         appBar: NotebookDetailAppBar(
           title: student.name,
+          actions: [DetailAppBarAction.add],
           onLeadingTap: () => context.pop(),
+          onAction: (action) {
+            if (action == DetailAppBarAction.add) {
+              context.push('${AppRoutes.addLesson}?studentId=${student.id}');
+            }
+          },
           customActions: [
             IconButton(
               onPressed: () => _showMoreOptions(context, ref),
@@ -219,14 +223,7 @@ class _StudentDetailContent extends ConsumerWidget {
                   ],
                 ),
               ),
-              // ── "Fine." 푸터 + 레슨 추가 액션 ──
-              _FineActionBar(
-                onAddLesson: () {
-                  context.push(
-                    '${AppRoutes.addLesson}?studentId=${student.id}',
-                  );
-                },
-              ),
+              const SizedBox(height: AppSpacing.space4),
             ],
           ),
         ),
@@ -499,10 +496,7 @@ class _StudentDetailContent extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '$studentName 학생의 학부모를 초대합니다',
-            style: AppTypography.bodyMedium,
-          ),
+          Text('$studentName 학생의 학부모를 초대합니다', style: AppTypography.bodyMedium),
           const SizedBox(height: AppSpacing.space4),
           Container(
             padding: const EdgeInsets.symmetric(
@@ -544,9 +538,7 @@ class _StudentDetailContent extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '* 코드는 24시간 동안 유효합니다',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -732,57 +724,6 @@ class _RomanTab extends StatelessWidget {
         const SizedBox(width: 6),
         Text(label),
       ],
-    );
-  }
-}
-
-/// "Fine." 푸터 + 레슨 추가 액션 — FloatingActionButton 대체.
-class _FineActionBar extends StatelessWidget {
-  final VoidCallback onAddLesson;
-
-  const _FineActionBar({required this.onAddLesson});
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.paper,
-      child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            const ThinRule(),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space2,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('Fine.', style: NotebookTypography.fine),
-                  const Spacer(),
-                  TextButton.icon(
-                    onPressed: onAddLesson,
-                    icon: const Icon(Icons.add, size: 18, color: AppColors.ink),
-                    label: Text(
-                      '레슨 추가',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.ink,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -584,6 +584,7 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 - [ ] flutter analyze 경고 없음
 - [ ] 다른 화면과 레이아웃 일관적인가?
 - [ ] 2탭 이내 도달 가능한가?
+- [ ] 헤더에 + 액션이 있으면 바디 동일 add CTA 중복이 없는가?
 ```
 
 ---
@@ -599,5 +600,6 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 2026-04-16 | 긴급 알림 Top 1 정책, Progressive Disclosure 원칙, 스파크라인 가이드라인 추가 (§2.5~2.7) |
 | 2026-05-04 | **Notebook x Score 팔레트 마이그레이션 반영** — 레거시 토큰(primary/success/warning/error/info/surfaceLight/borderLight/textPrimaryLight 등) 제거, Notebook 팔레트(paper/ink/paperAccent/paperOk) 기준으로 전면 갱신. 카드·버튼·뱃지·칩·긴급도 색상 규칙 모두 현행 코드와 동기화. 버튼 BorderRadius.zero 시그니처 반영 |
 | 2026-05-04 | **수강권 3색 잉크 체계 추가** — `paperTrial`/`paperTrialSoft` 토큰, §6.1 수강권 카드 섹션에 3색 잉크 체계(trial=세피아, monthly=녹색, package=버밀리온) 및 `SubscriptionCard(compact)` 통합 문서화 |
+| 2026-05-09 | 헤더 + 액션 우선 규칙: 동일 엔티티 add 액션은 헤더에서만 노출하고 바디 중복 CTA를 제거한다 |
 | 2026-05-09 | **§4.3 상세 화면 헤더 통일** — `NotebookDetailAppBar` 공통 위젯 + 적용 규칙. 모든 상세 화면 헤더 일관성 (back/close leading, enum 기반 actions, bottom border). `Icons.more_vert` (세로 ⋮) 통일, `more_horiz` 금지 |
 | 2026-05-05 | **회계식 기존 표현 → "입금대기(후불)" 용어 변경** — 회계/채권 뉘앙스를 줄이고 후불 발급 상태를 명확히 드러내도록 통일. indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |

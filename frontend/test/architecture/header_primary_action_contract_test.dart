@@ -21,7 +21,7 @@ void main() {
         violations,
         isEmpty,
         reason:
-            '아래 화면은 AppBar의 + 추가 액션과 동일한 의미의 하단/빈상태 add CTA를 동시에 노출하고 있습니다. 헤더 액션 우선 규칙에 따라 중복을 제거하세요.',
+            '아래 화면은 헤더 + 액션과 동일한 의미의 바디 add CTA를 동시에 노출하고 있습니다. 헤더 액션 우선 규칙에 따라 중복을 제거하세요.',
       );
     },
   );
@@ -39,12 +39,12 @@ List<File> _presentationScreenDartFiles(String root) {
 }
 
 bool _hasHeaderAddAction(String source) {
+  if (source.contains('DetailAppBarAction.add')) return true;
+
   var cursor = 0;
   while (true) {
     final appBarIndex = source.indexOf('AppBar(', cursor);
-    if (appBarIndex == -1) {
-      return false;
-    }
+    if (appBarIndex == -1) return false;
 
     final actionsIndex = source.indexOf('actions:', appBarIndex);
     if (actionsIndex != -1) {
@@ -75,7 +75,9 @@ bool _hasInBodyDuplicateAddAction(String source) {
       _hasEmptyStateAddAction(source) ||
       _hasLabeledButtonAddAction(source, 'FilledButton.icon') ||
       _hasLabeledButtonAddAction(source, 'OutlinedButton.icon') ||
-      _hasLabeledButtonAddAction(source, 'ElevatedButton.icon');
+      _hasLabeledButtonAddAction(source, 'ElevatedButton.icon') ||
+      _hasTextButtonAddAction(source) ||
+      _hasTextPrimaryBottomAddAction(source);
 }
 
 bool _hasFloatingActionAdd(String source) {
@@ -128,6 +130,30 @@ bool _hasLabeledButtonAddAction(String source, String buttonType) {
 
     final block = source.substring(index, closeParen + 1);
     if (_containsExactAddIcon(block) && block.contains('onPressed:')) {
+      return true;
+    }
+
+    cursor = closeParen + 1;
+  }
+}
+
+bool _hasTextPrimaryBottomAddAction(String source) {
+  return source.contains('_FineActionBar(');
+}
+
+bool _hasTextButtonAddAction(String source) {
+  var cursor = 0;
+  while (true) {
+    final index = source.indexOf('TextButton(', cursor);
+    if (index == -1) return false;
+
+    final openParen = source.indexOf('(', index);
+    final closeParen = _findMatchingParen(source, openParen);
+    if (closeParen == -1) return false;
+
+    final block = source.substring(index, closeParen + 1);
+    if ((block.contains('Icons.add') || _containsExactAddText(block)) &&
+        block.contains('onPressed:')) {
       return true;
     }
 
