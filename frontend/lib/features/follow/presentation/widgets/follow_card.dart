@@ -25,7 +25,7 @@ class FollowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTeacher = follow.targetType == FollowTargetType.teacher;
-    final displayName = follow.followingId; // TODO: Resolve to actual name
+    final displayName = follow.followingName ?? follow.followingId;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),

@@ -22,6 +22,9 @@ class Follow {
   /// Following target ID (teacher or academy)
   final String followingId;
 
+  /// Following target display name (resolved by backend via User JOIN)
+  final String? followingName;
+
   /// Target type (teacher or academy)
   final FollowTargetType targetType;
 
@@ -34,6 +37,7 @@ class Follow {
     required this.id,
     required this.followerId,
     required this.followingId,
+    this.followingName,
     required this.targetType,
     this.notificationEnabled = true,
     required this.createdAt,
@@ -43,6 +47,7 @@ class Follow {
   factory Follow.create({
     required String followerId,
     required String followingId,
+    String? followingName,
     required FollowTargetType targetType,
     bool notificationEnabled = true,
   }) {
@@ -60,6 +65,7 @@ class Follow {
     String? id,
     String? followerId,
     String? followingId,
+    String? followingName,
     FollowTargetType? targetType,
     bool? notificationEnabled,
     DateTime? createdAt,
@@ -68,6 +74,7 @@ class Follow {
       id: id ?? this.id,
       followerId: followerId ?? this.followerId,
       followingId: followingId ?? this.followingId,
+      followingName: followingName ?? this.followingName,
       targetType: targetType ?? this.targetType,
       notificationEnabled: notificationEnabled ?? this.notificationEnabled,
       createdAt: createdAt ?? this.createdAt,

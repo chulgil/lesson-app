@@ -264,7 +264,7 @@ class _SyncUserProfileChildrenProviderElement
 }
 
 String _$currentUserProfileHash() =>
-    r'898e198c53d3d6daf4fbbb417e0756a8578b99ad';
+    r'f7eb67af5e13cdd576a8f048483da13c8ae77bbc';
 
 /// Provider for the current user's profile with active role context
 ///

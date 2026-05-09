@@ -97,6 +97,9 @@ class Follow(UUIDMixin, Base):
 
     follower_id: Mapped[str] = mapped_column(String(36), nullable=False)
     following_id: Mapped[str] = mapped_column(String(36), nullable=False)
+
+    # Non-column attribute, populated by service layer via User JOIN
+    following_name: str | None = None
     target_type: Mapped[FollowTargetType] = mapped_column(
         Enum(FollowTargetType, native_enum=True),
         nullable=False,

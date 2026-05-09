@@ -164,6 +164,7 @@ class FollowResponse(BaseModel):
     id: str
     follower_id: str
     following_id: str
+    following_name: str | None = None
     target_type: str | None = None
     notification_enabled: bool = True
     created_at: datetime | None = None

@@ -312,7 +312,21 @@ class RelationshipService:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
         result = await self.db.scalars(query.order_by(Follow.created_at.desc()).offset(offset).limit(size))
-        return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
+        follows = list(result.all())
+
+        # Resolve following_name via User JOIN
+        if follows:
+            from app.models.user import User
+
+            following_ids = [f.following_id for f in follows]
+            users_result = await self.db.scalars(
+                select(User).where(User.id.in_(following_ids))
+            )
+            name_map = {u.id: u.name for u in users_result.all()}
+            for f in follows:
+                f.following_name = name_map.get(f.following_id)
+
+        return PaginatedResponse.create(items=follows, total=total, page=page, size=size)
 
     async def update_follow(self, follow_id: str, data: dict[str, Any], current_user: Any) -> Any:
         """Update follow preferences."""

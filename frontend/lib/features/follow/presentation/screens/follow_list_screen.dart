@@ -105,7 +105,7 @@ class _FollowTab extends ConsumerWidget {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
       title: AppStrings.followCancelTitle,
-      content: Text('${follow.followingId}의 팔로우를 취소하시겠습니까?'),
+      content: Text('${follow.followingName ?? follow.followingId}의 팔로우를 취소하시겠습니까?'),
       confirmLabel: AppStrings.followCancelConfirmLabel,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
