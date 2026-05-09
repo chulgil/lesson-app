@@ -133,6 +133,75 @@ class SyncQueueStore {
     return SyncQueueEntry.fromMap(Map<String, dynamic>.from(raw));
   }
 
+  /// Remove synced entries and expired failed entries.
+  /// Keeps up to [maxEntries] pending entries (oldest removed first).
+  /// Failed entries older than [expireAfter] are deleted regardless of maxEntries.
+  Future<int> cleanup({
+    int maxEntries = 500,
+    Duration expireAfter = const Duration(days: 7),
+  }) async {
+    final box = await _openQueueBox();
+    int removed = 0;
+    final now = DateTime.now().toUtc();
+    final entriesToDelete = <dynamic>[];
+
+    // Collect all synced entries and expired failed entries
+    for (final key in box.keys) {
+      final raw = box.get(key);
+      if (raw is! Map<dynamic, dynamic>) {
+        continue;
+      }
+      final entryMap = Map<String, dynamic>.from(raw);
+      if (entryMap['id'] is! String || entryMap['status'] is! String) {
+        continue;
+      }
+
+      final status = entryMap['status'] as String;
+
+      // Remove all synced entries
+      if (status == 'synced') {
+        entriesToDelete.add(key);
+        continue;
+      }
+
+      // Remove failed entries older than expireAfter
+      if (status == 'failed' && entryMap['createdAt'] is String) {
+        try {
+          final createdAt =
+              DateTime.parse(entryMap['createdAt'] as String).toUtc();
+          if (now.difference(createdAt) > expireAfter) {
+            entriesToDelete.add(key);
+          }
+        } catch (_) {
+          // Invalid date format, skip
+        }
+      }
+    }
+
+    // Delete collected entries
+    for (final key in entriesToDelete) {
+      await box.delete(key);
+      removed++;
+    }
+
+    // If still over maxEntries, remove oldest pending entries
+    if (removed < entriesToDelete.length) {
+      return removed; // Some deletions failed, return what succeeded
+    }
+
+    final allEntries = await fetchAll();
+    if (allEntries.length > maxEntries) {
+      final excess = allEntries.length - maxEntries;
+      // Remove oldest entries (already sorted by createdAt ascending)
+      for (int i = 0; i < excess; i++) {
+        await box.delete(allEntries[i].id);
+        removed++;
+      }
+    }
+
+    return removed;
+  }
+
   Future<void> close() async {
     if (Hive.isBoxOpen(boxName)) {
       await Hive.box<dynamic>(boxName).close();

@@ -512,7 +512,7 @@ final todayLessonsProvider = FutureProvider<List<Lesson>>.internal(
 );
 
 typedef TodayLessonsRef = FutureProviderRef<List<Lesson>>;
-String _$lessonsNotifierHash() => r'703437b5751ff16e2a5441b83758a0c004a47051';
+String _$lessonsNotifierHash() => r'a592f9e18b8c83c225746703979bcb0944938f62';
 
 /// Lesson list notifier for CRUD operations
 ///

@@ -306,5 +306,67 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 80));
       expect(errors, isEmpty);
     });
+
+    test('지수 백오프: retryCount 증가하면 재시도 지연이 증가한다', () async {
+      when(
+        () => apiClient.post<dynamic>(
+          any(),
+          data: any(named: 'data'),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).thenThrow(Exception('persistent failure'));
+
+      final service = await createService(
+        initialConnectivity: ConnectivityResult.wifi,
+        pollingInterval: const Duration(days: 1),
+      );
+
+      // 첫 시도: 0초 지연 (retryCount=0)
+      await service.queueMutation(
+        domain: 'lesson',
+        httpMethod: 'POST',
+        path: '/backoff-test',
+        payload: {'case': 'backoff'},
+      );
+
+      // 첫 번째 실패
+      await service.syncPending();
+      var entries = await store.fetchAll();
+      expect(entries.single.retryCount, equals(1));
+      expect(entries.single.status, equals(SyncQueueStatus.pending));
+
+      // retryCount=1이므로 1초 백오프 필요 → 즉시 재시도 불가
+      await service.syncPending();
+      entries = await store.fetchAll();
+      expect(entries.single.retryCount, equals(1)); // 변화 없음
+
+      // 1초 이상 경과 후 재시도 → retryCount=2로 증가, 2초 백오프 필요
+      await Future<void>.delayed(const Duration(seconds: 1, milliseconds: 100));
+      await service.syncPending();
+      entries = await store.fetchAll();
+      expect(entries.single.retryCount, equals(2));
+
+      // retryCount=2 → 2초 백오프, 즉시 재시도 불가
+      await service.syncPending();
+      entries = await store.fetchAll();
+      expect(entries.single.retryCount, equals(2));
+
+      // 2초 이상 경과 후 재시도 → retryCount=3으로 증가, 4초 백오프 필요
+      await Future<void>.delayed(const Duration(seconds: 2, milliseconds: 100));
+      await service.syncPending();
+      entries = await store.fetchAll();
+      expect(entries.single.retryCount, equals(3));
+
+      // retryCount 증가로 백오프 지연이 지수 증가함을 검증
+      verify(
+        () => apiClient.post<dynamic>(
+          any(),
+          data: any(named: 'data'),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        ),
+      ).called(greaterThanOrEqualTo(3));
+    });
   });
 }

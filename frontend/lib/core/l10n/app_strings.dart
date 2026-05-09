@@ -6926,4 +6926,8 @@ class AppStrings {
   static const subscriptionExpiredLabel = '만료됨';
   static const sortByInstrument = '악기순';
   static const sortByPracticeStatus = '연습상태별';
+
+  // ── Sync failures ──
+  static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
+  static const syncRetryAction = '재시도';
 }

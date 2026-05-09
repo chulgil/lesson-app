@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/sync/presentation/providers/sync_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -76,6 +77,9 @@ class DashboardTab extends ConsumerWidget {
               const DemoDashboardOverlay(),
 
               const SizedBox(height: AppSpacing.space4),
+
+              // ── Sync failure banner ────
+              _buildSyncFailureBanner(ref),
 
               // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
               // (home_master.md §3.5)
@@ -485,6 +489,74 @@ class DashboardTab extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// Sync failure notification banner.
+  /// Watches syncServiceStatsStream and displays warning when failed > 0.
+  /// Uses angular Notebook × Score design (no rounded corners, inkQuaternary border).
+  Widget _buildSyncFailureBanner(WidgetRef ref) {
+    return ref.watch(syncServiceStatsStreamProvider).when(
+      data: (stats) {
+        if (stats.failed == 0) {
+          return const SizedBox.shrink();
+        }
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.paperAccent.withValues(alpha: 0.12),
+            border: Border.all(
+              color: AppColors.inkQuaternary,
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space2,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.warning_outlined,
+                  color: AppColors.paperAccent,
+                  size: 18,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    AppStrings.syncFailedBanner(stats.failed),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                TextButton(
+                  onPressed: () {
+                    ref.read(syncServiceProvider).retryFailedEntries();
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 28),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    AppStrings.syncRetryAction,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.paperAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

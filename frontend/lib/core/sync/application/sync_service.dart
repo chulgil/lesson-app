@@ -72,6 +72,7 @@ class SyncService {
     _isInitialized = true;
 
     await _queueStore.runMigrations();
+    await _queueStore.cleanup();
     await _refreshStats();
     await syncPending();
 
@@ -118,6 +119,7 @@ class SyncService {
 
     try {
       await _flushQueue();
+      await _queueStore.cleanup();
       await _refreshStats(nextAction: 'all queued operations processed');
     } catch (_) {
       await _refreshStats(nextAction: 'sync error');
@@ -244,6 +246,16 @@ class SyncService {
     if (entry.status == SyncQueueStatus.synced) {
       return false;
     }
+
+    // For pending entries with retry count, check if backoff period has elapsed
+    if (entry.status == SyncQueueStatus.pending && entry.retryCount > 0) {
+      final requiredBackoff = _backoffDelay(entry.retryCount);
+      final timeSinceUpdate = DateTime.now().toUtc().difference(entry.updatedAt);
+      if (timeSinceUpdate < requiredBackoff) {
+        return false; // Still in backoff period
+      }
+    }
+
     return entry.isRetryable || entry.status == SyncQueueStatus.pending;
   }
 
@@ -312,5 +324,11 @@ class SyncService {
   (String? code, String message) _buildReplayError(Object error) {
     final errorText = '$error';
     return (null, errorText);
+  }
+
+  Duration _backoffDelay(int retryCount) {
+    // Exponential backoff: 2^retryCount, capped at 30 seconds
+    final baseSeconds = 1 << (retryCount - 1).clamp(0, 4); // 2^0=1, 2^1=2, 2^2=4, 2^3=8, 2^4=16
+    return Duration(seconds: baseSeconds.clamp(1, 30));
   }
 }
