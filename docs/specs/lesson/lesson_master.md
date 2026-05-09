@@ -1452,6 +1452,20 @@ frontend/lib/features/schedule/
 > **v2 (2026-05-09)**: 완료/취소/과거 레슨에는 스케줄 변경 버튼을 숨긴다.
 > 이미 끝난 레슨의 일정을 바꿀 수 없기 때문.
 
+### 12.3 회차 연동 (focusLessonId) — 2026-05-09
+
+레슨 상세에서 [스케줄 변경] 클릭 시, 해당 레슨이 수강권의 몇 회차인지를 수강권 상세 화면에 전달하여 **해당 회차가 자동 선택**되어야 한다.
+
+```
+레슨 상세 (4회차 레슨)
+  └→ [스케줄 변경] 클릭
+       └→ 수강권 상세 (focusLessonId: lesson.id)
+            └→ 4회차 자동 선택 → 4회차 스케줄 변경 진행
+```
+
+**구현**: `context.push(subscriptionDetail, extra: { focusLessonId: lesson.id })`
+**라우터**: `extra['focusLessonId']` → `SubscriptionDetailScreen.focusLessonId`
+
 ### 12.3 로직
 
 ```dart
