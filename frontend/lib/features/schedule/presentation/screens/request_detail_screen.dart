@@ -405,6 +405,72 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             ),
         child: Text(titleText, style: NotebookTypography.appBarTitle),
       ),
+      actions: const [DetailAppBarAction.more],
+      onAction: (action) {
+        if (action == DetailAppBarAction.more) {
+          _showMoreMenu(context, request);
+        }
+      },
+    );
+  }
+
+  void _showMoreMenu(BuildContext context, UnifiedLessonRequest request) {
+    final isTerminal = request.currentPhase == RequestPhase.terminal;
+    final items = <(IconData, String, VoidCallback)>[
+      if (!isTerminal)
+        (Icons.edit_outlined, AppStrings.modifyRequest, () {
+          Navigator.pop(context);
+          _handleModify(context, request);
+        }),
+      if (request.hasProposal)
+        (Icons.receipt_long_outlined, AppStrings.viewSubscription, () {
+          Navigator.pop(context);
+          _handleViewSubscription(context, request);
+        }),
+      if (!isTerminal)
+        (Icons.cancel_outlined, AppStrings.cancelRequestAction, () {
+          Navigator.pop(context);
+          _handleCancel(context, ref, request);
+        }),
+    ];
+
+    if (items.isEmpty) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLarge)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space2),
+            Container(
+              width: 32,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.inkQuaternary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            for (final (icon, label, onTap) in items)
+              ListTile(
+                leading: Icon(icon, color: label == AppStrings.cancelRequestAction ? AppColors.paperAccent : AppColors.ink),
+                title: Text(
+                  label,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: label == AppStrings.cancelRequestAction ? AppColors.paperAccent : AppColors.ink,
+                  ),
+                ),
+                onTap: onTap,
+              ),
+            const SizedBox(height: AppSpacing.space2),
+          ],
+        ),
+      ),
     );
   }
 

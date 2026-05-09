@@ -306,8 +306,14 @@ class AppStrings {
   /// 대안 시간 제안 성공
   static const alternativeProposeSent = '대안 시간과 함께 안내가 전달되었습니다';
 
+  /// 요청 수정
+  static const modifyRequest = '요청 수정';
+
   /// 요청 수정 준비 중
   static const modifyRequestPreparing = '요청 수정 기능은 준비 중입니다';
+
+  /// 수강권 보기
+  static const viewSubscription = '수강권 보기';
 
   /// 거절하기
   static const rejectAction = '거절하기';
