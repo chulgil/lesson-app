@@ -35,6 +35,7 @@ async def test_create_lesson(client: AsyncClient, auth_headers, create_test_user
     assert data["instrument"] == "violin"
     assert data["date"] == "2026-03-10"
     assert data["duration"] == 60
+    assert data["lesson_source"] == "manual"
     assert "id" in data
 
 

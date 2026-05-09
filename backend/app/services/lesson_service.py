@@ -75,7 +75,7 @@ class LessonService:
 
     async def create(self, data: LessonCreate, current_user: Any) -> LessonResponse:
         """Create a new lesson."""
-        from app.models.lesson import Lesson
+        from app.models.lesson import Lesson, LessonSource
         from app.models.student import Student
         from app.services.user_service import UserService
 
@@ -102,6 +102,7 @@ class LessonService:
             duration=data.duration,
             subscription_id=data.subscription_id,
             location_name=data.location_name,
+            lesson_source=LessonSource.manual,
         )
         self.db.add(lesson)
         await self.db.flush()

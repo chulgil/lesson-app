@@ -194,7 +194,9 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
         student,
     )
 
+    from app.models.lesson import Lesson
     from app.models.schedule import LessonBooking
+
     bookings = (await db_session.scalars(
         select(LessonBooking).where(
             LessonBooking.student_id == STUDENT_ID,
@@ -203,6 +205,19 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
     )).all()
     assert len(bookings) == 4  # monthly, total_lessons=4
     assert all(booking.subscription_id == sub.id for booking in bookings)
+
+    lessons = (await db_session.scalars(
+        select(Lesson).where(
+            Lesson.student_id == STUDENT_ID,
+            Lesson.teacher_id == TEACHER_PROF_ID,
+            Lesson.subscription_id == sub.id,
+        )
+    )).all()
+    assert len(lessons) == 4
+    assert all(
+        lesson.lesson_source == "subscriptionGenerated"
+        for lesson in lessons
+    )
 
 
 @pytest.mark.asyncio
@@ -219,7 +234,7 @@ async def test_trial_single_booking(db_session: AsyncSession, create_test_user):
     teacher = _FakeUser(TEACHER_ID)
     student = _FakeUser(STUDENT_ID, "student")
 
-    from app.schemas.subscription import SubscriptionProposalCreate, ProposalRespondRequest
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     proposal = await svc.create_proposal(
         SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id),
@@ -239,11 +254,17 @@ async def test_trial_single_booking(db_session: AsyncSession, create_test_user):
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
     await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
 
+    from app.models.lesson import Lesson
     from app.models.schedule import LessonBooking
+
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 1
     assert bookings[0].lesson_type == "trial"
     assert all(booking.subscription_id == result.subscription_id for booking in bookings)
+
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == STUDENT_ID))).all()
+    assert len(lessons) == 1
+    assert lessons[0].lesson_source == "subscriptionGenerated"
 
 
 @pytest.mark.asyncio
@@ -260,7 +281,7 @@ async def test_package_first_booking_only(db_session: AsyncSession, create_test_
     teacher = _FakeUser(TEACHER_ID)
     student = _FakeUser(STUDENT_ID, "student")
 
-    from app.schemas.subscription import SubscriptionProposalCreate, ProposalRespondRequest
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     proposal = await svc.create_proposal(
         SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id),
@@ -279,10 +300,16 @@ async def test_package_first_booking_only(db_session: AsyncSession, create_test_
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
     await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
 
+    from app.models.lesson import Lesson
     from app.models.schedule import LessonBooking
+
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 1  # Package: first lesson only
     assert all(booking.subscription_id == result.subscription_id for booking in bookings)
+
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == STUDENT_ID))).all()
+    assert len(lessons) == 1
+    assert lessons[0].lesson_source == "subscriptionGenerated"
 
 
 @pytest.mark.asyncio
@@ -298,7 +325,7 @@ async def test_backward_compat_no_lesson_request(db_session: AsyncSession, creat
     teacher = _FakeUser(TEACHER_ID)
     student = _FakeUser(STUDENT_ID, "student")
 
-    from app.schemas.subscription import SubscriptionProposalCreate, ProposalRespondRequest
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     # No lesson_request_id
     proposal = await svc.create_proposal(
@@ -347,7 +374,7 @@ async def test_existing_membership_reused(db_session: AsyncSession, create_test_
     teacher = _FakeUser(TEACHER_ID)
     student = _FakeUser(STUDENT_ID, "student")
 
-    from app.schemas.subscription import SubscriptionProposalCreate, ProposalRespondRequest
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     proposal = await svc.create_proposal(
         SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id),
@@ -377,7 +404,7 @@ async def test_card_rejected_no_bookings(db_session: AsyncSession, create_test_u
     teacher = _FakeUser(TEACHER_ID)
     student = _FakeUser(STUDENT_ID, "student")
 
-    from app.schemas.subscription import SubscriptionProposalCreate, ProposalRespondRequest
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     proposal = await svc.create_proposal(
         SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id),

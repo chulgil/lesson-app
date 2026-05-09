@@ -559,7 +559,7 @@ async def test_confirmation_card_confirm_does_not_duplicate_subscription_booking
     db_session,
 ):
     """Only the first confirmed card for a subscription may materialize bookings."""
-    from app.models.lesson import ClassMembership, LessonClass
+    from app.models.lesson import ClassMembership, Lesson, LessonClass
     from app.models.policy import ScheduleConfirmationCard
     from app.models.schedule import LessonBooking
     from app.models.student import Student
@@ -643,6 +643,15 @@ async def test_confirmation_card_confirm_does_not_duplicate_subscription_booking
         assert response.status_code == 200
 
     next_date = date.today() + timedelta(days=1)
+    lessons = (
+        await db_session.scalars(
+            select(Lesson).where(
+                Lesson.student_id == student.id,
+                Lesson.teacher_id == "dup-booking-teacher-prof",
+                Lesson.date >= next_date,
+            )
+        )
+    ).all()
     bookings = (
         await db_session.scalars(
             select(LessonBooking).where(
@@ -652,7 +661,9 @@ async def test_confirmation_card_confirm_does_not_duplicate_subscription_booking
             )
         )
     ).all()
+    assert len(lessons) == 1
     assert len(bookings) == 1
+    assert lessons[0].lesson_source == "subscriptionGenerated"
     assert bookings[0].scheduled_time == "15:00"
     assert bookings[0].subscription_id == "dup-booking-subscription"
 

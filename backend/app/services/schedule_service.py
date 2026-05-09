@@ -61,10 +61,11 @@ class ScheduleService:
         from app.models.schedule_ext import ScheduleException
         from app.schemas.schedule import DayAvailability, TimeSlotSchema
 
+        teacher_id_scope = await self._resolve_teacher_id_scope(teacher_id)
         teacher_user_id = await self._resolve_teacher_user_id(teacher_id)
         availability_rows = await self.db.scalars(
             select(TeacherAvailability)
-            .where(TeacherAvailability.teacher_id == teacher_user_id)
+            .where(TeacherAvailability.teacher_id.in_(teacher_id_scope))
             .order_by(TeacherAvailability.day_of_week)
         )
         day_list = []
@@ -90,7 +91,7 @@ class ScheduleService:
                 )
             day_list.append(DayAvailability(day_of_week=avail.day_of_week, time_slots=time_slots))
 
-        exception_filter = [ScheduleException.teacher_id == teacher_user_id]
+        exception_filter = [ScheduleException.teacher_id.in_(teacher_id_scope)]
         if avail_ids:
             exception_filter.append(ScheduleException.teacher_availability_id.in_(avail_ids))
         exception_rows = await self.db.scalars(
@@ -183,16 +184,18 @@ class ScheduleService:
         from datetime import date as date_type
         from datetime import timedelta
 
+        from app.models.lesson import Lesson, LessonStatus
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
 
         ws = date_type.fromisoformat(week_start) if week_start else date_type.today()
         # Align to Monday
         ws = ws - timedelta(days=ws.weekday())
         week_end = ws + timedelta(days=6)
+        teacher_id_scope = await self._resolve_teacher_id_scope(current_user.id)
 
         # Load availability
         avail_rows = await self.db.scalars(
-            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id.in_(teacher_id_scope))
         )
         avail_by_day: dict[int, list[dict]] = {}
         for avail in avail_rows.all():
@@ -206,7 +209,7 @@ class ScheduleService:
         # Load bookings for this week
         bookings = await self.db.scalars(
             select(LessonBooking).where(
-                LessonBooking.teacher_id == current_user.id,
+                LessonBooking.teacher_id.in_(teacher_id_scope),
                 LessonBooking.scheduled_date >= ws,
                 LessonBooking.scheduled_date <= week_end,
             )
@@ -220,6 +223,50 @@ class ScheduleService:
                     "duration": b.duration,
                     "status": b.status.value if hasattr(b.status, "value") else b.status,
                     "type": "booking",
+                    "booking_id": b.id,
+                }
+            )
+
+        # Load lesson records for this week
+        lessons = await self.db.scalars(
+            select(Lesson).where(
+                Lesson.teacher_id.in_(teacher_id_scope),
+                Lesson.date >= ws,
+                Lesson.date <= week_end,
+                Lesson.status.not_in(
+                    [
+                        LessonStatus.cancelled,
+                        LessonStatus.cancelledByStudentAdvance,
+                        LessonStatus.cancelledByStudentLate,
+                        LessonStatus.cancelledByTeacher,
+                        LessonStatus.cancelledMutual,
+                    ]
+                ),
+            )
+        )
+        lessons_by_date: dict[str, list[dict]] = {}
+        for lesson in lessons.all():
+            date_str = lesson.date.isoformat()
+            # Skip exact duplicates when booking already exists at same slot.
+            if any(
+                existing.get("start_time") == lesson.start_time
+                and existing.get("duration") == lesson.duration
+                for existing in bookings_by_date.get(date_str, [])
+            ):
+                continue
+            lessons_by_date.setdefault(date_str, []).append(
+                {
+                    "start_time": lesson.start_time,
+                    "duration": lesson.duration,
+                    "status": lesson.status.value if hasattr(lesson.status, "value") else lesson.status,
+                    "student_id": lesson.student_id,
+                    "lesson_id": lesson.id,
+                    "lesson_source": (
+                        lesson.lesson_source.value
+                        if hasattr(lesson.lesson_source, "value")
+                        else lesson.lesson_source
+                    ),
+                    "type": "lesson",
                 }
             )
 
@@ -233,6 +280,8 @@ class ScheduleService:
                 events.extend(avail_by_day[i])
             if date_str in bookings_by_date:
                 events.extend(bookings_by_date[date_str])
+            if date_str in lessons_by_date:
+                events.extend(lessons_by_date[date_str])
             if events:
                 days[date_str] = events
 
@@ -248,6 +297,22 @@ class ScheduleService:
             return teacher.user_id
         # Otherwise assume it's already a User.id
         return teacher_id
+
+    async def _resolve_teacher_id_scope(self, teacher_id: str) -> list[str]:
+        """Return both user and profile IDs for a teacher identifier."""
+        from app.models.teacher import Teacher
+
+        teacher_ids = [teacher_id]
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            if teacher.user_id not in teacher_ids:
+                teacher_ids.append(teacher.user_id)
+            return teacher_ids
+
+        profile_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == teacher_id))
+        if profile_id is not None and profile_id not in teacher_ids:
+            teacher_ids.append(profile_id)
+        return teacher_ids
 
     async def get_frontend_time_slots(self, *, teacher_id: str) -> list[dict[str, Any]]:
         """Return weekly availability as RemoteBookingRepository TimeSlot JSON."""
@@ -270,6 +335,7 @@ class ScheduleService:
         """Compute available booking slots for a date."""
         from datetime import date as date_type
 
+        from app.models.lesson import Lesson, LessonStatus
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
         from app.models.schedule_ext import ExceptionType, ScheduleException
         from app.schemas.schedule import SlotStatus
@@ -279,11 +345,12 @@ class ScheduleService:
 
         # Resolve teacher_id (could be Teacher.id or User.id)
         user_id = await self._resolve_teacher_user_id(teacher_id)
+        teacher_id_scope = await self._resolve_teacher_id_scope(teacher_id)
 
         # Find availability for this day
         availability_rows = await self.db.scalars(
             select(TeacherAvailability).where(
-                TeacherAvailability.teacher_id == user_id,
+                TeacherAvailability.teacher_id.in_(teacher_id_scope),
                 TeacherAvailability.day_of_week == day_of_week,
             )
         )
@@ -301,18 +368,36 @@ class ScheduleService:
         # Get existing bookings for this date
         bookings = await self.db.scalars(
             select(LessonBooking).where(
-                LessonBooking.teacher_id == user_id,
+                LessonBooking.teacher_id.in_(teacher_id_scope),
                 LessonBooking.scheduled_date == d,
                 LessonBooking.status.in_(["pending", "confirmed"]),
             )
         )
         booked_times = {b.scheduled_time for b in bookings.all()}
 
+        # Get existing lessons for this date
+        lessons = await self.db.scalars(
+            select(Lesson).where(
+                Lesson.teacher_id.in_(teacher_id_scope),
+                Lesson.date == d,
+                Lesson.status.not_in(
+                    [
+                        LessonStatus.cancelled,
+                        LessonStatus.cancelledByStudentAdvance,
+                        LessonStatus.cancelledByStudentLate,
+                        LessonStatus.cancelledByTeacher,
+                        LessonStatus.cancelledMutual,
+                    ]
+                ),
+            )
+        )
+        booked_times.update(lesson.start_time for lesson in lessons.all())
+
         # Get schedule exceptions (holiday/vacation) covering this date (#236)
         exceptions = await self.db.scalars(
             select(ScheduleException).where(
                 or_(
-                    ScheduleException.teacher_id == user_id,
+                    ScheduleException.teacher_id.in_(teacher_id_scope),
                     ScheduleException.teacher_availability_id.in_(availability_ids),
                 ),
                 ScheduleException.type.in_([ExceptionType.holiday, ExceptionType.vacation]),
@@ -516,7 +601,8 @@ class ScheduleService:
             return
 
         if getattr(exception, "teacher_id", None) is not None:
-            if exception.teacher_id != current_user.id:
+            current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+            if exception.teacher_id not in current_teacher_ids:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Forbidden",
@@ -531,7 +617,8 @@ class ScheduleService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Exception availability not found",
             )
-        if availability.teacher_id != current_user.id:
+        current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if availability.teacher_id not in current_teacher_ids:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     # ------------------------------------------------------------------

@@ -55,9 +55,11 @@ class ScheduleConfirmationService:
                     detail="해당 시간에 이미 예약이 있습니다",
                 )
 
+        teacher_id = await self._resolve_teacher_id_for_actor(current_user.id)
+
         card = ScheduleConfirmationCard(
             student_id=data.student_id,
-            teacher_id=current_user.id,
+            teacher_id=teacher_id,
             subscription_id=data.subscription_id,
             lesson_request_id=data.lesson_request_id,
             card_type=data.card_type,
@@ -245,7 +247,9 @@ class ScheduleConfirmationService:
         import datetime as dt
         from datetime import timedelta
 
+        from app.models.lesson import Lesson, LessonSource
         from app.models.schedule import LessonBooking
+        from app.models.student import Student
         from app.models.subscription import Subscription
 
         sub = await self.db.get(Subscription, card.subscription_id)
@@ -264,6 +268,13 @@ class ScheduleConfirmationService:
             count = sub.total_lessons or 4
             lesson_type = "regular"
 
+        teacher_profile_id = await self._resolve_teacher_id_for_actor(card.teacher_id)
+
+        student_name = card.student_id
+        student = await self.db.get(Student, card.student_id)
+        if student is not None:
+            student_name = student.name
+
         base_date = dt.date.today()
         proposed_day = int(card.proposed_day) if card.proposed_day else base_date.weekday()
 
@@ -280,7 +291,7 @@ class ScheduleConfirmationService:
 
             # Skip this date if teacher already has a booking at this time
             conflict = await self._check_time_conflict(
-                teacher_id=card.teacher_id,
+                teacher_id=teacher_profile_id,
                 scheduled_date=scheduled_date,
                 scheduled_time=scheduled_time,
                 duration=duration,
@@ -289,7 +300,7 @@ class ScheduleConfirmationService:
                 continue
 
             booking = LessonBooking(
-                teacher_id=card.teacher_id,
+                teacher_id=teacher_profile_id,
                 student_id=card.student_id,
                 lesson_type=lesson_type,
                 scheduled_date=scheduled_date,
@@ -301,6 +312,20 @@ class ScheduleConfirmationService:
             )
             self.db.add(booking)
 
+            lesson = Lesson(
+                teacher_id=teacher_profile_id,
+                student_id=card.student_id,
+                student_name=student_name,
+                instrument=card.instrument or "",
+                date=scheduled_date,
+                start_time=scheduled_time,
+                duration=duration,
+                status="scheduled",
+                subscription_id=card.subscription_id,
+                lesson_source=LessonSource.subscription_generated,
+            )
+            self.db.add(lesson)
+
     async def _check_time_conflict(
         self,
         teacher_id: str,
@@ -309,11 +334,13 @@ class ScheduleConfirmationService:
         duration: int,
     ) -> bool:
         """Check if teacher has an existing booking at this date/time."""
+        from app.models.lesson import Lesson
         from app.models.schedule import LessonBooking
+        teacher_ids = await self._resolve_teacher_id_scope(teacher_id)
 
         existing = await self.db.scalars(
             select(LessonBooking).where(
-                LessonBooking.teacher_id == teacher_id,
+                LessonBooking.teacher_id.in_(teacher_ids),
                 LessonBooking.scheduled_date == scheduled_date,
                 LessonBooking.status.not_in(["cancelled", "expired"]),
             )
@@ -328,7 +355,52 @@ class ScheduleConfirmationService:
             if new_start < existing_end and new_end > existing_start:
                 return True
 
+        existing_lessons = await self.db.scalars(
+            select(Lesson).where(
+                Lesson.teacher_id.in_(teacher_ids),
+                Lesson.date == scheduled_date,
+            )
+        )
+
+        for lesson in existing_lessons.all():
+            if self._is_cancelled_lesson_status(lesson.status):
+                continue
+            existing_start = self._time_to_minutes(lesson.start_time)
+            existing_end = existing_start + (lesson.duration or 60)
+            if new_start < existing_end and new_end > existing_start:
+                return True
+
         return False
+
+    async def _resolve_teacher_id_scope(self, teacher_id: str) -> list[str]:
+        """Return both user and profile IDs for a teacher identifier."""
+        from app.models.teacher import Teacher
+
+        teacher_ids = [teacher_id]
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            if teacher.user_id not in teacher_ids:
+                teacher_ids.append(teacher.user_id)
+            return teacher_ids
+
+        profile_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == teacher_id))
+        if profile_id is not None and profile_id not in teacher_ids:
+            teacher_ids.append(profile_id)
+        return teacher_ids
+
+    @staticmethod
+    def _is_cancelled_lesson_status(status: Any) -> bool:
+        from app.models.lesson import LessonStatus
+
+        if isinstance(status, LessonStatus):
+            return status in {
+                LessonStatus.cancelled,
+                LessonStatus.cancelledByStudentAdvance,
+                LessonStatus.cancelledByStudentLate,
+                LessonStatus.cancelledByTeacher,
+                LessonStatus.cancelledMutual,
+            }
+        return str(status).endswith("cancelled")
 
     @staticmethod
     def _time_to_minutes(time_str: str) -> int:
@@ -421,3 +493,13 @@ class ScheduleConfirmationService:
             )
         )
         return list(result.all())
+
+    async def _resolve_teacher_id_for_actor(self, actor_id: str) -> str:
+        """Normalize actor id to teacher profile ID when possible."""
+        from app.models.teacher import Teacher
+
+        if await self.db.scalar(select(Teacher.id).where(Teacher.id == actor_id)):
+            return actor_id
+
+        user_teacher_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == actor_id))
+        return user_teacher_id or actor_id

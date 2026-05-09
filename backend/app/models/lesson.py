@@ -10,6 +10,7 @@ from sqlalchemy import (
     Index,
     Integer,
     Numeric,
+    ForeignKey,
     String,
     Text,
 )
@@ -39,6 +40,11 @@ class LessonStatus(str, enum.Enum):
     noShow = "noShow"
     studentAbsent = "studentAbsent"
     reschedulePending = "reschedulePending"
+
+
+class LessonSource(str, enum.Enum):
+    manual = "manual"
+    subscription_generated = "subscriptionGenerated"
 
 
 class LocationType(str, enum.Enum):
@@ -165,7 +171,16 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     key_points: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     practice_tips: Mapped[str | None] = mapped_column(Text, nullable=True)
     student_note: Mapped[str | None] = mapped_column(Text, nullable=True)
-    subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    subscription_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("subscriptions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    lesson_source: Mapped[LessonSource] = mapped_column(
+        Enum(LessonSource, native_enum=True),
+        nullable=False,
+        default=LessonSource.manual,
+    )
     location_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     location_address: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -174,6 +189,8 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         Index("idx_lesson_teacher", "teacher_id"),
         Index("idx_lesson_date", "date"),
         Index("idx_lesson_status", "status"),
+        Index("idx_lesson_source", "lesson_source"),
+        Index("idx_lesson_subscription", "subscription_id"),
         Index("idx_lesson_teacher_date", "teacher_id", "date"),
     )
 

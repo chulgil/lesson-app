@@ -157,6 +157,7 @@ class LessonResponse(BaseModel):
     start_time: str | None = None
     duration: int | None = None
     status: str | None = None
+    lesson_source: str | None = None
     pieces: list[LessonPieceResponse] | None = None
     feedback: str | None = None
     key_points: list[str] | None = None
