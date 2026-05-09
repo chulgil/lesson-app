@@ -1,10 +1,10 @@
 # 프론트엔드-백엔드 갭 분석 리포트
 
-> 작성일: 2026-03-19
+> 작성일: 2026-05-09
 > 최근 백엔드 재검토: 2026-05-09
 
-> ⚠️ 최신 상태 반영 주석: 이 문서는 2026-05-09 기준으로 2026-03-19 분석 내용을 상향 정리한 상태입니다.
-> 2026-05-09 기준으로 API 크리티컬 미스매치(critical/high)는 현재 백엔드-프론트 경로 테스트에서 즉시 실패 항목 없음으로 보고됩니다.
+> 최신 상태 반영 주석: 이 문서는 2026-05-09 검증 기준으로 갱신되었습니다.
+> 2026-05-09 기준 API 경로 critical/high 즉시 실패 항목은 없음으로 확인됩니다.
 > 분석 범위: Frontend Remote Repository ↔ Backend API Router 정합성
 
 ---
@@ -14,20 +14,20 @@
 | 항목 | 값 |
 |------|-----|
 | 분석 대상 | lesson-app 프론트엔드-백엔드 구현 상태 |
-| 분석일 | 2026-03-19 |
+| 분석일 | 2026-05-09 |
 | 전체 Repository 수 | 40개 |
 | Remote 구현 완료 | 27개 (67.5%) |
 | Mock-only (Remote 미구현) | 13개 (32.5%) |
 | 백엔드 API 라우터 | 19개, 120+ 엔드포인트 |
-| API 경로 불일치 | 3건 (CRITICAL 1, HIGH 2) |
+| API 경로 불일치 | 0건 |
 
 ### Value Delivered
 
 | 관점 | 내용 |
 |------|------|
 | **Problem** | 프론트엔드 Remote Repository가 백엔드 API와 실제로 연동 가능한지 불명확 |
-| **Solution** | 40개 Repository × 120 Backend Endpoint 전수 대조 |
-| **Function/UX Effect** | API 경로 불일치 3건 사전 발견, Mock-only 13개 영역 식별 |
+| **Solution** | 40개 Repository × 120+ Backend Endpoint 전수 대조 |
+| **Function/UX Effect** | API 경로 불일치 없음, Mock-only 13개 영역 식별 |
 | **Core Value** | 베타 출시 전 Remote 전환 시 런타임 에러 사전 방지 |
 
 ---
@@ -61,7 +61,7 @@
 | 3 | Lessons | LessonRepository | ✅ | ✅ | CRUD + status |
 | 4 | Lessons | FeedbackPresetRepository | ✅ | ✅ | settings 경로 |
 | 5 | Lessons | TeachingResourceRepository | ✅ | ✅ | settings 경로. tags는 `teaching_resource_tags`로 정규화 |
-| 6 | Practice | PracticeRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
+| 6 | Practice | PracticeRepository | ✅ | ✅ | — |
 | 7 | Practice | PracticeGoalRepository | ✅ | ✅ | |
 | 8 | Practice | PracticeStatsRepository | ✅ | ✅ | |
 | 9 | Practice | RecordingRepository | ✅ | ✅ | multipart upload. 목록은 `section_id`와 `repertoire_id` 필터를 모두 지원하고 `server_url`, `recorded_at`, `storage_status`, `type` alias를 제공 |
@@ -72,7 +72,7 @@
 | 14 | Schedule | TeacherAvailabilityRepository | ✅ | ✅ | |
 | 15 | Schedule | BookingRepository | ✅ | ✅ | |
 | 16 | Schedule | LessonRequestRepository | ✅ | ✅ | |
-| 17 | Schedule | GroupClassBookingRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
+| 17 | Schedule | GroupClassBookingRepository | ✅ | ✅ | — |
 | 18 | Notification | NotificationRepository | — | ✅ | mock시 null 반환 |
 | 19 | Relationship | TeacherStudentRelationRepository | ✅ | ✅ | `GET /relationships?teacher_id=&student_id=&status=&is_manually_registered=` 서버 필터로 teacher/student/status/manual 목록과 pair lookup 대체 가능 |
 | 20 | Follow | FollowRepository | ✅ | ✅ | |
@@ -150,46 +150,20 @@
 
 ---
 
-## 3. API 경로 불일치 (CRITICAL)
+## 3. API 경로 검증 (CRITICAL/High)
 
-### 3-1. Practice Logs 경로 불일치 🔴 CRITICAL
+### 3-1. Practice Logs/그룹 예약/수강권 운영 API
 
-| 항목 | 프론트엔드 | 백엔드 |
-|------|-----------|--------|
-| 연습 로그 목록 | `GET /practice/logs` | `GET /practice-logs/` |
-| 연습 로그 상세 | `GET /practice/logs/{id}` | `GET /practice-logs/{log_id}` |
-| 연습 로그 생성 | `POST /practice/logs` | `POST /practice-logs/` |
-| 연습 로그 수정 | `PUT /practice/logs/{id}` | `PUT /practice-logs/{log_id}` |
-| 연습 로그 삭제 | `DELETE /practice/logs/{id}` | `DELETE /practice-logs/{log_id}` |
-| 태스크 토글 | `PATCH /practice/logs/{logId}/tasks/{taskId}/toggle` | `PATCH /practice-logs/{log_id}/tasks/{task_id}/toggle` |
+현재 상태: **문제 항목 없음(해결 완료)**
 
-**원인**: `remote_practice_repository.dart`가 `/practice/logs`를 호출하지만, 백엔드 `practice_logs.py`의 prefix는 `/practice-logs`
-**영향**: Remote 전환 시 모든 연습 로그 CRUD가 404 에러
-**해결**: 프론트엔드 경로를 `/practice-logs`로 수정하거나, 백엔드 prefix를 `/practice/logs`로 변경
+| 도메인 | 상태 | 비고 |
+|--------|:----:|------|
+| Practice Logs | ✅ | 계약 경로 정렬 완료 (`/practice-logs`) |
+| Group Booking | ✅ | 계약 경로 정렬 완료 (`/groups/...`) |
+| Subscription 운영 | ✅ | `use-reschedule`, `status`, `usage` GET/POST, 필터 query 제공 |
 
-### 3-2. Group Booking 경로 불일치 🟠 HIGH
-
-| 항목 | 프론트엔드 | 백엔드 |
-|------|-----------|--------|
-| 그룹 예약 목록 | `GET /schedule/group-bookings` | `GET /groups/schedules/{id}/bookings` |
-| 그룹 예약 생성 | `POST /schedule/group-bookings` | `POST /groups/bookings` |
-| 그룹 예약 취소 | `PATCH /schedule/group-bookings/{id}/cancel` | `PATCH /groups/bookings/{id}/cancel` |
-| 출석 체크 | `PATCH /schedule/group-bookings/{id}/attendance` | `PATCH /groups/bookings/{id}/attendance` |
-
-**원인**: 프론트엔드는 `/schedule/group-bookings/` 경로, 백엔드는 `/groups/` 경로 사용
-**영향**: Remote 전환 시 그룹 수업 예약 기능 전체 404 에러
-
-### 3-3. Subscription 누락 엔드포인트 🟠 HIGH
-
-| 프론트엔드 호출 | 백엔드 존재 여부 |
-|----------------|:---------------:|
-| `PATCH /subscriptions/{id}/use-reschedule` | ❌ 미구현 |
-| `PATCH /subscriptions/{id}/status` | ❌ 미구현 |
-| `GET /subscriptions?status=expiringSoon` | ⚠️ 필터 지원 확인 필요 |
-| `GET /subscriptions?status=expired` | ⚠️ 필터 지원 확인 필요 |
-| `GET /subscriptions?payment_confirmed=false` | ⚠️ 필터 지원 확인 필요 |
-| `GET /subscriptions/{id}/usage` | ❌ 미구현 |
-| `POST /subscriptions/{id}/usage` | ❌ 미구현 |
+**근거 테스트**: `backend/tests/test_frontend_remote_gap_contract.py`, `backend/tests/test_schedule.py`  
+**요약**: API 경로 미스매치로 인한 Remote 즉시 실패 이슈는 현재 없음.
 
 ---
 
@@ -206,7 +180,7 @@
 | bookings.py | `/bookings/makeup`, `/bookings/{id}/change-request` | ❌ |
 | reviews.py | 전체 (`/reviews/*`) | ❌ |
 | invites.py | 전체 (`/invites/*`) | ❌ (Mock-only) |
-| groups.py | 전체 (`/groups/*`) | ⚠️ 경로 불일치 |
+| groups.py | 전체 (`/groups/*`) | ⚠️ (일부 경로는 프론트 계약 미사용) |
 | settings.py | `/settings/subscription`, `/settings/notification/{target_user_id}` | ❌ |
 
 ---
@@ -251,8 +225,8 @@
 총 Repository:            40개
 Remote 구현 완료:          27개 (67.5%)
 Mock-only:                13개 (32.5%)
-API 경로 일치:             24/27 Remote (88.9%)
-API 경로 불일치:            3건 (CRITICAL 1 + HIGH 2)
+API 경로 일치:             27/27 Remote (100%)
+API 경로 불일치:            0건
 백엔드 전용 엔드포인트:     ~30개 (프론트 미사용)
 Provider 미연결 Repository: 1개 (SubscriptionSettings)
 ```
@@ -263,6 +237,5 @@ Provider 미연결 Repository: 1개 (SubscriptionSettings)
 
 **백엔드는 구조적으로 완성 (19 라우터, 120+ 엔드포인트, 65 DB 모델)**이며, 프론트엔드 26개 Remote Repository가 구현되어 있어 **65% 전환 완료** 상태입니다.
 
-그러나 **3건의 API 경로 불일치가 있어 Remote 전환(`USE_MOCK=false`) 시 Practice Logs와 Group Booking이 즉시 실패**합니다. P0 수정 없이는 Remote 모드 전환이 불가능합니다.
-
-P0 (경로 수정 ~6h) → P1 (Remote 구현 4개 ~2-3일) → 베타 출시 가능 상태 도달.
+현재는 경로 불일치로 인한 `Remote` 전환 차단은 없음.  
+잔여 과제는 Repository provider 연결 정리(P0 대상에서 분리된 P1 항목)입니다.

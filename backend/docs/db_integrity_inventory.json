@@ -278,12 +278,11 @@
       "SubscriptionService validates turn order for terminal schedule-change responses.",
       "Parents can read linked child events but cannot create schedule-change events."
     ],
-    "frontend_remote_status": "mock_only",
+    "frontend_remote_status": "backend_ready_not_client_bound",
     "frontend_notes": [
-      "SubscriptionSessionEventActions currently writes to an in-memory store in subscription_providers.dart.",
-      "subscriptionSessionEventsProvider and pendingScheduleChangeRequestsProvider are not wired to RemoteSubscriptionRepository yet.",
-      "RemoteSubscriptionRepository exposes useReschedule, but not get/create subscription events."
+      "수행중인 백엔드 계약 자체는 완결(이벤트 SSOT, pending 목록, use-reschedule 포함).",
+      "프론트엔드 Provider 계층의 remote 연결 여부는 별도 Flutter 검증 항목으로 추적한다."
     ],
-    "recommended_next_issue": "Add remote subscription session event repository methods and replace the in-memory schedule-change provider branch."
+    "recommended_next_issue": "프론트엔드 Remote Subscription provider와 pending schedule-change 분기 연결 검증이 다음 단계"
   }
 }
