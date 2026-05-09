@@ -519,6 +519,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       return _scheduleChangeButton(
         subscriptionId: lesson.subscriptionId!,
         label: AppStrings.announcementScheduleChange,
+        focusLessonId: lesson.id,
       );
     }
 
@@ -534,6 +535,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           subscriptionId: activeSub.id,
           label:
               '${AppStrings.announcementScheduleChange} (${activeSub.typeLabel})',
+          focusLessonId: lesson.id,
         );
       },
       orElse: () => const SizedBox.shrink(),
@@ -543,6 +545,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   Widget _scheduleChangeButton({
     required String subscriptionId,
     required String label,
+    String? focusLessonId,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -550,7 +553,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         onPressed:
             () => context.push(
               AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
-              extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
+              extra: {
+                'viewerRole': widget.isTeacher ? 'teacher' : 'student',
+                if (focusLessonId != null) 'focusLessonId': focusLessonId,
+              },
             ),
         icon: const Icon(Icons.swap_horiz, size: 18),
         label: Text(label),

@@ -158,10 +158,12 @@ List<RouteBase> subscriptionRoutes = [
       final initialSession = int.tryParse(
         state.uri.queryParameters['session'] ?? '',
       );
+      final focusLessonId = extra?['focusLessonId'] as String?;
       return SubscriptionDetailScreen(
         subscriptionId: id,
         viewerRole: viewerRole,
         initialSelectedSession: initialSession,
+        focusLessonId: focusLessonId,
       );
     },
   ),

@@ -42,9 +42,9 @@ class StudentLessonCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Row(
             children: [
-              // Date badge — fixed size for consistent card height
+              // Date badge — M/D (요일)
               Container(
-                width: 48,
+                width: 56,
                 height: 48,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
@@ -54,10 +54,12 @@ class StudentLessonCard extends StatelessWidget {
                           : AppColors.paperDark,
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${lesson.date.day}',
-                      style: AppTypography.headingSmall.copyWith(
+                      '${lesson.date.month}/${lesson.date.day}',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w700,
                         color:
                             isUpcoming ? AppColors.paperAccent : AppColors.ink,
                       ),

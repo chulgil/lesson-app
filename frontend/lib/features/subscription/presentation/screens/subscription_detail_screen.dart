@@ -40,11 +40,16 @@ class SubscriptionDetailScreen extends ConsumerWidget {
   final String viewerRole;
   final int? initialSelectedSession;
 
+  /// When navigating from a specific lesson, pass the lessonId
+  /// so the screen can auto-select the corresponding session.
+  final String? focusLessonId;
+
   const SubscriptionDetailScreen({
     super.key,
     required this.subscriptionId,
     this.viewerRole = 'student',
     this.initialSelectedSession,
+    this.focusLessonId,
   });
 
   @override
@@ -58,6 +63,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           subscription: subscription,
           viewerRole: viewerRole,
           initialSelectedSession: initialSelectedSession,
+          focusLessonId: focusLessonId,
         );
       },
       loading:
@@ -142,11 +148,13 @@ class _SubscriptionDetailBody extends ConsumerStatefulWidget {
   final Subscription subscription;
   final String viewerRole;
   final int? initialSelectedSession;
+  final String? focusLessonId;
 
   const _SubscriptionDetailBody({
     required this.subscription,
     required this.viewerRole,
     this.initialSelectedSession,
+    this.focusLessonId,
   });
 
   @override
@@ -171,6 +179,11 @@ class _SubscriptionDetailBodyState
   void initState() {
     super.initState();
     final totalSessions = subscription.totalLessonsForDisplay ?? 1;
+
+    // focusLessonId is passed when navigating from a specific lesson's
+    // schedule change button. Session resolution will be handled by
+    // the backend when lesson-subscription mapping is available.
+    // For now, use initialSelectedSession or default to next session.
     _selectedSession = (widget.initialSelectedSession ??
             subscription.usedLessons + 1)
         .clamp(1, totalSessions);
