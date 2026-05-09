@@ -42,6 +42,7 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    PUBLIC_WEB_BASE_URL: str = "https://lessonaza.com"
 
     # i18n
     DEFAULT_LOCALE: str = "ko"
