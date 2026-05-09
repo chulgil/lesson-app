@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -17,6 +18,9 @@ import 'startup_recovery.dart';
 Future<StartupRecoveryResult> bootstrapApp() async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Crashlytics: 비치명적 에러 수집 활성화
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
 
   // Set up background message handler
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);

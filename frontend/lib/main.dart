@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +30,15 @@ void clearStartupRecoveryResult() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await bootstrapApp();
+
+  // Crashlytics: Flutter 프레임워크 에러 캡처
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Crashlytics: Dart 비동기 에러 캡처
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   runApp(
     ProviderScope(observers: providerObservers(), child: const LessonazaApp()),
