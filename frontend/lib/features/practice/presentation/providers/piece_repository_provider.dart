@@ -10,6 +10,7 @@ part 'piece_repository_provider.g.dart';
 @Riverpod(keepAlive: true)
 PieceRepository pieceRepository(PieceRepositoryRef ref) {
   return createLocalFallbackRepository<PieceRepository>(
+    ref: ref,
     mock: MockPieceRepository.new,
     // No remote API yet — use empty mock to avoid dummy data
     fallback: () => MockPieceRepository(empty: true),

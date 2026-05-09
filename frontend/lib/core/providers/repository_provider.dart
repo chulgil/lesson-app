@@ -8,20 +8,33 @@ import '../sync/presentation/providers/sync_provider.dart';
 
 part 'repository_provider.g.dart';
 
-/// App-wide data mode boundary.
+/// Runtime data mode — determines mock vs remote repository selection.
 ///
-/// UI/application code should read this provider instead of importing
-/// [EnvironmentConfig] directly, so environment branching stays centralized.
+/// Initial value comes from [EnvironmentConfig.useMockData] (compile-time default).
+/// Changed at login time:
+/// - DEV account login → `true` (mock repositories)
+/// - Social login (Google/Kakao/Apple) → `false` (remote repositories)
+///
+/// All repository providers watch this via [createRepository] / [createSyncAwareRepository],
+/// so changing this triggers automatic provider rebuilds.
+@Riverpod(keepAlive: true)
+class DataMode extends _$DataMode {
+  @override
+  bool build() => EnvironmentConfig.useMockData;
+
+  void setMockMode(bool value) => state = value;
+}
+
+/// Convenience read-only alias for the current data mode.
+///
+/// UI code should watch this to show/hide mock-specific elements.
 @Riverpod(keepAlive: true)
 bool mockDataMode(Ref ref) {
-  return EnvironmentConfig.useMockData;
+  return ref.watch(dataModeProvider);
 }
 
 /// Creates a repository provider that switches between Mock and Remote
-/// implementations based on [EnvironmentConfig.useMockData].
-///
-/// Eliminates the repeated `if (useMockData) { return Mock(); } return Remote();`
-/// boilerplate found in 30+ provider files.
+/// implementations based on runtime data mode.
 ///
 /// Usage:
 /// ```dart
@@ -38,7 +51,8 @@ T createRepository<T>({
   required T Function() mock,
   required T Function(ApiClient apiClient) remote,
 }) {
-  if (EnvironmentConfig.useMockData) {
+  final useMock = ref.watch(mockDataModeProvider);
+  if (useMock) {
     return mock();
   }
   final apiClient = ref.read(apiClientProvider);
@@ -49,26 +63,13 @@ T createRepository<T>({
 ///
 /// In mock mode, bypasses sync entirely and returns the mock directly.
 /// In remote mode, injects both [ApiClient] and [MutationQueueHelper].
-///
-/// Usage:
-/// ```dart
-/// @Riverpod(keepAlive: true)
-/// LessonRepository lessonRepository(Ref ref) =>
-///     createSyncAwareRepository<LessonRepository>(
-///       ref: ref,
-///       mock: () => MockLessonRepository(),
-///       syncAware: (apiClient, queue) => SyncAwareLessonRepository(
-///         remote: RemoteLessonRepository(apiClient),
-///         queue: queue,
-///       ),
-///     );
-/// ```
 T createSyncAwareRepository<T>({
   required Ref ref,
   required T Function() mock,
   required T Function(ApiClient apiClient, MutationQueueHelper queue) syncAware,
 }) {
-  if (EnvironmentConfig.useMockData) {
+  final useMock = ref.watch(mockDataModeProvider);
+  if (useMock) {
     return mock();
   }
   final apiClient = ref.read(apiClientProvider);
@@ -79,15 +80,17 @@ T createSyncAwareRepository<T>({
   return syncAware(apiClient, queue);
 }
 
-/// Creates a repository provider for features that do not have a remote API yet.
+/// Creates a repository for features without a remote API yet.
 ///
-/// Keeps mock-mode branching centralized while allowing production builds to use
-/// a local empty/fallback implementation until a real remote adapter exists.
+/// In mock mode: returns [mock] (full mock data).
+/// In remote mode: returns [fallback] (empty/stub — no mock data for real users).
 T createLocalFallbackRepository<T>({
+  required Ref ref,
   required T Function() mock,
   required T Function() fallback,
 }) {
-  if (EnvironmentConfig.useMockData) {
+  final useMock = ref.watch(mockDataModeProvider);
+  if (useMock) {
     return mock();
   }
   return fallback();

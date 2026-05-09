@@ -6,7 +6,7 @@ part of 'piece_repository_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$pieceRepositoryHash() => r'c319caf428ee0b92e1810338c5f154691bd7b5c8';
+String _$pieceRepositoryHash() => r'c63253f907b6aef4fe58f6021aae15c7e67d4a82';
 
 /// Piece repository provider - switches between Mock and Remote.
 ///

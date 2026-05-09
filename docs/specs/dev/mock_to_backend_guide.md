@@ -1,19 +1,33 @@
 # Mock → Backend 전환 가이드
 
 > 작성일: 2026-03-31
-> 상태: 전환 준비 완료
+> 최종 업데이트: 2026-05-10
+> 상태: 런타임 전환 구현 완료
 
 ## 1. 전환 구조
 
-### 런타임 스위칭
+### 런타임 데이터 모드 전환 (v2, 2026-05-10)
+
+로그인 방식에 따라 Mock/Remote 모드가 **런타임에** 자동 결정됩니다.
+더 이상 `--dart-define=USE_MOCK=false` 빌드 분리가 필요하지 않습니다.
+
+```
+로그인 화면
+├── Google 계정 → setMockMode(false) → 실제 OAuth + Remote 레포지토리
+├── Kakao로 시작 → (준비 중, 추후 실제 OAuth)
+├── Apple 계정 → (준비 중, 추후 실제 OAuth)
+│
+└── [DEV] 테스트 계정 (debug 빌드만 표시)
+    └── setMockMode(true) → Mock 레포지토리
+```
+
+**핵심 메커니즘**: `DataMode` Riverpod Notifier가 런타임 상태를 관리하고,
+모든 repository provider가 `ref.watch(mockDataModeProvider)`로 모드를 관찰합니다.
+모드 변경 시 keepAlive provider가 자동으로 재생성됩니다.
 
 ```bash
-# Mock 모드 (기본값)
-flutter run
-
-# Backend 모드
+# 단일 빌드로 Mock + Remote 모두 테스트 가능
 flutter run \
-  --dart-define=USE_MOCK=false \
   --dart-define=API_BASE_URL=https://beta-lesson.chulgil.me/api/v1 \
   --dart-define=GOOGLE_SERVER_CLIENT_ID=<web-client-id> \
   --dart-define=GOOGLE_IOS_CLIENT_ID=<ios-client-id>
@@ -23,9 +37,10 @@ flutter run \
 
 | 파일 | 역할 |
 |------|------|
-| `core/config/environment.dart` | `useMockData` 플래그 + API URL |
-| `core/providers/repository_provider.dart` | Mock/Remote 전환 헬퍼 |
+| `core/config/environment.dart` | 컴파일 타임 기본값 (API URL, 클라이언트 ID) |
+| `core/providers/repository_provider.dart` | `DataMode` Notifier + Mock/Remote 전환 헬퍼 3종 |
 | `core/network/api_client.dart` | HTTP 클라이언트 (토큰 자동 첨부) |
+| `auth/presentation/screens/login_screen.dart` | 로그인 시 `dataModeProvider.notifier.setMockMode()` 호출 |
 
 ---
 
@@ -89,26 +104,26 @@ uv run python -m scripts.seeds.runner --preset full --reset
 
 ```bash
 cd frontend
-flutter run --dart-define=USE_MOCK=false \
+flutter run \
   --dart-define=API_BASE_URL=http://localhost:8000/api/v1
+# USE_MOCK 플래그 불필요 — 로그인 시 자동 전환
 ```
 
-### Step 4: 개발자 로그인
+### Step 4: 로그인
 
-```
-GET http://localhost:8000/api/v1/auth/dev-login?role=teacher
-```
-
-응답의 `access_token`을 앱에서 사용하거나, 앱 로그인 화면에서 "개발자 로그인" 사용.
+- **실제 백엔드 테스트**: Google 계정으로 시작 → 자동으로 Remote 모드
+- **Mock 데이터 테스트**: DEV 계정 (debug 빌드만 표시) → 자동으로 Mock 모드
+- **Backend dev-login API**: `GET /api/v1/auth/dev-login?role=teacher` (직접 토큰 발급)
 
 ---
 
 ## 4. Beta 서버 연결
 
 ```bash
-flutter run --dart-define=USE_MOCK=false \
+flutter run \
   --dart-define=API_BASE_URL=https://beta-lesson.chulgil.me/api/v1 \
   --dart-define=GOOGLE_SERVER_CLIENT_ID=312292843644-xxx.apps.googleusercontent.com
+# Google 로그인 → 자동 Remote, DEV 계정 → 자동 Mock
 ```
 
 Beta 서버: `108.61.162.25` (Vultr VPS)

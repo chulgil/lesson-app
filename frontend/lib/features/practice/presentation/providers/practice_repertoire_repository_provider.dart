@@ -12,6 +12,7 @@ part 'practice_repertoire_repository_provider.g.dart';
 @Riverpod(keepAlive: true)
 PracticeRepertoireRepository practiceRepertoireRepository(Ref ref) {
   return createLocalFallbackRepository<PracticeRepertoireRepository>(
+    ref: ref,
     mock: MockPracticeRepertoireRepository.new,
     // Hive 로컬 저장소 의존 (녹음 파일 관리) — Remote 전환 시 파일 동기화 설계 필요
     fallback: MockPracticeRepertoireRepository.new,

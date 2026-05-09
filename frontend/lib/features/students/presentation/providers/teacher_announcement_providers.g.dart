@@ -7,7 +7,7 @@ part of 'teacher_announcement_providers.dart';
 // **************************************************************************
 
 String _$teacherAnnouncementRepositoryHash() =>
-    r'bae1d912433f1e5c2ef784b15dfdc89b024ddb12';
+    r'3d7d65d6ee622e8a2663e426c7279f84345ff2af';
 
 /// Repository provider for teacher announcements.
 ///

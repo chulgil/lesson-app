@@ -7,7 +7,7 @@ part of 'practice_item_providers.dart';
 // **************************************************************************
 
 String _$practiceItemRepositoryHash() =>
-    r'f83f3bf3c87c929cd1b383ffcda61ebea7ceebd4';
+    r'c5f8858a9ec1fbde98f65445c5d1a6bc2186933b';
 
 /// Repository provider
 ///

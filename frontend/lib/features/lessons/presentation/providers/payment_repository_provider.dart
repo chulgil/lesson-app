@@ -10,6 +10,7 @@ part 'payment_repository_provider.g.dart';
 @Riverpod(keepAlive: true)
 PaymentRepository paymentRepository(PaymentRepositoryRef ref) {
   return createLocalFallbackRepository<PaymentRepository>(
+    ref: ref,
     mock: () => MockPaymentRepository(),
     fallback: () => MockPaymentRepository(empty: true),
   );

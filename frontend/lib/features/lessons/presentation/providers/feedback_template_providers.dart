@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_feedback_template_repository.dart';
 import '../../domain/entities/feedback_template.dart';
@@ -12,7 +13,11 @@ part 'feedback_template_providers.g.dart';
 FeedbackTemplateRepository feedbackTemplateRepository(
   FeedbackTemplateRepositoryRef ref,
 ) {
-  return MockFeedbackTemplateRepository();
+  return createLocalFallbackRepository<FeedbackTemplateRepository>(
+    ref: ref,
+    mock: () => MockFeedbackTemplateRepository(),
+    fallback: () => MockFeedbackTemplateRepository(),
+  );
 }
 
 @Riverpod(keepAlive: true)

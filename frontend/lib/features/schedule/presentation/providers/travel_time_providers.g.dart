@@ -6,7 +6,7 @@ part of 'travel_time_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$travelTimeApiHash() => r'254b1dc9bd544dccf438ba60bd91cd76c23e7b62';
+String _$travelTimeApiHash() => r'1eff51e6389e48f11ad23d9bc0060118829bfb4b';
 
 /// See also [travelTimeApi].
 @ProviderFor(travelTimeApi)

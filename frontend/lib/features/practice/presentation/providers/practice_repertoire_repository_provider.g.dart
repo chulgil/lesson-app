@@ -7,7 +7,7 @@ part of 'practice_repertoire_repository_provider.dart';
 // **************************************************************************
 
 String _$practiceRepertoireRepositoryHash() =>
-    r'8c59e60d2e0a4846dd2f9e9194b8b1ff09584ad0';
+    r'a6a466ba28b73cd3ca2e7620a326cbb3a7c024ba';
 
 /// Practice repertoire repository provider - switches between Mock and Remote.
 ///

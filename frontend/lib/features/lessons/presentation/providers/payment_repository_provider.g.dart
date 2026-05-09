@@ -6,7 +6,7 @@ part of 'payment_repository_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$paymentRepositoryHash() => r'd5e13526506306c52345974896ad911b0560b3ad';
+String _$paymentRepositoryHash() => r'4a83724609e76dc531d398c8e1446e21502493ac';
 
 /// Payment repository provider - switches between Mock and Remote.
 ///

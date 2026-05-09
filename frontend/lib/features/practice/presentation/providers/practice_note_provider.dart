@@ -11,6 +11,7 @@ part 'practice_note_provider.g.dart';
 @Riverpod(keepAlive: true)
 PracticeNoteRepository practiceNoteRepository(PracticeNoteRepositoryRef ref) {
   return createLocalFallbackRepository<PracticeNoteRepository>(
+    ref: ref,
     mock: MockPracticeNoteRepository.new,
     // Mock already starts empty — safe to use in remote mode
     fallback: MockPracticeNoteRepository.new,

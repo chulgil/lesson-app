@@ -12,6 +12,7 @@ part 'schedule_confirmation_card_providers.g.dart';
 ScheduleConfirmationCardRepository scheduleConfirmationCardRepository(
   ScheduleConfirmationCardRepositoryRef ref,
 ) => createLocalFallbackRepository<ScheduleConfirmationCardRepository>(
+  ref: ref,
   mock: () => MockScheduleConfirmationCardRepository(),
   // No remote API exists yet, so production keeps using the local fallback.
   fallback: () => MockScheduleConfirmationCardRepository(),

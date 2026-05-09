@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../notifications/notifications_facade.dart';
 import '../../data/repositories/mock_teacher_announcement_repository.dart';
@@ -12,9 +13,16 @@ part 'teacher_announcement_providers.g.dart';
 /// Repository provider for teacher announcements.
 @Riverpod(keepAlive: true)
 TeacherAnnouncementRepository teacherAnnouncementRepository(Ref ref) {
-  return MockTeacherAnnouncementRepository(
-    lessonRepository: ref.watch(lessonRepositoryProvider),
-    notificationService: ref.watch(notificationServiceProvider),
+  return createLocalFallbackRepository<TeacherAnnouncementRepository>(
+    ref: ref,
+    mock: () => MockTeacherAnnouncementRepository(
+      lessonRepository: ref.watch(lessonRepositoryProvider),
+      notificationService: ref.watch(notificationServiceProvider),
+    ),
+    fallback: () => MockTeacherAnnouncementRepository(
+      lessonRepository: ref.watch(lessonRepositoryProvider),
+      notificationService: ref.watch(notificationServiceProvider),
+    ),
   );
 }
 

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/services/mock_travel_time_api.dart';
 import '../../domain/entities/travel_time_result.dart';
 import '../../domain/services/travel_time_api.dart';
@@ -9,7 +10,11 @@ part 'travel_time_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 TravelTimeApi travelTimeApi(Ref ref) {
-  return MockTravelTimeApi();
+  return createLocalFallbackRepository<TravelTimeApi>(
+    ref: ref,
+    mock: () => MockTravelTimeApi(),
+    fallback: () => MockTravelTimeApi(),
+  );
 }
 
 /// Estimate travel time between teacher and student addresses.

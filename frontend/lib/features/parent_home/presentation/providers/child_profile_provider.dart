@@ -14,6 +14,7 @@ part 'child_profile_provider.g.dart';
 @riverpod
 ChildProfileRepository childProfileRepository(Ref ref) =>
     createLocalFallbackRepository<ChildProfileRepository>(
+      ref: ref,
       mock: MockChildProfileRepository.new,
       // No remote API yet — use empty mock to avoid dummy data
       fallback: () => MockChildProfileRepository(empty: true),

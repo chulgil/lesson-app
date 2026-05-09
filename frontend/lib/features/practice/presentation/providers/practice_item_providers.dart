@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../gamification/gamification_facade.dart'
     show pointAwardNotifierProvider;
@@ -16,7 +17,11 @@ part 'practice_item_providers.g.dart';
 /// Repository provider
 @Riverpod(keepAlive: true)
 PracticeItemRepository practiceItemRepository(PracticeItemRepositoryRef ref) {
-  return MockPracticeItemRepository();
+  return createLocalFallbackRepository<PracticeItemRepository>(
+    ref: ref,
+    mock: () => MockPracticeItemRepository(),
+    fallback: () => MockPracticeItemRepository(),
+  );
 }
 
 /// Current student ID provider (placeholder - should come from auth/navigation)

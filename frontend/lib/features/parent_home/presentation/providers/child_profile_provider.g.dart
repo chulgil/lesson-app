@@ -7,7 +7,7 @@ part of 'child_profile_provider.dart';
 // **************************************************************************
 
 String _$childProfileRepositoryHash() =>
-    r'0c96ff54e693c3aaa7cf1fca27dc909b6d6a9912';
+    r'8669274f97792ed022fd38f19e381f2777125e6e';
 
 /// Provider for the child profile repository - switches between Mock and Remote.
 ///

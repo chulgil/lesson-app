@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
@@ -45,8 +46,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final useMockData = ref.watch(mockDataModeProvider);
-
     return NotebookScreenScaffold(
       body: PaperScaffold(
         child: SafeArea(
@@ -75,7 +74,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const AppUpdateBanner(),
                     const SizedBox(height: AppSpacing.space4),
                     _buildSocialButtons(context),
-                    if (!useMockData) ...[
+                    if (EnvironmentConfig.isDebug) ...[
                       const SizedBox(height: AppSpacing.space6),
                       _buildDevAccountsSection(),
                     ],
@@ -281,6 +280,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }) async {
     if (_isLoading) return;
 
+    // Switch to mock mode for dev accounts
+    ref.read(dataModeProvider.notifier).setMockMode(true);
+
     setState(() => _isLoading = true);
 
     try {
@@ -318,15 +320,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
-    if (ref.read(mockDataModeProvider)) {
-      showRoleSelectSheet(
-        context,
-        authProvider: 'google',
-        onRoleSelected: (role) => _handleRoleLogin(context, role, 'google'),
-      );
-      return;
-    }
-
     if (_isLoading) return;
 
     if (_googleServerClientId.isEmpty) {
@@ -344,6 +337,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // Switch to remote mode for real OAuth
+      ref.read(dataModeProvider.notifier).setMockMode(false);
+
       final googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
         clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
@@ -387,82 +383,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleKakaoLogin(BuildContext context) {
-    if (!ref.read(mockDataModeProvider)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.authKakaoNotReady),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-    showRoleSelectSheet(
-      context,
-      authProvider: 'kakao',
-      onRoleSelected: (role) => _handleRoleLogin(context, role, 'kakao'),
+    // TODO(remote): Replace with real Kakao OAuth when SDK is integrated
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(AppStrings.authKakaoNotReady),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
   void _handleAppleLogin(BuildContext context) {
-    if (!ref.read(mockDataModeProvider)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Apple 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-    showRoleSelectSheet(
-      context,
-      authProvider: 'apple',
-      onRoleSelected: (role) => _handleRoleLogin(context, role, 'apple'),
+    // TODO(remote): Replace with real Apple Sign In when integrated
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Apple 로그인은 준비 중입니다.'),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
-  void _handleRoleLogin(
-    BuildContext context,
-    String role,
-    String authProvider,
-  ) {
-    if (role == 'teacher') {
-      _handleTeacherLogin(context, authProvider);
-    } else {
-      _handleStudentLogin(context, authProvider);
-    }
-  }
-
-  void _handleStudentLogin(BuildContext context, String authProvider) {
-    switch (authProvider) {
-      case 'google':
-        context.go(AppRoutes.studentHome);
-        break;
-      case 'kakao':
-        context.go(AppRoutes.studentHome);
-        break;
-      case 'apple':
-        context.go(AppRoutes.studentInviteCode);
-        break;
-      default:
-        context.go(AppRoutes.studentHome);
-    }
-  }
-
-  void _handleTeacherLogin(BuildContext context, String authProvider) {
-    switch (authProvider) {
-      case 'google':
-        context.go(AppRoutes.home);
-        break;
-      case 'kakao':
-        context.go(AppRoutes.home);
-        break;
-      case 'apple':
-        context.go(AppRoutes.teacherPhoneVerification);
-        break;
-      default:
-        context.go(AppRoutes.home);
-    }
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────
