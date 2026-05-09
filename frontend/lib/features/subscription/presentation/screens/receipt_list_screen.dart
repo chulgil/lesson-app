@@ -143,7 +143,7 @@ class _MonthPickerRow extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
         ),
         child: Row(
@@ -256,7 +256,7 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                   decoration: BoxDecoration(
                     color:
                         isSelected ? AppColors.paperAccent : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: Text(
                     // ignore: unnecessary_brace_in_string_interps
@@ -342,7 +342,7 @@ class _ReceiptCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
       ),
       child: Column(
@@ -414,7 +414,7 @@ class _PdfDownloadButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: hasPdf ? AppColors.paperAccentSoft : AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          borderRadius: BorderRadius.zero,
           border: Border.all(
             color: hasPdf ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: 0.5,

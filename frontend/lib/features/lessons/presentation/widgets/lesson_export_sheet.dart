@@ -157,8 +157,8 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
               ),
             ),
             onPressed: _startExport,
@@ -415,7 +415,7 @@ class _DateButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary, width: 0.5),
         ),
         child: Row(
@@ -460,7 +460,7 @@ class _FormatCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 1.5 : 0.5,
