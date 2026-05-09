@@ -190,8 +190,8 @@ void showCancelLessonDialog({
     ),
     actions: [
       TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text(AppStrings.closeAction),
+      onPressed: () => Navigator.pop(context),
+        child: const Text(AppStrings.cancel),
       ),
       TextButton(
         onPressed: () {

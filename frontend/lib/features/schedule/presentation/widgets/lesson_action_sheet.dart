@@ -9,8 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../../lessons/lessons_facade.dart';
 
 /// §13.2 — Show the common lesson action sheet.
 ///
