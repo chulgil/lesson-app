@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/app_release.dart';
 import '../providers/app_release_provider.dart';
@@ -18,7 +19,7 @@ class NewsRoadmapScreen extends ConsumerWidget {
     final releaseInfo = ref.watch(appReleaseSnapshotProvider);
 
     return NotebookScreenScaffold(
-      appBarTitle: AppStrings.newsRoadmapTitle,
+      appBar: const NotebookDetailAppBar(title: AppStrings.newsRoadmapTitle),
       body: releaseInfo.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:

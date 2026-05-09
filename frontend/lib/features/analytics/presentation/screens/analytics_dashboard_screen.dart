@@ -10,8 +10,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../widgets/analytics_summary_tab.dart';
 import '../widgets/revenue_analytics_tab.dart';
@@ -70,7 +70,6 @@ class _AnalyticsDashboardScreenState
       appBar: _buildAppBar(),
       body: Column(
         children: [
-          _buildMonthSelector(),
           _buildTabBar(),
           Expanded(
             child: TabBarView(
@@ -88,51 +87,27 @@ class _AnalyticsDashboardScreenState
   }
 
   PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
-      title: Text(
-        AppStrings.analyticsTitle,
-        style: NotebookTypography.appBarTitle,
-      ),
-    );
-  }
-
-  Widget _buildMonthSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space1,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border(
-          bottom: BorderSide(color: AppColors.inkQuaternary),
+    return NotebookDetailAppBar(
+      title: AppStrings.analyticsTitle,
+      onLeadingTap: () => context.pop(),
+      customActions: [
+        IconButton(
+          onPressed: () => _changeMonth(-1),
+          icon: const Icon(Icons.chevron_left),
+          iconSize: 20,
+          visualDensity: VisualDensity.compact,
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            onPressed: () => _changeMonth(-1),
-            icon: const Icon(Icons.chevron_left),
-            iconSize: 20,
-            visualDensity: VisualDensity.compact,
-          ),
-          Text(
-            formatYearMonth(_selectedMonth),
-            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-          ),
-          IconButton(
-            onPressed: _isCurrentMonth ? null : () => _changeMonth(1),
-            icon: const Icon(Icons.chevron_right),
-            iconSize: 20,
-            visualDensity: VisualDensity.compact,
-          ),
-        ],
-      ),
+        Text(
+          formatYearMonth(_selectedMonth),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+        ),
+        IconButton(
+          onPressed: _isCurrentMonth ? null : () => _changeMonth(1),
+          icon: const Icon(Icons.chevron_right),
+          iconSize: 20,
+          visualDensity: VisualDensity.compact,
+        ),
+      ],
     );
   }
 

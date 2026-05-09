@@ -7,8 +7,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../domain/entities/payment_receipt.dart';
 import '../providers/payment_receipt_providers.dart';
 
@@ -51,71 +51,46 @@ class _ReceiptListScreenState extends ConsumerState<ReceiptListScreen> {
     );
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paper,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: NotebookMasthead.mastheadTopPaddingScreen),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: NotebookMasthead(
-                eyebrow: 'RECEIPTS',
-                meta: AppStrings.receiptTitle,
-                trailing: IconButton(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.ink,
-                    size: 22,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
-                  ),
-                ),
-              ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.receiptTitle),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: AppSpacing.space4),
+          // ── Month picker ──
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
             ),
-            const SizedBox(height: AppSpacing.space4),
-            // ── Month picker ──
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: _MonthPickerRow(
-                year: _selectedYear,
-                month: _selectedMonth,
-                label: _monthLabel,
-                onPick: _showMonthPicker,
-              ),
+            child: _MonthPickerRow(
+              year: _selectedYear,
+              month: _selectedMonth,
+              label: _monthLabel,
+              onPick: _showMonthPicker,
             ),
-            const SizedBox(height: AppSpacing.space4),
-            // ── Receipt list ──
-            Expanded(
-              child: receiptsAsync.when(
-                data: (receipts) {
-                  if (receipts.isEmpty) {
-                    return _EmptyReceiptState(monthLabel: _monthLabel);
-                  }
-                  return _ReceiptList(receipts: receipts);
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (e, _) => Center(
-                      child: Text(
-                        '데이터를 불러오지 못했습니다.',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          // ── Receipt list ──
+          Expanded(
+            child: receiptsAsync.when(
+              data: (receipts) {
+                if (receipts.isEmpty) {
+                  return _EmptyReceiptState(monthLabel: _monthLabel);
+                }
+                return _ReceiptList(receipts: receipts);
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error:
+                  (e, _) => Center(
+                    child: Text(
+                      '데이터를 불러오지 못했습니다.',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkSecondary,
                       ),
                     ),
-              ),
+                  ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
