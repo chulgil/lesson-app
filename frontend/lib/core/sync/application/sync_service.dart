@@ -252,7 +252,17 @@ class SyncService {
       return;
     }
     final stats = await _readStats(nextAction: nextAction);
-    _statsStream.add(stats);
+    if (_statsStream.isClosed) {
+      return;
+    }
+    try {
+      _statsStream.add(stats);
+    } catch (error) {
+      if (_statsStream.isClosed || error is StateError) {
+        return;
+      }
+      rethrow;
+    }
   }
 
   Future<SyncServiceStats> _readStats({String nextAction = 'idle'}) async {

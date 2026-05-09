@@ -264,5 +264,47 @@ void main() {
         ),
       );
     });
+
+    test('dispose 직후 connectivity 이벤트가 와도 통계 스트림 add 오류를 발생시키지 않는다', () async {
+      final errors = <Object>[];
+      await runZonedGuarded(
+        () async {
+          final service = await createService(
+            initialConnectivity: ConnectivityResult.none,
+            pollingInterval: const Duration(milliseconds: 1),
+          );
+
+          when(
+            () => apiClient.post<dynamic>(
+              any(),
+              data: any(named: 'data'),
+              queryParameters: any(named: 'queryParameters'),
+              options: any(named: 'options'),
+            ),
+          ).thenAnswer((invocation) async {
+            await Future<void>.delayed(const Duration(milliseconds: 10));
+            return makeApiResponse(
+              invocation.positionalArguments.first as String,
+            );
+          });
+
+          await service.queueMutation(
+            domain: 'lesson',
+            httpMethod: 'POST',
+            path: '/dispose-safe-test',
+            payload: {'case': 'dispose-safe'},
+          );
+
+          fakeConnectivity!.setState(ConnectivityResult.wifi);
+          await service.dispose();
+        },
+        (error, stack) {
+          errors.add(error);
+        },
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      expect(errors, isEmpty);
+    });
   });
 }
