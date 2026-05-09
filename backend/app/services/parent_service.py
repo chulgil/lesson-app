@@ -231,7 +231,7 @@ class ParentService:
 
         await self._assert_can_access_parent(data.parent_id, current_user)
         student = Student(
-            teacher_id="",
+            teacher_id=None,
             name=data.name,
             instrument=data.instrument,
             level=StudentLevel(data.level),
@@ -359,7 +359,7 @@ class ParentService:
                 teacher_relation.status = RelationStatus.disconnected
                 teacher_relation.disconnected_at = datetime.now(UTC)
                 teacher_relation.is_app_connected = False
-        student.teacher_id = ""
+        student.teacher_id = None
         await self.db.flush()
         await self.db.refresh(student)
         return await self._child_profile_response(student, relation)

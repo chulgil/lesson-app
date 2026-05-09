@@ -97,7 +97,7 @@ async def test_parent_child_profile_crud_and_access_control(
         [
             Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
             Parent(id="other-parent-profile-id", user_id="other-parent-user-id", name="Other Parent"),
-            Student(id="other-child", teacher_id="", name="Other Child", instrument="piano"),
+            Student(id="other-child", teacher_id=None, name="Other Child", instrument="piano"),
             ParentChildRelation(parent_id="other-parent-profile-id", student_id="other-child"),
         ]
     )
@@ -171,7 +171,7 @@ async def test_parent_connects_and_disconnects_teacher_for_child_profile(
     db_session.add_all(
         [
             Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
-            Student(id="child-001", teacher_id="", name="Child", instrument="violin"),
+            Student(id="child-001", teacher_id=None, name="Child", instrument="violin"),
             ParentChildRelation(parent_id="parent-profile-id", student_id="child-001"),
         ]
     )

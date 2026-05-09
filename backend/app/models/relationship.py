@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
+from typing import ClassVar
 
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -99,7 +100,7 @@ class Follow(UUIDMixin, Base):
     following_id: Mapped[str] = mapped_column(String(36), nullable=False)
 
     # Non-column attribute, populated by service layer via User JOIN
-    following_name: str | None = None
+    following_name: ClassVar[str | None] = None
     target_type: Mapped[FollowTargetType] = mapped_column(
         Enum(FollowTargetType, native_enum=True),
         nullable=False,

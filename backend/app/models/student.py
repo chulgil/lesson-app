@@ -1,10 +1,12 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, String, Text
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
+
+# ruff: noqa: N815, UP042
 
 
 class StudentLevel(str, enum.Enum):
@@ -49,7 +51,11 @@ class Student(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "students"
 
     user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
-    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    teacher_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("teachers.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     instrument: Mapped[str] = mapped_column(String(50), nullable=False, default="")
     level: Mapped[StudentLevel] = mapped_column(

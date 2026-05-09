@@ -24,9 +24,9 @@
       "table": "students",
       "column": "teacher_id",
       "target": "teachers.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P0",
-      "reason": "Student rows are teacher-owned, but ownership is currently protected only by service checks."
+      "reason": "Teacher-owned student rows are FK-protected; parent-created child profiles may keep teacher_id null until teacher connection."
     },
     {
       "domain": "identity",

@@ -214,7 +214,7 @@ class StudentService:
 
         student = Student(
             user_id=current_user.id,
-            teacher_id="",  # No teacher yet (will be set on connection)
+            teacher_id=None,  # No teacher yet (will be set on connection)
             name=data.name,
             instrument=data.instrument,
             level=data.level,
