@@ -72,18 +72,11 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.studentFormTitle,
-        leading: DetailAppBarLeading.close,
         onLeadingTap: () => showExitConfirmation(
           context,
           hasChanges: _hasFormData(),
           onExit: () => context.pop(),
         ),
-        customActions: [
-          TextButton(
-            onPressed: _saveStudent,
-            child: const Text(AppStrings.save),
-          ),
-        ],
       ),
       body: Form(
         key: _formKey,

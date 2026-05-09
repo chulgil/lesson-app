@@ -80,22 +80,8 @@ class _ProfileVisibilityScreenState
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
 
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
+      appBar: const NotebookDetailAppBar(
         title: AppStrings.profileVisibilityAppBarTitle,
-        customActions: [
-          if (_hasChanges)
-            TextButton(
-              onPressed: _isLoading ? null : _save,
-              child:
-                  _isLoading
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Text(AppStrings.save),
-            ),
-        ],
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

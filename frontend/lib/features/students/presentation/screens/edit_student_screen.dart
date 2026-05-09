@@ -177,7 +177,6 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           child: NotebookScreenScaffold(
             appBar: NotebookDetailAppBar(
               title: AppStrings.studentEditTitle,
-              leading: DetailAppBarLeading.close,
               onLeadingTap: _isSaving
                   ? null
                   : () => showExitConfirmation(
@@ -185,26 +184,6 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                         hasChanges: _hasChanges,
                         onExit: () => context.pop(),
                       ),
-              customActions: [
-                TextButton(
-                  onPressed:
-                      _hasChanges && !_isSaving
-                          ? () => _saveStudent(student)
-                          : null,
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          '저장',
-                          style: TextStyle(
-                            color: _hasChanges ? null : AppColors.inkTertiary,
-                          ),
-                        ),
-                ),
-              ],
             ),
             body: Form(
               key: _formKey,

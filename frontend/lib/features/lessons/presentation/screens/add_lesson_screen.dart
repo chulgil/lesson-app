@@ -118,18 +118,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         title: _isRecordMode
             ? AppStrings.lessonRecordTitle
             : AppStrings.lessonAddTitle,
-        leading: DetailAppBarLeading.close,
         onLeadingTap: () => showLessonExitConfirmation(
           context: context,
           hasData: _hasFormData(),
           onExit: () => context.pop(),
         ),
-        customActions: [
-          TextButton(
-            onPressed: _saveLesson,
-            child: const Text(AppStrings.save),
-          ),
-        ],
       ),
       body: Form(
         key: _formKey,

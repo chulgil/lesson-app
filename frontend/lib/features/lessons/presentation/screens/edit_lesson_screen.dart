@@ -102,9 +102,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return NotebookScreenScaffold(
-        appBar: NotebookDetailAppBar(
+        appBar: const NotebookDetailAppBar(
           title: AppStrings.editLessonTitle,
-          leading: DetailAppBarLeading.close,
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -115,7 +114,6 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.editLessonTitle,
-        leading: DetailAppBarLeading.close,
         onLeadingTap: () => showEditLessonExitConfirmation(
           context: context,
           hasChanges: _hasChanges,

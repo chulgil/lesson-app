@@ -146,30 +146,8 @@ class _StudentProfileEditScreenState
     }
 
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
+      appBar: const NotebookDetailAppBar(
         title: AppStrings.studentHomeProfileEdit,
-        customActions: [
-          TextButton(
-            onPressed: _hasChanges && !_isSaving ? _onSave : null,
-            child:
-                _isSaving
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : Text(
-                      '저장',
-                      style: TextStyle(
-                        color:
-                            _hasChanges
-                                ? AppColors.paperAccent
-                                : AppColors.inkTertiary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),

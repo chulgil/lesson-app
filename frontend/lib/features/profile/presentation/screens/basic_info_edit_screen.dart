@@ -217,27 +217,8 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return PopScope(
       canPop: !_isLoading,
       child: NotebookScreenScaffold(
-        appBar: NotebookDetailAppBar(
+        appBar: const NotebookDetailAppBar(
           title: AppStrings.profileBasicInfoTitle,
-          customActions: [
-            TextButton(
-              onPressed: _isLoading ? null : _save,
-              child:
-                  _isLoading
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(
-                        '저장',
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.paperAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-            ),
-          ],
         ),
         body: Form(
           key: _formKey,

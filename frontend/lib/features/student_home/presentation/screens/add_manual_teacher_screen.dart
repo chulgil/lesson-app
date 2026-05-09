@@ -68,14 +68,7 @@ class _AddManualTeacherScreenState
         title: _isEditMode
             ? AppStrings.studentHomeTeacherEditLabel
             : AppStrings.studentHomeTeacherRegisterLabel,
-        leading: DetailAppBarLeading.close,
         onLeadingTap: _confirmExit,
-        customActions: [
-          TextButton(
-            onPressed: _isSaving ? null : _save,
-            child: const Text(AppStrings.save),
-          ),
-        ],
       ),
       body: Form(
         key: _formKey,
