@@ -8,7 +8,6 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/utils/image_utils.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 
 /// Show image picker options and return the cropped image path.
 ///
@@ -189,9 +188,7 @@ void showExitConfirmation(
           Navigator.pop(context);
           onExit();
         },
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.paperAccent,
-        ),
+        style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
         child: const Text(AppStrings.exitAction),
       ),
     ],
@@ -221,9 +218,7 @@ void showDeleteStudentConfirmation(
           Navigator.pop(context);
           onDelete();
         },
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.paperAccent,
-        ),
+        style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
         child: const Text(AppStrings.archive),
       ),
     ],

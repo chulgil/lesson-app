@@ -44,6 +44,8 @@
 - 직접 `AlertDialog(` 호출. 신규/수정 코드는 `NotebookAlertDialog` 또는 `showNotebookDialog`를 사용한다.
 - `showModalBottomSheet` 직접 호출. 신규/수정 코드는 `showNotebookBottomSheet` 또는 `showNotebookModalBottomSheet`를 사용한다.
 - `Colors.white`/Material surface에 의존하는 popup/sheet
+- `showDialog`에서 투명 route 위에 spinner만 띄우는 로딩 팝업. 처리중 상태도 `NotebookAlertDialog`/`showNotebookDialog` paper 표면 안에 표시한다.
+- 커스텀 `Dialog` 직접 반환 시 `backgroundColor: AppColors.paper`, `surfaceTintColor: Colors.transparent`, `shape: const RoundedRectangleBorder()` 누락
 - `Card` 위젯 사용 (평면 잉크 원칙 위반 — `Container` + `BoxDecoration(border)` 사용)
 - `BoxShadow`/`elevation > 0` (종이는 평면 잉크, 떠있는 material이 아님 §7.115)
 
@@ -257,6 +259,7 @@ showDialog<void>(
 금지:
 - 기본 `AlertDialog`를 직접 사용해 표면 계약을 화면마다 재정의
 - 둥근 dialog shape (`RoundedRectangleBorder(borderRadius: ...)`)
+- 투명 로딩 overlay (`Center(child: CircularProgressIndicator())` 단독 반환)
 - `Colors.white`, `surfaceTintColor` 기본값 의존
 - `BoxShadow`/`elevation > 0`
 - 다이얼로그 내부에 `Card` 위젯 중첩

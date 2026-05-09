@@ -506,6 +506,90 @@ void main() {
     },
   );
 
+  test('custom Dialog surfaces explicitly use Notebook paper', () {
+    final violations = <String>[];
+
+    for (final file in Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))
+        .where((file) => !file.path.endsWith('.g.dart'))) {
+      final normalizedPath = file.path.replaceAll('\\', '/');
+      if (normalizedPath ==
+          'lib/core/widgets/notebook/notebook_alert_dialog.dart') {
+        continue;
+      }
+
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        if (!RegExp(r'(^|[^A-Za-z0-9_])Dialog\(').hasMatch(lines[i])) {
+          continue;
+        }
+
+        final window = lines.skip(i).take(8).join('\n');
+        final hasPaper = window.contains('backgroundColor: AppColors.paper');
+        final hasTransparentTint = window.contains(
+          'surfaceTintColor: Colors.transparent',
+        );
+        final hasSquareShape = window.contains(
+          'shape: const RoundedRectangleBorder()',
+        );
+
+        if (!hasPaper || !hasTransparentTint || !hasSquareShape) {
+          violations.add('$normalizedPath:${i + 1}');
+        }
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Custom Dialog widgets must opt into the Notebook paper surface explicitly; otherwise loading and form popups can render as transparent or Material-default surfaces.',
+    );
+  });
+
+  test('showDialog builders do not create transparent loading overlays', () {
+    final violations = <String>[];
+
+    for (final file in Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))
+        .where((file) => !file.path.endsWith('.g.dart'))) {
+      final normalizedPath = file.path.replaceAll('\\', '/');
+      if (normalizedPath ==
+          'lib/core/widgets/notebook/notebook_alert_dialog.dart') {
+        continue;
+      }
+
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        if (!RegExp(r'showDialog(?:<.*>)?\(').hasMatch(lines[i])) {
+          continue;
+        }
+
+        final window = lines.skip(i).take(10).join('\n');
+        final isBareProgressOverlay =
+            window.contains('Center(child: CircularProgressIndicator())') ||
+            window.contains('CircularProgressIndicator()') &&
+                !window.contains('NotebookAlertDialog') &&
+                !window.contains('showNotebookDialog');
+
+        if (isBareProgressOverlay) {
+          violations.add('$normalizedPath:${i + 1}');
+        }
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Blocking loading popups must use NotebookAlertDialog/showNotebookDialog so the user never sees a transparent floating spinner.',
+    );
+  });
+
   test('schedule and subscription screens use Notebook scaffold wrappers', () {
     final targetDirectories = [
       Directory('lib/features/schedule/presentation/screens'),

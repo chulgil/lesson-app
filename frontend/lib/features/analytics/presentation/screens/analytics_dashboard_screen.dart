@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
@@ -116,7 +115,9 @@ class _AnalyticsDashboardScreenState
       color: AppColors.paper,
       child: TabBar(
         controller: _tabController,
-        labelStyle: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+        labelStyle: AppTypography.bodySmall.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
         unselectedLabelStyle: AppTypography.bodySmall,
         labelColor: AppColors.ink,
         unselectedLabelColor: AppColors.inkTertiary,

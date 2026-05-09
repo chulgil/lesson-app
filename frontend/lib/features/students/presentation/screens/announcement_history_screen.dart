@@ -8,7 +8,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
-import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
@@ -27,7 +26,9 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final teacherId = ref.watch(currentUserIdProvider);
-    final announcementsAsync = ref.watch(teacherAnnouncementsProvider(teacherId));
+    final announcementsAsync = ref.watch(
+      teacherAnnouncementsProvider(teacherId),
+    );
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
@@ -41,21 +42,26 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
       ),
       body: announcementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Text(
-            AppStrings.errorTryAgain,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
+        error:
+            (_, __) => Center(
+              child: Text(
+                AppStrings.errorTryAgain,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
             ),
-          ),
-        ),
         data: (announcements) {
           if (announcements.isEmpty) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.campaign_outlined, size: 48, color: AppColors.inkTertiary),
+                  Icon(
+                    Icons.campaign_outlined,
+                    size: 48,
+                    color: AppColors.inkTertiary,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     AppStrings.announcementHistoryEmpty,
@@ -72,9 +78,7 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             itemCount: announcements.length,
             itemBuilder: (context, index) {
-              return _AnnouncementCard(
-                announcement: announcements[index],
-              );
+              return _AnnouncementCard(announcement: announcements[index]);
             },
           );
         },
@@ -110,15 +114,17 @@ class _AnnouncementCard extends ConsumerWidget {
 
     if (result != null && result.isNotEmpty) {
       final repo = ref.read(teacherAnnouncementRepositoryProvider);
-      await repo.update(TeacherAnnouncement(
-        id: announcement.id,
-        teacherId: announcement.teacherId,
-        type: announcement.type,
-        dates: announcement.dates,
-        message: result,
-        createdAt: announcement.createdAt,
-        affectedLessons: announcement.affectedLessons,
-      ));
+      await repo.update(
+        TeacherAnnouncement(
+          id: announcement.id,
+          teacherId: announcement.teacherId,
+          type: announcement.type,
+          dates: announcement.dates,
+          message: result,
+          createdAt: announcement.createdAt,
+          affectedLessons: announcement.affectedLessons,
+        ),
+      );
       ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
     }
   }
@@ -145,9 +151,10 @@ class _AnnouncementCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDayOff = announcement.type == AnnouncementType.dayOff;
-    final dateText = announcement.dates.isNotEmpty
-        ? formatDateMD(announcement.dates.first)
-        : '';
+    final dateText =
+        announcement.dates.isNotEmpty
+            ? formatDateMD(announcement.dates.first)
+            : '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -174,7 +181,9 @@ class _AnnouncementCard extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    isDayOff ? '${AppStrings.announcementTypeDayOff} · $dateText' : AppStrings.announcementTypeGeneral,
+                    isDayOff
+                        ? '${AppStrings.announcementTypeDayOff} · $dateText'
+                        : AppStrings.announcementTypeGeneral,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -189,13 +198,27 @@ class _AnnouncementCard extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.space1),
                 PopupMenuButton<String>(
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                   iconSize: 18,
-                  icon: Icon(Icons.more_vert, size: 18, color: AppColors.inkTertiary),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(value: 'edit', child: Text(AppStrings.modify)),
-                    PopupMenuItem(value: 'delete', child: Text(AppStrings.delete)),
-                  ],
+                  icon: Icon(
+                    Icons.more_vert,
+                    size: 18,
+                    color: AppColors.inkTertiary,
+                  ),
+                  itemBuilder:
+                      (_) => [
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Text(AppStrings.modify),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text(AppStrings.delete),
+                        ),
+                      ],
                   onSelected: (action) {
                     if (action == 'edit') {
                       _editAnnouncement(context, ref);
@@ -248,15 +271,16 @@ class _AnnouncementCard extends ConsumerWidget {
                         border: Border.all(color: AppColors.inkQuaternary),
                       ),
                       child: InkWell(
-                        onTap: lesson.subscriptionId != null
-                            ? () => context.push(
-                                AppRoutes.subscriptionDetail.replaceFirst(
-                                  ':id',
-                                  lesson.subscriptionId!,
-                                ),
-                                extra: {'viewerRole': 'teacher'},
-                              )
-                            : null,
+                        onTap:
+                            lesson.subscriptionId != null
+                                ? () => context.push(
+                                  AppRoutes.subscriptionDetail.replaceFirst(
+                                    ':id',
+                                    lesson.subscriptionId!,
+                                  ),
+                                  extra: {'viewerRole': 'teacher'},
+                                )
+                                : null,
                         child: Padding(
                           padding: const EdgeInsets.all(AppSpacing.space3),
                           child: Row(
@@ -274,9 +298,10 @@ class _AnnouncementCard extends ConsumerWidget {
                                     ),
                                     Text(
                                       lesson.startTime,
-                                      style: AppTypography.captionSmall.copyWith(
-                                        color: AppColors.inkTertiary,
-                                      ),
+                                      style: AppTypography.captionSmall
+                                          .copyWith(
+                                            color: AppColors.inkTertiary,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -284,23 +309,26 @@ class _AnnouncementCard extends ConsumerWidget {
                               // 스케줄 변경 버튼 (크고 명확)
                               if (lesson.subscriptionId != null)
                                 FilledButton.icon(
-                                  onPressed: () => context.push(
-                                    AppRoutes.subscriptionDetail.replaceFirst(
-                                      ':id',
-                                      lesson.subscriptionId!,
-                                    ),
-                                    extra: {'viewerRole': 'teacher'},
-                                  ),
+                                  onPressed:
+                                      () => context.push(
+                                        AppRoutes.subscriptionDetail
+                                            .replaceFirst(
+                                              ':id',
+                                              lesson.subscriptionId!,
+                                            ),
+                                        extra: {'viewerRole': 'teacher'},
+                                      ),
                                   icon: const Icon(Icons.swap_horiz, size: 16),
-                                  label: const Text(AppStrings.announcementScheduleChange),
+                                  label: const Text(
+                                    AppStrings.announcementScheduleChange,
+                                  ),
                                   style: FilledButton.styleFrom(
                                     minimumSize: const Size(0, 36),
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: AppSpacing.space3,
                                     ),
-                                    textStyle: AppTypography.captionSmall.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    textStyle: AppTypography.captionSmall
+                                        .copyWith(fontWeight: FontWeight.w600),
                                   ),
                                 ),
                             ],

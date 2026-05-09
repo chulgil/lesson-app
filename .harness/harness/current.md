@@ -55,6 +55,9 @@
 - `@riverpod` 어노테이션만 사용 (수동 Provider 금지)
 - 새 코드는 반드시 `features/[domain]/` 아래에 작성 (`core/` 예외)
 - 색상: `AppColors`만, UI 텍스트: `AppStrings`만, 타이포: `AppTypography`만
+- 팝업/바텀시트: 신규/수정 UI는 `showNotebookDialog`, `NotebookAlertDialog`, `showNotebookBottomSheet`, `showNotebookModalBottomSheet`를 우선 사용한다.
+- 커스텀 `Dialog`가 필요한 경우 `AppColors.paper` 배경, `Colors.transparent` surface tint, `RoundedRectangleBorder()` 각진 shape를 명시한다.
+- 처리중/로딩 팝업은 투명 route 위 spinner 단독 표시를 금지하고 Notebook paper 표면 안에 표시한다.
 
 ## 유비쿼터스 언어
 

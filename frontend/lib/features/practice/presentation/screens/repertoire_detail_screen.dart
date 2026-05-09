@@ -417,7 +417,7 @@ class _RepertoireDetailScreenState
                 .read(repertoireArchiveNotifierProvider.notifier)
                 .archive(widget.repertoireId, widget.studentId);
 
-            if (!context.mounted) return;
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
             );

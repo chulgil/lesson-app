@@ -99,6 +99,7 @@ class _StudentProfileEditScreenState
     }
   }
 
+  // ignore: unused_element -- Save CTA is currently hidden while the student profile flow is being rebuilt.
   Future<void> _onSave() async {
     if (_currentStudent == null || _isSaving) return;
 
@@ -138,9 +139,7 @@ class _StudentProfileEditScreenState
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const NotebookScreenScaffold(
-        appBar: NotebookDetailAppBar(
-          title: AppStrings.studentHomeProfileEdit,
-        ),
+        appBar: NotebookDetailAppBar(title: AppStrings.studentHomeProfileEdit),
         body: Center(child: CircularProgressIndicator()),
       );
     }

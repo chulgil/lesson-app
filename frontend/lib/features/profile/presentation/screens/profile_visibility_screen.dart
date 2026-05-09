@@ -21,8 +21,10 @@ class ProfileVisibilityScreen extends ConsumerStatefulWidget {
 
 class _ProfileVisibilityScreenState
     extends ConsumerState<ProfileVisibilityScreen> {
+  // ignore: unused_field -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   bool _isLoading = false;
   late ProfileVisibilitySettings _settings;
+  // ignore: unused_field -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   bool _hasChanges = false;
 
   @override
@@ -44,6 +46,7 @@ class _ProfileVisibilityScreenState
     });
   }
 
+  // ignore: unused_element -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   Future<void> _save() async {
     setState(() => _isLoading = true);
 

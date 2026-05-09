@@ -24,7 +24,7 @@ void main() {
     );
   });
 
-  SyncQueueEntry _fakeEntry() {
+  SyncQueueEntry fakeEntry() {
     final now = DateTime.now().toUtc();
     return SyncQueueEntry(
       id: 'test-id',
@@ -70,7 +70,7 @@ void main() {
           path: any(named: 'path'),
           payload: any(named: 'payload'),
         ),
-      ).thenAnswer((_) async => _fakeEntry());
+      ).thenAnswer((_) async => fakeEntry());
 
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
@@ -96,8 +96,8 @@ void main() {
 
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
-        remoteCall: () async =>
-            throw const NetworkException(message: 'no network'),
+        remoteCall:
+            () async => throw const NetworkException(message: 'no network'),
         queueCall: (_) async {
           queueCallInvoked = true;
         },
@@ -113,8 +113,8 @@ void main() {
 
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
-        remoteCall: () async =>
-            throw const ServerException(message: 'internal error'),
+        remoteCall:
+            () async => throw const ServerException(message: 'internal error'),
         queueCall: (_) async {
           queueCallInvoked = true;
         },
@@ -130,10 +130,12 @@ void main() {
 
       expect(
         () => helper.executeMutation<String>(
-          remoteCall: () async => throw const ApiException(
-            message: 'bad request',
-            statusCode: 400,
-          ),
+          remoteCall:
+              () async =>
+                  throw const ApiException(
+                    message: 'bad request',
+                    statusCode: 400,
+                  ),
           queueCall: (_) async {
             fail('queueCall should not be called for 4xx');
           },
@@ -143,21 +145,23 @@ void main() {
       );
     });
 
-    test('online but ValidationException (422): propagates (no queue)',
-        () async {
-      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+    test(
+      'online but ValidationException (422): propagates (no queue)',
+      () async {
+        when(() => connectivity.isOnline).thenAnswer((_) async => true);
 
-      expect(
-        () => helper.executeMutation<String>(
-          remoteCall: () async => throw const ValidationException(),
-          queueCall: (_) async {
-            fail('queueCall should not be called');
-          },
-          optimisticResult: () => 'optimistic',
-        ),
-        throwsA(isA<ValidationException>()),
-      );
-    });
+        expect(
+          () => helper.executeMutation<String>(
+            remoteCall: () async => throw const ValidationException(),
+            queueCall: (_) async {
+              fail('queueCall should not be called');
+            },
+            optimisticResult: () => 'optimistic',
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+      },
+    );
   });
 
   group('executeVoidMutation', () {
@@ -194,8 +198,8 @@ void main() {
 
       var queueCallInvoked = false;
       await helper.executeVoidMutation(
-        remoteCall: () async =>
-            throw const NetworkException(message: 'timeout'),
+        remoteCall:
+            () async => throw const NetworkException(message: 'timeout'),
         queueCall: (_) async {
           queueCallInvoked = true;
         },

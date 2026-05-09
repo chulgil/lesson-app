@@ -102,6 +102,8 @@
 - 직접 `AlertDialog(` 호출. 신규/수정 코드는 `NotebookAlertDialog` 또는 `showNotebookDialog`를 사용한다.
 - `showModalBottomSheet` 직접 호출. 신규/수정 코드는 `showNotebookBottomSheet` 또는 `showNotebookModalBottomSheet`를 사용한다.
 - `Colors.white`/Material surface에 의존하는 popup/sheet
+- `showDialog`에서 `Center(child: CircularProgressIndicator())`만 반환하는 투명 로딩 팝업. 로딩/처리중 상태도 `showNotebookDialog` 또는 `NotebookAlertDialog`의 paper 표면 안에 표시한다.
+- 커스텀 `Dialog`를 직접 반환할 때 `backgroundColor: AppColors.paper`, `surfaceTintColor: Colors.transparent`, `shape: const RoundedRectangleBorder()`를 생략하는 코드
 
 예외:
 - 카메라, 녹음 파형, 튜너 등 실제 미디어/캔버스가 주 표면인 화면

@@ -168,6 +168,9 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: AppColors.paper,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(),
       child: AnimatedSize(
         duration: const Duration(milliseconds: 200),
         child:

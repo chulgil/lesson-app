@@ -3,9 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../config/environment.dart';
 import '../network/api_client.dart';
-import '../sync/application/connectivity_service.dart';
 import '../sync/application/mutation_queue_helper.dart';
-import '../sync/application/sync_service.dart';
 import '../sync/presentation/providers/sync_provider.dart';
 
 part 'repository_provider.g.dart';

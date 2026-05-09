@@ -159,6 +159,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     await notifier.pickAndSaveImage(source, context);
   }
 
+  // ignore: unused_element -- Save CTA is currently hidden while the profile edit flow is being rebuilt.
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 

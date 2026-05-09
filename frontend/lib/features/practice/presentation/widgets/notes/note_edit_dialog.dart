@@ -69,6 +69,8 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: AppColors.paper,
+      surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
