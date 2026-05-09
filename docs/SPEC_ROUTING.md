@@ -47,6 +47,7 @@
 | 새 기능 기획 | 해당 도메인 마스터 | `feature_hub.md` §2-3 | `requirement/requirement.md` (2025-12 기준, 오래됨) |
 | 결제/수강권 | `subscription/subscription_master.md` | `subscription/payment_architecture.md` | `requirement/requirement.md` (PG 정책 충돌) |
 | 초대/관계 | `lesson/invite/invite_system_v2.md` | `lesson/invite/subscription_based_relationship.md` | `_archive/` |
+| 학생 설치 웹 랜딩/요약 공유 | `lesson/invite/student_install_web_landing_spec.md` | `lesson/invite/invite_system_v2.md`, `backend/backend_spec.md` | `_archive/`, FastAPI Jinja2 랜딩 직접 구현 |
 | 알림 | `notification/notification_master.md` | `notification/notification_system.md` | |
 | 스케줄/예약 | `schedule/schedule_master.md` | `booking/unified_lesson_request_spec.md` | `_archive/` |
 

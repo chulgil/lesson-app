@@ -209,6 +209,24 @@ app/
 
 **v3 변경: v2의 `POST /lessons/bulk-cancel`은 제거됨. 공지와 레슨 취소가 분리됨.**
 
+### R2 학생 설치 웹 랜딩/레슨 요약 공유 계약 (2026-05-10)
+
+> 상세 스펙: [student_install_web_landing_spec.md](../lesson/invite/student_install_web_landing_spec.md)
+
+`lessonaza.com`의 Ghost 테마가 공개 HTML 랜딩과 SEO/카톡 미리보기를 담당한다. FastAPI는 Jinja2 템플릿을 직접 렌더링하지 않고, Ghost가 소비할 공개 읽기 API와 선생님용 공유 토큰 API만 제공한다.
+
+| 기능 | 엔드포인트 | 인증 | 설명 |
+|------|------------|------|------|
+| 초대 랜딩 데이터 | `GET /api/v1/public/invites/{code}/landing` | 없음 | 초대 코드 검증 + 선생님/악기/공유 URL 최소 정보 |
+| 요약 공유 토큰 생성 | `POST /api/v1/lesson-summaries/{lesson_id}/share` | 선생님 JWT | 레슨 요약 공유 URL/딥링크/카톡 텍스트 생성 |
+| 요약 공개 조회 | `GET /api/v1/public/student-summaries/{token}` | 토큰 | 설치 전 학생용 읽기 전용 레슨 요약 |
+
+**보안 원칙:**
+- 공개 API는 연락처, 결제 상태, 내부 메모, 다른 학생 정보를 노출하지 않는다.
+- 공유 토큰은 원문 저장 금지, 해시만 저장한다.
+- 토큰 조회는 `access_count`, `last_accessed_at`으로 최소 감사 추적한다.
+- Ghost Admin API 키는 브라우저에 노출하지 않는다.
+
 ### 주소 검색 API 계약 (2026-05-07)
 
 > 상세 스펙: [lesson_location_management_spec.md](../schedule/lesson_location_management_spec.md) §16
