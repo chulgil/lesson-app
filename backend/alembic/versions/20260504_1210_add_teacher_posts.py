@@ -42,4 +42,5 @@ def downgrade() -> None:
     op.drop_index("idx_teacher_posts_created", table_name="teacher_posts")
     op.drop_index("idx_teacher_posts_author", table_name="teacher_posts")
     op.drop_table("teacher_posts")
-    sa.Enum("performance", "event", "notice", name="posttype").drop(op.get_bind(), checkfirst=True)
+    if op.get_context().dialect.name == "postgresql":
+        sa.Enum("performance", "event", "notice", name="posttype").drop(op.get_bind(), checkfirst=True)

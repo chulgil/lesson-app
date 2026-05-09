@@ -19,16 +19,24 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    is_pg = op.get_context().dialect.name == "postgresql"
+
     relation_status = sa.Enum("pending", "active", "inactive", name="parentchildrelationstatus")
     invitation_source = sa.Enum("student", "teacher", name="parentinvitationsource")
-    invitation_source_column = postgresql.ENUM(
-        "student",
-        "teacher",
-        name="parentinvitationsource",
-        create_type=False,
-    )
-    relation_status.create(op.get_bind(), checkfirst=True)
-    invitation_source.create(op.get_bind(), checkfirst=True)
+
+    if is_pg:
+        invitation_source_column = postgresql.ENUM(
+            "student",
+            "teacher",
+            name="parentinvitationsource",
+            create_type=False,
+        )
+        relation_status.create(op.get_bind(), checkfirst=True)
+        invitation_source.create(op.get_bind(), checkfirst=True)
+    else:
+        invitation_source_column = sa.Enum(
+            "student", "teacher", name="parentinvitationsource", create_constraint=False,
+        )
 
     op.add_column(
         "parent_child_relations",
@@ -46,9 +54,11 @@ def upgrade() -> None:
         "parent_child_relations",
         sa.Column("unlinked_at", sa.DateTime(timezone=True), nullable=True),
     )
-    op.alter_column("parent_child_relations", "is_primary_guardian", server_default=None)
-    op.alter_column("parent_child_relations", "is_billing_target", server_default=None)
-    op.alter_column("parent_child_relations", "status", server_default=None)
+
+    if is_pg:
+        op.alter_column("parent_child_relations", "is_primary_guardian", server_default=None)
+        op.alter_column("parent_child_relations", "is_billing_target", server_default=None)
+        op.alter_column("parent_child_relations", "status", server_default=None)
 
     op.create_table(
         "parent_invitations",
@@ -69,7 +79,8 @@ def upgrade() -> None:
 
     for column in ("lesson_start", "lesson_end", "practice_complete", "streak_achievement", "lesson_note_update"):
         op.execute(sa.text(f"UPDATE parent_notification_settings SET {column} = false"))
-        op.alter_column("parent_notification_settings", column, server_default=sa.false())
+        if is_pg:
+            op.alter_column("parent_notification_settings", column, server_default=sa.false())
 
 
 def downgrade() -> None:
@@ -85,5 +96,6 @@ def downgrade() -> None:
     for column in ("lesson_start", "lesson_end", "practice_complete", "streak_achievement", "lesson_note_update"):
         op.alter_column("parent_notification_settings", column, server_default=sa.true())
 
-    sa.Enum(name="parentinvitationsource").drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name="parentchildrelationstatus").drop(op.get_bind(), checkfirst=True)
+    if op.get_context().dialect.name == "postgresql":
+        sa.Enum(name="parentinvitationsource").drop(op.get_bind(), checkfirst=True)
+        sa.Enum(name="parentchildrelationstatus").drop(op.get_bind(), checkfirst=True)

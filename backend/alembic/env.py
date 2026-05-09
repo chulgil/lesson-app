@@ -78,9 +78,26 @@ async def run_async_migrations() -> None:
     await connectable.dispose()
 
 
+def run_sync_migrations() -> None:
+    """Run migrations in 'online' mode with sync engine (for SQLite)."""
+    from sqlalchemy import create_engine
+
+    url = config.get_main_option("sqlalchemy.url")
+    connectable = create_engine(url, poolclass=pool.NullPool)
+
+    with connectable.connect() as connection:
+        do_run_migrations(connection)
+
+    connectable.dispose()
+
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode (async wrapper)."""
-    asyncio.run(run_async_migrations())
+    url = config.get_main_option("sqlalchemy.url") or ""
+    if url.startswith("sqlite"):
+        run_sync_migrations()
+    else:
+        asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():

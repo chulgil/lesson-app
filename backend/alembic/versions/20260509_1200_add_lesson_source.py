@@ -18,7 +18,8 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     lesson_source = sa.Enum("manual", "subscriptionGenerated", name="lessonsource")
-    lesson_source.create(op.get_bind(), checkfirst=True)
+    if op.get_context().dialect.name == "postgresql":
+        lesson_source.create(op.get_bind(), checkfirst=True)
 
     with op.batch_alter_table("lessons") as batch_op:
         batch_op.add_column(
@@ -50,4 +51,5 @@ def downgrade() -> None:
         batch_op.drop_column("lesson_source")
 
     lesson_source = sa.Enum("manual", "subscriptionGenerated", name="lessonsource")
-    lesson_source.drop(op.get_bind(), checkfirst=True)
+    if op.get_context().dialect.name == "postgresql":
+        lesson_source.drop(op.get_bind(), checkfirst=True)
