@@ -606,7 +606,6 @@ class _UnifiedLessonRequestScreenState
     // Only show when instrument and experience are selected
     if (_selectedInstrument == null) return const SizedBox.shrink();
 
-    // TODO: Replace with actual price lookup from teacher price table
     final referencePrice = _lookupReferencePrice();
     if (referencePrice == null) return const SizedBox.shrink();
 

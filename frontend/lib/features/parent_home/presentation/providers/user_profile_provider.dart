@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
+import '../../../../features/auth/auth_facade.dart';
 import './child_profile_provider.dart';
 
 part 'user_profile_provider.g.dart';
@@ -19,8 +20,9 @@ class CurrentUserProfile extends _$CurrentUserProfile {
   UserProfile build() {
     // TODO: Load from auth/storage service
     // For now, return a default parent profile
-    return const UserProfile(
-      userId: 'current-user-id',
+    final userId = ref.watch(currentUserIdProvider);
+    return UserProfile(
+      userId: userId,
       userName: '사용자',
       activeProfile: ProfileType.parent,
       hasStudentProfile: false,

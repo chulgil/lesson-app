@@ -242,6 +242,21 @@ class _SubscriptionDetailBodyState
     icon: Icons.check_circle,
   );
 
+  /// Resolve teacherId from membership.
+  /// Called in handlers that cannot access local build() variables.
+  String? _getTeacherId() {
+    final membershipAsync =
+        ref.read(membershipProvider(subscription.membershipId));
+    final membership = membershipAsync.valueOrNull;
+    if (membership == null) return null;
+
+    final lessonClassAsync = ref.read(
+      lessonClassProvider(membership.lessonClassId),
+    );
+    final lessonClass = lessonClassAsync.valueOrNull;
+    return lessonClass?.teacherId;
+  }
+
   /// Event strip widget — pixel-exact match with RequestDetailScreen._buildEventStrip()
   Widget _buildEventStrip() {
     return AnimatedSwitcher(
@@ -496,6 +511,7 @@ class _SubscriptionDetailBodyState
     BuildContext context,
     RequestEvent event,
   ) async {
+    final teacherId = _getTeacherId();
     final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
@@ -503,7 +519,7 @@ class _SubscriptionDetailBodyState
             (_) => SuggestAlternativeScreen(
               message: '',
               durationMinutes: 60,
-              teacherId: subscription.membershipId,
+              teacherId: teacherId ?? '',
             ),
       ),
     );
@@ -550,6 +566,7 @@ class _SubscriptionDetailBodyState
     BuildContext context,
     RequestEvent event,
   ) async {
+    final teacherId = _getTeacherId();
     final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
@@ -557,7 +574,7 @@ class _SubscriptionDetailBodyState
             (_) => SuggestAlternativeScreen(
               message: '',
               durationMinutes: 60,
-              teacherId: subscription.membershipId,
+              teacherId: teacherId ?? '',
             ),
       ),
     );
@@ -594,12 +611,14 @@ class _SubscriptionDetailBodyState
     final changeType = await showScheduleChangeTypeBottomSheet(context);
     if (changeType == null || !context.mounted) return;
 
+    final teacherId = _getTeacherId();
+
     // Both single and bulk use the same ScheduleChangeSlotBottomSheet.
     // P0-1 Phase B(b) — 부모가 BottomSheet 흐름이므로 sheet 로 통일.
     final result = await showScheduleChangeSlotBottomSheet(
       context,
       params: ScheduleChangeSlotParams(
-        teacherId: subscription.membershipId, // TODO: resolve teacherId
+        teacherId: teacherId ?? '',
         studentId: subscription.studentId,
         durationMinutes: 60,
         currentScheduleLabel: AppStrings.sessionNumberLabel(_selectedSession),

@@ -910,7 +910,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       params: ScheduleChangeSlotParams(
         teacherId: request.teacherId,
         studentId: request.studentId,
-        durationMinutes: 60, // TODO: get from subscription
+        durationMinutes: request.preferredDuration,
         currentScheduleLabel:
             request.preferredSlots.isNotEmpty
                 ? request.preferredSlots.first.displayLabel
@@ -983,7 +983,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       context,
       proposedSlots: proposedSlots,
       changeType: changeType,
-      durationMinutes: 60,
+      durationMinutes: request.preferredDuration,
       teacherId: request.teacherId,
     );
     if (result == null || !context.mounted) return;
