@@ -55,7 +55,7 @@ class _TipTemplateManagementScreenState
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           tabs: [
-            const Tab(text: '전체'),
+            const Tab(text: AppStrings.all),
             ...TipCategory.values.map((cat) => Tab(text: cat.label)),
           ],
         ),

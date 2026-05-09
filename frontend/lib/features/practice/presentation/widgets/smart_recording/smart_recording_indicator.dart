@@ -37,7 +37,7 @@ class SmartRecordingIndicator extends ConsumerWidget {
       ),
       RecordingPhase.recording => (
         Icons.fiber_manual_record,
-        '녹음 중',
+        AppStrings.recordingInProgress,
         AppColors.paperAccent,
       ),
       RecordingPhase.ending => (

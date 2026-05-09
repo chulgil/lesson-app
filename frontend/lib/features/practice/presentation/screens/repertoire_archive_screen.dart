@@ -21,7 +21,9 @@ class RepertoireArchiveScreen extends ConsumerWidget {
     final archivedAsync = ref.watch(archivedRepertoiresProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceArchiveTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceArchiveTitle,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -94,7 +96,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.space4),
                         Text(
-                          '오류가 발생했습니다',
+                          AppStrings.practiceErrorOccurred,
                           style: AppTypography.bodyLarge.copyWith(
                             color: AppColors.paperAccent,
                           ),

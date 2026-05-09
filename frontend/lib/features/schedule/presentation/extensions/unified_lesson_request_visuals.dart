@@ -1,7 +1,7 @@
 import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 
-const _shortWeekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+const _shortWeekdayLabels = AppStrings.dayNamesShort;
 
 extension LessonRequestTypeVisualX on LessonRequestType {
   String get label {

@@ -110,12 +110,12 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     // Validate range based on type
     if (_rangeType == SectionRangeType.measure) {
       if (_startMeasure > _endMeasure) {
-        _showErrorSnackBar('시작 마디가 끝 마디보다 클 수 없습니다');
+        _showErrorSnackBar(AppStrings.practiceStartMeasureGreaterError);
         return;
       }
     } else if (_rangeType == SectionRangeType.line) {
       if (_startLine > _endLine) {
-        _showErrorSnackBar('시작 줄이 끝 줄보다 클 수 없습니다');
+        _showErrorSnackBar(AppStrings.practiceStartLineGreaterError);
         return;
       }
     }
@@ -278,13 +278,17 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return NotebookScreenScaffold(
-        appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionAddTitle),
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.practiceSectionAddTitle,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionAddTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceSectionAddTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -484,7 +488,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
           endValue: isMeasure ? _endMeasure : _endLine,
           startLabel: isMeasure ? '시작 마디' : '시작 줄',
           endLabel: isMeasure ? '끝 마디' : '끝 줄',
-          unit: isMeasure ? '마디' : '줄',
+          unit: isMeasure ? AppStrings.measureLabel : AppStrings.lineLabel,
           onStartTap:
               isMeasure
                   ? () => _showMeasurePicker(isStart: true)

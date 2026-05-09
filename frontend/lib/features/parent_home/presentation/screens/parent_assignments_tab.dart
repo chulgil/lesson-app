@@ -149,14 +149,18 @@ class ParentAssignmentsTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _ProgressStat(label: '전체', value: '7', color: AppColors.paper),
               _ProgressStat(
-                label: '완료',
+                label: AppStrings.all,
+                value: '7',
+                color: AppColors.paper,
+              ),
+              _ProgressStat(
+                label: AppStrings.statusCompleted,
                 value: '5',
                 color: AppColors.paperDark,
               ),
               _ProgressStat(
-                label: '진행중',
+                label: AppStrings.parentHomeInProgress,
                 value: '2',
                 color: AppColors.paperAccentSoft,
               ),
@@ -366,7 +370,7 @@ class _AssignmentCard extends StatelessWidget {
   String _getPriorityLabel() {
     switch (priority) {
       case AssignmentPriority.must:
-        return '필수';
+        return AppStrings.parentHomeRequired;
       case AssignmentPriority.should:
         return '권장';
       case AssignmentPriority.could:

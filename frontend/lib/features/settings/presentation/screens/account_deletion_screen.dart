@@ -29,9 +29,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
-        title: '계정 삭제',
-      ),
+      appBar: const NotebookDetailAppBar(title: '계정 삭제'),
       body: _buildContent(context),
     );
   }
@@ -71,9 +69,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
               const SizedBox(height: AppSpacing.space3),
               Text(
                 '계정을 삭제하면 다음과 같은 일이 발생합니다:',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.ink,
-                ),
+                style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
               ),
               const SizedBox(height: AppSpacing.space2),
               _buildWarningItem('모든 개인 정보 및 데이터가 영구 삭제됩니다'),
@@ -115,19 +111,23 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
             onPressed: _isDeleting ? null : () => _showConfirmDialog(context),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.profileRed,
-              disabledBackgroundColor: AppColors.profileRed.withValues(alpha: 0.5),
+              disabledBackgroundColor: AppColors.profileRed.withValues(
+                alpha: 0.5,
+              ),
             ),
-            child: _isDeleting
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.paper),
-                    ),
-                  )
-                : const Text('계정 삭제'),
+            child:
+                _isDeleting
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.paper,
+                        ),
+                      ),
+                    )
+                    : const Text('계정 삭제'),
           ),
         ),
 
@@ -138,7 +138,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
           width: double.infinity,
           child: OutlinedButton(
             onPressed: _isDeleting ? null : () => context.pop(),
-            child: const Text('취소'),
+            child: const Text(AppStrings.cancel),
           ),
         ),
       ],
@@ -164,9 +164,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
         Expanded(
           child: Text(
             text,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
           ),
         ),
       ],
@@ -189,7 +187,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
         TextButton(
           onPressed: () => Navigator.pop(context, true),
           child: Text(
-            '삭제',
+            AppStrings.delete,
             style: const TextStyle(color: AppColors.profileRed),
           ),
         ),
@@ -197,12 +195,13 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
     );
 
     if (confirmed == true) {
+      if (!context.mounted) return;
       await _deleteAccount(context);
     }
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     setState(() => _isDeleting = true);
 
@@ -212,18 +211,18 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
       // Call DELETE /api/v1/users/me
       await apiClient.delete<void>('/api/v1/users/me');
 
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       // Clear local tokens
       final tokenStorage = ref.read(tokenStorageProvider);
       await tokenStorage.clearTokens();
 
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       // Navigate to login screen
       context.go(AppRoutes.login);
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('계정이 삭제되었습니다. 30일 후 모든 데이터가 영구 삭제됩니다.'),
@@ -232,7 +231,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
         );
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       setState(() => _isDeleting = false);
 

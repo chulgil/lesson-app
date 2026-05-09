@@ -570,7 +570,7 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildUpcomingLesson() {
     return SectionCard(
       romanIndex: 0,
-      title: '다음 레슨',
+      title: AppStrings.parentHomeNextLesson,
       icon: Icons.event,
       child: ListTile(
         contentPadding: EdgeInsets.zero,
@@ -591,7 +591,7 @@ class ParentDashboardTab extends ConsumerWidget {
                 ),
               ),
               Text(
-                '토',
+                AppStrings.sat,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.paperAccent,
                 ),
@@ -636,7 +636,7 @@ class ParentDashboardTab extends ConsumerWidget {
 
     return SectionCard(
       romanIndex: 1,
-      title: '이번 주 연습',
+      title: AppStrings.parentHomeWeeklyPractice,
       icon: Icons.local_fire_department,
       trailing: Text(
         '5일 연습',
@@ -652,7 +652,16 @@ class ParentDashboardTab extends ConsumerWidget {
           final practiced = practiceStatus[index];
           final isToday = index == today.weekday - 1;
           final isPast = index < today.weekday - 1;
-          final dayLabel = ['월', '화', '수', '목', '금', '토', '일'][index];
+          const dayLabels = [
+            AppStrings.mon,
+            AppStrings.tue,
+            AppStrings.wed,
+            AppStrings.thu,
+            AppStrings.fri,
+            AppStrings.sat,
+            AppStrings.sun,
+          ];
+          final dayLabel = dayLabels[index];
 
           return Column(
             children: [
@@ -710,7 +719,7 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildRecentAssignments() {
     return SectionCard(
       romanIndex: 2,
-      title: '과제 현황',
+      title: AppStrings.parentHomeAssignmentStatus,
       icon: Icons.assignment,
       trailing: null,
       child: Column(
@@ -743,7 +752,7 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildPaymentStatus() {
     return SectionCard(
       romanIndex: 3,
-      title: '입금 상태',
+      title: AppStrings.parentHomeNotificationCategoryPayment,
       icon: Icons.payment,
       child: Column(
         children: [
@@ -783,7 +792,7 @@ class ParentDashboardTab extends ConsumerWidget {
                     // "입금대기(후불)" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
                     // italic (README §1.1 4계층, §7.127 Gaegu 회피).
                     child: Text(
-                      '입금대기(후불)',
+                      AppStrings.paymentStatusUnpaid,
                       style: NotebookTypography.indicatorLabel,
                     ),
                   ),

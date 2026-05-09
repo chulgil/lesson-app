@@ -56,7 +56,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    const days = AppStrings.dayNamesShort;
     final isEditing = widget.existingSchedule != null;
 
     return Container(
@@ -193,7 +193,9 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: Text(isEditing ? AppStrings.edit : AppStrings.add),
+                        child: Text(
+                          isEditing ? AppStrings.edit : AppStrings.add,
+                        ),
                       ),
                     ),
                   ],

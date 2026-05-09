@@ -157,7 +157,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
                       // italic (README §1.1 4계층, §7.127 Gaegu 회피).
                       child: Text(
-                        '오늘',
+                        AppStrings.todayLabel,
                         style: NotebookTypography.indicatorLabel,
                       ),
                     ),

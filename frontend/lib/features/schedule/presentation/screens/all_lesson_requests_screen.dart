@@ -59,9 +59,7 @@ class _AllLessonRequestsScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: NotebookDetailAppBar(
-        title: AppStrings.lessonRequestTitle,
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.lessonRequestTitle),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -296,7 +294,7 @@ class _AllLessonRequestsScreenState
       dateText = _selectedPreset.label;
     } else if (_filter.specificDate != null) {
       // Calendar date mode
-      const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+      const weekdays = AppStrings.dayNamesShort;
       final d = _selectedDate;
       final dayLabel = weekdays[d.weekday - 1];
       final now = DateTime.now();

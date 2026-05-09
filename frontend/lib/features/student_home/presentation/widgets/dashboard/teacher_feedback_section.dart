@@ -69,7 +69,7 @@ class TeacherFeedbackSection extends ConsumerWidget {
       ),
       child: Center(
         child: Text(
-          '아직 피드백이 없습니다',
+          AppStrings.feedbackEmpty,
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkTertiary,
           ),

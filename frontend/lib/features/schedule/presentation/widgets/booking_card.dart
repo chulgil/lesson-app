@@ -255,7 +255,7 @@ class BookingCard extends StatelessWidget {
 
   String _getDaysText() {
     final days = booking.daysUntilLesson;
-    if (days == 0) return '오늘';
+    if (days == 0) return AppStrings.todayLabel;
     if (days == 1) return '내일';
     return 'D-$days';
   }

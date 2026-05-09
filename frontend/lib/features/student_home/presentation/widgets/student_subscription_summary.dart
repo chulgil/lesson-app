@@ -109,7 +109,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '등록된 수강권이 없습니다',
+            AppStrings.noSubscriptionsRegisteredTitle,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),

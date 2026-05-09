@@ -95,7 +95,7 @@ class DateSuggestion {
 
   /// Get formatted date string (e.g., "2/20(목)")
   String get formattedDate {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    const weekdays = AppStrings.dayNamesShort;
     final weekday = weekdays[date.weekday - 1];
     return '${date.month}/${date.day}($weekday)';
   }

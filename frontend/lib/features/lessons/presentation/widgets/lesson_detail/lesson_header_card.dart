@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -62,7 +63,7 @@ class LessonHeaderCard extends StatelessWidget {
                         Text(
                           isTeacher
                               ? lesson.studentName
-                              : (lesson.teacherName ?? '선생님'),
+                              : (lesson.teacherName ?? AppStrings.teacher),
                           style: NotebookTypography.sectionTitle,
                         ),
                         const SizedBox(width: AppSpacing.space2),

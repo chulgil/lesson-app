@@ -478,7 +478,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
 
           // Max duration hint
           Text(
-            widget.isRecording ? '녹음 중...' : '최대 3분',
+            widget.isRecording ? AppStrings.recordingInProgressLabel : '최대 3분',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -498,7 +498,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                     foregroundColor: AppColors.paperAccent,
                     side: const BorderSide(color: AppColors.paperAccent),
                   ),
-                  tooltip: '취소',
+                  tooltip: AppStrings.cancel,
                 ),
                 SizedBox(width: AppSpacing.space4),
 
@@ -512,7 +512,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                     style: IconButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                     ),
-                    tooltip: '녹음 완료',
+                    tooltip: AppStrings.recordingComplete,
                   ),
                 ),
               ] else ...[
@@ -767,7 +767,7 @@ class _RecordingItem extends StatelessWidget {
                       Icon(Icons.delete_outline, color: AppColors.paperAccent),
                       SizedBox(width: AppSpacing.space2),
                       Text(
-                        '삭제',
+                        AppStrings.delete,
                         style: TextStyle(color: AppColors.paperAccent),
                       ),
                     ],

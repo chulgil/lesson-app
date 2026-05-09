@@ -250,9 +250,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             TextButton(
               onPressed: _selectAllStudents,
               child: Text(
-                _isAllSelected
-                    ? AppStrings.deselectAll
-                    : AppStrings.selectAll,
+                _isAllSelected ? AppStrings.deselectAll : AppStrings.selectAll,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.ink,
                   fontWeight: FontWeight.w600,
@@ -636,7 +634,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return EmptyStateWidget(
       icon: Icons.people_outline,
-      title: query.isNotEmpty ? AppStrings.studentsSearchEmptyTitle : AppStrings.studentsEmptyTitle,
+      title:
+          query.isNotEmpty
+              ? AppStrings.studentsSearchEmptyTitle
+              : AppStrings.studentsEmptyTitle,
       subtitle: query.isEmpty ? AppStrings.studentsEmptySubtitle : null,
       actionLabel: query.isEmpty ? AppStrings.studentAddLabel : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
@@ -735,15 +736,15 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 }
 
 enum StudentFilter {
-  all('전체'),
-  good('우수'),
-  normal('보통'),
-  poor('부족'),
-  paused('휴강'),
-  expiring('만료임박'),
-  unpaid('입금대기(후불)'),
-  trial('체험'),
-  archive('보관');
+  all(AppStrings.all),
+  good(AppStrings.studentPracticeStatusGood),
+  normal(AppStrings.studentPracticeStatusNormal),
+  poor(AppStrings.studentPracticeStatusPoor),
+  paused(AppStrings.studentPracticeStatusPaused),
+  expiring(AppStrings.studentTriageExpiring),
+  unpaid(AppStrings.studentTriageUnpaid),
+  trial(AppStrings.studentStatusTrial),
+  archive(AppStrings.archive);
 
   final String label;
   const StudentFilter(this.label);
@@ -1100,16 +1101,26 @@ class _EnrollmentExtras extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.space2),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
-            const SizedBox(width: AppSpacing.space2),
-            Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
-          ],
-        ),
-      ),
+      error:
+          (_, __) => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
     );
   }
 

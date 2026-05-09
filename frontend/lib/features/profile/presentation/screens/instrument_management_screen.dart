@@ -250,7 +250,7 @@ class _InstrumentManagementScreenState
 
         // Custom instrument input
         Text(
-          '직접 입력',
+          AppStrings.profileDirectInput,
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkSecondary,
           ),

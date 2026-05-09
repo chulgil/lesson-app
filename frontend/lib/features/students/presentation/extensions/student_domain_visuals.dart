@@ -114,13 +114,13 @@ extension MembershipStatusVisuals on MembershipStatus {
   String get label {
     switch (this) {
       case MembershipStatus.trial:
-        return '체험중';
+        return AppStrings.studentTriageTrial;
       case MembershipStatus.active:
         return '수강중';
       case MembershipStatus.paused:
-        return '휴강';
+        return AppStrings.studentStatusPaused;
       case MembershipStatus.terminated:
-        return '종료';
+        return AppStrings.studentStatusInactive;
     }
   }
 }

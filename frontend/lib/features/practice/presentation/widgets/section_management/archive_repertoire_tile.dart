@@ -68,7 +68,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
-                                '영구 삭제',
+                                AppStrings.practicePermanentDelete,
                                 style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],
@@ -203,9 +203,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
           child: const Text(AppStrings.cancel),
         ),
         FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
           onPressed: () async {
             Navigator.of(context).pop();
             await ref

@@ -22,7 +22,7 @@ class LessonTimeSettingsSectionTitle extends StatelessWidget {
     super.key,
     required this.title,
     this.onAddPressed,
-    this.addButtonLabel = '추가',
+    this.addButtonLabel = AppStrings.add,
   });
 
   @override
@@ -99,7 +99,7 @@ class DurationOptionItem extends StatelessWidget {
                 size: 20,
               ),
               onPressed: onDelete,
-              tooltip: '삭제',
+              tooltip: AppStrings.delete,
             ),
           // Active/Disable switch
           Switch(
@@ -399,7 +399,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '시작 시간',
+                      AppStrings.selectStartTime,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -691,7 +691,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 helperText:
                     '${LessonDurations.minDuration}~${LessonDurations.maxDuration}분',
                 border: const OutlineInputBorder(),
-                suffixText: '분',
+                suffixText: AppStrings.minuteLabel,
               ),
               onChanged: (value) {
                 final parsed = int.tryParse(value);

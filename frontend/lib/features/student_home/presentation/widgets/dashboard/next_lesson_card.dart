@@ -100,14 +100,22 @@ class NextLessonCard extends ConsumerWidget {
 
     String dDayText;
     if (isToday) {
-      dDayText = '오늘';
+      dDayText = AppStrings.todayLabel;
     } else if (isTomorrow) {
       dDayText = '내일';
     } else {
       dDayText = 'D-$daysUntil';
     }
 
-    final dayOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
+    const dayOfWeek = [
+      AppStrings.mon,
+      AppStrings.tue,
+      AppStrings.wed,
+      AppStrings.thu,
+      AppStrings.fri,
+      AppStrings.sat,
+      AppStrings.sun,
+    ];
     final weekdayText = dayOfWeek[booking.lessonDate.weekday - 1];
     final typeText = booking.lessonType == LessonType.regular ? '정기' : '체험';
 
@@ -173,7 +181,7 @@ class NextLessonCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '다음 레슨',
+                        AppStrings.parentHomeNextLesson,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paper.withValues(alpha: 0.8),
                         ),

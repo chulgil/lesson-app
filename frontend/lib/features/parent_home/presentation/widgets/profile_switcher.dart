@@ -187,7 +187,10 @@ class _ProfileDropdown extends ConsumerWidget {
               icon: ProfileType.child.icon,
               color: child.profileColor,
               subtitle: _getChildSubtitle(child),
-              badge: child.isUnconnected ? '미연결' : null,
+              badge:
+                  child.isUnconnected
+                      ? AppStrings.parentHomeChildConnectionUnconnected
+                      : null,
               badgeColor: child.connectionStatus.color,
             ),
             isSelected:
@@ -398,7 +401,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             if (availableProfiles.contains(ProfileType.parent))
               _ProfileTile(
                 label: AppStrings.parentHomeParentLabel,
-                subtitle: '자녀 관리',
+                subtitle: AppStrings.parentHomeChildManagement,
                 icon: ProfileType.parent.icon,
                 color: ProfileType.parent.color,
                 isSelected: userProfile.activeProfile == ProfileType.parent,
@@ -454,7 +457,10 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
                   isSelected:
                       userProfile.activeProfile == ProfileType.child &&
                       userProfile.activeChildId == child.id,
-                  badge: child.isUnconnected ? '미연결' : null,
+                  badge:
+                      child.isUnconnected
+                          ? AppStrings.parentHomeChildConnectionUnconnected
+                          : null,
                   badgeColor: child.connectionStatus.color,
                   onTap: () {
                     ref

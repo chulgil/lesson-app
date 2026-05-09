@@ -192,7 +192,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       endHour = maxHour > endHour ? maxHour : endHour;
     }
 
-    const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+    const dayLabels = AppStrings.dayNamesShort;
     const cellHeight = 28.0;
 
     return Padding(

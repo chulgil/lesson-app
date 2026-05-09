@@ -123,7 +123,7 @@ class _FeedbackTemplatePickerSheetState
           horizontal: AppSpacing.screenPadding,
         ),
         children: [
-          _categoryChip(null, '전체'),
+          _categoryChip(null, AppStrings.all),
           ...FeedbackCategory.values.map((c) => _categoryChip(c, c.label)),
         ],
       ),

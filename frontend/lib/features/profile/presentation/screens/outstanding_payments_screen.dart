@@ -303,9 +303,9 @@ class _UnpaidCard extends ConsumerWidget {
         final total = subscription.totalLessonsForDisplay ?? 0;
         return '회차권 · ${subscription.usedLessons}/$total회';
       case SubscriptionType.monthly:
-        return '월정액';
+        return AppStrings.subscriptionTypeMonthly;
       case SubscriptionType.trial:
-        return '체험';
+        return AppStrings.subscriptionTypeTrial;
     }
   }
 

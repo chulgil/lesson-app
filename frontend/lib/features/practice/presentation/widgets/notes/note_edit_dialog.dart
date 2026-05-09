@@ -141,7 +141,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 const SizedBox(width: AppSpacing.space2),
                 FilledButton(
                   onPressed: _hasContent ? _save : null,
-                  child: Text(isEditing ? '수정' : '저장'),
+                  child: Text(isEditing ? AppStrings.modify : AppStrings.save),
                 ),
               ],
             ),

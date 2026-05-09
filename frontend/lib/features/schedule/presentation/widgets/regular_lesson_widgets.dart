@@ -173,7 +173,7 @@ class RegularLessonDaySelector extends StatelessWidget {
     required this.onTimeRemoved,
   });
 
-  static const List<String> dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+  static const List<String> dayNames = AppStrings.dayNamesShort;
 
   @override
   Widget build(BuildContext context) {
@@ -430,8 +430,8 @@ class LessonsPerWeekSelector extends StatelessWidget {
       children: [
         Expanded(
           child: OptionCard(
-            title: '주 1회',
-            subtitle: '월 4회',
+            title: AppStrings.studentFrequencyOnceTitle,
+            subtitle: AppStrings.studentFrequencyOnceSubtitle,
             isSelected: lessonsPerWeek == 1,
             onTap: () {
               onChanged(1);
@@ -442,8 +442,8 @@ class LessonsPerWeekSelector extends StatelessWidget {
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: OptionCard(
-            title: '주 2회',
-            subtitle: '월 8회',
+            title: AppStrings.studentFrequencyTwiceTitle,
+            subtitle: AppStrings.studentFrequencyTwiceSubtitle,
             isSelected: lessonsPerWeek == 2,
             onTap: () => onChanged(2),
           ),
@@ -518,7 +518,12 @@ class RegularLessonFeeSelector extends StatelessWidget {
   });
 
   static const List<int> fees = [160000, 180000, 200000, 240000];
-  static const List<String> labels = ['입문', '초급', '중급', '고급'];
+  static const List<String> labels = [
+    AppStrings.studentLevelBeginner,
+    AppStrings.studentLevelElementary,
+    AppStrings.studentLevelIntermediate,
+    AppStrings.studentLevelAdvanced,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -612,7 +617,7 @@ class RegularLessonSummary extends StatelessWidget {
     required this.startDate,
   });
 
-  static const List<String> dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+  static const List<String> dayNames = AppStrings.dayNamesShort;
 
   @override
   Widget build(BuildContext context) {
@@ -626,10 +631,13 @@ class RegularLessonSummary extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildRow('레슨 유형', scheduleTypeLabel),
+          _buildRow(AppStrings.lessonTypeLabel, scheduleTypeLabel),
           const SizedBox(height: AppSpacing.space2),
           if (isFixedSchedule) ...[
-            _buildRow('레슨 시간', LessonDurations.format(lessonDuration)),
+            _buildRow(
+              AppStrings.lessonDurationLabel,
+              LessonDurations.format(lessonDuration),
+            ),
             const SizedBox(height: AppSpacing.space2),
             if (selectedDays.isNotEmpty)
               ...(selectedDays.toList()..sort()).map((day) {
@@ -648,7 +656,10 @@ class RegularLessonSummary extends StatelessWidget {
                 );
               }),
           ],
-          _buildRow('레슨 횟수', '주 $lessonsPerWeek회 (월 ${lessonsPerWeek * 4}회)'),
+          _buildRow(
+            AppStrings.lessonCountLabel,
+            '주 $lessonsPerWeek회 (월 ${lessonsPerWeek * 4}회)',
+          ),
           const SizedBox(height: AppSpacing.space2),
           _buildRow('회당 수강료', formatFee(perLessonFee)),
           const SizedBox(height: AppSpacing.space2),

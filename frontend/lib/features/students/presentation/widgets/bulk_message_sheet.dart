@@ -111,7 +111,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 controller: _titleController,
                 maxLength: 40,
                 decoration: const InputDecoration(
-                  labelText: '제목',
+                  labelText: AppStrings.titleLabel,
                   hintText: AppStrings.studentBulkMessageTitleHint,
                   border: OutlineInputBorder(),
                 ),
@@ -137,7 +137,11 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
                 ),
-                child: Text(_submitting ? '전송 중…' : '메시지 보내기'),
+                child: Text(
+                  _submitting
+                      ? AppStrings.sendingInProgress
+                      : AppStrings.studentSendMessage,
+                ),
               ),
             ],
           ),

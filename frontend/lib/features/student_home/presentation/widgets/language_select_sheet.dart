@@ -54,7 +54,7 @@ class LanguageSelectSheet extends StatelessWidget {
               _buildLanguageItem(
                 context,
                 flag: '🇰🇷',
-                name: '한국어',
+                name: AppStrings.studentHomeMenuLanguageValue,
                 isSelected: true,
                 onTap: () => Navigator.pop(context),
               ),
@@ -141,7 +141,7 @@ class LanguageSelectSheet extends StatelessWidget {
                   color: AppColors.inkTertiary.withValues(alpha: 0.1),
                 ),
                 child: Text(
-                  '준비 중',
+                  AppStrings.newsRoadmapStatusPlanned,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),

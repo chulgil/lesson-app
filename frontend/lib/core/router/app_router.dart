@@ -52,7 +52,7 @@ class AppRouter {
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
-      navigatorObservers: [
+      observers: [
         analyticsService.observer,
       ],
       redirect:
@@ -128,7 +128,7 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.login,
     debugLogDiagnostics: true,
-    navigatorObservers: [
+    observers: [
       AnalyticsService().observer,
     ],
     routes: [

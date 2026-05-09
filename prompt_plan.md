@@ -1,7 +1,45 @@
-# 현재 계획: 선생님 공지 시스템 v3 (공지 중심 재설계)
+# 현재 계획: R4 IAP 통합 + Free/Pro/Studio 유료화 (#319)
 
-> 생성: 2026-05-07
-> 스펙: `docs/specs/student/bulk_teacher_actions_spec.md` (v3)
+> 생성: 2026-05-10
+> 이슈: #319
+
+## Phase A: 백엔드 빌링 모델 + API ✅
+
+- [x] `AppBillingPlan`, `AppBillingReceipt` 모델 (SQLite 호환 마이그레이션)
+- [x] GET /status, POST /trial/start, POST /verify-purchase, POST /restore, GET /products
+- [x] 테스트 7/7 + Alembic chain 통과
+
+## Phase B: FE billing 도메인 + BillingGuard ✅
+
+- [x] `features/billing/domain/entities/billing_plan.dart` — BillingStatus, BillingProduct, BillingPlanType
+- [x] `features/billing/domain/repositories/billing_repository.dart` — 인터페이스
+- [x] `features/billing/data/repositories/remote_billing_repository.dart` — BE API 연동
+- [x] `features/billing/data/repositories/mock_billing_repository.dart` — dev-login 모드
+- [x] `features/billing/presentation/providers/billing_provider.dart` — billingStatusNotifier + billingLimitReached
+- [x] `features/billing/presentation/widgets/billing_guard.dart` — 학생 추가 시 free limit 체크
+- [x] `features/billing/presentation/widgets/free_limit_sheet.dart` — 페이월 바텀시트
+- [x] `features/billing/billing.dart` — 배럴 파일
+- [x] `in_app_purchase: ^3.1.13` 패키지 추가
+- [x] AppStrings 빌링 상수 12개 추가
+- [x] `flutter analyze` 통과 (신규 에러 0)
+
+## Phase C: Paywall UI + 구독 화면 (다음)
+
+- [ ] 구독 플랜 비교 화면 (SubscriptionPlansScreen)
+- [ ] IAP 결제 흐름 연동 (in_app_purchase 패키지 사용)
+- [ ] 프로필 구독 배지 표시
+- [ ] 얼리어답터 Lifetime 199,000원 (90일 한정) UI
+
+## Phase D: BillingGuard 통합
+
+- [ ] 학생 추가 버튼에 BillingGuard.check() 연동
+- [ ] 기존 학생 추가 플로우에 guard 삽입
+
+---
+
+## 이전 계획
+
+### 선생님 공지 시스템 v3 (공지 중심 재설계, 2026-05-07)
 
 ## Phase A: 스펙 전면 재작성 ✅
 

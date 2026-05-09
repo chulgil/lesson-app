@@ -186,7 +186,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                         ),
                         const SizedBox(height: AppSpacing.space4),
                         const Text(
-                          '오류가 발생했습니다.',
+                          AppStrings.practiceErrorOccurredDot,
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                       ],

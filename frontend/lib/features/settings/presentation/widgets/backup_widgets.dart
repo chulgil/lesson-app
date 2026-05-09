@@ -638,7 +638,7 @@ class BackupItem extends ConsumerWidget {
         '이 백업에서 데이터를 복원하시겠습니까?\n\n'
         '이미 존재하는 녹음은 건너뜁니다.',
       ),
-      confirmLabel: '복원',
+      confirmLabel: AppStrings.settingsRestore,
       cancelLabel: AppStrings.cancel,
       onConfirm: () => Navigator.pop(context, true),
       onCancel: () => Navigator.pop(context, false),

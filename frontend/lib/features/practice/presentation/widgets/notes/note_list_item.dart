@@ -99,7 +99,7 @@ class NoteListItem extends StatelessWidget {
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
-                                '삭제',
+                                AppStrings.delete,
                                 style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],

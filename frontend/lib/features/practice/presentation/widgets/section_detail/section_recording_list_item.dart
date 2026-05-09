@@ -209,9 +209,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             Navigator.of(context).pop();
             widget.onDelete();
           },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
           child: const Text(AppStrings.delete),
         ),
       ],
@@ -340,7 +338,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             ),
                             SizedBox(width: AppSpacing.space2),
                             Text(
-                              '삭제',
+                              AppStrings.delete,
                               style: TextStyle(color: AppColors.paperAccent),
                             ),
                           ],

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -381,8 +382,8 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             children: [
                               Text(
                                 state.settings.timeSignature.isCompound
-                                    ? '복합 박자'
-                                    : '단순 박자',
+                                    ? AppStrings.metronomeCompoundTimeTitle
+                                    : AppStrings.metronomeSimpleTimeTitle,
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.inkSecondary,
                                 ),

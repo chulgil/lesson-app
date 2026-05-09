@@ -52,7 +52,7 @@ class WeeklyCalendarPicker extends ConsumerStatefulWidget {
 }
 
 class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
-  static const _dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+  static const _dayLabels = AppStrings.dayNamesShort;
   static const _timeColumnWidth = 40.0;
   static const _cellHeight = 44.0;
   static const _headerHeight = 48.0;

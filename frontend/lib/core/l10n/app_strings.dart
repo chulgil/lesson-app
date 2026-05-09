@@ -6962,4 +6962,18 @@ class AppStrings {
   // ── Sync failures ──
   static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
   static const syncRetryAction = '재시도';
+
+  // ── Billing / IAP ──
+  static const billingFreeLimitTitle = '무료 플랜 학생 수 초과';
+  static const billingFreeLimitDescription =
+      '무료 플랜은 최대 5명까지 등록할 수 있습니다.\nPro 플랜으로 업그레이드하면 학생 수 제한 없이 사용할 수 있습니다.';
+  static const billingStartTrial = '14일 무료 체험 시작';
+  static const billingViewPlans = '구독 플랜 보기';
+  static const billingProBadge = 'Pro';
+  static const billingStudioBadge = 'Studio';
+  static const billingLifetimeBadge = 'Lifetime';
+  static const billingTrialBadge = '체험 중';
+  static String billingTrialDaysLeft(int days) => '체험 $days일 남음';
+  static String billingDaysLeft(int days) => '$days일 남음';
+  static const billingRestorePurchase = '구매 복원';
 }

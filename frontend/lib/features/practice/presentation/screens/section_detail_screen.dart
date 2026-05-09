@@ -104,7 +104,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                         ),
                         SizedBox(width: AppSpacing.space2),
                         Text(
-                          '삭제',
+                          AppStrings.delete,
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                       ],

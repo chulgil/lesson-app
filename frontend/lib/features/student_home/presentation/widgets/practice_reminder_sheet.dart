@@ -175,7 +175,15 @@ class PracticeReminderSheet extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(7, (index) {
-                  final days = ['월', '화', '수', '목', '금', '토', '일'];
+                  const days = [
+                    AppStrings.mon,
+                    AppStrings.tue,
+                    AppStrings.wed,
+                    AppStrings.thu,
+                    AppStrings.fri,
+                    AppStrings.sat,
+                    AppStrings.sun,
+                  ];
                   final isSelected = settings.selectedDays.contains(index);
                   return GestureDetector(
                     onTap:

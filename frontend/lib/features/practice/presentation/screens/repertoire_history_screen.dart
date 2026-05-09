@@ -25,7 +25,9 @@ class RepertoireHistoryScreen extends ConsumerWidget {
     final timelineAsync = ref.watch(repertoireTimelineProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireHistoryTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceRepertoireHistoryTitle,
+      ),
       body: timelineAsync.when(
         data: (timeline) {
           if (timeline.totalCount == 0) {
@@ -105,7 +107,7 @@ class RepertoireHistoryScreen extends ConsumerWidget {
           Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '오류가 발생했습니다',
+            AppStrings.practiceErrorOccurred,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.paperAccent,
             ),

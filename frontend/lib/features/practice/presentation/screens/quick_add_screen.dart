@@ -100,7 +100,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       initialDate: _startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: '시작일 선택',
+      helpText: AppStrings.selectStartDate,
     );
     if (picked != null) {
       setState(() {
@@ -118,7 +118,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       initialDate: _endDate ?? _startDate,
       firstDate: _startDate,
       lastDate: DateTime(2030),
-      helpText: '종료일 선택',
+      helpText: AppStrings.selectEndDate,
     );
     if (picked != null) {
       setState(() => _endDate = picked);
@@ -288,7 +288,9 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireAddTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceRepertoireAddTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -300,14 +302,14 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               TextFormField(
                 controller: _repertoireNameController,
                 decoration: const InputDecoration(
-                  labelText: '레퍼토리 이름 *',
+                  labelText: AppStrings.repertoireNameLabel,
                   hintText: AppStrings.practiceRepertoireNameHintSuzuki,
                   prefixIcon: Icon(Icons.library_music),
                 ),
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '레퍼토리 이름을 입력해주세요';
+                    return AppStrings.repertoireNameRequired;
                   }
                   return null;
                 },
@@ -334,7 +336,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '설명 (선택)',
+                  labelText: AppStrings.descriptionOptional,
                   hintText: AppStrings.repertoireDescriptionHint,
                   prefixIcon: Icon(Icons.description_outlined),
                 ),
@@ -351,7 +353,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 onStartDateTap: _selectStartDate,
                 onEndDateTap: _selectEndDate,
                 onEndDateClear: _clearEndDate,
-                endDatePlaceholder: '설정 안함 (매일 반복)',
+                endDatePlaceholder: AppStrings.endDateNotSetDaily,
                 showHintMessage: true,
               ),
 

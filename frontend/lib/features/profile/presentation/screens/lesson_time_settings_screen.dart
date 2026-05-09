@@ -746,7 +746,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 TextButton(
                   onPressed: () => Navigator.pop(context, -1),
                   child: Text(
-                    '삭제',
+                    AppStrings.delete,
                     style: TextStyle(color: AppColors.paperAccent),
                   ),
                 ),

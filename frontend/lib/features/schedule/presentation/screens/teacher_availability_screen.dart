@@ -46,7 +46,9 @@ class _TeacherAvailabilityScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(title: AppStrings.teacherAvailabilityTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.teacherAvailabilityTitle,
+      ),
       body: availabilityAsync.when(
         data: (availability) => _buildBody(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -224,7 +226,7 @@ class _TeacherAvailabilityScreenState
   }
 
   Widget _buildDayRow(int dayIndex, List<WeeklySchedule> schedules) {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    const days = AppStrings.dayNamesShort;
     final dayName = days[dayIndex];
     final isWeekend = dayIndex >= 5;
     final hasSchedules = schedules.isNotEmpty;
@@ -427,7 +429,7 @@ class _TeacherAvailabilityScreenState
   // ─── Section 3: Weekly Preview ─────────────────────────────
 
   Widget _buildWeeklyPreview(TeacherAvailability avail) {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    const days = AppStrings.dayNamesShort;
     final grouped = <int, List<WeeklySchedule>>{};
     for (final s in avail.weeklySchedules) {
       grouped.putIfAbsent(s.dayOfWeek, () => []);

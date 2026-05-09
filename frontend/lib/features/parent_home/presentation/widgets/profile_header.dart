@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -65,7 +66,7 @@ class ProfileHeader extends ConsumerWidget {
                     Text(
                       userProfile.userName.isNotEmpty
                           ? userProfile.userName
-                          : '학부모',
+                          : AppStrings.parentHomeParentLabel,
                       style: AppTypography.headingLarge,
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -80,7 +81,7 @@ class ProfileHeader extends ConsumerWidget {
                         borderRadius: BorderRadius.zero,
                       ),
                       child: Text(
-                        '학부모',
+                        AppStrings.parentHomeParentLabel,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,

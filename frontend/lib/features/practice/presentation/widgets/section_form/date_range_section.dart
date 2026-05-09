@@ -41,7 +41,7 @@ class DateRangeSection extends StatelessWidget {
     required this.onEndDateTap,
     this.onEndDateClear,
     this.startDatePlaceholder,
-    this.endDatePlaceholder = '설정 안함',
+    this.endDatePlaceholder = AppStrings.practiceNotSet,
     this.showHintMessage = false,
     this.endDateNullHint,
     this.endDateSetHint,

@@ -7,7 +7,7 @@ part of 'app_release_provider.dart';
 // **************************************************************************
 
 String _$appReleaseRepositoryHash() =>
-    r'740880e5459c31204cb2c28f95a927379bf4bb30';
+    r'4a2615d0e6f13a462492aace47f7e6efe3f06da3';
 
 /// See also [appReleaseRepository].
 @ProviderFor(appReleaseRepository)

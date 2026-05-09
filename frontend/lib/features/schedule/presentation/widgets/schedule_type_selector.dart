@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -123,7 +124,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                               color: AppColors.paperOk.withValues(alpha: 0.15),
                             ),
                             child: Text(
-                              '권장',
+                              AppStrings.studentAddMethodBadgeRecommended,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.paperOk,
                                 fontWeight: FontWeight.w600,

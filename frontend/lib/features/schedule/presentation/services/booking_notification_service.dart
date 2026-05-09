@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 
 /// Service for creating and sending booking-related notifications
@@ -58,17 +59,19 @@ class BookingNotificationService {
     final newTimeStr = _formatTime(newTime);
 
     final title = isTeacherInitiated ? '레슨 시간 변경 안내' : '레슨 변경 완료';
-    final body = isTeacherInitiated
-        ? '$teacherName 선생님이 레슨 시간을 변경했습니다.\n$oldDateStr $oldTimeStr → $newDateStr $newTimeStr'
-        : '레슨이 $newDateStr $newTimeStr로 변경되었습니다.';
+    final body =
+        isTeacherInitiated
+            ? '$teacherName 선생님이 레슨 시간을 변경했습니다.\n$oldDateStr $oldTimeStr → $newDateStr $newTimeStr'
+            : '레슨이 $newDateStr $newTimeStr로 변경되었습니다.';
 
     return AppNotification(
       id: _uuid.v4(),
       userId: userId,
       type: NotificationType.lessonRescheduled,
-      priority: isTeacherInitiated
-          ? NotificationPriority.high
-          : NotificationPriority.normal,
+      priority:
+          isTeacherInitiated
+              ? NotificationPriority.high
+              : NotificationPriority.normal,
       title: title,
       body: body,
       data: {
@@ -97,9 +100,10 @@ class BookingNotificationService {
     final timeStr = _formatTime(startTime);
 
     final title = isTeacherInitiated ? '레슨 취소 안내' : '레슨 취소 완료';
-    final body = isTeacherInitiated
-        ? '$teacherName 선생님이 $dateStr $timeStr 레슨을 취소했습니다.${reason != null ? '\n사유: $reason' : ''}'
-        : '$dateStr $timeStr 레슨이 취소되었습니다.';
+    final body =
+        isTeacherInitiated
+            ? '$teacherName 선생님이 $dateStr $timeStr 레슨을 취소했습니다.${reason != null ? '\n${AppStrings.reasonPrefix}$reason' : ''}'
+            : '$dateStr $timeStr 레슨이 취소되었습니다.';
 
     return AppNotification(
       id: _uuid.v4(),
@@ -129,9 +133,10 @@ class BookingNotificationService {
     required TimeOfDay startTime,
     required int minutesBefore,
   }) {
-    final title = minutesBefore >= 60
-        ? '레슨 ${minutesBefore ~/ 60}시간 전'
-        : '레슨 $minutesBefore분 전';
+    final title =
+        minutesBefore >= 60
+            ? '레슨 ${minutesBefore ~/ 60}시간 전'
+            : '레슨 $minutesBefore분 전';
 
     final dateStr = _formatDate(lessonDate);
     final timeStr = _formatTime(startTime);
@@ -140,9 +145,10 @@ class BookingNotificationService {
       id: _uuid.v4(),
       userId: userId,
       type: NotificationType.lessonReminder,
-      priority: minutesBefore <= 30
-          ? NotificationPriority.high
-          : NotificationPriority.normal,
+      priority:
+          minutesBefore <= 30
+              ? NotificationPriority.high
+              : NotificationPriority.normal,
       title: title,
       body: '$dateStr $timeStr $teacherName 선생님 $instrument 레슨이 있습니다.',
       data: {
@@ -170,10 +176,7 @@ class BookingNotificationService {
       priority: NotificationPriority.urgent,
       title: '레슨이 곧 시작됩니다',
       body: '$teacherName 선생님 $instrument 레슨이 시작됩니다.',
-      data: {
-        'teacherName': teacherName,
-        'instrument': instrument,
-      },
+      data: {'teacherName': teacherName, 'instrument': instrument},
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
     );
@@ -210,7 +213,7 @@ class BookingNotificationService {
 
   // Helper methods
   static String _formatDate(DateTime date) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    const weekdays = AppStrings.dayNamesShort;
     final weekday = weekdays[date.weekday - 1];
     return '${date.month}/${date.day}($weekday)';
   }
@@ -227,7 +230,8 @@ extension BookingNotificationTemplates on NotificationTemplate {
   static const lessonBooked = NotificationTemplate(
     type: NotificationType.lessonBooked,
     titleTemplate: '레슨 예약 완료',
-    bodyTemplate: '{{date}} {{time}} {{teacherName}} 선생님 {{instrument}} 레슨이 예약되었습니다.',
+    bodyTemplate:
+        '{{date}} {{time}} {{teacherName}} 선생님 {{instrument}} 레슨이 예약되었습니다.',
     priority: NotificationPriority.normal,
   );
 

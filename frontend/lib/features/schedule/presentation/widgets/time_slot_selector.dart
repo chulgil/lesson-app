@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -168,7 +169,8 @@ class TimeSlotSelector extends StatelessWidget {
   String? _getBookedBy(TimeOfDay time) {
     for (final booked in bookedSlots) {
       if (booked.hour == time.hour && booked.minute == time.minute) {
-        return '예약됨'; // In production, this would be the student name
+        return AppStrings
+            .scheduleBooked; // In production, this would be the student name
       }
     }
     return null;

@@ -77,7 +77,9 @@ class _BookingRescheduleScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(title: AppStrings.bookingRescheduleTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.bookingRescheduleTitle,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -382,19 +384,26 @@ class _BookingRescheduleScreenState
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+      error:
+          (_, __) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -584,7 +593,7 @@ class _BookingRescheduleScreenState
   }
 
   String _formatCurrentBooking() {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    const weekdays = AppStrings.dayNamesShort;
     final weekday = weekdays[widget.currentDate.weekday - 1];
     final hour = widget.currentStartTime.hour.toString().padLeft(2, '0');
     final minute = widget.currentStartTime.minute.toString().padLeft(2, '0');

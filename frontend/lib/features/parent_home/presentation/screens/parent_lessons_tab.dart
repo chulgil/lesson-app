@@ -367,7 +367,7 @@ class ParentLessonsTab extends ConsumerWidget {
     switch (priority) {
       case 'must':
         priorityColor = AppColors.paperAccent;
-        priorityLabel = '필수';
+        priorityLabel = AppStrings.parentHomeRequired;
         break;
       case 'should':
         priorityColor = AppColors.paperAccent;
@@ -439,15 +439,21 @@ class ParentLessonsTab extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Center(
-            child: Text(monthName, style: AppTypography.headingSmall),
-          ),
+          Center(child: Text(monthName, style: AppTypography.headingSmall)),
           const SizedBox(height: AppSpacing.space2),
           // Mini calendar week days
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children:
-                ['일', '월', '화', '수', '목', '금', '토']
+                const [
+                      AppStrings.sun,
+                      AppStrings.mon,
+                      AppStrings.tue,
+                      AppStrings.wed,
+                      AppStrings.thu,
+                      AppStrings.fri,
+                      AppStrings.sat,
+                    ]
                     .map(
                       (day) => SizedBox(
                         width: 36,

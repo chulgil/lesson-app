@@ -405,34 +405,45 @@ class RequestHistoryChat extends StatelessWidget {
   /// §7.119 v2: 선생님 사유 휴강 버블 — 회차 + 사유 + 변경권 메타 + 보강 CTA.
   /// §7.119 v2.2: 상단 휴강 배너 — 미래 휴강이 있으면 표시, 지나면 자동 숨김.
   Widget? _buildTeacherCancelBanner(List<RequestEvent> chronological) {
-    final cancelEvents = chronological.where(
-      (e) => e.eventType == RequestEventType.lessonCancelledByTeacher,
-    ).toList();
+    final cancelEvents =
+        chronological
+            .where(
+              (e) => e.eventType == RequestEventType.lessonCancelledByTeacher,
+            )
+            .toList();
     if (cancelEvents.isEmpty) return null;
 
     // 이벤트의 createdAt 기준으로 휴강 날짜 추출 (session별 날짜)
     // 미래 날짜가 1개 이상이면 배너 표시
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final futureCancels = cancelEvents.where(
-      (e) => !e.createdAt.isBefore(today.subtract(const Duration(days: 1))),
-    ).toList();
+    final futureCancels =
+        cancelEvents
+            .where(
+              (e) =>
+                  !e.createdAt.isBefore(
+                    today.subtract(const Duration(days: 1)),
+                  ),
+            )
+            .toList();
     if (futureCancels.isEmpty) return null;
 
     // 날짜 범위 계산
     final dates = futureCancels.map((e) => e.createdAt).toList()..sort();
-    final dateText = dates.length == 1
-        ? formatDateMD(dates.first)
-        : '${formatDateMD(dates.first)}~${formatDateMD(dates.last)}';
+    final dateText =
+        dates.length == 1
+            ? formatDateMD(dates.first)
+            : '${formatDateMD(dates.first)}~${formatDateMD(dates.last)}';
 
     // 사유 (첫 이벤트 기준)
     final reason = futureCancels.first.message;
 
     // 회차 정보
-    final sessions = futureCancels
-        .where((e) => e.sessionNumber != null)
-        .map((e) => '${e.sessionNumber}회차')
-        .toList();
+    final sessions =
+        futureCancels
+            .where((e) => e.sessionNumber != null)
+            .map((e) => '${e.sessionNumber}회차')
+            .toList();
     final sessionText = sessions.isNotEmpty ? sessions.join(', ') : null;
 
     return Padding(
@@ -474,7 +485,7 @@ class RequestHistoryChat extends StatelessWidget {
             if (reason != null && reason.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.space1),
               Text(
-                '사유: $reason',
+                '${AppStrings.reasonPrefix}$reason',
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -524,7 +535,7 @@ class RequestHistoryChat extends StatelessWidget {
         if (event.message != null && event.message!.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '사유: ${event.message}',
+            '${AppStrings.reasonPrefix}${event.message}',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -551,9 +562,7 @@ class RequestHistoryChat extends StatelessWidget {
         const SizedBox(height: AppSpacing.space2),
         Text(
           AppStrings.bulkCancelRescheduleCta,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.paperAccent,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
         ),
       ],
     );
@@ -620,7 +629,7 @@ class RequestHistoryChat extends StatelessWidget {
 
   /// Date separator: "3월 25일 화요일"
   Widget _buildDateSeparator(DateTime date) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    const weekdays = AppStrings.dayNamesShort;
     final dayLabel = weekdays[date.weekday - 1];
 
     return Padding(
@@ -647,7 +656,7 @@ class RequestHistoryChat extends StatelessWidget {
   Widget _buildTimestamp(DateTime time) {
     final hour = time.hour;
     final minute = time.minute;
-    final period = hour < 12 ? '오전' : '오후';
+    final period = hour < 12 ? AppStrings.timeAM : AppStrings.timePM;
     final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
     final minuteStr = minute.toString().padLeft(2, '0');
 

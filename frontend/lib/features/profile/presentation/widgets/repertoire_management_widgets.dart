@@ -137,7 +137,7 @@ class RepertoireEmptyState extends StatelessWidget {
           Icon(Icons.library_music, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            hasFilters ? '검색 결과가 없습니다' : '등록된 곡이 없습니다',
+            hasFilters ? AppStrings.searchNoResults : '등록된 곡이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -301,7 +301,7 @@ class PieceCard extends StatelessWidget {
                             Icon(Icons.delete, color: AppColors.paperAccent),
                             SizedBox(width: AppSpacing.space2),
                             Text(
-                              '삭제',
+                              AppStrings.delete,
                               style: TextStyle(color: AppColors.paperAccent),
                             ),
                           ],
@@ -401,7 +401,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _composerController,
                 decoration: const InputDecoration(
-                  labelText: '작곡가',
+                  labelText: AppStrings.profileRepertoireComposerLabel,
                   hintText: AppStrings.profileRepertoireHintComposer,
                 ),
               ),
@@ -411,7 +411,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _opusController,
                 decoration: const InputDecoration(
-                  labelText: '작품번호',
+                  labelText: AppStrings.profileRepertoireOpusLabel,
                   hintText: AppStrings.profileRepertoireHintOpus,
                 ),
               ),
@@ -421,7 +421,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _movementController,
                 decoration: const InputDecoration(
-                  labelText: '악장',
+                  labelText: AppStrings.profileRepertoireMovementLabel,
                   hintText: AppStrings.profileRepertoireHintMovement,
                 ),
               ),
@@ -429,7 +429,7 @@ class _PieceDialogState extends State<PieceDialog> {
 
               // Difficulty
               Text(
-                '난이도',
+                AppStrings.profileRepertoireDifficultyLabel,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -466,7 +466,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _notesController,
                 decoration: const InputDecoration(
-                  labelText: '메모',
+                  labelText: AppStrings.formSectionNotes,
                   hintText: AppStrings.profileRepertoireHintNotes,
                 ),
                 maxLines: 3,
@@ -685,7 +685,7 @@ void showPieceDetails({
                     if (piece.notes != null && piece.notes!.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.space4),
                       Text(
-                        '메모',
+                        AppStrings.formSectionNotes,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -803,9 +803,7 @@ void showAssignToStudentDialog({
               final student = students[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppColors.paperAccent.withValues(
-                    alpha: 0.1,
-                  ),
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                   child: Text(
                     student.name[0],
                     style: TextStyle(color: AppColors.paperAccent),

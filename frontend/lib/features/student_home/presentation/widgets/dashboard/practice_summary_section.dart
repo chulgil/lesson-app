@@ -172,7 +172,15 @@ class PracticeSummarySection extends ConsumerWidget {
   }
 
   Widget _buildCompactWeeklyChart(List<double> progress) {
-    final days = ['월', '화', '수', '목', '금', '토', '일'];
+    const days = [
+      AppStrings.mon,
+      AppStrings.tue,
+      AppStrings.wed,
+      AppStrings.thu,
+      AppStrings.fri,
+      AppStrings.sat,
+      AppStrings.sun,
+    ];
     final today = DateTime.now().weekday - 1;
 
     return Container(

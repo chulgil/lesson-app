@@ -307,7 +307,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 shape: RoundedRectangleBorder(),
               ),
               child: Text(
-                '거절하기',
+                AppStrings.rejectAction,
                 style: AppTypography.button.copyWith(
                   color: AppColors.inkSecondary,
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -164,18 +165,18 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
         final total = subscription.totalLessonsForDisplay ?? 0;
         return '[${subscription.usedLessons}/$total]';
       case SubscriptionType.monthly:
-        return '월정액';
+        return AppStrings.subscriptionTypeMonthly;
       case SubscriptionType.trial:
-        return '체험중';
+        return AppStrings.studentTriageTrial;
     }
   }
 }
 
 /// Filter enum for class type.
 enum ClassTypeFilter {
-  all('전체'),
-  academy('학원'),
-  private('개인');
+  all(AppStrings.all),
+  academy(AppStrings.academy),
+  private(AppStrings.individual);
 
   final String label;
   const ClassTypeFilter(this.label);

@@ -130,10 +130,10 @@ class PracticeNoteListScreen extends ConsumerWidget {
     }
     if (section.rangeText != null &&
         section.rangeText.isNotEmpty &&
-        section.rangeText != '전체') {
+        section.rangeText != AppStrings.all) {
       parts.add(section.rangeText);
     }
-    return parts.isEmpty ? '전체' : parts.join(' · ');
+    return parts.isEmpty ? AppStrings.all : parts.join(' · ');
   }
 
   Widget _buildFallbackHeader() {
@@ -244,7 +244,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
           Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '오류가 발생했습니다',
+            AppStrings.practiceErrorOccurred,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.paperAccent,
             ),

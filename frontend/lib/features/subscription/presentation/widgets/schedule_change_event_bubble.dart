@@ -292,7 +292,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         if (event.message != null && event.message!.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '사유: ${event.message}',
+            '${AppStrings.reasonPrefix}${event.message}',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -317,9 +317,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         const SizedBox(height: AppSpacing.space2),
         Text(
           AppStrings.bulkCancelRescheduleCta,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.paperAccent,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
         ),
       ],
     );
@@ -372,7 +370,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '결정을 변경했습니다',
+          AppStrings.chatWithdrawApproval,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.ink,
