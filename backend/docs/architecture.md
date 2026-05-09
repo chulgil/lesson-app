@@ -1,6 +1,6 @@
 # Backend Architecture
 
-> 마지막 업데이트: 2026-05-07
+> 마지막 업데이트: 2026-05-09
 
 ## 개요
 
@@ -43,7 +43,7 @@ backend/
 │   │   ├── i18n.py                   # 다국어 미들웨어 + 번역 로더
 │   │   └── storage.py                # Vultr Object Storage 클라이언트
 │   │
-│   ├── models/                       # SQLAlchemy ORM 모델 (29 files)
+│   ├── models/                       # SQLAlchemy ORM 모델 (30 files)
 │   │   ├── base.py                   # Base, TimestampMixin, UUIDMixin
 │   │   ├── user.py                   # User, OAuthAccount, TokenBlacklist
 │   │   ├── teacher.py                # Teacher, Education, Career, Certificate
@@ -60,7 +60,7 @@ backend/
 │   │   ├── policy.py                 # LessonPolicy, MakeupLesson, ScheduleConfirmationCard
 │   │   └── request_event.py          # LessonRequest / subscription event log
 │   │
-│   ├── schemas/                      # Pydantic v2 요청/응답 스키마 (32 files)
+│   ├── schemas/                      # Pydantic v2 요청/응답 스키마 (33 files)
 │   │   ├── auth.py                   # TokenResponse, OAuthRequest
 │   │   ├── user.py                   # UserRead, UserUpdate
 │   │   ├── teacher.py                # TeacherRead, TeacherUpdate
@@ -98,7 +98,7 @@ backend/
 │   │       ├── announcements.py      # /announcements/*
 │   │       └── device_tokens.py      # /device-tokens/*
 │   │
-│   ├── services/                     # 비즈니스 로직 (37 files)
+│   ├── services/                     # 비즈니스 로직 (39 files)
 │   │   ├── auth_service.py           # OAuth + JWT
 │   │   ├── lesson_service.py         # 레슨 CRUD + 상태 관리
 │   │   ├── subscription_service.py   # 구독 + 차감 + 제안 워크플로우
@@ -196,6 +196,18 @@ Schema    Schema (Pydantic v2)
 ```bash
 cd backend && uv run pytest tests/test_backend_architecture_contract.py -q
 ```
+
+### 2026-05-09 운영 검증 스냅샷
+
+- `backend/tests/test_backend_architecture_contract.py`: 12 passed
+- `backend/tests/test_frontend_remote_gap_contract.py`: 2 passed
+- `backend/tests/test_bulk_teacher_actions.py`: 15 passed
+- `backend/tests/test_teacher_announcements.py`: 13 passed
+- `backend/tests/test_db_integrity_inventory.py`: 현재 계약 범위에서 `db_integrity_inventory` 검증이 통과
+- OpenAPI `/api/v1` path count: 267 (총 path 268)
+- 메타데이터 테이블 수: 83
+
+백엔드 테스트 전체(`uv run pytest -q`)는 **558 passed**로 유지되어 있습니다.
 
 ### 도메인 경계
 

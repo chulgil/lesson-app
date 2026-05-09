@@ -1,6 +1,6 @@
 # Backend Spec — Lessonaza API
 
-> 작성일: 2026-03-16 | 업데이트: 2026-05-05 | 상태: Phase 1 완료 + 아키텍처 가드레일 보강
+> 작성일: 2026-03-16 | 업데이트: 2026-05-09 | 상태: API/DB 확장 정합성 운영 중
 
 ## 개요
 
@@ -19,7 +19,7 @@ FastAPI + PostgreSQL + 자체 JWT/OAuth 기반 백엔드 API.
 
 ## 테이블 현황
 
-**총 64개 테이블** (기존 43 + 신규 21)
+**총 83개 테이블** (2026-05-09 기준 메타데이터 기준 수치)
 
 ### 기존 테이블 (43개, Migration 0001)
 
@@ -40,7 +40,7 @@ FastAPI + PostgreSQL + 자체 JWT/OAuth 기반 백엔드 API.
 | i18n | i18n_translations, supported_locales | 2 |
 | 팁 | tip_templates | 1 |
 
-### 신규 테이블 (21개, Migration 0002)
+### 신규 테이블 (스냅샷 누적)
 
 | 그룹 | 테이블 | 용도 |
 |------|--------|------|
@@ -57,7 +57,7 @@ FastAPI + PostgreSQL + 자체 JWT/OAuth 기반 백엔드 API.
 
 ## API 엔드포인트 현황
 
-**총 154개 엔드포인트** (기존 ~100 + 신규 ~54)
+**총 267개 엔드포인트** (`/api/v1` 기준)
 
 ### 신규 라우터
 
@@ -74,10 +74,10 @@ FastAPI + PostgreSQL + 자체 JWT/OAuth 기반 백엔드 API.
 
 ```
 app/
-├── api/v1/          # 37개 라우터 파일
-├── services/        # 36개 서비스 파일 (비즈니스 로직)
-├── models/          # 28개 모델 파일 (64+ 테이블)
-├── schemas/         # 31개 스키마 파일 (Pydantic v2)
+├── api/v1/          # 39개 라우터 파일
+├── services/        # 39개 서비스 파일 (비즈니스 로직)
+├── models/          # 30개 모델 파일 (83 테이블)
+├── schemas/         # 33개 스키마 파일 (Pydantic v2)
 ├── core/            # config, database, deps, security, i18n, storage
 ├── jobs/            # 백그라운드 작업 (APScheduler KST 00:05)
 ├── utils/           # 헬퍼 유틸리티
@@ -94,7 +94,7 @@ app/
 - **Timestamps**: TimestampMixin (created_at, updated_at)
 - **Pagination**: PaginatedResponse[T] 제네릭 (page, size, total, pages)
 
-### 최신 검증 요약 (2026-05-07)
+### 최신 검증 요약 (2026-05-09)
 
 백엔드 API/DB 정합성은 다음 테스트로 정기 검증되었고, 모두 통과했습니다.
 
@@ -111,7 +111,7 @@ app/
 - `uv run pytest tests/test_frontend_remote_gap_contract.py -q` (핵심 프론트 원격 계약 경로 노출 점검)
 - `uv run pytest -q` (backend 전체)
 
-**결과:** 532개 테스트 모두 통과(실패 0)
+**결과:** 558개 테스트 모두 통과(실패 0)
 
 핵심 정합성 점검 대상:
 
