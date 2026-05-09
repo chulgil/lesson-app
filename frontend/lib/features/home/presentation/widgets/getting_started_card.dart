@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../billing/presentation/widgets/billing_guard.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -40,7 +41,11 @@ class GettingStartedCard extends ConsumerWidget {
             title: AppStrings.gettingStartedStep1Title,
             subtitle: AppStrings.gettingStartedStep1Subtitle,
             isCompleted: hasStudents,
-            onTap: () => context.push(AppRoutes.addStudentMethod),
+            onTap: () => BillingGuard.check(
+              context: context,
+              ref: ref,
+              onAllowed: () => context.push(AppRoutes.addStudentMethod),
+            ),
           ),
           _GettingStartedStep(
             step: 2,

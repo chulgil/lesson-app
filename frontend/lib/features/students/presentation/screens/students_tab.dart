@@ -22,6 +22,7 @@ import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../../billing/presentation/widgets/billing_guard.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
@@ -323,9 +324,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                // + 학생 추가
+                // + 학생 추가 (BillingGuard: free plan 5명 제한)
                 IconButton(
-                  onPressed: () => context.push(AppRoutes.addStudentMethod),
+                  onPressed: () => BillingGuard.check(
+                    context: context,
+                    ref: ref,
+                    onAllowed: () => context.push(AppRoutes.addStudentMethod),
+                  ),
                   icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
                   tooltip: AppStrings.studentAddLabel,
                   padding: EdgeInsets.zero,
@@ -642,7 +647,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       actionLabel: query.isEmpty ? AppStrings.studentAddLabel : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
       onAction:
-          query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
+          query.isEmpty
+              ? () => BillingGuard.check(
+                    context: context,
+                    ref: ref,
+                    onAllowed: () => context.push(AppRoutes.addStudentMethod),
+                  )
+              : null,
     );
   }
 

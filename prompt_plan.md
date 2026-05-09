@@ -35,10 +35,12 @@
 - [x] 얼리어답터 Lifetime 199,000원 (90일 한정) 카드 UI 포함
 - [x] `flutter analyze` 신규 에러 0
 
-## Phase D: BillingGuard 통합
+## Phase D: BillingGuard 통합 ✅
 
-- [ ] 학생 추가 버튼에 BillingGuard.check() 연동
-- [ ] 기존 학생 추가 플로우에 guard 삽입
+- [x] `students_tab.dart` 상단 + 아이콘 버튼 — BillingGuard.check() 래핑
+- [x] `students_tab.dart` 빈 상태 위젯 액션 — BillingGuard.check() 래핑
+- [x] `getting_started_card.dart` 온보딩 학생 추가 — BillingGuard.check() 래핑
+- [x] `flutter analyze` — No issues found!
 
 ---
 
