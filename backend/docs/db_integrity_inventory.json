@@ -114,7 +114,7 @@
       "table": "lessons",
       "column": "subscription_id",
       "target": "subscriptions.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P1",
       "reason": "Some historical lessons are standalone; active subscription-linked lessons need cleanup before FK enforcement."
     },
