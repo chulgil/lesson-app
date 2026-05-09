@@ -266,6 +266,11 @@ class ProfileTab extends ConsumerWidget {
             title: AppStrings.profileSectionSupport,
             items: [
               _MenuItem(
+                icon: Icons.campaign_outlined,
+                label: AppStrings.newsRoadmapTitle,
+                onTap: () => context.push(AppRoutes.newsRoadmap),
+              ),
+              _MenuItem(
                 icon: Icons.help_outline,
                 label: AppStrings.profileHelpLabel,
                 onTap: () => context.push(AppRoutes.help),
