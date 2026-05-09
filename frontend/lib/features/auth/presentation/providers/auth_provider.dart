@@ -45,8 +45,9 @@ class AuthNotifier extends _$AuthNotifier {
     _authRepository = ref.read(authRepositoryProvider);
     _termsAgreed = false;
 
-    // In mock mode, skip authentication entirely
-    if (ref.watch(mockDataModeProvider)) {
+    // In mock mode at startup, skip auto-login (no stored tokens to check).
+    // Uses ref.read (not watch) so mode changes after login don't reset auth state.
+    if (ref.read(mockDataModeProvider)) {
       return const AuthUnauthenticated();
     }
 

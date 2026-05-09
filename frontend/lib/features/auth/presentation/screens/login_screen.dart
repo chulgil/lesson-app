@@ -291,6 +291,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .devLogin(email: email, role: role, name: name);
 
       if (!mounted) return;
+
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
