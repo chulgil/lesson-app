@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime as _dt
+from datetime import UTC, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -57,15 +58,21 @@ class ScheduleService:
     async def get_availability_by_teacher_id(self, teacher_id: str) -> AvailabilityResponse:
         """Return weekly availability for a target teacher id or profile id."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
+        from app.models.schedule_ext import ScheduleException
         from app.schemas.schedule import DayAvailability, TimeSlotSchema
 
         teacher_user_id = await self._resolve_teacher_user_id(teacher_id)
-        avail_rows = await self.db.scalars(
-            select(TeacherAvailability).where(TeacherAvailability.teacher_id == teacher_user_id)
+        availability_rows = await self.db.scalars(
+            select(TeacherAvailability)
+            .where(TeacherAvailability.teacher_id == teacher_user_id)
+            .order_by(TeacherAvailability.day_of_week)
         )
         day_list = []
         weekly_schedules = []
-        for avail in avail_rows.all():
+        avails = availability_rows.all()
+        avail_ids = [a.id for a in avails]
+
+        for avail in avails:
             slots_rows = await self.db.scalars(
                 select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
@@ -83,10 +90,37 @@ class ScheduleService:
                 )
             day_list.append(DayAvailability(day_of_week=avail.day_of_week, time_slots=time_slots))
 
+        exception_filter = [ScheduleException.teacher_id == teacher_user_id]
+        if avail_ids:
+            exception_filter.append(ScheduleException.teacher_availability_id.in_(avail_ids))
+        exception_rows = await self.db.scalars(
+            select(ScheduleException).where(or_(*exception_filter))
+        )
+        exceptions = [
+            {
+                "id": exc.id,
+                "teacher_id": exc.teacher_id,
+                "teacher_availability_id": exc.teacher_availability_id,
+                "type": exc.type.value,
+                "start_date": exc.start_date,
+                "end_date": exc.end_date,
+                "start_time": exc.start_time,
+                "end_time": exc.end_time,
+                "reason": exc.reason,
+                "created_at": exc.created_at,
+            }
+            for exc in exception_rows.all()
+        ]
+
+        created_at = avails[0].created_at if avails else _dt.datetime.now(UTC)
+
         return AvailabilityResponse(
+            id=f"availability-{teacher_user_id}",
             teacher_id=teacher_user_id,
             availabilities=day_list,
             weekly_schedules=weekly_schedules,
+            exceptions=exceptions,
+            created_at=created_at,
         )
 
     async def set_availability(self, data: AvailabilityCreate, current_user: Any) -> AvailabilityResponse:
@@ -247,18 +281,21 @@ class ScheduleService:
         user_id = await self._resolve_teacher_user_id(teacher_id)
 
         # Find availability for this day
-        avail = await self.db.scalar(
+        availability_rows = await self.db.scalars(
             select(TeacherAvailability).where(
                 TeacherAvailability.teacher_id == user_id,
                 TeacherAvailability.day_of_week == day_of_week,
             )
         )
-        if not avail:
+        availability_ids = [a.id for a in availability_rows.all()]
+        if not availability_ids:
             return SlotsResponse(date=d, slots=[])
 
         # Get time slots
         time_slots = await self.db.scalars(
-            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
+            select(AvailabilityTimeSlot).where(
+                AvailabilityTimeSlot.availability_id.in_(availability_ids)
+            )
         )
 
         # Get existing bookings for this date
@@ -274,7 +311,10 @@ class ScheduleService:
         # Get schedule exceptions (holiday/vacation) covering this date (#236)
         exceptions = await self.db.scalars(
             select(ScheduleException).where(
-                ScheduleException.teacher_availability_id == avail.id,
+                or_(
+                    ScheduleException.teacher_id == user_id,
+                    ScheduleException.teacher_availability_id.in_(availability_ids),
+                ),
                 ScheduleException.type.in_([ExceptionType.holiday, ExceptionType.vacation]),
                 ScheduleException.start_date <= d,
                 ScheduleException.end_date >= d,
@@ -381,14 +421,8 @@ class ScheduleService:
 
     async def create_exception(self, data: ScheduleExceptionCreate, current_user: Any) -> ScheduleExceptionResponse:
         """Add a schedule exception."""
-        # Find teacher's first availability to link to (or use empty string)
-        from app.models.schedule import TeacherAvailability
         from app.models.schedule_ext import ScheduleException
 
-        avail = await self.db.scalar(
-            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
-        )
-        avail_id = avail.id if avail else ""
         self._validate_exception_dates_and_time(
             data.start_date,
             data.end_date,
@@ -397,7 +431,8 @@ class ScheduleService:
         )
 
         exception = ScheduleException(
-            teacher_availability_id=avail_id,
+            teacher_id=current_user.id,
+            teacher_availability_id=None,
             type=data.type,
             start_date=data.start_date,
             end_date=data.end_date,
@@ -477,10 +512,18 @@ class ScheduleService:
         await self.db.flush()
 
     async def _assert_exception_owner(self, exception: Any, current_user: Any | None) -> None:
-        from app.models.schedule import TeacherAvailability
-
         if current_user is None:
             return
+
+        if getattr(exception, "teacher_id", None) is not None:
+            if exception.teacher_id != current_user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Forbidden",
+                )
+            return
+
+        from app.models.schedule import TeacherAvailability
 
         availability = await self.db.get(TeacherAvailability, exception.teacher_availability_id)
         if availability is None:

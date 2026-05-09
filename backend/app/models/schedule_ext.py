@@ -1,7 +1,18 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    Enum,
+    Index,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -53,7 +64,8 @@ class ScheduleException(UUIDMixin, Base):
 
     __tablename__ = "schedule_exceptions"
 
-    teacher_availability_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    teacher_availability_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    teacher_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     type: Mapped[ExceptionType] = mapped_column(
         Enum(ExceptionType, native_enum=True),
         nullable=False,
@@ -70,7 +82,12 @@ class ScheduleException(UUIDMixin, Base):
     )
 
     __table_args__ = (
+        CheckConstraint(
+            "teacher_availability_id IS NOT NULL OR teacher_id IS NOT NULL",
+            name="ck_sched_exc_owner_scope",
+        ),
         Index("idx_sched_exc_avail", "teacher_availability_id"),
+        Index("idx_sched_exc_teacher", "teacher_id"),
         Index("idx_sched_exc_dates", "start_date", "end_date"),
     )
 

@@ -3,7 +3,7 @@
 import datetime as _dt
 from datetime import time
 
-from pydantic import BaseModel, ConfigDict, computed_field, model_validator, field_validator
+from pydantic import BaseModel, ConfigDict, computed_field, field_validator, model_validator
 
 
 def _slot_minutes(value: str) -> int:
@@ -57,9 +57,13 @@ class AvailabilityResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    id: str | None = None
     teacher_id: str
     availabilities: list[DayAvailability] = []
     weekly_schedules: list[dict] = []
+    exceptions: list[dict] = []
+    created_at: _dt.datetime | None = None
+    updated_at: _dt.datetime | None = None
     # Settings (stored in TeacherSettings, returned for convenience)
     slot_duration_minutes: int = 30
     break_time_between_lessons: int = 10
@@ -113,7 +117,7 @@ class AvailabilityCreate(BaseModel):
             if day.day_of_week in seen_days:
                 raise ValueError("day_of_week must be unique")
             seen_days.add(day.day_of_week)
-            slots = sorted(((_slot_minutes(slot.start_time), _slot_minutes(slot.end_time)) for slot in day.time_slots))
+            slots = sorted((_slot_minutes(slot.start_time), _slot_minutes(slot.end_time)) for slot in day.time_slots)
             bucket = seen.setdefault(day.day_of_week, [])
             bucket.extend(slots)
             bucket.sort()
@@ -242,6 +246,7 @@ class ScheduleExceptionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    teacher_id: str | None = None
     teacher_availability_id: str | None = None
     start_date: _dt.date
     end_date: _dt.date

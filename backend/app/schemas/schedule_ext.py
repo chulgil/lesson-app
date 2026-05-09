@@ -31,7 +31,8 @@ class ScheduleExceptionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    teacher_availability_id: str
+    teacher_id: str | None = None
+    teacher_availability_id: str | None = None
     type: str
     start_date: _dt.date
     end_date: _dt.date

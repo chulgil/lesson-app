@@ -103,3 +103,68 @@ async def test_no_exception_returns_all_available(db_session: AsyncSession):
     assert len(result.slots) > 0
     for slot in result.slots:
         assert slot.status == "available", f"Slot {slot.start_time} should be available"
+
+
+@pytest.mark.asyncio
+async def test_teacher_scope_exception_blocks_slots(db_session: AsyncSession):
+    """Teacher-level exception should block matching slots even without availability linkage."""
+    await _seed_availability(db_session)
+
+    exc = ScheduleException(
+        id="exc-teacher",
+        teacher_id="test-user-id",
+        type=ExceptionType.vacation,
+        start_date=date(2026, 5, 4),
+        end_date=date(2026, 5, 4),
+        start_time="10:00",
+        end_time="11:00",
+        reason="teacher scoped",
+    )
+    db_session.add(exc)
+    await db_session.flush()
+
+    svc = ScheduleService(db_session)
+    result = await svc.get_available_slots(teacher_id="test-user-id", date="2026-05-04")
+    statuses = {s.start_time: s.status for s in result.slots}
+
+    assert statuses["10:00"] == "unavailable"
+    assert statuses["09:30"] == "unavailable"
+    assert statuses["11:00"] == "available"
+
+
+@pytest.mark.asyncio
+async def test_availability_response_includes_exceptions(db_session: AsyncSession):
+    """/schedule/availability should return both teacher-level and availability-level exceptions."""
+    await _seed_availability(db_session)
+    db_session.add(
+        ScheduleException(
+            id="exc-avail",
+            teacher_availability_id="avail-1",
+            teacher_id="test-user-id",
+            type=ExceptionType.holiday,
+            start_date=date(2026, 5, 5),
+            end_date=date(2026, 5, 5),
+            start_time=None,
+            end_time=None,
+            reason="avail scoped",
+        )
+    )
+    db_session.add(
+        ScheduleException(
+            id="exc-teacher",
+            teacher_id="test-user-id",
+            type=ExceptionType.vacation,
+            start_date=date(2026, 5, 6),
+            end_date=date(2026, 5, 6),
+            start_time="10:00",
+            end_time="11:00",
+            reason="teacher scoped",
+        )
+    )
+    await db_session.flush()
+
+    svc = ScheduleService(db_session)
+    availability = await svc.get_availability_by_teacher_id("test-user-id")
+    assert len(availability.exceptions) == 2
+    exception_types = {e["type"] for e in availability.exceptions}
+    assert exception_types == {"holiday", "vacation"}
