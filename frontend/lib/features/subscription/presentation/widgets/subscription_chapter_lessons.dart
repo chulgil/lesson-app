@@ -540,7 +540,7 @@ class _SubscriptionChapterLessonsState
             const SizedBox(
               width: 24,
               child: Icon(
-                Icons.more_horiz,
+                Icons.more_vert,
                 size: 20,
                 color: AppColors.inkTertiary,
               ),
