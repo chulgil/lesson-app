@@ -167,7 +167,7 @@
 
 | 이슈 | 내용 | 우선순위 |
 |------|------|:--------:|
-| [#8](https://github.com/chulgil/lesson-app/issues/8) | 연습완료 날짜별 완료 상태 동기화 | 🟠 High |
+| [#8](https://github.com/chulgil/lesson-app/issues/8) | 연습완료 날짜별 완료 상태 동기화 | ✅ |
 
 ---
 
@@ -175,7 +175,7 @@
 
 | 순위 | 기능 | 설명 |
 |------|------|------|
-| 1 | Issue #8 해결 | 열린 이슈 마무리 |
+| 1 | Issue #8 해결 | ✅ 완료 |
 | 2 | 백엔드 API 개발 | FastAPI + Supabase |
 | 3 | OAuth 연동 | Google, Kakao 로그인 |
 | 4 | 푸시 알림 (FCM) | 레슨/연습 리마인더 |

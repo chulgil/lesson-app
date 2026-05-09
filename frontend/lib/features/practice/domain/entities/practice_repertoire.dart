@@ -784,7 +784,25 @@ class PracticeRepertoire {
 
   /// Get visible sections for a specific date
   List<PracticeSection> getSectionsForDate(DateTime date) {
-    return sections.where((s) => s.isVisibleForDate(date)).toList();
+    if (!isActiveForDate(date)) {
+      return [];
+    }
+
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (dateOnly.isBefore(today)) {
+      return sections
+          .where(
+            (section) =>
+                section.isCompletedForDate(dateOnly) &&
+                section.isActiveForDate(dateOnly),
+          )
+          .toList();
+    }
+
+    return sections.where((section) => section.isVisibleForDate(dateOnly)).toList();
   }
 
   PracticeRepertoire copyWith({
