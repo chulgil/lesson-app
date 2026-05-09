@@ -83,6 +83,21 @@ void showLessonActionSheet({
                     },
                   ),
                 ],
+                // Subscription lesson → edit content (notes/pieces only)
+                if (hasSubscription) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  LessonActionCard(
+                    icon: Icons.edit_note,
+                    iconColor: AppColors.ink,
+                    label: AppStrings.editContent,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      context.push(
+                        AppRoutes.editLesson.replaceFirst(':id', lesson.id),
+                      );
+                    },
+                  ),
+                ],
                 // Subscription + upcoming → schedule change (chat)
                 if (hasSubscription && isUpcoming) ...[
                   const SizedBox(height: AppSpacing.space2),
