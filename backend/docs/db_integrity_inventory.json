@@ -33,9 +33,9 @@
       "table": "parents",
       "column": "user_id",
       "target": "users.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P0",
-      "reason": "Parent profile uniqueness exists, but account linkage is not FK-protected."
+      "reason": "Parent profiles are account-owned and FK-protected with cascade delete."
     },
     {
       "domain": "relationship",
