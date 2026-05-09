@@ -352,11 +352,8 @@ class _SubscriptionDetailBodyState
 
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
-          appBar: AppBar(
-            titleSpacing: 0,
-            // Notebook × Score: Scaffold.appBar 제목은 Playfair appBarTitle
-            // 로 통일 (§7.27). 탭하면 학생 프로필 바텀시트 표시.
-            title: GestureDetector(
+          appBar: NotebookDetailAppBar(
+            titleWidget: GestureDetector(
               onTap:
                   () => showStudentProfileBottomSheet(
                     context: context,
@@ -366,24 +363,17 @@ class _SubscriptionDetailBodyState
                     student: ref.read(studentProvider(subscription.studentId)).valueOrNull,
                     subscriptionSummary: '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
                   ),
-              child: Text(
-                appBarTitle,
-                style: NotebookTypography.appBarTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(appBarTitle, style: NotebookTypography.appBarTitle),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.rule_rounded),
-                tooltip: AppStrings.policyAppliedTitle,
-                onPressed:
-                    () => SubscriptionPolicySheet.show(
-                      context,
-                      subscription: subscription,
-                    ),
-              ),
-            ],
+            actions: const [DetailAppBarAction.more],
+            onAction: (action) {
+              if (action == DetailAppBarAction.more) {
+                SubscriptionPolicySheet.show(
+                  context,
+                  subscription: subscription,
+                );
+              }
+            },
           ),
           body: Column(
             children: [

@@ -283,42 +283,41 @@ class _AnnouncementCard extends ConsumerWidget {
                                 : null,
                         child: Padding(
                           padding: const EdgeInsets.all(AppSpacing.space3),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
-                              // 학생 정보
-                              Text(
-                                '${lesson.studentName} · ${lesson.instrument}',
-                                style: AppTypography.bodyMedium.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                lesson.startTime,
-                                style: AppTypography.captionSmall.copyWith(
-                                  color: AppColors.inkTertiary,
-                                ),
-                              ),
-                              // 스케줄 변경 링크
-                              if (lesson.subscriptionId != null) ...[
-                                const SizedBox(height: AppSpacing.space2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      AppStrings.announcementScheduleChange,
-                                      style: AppTypography.bodySmall.copyWith(
-                                        color: AppColors.paperAccent,
+                                      '${lesson.studentName} · ${lesson.instrument}',
+                                      style: AppTypography.bodyMedium.copyWith(
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    const SizedBox(width: AppSpacing.space1),
-                                    const Icon(
-                                      Icons.chevron_right,
-                                      size: 16,
-                                      color: AppColors.paperAccent,
+                                    Text(
+                                      lesson.startTime,
+                                      style: AppTypography.captionSmall
+                                          .copyWith(
+                                            color: AppColors.inkTertiary,
+                                          ),
                                     ),
                                   ],
+                                ),
+                              ),
+                              if (lesson.subscriptionId != null) ...[
+                                Text(
+                                  AppStrings.announcementScheduleChange,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.paperAccent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.space1),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  size: 16,
+                                  color: AppColors.paperAccent,
                                 ),
                               ],
                             ],
