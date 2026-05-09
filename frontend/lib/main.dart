@@ -12,6 +12,8 @@ import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
+import 'features/practice/presentation/providers/recording_provider.dart';
+import 'features/practice/presentation/providers/tuner_provider.dart';
 
 /// Get the startup recovery result.
 startup_recovery.StartupRecoveryResult? getStartupRecoveryResult() =>
@@ -38,10 +40,12 @@ class LessonazaApp extends ConsumerStatefulWidget {
   ConsumerState<LessonazaApp> createState() => _LessonazaAppState();
 }
 
-class _LessonazaAppState extends ConsumerState<LessonazaApp> {
+class _LessonazaAppState extends ConsumerState<LessonazaApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Pre-initialize engines at app startup to eliminate first-use delay
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
@@ -53,8 +57,33 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(ref.read(syncServiceProvider).dispose());
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        // Preserve intentional recordings. Stop tuner stream/background capture
+        // when microphone is only warm-up/processing mode.
+        unawaited(ref.read(tunerProvider.notifier).onAppPaused());
+        break;
+      case AppLifecycleState.resumed:
+        final recorder = ref.read(audioRecorderServiceProvider);
+
+        // If a manual recording is active, keep recording ownership of the
+        // microphone and only resume tuner when the user had it running.
+        if (!recorder.isCaptureActive) {
+          unawaited(ref.read(tunerProvider.notifier).onAppResumed());
+        }
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   Future<void> _initializeSyncService() async {
