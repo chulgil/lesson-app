@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -89,11 +90,8 @@ class _ScheduleChangeRequestListScreenState
     final studentNames = ref.watch(studentNameMapProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        title: const Text(AppStrings.scheduleChangeRequestTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.scheduleChangeRequestTitle,
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

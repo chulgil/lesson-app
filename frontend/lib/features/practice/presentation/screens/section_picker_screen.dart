@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -68,13 +69,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
     final sectionsAsync = ref.watch(allSectionsForAssignmentProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: Text(widget.title ?? '섹션 선택'),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        foregroundColor: AppColors.ink,
-      ),
+      appBar: NotebookDetailAppBar(title: widget.title ?? '섹션 선택'),
       body: Column(
         children: [
           // Search bar

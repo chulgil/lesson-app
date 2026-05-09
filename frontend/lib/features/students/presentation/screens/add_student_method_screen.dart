@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Screen for selecting student registration method
@@ -16,12 +17,8 @@ class AddStudentMethodScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.studentAddLabel),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.studentAddLabel,
       ),
       body: SafeArea(
         child: Padding(

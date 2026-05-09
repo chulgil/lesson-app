@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
@@ -84,17 +85,19 @@ class _PracticeRecordingScreenState
     }
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(widget.repertoireName),
-        actions: [
-          if (state.representativeRecording != null &&
-              !state.representativeRecording!.isShared)
-            TextButton.icon(
-              onPressed: _shareWithTeacher,
-              icon: const Icon(Icons.share),
-              label: const Text(AppStrings.practiceShareToTeacherAction),
-            ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: widget.repertoireName,
+        customActions:
+            (state.representativeRecording != null &&
+                    !state.representativeRecording!.isShared)
+                ? [
+                  TextButton.icon(
+                    onPressed: _shareWithTeacher,
+                    icon: const Icon(Icons.share),
+                    label: const Text(AppStrings.practiceShareToTeacherAction),
+                  ),
+                ]
+                : null,
       ),
       body:
           state.isLoading

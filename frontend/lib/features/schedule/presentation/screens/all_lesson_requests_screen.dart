@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 import '../../domain/entities/request_filter.dart';
 import '../../domain/entities/unified_lesson_request.dart';
@@ -59,11 +59,8 @@ class _AllLessonRequestsScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: Text(
-          AppStrings.lessonRequestTitle,
-          style: NotebookTypography.appBarTitle,
-        ),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.lessonRequestTitle,
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

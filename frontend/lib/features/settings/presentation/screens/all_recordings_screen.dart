@@ -17,6 +17,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
@@ -34,13 +35,9 @@ class AllRecordingsScreen extends ConsumerWidget {
     final recordingsAsync = ref.watch(allRecordingsWithSectionInfoProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: const Text(AppStrings.allRecordingsAppBarTitle),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        foregroundColor: AppColors.ink,
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.allRecordingsAppBarTitle,
+        customActions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => _importRecording(context, ref),

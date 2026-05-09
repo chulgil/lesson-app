@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -42,13 +43,7 @@ class _LessonNoteHistoryScreenState
     final notesAsync = ref.watch(studentLessonNotesProvider(widget.studentId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.lessonNotesTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.lessonNotesTitle),
       body: Column(
         children: [
           // Search bar

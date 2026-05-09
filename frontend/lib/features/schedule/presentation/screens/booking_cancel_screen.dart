@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -69,7 +70,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.bookingCancelTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.bookingCancelTitle),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -113,22 +114,17 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: Text(
-          _isRecordMode
-              ? AppStrings.lessonRecordTitle
-              : AppStrings.lessonAddTitle,
+      appBar: NotebookDetailAppBar(
+        title: _isRecordMode
+            ? AppStrings.lessonRecordTitle
+            : AppStrings.lessonAddTitle,
+        leading: DetailAppBarLeading.close,
+        onLeadingTap: () => showLessonExitConfirmation(
+          context: context,
+          hasData: _hasFormData(),
+          onExit: () => context.pop(),
         ),
-        leading: IconButton(
-          onPressed:
-              () => showLessonExitConfirmation(
-                context: context,
-                hasData: _hasFormData(),
-                onExit: () => context.pop(),
-              ),
-          icon: const Icon(Icons.close),
-        ),
-        actions: [
+        customActions: [
           TextButton(
             onPressed: _saveLesson,
             child: const Text(AppStrings.save),

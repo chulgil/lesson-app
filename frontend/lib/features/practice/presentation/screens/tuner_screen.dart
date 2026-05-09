@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/tuner_provider.dart';
@@ -70,17 +71,14 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: const Text(AppStrings.tunerAppBarTitle),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => TunerSettingsSheet.show(context),
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.tunerAppBarTitle,
+        actions: const [DetailAppBarAction.settings],
+        onAction: (action) {
+          if (action == DetailAppBarAction.settings) {
+            TunerSettingsSheet.show(context);
+          }
+        },
       ),
       body: SafeArea(
         child: Stack(

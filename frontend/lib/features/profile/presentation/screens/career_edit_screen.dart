@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
@@ -155,20 +156,16 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          _isEdit
-              ? AppStrings.profileCareerEditTitle
-              : AppStrings.profileCareerAddTitle,
-        ),
-        actions: [
-          if (_isEdit)
-            IconButton(
-              onPressed: _isLoading ? null : _delete,
-              icon: const Icon(Icons.delete_outline),
-              color: AppColors.paperAccent,
-            ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: _isEdit
+            ? AppStrings.profileCareerEditTitle
+            : AppStrings.profileCareerAddTitle,
+        actions: [if (_isEdit) DetailAppBarAction.delete],
+        onAction: (action) {
+          if (action == DetailAppBarAction.delete) {
+            if (!_isLoading) _delete();
+          }
+        },
       ),
       body: Form(
         key: _formKey,

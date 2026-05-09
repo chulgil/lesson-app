@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -48,16 +49,14 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
     final lessonsAsync = ref.watch(lessonsNotifierProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(_stepTitle),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed:
-              _currentStep > 0
-                  ? () => setState(() => _currentStep--)
-                  : () => context.pop(),
-          icon: Icon(_currentStep > 0 ? Icons.arrow_back : Icons.close),
-        ),
+      appBar: NotebookDetailAppBar(
+        title: _stepTitle,
+        leading: _currentStep > 0
+            ? DetailAppBarLeading.back
+            : DetailAppBarLeading.close,
+        onLeadingTap: _currentStep > 0
+            ? () => setState(() => _currentStep--)
+            : () => context.pop(),
       ),
       body: lessonsAsync.when(
         data: (lessons) => _buildStep(lessons),

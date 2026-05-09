@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/entities.dart';
 import '../providers/practice_goal_provider.dart';
 import '../widgets/goal/goal_setting_chips.dart';
@@ -122,18 +123,20 @@ class _PracticeGoalSettingScreenState
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.practiceGoalSettingTitle),
-        actions: [
-          if (_hasChanges && _hasAnyGoal)
-            TextButton(
-              onPressed: _saveGoal,
-              child: Text(
-                AppStrings.practiceGoalSaveButton,
-                style: TextStyle(color: AppColors.paperAccent),
-              ),
-            ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.practiceGoalSettingTitle,
+        customActions:
+            (_hasChanges && _hasAnyGoal)
+                ? [
+                  TextButton(
+                    onPressed: _saveGoal,
+                    child: Text(
+                      AppStrings.practiceGoalSaveButton,
+                      style: TextStyle(color: AppColors.paperAccent),
+                    ),
+                  ),
+                ]
+                : null,
       ),
       body:
           _isLoading

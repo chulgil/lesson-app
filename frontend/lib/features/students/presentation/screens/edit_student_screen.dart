@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
@@ -129,12 +130,12 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     return studentAsync.when(
       loading:
           () => NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.studentEditTitle),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.studentEditTitle),
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -162,7 +163,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       data: (student) {
         if (student == null) {
           return NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.studentEditTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.studentEditTitle),
             body: const Center(child: Text(AppStrings.studentNotFound)),
           );
         }
@@ -174,38 +175,34 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         return PopScope(
           canPop: !_isSaving,
           child: NotebookScreenScaffold(
-            appBar: AppBar(
-              title: const Text(AppStrings.studentEditTitle),
-              leading: IconButton(
-                onPressed:
-                    _isSaving
-                        ? null
-                        : () => showExitConfirmation(
-                          context,
-                          hasChanges: _hasChanges,
-                          onExit: () => context.pop(),
-                        ),
-                icon: const Icon(Icons.close),
-              ),
-              actions: [
+            appBar: NotebookDetailAppBar(
+              title: AppStrings.studentEditTitle,
+              leading: DetailAppBarLeading.close,
+              onLeadingTap: _isSaving
+                  ? null
+                  : () => showExitConfirmation(
+                        context,
+                        hasChanges: _hasChanges,
+                        onExit: () => context.pop(),
+                      ),
+              customActions: [
                 TextButton(
                   onPressed:
                       _hasChanges && !_isSaving
                           ? () => _saveStudent(student)
                           : null,
-                  child:
-                      _isSaving
-                          ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : Text(
-                            '저장',
-                            style: TextStyle(
-                              color: _hasChanges ? null : AppColors.inkTertiary,
-                            ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          '저장',
+                          style: TextStyle(
+                            color: _hasChanges ? null : AppColors.inkTertiary,
                           ),
+                        ),
                 ),
               ],
             ),

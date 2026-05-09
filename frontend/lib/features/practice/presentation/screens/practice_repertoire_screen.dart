@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -25,10 +26,9 @@ class PracticeRepertoireScreen extends ConsumerWidget {
     final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.practiceAppBarTitle),
-        actions: [
-          // Archive button
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.practiceAppBarTitle,
+        customActions: [
           IconButton(
             icon: const Icon(Icons.inventory_2_outlined),
             onPressed:
@@ -37,7 +37,6 @@ class PracticeRepertoireScreen extends ConsumerWidget {
                 ),
             tooltip: '아카이브',
           ),
-          // Add repertoire button
           IconButton(
             icon: const Icon(Icons.add),
             onPressed:

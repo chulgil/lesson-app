@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
@@ -22,12 +22,8 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profileLessonTimeTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.profileLessonTimeTitle,
       ),
       body: settingsAsync.when(
         data: (settings) => _LessonTimeSettingsContent(settings: settings),

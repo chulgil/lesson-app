@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/entities.dart';
 import '../providers/practice_note_provider.dart';
 import '../providers/practice_repertoire_crud_provider.dart';
@@ -38,15 +39,14 @@ class PracticeNoteListScreen extends ConsumerWidget {
     final repertoireName = repertoireAsync?.valueOrNull?.name;
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.practiceNoteTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _showAddDialog(context, ref),
-            tooltip: '노트 추가',
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.practiceNoteTitle,
+        actions: const [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) {
+            _showAddDialog(context, ref);
+          }
+        },
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

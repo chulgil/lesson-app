@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/address_search_field.dart';
@@ -216,9 +217,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return PopScope(
       canPop: !_isLoading,
       child: NotebookScreenScaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.profileBasicInfoTitle),
-          actions: [
+        appBar: NotebookDetailAppBar(
+          title: AppStrings.profileBasicInfoTitle,
+          customActions: [
             TextButton(
               onPressed: _isLoading ? null : _save,
               child:

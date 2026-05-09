@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -26,28 +27,19 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     final templatesAsync = ref.watch(teacherTemplatesProvider(teacherId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.templateListAppBarTitle),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () => _showAddTemplateDialog(context, ref),
-            icon: const Icon(Icons.add),
-            tooltip: AppStrings.templateAddButton,
-          ),
-          IconButton(
-            onPressed: () {
-              context.push(
-                '${AppRoutes.proposalSettings}?teacherId=$teacherId',
-              );
-            },
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: AppStrings.proposalSettingsAppBarTitle,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.templateListAppBarTitle,
+        actions: const [DetailAppBarAction.add, DetailAppBarAction.settings],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) {
+            _showAddTemplateDialog(context, ref);
+          } else if (action == DetailAppBarAction.settings) {
+            context.push(
+              '${AppRoutes.proposalSettings}?teacherId=$teacherId',
+            );
+          }
+        },
       ),
-      backgroundColor: AppColors.paperDark,
       body: templatesAsync.when(
         data: (templates) => _buildContent(context, ref, templates),
         loading: () => const Center(child: CircularProgressIndicator()),

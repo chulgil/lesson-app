@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -31,15 +32,12 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: const Text(AppStrings.timeExceptionTitle),
-        actions: [
-          IconButton(
-            onPressed: () => _showAddExceptionDialog(),
-            icon: const Icon(Icons.add),
-            tooltip: AppStrings.addTimeException,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.timeExceptionTitle,
+        actions: const [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) _showAddExceptionDialog();
+        },
       ),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),

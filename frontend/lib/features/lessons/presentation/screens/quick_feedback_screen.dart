@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -74,7 +75,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       data: (lesson) {
         if (lesson == null) {
           return NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.feedbackTitle),
             body: const Center(child: Text(AppStrings.lessonNotFound)),
           );
         }
@@ -82,9 +83,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         _initFromLesson(lesson);
 
         return NotebookScreenScaffold(
-          appBar: AppBar(
-            title: Text(AppStrings.studentFeedbackTitle(lesson.studentName)),
-            actions: [
+          appBar: NotebookDetailAppBar(
+            title: AppStrings.studentFeedbackTitle(lesson.studentName),
+            customActions: [
               if (_isSaving)
                 const Padding(
                   padding: EdgeInsets.all(AppSpacing.space4),
@@ -180,12 +181,12 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       },
       loading:
           () => NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.feedbackTitle),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => NotebookScreenScaffold(
-            appBar: AppBar(title: const Text(AppStrings.feedbackTitle)),
+            appBar: NotebookDetailAppBar(title: AppStrings.feedbackTitle),
             body: Center(
               child: Text(
                 AppStrings.loadDataFailed,

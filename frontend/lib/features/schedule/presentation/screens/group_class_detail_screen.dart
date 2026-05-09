@@ -6,6 +6,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -54,12 +55,8 @@ class _GroupClassDetailScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Text(
-          AppStrings.groupClassTitle(widget.groupClass.name),
-          style: NotebookTypography.appBarTitle,
-        ),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.groupClassTitle(widget.groupClass.name),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),

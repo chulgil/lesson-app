@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/time_format_utils.dart';
@@ -44,8 +45,8 @@ class _PracticeStatsScreenState extends ConsumerState<PracticeStatsScreen>
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.practiceStatsAppBarTitle),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.practiceStatsAppBarTitle,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [Tab(text: '주간'), Tab(text: '월간')],

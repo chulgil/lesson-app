@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -23,23 +24,14 @@ class MyConnectionsScreen extends ConsumerWidget {
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: Text(userRole == InviteUserRole.teacher ? '내 학생' : '내 선생님'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => context.push(AppRoutes.invite),
-            icon: const Icon(Icons.add),
-            tooltip:
-                userRole == InviteUserRole.teacher
-                    ? AppStrings.studentAddLabel
-                    : AppStrings.inviteTeacher,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: userRole == InviteUserRole.teacher ? '내 학생' : '내 선생님',
+        actions: const [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) {
+            context.push(AppRoutes.invite);
+          }
+        },
       ),
       body: connections.when(
         loading: () => const Center(child: CircularProgressIndicator()),

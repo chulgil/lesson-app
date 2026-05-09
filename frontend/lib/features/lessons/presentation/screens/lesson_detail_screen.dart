@@ -11,6 +11,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -79,12 +80,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Widget _buildNotFoundScaffold() {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-      ),
+      appBar: NotebookDetailAppBar(title: ''),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -105,24 +101,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Widget _buildLoadingScaffold() {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-      ),
+      appBar: NotebookDetailAppBar(title: ''),
       body: const Center(child: CircularProgressIndicator()),
     );
   }
 
   Widget _buildErrorScaffold() {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-      ),
+      appBar: NotebookDetailAppBar(title: ''),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -205,36 +191,28 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   PreferredSizeWidget _buildAppBar(Lesson lesson) {
-    return AppBar(
-      titleSpacing: 0,
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back),
-      ),
-      title: Text(
-        AppStrings.lessonDetailAppBarTitle(lesson.studentName),
-        style: NotebookTypography.appBarTitle,
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            final date = formatDateYMD(lesson.date);
-            final text = AppStrings.lessonShareText(
-              studentName: lesson.studentName,
-              instrument: lesson.instrument,
-              date: date,
-              startTime: lesson.startTime,
-              duration: lesson.duration,
-            );
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppStrings.shareTextCopied(text)),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          },
-          icon: const Icon(Icons.share_outlined),
-        ),
+    return NotebookDetailAppBar(
+      title: AppStrings.lessonDetailAppBarTitle(lesson.studentName),
+      actions: const [DetailAppBarAction.share],
+      onAction: (action) {
+        if (action == DetailAppBarAction.share) {
+          final date = formatDateYMD(lesson.date);
+          final text = AppStrings.lessonShareText(
+            studentName: lesson.studentName,
+            instrument: lesson.instrument,
+            date: date,
+            startTime: lesson.startTime,
+            duration: lesson.duration,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppStrings.shareTextCopied(text)),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      },
+      customActions: [
         PopupMenuButton<String>(
           onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder:

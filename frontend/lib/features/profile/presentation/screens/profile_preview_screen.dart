@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -21,25 +22,16 @@ class ProfilePreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
 
+    final profile = profileAsync.valueOrNull;
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profilePreviewTitle),
-        actions: [
-          profileAsync.whenOrNull(
-                data:
-                    (profile) =>
-                        profile != null
-                            ? IconButton(
-                              icon: const Icon(Icons.copy_outlined),
-                              tooltip: '프로필 복사',
-                              onPressed:
-                                  () =>
-                                      _copyProfileToClipboard(context, profile),
-                            )
-                            : null,
-              ) ??
-              const SizedBox.shrink(),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.profilePreviewTitle,
+        actions: [if (profile != null) DetailAppBarAction.copy],
+        onAction: (action) {
+          if (action == DetailAppBarAction.copy && profile != null) {
+            _copyProfileToClipboard(context, profile);
+          }
+        },
       ),
       body: profileAsync.when(
         data: (profile) {

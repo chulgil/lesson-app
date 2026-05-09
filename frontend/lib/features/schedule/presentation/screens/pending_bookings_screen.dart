@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -25,7 +26,7 @@ class PendingBookingsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.schedulePendingApproval)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.schedulePendingApproval),
       body: pendingBookings.when(
         data: (bookings) {
           if (bookings.isEmpty) {

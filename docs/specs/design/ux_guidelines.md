@@ -424,6 +424,60 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 월 1회 | 별도 탭 또는 설정 |
 | 가끔 | 설정 메뉴 |
 
+### 4.3 상세 화면 헤더 (NotebookDetailAppBar) — 2026-05-09
+
+> **모든 뒤로가기가 필요한 상세 화면**의 헤더는 동일한 컨셉으로 작성한다.
+> 일관성이 최우선.
+
+```
+──────────────────────────────────────
+ [←] 주제                    [+] [⋮]
+──────────────────────────────────────  ← bottom border (ink 15%)
+```
+
+**공통 위젯**: `core/widgets/notebook/notebook_detail_app_bar.dart`
+
+#### Leading (왼쪽)
+
+| 타입 | 아이콘 | 용도 |
+|------|--------|------|
+| `back` (기본) | `←` arrow_back | 일반 탐색 (상세 → 목록) |
+| `close` | `×` close | 편집/생성 화면 (저장 안 하고 닫기) |
+
+#### Actions (오른쪽) — enum 기반
+
+| 액션 | 아이콘 | 용도 예시 |
+|------|--------|----------|
+| `add` | `+` add | 항목 추가 |
+| `edit` | edit_outlined | 편집 모드 진입 |
+| `delete` | delete_outline | 삭제 (편집 모드) |
+| `share` | share_outlined | 공유 |
+| `more` | **more_vert (⋮ 세로)** | 메뉴 (가로 ··· 금지) |
+| `settings` | settings_outlined | 설정 |
+| `filter` | filter_list | 필터 |
+| `search` | search | 검색 |
+| `copy` | copy_outlined | 복사 |
+| `history` | history | 이력 |
+
+**TextButton ("저장" 등)**: `customActions` 파라미터 사용
+**PopupMenuButton**: `customActions`에 직접 전달 (아이콘은 반드시 `Icons.more_vert`)
+
+#### 적용 대상 / 제외
+
+| 대상 | 제외 |
+|------|------|
+| push navigation 상세 화면 (~65개) | 메인 탭 화면 (home, schedule_tab 등) |
+| 편집/생성 화면 (close leading) | SliverAppBar (teacher_detail, academy_detail) |
+| 설정 하위 화면 | 로그인/온보딩 (별도 플로우) |
+| | 팝업/바텀시트/다이얼로그 |
+
+#### 금지
+
+- `Icons.more_horiz` (가로 ···) → 반드시 `Icons.more_vert` (세로 ⋮)
+- `backgroundColor: AppColors.paperDark` 수동 설정 → 테마 상속
+- `elevation` 수동 설정 → 테마 상속
+- `leading: IconButton(Icons.arrow_back, ...)` 수동 배치 → NotebookDetailAppBar 사용
+
 ---
 
 ## 5. 역할별 화면 재사용
@@ -545,4 +599,5 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 2026-04-16 | 긴급 알림 Top 1 정책, Progressive Disclosure 원칙, 스파크라인 가이드라인 추가 (§2.5~2.7) |
 | 2026-05-04 | **Notebook x Score 팔레트 마이그레이션 반영** — 레거시 토큰(primary/success/warning/error/info/surfaceLight/borderLight/textPrimaryLight 등) 제거, Notebook 팔레트(paper/ink/paperAccent/paperOk) 기준으로 전면 갱신. 카드·버튼·뱃지·칩·긴급도 색상 규칙 모두 현행 코드와 동기화. 버튼 BorderRadius.zero 시그니처 반영 |
 | 2026-05-04 | **수강권 3색 잉크 체계 추가** — `paperTrial`/`paperTrialSoft` 토큰, §6.1 수강권 카드 섹션에 3색 잉크 체계(trial=세피아, monthly=녹색, package=버밀리온) 및 `SubscriptionCard(compact)` 통합 문서화 |
+| 2026-05-09 | **§4.3 상세 화면 헤더 통일** — `NotebookDetailAppBar` 공통 위젯 + 적용 규칙. 모든 상세 화면 헤더 일관성 (back/close leading, enum 기반 actions, bottom border). `Icons.more_vert` (세로 ⋮) 통일, `more_horiz` 금지 |
 | 2026-05-05 | **회계식 기존 표현 → "입금대기(후불)" 용어 변경** — 회계/채권 뉘앙스를 줄이고 후불 발급 상태를 명확히 드러내도록 통일. indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -40,16 +41,12 @@ class _RepertoireDetailScreenState
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Text(
-          widget.selectedDate != null
-              ? '레퍼토리 · ${_formatDateForTitle(widget.selectedDate!)}'
-              : '레퍼토리',
-          style: NotebookTypography.appBarTitle,
-        ),
-        actions: [
-          // More menu with edit and archive options
+      appBar: NotebookDetailAppBar(
+        title:
+            widget.selectedDate != null
+                ? '레퍼토리 · ${_formatDateForTitle(widget.selectedDate!)}'
+                : '레퍼토리',
+        customActions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) => _handleMenuAction(value),

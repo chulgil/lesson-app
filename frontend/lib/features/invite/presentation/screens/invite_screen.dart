@@ -7,6 +7,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart' show ShareParams, SharePlus;
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -46,24 +47,17 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     final userRole = ref.watch(currentInviteUserRoleProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: Text(
-          userRole == InviteUserRole.teacher
-              ? AppStrings.inviteScreenTitleTeacher
-              : AppStrings.inviteScreenTitleStudent,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () => context.push(AppRoutes.inviteHistory),
-            tooltip: AppStrings.inviteHistoryTooltip,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: userRole == InviteUserRole.teacher
+            ? AppStrings.inviteScreenTitleTeacher
+            : AppStrings.inviteScreenTitleStudent,
+        leading: DetailAppBarLeading.close,
+        actions: const [DetailAppBarAction.history],
+        onAction: (action) {
+          if (action == DetailAppBarAction.history) {
+            context.push(AppRoutes.inviteHistory);
+          }
+        },
       ),
       body: inviteState.when(
         loading: () => const Center(child: CircularProgressIndicator()),

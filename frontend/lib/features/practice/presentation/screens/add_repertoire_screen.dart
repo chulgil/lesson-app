@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../core/widgets/app_date_picker.dart';
 import '../widgets/section_form/date_range_section.dart';
@@ -156,7 +157,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.practiceRepertoireAddTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireAddTitle),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(

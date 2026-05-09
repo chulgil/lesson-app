@@ -7,9 +7,9 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/teacher_announcement.dart';
@@ -29,18 +29,14 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
     final announcementsAsync = ref.watch(teacherAnnouncementsProvider(teacherId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          AppStrings.announcementHistoryTitle,
-          style: NotebookTypography.appBarTitle,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => AnnouncementSheet.show(context, ref: ref),
-            icon: const Icon(Icons.add, color: AppColors.ink),
-            tooltip: AppStrings.announcementSend,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.announcementHistoryTitle,
+        actions: [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) {
+            AnnouncementSheet.show(context, ref: ref);
+          }
+        },
       ),
       body: announcementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

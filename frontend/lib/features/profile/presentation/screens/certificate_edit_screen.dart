@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -242,20 +243,16 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          _isEdit
-              ? AppStrings.certificateEditAppBarEdit
-              : AppStrings.certificateEditAppBarAdd,
-        ),
-        actions: [
-          if (_isEdit)
-            IconButton(
-              onPressed: _isLoading ? null : _delete,
-              icon: const Icon(Icons.delete_outline),
-              color: AppColors.paperAccent,
-            ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: _isEdit
+            ? AppStrings.certificateEditAppBarEdit
+            : AppStrings.certificateEditAppBarAdd,
+        actions: [if (_isEdit) DetailAppBarAction.delete],
+        onAction: (action) {
+          if (action == DetailAppBarAction.delete) {
+            if (!_isLoading) _delete();
+          }
+        },
       ),
       body: Form(
         key: _formKey,

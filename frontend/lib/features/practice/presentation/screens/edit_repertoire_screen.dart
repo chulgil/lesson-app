@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../core/widgets/app_date_picker.dart';
 import '../widgets/section_form/add_section_widgets.dart';
@@ -236,7 +237,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.editRepertoireAppBarTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.editRepertoireAppBarTitle),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => const Center(child: Text(AppStrings.errorOccurred)),

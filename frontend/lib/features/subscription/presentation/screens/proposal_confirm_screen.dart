@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -43,9 +44,8 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.paymentConfirm),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.paymentConfirm,
       ),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

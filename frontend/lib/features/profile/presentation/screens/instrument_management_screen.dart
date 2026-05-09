@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -35,12 +35,8 @@ class _InstrumentManagementScreenState
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profileInstrumentTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.profileInstrumentTitle,
       ),
       body: settingsAsync.when(
         data: (settings) => _buildContent(settings),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -44,19 +44,12 @@ class _TipTemplateManagementScreenState
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text(AppStrings.profileTipTemplateTitle),
-        actions: [
-          IconButton(
-            onPressed: _showAddTemplateDialog,
-            icon: const Icon(Icons.add),
-            tooltip: AppStrings.profileTipTemplateAdd,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.profileTipTemplateTitle,
+        actions: [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) _showAddTemplateDialog();
+        },
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,

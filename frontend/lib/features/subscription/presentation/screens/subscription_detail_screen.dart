@@ -5,6 +5,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -62,9 +63,8 @@ class SubscriptionDetailScreen extends ConsumerWidget {
       },
       loading:
           () => NotebookScreenScaffold(
-            appBar: AppBar(
-              title: Text(AppStrings.subscriptionDetailTitle),
-              centerTitle: true,
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.subscriptionDetailTitle,
             ),
             body: const Center(child: CircularProgressIndicator()),
           ),
@@ -74,9 +74,8 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
   Widget _buildNotFoundScaffold() {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.subscriptionDetailTitle),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.subscriptionDetailTitle,
       ),
       body: Center(
         child: Column(
@@ -99,9 +98,8 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
   Widget _buildErrorScaffold(String error) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.subscriptionDetailTitle),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.subscriptionDetailTitle,
       ),
       body: Center(
         child: Padding(
@@ -396,17 +394,15 @@ class _SubscriptionDetailBodyState
       },
       loading:
           () => NotebookScreenScaffold(
-            appBar: AppBar(
-              title: Text(AppStrings.subscriptionDetailTitle),
-              centerTitle: true,
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.subscriptionDetailTitle,
             ),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (_, __) => NotebookScreenScaffold(
-            appBar: AppBar(
-              title: Text(AppStrings.subscriptionDetailTitle),
-              centerTitle: true,
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.subscriptionDetailTitle,
             ),
             body: Center(
               child: Text(

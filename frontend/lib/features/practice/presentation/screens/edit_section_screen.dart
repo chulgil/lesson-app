@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../widgets/section_form/add_section_widgets.dart';
@@ -259,13 +260,13 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return NotebookScreenScaffold(
-        appBar: AppBar(title: const Text(AppStrings.practiceSectionEditTitle)),
+        appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionEditTitle),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.practiceSectionEditTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionEditTitle),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(

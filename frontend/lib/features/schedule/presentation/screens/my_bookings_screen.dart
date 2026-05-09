@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -57,7 +58,7 @@ class MyBookingsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.myBookingsTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.myBookingsTitle),
       body: SafeArea(
         child: Column(
           children: [

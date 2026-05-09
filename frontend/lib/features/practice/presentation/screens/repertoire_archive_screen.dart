@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/repertoire_archive_provider.dart';
@@ -20,7 +21,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
     final archivedAsync = ref.watch(archivedRepertoiresProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.practiceArchiveTitle)),
+      appBar: const NotebookDetailAppBar(title: AppStrings.practiceArchiveTitle),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

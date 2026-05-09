@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -159,14 +160,8 @@ class _SuggestAlternativeScreenState
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: Text(
-          AppStrings.counterPropose,
-          style: NotebookTypography.appBarTitle,
-        ),
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.counterPropose,
       ),
       body: Column(
         children: [

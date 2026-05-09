@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,9 +43,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.proposalCreateAppBarTitle),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.proposalCreateAppBarTitle,
       ),
       // 처리 중일 때는 provider 상태 변화로 인한 UI 깜빡임 방지
       body:

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
@@ -79,9 +80,9 @@ class _ProfileVisibilityScreenState
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profileVisibilityAppBarTitle),
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.profileVisibilityAppBarTitle,
+        customActions: [
           if (_hasChanges)
             TextButton(
               onPressed: _isLoading ? null : _save,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,39 +29,8 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
     final studentsAsync = ref.watch(studentsProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: expiringSoonAsync.when(
-          loading: () => const Text(AppStrings.subscriptionViewAction),
-          error: (_, __) => const Text(AppStrings.subscriptionViewAction),
-          data: (subscriptions) {
-            final expiredSubs = expiredAsync.valueOrNull ?? [];
-            final allStudents = {
-              ...subscriptions.map((s) => s.studentId),
-              ...expiredSubs.map((s) => s.studentId),
-            };
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(AppStrings.subscriptionViewAction),
-                if (allStudents.isNotEmpty)
-                  Text(
-                    AppStrings.studentsCountSubtitle(allStudents.length),
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.subscriptionViewAction,
       ),
       body: expiringSoonAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

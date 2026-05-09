@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../practice/practice_facade.dart';
@@ -31,18 +31,12 @@ class _RepertoireManagementScreenState
     final searchQuery = ref.watch(pieceSearchQueryProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profileRepertoireTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showAddPieceDialog,
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.profileRepertoireTitle,
+        actions: [DetailAppBarAction.add],
+        onAction: (action) {
+          if (action == DetailAppBarAction.add) _showAddPieceDialog();
+        },
       ),
       body: Column(
         children: [

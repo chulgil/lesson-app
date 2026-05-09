@@ -3,6 +3,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -230,15 +231,10 @@ class _IssueSubscriptionScreenState
     }
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.isBatchMode
-              ? AppStrings.batchSubscriptionAppBarTitle(
-                widget.studentIds.length,
-              )
-              : AppStrings.proposalTitle,
-        ),
-        centerTitle: true,
+      appBar: NotebookDetailAppBar(
+        title: widget.isBatchMode
+            ? AppStrings.batchSubscriptionAppBarTitle(widget.studentIds.length)
+            : AppStrings.proposalTitle,
       ),
       body:
           widget.isBatchMode

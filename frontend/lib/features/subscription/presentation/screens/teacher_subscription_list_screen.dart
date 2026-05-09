@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -55,9 +56,8 @@ class _TeacherSubscriptionListScreenState
     );
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.issuedSubscriptions),
-        centerTitle: true,
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.issuedSubscriptions,
         bottom: TabBar(
           controller: _tabController,
           tabs: subscriptionsAsync.when(

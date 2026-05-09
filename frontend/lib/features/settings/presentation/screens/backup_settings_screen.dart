@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/backup_state.dart';
 import '../providers/backup_provider.dart';
@@ -22,12 +23,8 @@ class BackupSettingsScreen extends ConsumerWidget {
     final backupState = ref.watch(backupStateNotifierProvider);
 
     return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      appBar: AppBar(
-        title: const Text(AppStrings.backupAppBarTitle),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        foregroundColor: AppColors.ink,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.backupAppBarTitle,
       ),
       body: backupState.when(
         data: (state) => _BackupContent(state: state),

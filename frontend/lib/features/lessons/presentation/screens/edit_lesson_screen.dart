@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -101,7 +102,10 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return NotebookScreenScaffold(
-        appBar: AppBar(title: const Text(AppStrings.editLessonTitle)),
+        appBar: NotebookDetailAppBar(
+          title: AppStrings.editLessonTitle,
+          leading: DetailAppBarLeading.close,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -109,18 +113,15 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
     final isSubscriptionLesson = _originalLesson?.subscriptionId != null;
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.editLessonTitle),
-        leading: IconButton(
-          onPressed:
-              () => showEditLessonExitConfirmation(
-                context: context,
-                hasChanges: _hasChanges,
-                onExit: () => context.pop(),
-              ),
-          icon: const Icon(Icons.close),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.editLessonTitle,
+        leading: DetailAppBarLeading.close,
+        onLeadingTap: () => showEditLessonExitConfirmation(
+          context: context,
+          hasChanges: _hasChanges,
+          onExit: () => context.pop(),
         ),
-        actions: [
+        customActions: [
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {

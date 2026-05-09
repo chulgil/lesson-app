@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -20,12 +21,8 @@ class ExtendedProfileScreen extends ConsumerWidget {
     final profileState = ref.watch(teacherExtendedProfileProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.profileExtendedTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.profileExtendedTitle,
       ),
       body: profileState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
