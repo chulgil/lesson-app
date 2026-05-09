@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+  "appTitle": "Lessonaza",
+  "@appTitle": {
+    "description": "Application title."
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom navigation label for the home tab."
+  },
+  "navLessons": "Lessons",
+  "@navLessons": {
+    "description": "Bottom navigation label for the lessons tab."
+  },
+  "navPractice": "Practice",
+  "@navPractice": {
+    "description": "Bottom navigation label for the practice tab."
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom navigation label for the profile tab."
+  },
+  "navAssignments": "Assignments",
+  "@navAssignments": {
+    "description": "Bottom navigation label for the assignments tab."
+  },
+  "navPayments": "Payments",
+  "@navPayments": {
+    "description": "Bottom navigation label for the payments tab."
+  }
+}

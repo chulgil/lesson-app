@@ -1,0 +1,31 @@
+{
+  "@@locale": "ko",
+  "appTitle": "Lessonaza",
+  "@appTitle": {
+    "description": "Application title."
+  },
+  "navHome": "홈",
+  "@navHome": {
+    "description": "Bottom navigation label for the home tab."
+  },
+  "navLessons": "레슨",
+  "@navLessons": {
+    "description": "Bottom navigation label for the lessons tab."
+  },
+  "navPractice": "연습",
+  "@navPractice": {
+    "description": "Bottom navigation label for the practice tab."
+  },
+  "navProfile": "프로필",
+  "@navProfile": {
+    "description": "Bottom navigation label for the profile tab."
+  },
+  "navAssignments": "과제",
+  "@navAssignments": {
+    "description": "Bottom navigation label for the assignments tab."
+  },
+  "navPayments": "입금",
+  "@navPayments": {
+    "description": "Bottom navigation label for the payments tab."
+  }
+}

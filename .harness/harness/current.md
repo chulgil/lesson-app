@@ -33,6 +33,7 @@
 - `flutter --no-version-check test frontend/test/architecture/layer_boundaries_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/feature_dependency_contract_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/notebook_design_contract_test.dart`
+- `flutter --no-version-check test frontend/test/architecture/i18n_contract_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/ux_overlay_label_contract_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/header_primary_action_contract_test.dart`
 - `flutter --no-version-check test frontend/test/core/sync/sync_queue_store_test.dart`

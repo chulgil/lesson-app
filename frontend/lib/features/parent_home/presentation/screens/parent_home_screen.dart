@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
@@ -67,11 +68,11 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, 'I', '홈'),
-              _buildNavItem(1, 'II', '레슨'),
-              _buildNavItem(2, 'III', '과제'),
-              _buildNavItem(3, 'IV', '입금'),
-              _buildNavItem(4, 'V', '프로필'),
+              _buildNavItem(0, 'I', AppStrings.navHome),
+              _buildNavItem(1, 'II', AppStrings.navLessons),
+              _buildNavItem(2, 'III', AppStrings.navAssignments),
+              _buildNavItem(3, 'IV', AppStrings.navPayments),
+              _buildNavItem(4, 'V', AppStrings.navProfile),
             ],
           ),
         ),

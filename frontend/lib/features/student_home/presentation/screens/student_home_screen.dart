@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
@@ -105,12 +106,12 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, 'I', '홈'),
-              _buildNavItem(1, 'II', '레슨'),
+              _buildNavItem(0, 'I', AppStrings.navHome),
+              _buildNavItem(1, 'II', AppStrings.navLessons),
               // Center practice button (same level as other items)
               const PracticeCenterButton(size: 48),
-              _buildNavItem(2, 'III', '연습'),
-              _buildNavItem(3, 'IV', '프로필'),
+              _buildNavItem(2, 'III', AppStrings.navPractice),
+              _buildNavItem(3, 'IV', AppStrings.navProfile),
             ],
           ),
         ),

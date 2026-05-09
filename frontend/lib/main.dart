@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/l10n/generated/app_localizations.dart';
 import 'core/providers/repository_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/startup/app_bootstrap.dart';
@@ -109,11 +110,12 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
 
         // Localization
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
+        supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('ko', 'KR'),
 
         // Theme

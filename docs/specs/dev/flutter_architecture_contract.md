@@ -185,8 +185,9 @@ features/onboarding/presentation/providers/onboarding_progress_storage_provider.
 사용자에게 보이는 문구는 `AppStrings` 또는 l10n 계층으로 모은다.
 
 - `AppStrings`는 현재 앱의 중앙 문자열 SSOT로 유지한다.
-- Flutter ARB 기반 `AppLocalizations` 구조가 도입되기 전까지는 `AppStrings`를 presentation 계층의 공통 문자열 API로 사용한다.
-- 다국어 적용이 필요해지면 `AppStrings`와 ARB를 중복 관리하지 않고, facade 또는 단계적 migration plan을 통해 하나의 런타임 accessor로 수렴시킨다.
+- Flutter ARB 기반 `AppLocalizations` 구조는 `frontend/l10n.yaml`과 `frontend/lib/core/l10n/arb/*.arb`에서 시작한다.
+- `AppStrings`는 기존 화면의 중앙 문자열 SSOT로 유지하되, 신규/수정 화면은 하드코딩 한글을 추가하지 않고 `AppStrings` 또는 generated `AppLocalizations`로만 노출한다.
+- ARB 전환은 도메인별 단계 이행으로 진행한다. `AppStrings`와 ARB가 병행되는 동안에도 presentation 외 계층은 l10n import를 금지한다.
 - 새/수정 UI에서 하드코딩 Korean/English label을 추가하지 않는다.
 - 일정 변경, 확정, 거절, 카운터 제안처럼 메시지/말풍선에 들어가는 문구는 공통 string API를 사용한다.
 - 사용자가 입력한 확정 메시지와 시스템 이벤트 메시지는 별도 필드로 유지하고, 표시 단계에서 누락하지 않는다.
