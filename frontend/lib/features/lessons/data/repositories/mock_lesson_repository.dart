@@ -103,6 +103,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '16:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_pkg_03',
         pieces: const [
           LessonPiece(
             id: 'piece_004',
@@ -135,6 +136,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '18:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_pkg_04',
         pieces: const [
           LessonPiece(
             id: 'piece_006',
@@ -163,6 +165,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '11:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_pkg_02',
         pieces: const [
           LessonPiece(
             id: 'piece_007',
@@ -218,6 +221,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '17:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        subscriptionId: 'sub_mon_03',
         pieces: const [
           LessonPiece(
             id: 'piece_009',

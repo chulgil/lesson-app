@@ -33,8 +33,10 @@ class MockTeacherAnnouncementRepository
         final lessons = await _lessonRepository.getLessonsByDate(date);
         final cancellable = lessons.where(
           (l) =>
-              l.status == LessonStatus.scheduled ||
-              l.status == LessonStatus.reschedulePending,
+              l.teacherId == announcement.teacherId &&
+              !l.isPreview &&
+              (l.status == LessonStatus.scheduled ||
+              l.status == LessonStatus.reschedulePending),
         );
         for (final lesson in cancellable) {
           affectedLessons.add(
