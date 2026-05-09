@@ -1,7 +1,7 @@
 # Gamification 엔티티
 
 > 마지막 업데이트: 2026-03-11
-> 관련 스펙: [gamification_spec.md](../../specs/practice/gamification_spec.md)
+> 관련 스펙: [gamification_spec.md](../../specs/_archive/old/gamification_spec.md)
 
 ## 개요
 

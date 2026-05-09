@@ -1049,8 +1049,7 @@ class LessonRequest extends HiveObject {
 | 문서 | 설명 |
 |------|------|
 | [subscription_system_spec.md](./subscription_system_spec.md) | 수강권 시스템 및 학원 모드 설계서 (원본) |
-| [subscription_proposal_spec.md](./subscription_proposal_spec.md) | 수강권 제안 시스템 스펙 (원본) |
-| [subscription_status_colors.md](./subscription_status_colors.md) | 상태별 색상 체계 (원본) |
+| [subscription_master.md](./subscription_master.md) | 수강권 제안 시스템 스펙 (원본) |
 | [lesson_cancellation_policy.md](./lesson_cancellation_policy.md) | 취소/변경 정책 (원본) |
 | [lesson_policy_settings.md](./lesson_policy_settings.md) | 레슨 정책 설정 (원본) |
 | [lesson_request_system.md](./lesson_request_system.md) | 학생 레슨 요청 (원본) |

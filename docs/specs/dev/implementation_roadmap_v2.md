@@ -31,8 +31,8 @@
 | 기능 | 스펙 | 경쟁사 대비 | 우선순위 |
 |------|------|-----------|:--------:|
 | ~~통계/리포트 대시보드~~ | analytics_dashboard_spec.md | StudioMate, Modacity | ✅ Phase 1+2 done |
-| 출석 관리 | attendance_spec.md | StudioMate | HIGH |
-| ~~게이미피케이션~~ | gamification_spec.md | Tonara (+68%), Practice Space | ⚠️ Phase 1 UI done |
+| 출석 관리 | [attendance_spec.md](../_archive/old/attendance_spec.md) | StudioMate | HIGH |
+| ~~게이미피케이션~~ | [gamification_spec.md](../_archive/old/gamification_spec.md) | Tonara (+68%), Practice Space | ⚠️ Phase 1 UI done |
 | 팔로우 피드 | follow_master.md | 인스타그램형 | LOW |
 
 ### 1.3 경쟁사 대비 강점/약점
@@ -74,8 +74,8 @@
 | # | 작업 | 스펙 | 예상 규모 | 우선순위 |
 |---|------|------|:---------:|:--------:|
 | 2-1 | **통계/리포트 대시보드** | analytics_dashboard_spec.md | L | ✅ done |
-| 2-2 | **출석 관리 (Quick Action)** | attendance_spec.md Phase 1 | M | ✅ done |
-| 2-3 | **게이미피케이션 Phase 1** (포인트+레벨) | gamification_spec.md Phase 1 | L | ✅ done |
+| 2-2 | **출석 관리 (Quick Action)** | [attendance_spec.md](../_archive/old/attendance_spec.md) Phase 1 | M | ✅ done |
+| 2-3 | **게이미피케이션 Phase 1** (포인트+레벨) | [gamification_spec.md](../_archive/old/gamification_spec.md) Phase 1 | L | ✅ done |
 | 2-4 | 대시보드 정보 계층화 | design_master.md 5.3 | M | ✅ done |
 | 2-5 | 수강권 카드 UI 개선 (프로그레스 바) | subscription_master.md | S | ✅ done |
 | 2-6 | 예약 색상 체계 적용 | design_master.md 5.3 | S | ✅ done |
@@ -86,8 +86,8 @@
 
 | # | 작업 | 스펙 | 예상 규모 | 우선순위 |
 |---|------|------|:---------:|:--------:|
-| 3-1 | **출석 관리 Phase 2** (통계 + 그룹 출석) | attendance_spec.md Phase 2 | M | ✅ done |
-| 3-2 | **게이미피케이션 Phase 2** (뱃지 + 리더보드) | gamification_spec.md Phase 2 | L | ✅ done |
+| 3-1 | **출석 관리 Phase 2** (통계 + 그룹 출석) | [attendance_spec.md](../_archive/old/attendance_spec.md) Phase 2 | M | ✅ done |
+| 3-2 | **게이미피케이션 Phase 2** (뱃지 + 리더보드) | [gamification_spec.md](../_archive/old/gamification_spec.md) Phase 2 | L | ✅ done |
 | 3-3 | 학생 연습 현황 상세 조회 | practice_master.md | M | ✅ done |
 | 3-4 | **알림 시스템 고도화 (FCM)** | notification_master.md | L | ⚠️ 코드 완료, Firebase 설정 대기 |
 | 3-5 | **팔로우/소식 피드** | follow_master.md Phase 3 | M | ✅ done |
@@ -104,7 +104,7 @@
 | 4-3 | **게이미피케이션 Phase 3 (도전 과제)** | gamification_master.md | ✅ done |
 | 4-4 | **AI 연습 분석 (피치)** | pitch_analysis.dart | ⚠️ 엔티티+UI 완료, 실시간 연동 대기 |
 | 4-5 | **결제 시스템 (Toss PG)** | payment_gateway_service.py | ⚠️ 인프라 완료, PG 키 설정 대기 |
-| 4-6 | **출석 Phase 3 (알림 + 자동화)** | attendance_spec.md Phase 3 | ✅ done |
+| 4-6 | **출석 Phase 3 (알림 + 자동화)** | [attendance_spec.md](../_archive/old/attendance_spec.md) Phase 3 | ✅ done |
 
 ---
 
@@ -155,8 +155,8 @@
 | # | 스펙 | 도메인 | 상태 |
 |---|------|--------|:----:|
 | 1 | analytics_dashboard_spec.md | analytics | 보강 완료 |
-| 2 | attendance_spec.md | lesson | 보강 완료 |
-| 3 | gamification_spec.md | practice | 신규 작성 |
+| 2 | [attendance_spec.md](../_archive/old/attendance_spec.md) | lesson | 보강 완료 |
+| 3 | [gamification_spec.md](../_archive/old/gamification_spec.md) | practice | 신규 작성 |
 
 ### 4.3 일관성 수정 (6건)
 
@@ -204,9 +204,9 @@
 | [feature_hub.md](../feature_hub.md) | 기능 매트릭스 + Pain Point 매핑 |
 | [DOCUMENT_INDEX.md](../../DOCUMENT_INDEX.md) | 문서 네비게이션 |
 | [teacher_ux_review.md](../design/teacher_ux_review.md) | UX 검토 보고서 (#63~#73) |
-| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 스펙 (신규) |
+| [gamification_spec.md](../_archive/old/gamification_spec.md) | 게이미피케이션 스펙 (신규) |
 | [analytics_dashboard_spec.md](../analytics/analytics_dashboard_spec.md) | 통계 대시보드 스펙 |
-| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 스펙 |
+| [attendance_spec.md](../_archive/old/attendance_spec.md) | 출석 관리 스펙 |
 | [beta_readiness.md](beta_readiness.md) | 베타 출시 준비 체크리스트 |
 
 ---

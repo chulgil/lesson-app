@@ -678,7 +678,7 @@ sequenceDiagram
 
 #### 앱 전환용 수강권 발급 코드
 
-> 👉 **상세 구현**: [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md#85-기존-정기레슨--앱-전환)
+> 👉 **상세 구현**: [subscription_master.md](../subscription/subscription_master.md#85-기존-정기레슨--앱-전환)
 
 ```dart
 /// 앱 전환 시 수강권 즉시 발급 (결제 확인 스킵)
@@ -1389,6 +1389,6 @@ invite_system_v2.md
 ## 14. 관련 문서
 
 - [기존 초대 시스템 v2](./invite_system_v2.md) - 학부모/학원 부분 참조
-- [수강권 제안 시스템](../subscription/subscription_proposal_spec.md)
+- [수강권 제안 시스템](../subscription/subscription_master.md)
 - [레슨 요청 시스템](../subscription/lesson_request_system.md)
 - [알림 시스템](../notification/notification_system.md)

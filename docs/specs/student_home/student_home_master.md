@@ -339,7 +339,7 @@ enum StudentTab {
 | 스펙 | 관계 |
 |------|------|
 | [선생님 캘린더](../calendar/calendar_master.md) | 선생님 스케줄 탭 (유사 구조) |
-| [게이미피케이션](../practice/gamification_spec.md) | 학생 대시보드 헤더에 게이미피케이션 요소 표시 예정 |
+| [게이미피케이션](../_archive/old/gamification_spec.md) | 학생 대시보드 헤더에 게이미피케이션 요소 표시 예정 |
 | [연습 시스템](../practice/practice_master.md) | 연습 탭 레퍼토리/섹션 관리 |
 | [UX 가이드라인](../design/ux_guidelines.md) | UI/UX 규칙 |
 | [알림 시스템](../notification/notification_master.md) | 알림 벨 아이콘, 수강권 제안 배너 |

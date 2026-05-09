@@ -4,10 +4,10 @@
 > 최종 수정: 2026-01-27
 > 상태: 스펙 확정 (수강권 제안 플로우 추가)
 > 엔티티 스키마: [booking.md](../../schema/entities/booking.md)
-> 관련 문서: [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
+> 관련 문서: [subscription_master.md](../subscription/subscription_master.md)
 
 > ⚠️ **핵심 원칙**: 레슨 예약은 **유효한 수강권이 있어야만** 가능합니다.
-> 수강권이 없는 학생은 [수강권 제안 플로우](../subscription/subscription_proposal_spec.md)를 통해 먼저 수강권을 발급받아야 합니다.
+> 수강권이 없는 학생은 [수강권 제안 플로우](../subscription/subscription_master.md)를 통해 먼저 수강권을 발급받아야 합니다.
 
 ---
 
@@ -345,7 +345,7 @@
 | 4 | 선생님 | 입금 확인 → [확인 완료] | 수강권 자동 발급 |
 | 5 | 학생 | 레슨 예약 | LessonBookingScreen |
 
-→ 상세: [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
+→ 상세: [subscription_master.md](../subscription/subscription_master.md)
 
 ### 단일 예약 화면 원칙
 
@@ -366,5 +366,5 @@
 | [booking.md](../../schema/entities/booking.md) | Booking, LessonType, BookingStatus 엔티티 |
 | [practice_space.md](../../schema/entities/practice_space.md) | InviteCode 엔티티 |
 | [Lesson_Schedule_Design.md](./Lesson_Schedule_Design.md) | 레슨 스케줄 설계 |
-| [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 시스템 |
+| [subscription_master.md](../subscription/subscription_master.md) | 수강권 제안 시스템 |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 시간 선택 UI |

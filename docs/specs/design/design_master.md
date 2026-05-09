@@ -1551,14 +1551,14 @@ TabBar 구성: 노트 | 녹음 | 과제
 | #70 빈 상태 UI 통일 | 공통 empty_state 컴포넌트 적용 | 구현 완료 |
 | #71 학생 카드 연습률 | 연습률 점 패턴 표시 구현 | 구현 완료 |
 | #72 통계/리포트 스펙 | 통계 스펙 작성 완료 | 스펙 완료 |
-| #73 출석 관리 스펙 | [attendance_spec.md](../lesson/attendance_spec.md) 작성 | 스펙 완료 |
+| #73 출석 관리 스펙 | [attendance_spec.md](../_archive/old/attendance_spec.md) 작성 | 스펙 완료 |
 
 #### 관련 신규 스펙
 
 | 스펙 | 설명 | 상태 |
 |------|------|:----:|
-| [gamification_spec.md](../practice/gamification_spec.md) | 포인트/레벨/뱃지 시스템 (Tonara 벤치마크) | 구현 대기 |
-| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 + 수강권 차감 연동 | 구현 대기 |
+| [gamification_spec.md](../_archive/old/gamification_spec.md) | 포인트/레벨/뱃지 시스템 (Tonara 벤치마크) | 구현 대기 |
+| [attendance_spec.md](../_archive/old/attendance_spec.md) | 출석 관리 + 수강권 차감 연동 | 구현 대기 |
 | [teacher_ux_review.md](teacher_ux_review.md) | 선생님 앱 UX 종합 검토 보고서 | 검토 완료 |
 
 ---
@@ -1583,7 +1583,7 @@ TabBar 구성: 노트 | 녹음 | 과제
 | 2026-02-05 | 역할별 화면 설계 최종 수정 | role_based_screens.md |
 | 2026-03-02 | WeekCalendarWidget 월간/주간 토글 기반 스펙 정리 | teacher_app_screens.md |
 | 2026-03-06 | **Design Master Spec 통합 문서 생성** | 전체 통합 |
-| 2026-03-07 | 프로필 탭 재구성 반영 (#63), UX 리뷰 결과 반영 (#63~#73), 경쟁사 대비 UX 원칙 추가, 새 스펙 참조 추가 (gamification, attendance, teacher_ux_review) | teacher_ux_review.md, gamification_spec.md, attendance_spec.md |
+| 2026-03-07 | 프로필 탭 재구성 반영 (#63), UX 리뷰 결과 반영 (#63~#73), 경쟁사 대비 UX 원칙 추가, 새 스펙 참조 추가 (gamification, attendance, teacher_ux_review) | teacher_ux_review.md, [gamification_spec.md](../_archive/old/gamification_spec.md), [attendance_spec.md](../_archive/old/attendance_spec.md) |
 
 ---
 
@@ -1601,7 +1601,7 @@ TabBar 구성: 노트 | 녹음 | 과제
 | [student_class_system.md](../student/student_class_system.md) | 학생 클래스/소속 시스템 |
 | [parent_system.md](../user/parent_system.md) | 학부모 시스템 |
 | [subscription_master.md](../subscription/subscription_master.md) | 수강권 시스템 |
-| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (포인트/레벨/뱃지) |
-| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 시스템 |
+| [gamification_spec.md](../_archive/old/gamification_spec.md) | 게이미피케이션 (포인트/레벨/뱃지) |
+| [attendance_spec.md](../_archive/old/attendance_spec.md) | 출석 관리 시스템 |
 | [Multi_Option_Schedule_Spec.md](../old/Multi_Option_Schedule_Spec.md) | 다중 옵션 스케줄 (archived) |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용 슬롯 |

@@ -71,8 +71,8 @@ docs/schema/
 |--------|------|----------|:-----------:|
 | [Payment](entities/payment.md) | 레거시 입금 기록, 청구서 이력 | [payment_architecture.md](../specs/subscription/payment_architecture.md) | 70-80 |
 | [Subscription](entities/subscription.md) | 수강권, 부가 서비스, 교차 수강 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 55-62 |
-| SubscriptionTemplate | 수강권 템플릿 (선생님 재사용) | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 80 |
-| SubscriptionProposal | 수강권 제안 | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 81-82 |
+| SubscriptionTemplate | 수강권 템플릿 (선생님 재사용) | [subscription_master.md](../specs/subscription/subscription_master.md) | 80 |
+| SubscriptionProposal | 수강권 제안 | [subscription_master.md](../specs/subscription/subscription_master.md) | 81-82 |
 
 ### 사용자
 

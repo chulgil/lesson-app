@@ -3,7 +3,7 @@
 > 구현 상태: ✅ 구현 완료
 > 최종 업데이트: 2026-03-12
 > 통합 문서: `teacher_availability_spec.md`, `schedule_confirmation_card_spec.md`
-> 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)
+> 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)
 
 ---
 
@@ -161,7 +161,7 @@ booked -> available (취소)
 
 **전제 조건:**
 - 유효한 수강권 보유 (잔여 횟수 > 0)
-- 수강권 없는 경우 [수강권 제안 플로우](../subscription/subscription_proposal_spec.md) 먼저 진행
+- 수강권 없는 경우 [수강권 제안 플로우](../subscription/subscription_master.md) 먼저 진행
 
 **예약 플로우:**
 
@@ -1480,10 +1480,10 @@ enum ScheduleCardStatus {
 |------|------|
 | [lesson_master.md](../lesson/lesson_master.md) | 레슨 시스템 마스터 (레슨 플로우, 예약, 취소/변경) |
 | [subscription_system_spec.md](../subscription/subscription_system_spec.md) | 수강권 시스템 |
-| [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 (결제 전 플로우) |
+| [subscription_master.md](../subscription/subscription_master.md) | 수강권 제안 (결제 전 플로우) |
 | [group_lesson_spec.md](../lesson/group_lesson_spec.md) | 그룹레슨 시스템 |
-| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 시스템 |
-| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
+| [attendance_spec.md](../_archive/old/attendance_spec.md) | 출석 관리 시스템 |
+| [gamification_spec.md](../_archive/old/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
 | [ux_guidelines.md](../design/ux_guidelines.md) | UX 가이드라인 (섹션 11~12) |
 | [subscription.md](../../schema/entities/subscription.md) | 수강권 엔티티 스키마 |
 

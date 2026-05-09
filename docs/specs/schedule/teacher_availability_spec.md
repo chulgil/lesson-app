@@ -3,11 +3,11 @@
 > 작성일: 2026-01-26
 > 최종 수정: 2026-02-01
 > 상태: ✅ 구현 완료 (Phase 1~4)
-> 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
+> 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md)
 > UX 가이드: [ux_guidelines.md](../design/ux_guidelines.md) - 섹션 11~12 참고
 
 > ⚠️ **중요**: 레슨 예약은 **유효한 수강권이 있어야만** 가능합니다.
-> 수강권이 없는 학생의 경우 먼저 [수강권 제안 플로우](../subscription/subscription_proposal_spec.md)를 통해 수강권을 발급받아야 합니다.
+> 수강권이 없는 학생의 경우 먼저 [수강권 제안 플로우](../subscription/subscription_master.md)를 통해 수강권을 발급받아야 합니다.
 
 ---
 
@@ -1122,7 +1122,7 @@ lib/features/schedule/
 ## 관련 문서
 
 - [subscription_system_spec.md](../subscription/subscription_system_spec.md) - 수강권 시스템
-- [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) - 수강권 제안 시스템 (결제 전 플로우)
+- [subscription_master.md](../subscription/subscription_master.md) - 수강권 제안 시스템 (결제 전 플로우)
 - [group_lesson_spec.md](../lesson/group_lesson_spec.md) - 그룹레슨 시스템
 - [subscription.md](../../schema/entities/subscription.md) - 수강권 엔티티
 - [ux_guidelines.md](../design/ux_guidelines.md) - UX 가이드라인

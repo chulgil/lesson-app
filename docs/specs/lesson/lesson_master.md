@@ -1310,7 +1310,7 @@ frontend/lib/features/schedule/
 |------|------|
 | [schedule_master.md](../schedule/schedule_master.md) | 스케줄 시스템 마스터 (가용시간, 예약, 확인 카드) |
 | [subscription_system_spec.md](../subscription/subscription_system_spec.md) | 수강권 시스템 |
-| [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 시스템 |
+| [subscription_master.md](../subscription/subscription_master.md) | 수강권 제안 시스템 |
 | [lesson_request_system.md](../subscription/lesson_request_system.md) | 레슨 요청 시스템 (재등록) |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용시간 |
 | [subscription_based_relationship.md](invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
@@ -1318,8 +1318,8 @@ frontend/lib/features/schedule/
 | [student_class_system.md](../student/student_class_system.md) | LessonClass, ClassMembership 엔티티 |
 | [ux_guidelines.md](../design/ux_guidelines.md) | UX 가이드라인 |
 | [notification_system.md](../notification/notification_system.md) | 알림 시스템 |
-| [attendance_spec.md](attendance_spec.md) | 출석 관리 시스템 |
-| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
+| [attendance_spec.md](../_archive/old/attendance_spec.md) | 출석 관리 시스템 |
+| [gamification_spec.md](../_archive/old/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
 
 #### 통합 원본 (Historical — 작업 근거로 사용 금지)
 

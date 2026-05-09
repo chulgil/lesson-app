@@ -1681,7 +1681,7 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 
 | 스펙 | 위치 | 설명 |
 |------|------|------|
-| 게이미피케이션 | `docs/specs/practice/gamification_spec.md` | 포인트/레벨/뱃지 시스템 (신규) |
+| 게이미피케이션 | `docs/specs/_archive/old/gamification_spec.md` | 포인트/레벨/뱃지 시스템 (신규) |
 | 메트로놈 | `docs/specs/metronome/` | 커스텀 MetronomePlugin, 박자/세분화 |
 | 튜너 | `docs/specs/tuner/` | 실시간 음고 감지 |
 | 학생 홈 | `docs/specs/user/` | 학생 홈 화면 탭 구성 |
@@ -1701,7 +1701,7 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | 2026-03-07 | Enum 정식 정의 추가 (PracticePriority, PracticeType dart 코드 블록) |
 | | 경쟁사 대비 차별점 섹션 추가 (1.3) |
 | | Claude 구현 가이드 섹션 추가 (8장) - Provider 설계 상세, 미구현 파일 매핑 |
-| | 관련 스펙에 gamification_spec.md, user_master.md 참조 추가 |
+| | 관련 스펙에 [gamification_spec.md](../_archive/old/gamification_spec.md), user_master.md 참조 추가 |
 | | 목차 갱신 (8~10장 추가/재번호) |
 | 2026-03-06 | 마스터 스펙 초안 작성 - 18개 원본 문서 통합 |
 | | 원본: Practice_System_Spec.md (v2.0, 2026-01-05) |

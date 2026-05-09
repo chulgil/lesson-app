@@ -61,7 +61,7 @@
 
 | 프론트엔드 호출 경로 | 백엔드 상태 | 심각도 |
 |--------------------|-----------|--------|
-| `/practice/logs/*` (CRUD, 토글, 주간, 스트릭) | 미구현 | CRITICAL |
+| `/practice-logs/*` (CRUD, 토글, 주간, 스트릭) | 미구현 | CRITICAL |
 | `/schedule/lesson-requests/*` (CRUD, 상태변경) | 미구현 | HIGH |
 | `/subscriptions/{id}/usage` | 미구현 | HIGH |
 | URL 패턴: `/subscriptions-templates` vs `/subscriptions/-templates` | 불일치 | HIGH |
