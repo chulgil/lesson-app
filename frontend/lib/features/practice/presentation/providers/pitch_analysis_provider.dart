@@ -15,7 +15,8 @@ Future<PitchAnalysisResult?> pitchAnalysis(
   Ref ref,
   String recordingId,
 ) async {
-  // TODO: Replace with actual analysis when audio processing is ready
+  // Remote API not yet available — mock fallback for all modes
+  // TODO(remote): Replace with actual analysis when audio processing is ready
   return _generateMockAnalysis(recordingId);
 }
 

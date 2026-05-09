@@ -8,7 +8,8 @@ part 'challenge_provider.g.dart';
 /// Provides the list of active challenges for a student.
 @riverpod
 Future<List<Challenge>> studentChallenges(Ref ref, String studentId) async {
-  // TODO: Replace with repository call when backend is ready
+  // Remote API not yet available — mock fallback for all modes
+  // TODO(remote): Replace with repository call when backend is ready
   return _generateMockChallenges();
 }
 

@@ -12,7 +12,8 @@ Future<StudentPracticeOverview> studentPracticeOverview(
   Ref ref,
   String studentId,
 ) async {
-  // TODO: Replace with real repository call when backend is ready
+  // Remote API not yet available — mock fallback for all modes
+  // TODO(remote): Replace with real repository call when backend is ready
   return _generateMockOverview(studentId);
 }
 
