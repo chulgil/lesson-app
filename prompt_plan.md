@@ -23,12 +23,17 @@
 - [x] AppStrings 빌링 상수 12개 추가
 - [x] `flutter analyze` 통과 (신규 에러 0)
 
-## Phase C: Paywall UI + 구독 화면 (다음)
+## Phase C: Paywall UI + 구독 화면 ✅
 
-- [ ] 구독 플랜 비교 화면 (SubscriptionPlansScreen)
-- [ ] IAP 결제 흐름 연동 (in_app_purchase 패키지 사용)
-- [ ] 프로필 구독 배지 표시
-- [ ] 얼리어답터 Lifetime 199,000원 (90일 한정) UI
+- [x] `IapService` — in_app_purchase 패키지 래핑 (상품 조회, 구매, 복원, 영수증 BE 검증)
+- [x] `BillingPlansScreen` — Free/Pro/Studio/Lifetime 플랜 비교 + 스토어 가격 표시 + IAP 구매
+- [x] `BillingPlanBadge` — 프로필 헤더에 현재 플랜 배지 표시
+- [x] 프로필 탭 구독 관리 메뉴 추가 (수강권·입금 섹션 상단)
+- [x] `FreeLimitSheet` → 플랜 보기 네비게이션 연결
+- [x] GoRouter `/billing/plans` 라우트 등록
+- [x] AppStrings `billingManageSubscription` 추가
+- [x] 얼리어답터 Lifetime 199,000원 (90일 한정) 카드 UI 포함
+- [x] `flutter analyze` 신규 에러 0
 
 ## Phase D: BillingGuard 통합
 

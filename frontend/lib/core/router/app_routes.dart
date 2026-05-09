@@ -78,6 +78,9 @@ class AppRoutes {
   static const profilePreview = '/profile/preview';
   static const outstandingPayments = '/profile/outstanding-payments';
 
+  // Billing routes
+  static const billingPlans = '/billing/plans';
+
   // Student routes
   static const myTeachers = '/student/my-teachers';
   static const addManualTeacher = '/student/my-teachers/add';

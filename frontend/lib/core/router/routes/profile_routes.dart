@@ -16,6 +16,7 @@ import '../../../features/profile/presentation/screens/bank_account_edit_screen.
 import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
+import '../../../features/billing/presentation/screens/billing_plans_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
 import '../app_routes.dart';
@@ -143,5 +144,12 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.teacherAttendance,
     name: 'teacherAttendance',
     builder: (context, state) => const TeacherAttendanceScreen(),
+  ),
+
+  // Billing Plans (IAP subscription)
+  GoRoute(
+    path: AppRoutes.billingPlans,
+    name: 'billingPlans',
+    builder: (context, state) => const BillingPlansScreen(),
   ),
 ];

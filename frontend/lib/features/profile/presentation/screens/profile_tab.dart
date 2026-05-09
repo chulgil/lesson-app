@@ -14,6 +14,8 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../billing/presentation/providers/billing_provider.dart';
+import '../../../billing/presentation/widgets/billing_plan_badge.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -108,6 +110,12 @@ class ProfileTab extends ConsumerWidget {
           _buildMenuSection(
             title: AppStrings.profileSectionSubscriptionPayment,
             items: [
+              _MenuItem(
+                icon: Icons.workspace_premium_rounded,
+                label: AppStrings.billingManageSubscription,
+                subtitle: _billingSubtitle(ref),
+                onTap: () => context.push(AppRoutes.billingPlans),
+              ),
               _MenuItem(
                 icon: Icons.card_membership,
                 label: AppStrings.profileSubscriptionTemplateLabel,
@@ -351,7 +359,15 @@ class ProfileTab extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: AppTypography.headingMedium),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(name, style: AppTypography.headingMedium),
+                        ),
+                        const SizedBox(width: AppSpacing.space2),
+                        const BillingPlanBadge(),
+                      ],
+                    ),
                     if (email.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
@@ -742,6 +758,15 @@ class ProfileTab extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _billingSubtitle(WidgetRef ref) {
+    final status = ref.watch(billingStatusNotifierProvider).valueOrNull;
+    if (status == null || status.isFree) return 'Free 플랜';
+    if (status.isTrial && status.daysRemaining != null) {
+      return AppStrings.billingTrialDaysLeft(status.daysRemaining!);
+    }
+    return '${status.plan.toUpperCase()} 플랜';
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {

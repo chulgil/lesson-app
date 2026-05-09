@@ -6976,4 +6976,5 @@ class AppStrings {
   static String billingTrialDaysLeft(int days) => '체험 $days일 남음';
   static String billingDaysLeft(int days) => '$days일 남음';
   static const billingRestorePurchase = '구매 복원';
+  static const billingManageSubscription = '구독 관리';
 }

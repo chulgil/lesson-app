@@ -1,12 +1,14 @@
 // Billing providers for IAP subscription status and guard logic.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../students/students_facade.dart';
 import '../../data/repositories/mock_billing_repository.dart';
 import '../../data/repositories/remote_billing_repository.dart';
+import '../../data/services/iap_service.dart';
 import '../../domain/entities/billing_plan.dart';
 import '../../domain/repositories/billing_repository.dart';
 
@@ -94,4 +96,23 @@ bool billingLimitReached(Ref ref) {
 Future<List<BillingProduct>> billingProducts(Ref ref) async {
   final repo = ref.read(billingRepositoryProvider);
   return repo.getProducts();
+}
+
+/// IAP service singleton — manages store interactions.
+@Riverpod(keepAlive: true)
+IapService iapService(Ref ref) {
+  final repo = ref.read(billingRepositoryProvider);
+  final service = IapService(billingRepository: repo);
+  service.initialize();
+  ref.onDispose(service.dispose);
+  return service;
+}
+
+/// Store product details with real prices from App Store / Google Play.
+@riverpod
+Future<List<ProductDetails>> storeProducts(Ref ref) async {
+  final service = ref.read(iapServiceProvider);
+  final available = await service.isAvailable();
+  if (!available) return [];
+  return service.queryProducts();
 }

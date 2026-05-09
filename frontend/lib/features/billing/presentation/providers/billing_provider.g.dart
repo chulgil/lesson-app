@@ -62,6 +62,40 @@ final billingProductsProvider =
 );
 
 typedef BillingProductsRef = AutoDisposeFutureProviderRef<List<BillingProduct>>;
+String _$iapServiceHash() => r'4aef05cd33a4aec3937fb714d0a138c113d7effc';
+
+/// IAP service singleton — manages store interactions.
+///
+/// Copied from [iapService].
+@ProviderFor(iapService)
+final iapServiceProvider = Provider<IapService>.internal(
+  iapService,
+  name: r'iapServiceProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$iapServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef IapServiceRef = ProviderRef<IapService>;
+String _$storeProductsHash() => r'567f30066a70140ab299c2537333ec5921359cc7';
+
+/// Store product details with real prices from App Store / Google Play.
+///
+/// Copied from [storeProducts].
+@ProviderFor(storeProducts)
+final storeProductsProvider =
+    AutoDisposeFutureProvider<List<ProductDetails>>.internal(
+  storeProducts,
+  name: r'storeProductsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$storeProductsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef StoreProductsRef = AutoDisposeFutureProviderRef<List<ProductDetails>>;
 String _$billingStatusNotifierHash() =>
     r'7db5b27c4f4c97a230db73b94d4f889a3eb1cd6b';
 
