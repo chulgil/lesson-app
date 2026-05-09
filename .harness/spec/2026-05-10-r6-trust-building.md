@@ -11,7 +11,7 @@
 ## 2. 성공 기준 (측정 가능)
 
 - [ ] AC-1: `GET /api/v1/app/version` 이 latest, min, news, roadmap 을 JSON 으로 반환한다
-- [ ] AC-2: 앱 버전 < latest 이면 홈 대시보드 상단에 업데이트 배너가 노출된다
+- [ ] AC-2: 앱 버전 < latest 이면 로그인 화면에 업데이트 배너가 노출된다 (현재 위치 유지)
 - [ ] AC-3: 앱 버전 < min 이면 ForceUpdateScreen 이 홈을 차단한다
 - [ ] AC-4: 버전 체크 결과가 SharedPreferences 에 1시간 캐시된다
 - [ ] AC-5: 프로필 탭 지원 섹션에 "새 소식" 메뉴가 존재하고 탭하면 NewsRoadmapScreen 이 열린다
@@ -22,8 +22,9 @@
 
 ### 시나리오 1: 선택 업데이트 배너
 - Given: 사용자 앱 버전 1.0.0, 서버 latest 1.2.0, min 1.0.0
-- When: 홈 대시보드 진입
-- Then: 상단에 "새 버전 1.2.0" 배너 노출, 탭하면 새 소식 화면 이동
+- When: 로그인 화면 진입
+- Then: "새 버전 1.2.0" 배너 노출, 탭하면 새 소식 화면 이동
+- Note: 업무 화면(대시보드)에는 배너 미노출 — 사용자는 업무 중 앱 소식을 원하지 않음
 
 ### 시나리오 2: 강제 업데이트
 - Given: 사용자 앱 버전 0.9.0, 서버 min 1.0.0
@@ -215,7 +216,7 @@ class AppVersionSnapshot {
 - [ ] `ForceUpdateScreen` 위젯
 - [ ] 앱 시작 시 버전 체크 → 강제 업데이트 라우팅
 
-### Job 3: FE 프로필 메뉴 통합 + 배너 위치
+### Job 3: FE 프로필 메뉴 통합
 - [ ] 프로필 탭 지원 섹션에 "새 소식" 메뉴 추가
-- [ ] `AppUpdateBanner` 를 홈 dashboard_tab 에 배치 (login_screen 에서 제거)
+- [ ] `AppUpdateBanner` 는 로그인 화면 유지 (업무 화면에 앱 소식 미노출 원칙)
 - [ ] 라우트 연결 확인
