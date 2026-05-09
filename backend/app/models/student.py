@@ -50,7 +50,11 @@ class Student(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "students"
 
-    user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    user_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     teacher_id: Mapped[str | None] = mapped_column(
         String(36),
         ForeignKey("teachers.id", ondelete="RESTRICT"),

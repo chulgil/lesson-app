@@ -25,6 +25,15 @@ def test_student_teacher_fk_target_is_declared_in_model() -> None:
     assert table.c.teacher_id.nullable is True
 
 
+def test_student_user_fk_target_is_declared_in_model() -> None:
+    """Student account linkage should be FK-bound while allowing profile-only children."""
+    table = Base.metadata.tables["students"]
+    user_fk_targets = {fk.target_fullname: fk.ondelete for fk in table.c.user_id.foreign_keys}
+
+    assert user_fk_targets["users.id"] == "SET NULL"
+    assert table.c.user_id.nullable is True
+
+
 def test_student_teacher_fk_migration_is_chained_and_declares_constraint() -> None:
     """Alembic migration should explicitly add the nullable student teacher FK."""
     script = _script()
@@ -35,3 +44,15 @@ def test_student_teacher_fk_migration_is_chained_and_declares_constraint() -> No
     source = Path(rev.module.__file__).read_text()
     assert "fk_students_teacher_id_teachers" in source
     assert "nullable=True" in source
+
+
+def test_student_user_fk_migration_is_chained_and_declares_constraint() -> None:
+    """Alembic migration should explicitly add the nullable student user FK."""
+    script = _script()
+    rev = script.get_revision("add_student_user_fk")
+    assert rev is not None
+    assert rev.down_revision == "add_lesson_session_number"
+
+    source = Path(rev.module.__file__).read_text()
+    assert "fk_students_user_id_users" in source
+    assert "ondelete=\"SET NULL\"" in source

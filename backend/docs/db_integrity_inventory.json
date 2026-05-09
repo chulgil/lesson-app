@@ -15,9 +15,9 @@
       "table": "students",
       "column": "user_id",
       "target": "users.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P0",
-      "reason": "Student profiles can be linked to app accounts; nullable legacy rows need cleanup before FK enforcement."
+      "reason": "Student profiles can be linked to app accounts; profile-only children may keep user_id null."
     },
     {
       "domain": "identity",
