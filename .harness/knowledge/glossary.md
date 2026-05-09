@@ -1,6 +1,6 @@
 # 유비쿼터스 언어 (Ubiquitous Language)
 
-> 최종 업데이트: 2026-05-04
+> 최종 업데이트: 2026-05-10
 > 원본: `docs/specs/glossary.md` (관계/역할/UX 용어)
 > 본 문서: 전 도메인 통합 + FE-BE 명칭 매핑 + 코드 심볼 기준
 
@@ -132,10 +132,24 @@
 
 ---
 
+## 10. 앱 릴리즈 / 신뢰 구축 (App Release / Trust)
+
+| 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
+|------|------|-----------|-----------|------|
+| 앱 버전 스냅샷 | AppVersionSnapshot | `AppVersionSnapshot` | — | 현재/최신/빌드 버전 정보 |
+| 새 소식 | AppNewsItem | `AppNewsItem` | `AppNewsItem` | 변경 로그 항목 |
+| 로드맵 항목 | AppRoadmapItem | `AppRoadmapItem` | `AppRoadmapItem` | 개발 예정/진행중/완료 기능 |
+| 릴리즈 스냅샷 | AppReleaseSnapshot | `AppReleaseSnapshot` | — | 버전 + 뉴스 + 로드맵 통합 응답 |
+| 리뷰 상태 | AppReviewState | `AppReviewState` | — | 리뷰 프롬프트 이력 (Hive 로컬 저장) |
+| 로드맵 상태 | AppRoadmapStatus | `AppRoadmapStatus` | — | planned / inProgress / shipped |
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-05-10 | §10 앱 릴리즈/신뢰 구축: AppVersionSnapshot, AppNewsItem, AppRoadmapItem, AppReleaseSnapshot, AppReviewState 추가 (R6) |
 | 2026-05-07 | §7 알림: lessonCancelledByTeacher, teacherAnnouncement 이벤트 타입 추가 (일괄 작업 v2) |
 | 2026-05-07 | §2 체험레슨: 수강권 필수 명시 (유료 기본, 무료 선택), 변경/취소 정책 동일 적용 |
 | 2026-05-07 | §8 UX 용어: 퀘스트/코치마크/워크스루/셀레브레이션/프로필완성도 추가 (온보딩 v2) |
