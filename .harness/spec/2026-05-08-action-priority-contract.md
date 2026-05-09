@@ -13,7 +13,9 @@
   `OutlinedButton.icon`, `ElevatedButton.icon`에 의해 노출되는 `Icons.add` 기반 추가 CTA가
   중복되어 노출되지 않는다.
 - 중복이 필요한 화면은 없다면, 헤더 액션을 우선 추가 입구로 유지한다.
-- 헤더 액션이 없는 화면에서만 바디 내 add CTA(빈 상태 액션, FAB 등)를 허용한다.
+- 헤더 액션이 없는 화면에서만 `FloatingActionButton` + 본문 내 1차 추가 CTA(문구/아이콘에 `추가`가
+  포함된 액션) 허용을 허용한다.
+- 기존의 `FloatingActionButton`으로 구현된 추가 액션은 동일 화면 헤더 `+` 액션으로 통합한다.
 
 ## 적용 범위
 

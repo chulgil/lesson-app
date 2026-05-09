@@ -51,6 +51,13 @@ class _FeedbackTemplateManagementScreenState
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text(AppStrings.feedbackTemplateScreenTitle),
+        actions: [
+          IconButton(
+            onPressed: () => FeedbackTemplateFormSheet.show(context),
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.profileFeedbackTemplateAdd,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -67,11 +74,6 @@ class _FeedbackTemplateManagementScreenState
           _buildList(null),
           ...FeedbackCategory.values.map((cat) => _buildList(cat)),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => FeedbackTemplateFormSheet.show(context),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.profileFeedbackTemplateAdd),
       ),
     );
   }

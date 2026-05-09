@@ -31,16 +31,20 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.timeExceptionTitle)),
+      appBar: AppBar(
+        title: const Text(AppStrings.timeExceptionTitle),
+        actions: [
+          IconButton(
+            onPressed: () => _showAddExceptionDialog(),
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.addTimeException,
+          ),
+        ],
+      ),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _buildErrorState(error),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddExceptionDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.addTimeException),
       ),
     );
   }
@@ -109,8 +113,6 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             const SizedBox(height: AppSpacing.space3),
             ...past.map((e) => _buildExceptionCard(e, isPast: true)),
           ],
-
-          const SizedBox(height: 80), // Space for FAB
         ],
       ),
     );

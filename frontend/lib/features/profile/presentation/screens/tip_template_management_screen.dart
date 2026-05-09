@@ -50,6 +50,13 @@ class _TipTemplateManagementScreenState
           icon: const Icon(Icons.arrow_back),
         ),
         title: const Text(AppStrings.profileTipTemplateTitle),
+        actions: [
+          IconButton(
+            onPressed: _showAddTemplateDialog,
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.profileTipTemplateAdd,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -66,11 +73,6 @@ class _TipTemplateManagementScreenState
           _buildTemplateList(null),
           ...TipCategory.values.map((cat) => _buildTemplateList(cat)),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddTemplateDialog,
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.profileTipTemplateAdd),
       ),
     );
   }

@@ -30,6 +30,16 @@ class MyConnectionsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push(AppRoutes.invite),
+            icon: const Icon(Icons.add),
+            tooltip:
+                userRole == InviteUserRole.teacher
+                    ? AppStrings.studentAddLabel
+                    : AppStrings.inviteTeacher,
+          ),
+        ],
       ),
       body: connections.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -49,11 +59,6 @@ class MyConnectionsScreen extends ConsumerWidget {
             userRole,
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.invite),
-        icon: const Icon(Icons.person_add),
-        label: Text(userRole == InviteUserRole.teacher ? '학생 추가' : '선생님 추가'),
       ),
     );
   }

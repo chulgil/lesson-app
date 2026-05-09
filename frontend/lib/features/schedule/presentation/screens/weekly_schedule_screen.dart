@@ -30,16 +30,20 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.weeklyScheduleSetting)),
+      appBar: AppBar(
+        title: const Text(AppStrings.weeklyScheduleSetting),
+        actions: [
+          IconButton(
+            onPressed: () => _showAddScheduleDialog(),
+            icon: const Icon(Icons.add),
+            tooltip: AppStrings.addSchedule,
+          ),
+        ],
+      ),
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _buildErrorState(error),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddScheduleDialog(),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.addSchedule),
       ),
     );
   }
@@ -89,8 +93,6 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             final daySchedules = groupedSchedules[dayIndex] ?? [];
             return _buildDayRow(dayIndex, daySchedules);
           }),
-
-          const SizedBox(height: 80), // Space for FAB
         ],
       ),
     );

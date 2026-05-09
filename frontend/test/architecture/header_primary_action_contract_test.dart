@@ -89,7 +89,9 @@ bool _hasFloatingActionAdd(String source) {
   if (closeParen == -1) return false;
 
   final block = source.substring(fabIndex, closeParen + 1);
-  return _containsExactAddIcon(block);
+  return _containsExactAddIcon(block) ||
+      block.contains('Icons.person_add') ||
+      _containsExactAddText(block);
 }
 
 bool _hasEmptyStateAddAction(String source) {
@@ -135,6 +137,11 @@ bool _hasLabeledButtonAddAction(String source, String buttonType) {
 
 bool _containsExactAddIcon(String source) {
   return RegExp(r'Icons\.add(?![_a-zA-Z0-9])').hasMatch(source);
+}
+
+bool _containsExactAddText(String source) {
+  return source.contains('추가') ||
+      RegExp(r'AppStrings\.[a-zA-Z0-9_]*[Aa]dd').hasMatch(source);
 }
 
 int _findMatchingParen(String source, int openIndex) {
