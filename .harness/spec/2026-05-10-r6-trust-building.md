@@ -1,6 +1,6 @@
 # Spec — r6-trust-building
 
-> 날짜: 2026-05-10 | 상태: draft
+> 날짜: 2026-05-10 | 상태: locked
 > 인터뷰: .harness/interview/2026-05-10-r6-trust-building.md
 > 관련 스펙: docs/specs/settings/app_rating_prompt_spec.md (리뷰 프롬프트 v2 — 별도 완료)
 

@@ -1,4 +1,5 @@
 # Import all models so Alembic can detect them via Base.metadata
+from app.models.app_version import AppNews, AppRoadmap, AppVersion  # noqa: F401
 from app.models.base import Base  # noqa: F401
 from app.models.device_token import DeviceToken  # noqa: F401
 from app.models.gamification import GamificationBadge, GamificationPoint  # noqa: F401

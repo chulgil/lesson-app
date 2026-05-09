@@ -22,6 +22,7 @@ import asyncio
 SCENARIOS = {
     "schedule": "스케줄 (가용시간, 부킹, 레슨 요청)",
     "legacy-full": "기존 seed_data.py 전체 데이터 (레슨, 구독, 알림 등)",
+    "app-version": "앱 버전 + 새 소식 + 로드맵 (R6 신뢰구축)",
 }
 
 PRESETS = {
@@ -31,7 +32,7 @@ PRESETS = {
     },
     "full": {
         "description": "전체 데이터 (기존 seed_data.py + 스케줄)",
-        "scenarios": ["legacy-full", "schedule"],
+        "scenarios": ["legacy-full", "schedule", "app-version"],
     },
     "schedule-test": {
         "description": "스케줄 흐름 테스트 (계정 + 스케줄)",
@@ -50,12 +51,14 @@ async def run(
     from app.core.database import AsyncSessionLocal
 
     from scripts.seeds.base.accounts import seed_accounts
+    from scripts.seeds.scenarios.app_version import seed_app_version
     from scripts.seeds.scenarios.legacy_full import seed_legacy_full
     from scripts.seeds.scenarios.schedule import seed_schedule
 
     scenario_map = {
         "schedule": seed_schedule,
         "legacy-full": seed_legacy_full,
+        "app-version": seed_app_version,
     }
 
     async with AsyncSessionLocal() as session:
