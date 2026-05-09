@@ -60,7 +60,7 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
                     Icon(Icons.event_busy, color: AppColors.inkTertiary),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
-                      '예정된 레슨이 없습니다',
+                      AppStrings.studentUpcomingLessonsEmpty,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -147,7 +147,7 @@ class StudentRecentLessonsSection extends ConsumerWidget {
                     Icon(Icons.history, color: AppColors.inkTertiary),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
-                      '완료된 레슨이 없습니다',
+                      AppStrings.studentRecentLessonsEmpty,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),

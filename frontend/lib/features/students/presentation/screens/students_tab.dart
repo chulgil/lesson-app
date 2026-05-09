@@ -22,7 +22,6 @@ import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
-import 'announcement_history_screen.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
@@ -36,9 +35,9 @@ class StudentsTab extends ConsumerStatefulWidget {
 }
 
 enum StudentSortOption {
-  name('이름순'),
-  instrument('악기순'),
-  practiceStatus('연습상태별');
+  name(AppStrings.sortByName),
+  instrument(AppStrings.sortByInstrument),
+  practiceStatus(AppStrings.sortByPracticeStatus);
 
   final String label;
   const StudentSortOption(this.label);
@@ -244,7 +243,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         child: Row(
           children: [
             Text(
-              '${_selectedStudentIds.length}명 선택됨',
+              AppStrings.selectedCount(_selectedStudentIds.length),
               style: AppTypography.headingLarge,
             ),
             const Spacer(),
@@ -264,7 +263,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             TextButton(
               onPressed: _exitSelectionMode,
               child: Text(
-                '취소',
+                AppStrings.cancel,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -489,7 +488,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       child: Row(
         children: [
           Text(
-            '전체 $count명',
+            AppStrings.totalStudentCount(count),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -668,7 +667,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '${_selectedStudentIds.length}명 선택됨',
+                  AppStrings.selectedCount(_selectedStudentIds.length),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -691,11 +690,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   void _showAnnouncementHistory(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const AnnouncementHistoryScreen(),
-      ),
-    );
+    context.push(AppRoutes.announcementHistory);
   }
 
   void _onBulkMessage() async {
@@ -719,7 +714,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '데이터를 불러오는데 실패했습니다',
+            AppStrings.loadDataFailed,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -985,7 +980,7 @@ class _StudentCard extends ConsumerWidget {
             ),
             // Row 2: Schedule
             Text(
-              swm.lessonSchedule ?? '스케줄 미등록',
+              swm.lessonSchedule ?? AppStrings.studentNoSchedule,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -1034,7 +1029,7 @@ class _StudentCard extends ConsumerWidget {
                   border: Border.all(color: AppColors.paperAccent),
                 ),
                 child: Text(
-                  '입금대기(후불)',
+                  AppStrings.teacherWaitingPayment,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
@@ -1168,7 +1163,7 @@ class _EnrollmentExtras extends ConsumerWidget {
     final expiredDateText =
         latest?.endDate != null
             ? '${latest!.endDate!.year}-${latest.endDate!.month.toString().padLeft(2, '0')}-${latest.endDate!.day.toString().padLeft(2, '0')} 만료'
-            : '만료됨';
+            : AppStrings.subscriptionExpiredLabel;
     return Text(
       expiredDateText,
       style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),

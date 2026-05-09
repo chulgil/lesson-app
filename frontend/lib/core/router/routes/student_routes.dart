@@ -8,6 +8,7 @@ import '../../../features/lessons/presentation/screens/lesson_note_history_scree
 import '../../../features/gamification/presentation/screens/badge_collection_screen.dart';
 import '../../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../../features/students/presentation/screens/student_detail_screen.dart';
+import '../../../features/students/presentation/screens/announcement_history_screen.dart';
 import '../app_routes.dart';
 
 /// Student management routes
@@ -66,5 +67,12 @@ List<GoRoute> studentRoutes = [
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return BadgeCollectionScreen(studentId: studentId);
     },
+  ),
+
+  // Announcement History
+  GoRoute(
+    path: AppRoutes.announcementHistory,
+    name: 'announcementHistory',
+    builder: (context, state) => const AnnouncementHistoryScreen(),
   ),
 ];

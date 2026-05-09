@@ -168,4 +168,7 @@ class AppRoutes {
 
   // Assignment routes
   static const assignmentDashboard = '/assignments';
+
+  // Announcement routes
+  static const announcementHistory = '/students/announcement-history';
 }

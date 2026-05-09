@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
+import '../../../../auth/auth_facade.dart';
 import '../../../../practice/practice_facade.dart';
 import '../../../../practice/practice_ui_facade.dart';
 
@@ -348,7 +349,7 @@ class _RecordingTile extends ConsumerWidget {
               context,
               recording: recording,
               studentId: studentId,
-              teacherId: 'teacher_current',
+              teacherId: ref.read(currentUserIdProvider) ?? '',
             ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -479,15 +480,7 @@ class _DetailStatsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {
-        // TODO: Navigate to practice statistics detail screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.studentDetailStatsPreparing),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      },
+      onPressed: null,
       icon: const Icon(Icons.bar_chart_outlined, size: 18),
       label: const Text(AppStrings.studentDetailStatsButton),
       style: OutlinedButton.styleFrom(

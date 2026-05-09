@@ -255,7 +255,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 enabled: student.phone != null && student.phone!.isNotEmpty,
                 hint:
                     student.phone == null || student.phone!.isEmpty
-                        ? '전화번호 미등록'
+                        ? AppStrings.studentNoPhone
                         : null,
                 onTap: () {
                   Navigator.pop(context);
@@ -270,7 +270,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 enabled: student.phone != null && student.phone!.isNotEmpty,
                 hint:
                     student.phone == null || student.phone!.isEmpty
-                        ? '전화번호 미등록'
+                        ? AppStrings.studentNoPhone
                         : null,
                 onTap: () {
                   Navigator.pop(context);

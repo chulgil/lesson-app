@@ -6601,6 +6601,17 @@ class AppStrings {
   static const viewStudentDetail = '학생 상세 보기';
   static const studentDetailStatsPreparing = '상세 통계 기능은 준비 중입니다';
   static const studentDetailStatsButton = '상세 통계 보기';
+  static const studentNoPhone = '전화번호 미등록';
+  static const studentUpcomingLessonsEmpty = '예정된 레슨이 없습니다';
+  static const studentRecentLessonsEmpty = '완료된 레슨이 없습니다';
+  static const formSectionBasicInfo = '기본 정보';
+  static const formSectionGuardianInfo = '보호자 정보';
+  static const formSectionGuardianHint = '미성년 학생의 경우 입력해주세요';
+  static const formSectionAddress = '주소';
+  static const formSectionInstrument = '악기';
+  static const formSectionLevelTuition = '레벨 및 수강료';
+  static const formSectionSchedule = '레슨 일정';
+  static const formSectionNotes = '메모';
   static const studentStatTotalLessons = '총 레슨';
   static const studentStatThisMonth = '이번 달';
   static const studentStatWeeklyPractice = '주간 연습';
@@ -6907,4 +6918,12 @@ class AppStrings {
   static const tutorialTeacherNameLabel = '선생님 이름';
   static const tutorialTeacherNameHint = '예) 김선생';
   static const tutorialLessonNoteHint = '예) 오늘 연습한 내용과 다음 과제를 적어주세요.';
+
+  // ── Students tab ──
+  static String selectedCount(int count) => '$count명 선택됨';
+  static String totalStudentCount(int count) => '전체 $count명';
+  static const studentNoSchedule = '스케줄 미등록';
+  static const subscriptionExpiredLabel = '만료됨';
+  static const sortByInstrument = '악기순';
+  static const sortByPracticeStatus = '연습상태별';
 }

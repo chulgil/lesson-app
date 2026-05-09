@@ -147,7 +147,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
-                    '학생 정보를 불러올 수 없습니다',
+                    AppStrings.loadDataFailed,
                     style: TextStyle(color: AppColors.paperAccent),
                   ),
                   const SizedBox(height: AppSpacing.space3),
@@ -199,7 +199,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Basic info section
-                    const FormSectionTitle('기본 정보'),
+                    const FormSectionTitle(AppStrings.formSectionBasicInfo),
                     const SizedBox(height: AppSpacing.space3),
                     BasicInfoFields(
                       nameController: _nameController,
@@ -210,8 +210,8 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Parent/Guardian info section
-                    const FormSectionTitle('보호자 정보'),
-                    const FormSectionSubtitle('미성년 학생의 경우 입력해주세요'),
+                    const FormSectionTitle(AppStrings.formSectionGuardianInfo),
+                    const FormSectionSubtitle(AppStrings.formSectionGuardianHint),
                     const SizedBox(height: AppSpacing.space3),
                     ParentInfoFields(
                       parentNameController: _parentNameController,
@@ -221,7 +221,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Address section
-                    const FormSectionTitle('주소'),
+                    const FormSectionTitle(AppStrings.formSectionAddress),
                     const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
                     const SizedBox(height: AppSpacing.space3),
                     AddressFields(
@@ -233,7 +233,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Instrument section
-                    const FormSectionTitle('악기'),
+                    const FormSectionTitle(AppStrings.formSectionInstrument),
                     const SizedBox(height: AppSpacing.space3),
                     InstrumentSelector(
                       selectedInstrument: _selectedInstrument,
@@ -248,7 +248,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Level and tuition section
-                    const FormSectionTitle('레벨 및 수강료'),
+                    const FormSectionTitle(AppStrings.formSectionLevelTuition),
                     FormSectionSubtitle(
                       isLinked ? '수강권이 발급된 학생입니다' : '레벨에 따라 기본 수강료가 설정됩니다',
                     ),
@@ -289,7 +289,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Lesson schedule section
-                    const FormSectionTitle('레슨 일정'),
+                    const FormSectionTitle(AppStrings.formSectionSchedule),
                     const SizedBox(height: AppSpacing.space3),
                     ScheduleSection(
                       selectedDays: _selectedDays,
@@ -334,7 +334,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Notes section
-                    const FormSectionTitle('메모'),
+                    const FormSectionTitle(AppStrings.formSectionNotes),
                     const FormSectionSubtitle('레슨 시 참고할 내용을 입력해주세요'),
                     const SizedBox(height: AppSpacing.space3),
                     NotesField(controller: _notesController),
